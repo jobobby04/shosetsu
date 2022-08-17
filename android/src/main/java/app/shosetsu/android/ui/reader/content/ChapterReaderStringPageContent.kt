@@ -9,6 +9,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -62,7 +63,9 @@ fun ChapterReaderStringContent(
 	onClick: () -> Unit,
 	onDoubleClick: () -> Unit
 ) {
-	val content by getStringContent(item).collectAsState(AChapterReaderViewModel.ChapterPassage.Loading)
+	val content by remember(item) {
+		getStringContent(item)
+	}.collectAsState(AChapterReaderViewModel.ChapterPassage.Loading)
 
 	when (content) {
 		is AChapterReaderViewModel.ChapterPassage.Error -> {
@@ -92,10 +95,10 @@ fun ChapterReaderStringContent(
 			}
 		}
 		is AChapterReaderViewModel.ChapterPassage.Success -> {
-			val textSize by textSizeFlow().collectAsState(SettingKey.ReaderTextSize.default)
-			val textColor by textColorFlow().collectAsState(Color.White.toArgb())
-			val progress by progressFlow().collectAsState(0.0)
-			val backgroundColor by backgroundColorFlow().collectAsState(
+			val textSize by remember { textSizeFlow() }.collectAsState(SettingKey.ReaderTextSize.default)
+			val textColor by remember { textColorFlow() }.collectAsState(Color.White.toArgb())
+			val progress by remember { progressFlow() }.collectAsState(0.0)
+			val backgroundColor by remember { backgroundColorFlow() }.collectAsState(
 				Color.Gray.toArgb()
 			)
 

@@ -9,6 +9,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import app.shosetsu.android.R
@@ -47,16 +48,18 @@ import kotlinx.coroutines.flow.Flow
  */
 @Suppress("FunctionName")
 @Composable
-inline fun ChapterReaderHTMLContent(
+fun ChapterReaderHTMLContent(
 	item: ReaderUIItem.ReaderChapterUI,
 	progressFlow: () -> Flow<Double>,
 	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<AChapterReaderViewModel.ChapterPassage>,
-	crossinline retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
-	crossinline onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
-	crossinline onClick: () -> Unit,
-	crossinline onDoubleClick: () -> Unit
+	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
+	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
+	onClick: () -> Unit,
+	onDoubleClick: () -> Unit
 ) {
-	val html by getHTMLContent(item).collectAsState(AChapterReaderViewModel.ChapterPassage.Loading)
+	val html by remember(item) {
+		getHTMLContent(item)
+	}.collectAsState(AChapterReaderViewModel.ChapterPassage.Loading)
 
 	when (html) {
 		is AChapterReaderViewModel.ChapterPassage.Error -> {
@@ -81,7 +84,7 @@ inline fun ChapterReaderHTMLContent(
 			}
 		}
 		is AChapterReaderViewModel.ChapterPassage.Success -> {
-			val progress by progressFlow().collectAsState(0.0)
+			val progress by remember { progressFlow() }.collectAsState(0.0)
 			WebViewPageContent(
 				html = (html as AChapterReaderViewModel.ChapterPassage.Success).content,
 				progress = progress,
