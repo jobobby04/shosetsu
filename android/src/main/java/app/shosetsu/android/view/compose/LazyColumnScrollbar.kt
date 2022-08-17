@@ -9,13 +9,13 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
@@ -40,7 +40,7 @@ fun LazyColumnScrollbar(
 	Box {
 		content()
 		LazyColumnScrollbar(
-			modifier = modifier,
+			modifier = modifier.align(if (rightSide) Alignment.TopEnd else Alignment.TopStart),
 			listState = listState,
 			rightSide = rightSide,
 			thickness = thickness,
@@ -119,52 +119,44 @@ fun LazyColumnScrollbar(
 			delayMillis = if (isInAction) 0 else 500
 		)
 	)
+	val isThumbVisible = alpha > 0f
 
-	BoxWithConstraints(modifier.fillMaxWidth()) {
+	BoxWithConstraints(modifier.fillMaxHeight()) {
 
 		val dragState = rememberDraggableState { delta ->
 			setScrollOffset(dragOffset + delta / constraints.maxHeight.toFloat())
 		}
 
-		BoxWithConstraints(
+		Box(
 			Modifier
-				.align(if (rightSide) Alignment.TopEnd else Alignment.TopStart)
-				.alpha(alpha)
-				.fillMaxHeight()
+				.graphicsLayer {
+					translationY = constraints.maxHeight.toFloat() * normalizedOffsetPosition()
+				}
 				.draggable(
 					state = dragState,
 					orientation = Orientation.Vertical,
 					startDragImmediately = true,
-					onDragStarted = { offset ->
-						val newOffset = offset.y / constraints.maxHeight.toFloat()
-						val currentOffset = normalizedOffsetPosition()
-
-						if (currentOffset < newOffset && newOffset < currentOffset + normalizedThumbSize())
-							dragOffset = currentOffset
-						else
-							setScrollOffset(newOffset)
-
+					onDragStarted = {
 						isSelected = true
 					},
 					onDragStopped = {
 						isSelected = false
-					}
+					},
+					enabled = isThumbVisible,
+				)
+				.then(
+					// Exclude thumb from gesture area only when needed
+					if (isThumbVisible && !isSelected && !listState.isScrollInProgress) {
+						Modifier.systemGestureExclusion()
+					} else Modifier,
 				)
 				.absoluteOffset(x = if (rightSide) displacement.dp else -displacement.dp)
-		) {
+				.fillMaxHeight(normalizedThumbSize())
+				.padding(horizontal = padding)
+				.width(thickness)
+				.alpha(alpha)
+				.background(if (isSelected) thumbSelectedColor else thumbColor, shape = thumbShape)
 
-			Box(
-				Modifier
-					.align(Alignment.TopEnd)
-					.graphicsLayer {
-						translationY = constraints.maxHeight.toFloat() * normalizedOffsetPosition()
-					}
-					.padding(horizontal = padding)
-					.width(thickness)
-					.clip(thumbShape)
-					.background(if (isSelected) thumbSelectedColor else thumbColor)
-					.fillMaxHeight(normalizedThumbSize())
-			)
-		}
+		)
 	}
 }
