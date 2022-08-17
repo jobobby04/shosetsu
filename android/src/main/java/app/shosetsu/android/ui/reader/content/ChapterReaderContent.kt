@@ -1,10 +1,12 @@
 package app.shosetsu.android.ui.reader.content
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -98,6 +100,7 @@ fun ChapterReaderContent(
 	content: @Composable (PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit
 ) {
+	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
 
 	if (isFocused && isFirstFocus) {
@@ -110,6 +113,12 @@ fun ChapterReaderContent(
 					SnackbarResult.ActionPerformed -> onFirstFocus()
 				}
 			}
+		}
+	}
+
+	BackHandler(scaffoldState.bottomSheetState.isExpanded) {
+		scope.launch {
+			scaffoldState.bottomSheetState.collapse()
 		}
 	}
 
