@@ -2,7 +2,6 @@ package app.shosetsu.android.ui.reader.content
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.LinearProgressIndicator
@@ -10,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -84,14 +84,16 @@ fun ChapterReaderStringContent(
 				Color.Gray.toArgb()
 			)
 
-			Column {
-				LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-
-				Box(
+			Box(
+				Modifier
+					.background(Color(backgroundColor))
+					.fillMaxSize()
+			) {
+				LinearProgressIndicator(
 					modifier = Modifier
-						.background(Color(backgroundColor))
-						.fillMaxSize()
-				) { }
+						.fillMaxWidth()
+						.align(Alignment.TopCenter)
+				)
 			}
 		}
 		is AChapterReaderViewModel.ChapterPassage.Success -> {
@@ -112,12 +114,8 @@ fun ChapterReaderStringContent(
 				},
 				textColor = textColor,
 				backgroundColor = backgroundColor,
-				onClick = {
-					onClick()
-				},
-				onDoubleClick = {
-					onDoubleClick()
-				}
+				onClick = onClick,
+				onDoubleClick = onDoubleClick
 				//	isTapToScroll=isTapToScroll
 			)
 		}
