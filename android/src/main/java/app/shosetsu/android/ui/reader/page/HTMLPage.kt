@@ -2,15 +2,16 @@ package app.shosetsu.android.ui.reader.page
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.view.compose.ScrollStateBar
 import com.google.accompanist.web.AccompanistWebViewClient
@@ -59,12 +60,13 @@ fun WebViewPageContent(
 			}
 		}
 
+	val backgroundColor = MaterialTheme.colors.background
 	ScrollStateBar(scrollState) {
 		WebView(
 			state,
 			captureBackPresses = false,
 			onCreated = { webView ->
-				webView.setBackgroundColor(Color.BLACK)
+				webView.setBackgroundColor(backgroundColor.toArgb())
 				webView.settings.apply {
 					@SuppressLint("SetJavaScriptEnabled")
 					javaScriptEnabled = true
@@ -100,7 +102,7 @@ fun WebViewPageContent(
 						"""
 						window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
 						window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
-	""".trimIndent(), null
+						""".trimIndent(), null
 					)
 				}
 			}

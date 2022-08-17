@@ -2,14 +2,15 @@ package app.shosetsu.android.ui.reader.content
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import app.shosetsu.android.R
@@ -74,13 +75,16 @@ fun ChapterReaderHTMLContent(
 			)
 		}
 		AChapterReaderViewModel.ChapterPassage.Loading -> {
-			Column {
-				LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-				Box(
+			Box(
+				Modifier
+					.background(MaterialTheme.colors.background)
+					.fillMaxSize()
+			) {
+				LinearProgressIndicator(
 					modifier = Modifier
-						.background(Color.Black)
-						.fillMaxSize()
-				) {}
+						.fillMaxWidth()
+						.align(Alignment.TopCenter)
+				)
 			}
 		}
 		is AChapterReaderViewModel.ChapterPassage.Success -> {
@@ -91,12 +95,8 @@ fun ChapterReaderHTMLContent(
 				onScroll = {
 					onScroll(item, it)
 				},
-				onClick = {
-					onClick()
-				},
-				onDoubleClick = {
-					onDoubleClick()
-				}
+				onClick = onClick,
+				onDoubleClick = onDoubleClick
 			)
 		}
 	}
