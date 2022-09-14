@@ -427,9 +427,8 @@ class NovelController : ShosetsuController(),
 						novelInfo = novelInfo,
 						chapters = chapters,
 						selectedChaptersStateFlow = viewModel.selectedChaptersState,
-						itemAt,
-						updateItemAt = viewModel::setItemAt,
-						isRefreshing,
+						itemAt = itemAt,
+						isRefreshing = isRefreshing,
 						onRefresh = {
 							if (viewModel.isOnline())
 								refresh()
@@ -713,7 +712,6 @@ fun PreviewNovelInfoContent() {
 				MutableStateFlow(SelectedChaptersState())
 			},
 			itemAt = 0,
-			{},
 			isRefreshing = false,
 			onRefresh = {},
 			openWebView = {},
@@ -745,7 +743,6 @@ fun NovelInfoContent(
 	chapters: List<ChapterUI>?,
 	selectedChaptersStateFlow: StateFlow<SelectedChaptersState>,
 	itemAt: Int,
-	updateItemAt: (Int) -> Unit,
 	isRefreshing: Boolean,
 	onRefresh: () -> Unit,
 	openWebView: () -> Unit,
@@ -813,16 +810,6 @@ fun NovelInfoContent(
 							if (!state.isScrollInProgress)
 								state.scrollToItem(itemAt)
 						}
-					}
-
-					LaunchedEffect(state) {
-						snapshotFlow { state.layoutInfo.visibleItemsInfo.firstOrNull()?.index }
-							.distinctUntilChanged()
-							.collect { item ->
-								if (item == null) return@collect
-								println("Updating item at: $item")
-								updateItemAt(item)
-							}
 					}
 				}
 			}
