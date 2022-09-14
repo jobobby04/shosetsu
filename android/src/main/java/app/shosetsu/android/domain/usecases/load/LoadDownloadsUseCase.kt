@@ -6,8 +6,6 @@ import app.shosetsu.android.dto.convertList
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 
 /*
@@ -36,10 +34,7 @@ class LoadDownloadsUseCase(
 	private val iDownloadsRepository: IDownloadsRepository,
 ) {
 	@OptIn(ExperimentalCoroutinesApi::class)
-	operator fun invoke(): Flow<List<DownloadUI>> = flow {
-		emitAll(
-			iDownloadsRepository.loadDownloadsFlow().mapLatestToResultFlowWithFactory()
-				.mapLatest { it.convertList() }
-		)
-	}
+	operator fun invoke(): Flow<List<DownloadUI>> = iDownloadsRepository.loadDownloadsFlow()
+		.mapLatestToResultFlowWithFactory()
+		.mapLatest { it.convertList() }
 }

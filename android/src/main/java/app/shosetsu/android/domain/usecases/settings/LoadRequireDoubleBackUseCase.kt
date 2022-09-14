@@ -2,7 +2,7 @@ package app.shosetsu.android.domain.usecases.settings
 
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -28,6 +28,6 @@ import kotlinx.coroutines.flow.Flow
 class LoadRequireDoubleBackUseCase(
 	private val iSettingsRepository: ISettingsRepository
 ) {
-	operator fun invoke(): Flow<Boolean> =
+	operator fun invoke(): StateFlow<Boolean> =
 		iSettingsRepository.getBooleanFlow(SettingKey.RequireDoubleBackToExit)
 }

@@ -1,6 +1,6 @@
 package app.shosetsu.android.viewmodel.base
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -31,5 +31,5 @@ interface SubscribeViewModel<T> {
 	/**
 	 * LiveData of this class
 	 */
-	val liveData: Flow<T>
+	val liveData: StateFlow<T>
 }

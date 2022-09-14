@@ -7,6 +7,8 @@ import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -36,11 +38,11 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	 * If 0, Bottom
 	 * If 1, Drawer
 	 */
-	abstract val navigationStyle: NavigationStyle
+	abstract val navigationStyle: StateFlow<NavigationStyle>
 
-	abstract val appThemeLiveData: Flow<AppThemes>
+	abstract val appThemeLiveData: SharedFlow<AppThemes>
 
-	abstract val requireDoubleBackToExit: Boolean
+	abstract val requireDoubleBackToExit: StateFlow<Boolean>
 
 	/**
 	 * The user requests to update the app
@@ -70,7 +72,7 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 
 	}
 
-	abstract val backupProgressState: Flow<IBackupRepository.BackupProgress>
+	abstract val backupProgressState: StateFlow<IBackupRepository.BackupProgress>
 
 	/** If the application should show the show splash screen */
 	abstract suspend fun showIntro(): Boolean

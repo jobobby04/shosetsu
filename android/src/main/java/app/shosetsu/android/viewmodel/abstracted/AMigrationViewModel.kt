@@ -4,7 +4,7 @@ import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.view.uimodels.model.MigrationExtensionUI
 import app.shosetsu.android.view.uimodels.model.MigrationNovelUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -34,24 +34,24 @@ abstract class AMigrationViewModel : ShosetsuViewModel() {
 	/**
 	 * The query that is being used for the current novel to be searched for
 	 */
-	abstract val currentQuery: Flow<String>
+	abstract val currentQuery: StateFlow<String?>
 
 	/**
 	 * The extensions to select from
 	 */
-	abstract val extensions: Flow<List<MigrationExtensionUI>>
+	abstract val extensions: StateFlow<List<MigrationExtensionUI>>
 
 	/**
 	 * Novels that will be transfered
 	 */
-	abstract val novels: Flow<List<MigrationNovelUI>>
+	abstract val novels: StateFlow<List<MigrationNovelUI>>
 
 	/**
 	 * Which novel is currently being worked on
 	 */
-	abstract val which: Flow<Int>
+	abstract val which: StateFlow<Int>
 
-	abstract val results: Flow<List<StrippedBookmarkedNovelEntity>>
+	abstract val results: StateFlow<List<StrippedBookmarkedNovelEntity>>
 
 	/**
 	 * Set which novel is being worked on

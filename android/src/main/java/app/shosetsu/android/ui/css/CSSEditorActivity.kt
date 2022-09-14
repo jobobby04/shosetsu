@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -56,8 +57,8 @@ import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -87,11 +88,11 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 
 
 		setContent {
-			val cssTitle by viewModel.cssTitle.collectAsState(stringResource(R.string.loading))
+			val cssTitle by viewModel.cssTitle.collectAsState()
 
 
-			val isCSSInvalid by viewModel.isCSSValid.collectAsState(true)
-			val cssInvalidReason by viewModel.cssInvalidReason.collectAsState(null)
+			val isCSSInvalid by viewModel.isCSSValid.collectAsState()
+			val cssInvalidReason by viewModel.cssInvalidReason.collectAsState()
 
 			ShosetsuCompose {
 				CSSEditorContent(
@@ -144,7 +145,9 @@ fun PreviewCSSEditorContent() {
 	ShosetsuCompose {
 		CSSEditorContent(
 			"TestCSS",
-			flow { emit("") },
+			remember {
+				MutableStateFlow("")
+			},
 			onBack = {},
 			onNewText = {},
 			onUndo = {},
@@ -153,7 +156,9 @@ fun PreviewCSSEditorContent() {
 			cssInvalidReason = "This is not CSS",
 			onPaste = {},
 			onExport = {},
-			onHelp = {}
+			onHelp = {},
+			canRedoLive = remember { MutableStateFlow(true) },
+			canUndoLive = remember { MutableStateFlow(true) },
 		) {}
 	}
 }
@@ -161,7 +166,7 @@ fun PreviewCSSEditorContent() {
 @Composable
 fun CSSEditorContent(
 	cssTitle: String,
-	cssContentLive: Flow<String>,
+	cssContentLive: StateFlow<String>,
 	isCSSInvalid: Boolean,
 	cssInvalidReason: String? = null,
 	onBack: () -> Unit,
@@ -172,8 +177,8 @@ fun CSSEditorContent(
 	onPaste: () -> Unit,
 	onExport: () -> Unit,
 	hasPaste: Boolean = true,
-	canUndoLive: Flow<Boolean> = flow { emit(true) },
-	canRedoLive: Flow<Boolean> = flow { emit(true) },
+	canUndoLive: StateFlow<Boolean>,
+	canRedoLive: StateFlow<Boolean>,
 	onSave: () -> Unit
 ) {
 	val fabShape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50))
@@ -248,7 +253,7 @@ fun CSSEditorContent(
 						Row(
 							verticalAlignment = Alignment.CenterVertically,
 						) {
-							val canUndo by canUndoLive.collectAsState(false)
+							val canUndo by canUndoLive.collectAsState()
 							IconButton(onClick = onUndo, enabled = canUndo) {
 								Icon(
 									painterResource(R.drawable.ic_baseline_undo_24),
@@ -307,9 +312,9 @@ fun CSSEditorContent(
 		isFloatingActionButtonDocked = true,
 		floatingActionButtonPosition = FabPosition.Center
 	) {
-		val cssContent by cssContentLive.collectAsState("")
+		val cssContent by cssContentLive.collectAsState()
 
-		Column {
+		Column(Modifier.padding(it)) {
 			AndroidView(
 				factory = { context ->
 					WebView(context).apply {

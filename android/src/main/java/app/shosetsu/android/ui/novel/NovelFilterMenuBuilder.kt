@@ -21,7 +21,7 @@ import app.shosetsu.android.databinding.ControllerNovelInfoBottomMenu1Binding
 import app.shosetsu.android.databinding.ControllerNovelInfoBottomMenuBinding
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import org.acra.ACRA
 
 /*
@@ -52,7 +52,7 @@ class NovelFilterMenuBuilder(
 	private val inflater: LayoutInflater,
 	private val viewModel: ANovelViewModel
 ) {
-	private val novelSettingFlow: Flow<NovelSettingUI?> =
+	private val novelSettingFlow: SharedFlow<NovelSettingUI?> =
 		viewModel.novelSettingFlow
 
 	private fun updateNovelSetting(novelSettingUI: NovelSettingUI) =

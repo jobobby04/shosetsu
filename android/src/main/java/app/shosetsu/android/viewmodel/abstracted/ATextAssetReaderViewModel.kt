@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -34,12 +34,12 @@ abstract class ATextAssetReaderViewModel : ShosetsuViewModel(), SubscribeViewMod
 	/**
 	 * [LiveData] of text to display
 	 */
-	abstract override val liveData: Flow<String?>
+	abstract override val liveData: StateFlow<String?>
 
 	/**
 	 * [LiveData] of the current [TextAsset]
 	 */
-	abstract val targetLiveData: Flow<TextAsset?>
+	abstract val targetLiveData: StateFlow<TextAsset?>
 
 	/**
 	 * Set the target asset to read

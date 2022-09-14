@@ -18,7 +18,6 @@ import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_B
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.ui.reader.content.*
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
@@ -161,23 +160,22 @@ class ChapterReader
 		val insetsController = WindowInsetsControllerCompat(window, window.decorView)
 
 		setContent {
-			val items by viewModel.liveData.collectAsState(emptyList())
-			val isHorizontalReading by viewModel.isHorizontalReading.collectAsState(false)
-			val isBookmarked by viewModel.isCurrentChapterBookmarked.collectAsState(false)
-			val isRotationLocked by viewModel.liveIsScreenRotationLocked.collectAsState(false)
-			val isFocused by viewModel.isFocused.collectAsState(false)
-			val enableFullscreen by viewModel.enableFullscreen.collectAsState(true)
-			val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState(false)
-			val chapterType by viewModel.chapterType.collectAsState(null)
-			val currentChapterID by viewModel.currentChapterID.collectAsState(-1)
+			val items by viewModel.liveData.collectAsState()
+			val isHorizontalReading by viewModel.isHorizontalReading.collectAsState()
+			val isBookmarked by viewModel.isCurrentChapterBookmarked.collectAsState()
+			val isRotationLocked by viewModel.liveIsScreenRotationLocked.collectAsState()
+			val isFocused by viewModel.isFocused.collectAsState()
+			val enableFullscreen by viewModel.enableFullscreen.collectAsState()
+			val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
+			val chapterType by viewModel.chapterType.collectAsState()
+			val currentChapterID by viewModel.currentChapterID.collectAsState()
 			val isTTSCapable by isTTSCapable.collectAsState()
 			val isTTSPlaying by isTTSPlaying.collectAsState()
-			val setting by viewModel.getSettings()
-				.collectAsState(NovelReaderSettingEntity(-1, 0, 0.0F))
-			val currentPage by viewModel.currentPage.collectAsState(null)
+			val setting by viewModel.getSettings().collectAsState()
+			val currentPage by viewModel.currentPage.collectAsState()
 
-			val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState(false)
-			val isSwipeInverted by viewModel.isSwipeInverted.collectAsState(false)
+			val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
+			val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
 			//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
 
 			MdcTheme {
@@ -201,11 +199,12 @@ class ChapterReader
 							onPlayTTS = {
 								if (chapterType == null) return@ChapterReaderBottomSheetContent
 								items
+									.orEmpty()
 									.filterIsInstance<ReaderChapterUI>()
 									.find { it.id == currentChapterID }
 									?.let { item ->
-										tts.setPitch(viewModel.ttsPitch)
-										tts.setSpeechRate(viewModel.ttsSpeed)
+										tts.setPitch(viewModel.ttsPitch.value)
+										tts.setSpeechRate(viewModel.ttsSpeed.value)
 										when (chapterType!!) {
 											ChapterType.STRING -> {
 												viewModel.getChapterStringPassage(item)
@@ -265,7 +264,7 @@ class ChapterReader
 					content = { paddingValues ->
 						ChapterReaderPagerContent(
 							paddingValues = paddingValues,
-							items = items,
+							items = items.orEmpty(),
 							isHorizontal = isHorizontalReading,
 							isSwipeInverted = isSwipeInverted,
 							currentPage = currentPage,
@@ -279,7 +278,7 @@ class ChapterReader
 								tts.stop()
 							},
 							createPage = { page ->
-								when (val item = items[page]) {
+								when (val item = items.orEmpty()[page]) {
 									is ReaderChapterUI -> {
 										when (chapterType) {
 											ChapterType.STRING -> {
@@ -369,7 +368,7 @@ class ChapterReader
 	 * Adds the
 	 */
 	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-		return if (viewModel.isVolumeScrollEnabled)
+		return if (viewModel.isVolumeScrollEnabled.value)
 			when (keyCode) {
 				KeyEvent.KEYCODE_VOLUME_DOWN -> {
 					viewModel.incrementProgress()

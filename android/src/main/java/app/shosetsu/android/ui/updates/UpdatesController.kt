@@ -6,15 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
@@ -36,22 +28,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModel
-import app.shosetsu.android.view.compose.ErrorAction
-import app.shosetsu.android.view.compose.ErrorContent
-import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.compose.coverRatio
+import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
 import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import app.shosetsu.android.R
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
@@ -94,10 +82,8 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 		setViewTitle()
 		setContent {
 			ShosetsuCompose {
-				val items: Map<DateTime, List<UpdatesUI>> by viewModel.liveData.collectAsState(
-					emptyMap()
-				)
-				val isRefreshing by viewModel.isRefreshing.collectAsState(false)
+				val items: Map<DateTime, List<UpdatesUI>> by viewModel.liveData.collectAsState()
+				val isRefreshing by viewModel.isRefreshing.collectAsState()
 
 				UpdatesContent(
 					items = items,

@@ -158,7 +158,7 @@ fun AdvancedSettingsContent(
 	) {
 		item {
 			val choice by viewModel.settingsRepo.getIntFlow(AppTheme)
-				.collectAsState(AppTheme.default)
+				.collectAsState()
 
 			DropdownSettingContent(
 				title = stringResource(R.string.theme),

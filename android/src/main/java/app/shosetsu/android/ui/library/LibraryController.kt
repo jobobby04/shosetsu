@@ -100,14 +100,14 @@ class LibraryController
 		return ComposeView(requireContext()).apply {
 			setContent {
 				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState(emptyList())
-					val isEmpty by viewModel.isEmptyFlow.collectAsState(false)
-					val hasSelected by viewModel.hasSelectionFlow.collectAsState(false)
-					val type by viewModel.novelCardTypeFlow.collectAsState(NORMAL)
-					val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState(true)
+					val items by viewModel.liveData.collectAsState()
+					val isEmpty by viewModel.isEmptyFlow.collectAsState()
+					val hasSelected by viewModel.hasSelection.collectAsState()
+					val type by viewModel.novelCardTypeFlow.collectAsState()
+					val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
 
-					val columnsInV by viewModel.columnsInV.collectAsState(SettingKey.ChapterColumnsInPortait.default)
-					val columnsInH by viewModel.columnsInH.collectAsState(SettingKey.ChapterColumnsInLandscape.default)
+					val columnsInV by viewModel.columnsInV.collectAsState()
+					val columnsInH by viewModel.columnsInH.collectAsState()
 
 					BackHandler(hasSelected) {
 						viewModel.deselectAll()
@@ -172,13 +172,13 @@ class LibraryController
 			else fab?.show()
 		}
 
-		viewModel.hasSelectionFlow.collectLatestLA(this, catch = {}) {
+		viewModel.hasSelection.collectLatestLA(this, catch = {}) {
 			activity?.invalidateOptionsMenu()
 		}
 	}
 
 	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-		if (!viewModel.hasSelection) {
+		if (!viewModel.hasSelection.value) {
 			inflater.inflate(R.menu.toolbar_library, menu)
 		} else {
 			inflater.inflate(R.menu.toolbar_library_selected, menu)

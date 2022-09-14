@@ -8,10 +8,7 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.StyleEntity
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 /*
@@ -43,8 +40,17 @@ class CSSEditorViewModel(
 ) : ACSSEditorViewModel() {
 	private val undoStack by lazy { Stack<String>() }
 	private val redoStack by lazy { Stack<String>() }
-	private val cssIDFlow by lazy { MutableStateFlow(-2) }
-	private val cssContentFlow by lazy { MutableStateFlow("") }
+	private val cssIDFlow = MutableStateFlow(-2)
+
+
+	override val cssContent = MutableStateFlow("")
+	override val cssTitle: StateFlow<String> by lazy {
+		styleFlow.map { it.title }.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, app.resources.getString(R.string.loading))
+	}
+	override val isCSSValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
+	override val cssInvalidReason: MutableStateFlow<String?> = MutableStateFlow(null)
+	override val canRedo: MutableStateFlow<Boolean> = MutableStateFlow(false)
+	override val canUndo: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	private val styleFlow by lazy {
 		cssIDFlow.map { id ->
@@ -55,58 +61,55 @@ class CSSEditorViewModel(
 		}
 	}
 
-	private val canUndoFlow by lazy { MutableStateFlow(false) }
-	private val canRedoFlow by lazy { MutableStateFlow(false) }
-
 	override fun undo() {
 		logI("Undo")
-		redoStack.add(cssContentFlow.value) // Save currentText as a redo action
-		canRedoFlow.value = true
-		cssContentFlow.value = undoStack.pop()
+		redoStack.add(cssContent.value) // Save currentText as a redo action
+		canRedo.value = true
+		cssContent.value = undoStack.pop()
 		if (undoStack.size == 0) {
-			canUndoFlow.value = false
+			canUndo.value = false
 		}
 	}
 
 	override fun redo() {
 		logI("Redo")
-		undoStack.add(cssContentFlow.value)
-		canUndoFlow.value = true
-		cssContentFlow.value = redoStack.pop()
+		undoStack.add(cssContent.value)
+		canUndo.value = true
+		cssContent.value = redoStack.pop()
 		if (redoStack.size == 0) {
-			canRedoFlow.value = false
+			canRedo.value = false
 		}
 	}
 
 	override fun write(content: String) {
 		launchIO {
 			if (undoStack.size > 0 && undoStack.peek() == content) return@launchIO // ignore if nothing changed
-			undoStack.add(cssContentFlow.value)
-			canUndoFlow.value = true
+			undoStack.add(cssContent.value)
+			canUndo.value = true
 			redoStack.clear()
-			canRedoFlow.value = false
+			canRedo.value = false
 		}
-		cssContentFlow.value = content
+		cssContent.value = content
 	}
 
 	override fun saveCSS() {
 		launchIO {
-			settingsRepo.setString(SettingKey.ReaderHtmlCss, cssContentFlow.value)
+			settingsRepo.setString(SettingKey.ReaderHtmlCss, cssContent.value)
 		}
 	}
 
 	override fun appendText(pasteContent: String) {
-		val value = cssContentFlow.value
+		val value = cssContent.value
 		val combined = value + pasteContent
 		if (value == combined) return // ignore paste if the old value equals paste
 		launchIO {
 			if (undoStack.size > 0 && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
 			undoStack.add(value)
-			canUndoFlow.value = true
+			canUndo.value = true
 			redoStack.clear()
-			canRedoFlow.value = false
+			canRedo.value = false
 		}
-		cssContentFlow.value = combined
+		cssContent.value = combined
 	}
 
 	override fun setCSSId(int: Int) {
@@ -114,7 +117,7 @@ class CSSEditorViewModel(
 			if (int != cssIDFlow.value) {
 				undoStack.clear()
 				redoStack.clear()
-				cssContentFlow.value = ""
+				cssContent.value = ""
 				cssIDFlow.value = int
 			}
 		}
@@ -125,22 +128,10 @@ class CSSEditorViewModel(
 			styleFlow.collect { result ->
 				result.let {
 					settingsRepo.getString(SettingKey.ReaderHtmlCss).let {
-						cssContentFlow.value = it
+						cssContent.value = it
 					}
 				}
 			}
 		}
 	}
-
-	override val cssContent: Flow<String> by lazy { cssContentFlow.map { it } }
-
-	override val cssTitle: Flow<String> by lazy { styleFlow.map { it.title } }
-
-	override val isCSSValid: Flow<Boolean> by lazy { flow { emit(true) } }
-
-	override val cssInvalidReason: Flow<String?> by lazy { flow { emit(null) } }
-
-	override val canRedo: Flow<Boolean> by lazy { canRedoFlow }
-
-	override val canUndo: Flow<Boolean> by lazy { canUndoFlow }
 }

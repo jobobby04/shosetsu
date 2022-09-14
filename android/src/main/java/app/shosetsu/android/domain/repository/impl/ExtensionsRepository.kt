@@ -46,7 +46,7 @@ class ExtensionsRepository(
 	@Throws(SQLiteException::class)
 	@OptIn(ExperimentalCoroutinesApi::class)
 	override fun loadBrowseExtensions(): Flow<List<BrowseExtensionEntity>> {
-		return repoDBSource.loadExtensionsFlow().transformLatest { list ->
+		return repoDBSource.loadExtensionsFlow().flatMapLatest { list ->
 
 			val browseExtensions = list.groupBy { it.id }.map { (extId, matchingExtensions) ->
 				installedDBSource.loadExtensionLive(extId).map { installedExt ->
@@ -87,7 +87,7 @@ class ExtensionsRepository(
 				}
 			}
 
-			emitAll(combine(browseExtensions) { it.toList() })
+			combine(browseExtensions) { it.toList() }
 		}.distinctUntilChanged().onIO()
 	}
 

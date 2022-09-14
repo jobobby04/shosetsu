@@ -55,7 +55,7 @@ import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDownloadsState
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Shosetsu
@@ -81,8 +81,8 @@ class DownloadsController : ShosetsuController(),
 		return ComposeView(requireContext()).apply {
 			setContent {
 				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState(emptyList())
-					val hasSelected by viewModel.hasSelectedFlow.collectAsState(false)
+					val items by viewModel.liveData.collectAsState()
+					val hasSelected by viewModel.hasSelectedFlow.collectAsState()
 
 					DownloadsContent(
 						items = items,
@@ -207,7 +207,7 @@ class DownloadsController : ShosetsuController(),
 @Composable
 fun DownloadsContent(
 	items: List<DownloadUI>,
-	selectedDownloadStateFlow: Flow<SelectedDownloadsState>,
+	selectedDownloadStateFlow: StateFlow<SelectedDownloadsState>,
 	hasSelected: Boolean,
 	pauseSelection: () -> Unit,
 	startSelection: () -> Unit,

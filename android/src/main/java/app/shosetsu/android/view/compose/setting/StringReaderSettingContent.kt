@@ -59,7 +59,7 @@ fun StringSettingContent(
 	key: SettingKey<String>,
 	modifier: Modifier = Modifier,
 ) {
-	val value by repo.getStringFlow(key).collectAsState(key.default)
+	val value by repo.getStringFlow(key).collectAsState()
 
 	Column {
 		TextField(

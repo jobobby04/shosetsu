@@ -1,19 +1,15 @@
 package app.shosetsu.android.viewmodel.impl
 
-import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.trimDate
-import app.shosetsu.android.domain.model.local.UpdateCompleteEntity
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.load.LoadUpdatesUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateChapterUseCase
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
 import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import org.joda.time.DateTime
 
 /*
@@ -47,7 +43,7 @@ class UpdatesViewModel(
 	private val isOnlineUseCase: IsOnlineUseCase,
 	private val updateChapterUseCase: UpdateChapterUseCase
 ) : AUpdatesViewModel() {
-	override val liveData: Flow<Map<DateTime, List<UpdatesUI>>> by lazy {
+	override val liveData: StateFlow<Map<DateTime, List<UpdatesUI>>> by lazy {
 		getUpdatesUseCase().transformLatest {
 			isRefreshing.value = true
 			emit(it.ifEmpty { emptyList() }.sortedByDescending { it.time })
@@ -56,14 +52,14 @@ class UpdatesViewModel(
 			result.groupBy {
 				DateTime(it.time).trimDate()
 			}
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyMap())
 	}
 
 	override fun startUpdateManager() = startUpdateWorkerUseCase()
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
-	override val isRefreshing: MutableStateFlow<Boolean> by lazy { MutableStateFlow(false) }
+	override val isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	override suspend fun updateChapter(
 		updateUI: UpdatesUI,

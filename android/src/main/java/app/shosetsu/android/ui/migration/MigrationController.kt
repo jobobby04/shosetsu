@@ -92,9 +92,9 @@ class MigrationController : ShosetsuController() {
 
 @Composable
 fun MigrationContent(viewModel: AMigrationViewModel) {
-	val novelList by viewModel.novels.collectAsState(emptyList())
-	val extensionsToSelect by viewModel.extensions.collectAsState(initial = emptyList())
-	val currentQuery by viewModel.currentQuery.collectAsState(null)
+	val novelList by viewModel.novels.collectAsState()
+	val extensionsToSelect by viewModel.extensions.collectAsState()
+	val currentQuery by viewModel.currentQuery.collectAsState()
 
 	Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
 		// Novels that the user selected to transfer

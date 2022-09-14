@@ -90,20 +90,16 @@ class DownloadsViewModel(
 		it.status == DownloadStatus.DOWNLOADING
 	})
 
-	private val downloadsFlow by lazy {
-		flow {
-			emitAll(getDownloadsUseCase().mapLatest { list ->
-				list.sort()
-			}.combine(selectedDownloads) { list, map ->
-				list.map {
-					it.copy(isSelected = map.getOrElse(it.chapterID) { false })
-				}
-			})
-		}
+	override val liveData: StateFlow<List<DownloadUI>> by lazy {
+		getDownloadsUseCase().combine(selectedDownloads) { list, map ->
+			list.sort().map {
+				it.copy(isSelected = map.getOrElse(it.chapterID) { false })
+			}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
-	override val selectedDownloadState: Flow<SelectedDownloadsState> by lazy {
-		downloadsFlow.map { downloads ->
+	override val selectedDownloadState: StateFlow<SelectedDownloadsState> by lazy {
+		liveData.map { downloads ->
 			val selectedDownloads = downloads.filter { it.isSelected }
 
 			SelectedDownloadsState(
@@ -123,22 +119,18 @@ class DownloadsViewModel(
 							(isDownloadPaused.first() && it.status == DownloadStatus.DOWNLOADING)
 				}
 			)
-		}.onIO()
-	}
-
-	override val liveData: Flow<List<DownloadUI>> by lazy {
-		downloadsFlow
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, SelectedDownloadsState())
 	}
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
-	override val isDownloadPaused: Flow<Boolean> by lazy {
-		settings.getBooleanFlow(IsDownloadPaused).onIO()
+	override val isDownloadPaused: StateFlow<Boolean> by lazy {
+		settings.getBooleanFlow(IsDownloadPaused)
 	}
-	override val hasSelectedFlow: Flow<Boolean> by lazy {
+	override val hasSelectedFlow: StateFlow<Boolean> by lazy {
 		selectedDownloads.mapLatest { map ->
 			map.values.any { it }
-		}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
 	override fun togglePause() {
@@ -154,7 +146,7 @@ class DownloadsViewModel(
 		launchIO {
 			pauseAndWait()
 
-			downloadsFlow.first { it.isNotEmpty() }.let { list ->
+			liveData.first { it.isNotEmpty() }.let { list ->
 				list.forEach { deleteDownloadUseCase(it) }
 			}
 		}

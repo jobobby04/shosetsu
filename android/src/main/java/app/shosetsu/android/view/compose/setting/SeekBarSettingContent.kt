@@ -24,7 +24,7 @@ fun SliderSettingContent(
 	manipulateUpdate: ((Int) -> Int)? = null,
 	maxHeaderSize: Dp? = null
 ) {
-	val choice by repo.getIntFlow(key).collectAsState(key.default)
+	val choice by repo.getIntFlow(key).collectAsState()
 
 	GenericBottomSettingLayout(
 		title,
@@ -62,7 +62,7 @@ fun FloatSliderSettingContent(
 	flip: Boolean = false,
 	maxHeaderSize: Dp? = null
 ) {
-	val choice by repo.getFloatFlow(key).collectAsState(key.default)
+	val choice by repo.getFloatFlow(key).collectAsState()
 
 	GenericBottomSettingLayout(
 		title,

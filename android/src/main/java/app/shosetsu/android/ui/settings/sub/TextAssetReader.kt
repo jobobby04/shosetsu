@@ -56,7 +56,7 @@ class TextAssetReader : ShosetsuController() {
 		savedViewState: Bundle?
 	): View = ComposeView(requireContext()).apply {
 		setContent {
-			val content by viewModel.liveData.collectAsState(initial = null)
+			val content by viewModel.liveData.collectAsState()
 			ShosetsuCompose {
 				TextAssetReaderContent(content)
 			}

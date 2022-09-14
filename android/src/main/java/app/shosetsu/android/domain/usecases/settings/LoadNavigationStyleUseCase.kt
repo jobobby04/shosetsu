@@ -2,7 +2,7 @@ package app.shosetsu.android.domain.usecases.settings
 
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -28,5 +28,5 @@ import kotlinx.coroutines.flow.Flow
 class LoadNavigationStyleUseCase(
 	private val iSettingsRepository: ISettingsRepository
 ) {
-	operator fun invoke(): Flow<Int> = iSettingsRepository.getIntFlow(SettingKey.NavStyle)
+	operator fun invoke(): StateFlow<Int> = iSettingsRepository.getIntFlow(SettingKey.NavStyle)
 }

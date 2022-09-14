@@ -30,7 +30,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.enums.NovelCardType
@@ -95,15 +94,15 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 		return ComposeView(requireContext()).apply {
 			setContent {
 				ShosetsuCompose {
-					val type by viewModel.novelCardTypeLive.collectAsState(NORMAL)
+					val type by viewModel.novelCardTypeLive.collectAsState()
 
-					val columnsInV by viewModel.columnsInV.collectAsState(SettingKey.ChapterColumnsInPortait.default)
-					val columnsInH by viewModel.columnsInH.collectAsState(SettingKey.ChapterColumnsInLandscape.default)
+					val columnsInV by viewModel.columnsInV.collectAsState()
+					val columnsInH by viewModel.columnsInH.collectAsState()
 
 					val items = viewModel.itemsLive.collectAsLazyPagingItems()
 
-					val exception by viewModel.exceptionFlow.collectAsState(null)
-					val hasFilters by viewModel.hasFilters.collectAsState(false)
+					val exception by viewModel.exceptionFlow.collectAsState()
+					val hasFilters by viewModel.hasFilters.collectAsState()
 
 					if (exception != null)
 						LaunchedEffect(Unit) {
@@ -365,7 +364,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 						ComposeView((view ?: return@apply).context).apply {
 							setContent {
 								ShosetsuCompose((view ?: return@setContent).context) {
-									val items by viewModel.filterItemsLive.collectAsState(emptyList())
+									val items by viewModel.filterItemsLive.collectAsState()
 									CatalogFilterMenu(
 										items = items,
 										getBoolean = viewModel::getFilterBooleanState,

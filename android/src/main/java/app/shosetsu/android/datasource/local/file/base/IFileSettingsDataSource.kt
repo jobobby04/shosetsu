@@ -1,7 +1,7 @@
 package app.shosetsu.android.datasource.local.file.base
 
 import app.shosetsu.android.common.SettingKey
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -28,17 +28,17 @@ interface IFileSettingsDataSource {
 
 	// Observe
 
-	fun observeLong(name: String, key: SettingKey<Long>): Flow<Long>
+	fun observeLong(name: String, key: SettingKey<Long>): StateFlow<Long>
 
-	fun observeString(name: String, key: SettingKey<String>): Flow<String>
+	fun observeString(name: String, key: SettingKey<String>): StateFlow<String>
 
-	fun observeInt(name: String, key: SettingKey<Int>): Flow<Int>
+	fun observeInt(name: String, key: SettingKey<Int>): StateFlow<Int>
 
-	fun observeBoolean(name: String, key: SettingKey<Boolean>): Flow<Boolean>
+	fun observeBoolean(name: String, key: SettingKey<Boolean>): StateFlow<Boolean>
 
-	fun observeStringSet(name: String, key: SettingKey<Set<String>>): Flow<Set<String>>
+	fun observeStringSet(name: String, key: SettingKey<Set<String>>): StateFlow<Set<String>>
 
-	fun observeFloat(name: String, key: SettingKey<Float>): Flow<Float>
+	fun observeFloat(name: String, key: SettingKey<Float>): StateFlow<Float>
 
 	// Get
 

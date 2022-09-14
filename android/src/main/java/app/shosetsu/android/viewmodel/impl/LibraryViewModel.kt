@@ -18,6 +18,7 @@ package app.shosetsu.android.viewmodel.impl
  */
 
 import androidx.compose.ui.state.ToggleableState
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.InclusionState
 import app.shosetsu.android.common.enums.InclusionState.EXCLUDE
 import app.shosetsu.android.common.enums.InclusionState.INCLUDE
@@ -27,11 +28,7 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
-import app.shosetsu.android.domain.usecases.load.LoadLibraryUseCase
-import app.shosetsu.android.domain.usecases.load.LoadNovelUIBadgeToastUseCase
-import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
-import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsPUseCase
-import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
+import app.shosetsu.android.domain.usecases.load.*
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
@@ -39,7 +36,6 @@ import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import java.util.Locale.getDefault as LGD
 
 /**
@@ -71,7 +67,7 @@ class LibraryViewModel(
 
 	override fun selectAll() {
 		launchIO {
-			val list = liveData.first()
+			val list = liveData.value
 			val selection = copySelected()
 
 			list.forEach {
@@ -125,7 +121,7 @@ class LibraryViewModel(
 
 	override fun invertSelection() {
 		launchIO {
-			val list = liveData.first()
+			val list = liveData.value
 			val selection = copySelected()
 
 			list.forEach {
@@ -138,21 +134,17 @@ class LibraryViewModel(
 
 	private val librarySourceFlow: Flow<List<LibraryNovelUI>> by lazy { libraryAsCardsUseCase() }
 
-	override val isEmptyFlow: Flow<Boolean> by lazy {
+	override val isEmptyFlow: StateFlow<Boolean> by lazy {
 		librarySourceFlow.map {
 			it.isEmpty()
-		}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val hasSelectionFlow: Flow<Boolean> by lazy {
+	override val hasSelection: StateFlow<Boolean> by lazy {
 		selectedNovels.mapLatest { map ->
-			val b = map.values.any { it }
-			hasSelection = b
-			b
-		}
+			map.values.any { it }
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
-
-	override var hasSelection: Boolean = false
 
 	override val genresFlow: Flow<List<String>> by lazy {
 		stripOutList { it.genres }
@@ -170,8 +162,10 @@ class LibraryViewModel(
 		stripOutList { it.artists }
 	}
 
-	override val novelCardTypeFlow: Flow<NovelCardType> by lazy {
+	override val novelCardTypeFlow: StateFlow<NovelCardType> by lazy {
 		loadNovelUITypeUseCase()
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelCardType.NORMAL)
 	}
 
 	private val novelSortTypeFlow: MutableStateFlow<NovelSortType> by lazy {
@@ -213,7 +207,7 @@ class LibraryViewModel(
 	 *
 	 * This also connects all the filtering as well
 	 */
-	override val liveData: Flow<List<LibraryNovelUI>> by lazy {
+	override val liveData: StateFlow<List<LibraryNovelUI>> by lazy {
 		librarySourceFlow
 			.combineSelection()
 			.combineArtistFilter()
@@ -223,19 +217,23 @@ class LibraryViewModel(
 			.combineUnreadStatus()
 			.combineSortType()
 			.combineSortReverse()
-			.combineFilter().onIO()
+			.combineFilter()
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
 	override val columnsInH by lazy {
 		loadNovelUIColumnsH().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInLandscape.default)
 	}
 
 	override val columnsInV by lazy {
 		loadNovelUIColumnsP().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInPortait.default)
 	}
 
 	override val badgeUnreadToastFlow by lazy {
-		loadNovelUIBadgeToast().onIO()
+		loadNovelUIBadgeToast()
 	}
 
 	/**
@@ -367,7 +365,7 @@ class LibraryViewModel(
 
 	override fun removeSelectedFromLibrary() {
 		launchIO {
-			val selected = liveData.first().filter { it.isSelected }
+			val selected = liveData.value.filter { it.isSelected }
 			clearSelected()
 			updateBookmarkedNovelUseCase(selected.map {
 				it.copy(bookmarked = false)

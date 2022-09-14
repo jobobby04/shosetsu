@@ -4,7 +4,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.common.enums.ChapterSortType
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
@@ -32,10 +31,8 @@ import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
 import io.github.g0dkar.qrcode.QRCode
 import io.github.g0dkar.qrcode.render.QRCodeCanvasFactory
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 
 /*
  * This file is part of shosetsu.
@@ -90,12 +87,27 @@ class NovelViewModel(
 
 	override val otherException: MutableStateFlow<Throwable?> = MutableStateFlow(null)
 
-	override val chaptersLive: Flow<List<ChapterUI>> by lazy {
-		chaptersFlow.onIO()
+	override val isRefreshing = MutableStateFlow(false)
+
+	private val novelIDLive = MutableStateFlow(-1)
+
+	override val chaptersLive: StateFlow<List<ChapterUI>> by lazy {
+		novelIDLive.flatMapLatest { id: Int ->
+			getChapterUIsUseCase(id)
+				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
+				.combineBookmarked()
+				.combineDownloaded()
+				.combineStatus()
+				.combineSort()
+				.combineReverse()
+				.combineSelection()
+		}.catch {
+			chaptersException.value = it
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
-	override val selectedChaptersState: Flow<SelectedChaptersState> by lazy {
-		chaptersFlow.map { rawChapters ->
+	override val selectedChaptersState: StateFlow<SelectedChaptersState> by lazy {
+		chaptersLive.map { rawChapters ->
 			val chapters = rawChapters.filter { it.isSelected }
 			SelectedChaptersState(
 				showRemoveBookmark = chapters.any { it.bookmarked },
@@ -105,16 +117,16 @@ class NovelViewModel(
 				showMarkAsRead = chapters.any { it.readingStatus != ReadingStatus.READ },
 				showMarkAsUnread = chapters.any { it.readingStatus != ReadingStatus.UNREAD }
 			)
-		}.onIO()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, SelectedChaptersState())
 	}
 
 	private val selectedChapters = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
 
-	private suspend fun copySelected(): HashMap<Int, Boolean> =
-		selectedChapters.first().copy()
+	private fun copySelected(): HashMap<Int, Boolean> =
+		selectedChapters.value.copy()
 
-	private suspend fun getSelectedIds(): List<Int> =
-		selectedChapters.first().filter { it.value }.map { it.key }
+	private fun getSelectedIds(): List<Int> =
+		selectedChapters.value.filter { it.value }.map { it.key }
 
 	override fun clearSelection() {
 		launchIO {
@@ -126,25 +138,10 @@ class NovelViewModel(
 		selectedChapters.value = emptyMap()
 	}
 
-	private val chaptersFlow: Flow<List<ChapterUI>> by lazy {
-		novelIDLive.transformLatest { id: Int ->
-			emitAll(
-				getChapterUIsUseCase(id)
-					.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
-					.combineBookmarked()
-					.combineDownloaded()
-					.combineStatus()
-					.combineSort()
-					.combineReverse()
-					.combineSelection()
-			)
-		}.catch {
-			chaptersException.value = it
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
-	}
-
-	override val novelSettingFlow: Flow<NovelSettingUI?> by lazy {
-		novelSettingsFlow.onIO()
+	override val novelSettingFlow: SharedFlow<NovelSettingUI?> by lazy {
+		novelIDLive.flatMapLatest { getNovelSettingFlowUseCase(it) }
+			.onIO()
+			.shareIn(viewModelScopeIO, SharingStarted.Eagerly, 1)
 	}
 
 	override fun getIfAllowTrueDelete(): Flow<Boolean> =
@@ -153,106 +150,86 @@ class NovelViewModel(
 		}.onIO()
 
 	override fun getQRCode(): Flow<ImageBitmap?> =
-		flow {
-			emitAll(novelFlow.transformLatest { novel ->
-				if (novel != null) {
-					emitAll(getNovelURL().transformLatest { novelURL ->
-						if (novelURL != null) {
-							emitAll(getInstalledExtensionUseCase(novel.extID).transformLatest { ext ->
-								if (ext != null) {
-									val repo = getRepositoryUseCase(ext.repoID)
-									if (repo != null) {
-										val url = NovelLink(
-											novel.title,
-											novel.imageURL,
-											novelURL,
-											ExtensionLink(
-												novel.extID,
-												ext.name,
-												ext.imageURL,
-												RepositoryLink(
-													repo.name,
-													repo.url
-												)
+		novelLive.transformLatest { novel ->
+			if (novel != null) {
+				emitAll(getNovelURL().transformLatest { novelURL ->
+					if (novelURL != null) {
+						emitAll(getInstalledExtensionUseCase(novel.extID).transformLatest { ext ->
+							if (ext != null) {
+								val repo = getRepositoryUseCase(ext.repoID)
+								if (repo != null) {
+									val url = NovelLink(
+										novel.title,
+										novel.imageURL,
+										novelURL,
+										ExtensionLink(
+											novel.extID,
+											ext.name,
+											ext.imageURL,
+											RepositoryLink(
+												repo.name,
+												repo.url
 											)
-										).toURL()
-										val code = QRCode(url)
-										val encoding = code.encode()
-
-										QRCodeCanvasFactory.AVAILABLE_IMPLEMENTATIONS["android.graphics.Bitmap"] =
-											{ width, height ->
-												AndroidQRCodeDrawable(
-													width,
-													height
-												)
-											}
-
-										val size = code.computeImageSize(
-											QRCode.DEFAULT_CELL_SIZE,
-											QRCode.DEFAULT_MARGIN,
 										)
-										val bytes = code.render(
-											qrCodeCanvas = AndroidQRCodeDrawable(size, size),
-											rawData = encoding,
-											brightColor = Color.WHITE,
-											darkColor = Color.BLACK,
-											marginColor = Color.WHITE
-										).toByteArray()
+									).toURL()
+									val code = QRCode(url)
+									val encoding = code.encode()
 
-										emit(
-											BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-												.asImageBitmap()
-										)
-									} else emit(null)
+									QRCodeCanvasFactory.AVAILABLE_IMPLEMENTATIONS["android.graphics.Bitmap"] =
+										{ width, height ->
+											AndroidQRCodeDrawable(
+												width,
+												height
+											)
+										}
+
+									val size = code.computeImageSize(
+										QRCode.DEFAULT_CELL_SIZE,
+										QRCode.DEFAULT_MARGIN,
+									)
+									val bytes = code.render(
+										qrCodeCanvas = AndroidQRCodeDrawable(size, size),
+										rawData = encoding,
+										brightColor = Color.WHITE,
+										darkColor = Color.BLACK,
+										marginColor = Color.WHITE
+									).toByteArray()
+
+									emit(
+										BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+											.asImageBitmap()
+									)
 								} else emit(null)
-							})
-						} else emit(null)
-					})
-				} else emit(null)
-			})
+							} else emit(null)
+						})
+					} else emit(null)
+				})
+			} else emit(null)
 		}.onIO()
 
-	private val novelFlow: Flow<NovelUI?> by lazy {
-		novelIDLive.transformLatest {
-			emit(null)
-			emitAll(loadNovelUIUseCase(it))
+	override val novelLive: StateFlow<NovelUI?> by lazy {
+		novelIDLive.flatMapLatest {
+			loadNovelUIUseCase(it)
 		}.catch {
 			novelException.emit(it)
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
-
-	override val novelLive: Flow<NovelUI?> by lazy {
-		novelFlow.onIO()
-	}
-
-	private val _isRefreshing by lazy {
-		MutableStateFlow(false)
-	}
-
-	override val isRefreshing: Flow<Boolean> = _isRefreshing.onIO()
-
-	private val novelSettingsFlow: Flow<NovelSettingUI?> by lazy {
-		novelIDLive.transformLatest { emitAll(getNovelSettingFlowUseCase(it)) }
-			.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Eagerly, 1)
-	}
-
-	private val novelIDLive: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
 
 
 	private val _showOnlyStatusOfFlow: Flow<ReadingStatus?> =
-		novelSettingsFlow.mapLatest { it?.showOnlyReadingStatusOf }
+		novelSettingFlow.mapLatest { it?.showOnlyReadingStatusOf }
 
 	private val _onlyDownloadedFlow: Flow<Boolean> =
-		novelSettingsFlow.mapLatest { it?.showOnlyDownloaded ?: false }
+		novelSettingFlow.mapLatest { it?.showOnlyDownloaded ?: false }
 
 	private val _onlyBookmarkedFlow: Flow<Boolean> =
-		novelSettingsFlow.mapLatest { it?.showOnlyBookmarked ?: false }
+		novelSettingFlow.mapLatest { it?.showOnlyBookmarked ?: false }
 
 	private val _sortTypeFlow: Flow<ChapterSortType> =
-		novelSettingsFlow.mapLatest { it?.sortType ?: ChapterSortType.SOURCE }
+		novelSettingFlow.mapLatest { it?.sortType ?: ChapterSortType.SOURCE }
 
 	private val _reversedSortFlow: Flow<Boolean> =
-		novelSettingsFlow.mapLatest { it?.reverseOrder ?: false }
+		novelSettingFlow.mapLatest { it?.reverseOrder ?: false }
 
 	private fun Flow<List<ChapterUI>>.combineBookmarked(): Flow<List<ChapterUI>> =
 		combine(_onlyBookmarkedFlow) { result, onlyBookmarked ->
@@ -320,7 +297,7 @@ class NovelViewModel(
 			loadDeletePreviousChapterUseCase().let { chaptersBackToDelete ->
 				if (chaptersBackToDelete != -1) {
 					val lastUnread =
-						getLastReadChapter(novelFlow.first { it != null }!!.id)
+						getLastReadChapter(novelLive.first { it != null }!!.id)
 
 					if (lastUnread == null) {
 						logE("Received empty when trying to get lastUnreadResult")
@@ -328,7 +305,7 @@ class NovelViewModel(
 						return@flow
 					}
 
-					val chapters = chaptersFlow.first().sortedBy { it.order }
+					val chapters = chaptersLive.value.sortedBy { it.order }
 
 					val indexOfLast = chapters.indexOfFirst { it.id == lastUnread.chapterId }
 
@@ -353,7 +330,7 @@ class NovelViewModel(
 	override fun destroy() {
 		novelIDLive.value = -1 // Reset view to nothing
 		itemIndex.value = 0
-		_isRefreshing.value = false
+		isRefreshing.value = false
 
 		novelException.value = null
 		chaptersException.value = null
@@ -373,7 +350,7 @@ class NovelViewModel(
 
 	override fun openLastRead(): Flow<ChapterUI?> =
 		flow {
-			val array = chaptersFlow.first()
+			val array = chaptersLive.value
 
 			val sortedArray = array.sortedBy { it.order }
 			val result = isChaptersResumeFirstUnread()
@@ -393,14 +370,14 @@ class NovelViewModel(
 			)
 		}.onIO()
 
-	override fun getNovelURL(): Flow<String?> =
+	override fun getNovelURL(): StateFlow<String?> =
 		flow {
-			emit(getContentURL(novelFlow.first { it != null }!!))
-		}.onIO()
+			emit(getContentURL(novelLive.first { it != null }!!))
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 
 	override fun getShareInfo(): Flow<NovelShareInfo?> =
 		flow {
-			emit(novelFlow.first { it != null }!!.let {
+			emit(novelLive.first { it != null }!!.let {
 				getContentURL(it)?.let { url ->
 					NovelShareInfo(it.title, url)
 				}
@@ -414,7 +391,7 @@ class NovelViewModel(
 
 	override fun refresh(): Flow<Unit> =
 		flow {
-			_isRefreshing.value = true
+			isRefreshing.value = true
 			val t: Throwable? = null
 			try {
 				loadRemoteNovel(novelIDLive.value, true)?.let {
@@ -424,7 +401,7 @@ class NovelViewModel(
 
 			} finally {
 				emit(Unit)
-				_isRefreshing.value = false
+				isRefreshing.value = false
 			}
 			if (t != null)
 				throw t
@@ -444,27 +421,27 @@ class NovelViewModel(
 
 	override fun toggleNovelBookmark(): Flow<ToggleBookmarkResponse> {
 		return flow {
-			val novel = novelFlow.first { it != null }!!
+			val novel = novelLive.first { it != null }!!
 			val newState = !novel.bookmarked
 			updateNovelUseCase(novel.copy(bookmarked = newState))
 
 			if (!newState) {
-				val chapters = chaptersFlow.first().filter { it.isSaved }.size
+				val chapters = chaptersLive.value.filter { it.isSaved }.size
 				if (chapters != 0)
 					emit(ToggleBookmarkResponse.DeleteChapters(chapters))
 				return@flow
 			}
 			emit(ToggleBookmarkResponse.Nothing)
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Eagerly)
+		}.onIO().shareIn(viewModelScopeIO, SharingStarted.Eagerly)
 	}
 
 	override fun isBookmarked(): Flow<Boolean> = flow {
-		emit(novelFlow.first()?.bookmarked ?: false)
+		emit(novelLive.value?.bookmarked ?: false)
 	}.onIO()
 
 	override fun downloadNextChapter() {
 		launchIO {
-			val array = chaptersFlow.first().sortedBy { it.order }
+			val array = chaptersLive.value.sortedBy { it.order }
 			val r = array.indexOfFirst { it.readingStatus != ReadingStatus.READ }
 			if (r != -1) downloadChapter(arrayOf(array[r]))
 			startDownloadWorkerUseCase()
@@ -473,7 +450,7 @@ class NovelViewModel(
 
 	override fun downloadNextCustomChapters(max: Int) {
 		launchIO {
-			val array = chaptersFlow.first().sortedBy { it.order }
+			val array = chaptersLive.value.sortedBy { it.order }
 			val r = array.indexOfFirst { it.readingStatus != ReadingStatus.READ }
 			if (r != -1) {
 				val list = arrayListOf<ChapterUI>()
@@ -496,7 +473,7 @@ class NovelViewModel(
 	override fun downloadAllUnreadChapters() {
 		launchIO {
 			downloadChapter(
-				chaptersFlow.first().filter { it.readingStatus == ReadingStatus.UNREAD }
+				chaptersLive.value.filter { it.readingStatus == ReadingStatus.UNREAD }
 					.toTypedArray())
 			startDownloadWorkerUseCase()
 		}
@@ -504,7 +481,7 @@ class NovelViewModel(
 
 	override fun downloadAllChapters() {
 		launchIO {
-			downloadChapter(chaptersFlow.first().toTypedArray())
+			downloadChapter(chaptersLive.value.toTypedArray())
 			startDownloadWorkerUseCase()
 		}
 	}
@@ -528,8 +505,10 @@ class NovelViewModel(
 		itemIndex.value = index
 	}
 
-	override val hasSelected: Flow<Boolean> by lazy {
-		chaptersFlow.mapLatest { chapters -> chapters.any { it.isSelected } }
+	override val hasSelected: StateFlow<Boolean> by lazy {
+		this.chaptersLive.mapLatest { chapters -> chapters.any { it.isSelected } }
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
 	override fun bookmarkSelected() {
@@ -542,7 +521,7 @@ class NovelViewModel(
 
 	override fun deleteSelected() {
 		launchIO {
-			val list = chaptersFlow.first().filter { it.isSelected && it.isSaved }
+			val list = chaptersLive.value.filter { it.isSelected && it.isSaved }
 			deleteChapterPassageUseCase(list)
 			clearSelected()
 		}
@@ -550,7 +529,7 @@ class NovelViewModel(
 
 	override fun downloadSelected() {
 		launchIO {
-			val list = chaptersFlow.first().filter { it.isSelected && !it.isSaved }
+			val list = chaptersLive.value.filter { it.isSelected && !it.isSaved }
 			downloadChapterPassageUseCase(list.toTypedArray())
 			clearSelected()
 			startDownloadWorkerUseCase()
@@ -559,7 +538,7 @@ class NovelViewModel(
 
 	override fun invertSelection() {
 		launchIO {
-			val list = chaptersFlow.first()
+			val list = chaptersLive.value
 			val selection = copySelected()
 
 			list.forEach {
@@ -587,7 +566,7 @@ class NovelViewModel(
 
 	override fun selectAll() {
 		launchIO {
-			val list = chaptersFlow.first()
+			val list = chaptersLive.first()
 			val selection = copySelected()
 
 			list.forEach {
@@ -600,7 +579,7 @@ class NovelViewModel(
 
 	override fun selectBetween() {
 		launchIO {
-			val list = chaptersFlow.first()
+			val list = chaptersLive.value
 			val selection = copySelected()
 
 			val firstSelected = list.indexOfFirst { it.isSelected }
@@ -631,7 +610,7 @@ class NovelViewModel(
 
 	override fun trueDeleteSelected() {
 		launchIO {
-			val list = chaptersFlow.first()
+			val list = chaptersLive.value
 			trueDeleteChapter(list.filter { it.isSelected })
 			clearSelected()
 		}
@@ -639,8 +618,7 @@ class NovelViewModel(
 
 	override fun scrollTo(predicate: (ChapterUI) -> Boolean): Flow<Boolean> =
 		flow {
-			val chapters = chaptersFlow.first()
-			chapters.indexOfFirst(predicate).takeIf { it != -1 }?.let {
+			chaptersLive.value.indexOfFirst(predicate).takeIf { it != -1 }?.let {
 				itemIndex.value = it
 				emit(true)
 			} ?: emit(false)
@@ -657,14 +635,11 @@ class NovelViewModel(
 		}
 	}
 
-	override fun getChapterCount(): Flow<Int> =
-		flow {
-			emit(chaptersFlow.first().size)
-		}
+	override fun getChapterCount(): Flow<Int> = flowOf(chaptersLive.value.size)
 
 	override fun deleteChapters() {
 		launchIO {
-			deleteChapterPassageUseCase(chaptersFlow.first().filter { it.isSaved })
+			deleteChapterPassageUseCase(chaptersLive.value.filter { it.isSaved })
 		}
 	}
 
