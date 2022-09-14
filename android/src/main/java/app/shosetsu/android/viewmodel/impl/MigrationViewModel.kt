@@ -55,77 +55,63 @@ class MigrationViewModel(
 	private val queryMap = hashMapOf<Int, MutableStateFlow<String>>()
 	private val submittedQueryMap = hashMapOf<Int, MutableStateFlow<String?>>()
 
-	override val currentQuery: Flow<String> by lazy {
-		whichFlow.transformLatest { currentNovelId ->
-			emitAll(
-				novelFlow.transformLatest { novelResult ->
-					emitAll(
-						queryMap.getOrPut(currentNovelId) {
-							MutableStateFlow(
-								novelResult.find { it.id == currentNovelId }?.title ?: ""
-							)
-						}.map { it }
+	override val currentQuery: StateFlow<String?> by lazy {
+		which.flatMapLatest { currentNovelId ->
+			novels.flatMapLatest { novelResult ->
+				queryMap.getOrPut(currentNovelId) {
+					MutableStateFlow(
+						novelResult.find { it.id == currentNovelId }?.title ?: ""
 					)
 				}
-			)
+			}
 		}.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	override val extensions: Flow<List<MigrationExtensionUI>> by lazy {
-		flow {
-			emitAll(
-				loadBrowseExtensionsFlow().map { hResult ->
-					hResult.let { list ->
-						list.filter { it.isInstalled }.map {
-							MigrationExtensionUI(
-								it.id,
-								it.name,
-								it.imageURL
-							)
-						}
-					}
-				}.transform { extensionsResult ->
-					extensionsResult.let { mExtensions ->
-						emitAll(
-							whichFlow.transformLatest { selectedId ->
-								emitAll(
-									selectedExtensionMap.getOrPut(selectedId) {
-										MutableStateFlow(mExtensions.firstOrNull()?.id ?: -1)
-									}
-										.mapLatest { selectedExtension ->
-											mExtensions.map { extension ->
-												extension.copy(
-													isSelected = selectedExtension == extension.id
-												)
-											}
-										}
+	override val extensions: StateFlow<List<MigrationExtensionUI>> by lazy {
+		loadBrowseExtensionsFlow().map { hResult ->
+			hResult.let { list ->
+				list.filter { it.isInstalled }.map {
+					MigrationExtensionUI(
+						it.id,
+						it.name,
+						it.imageURL
+					)
+				}
+			}
+		}.transform { extensionsResult ->
+			extensionsResult.let { mExtensions ->
+				emitAll(
+					which.flatMapLatest { selectedId ->
+						selectedExtensionMap.getOrPut(selectedId) {
+							MutableStateFlow(mExtensions.firstOrNull()?.id ?: -1)
+						}.mapLatest { selectedExtension ->
+							mExtensions.map { extension ->
+								extension.copy(
+									isSelected = selectedExtension == extension.id
 								)
 							}
-						)
+						}
 					}
-				}
-			)
-		}.onIO()
+				)
+			}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
-	private val novelFlow: Flow<List<MigrationNovelUI>> by lazy {
-		novelIds.transformLatest { ids ->
-
-			emitAll(
-				combine(
-					ids.map {
-						getNovelUI(it)
-					}
-				) {
-					it.filterNotNull()
+	override val novels: StateFlow<List<MigrationNovelUI>> by lazy {
+		novelIds.flatMapLatest { ids ->
+			combine(
+				ids.map {
+					getNovelUI(it)
 				}
-			)
-
+			) {
+				it.filterNotNull()
+			}
 		}.mapLatest { result ->
 			result.map {
 				MigrationNovelUI(it.id, it.title, it.imageURL)
 			}
-		}.combine(whichFlow) { list, id ->
+		}.combine(which) { list, id ->
 			val result = list.let {
 				it.map { novelUI ->
 					novelUI.copy(
@@ -135,42 +121,37 @@ class MigrationViewModel(
 			}
 			logV("New list: $result")
 			result
-		}.onIO()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
-
-	override val novels: Flow<List<MigrationNovelUI>> by lazy { novelFlow.onIO() }
 
 	/**
 	 * Which novel is being worked on rn
 	 *
 	 * Contains the novelId
 	 */
-	private val whichFlow: MutableStateFlow<Int> by lazy {
+	override val which: MutableStateFlow<Int> by lazy {
 		MutableStateFlow(novelIds.value.firstOrNull() ?: -1)
 	}
 
-	override val which: Flow<Int>
-		get() = whichFlow.onIO()
-
-	override val results: Flow<List<StrippedBookmarkedNovelEntity>> by lazy {
-		whichFlow.transformLatest { novelId ->
-			if (submittedQueryMap.containsKey(novelId))
+	override val results: StateFlow<List<StrippedBookmarkedNovelEntity>> by lazy {
+		which.transformLatest<_, List<StrippedBookmarkedNovelEntity>> { novelId ->
+			if (submittedQueryMap.containsKey(novelId)) {
 				emitAll(
-					submittedQueryMap[novelId]!!.transform { query ->
+					submittedQueryMap[novelId]!!.map { query ->
 						if (query.isNullOrBlank()) {
-							emit(emptyList())
+							emptyList()
 						} else {
-							emit(emptyList())
+							emptyList()
 						}
 					}
 				)
-			else emit(emptyList())
-		}
+			} else emit(emptyList())
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
 	override fun setWorkingOn(novelId: Int) {
 		logI("Now working on $novelId")
-		whichFlow.value = novelId
+		which.value = novelId
 	}
 
 	override fun setNovels(array: IntArray) {
@@ -178,7 +159,7 @@ class MigrationViewModel(
 	}
 
 	override fun setSelectedExtension(extensionUI: MigrationExtensionUI) {
-		val novelId = whichFlow.value
+		val novelId = which.value
 		logI("$novelId now working with extension ${extensionUI.name}(${extensionUI.id})")
 		if (selectedExtensionMap.containsKey(novelId)) {
 			logI("Emitting")
@@ -190,7 +171,7 @@ class MigrationViewModel(
 	}
 
 	override fun setQuery(newQuery: String) {
-		val novelId = whichFlow.value
+		val novelId = which.value
 		logI("$novelId now working with query $newQuery")
 		if (queryMap.containsKey(novelId)) {
 			logI("Emitting")

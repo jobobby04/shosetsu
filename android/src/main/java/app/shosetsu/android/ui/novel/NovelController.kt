@@ -71,10 +71,7 @@ import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.acra.ACRA
@@ -421,13 +418,13 @@ class NovelController : ShosetsuController(),
 			setContent {
 				if (resume != null)
 					syncFABWithCompose(state, resume!!)
-				val novelInfo by viewModel.novelLive.collectAsState(null)
-				val chapters by viewModel.chaptersLive.collectAsState(emptyList())
-				val isRefreshing by viewModel.isRefreshing.collectAsState(false)
-				val hasSelected by viewModel.hasSelected.collectAsState(false)
-				val itemAt by viewModel.itemIndex.collectAsState(0)
-				val categories by viewModel.categories.collectAsState(emptyList())
-				val novelCategories by viewModel.novelCategories.collectAsState(emptyList())
+				val novelInfo by viewModel.novelLive.collectAsState()
+				val chapters by viewModel.chaptersLive.collectAsState()
+				val isRefreshing by viewModel.isRefreshing.collectAsState()
+				val hasSelected by viewModel.hasSelected.collectAsState()
+				val itemAt by viewModel.itemIndex.collectAsState()
+				val categories by viewModel.categories.collectAsState()
+				val novelCategories by viewModel.novelCategories.collectAsState()
 
 				activity?.invalidateOptionsMenu()
 				// If the data is not present, loads it
@@ -441,8 +438,8 @@ class NovelController : ShosetsuController(),
 
 				ShosetsuCompose {
 					NovelInfoContent(
-						novelInfo,
-						chapters,
+						novelInfo = novelInfo,
+						chapters = chapters,
 						selectedChaptersStateFlow = viewModel.selectedChaptersState,
 						itemAt,
 						updateItemAt = viewModel::setItemAt,
@@ -736,7 +733,9 @@ fun PreviewNovelInfoContent() {
 		NovelInfoContent(
 			novelInfo = info,
 			chapters = chapters,
-			selectedChaptersStateFlow = flow { },
+			selectedChaptersStateFlow = remember {
+				MutableStateFlow(SelectedChaptersState())
+			},
 			itemAt = 0,
 			{},
 			isRefreshing = false,
@@ -754,12 +753,12 @@ fun PreviewNovelInfoContent() {
 					selectionMode = false
 				) {}
 			},
-			{},
-			{},
-			{},
-			{},
-			{},
-			{},
+			downloadSelected = {},
+			deleteSelected = {},
+			markSelectedAsRead = {},
+			markSelectedAsUnread = {},
+			bookmarkSelected = {},
+			unbookmarkSelected = {},
 			hasSelected = false,
 			state = rememberLazyListState(0)
 		)
@@ -770,7 +769,7 @@ fun PreviewNovelInfoContent() {
 fun NovelInfoContent(
 	novelInfo: NovelUI?,
 	chapters: List<ChapterUI>?,
-	selectedChaptersStateFlow: Flow<SelectedChaptersState>,
+	selectedChaptersStateFlow: StateFlow<SelectedChaptersState>,
 	itemAt: Int,
 	updateItemAt: (Int) -> Unit,
 	isRefreshing: Boolean,
@@ -860,9 +859,7 @@ fun NovelInfoContent(
 		}
 
 		if (chapters != null && hasSelected) {
-			val selectedChaptersState by selectedChaptersStateFlow.collectAsState(
-				SelectedChaptersState()
-			)
+			val selectedChaptersState by selectedChaptersStateFlow.collectAsState()
 			Card(
 				modifier = Modifier
 					.align(BiasAlignment(0f, 0.7f))

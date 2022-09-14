@@ -103,9 +103,9 @@ fun ConfigureExtensionContent(
 	viewModel: AExtensionConfigureViewModel,
 	onExit: () -> Unit
 ) {
-	val extensionUIResult by viewModel.liveData.collectAsState(null)
-	val extensionListingResult by viewModel.extensionListing.collectAsState(null)
-	val extensionSettingsResult by viewModel.extensionSettings.collectAsState(emptyList())
+	val extensionUIResult by viewModel.liveData.collectAsState()
+	val extensionListingResult by viewModel.extensionListing.collectAsState()
+	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
 
 
 	LazyColumn(

@@ -24,8 +24,7 @@ import app.shosetsu.android.domain.usecases.MoveCategoryUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 class CategoriesViewModel(
     private val getCategoriesUseCase: GetCategoriesUseCase,
@@ -34,8 +33,9 @@ class CategoriesViewModel(
     private val moveCategoryUseCase: MoveCategoryUseCase
 ) : ACategoriesViewModel() {
 
-    override val liveData: Flow<List<CategoryUI>> by lazy {
+    override val liveData: StateFlow<List<CategoryUI>> by lazy {
         getCategoriesUseCase()
+            .stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
     }
 
     override fun addCategory(name: String): Flow<Unit> = flow {

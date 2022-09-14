@@ -5,7 +5,7 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
 
 /*
@@ -31,33 +31,33 @@ import javax.security.auth.Destroyable
  */
 abstract class AAddShareViewModel : ShosetsuViewModel(), Destroyable {
 
-	abstract val isAdding: Flow<Boolean>
-	abstract val isComplete: Flow<Boolean>
+	abstract val isAdding: StateFlow<Boolean>
+	abstract val isComplete: StateFlow<Boolean>
 
 	/**
 	 * Prompts UI to allow user to open novel
 	 */
-	abstract val isNovelOpenable: Flow<Boolean>
+	abstract val isNovelOpenable: StateFlow<Boolean>
 
-	abstract val isNovelAlreadyPresent: Flow<Boolean>
-	abstract val isStyleAlreadyPresent: Flow<Boolean>
-	abstract val isExtAlreadyPresent: Flow<Boolean>
-	abstract val isRepoAlreadyPresent: Flow<Boolean>
+	abstract val isNovelAlreadyPresent: StateFlow<Boolean>
+	abstract val isStyleAlreadyPresent: StateFlow<Boolean>
+	abstract val isExtAlreadyPresent: StateFlow<Boolean>
+	abstract val isRepoAlreadyPresent: StateFlow<Boolean>
 
-	abstract val isProcessing: Flow<Boolean>
+	abstract val isProcessing: StateFlow<Boolean>
 
-	abstract val isURLValid: Flow<Boolean>
+	abstract val isURLValid: StateFlow<Boolean>
 
-	abstract val novelLink: Flow<NovelLink?>
-	abstract val extLink: Flow<ExtensionLink?>
-	abstract val repoLink: Flow<RepositoryLink?>
+	abstract val novelLink: StateFlow<NovelLink?>
+	abstract val extLink: StateFlow<ExtensionLink?>
+	abstract val repoLink: StateFlow<RepositoryLink?>
 
-	abstract val showURLInput: Flow<Boolean>
-	abstract val url: Flow<String>
+	abstract val showURLInput: StateFlow<Boolean>
+	abstract val url: StateFlow<String>
 	abstract fun setURL(url: String)
 	abstract fun applyURL()
 
-	abstract val exception: Flow<Exception?>
+	abstract val exception: StateFlow<Exception?>
 
 	/**
 	 * Take the data from a correct QR code

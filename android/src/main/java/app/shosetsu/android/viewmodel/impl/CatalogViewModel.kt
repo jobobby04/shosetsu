@@ -5,6 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
@@ -24,10 +25,8 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 
 /*
  * This file is part of shosetsu.
@@ -70,17 +69,24 @@ class CatalogViewModel(
 	 */
 	private var filterDataState: HashMap<Int, MutableStateFlow<Any>> = hashMapOf()
 
-	private val filterDataFlow by lazy { MutableStateFlow<Map<Int, Any>>(hashMapOf()) }
+	private val filterDataFlow = MutableStateFlow<Map<Int, Any>>(hashMapOf())
 
-	private val iExtensionFlow: Flow<IExtension?> by lazy {
-		extensionIDFlow.transformLatest { extensionID ->
+	/**
+	 * Flow source for extension ID
+	 */
+	private val extensionIDFlow: MutableStateFlow<Int> = MutableStateFlow(-1)
+
+	override val exceptionFlow: MutableStateFlow<Throwable?> = MutableStateFlow(null)
+
+	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
+		extensionIDFlow.mapLatest { extensionID ->
 			val ext = getExtensionUseCase(extensionID)
 
 			// Ensure filter is initialized
 			ext?.searchFiltersModel?.toList()?.init()
 			_applyFilter()
-			emit(ext)
-		}.distinctUntilChanged()
+			ext
+		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	private fun List<Filter<*>>.init() {
@@ -106,19 +112,14 @@ class CatalogViewModel(
 		}
 	}
 
-	/**
-	 * Flow source for extension ID
-	 */
-	private val extensionIDFlow: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
-
 	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy {
 		iExtensionFlow.transformLatest { ext ->
 			if (ext == null) {
 				emit(null)
 			} else {
-				emitAll(queryFlow.transformLatest { query ->
-					emitAll(filterDataFlow.transformLatest { data ->
-						emit(
+				emitAll(
+					queryFlow.flatMapLatest { query ->
+						filterDataFlow.mapLatest { data ->
 							Pager(
 								PagingConfig(10)
 							) {
@@ -130,10 +131,9 @@ class CatalogViewModel(
 									data
 								)
 							}
-						)
+						}
 					}
-					)
-				})
+				)
 			}
 		}.onIO()
 	}
@@ -144,42 +144,40 @@ class CatalogViewModel(
 				emitAll(it.flow)
 			else emit(PagingData.empty())
 		}.catch {
-			exceptionFlow.emit(it)
+			exceptionFlow.value = it
 		}.cachedIn(viewModelScope)
 	}
 
-	override val exceptionFlow: MutableStateFlow<Throwable?> by lazy {
-		MutableStateFlow(null)
-	}
-
-	private val filterItemsFlow: Flow<List<Filter<*>>> by lazy {
+	override val filterItemsLive: StateFlow<List<Filter<*>>> by lazy {
 		iExtensionFlow.mapLatest {
 			it?.searchFiltersModel?.toList() ?: emptyList()
-		}.onIO()
-	}
-
-	override val filterItemsLive: Flow<List<Filter<*>>> by lazy {
-		filterItemsFlow.transformLatest {
+		}.mapLatest {
 			filterDataState.clear() // Reset filter state so no data conflicts occur
-			emit(it)
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Eagerly, 1)
+			it
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, emptyList())
 	}
 
-	override val hasFilters: Flow<Boolean> by lazy {
+	override val hasFilters: StateFlow<Boolean> by lazy {
 		iExtensionFlow.mapLatest { it?.searchFiltersModel?.isNotEmpty() ?: false }
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val hasSearchLive: Flow<Boolean> by lazy {
-		iExtensionFlow.mapLatest { it?.hasSearch ?: false }.onIO()
+	override val hasSearchLive: StateFlow<Boolean> by lazy {
+		iExtensionFlow.mapLatest { it?.hasSearch ?: false }
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val extensionName: Flow<String> by lazy {
-		iExtensionFlow.mapLatest { it?.name ?: "" }.onIO()
+	override val extensionName: StateFlow<String> by lazy {
+		iExtensionFlow.mapLatest { it?.name ?: "" }
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, "")
 	}
 
 	override fun getBaseURL(): Flow<String> =
 		flow {
-			val ext = iExtensionFlow.first() ?: return@flow
+			val ext = iExtensionFlow.value ?: return@flow
 			emit(ext.baseURL)
 		}.onIO()
 
@@ -224,8 +222,8 @@ class CatalogViewModel(
 		}
 	}
 
-	private suspend fun resetFilterDataState() {
-		filterItemsFlow.first().forEach { filter -> resetFilter(filter) }
+	private fun resetFilterDataState() {
+		filterItemsLive.value.forEach { filter -> resetFilter(filter) }
 	}
 
 	override fun backgroundNovelAdd(novelID: Int, categories: IntArray): Flow<BackgroundNovelAddProgress> =
@@ -311,20 +309,24 @@ class CatalogViewModel(
 		launchIO { setNovelUIType(cardType) }
 	}
 
-	override val novelCardTypeLive: Flow<NovelCardType> by lazy {
+	override val novelCardTypeLive: StateFlow<NovelCardType> by lazy {
 		loadNovelUITypeUseCase().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelCardType.NORMAL)
 	}
 
-	override val columnsInH: Flow<Int> by lazy {
+	override val columnsInH: StateFlow<Int> by lazy {
 		loadNovelUIColumnsHUseCase().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInLandscape.default)
 	}
 
-	override val columnsInV: Flow<Int> by lazy {
+	override val columnsInV: StateFlow<Int> by lazy {
 		loadNovelUIColumnsPUseCase().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInPortait.default)
 	}
 
-	override val categories: Flow<List<CategoryUI>> by lazy {
+	override val categories: StateFlow<List<CategoryUI>> by lazy {
 		getCategoriesUseCase()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
 	override fun destroy() {

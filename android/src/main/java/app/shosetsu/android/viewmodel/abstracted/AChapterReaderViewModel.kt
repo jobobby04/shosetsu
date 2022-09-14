@@ -10,6 +10,8 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import app.shosetsu.lib.Novel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -33,11 +35,11 @@ import kotlinx.coroutines.flow.Flow
  * 06 / 05 / 2020
  */
 abstract class AChapterReaderViewModel :
-	SubscribeViewModel<List<ReaderUIItem>>,
+	SubscribeViewModel<List<ReaderUIItem>?>,
 	ShosetsuViewModel(),
 	ExposedSettingsRepoViewModel {
 
-	abstract val appThemeLiveData: Flow<AppThemes>
+	abstract val appThemeLiveData: SharedFlow<AppThemes>
 
 	abstract fun retryChapter(item: ReaderChapterUI)
 
@@ -53,34 +55,34 @@ abstract class AChapterReaderViewModel :
 
 	abstract fun setCurrentPage(page: Int)
 
-	abstract val isFirstFocusFlow: Flow<Boolean>
-	abstract val isSwipeInverted: Flow<Boolean>
+	abstract val isFirstFocusFlow: StateFlow<Boolean>
+	abstract val isSwipeInverted: StateFlow<Boolean>
 
 	abstract fun getChapterProgress(chapter: ReaderChapterUI): Flow<Double>
 
 	abstract fun onFirstFocus()
 
-	abstract val currentPage: Flow<Int>
+	abstract val currentPage: StateFlow<Int?>
 
-	abstract val isCurrentChapterBookmarked: Flow<Boolean>
+	abstract val isCurrentChapterBookmarked: StateFlow<Boolean>
 
-	abstract val chapterType: Flow<Novel.ChapterType?>
+	abstract val chapterType: StateFlow<Novel.ChapterType?>
 
-	abstract val ttsSpeed: Float
-	abstract val ttsPitch: Float
+	abstract val ttsSpeed: StateFlow<Float>
+	abstract val ttsPitch: StateFlow<Float>
 
 	/**
 	 * Is tap to scroll enabled
 	 */
-	abstract val tapToScroll: Flow<Boolean>
+	abstract val tapToScroll: StateFlow<Boolean>
 
 	/**
 	 * Double tap required to focus/unfocus the reader
 	 */
-	abstract val isFocused: Flow<Boolean>
-	abstract val isSystemVisible: Flow<Boolean>
-	abstract val enableFullscreen: Flow<Boolean>
-	abstract val matchFullscreenToFocus: Flow<Boolean>
+	abstract val isFocused: StateFlow<Boolean>
+	abstract val isSystemVisible: StateFlow<Boolean>
+	abstract val enableFullscreen: StateFlow<Boolean>
+	abstract val matchFullscreenToFocus: StateFlow<Boolean>
 
 	abstract fun toggleFocus()
 	abstract fun toggleSystemVisible()
@@ -91,35 +93,35 @@ abstract class AChapterReaderViewModel :
 	/**
 	 * Should the screen be locked
 	 */
-	abstract val liveIsScreenRotationLocked: Flow<Boolean>
+	abstract val liveIsScreenRotationLocked: StateFlow<Boolean>
 
 	/**
 	 * Should the reader keep the screen on
 	 */
-	abstract val liveKeepScreenOn: Flow<Boolean>
+	abstract val liveKeepScreenOn: StateFlow<Boolean>
 
 	/**
 	 * The current chapter ID that is being read
 	 */
-	abstract val currentChapterID: Flow<Int>
+	abstract val currentChapterID: StateFlow<Int>
 
-	abstract val textColor: Flow<Int>
-	abstract val backgroundColor: Flow<Int>
+	abstract val textColor: StateFlow<Int>
+	abstract val backgroundColor: StateFlow<Int>
 
-	abstract val liveTextSize: Flow<Float>
+	abstract val liveTextSize: StateFlow<Float>
 
 
 	/**
 	 * false    -> vertical paging
 	 * true     -> horizontal paging
 	 */
-	abstract val isHorizontalReading: Flow<Boolean>
+	abstract val isHorizontalReading: StateFlow<Boolean>
 
 	/**
 	 * The state that should be used by default for newly created views
 	 * This also is the way to easily get current state without async calls
 	 */
-	abstract val isVolumeScrollEnabled: Boolean
+	abstract val isVolumeScrollEnabled: StateFlow<Boolean>
 
 	/** Set the novelID */
 	abstract fun setNovelID(novelID: Int)
@@ -148,7 +150,7 @@ abstract class AChapterReaderViewModel :
 	/**
 	 * Loads the settings list for the bottom bar
 	 */
-	abstract fun getSettings(): Flow<NovelReaderSettingEntity>
+	abstract fun getSettings(): StateFlow<NovelReaderSettingEntity>
 
 	abstract fun updateSetting(novelReaderSettingEntity: NovelReaderSettingEntity)
 

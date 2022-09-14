@@ -4,10 +4,8 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.utils.archURL
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
-import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.CanAppSelfUpdateUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
@@ -19,9 +17,7 @@ import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCase
 import app.shosetsu.android.domain.usecases.start.StartAppUpdateInstallWorkerUseCase
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 /*
  * This file is part of shosetsu.
@@ -56,35 +52,27 @@ class MainViewModel(
 	private val loadBackupProgress: LoadBackupProgressFlowUseCase,
 	private val settingsRepository: ISettingsRepository
 ) : AMainViewModel() {
-	private var _navigationStyle = NavigationStyle.MATERIAL
-	private var _requireDoubleBackToExit = SettingKey.RequireDoubleBackToExit.default
 
-	override val requireDoubleBackToExit: Boolean
-		get() = _requireDoubleBackToExit
-
-	init {
-		launchIO {
-			loadNavigationStyleUseCase().collect {
-				_navigationStyle = NavigationStyle.values()[it]
-			}
-		}
-		launchIO {
-			loadRequireDoubleBackUseCase().collect {
-				_requireDoubleBackToExit = it
-			}
-		}
+	override val requireDoubleBackToExit by lazy {
+		loadRequireDoubleBackUseCase()
 	}
 
 	override fun startAppUpdateCheck(): Flow<AppUpdateEntity?> =
 		loadAppUpdateFlowLiveUseCase()
 
-	override val navigationStyle: NavigationStyle
-		get() = _navigationStyle
+	override val navigationStyle by lazy {
+		loadNavigationStyleUseCase().map { NavigationStyle.values()[it] }
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NavigationStyle.MATERIAL)
+	}
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
-	override val appThemeLiveData: Flow<AppThemes>
-		get() = loadLiveAppThemeUseCase()
+	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
+		loadLiveAppThemeUseCase()
+			.onIO()
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, replay = 1)
+	}
 
 	override fun handleAppUpdate(): Flow<AppUpdateAction?> =
 		flow {
@@ -103,21 +91,12 @@ class MainViewModel(
 					}
 				}
 			)
-		}
+		}.onIO()
 
-	override val backupProgressState: Flow<IBackupRepository.BackupProgress> by lazy {
-		loadBackupProgress()
-	}
+	override val backupProgressState = loadBackupProgress()
 
-	private var showIntro = SettingKey.FirstTime.default
-
-	init {
-		launchIO {
-			settingsRepository.getBooleanFlow(SettingKey.FirstTime).collectLatest {
-				logV("Collected $it")
-				showIntro = it
-			}
-		}
+	private val showIntro by lazy {
+		settingsRepository.getBooleanFlow(SettingKey.FirstTime)
 	}
 
 	override suspend fun showIntro(): Boolean =
@@ -125,7 +104,7 @@ class MainViewModel(
 
 	override fun toggleShowIntro() {
 		launchIO {
-			settingsRepository.setBoolean(SettingKey.FirstTime, !showIntro)
+			settingsRepository.setBoolean(SettingKey.FirstTime, !showIntro.value)
 		}
 	}
 }

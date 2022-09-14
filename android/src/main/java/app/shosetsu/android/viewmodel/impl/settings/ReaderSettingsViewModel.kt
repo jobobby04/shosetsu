@@ -114,7 +114,7 @@ fun ExposedSettingsRepoViewModel.enableFullscreen() {
 fun ExposedSettingsRepoViewModel.matchFullscreenToFocus() {
 	val enableFullscreen by remember {
 		settingsRepo.getBooleanFlow(ReaderEnableFullscreen)
-	}.collectAsState(true)
+	}.collectAsState()
 	SwitchSettingContent(
 		stringResource(R.string.settings_reader_fullscreen_focus),
 		stringResource(R.string.settings_reader_fullscreen_focus_desc),
@@ -140,10 +140,10 @@ fun ExposedSettingsRepoViewModel.doubleTapFocus() {
 fun ExposedSettingsRepoViewModel.doubleTapSystem() {
 	val enableFullscreen by remember {
 		settingsRepo.getBooleanFlow(ReaderEnableFullscreen)
-	}.collectAsState(true)
+	}.collectAsState()
 	val matchFullscreenToFocus by remember {
 		settingsRepo.getBooleanFlow(ReaderMatchFullscreenToFocus)
-	}.collectAsState(false)
+	}.collectAsState()
 
 	SwitchSettingContent(
 		stringResource(R.string.settings_reader_double_tap_system),

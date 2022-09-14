@@ -48,12 +48,6 @@ class SearchViewModel(
 	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
 	private val getExtensionUseCase: GetExtensionUseCase
 ) : ASearchViewModel() {
-	/**
-	 * Holds the current query
-	 *
-	 * Used to save user input
-	 */
-	private val queryFlow: MutableStateFlow<String?> = MutableStateFlow(null)
 
 	/**
 	 * Holds the applied query
@@ -61,6 +55,13 @@ class SearchViewModel(
 	 * Applied means it is used for data retrieval
 	 */
 	private val appliedQueryFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+
+	/**
+	 * Holds the current query
+	 *
+	 * Used to save user input
+	 */
+	override val query: MutableStateFlow<String?> = MutableStateFlow(null)
 
 	private val searchFlows =
 		HashMap<Int, Flow<PagingData<ACatalogNovelUI>>>()
@@ -71,46 +72,44 @@ class SearchViewModel(
 	private val exceptionFlows =
 		HashMap<Int, MutableStateFlow<Throwable?>>()
 
-	override val query: Flow<String?> by lazy { queryFlow.onIO() }
-
 	@OptIn(ExperimentalCoroutinesApi::class)
-	override val listings: Flow<List<SearchRowUI>> by lazy {
-		loadSearchRowUIUseCase().transformLatest { ogList ->
-			emitAll(
-				combine(ogList.map { rowUI ->
-					getExceptionFlow(rowUI.extensionID).map {
-						if (it != null)
-							rowUI.copy(hasError = true)
-						else rowUI
-					}
-				}) {
-					it.toList()
+	override val listings: StateFlow<List<SearchRowUI>> by lazy {
+		loadSearchRowUIUseCase().flatMapLatest { ogList ->
+			combine(ogList.map { rowUI ->
+				getExceptionFlow(rowUI.extensionID).map {
+					if (it != null)
+						rowUI.copy(hasError = true)
+					else rowUI
 				}
-			)
+			}) {
+				it.toList()
+			}
 		}.map { list ->
 			list.sortedBy { it.name }.sortedBy { it.extensionID != -1 }.sortedBy { it.hasError }
 		}.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
-	override val isCozy: Flow<Boolean> by lazy {
+	override val isCozy: StateFlow<Boolean> by lazy {
 		loadNovelUITypeUseCase().map { it == NovelCardType.COZY }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
 	override fun initQuery(string: String) {
 		launchIO {
-			if (queryFlow.first() == null) {
-				queryFlow.value = string
+			if (query.value == null) {
+				query.value = string
 				appliedQueryFlow.value = string
 			}
 		}
 	}
 
 	override fun setQuery(query: String) {
-		this.queryFlow.value = query
+		this.query.value = query
 	}
 
 	override fun applyQuery(query: String) {
-		queryFlow.value = query
+		this.query.value = query
 		appliedQueryFlow.value = query
 	}
 
@@ -148,7 +147,7 @@ class SearchViewModel(
 	override fun destroy() {
 		logI("Clearing out all flows")
 		searchFlows.clear()
-		queryFlow.value = null
+		query.value = null
 		appliedQueryFlow.value = null
 	}
 
@@ -168,9 +167,8 @@ class SearchViewModel(
 	@OptIn(ExperimentalCoroutinesApi::class)
 	private val libraryResultFlow: Flow<PagingData<ACatalogNovelUI>> by lazy {
 		appliedQueryFlow.combine(getRefreshFlow(-1)) { query, _ -> query }
+			.filterNotNull()
 			.transformLatest { query ->
-				if (query == null) return@transformLatest
-
 				val exceptionFlow = getExceptionFlow(-1)
 
 				exceptionFlow.value = null
@@ -212,8 +210,8 @@ class SearchViewModel(
 
 			emitAll(
 				appliedQueryFlow.combine(getRefreshFlow(extensionID)) { query, _ -> query }
+					.filterNotNull()
 					.transformLatest { query ->
-						if (query == null) return@transformLatest
 						exceptionFlow.value = null
 
 						emitAll(
@@ -232,7 +230,6 @@ class SearchViewModel(
 								}
 							}.flow
 						)
-
 					}.catch {
 						exceptionFlow.value = it
 					}

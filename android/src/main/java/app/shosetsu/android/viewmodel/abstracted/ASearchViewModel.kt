@@ -5,6 +5,7 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
 
 /*
@@ -33,11 +34,11 @@ import javax.security.auth.Destroyable
  */
 abstract class ASearchViewModel : ShosetsuViewModel(), Destroyable {
 
-	abstract val query: Flow<String?>
+	abstract val query: StateFlow<String?>
 
-	abstract val listings: Flow<List<SearchRowUI>>
+	abstract val listings: StateFlow<List<SearchRowUI>>
 
-	abstract val isCozy: Flow<Boolean>
+	abstract val isCozy: StateFlow<Boolean>
 
 	abstract fun initQuery(string: String)
 	abstract fun setQuery(query: String)

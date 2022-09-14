@@ -88,22 +88,22 @@ class AddShareController : ShosetsuController(), CollapsedToolBarController {
 		setViewTitle()
 		setContent {
 			ShosetsuCompose {
-				val url by viewModel.url.collectAsState("")
-				val showURLInput by viewModel.showURLInput.collectAsState(true)
-				val isProcessing by viewModel.isProcessing.collectAsState(true)
-				val isQRCodeValid by viewModel.isURLValid.collectAsState(true)
-				val isAdding by viewModel.isAdding.collectAsState(false)
-				val isComplete by viewModel.isComplete.collectAsState(false)
-				val isNovelOpenable by viewModel.isNovelOpenable.collectAsState(false)
+				val url by viewModel.url.collectAsState()
+				val showURLInput by viewModel.showURLInput.collectAsState()
+				val isProcessing by viewModel.isProcessing.collectAsState()
+				val isQRCodeValid by viewModel.isURLValid.collectAsState()
+				val isAdding by viewModel.isAdding.collectAsState()
+				val isComplete by viewModel.isComplete.collectAsState()
+				val isNovelOpenable by viewModel.isNovelOpenable.collectAsState()
 
-				val isNovelAlreadyPresent by viewModel.isNovelAlreadyPresent.collectAsState(false)
-				val isStyleAlreadyPresent by viewModel.isStyleAlreadyPresent.collectAsState(false)
-				val isExtAlreadyPresent by viewModel.isExtAlreadyPresent.collectAsState(false)
-				val isRepoAlreadyPresent by viewModel.isRepoAlreadyPresent.collectAsState(false)
+				val isNovelAlreadyPresent by viewModel.isNovelAlreadyPresent.collectAsState()
+				val isStyleAlreadyPresent by viewModel.isStyleAlreadyPresent.collectAsState()
+				val isExtAlreadyPresent by viewModel.isExtAlreadyPresent.collectAsState()
+				val isRepoAlreadyPresent by viewModel.isRepoAlreadyPresent.collectAsState()
 
-				val novelLink by viewModel.novelLink.collectAsState(null)
-				val extLink by viewModel.extLink.collectAsState(null)
-				val repoLink by viewModel.repoLink.collectAsState(null)
+				val novelLink by viewModel.novelLink.collectAsState()
+				val extLink by viewModel.extLink.collectAsState()
+				val repoLink by viewModel.repoLink.collectAsState()
 
 				AddShareContent(
 					showURLInput = showURLInput,

@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		@Suppress("UNUSED_VARIABLE") // We keep this value
 		val splashScreen = installSplashScreen()
-		viewModel.navigationStyle
+		viewModel.navigationStyle.value
 
 		onBackPressedDispatcher.addCallback(this) {
 			logI("Back pressed")
@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 		binding.coordinator.removeView(binding.efab)
 		binding.coordinator.addView(binding.efab)
 
-		if (viewModel.navigationStyle == MATERIAL) {
+		if (viewModel.navigationStyle.value == MATERIAL) {
 			binding.navRail.isVisible = isTablet
 			binding.navBottom.isVisible = !isTablet
 
@@ -302,7 +302,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 
 	private fun shouldProtectBack(): Boolean =
 		navController.backQueue.size == 2 &&
-				viewModel.requireDoubleBackToExit &&
+				viewModel.requireDoubleBackToExit.value &&
 				!inProtectingBack
 
 	private fun setupView() {
@@ -312,13 +312,13 @@ class MainActivity : AppCompatActivity(), DIAware {
 		binding.toolbar.setNavigationOnClickListener {
 			logV("Navigation item clicked")
 			if (navController.backQueue.size == 2) {
-				if (viewModel.navigationStyle == LEGACY) {
+				if (viewModel.navigationStyle.value == LEGACY) {
 					binding.drawerLayout.openDrawer(GravityCompat.START)
 				} else onBackPressedDispatcher.onBackPressed()
 			} else onBackPressedDispatcher.onBackPressed()
 		}
 
-		when (viewModel.navigationStyle) {
+		when (viewModel.navigationStyle.value) {
 			MATERIAL -> {
 				getMaterialNav().isVisible = true
 				binding.navDrawer.isVisible = false
@@ -591,7 +591,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 	 * Show navigation components
 	 */
 	private fun hideNavigation() {
-		when (viewModel.navigationStyle) {
+		when (viewModel.navigationStyle.value) {
 			LEGACY -> {
 				logI("Sync activity view with controller for legacy")
 				actionBarDrawerToggle?.isDrawerIndicatorEnabled = false
@@ -612,7 +612,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 	 * Hide navigation components
 	 */
 	private fun showNavigation() {
-		when (viewModel.navigationStyle) {
+		when (viewModel.navigationStyle.value) {
 			LEGACY -> {
 				logI("Sync activity view with controller for legacy")
 				actionBarDrawerToggle?.isDrawerIndicatorEnabled = true

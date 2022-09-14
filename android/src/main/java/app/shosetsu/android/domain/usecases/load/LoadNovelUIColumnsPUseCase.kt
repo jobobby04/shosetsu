@@ -2,7 +2,7 @@ package app.shosetsu.android.domain.usecases.load
 
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.mapLatest
 
 /*
  * This file is part of Shosetsu.
@@ -29,9 +29,9 @@ class LoadNovelUIColumnsPUseCase(
 	private val iSettingsRepository: ISettingsRepository
 ) {
 	operator fun invoke() =
-		iSettingsRepository.getIntFlow(SettingKey.ChapterColumnsInPortait).transformLatest {
+		iSettingsRepository.getIntFlow(SettingKey.ChapterColumnsInPortait).mapLatest {
 			if (it != 0)
-				emit(it)
-			else emit(3)
+				it
+			else 3
 		}
 }

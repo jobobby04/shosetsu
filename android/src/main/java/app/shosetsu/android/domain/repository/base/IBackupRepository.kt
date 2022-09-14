@@ -3,7 +3,7 @@ package app.shosetsu.android.domain.repository.base
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.domain.model.local.BackupEntity
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
 /*
@@ -36,7 +36,7 @@ interface IBackupRepository {
 		FAILURE
 	}
 
-	val backupProgress: Flow<BackupProgress>
+	val backupProgress: StateFlow<BackupProgress>
 
 
 	/**

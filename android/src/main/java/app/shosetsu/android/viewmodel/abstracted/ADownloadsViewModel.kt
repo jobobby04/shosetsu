@@ -5,7 +5,7 @@ import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -36,9 +36,9 @@ abstract class ADownloadsViewModel :
 	ShosetsuViewModel(),
 	IsOnlineCheckViewModel {
 
-	abstract val selectedDownloadState: Flow<SelectedDownloadsState>
-	abstract val isDownloadPaused: Flow<Boolean>
-	abstract val hasSelectedFlow: Flow<Boolean>
+	abstract val selectedDownloadState: StateFlow<SelectedDownloadsState>
+	abstract val isDownloadPaused: StateFlow<Boolean>
+	abstract val hasSelectedFlow: StateFlow<Boolean>
 
 	/**
 	 * Toggles paused downloads

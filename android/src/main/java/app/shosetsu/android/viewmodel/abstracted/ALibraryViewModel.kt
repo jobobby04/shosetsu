@@ -10,6 +10,7 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.StartUpdateManagerViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -36,14 +37,13 @@ import kotlinx.coroutines.flow.Flow
  * @author github.com/doomsdayrs
  */
 abstract class ALibraryViewModel :
-	SubscribeViewModel<LibraryUI>,
+	SubscribeViewModel<LibraryUI?>,
 	ShosetsuViewModel(),
 	IsOnlineCheckViewModel,
 	StartUpdateManagerViewModel {
 
-	abstract val isEmptyFlow: Flow<Boolean>
-	abstract val hasSelectionFlow: Flow<Boolean>
-	abstract val hasSelection: Boolean
+	abstract val isEmptyFlow: StateFlow<Boolean>
+	abstract val hasSelection: StateFlow<Boolean>
 
 	/** All genres from all [LibraryNovelUI] combined*/
 	abstract val genresFlow: Flow<List<String>>
@@ -57,11 +57,11 @@ abstract class ALibraryViewModel :
 	/** All artists from all [LibraryNovelUI] combined*/
 	abstract val artistsFlow: Flow<List<String>>
 
-	abstract val novelCardTypeFlow: Flow<NovelCardType>
+	abstract val novelCardTypeFlow: StateFlow<NovelCardType>
 
-	abstract val columnsInH: Flow<Int>
-	abstract val columnsInV: Flow<Int>
-	abstract val badgeUnreadToastFlow: Flow<Boolean>
+	abstract val columnsInH: StateFlow<Int>
+	abstract val columnsInV: StateFlow<Int>
+	abstract val badgeUnreadToastFlow: StateFlow<Boolean>
 
 	abstract fun cycleUnreadFilter(currentState: ToggleableState)
 	abstract fun getUnreadFilter(): Flow<ToggleableState>
@@ -98,10 +98,10 @@ abstract class ALibraryViewModel :
 	abstract fun selectBetween()
 	abstract fun toggleSelection(item: LibraryNovelUI)
 
-	abstract val queryFlow: Flow<String>
+	abstract val queryFlow: StateFlow<String>
 	abstract fun setQuery(s: String)
 
-	abstract val activeCategory: Flow<Int>
+	abstract val activeCategory: StateFlow<Int>
 	abstract fun setActiveCategory(category: Int)
 
 }

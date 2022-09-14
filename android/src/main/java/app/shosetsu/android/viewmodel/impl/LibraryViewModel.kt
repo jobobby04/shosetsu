@@ -18,7 +18,7 @@ package app.shosetsu.android.viewmodel.impl
  */
 
 import androidx.compose.ui.state.ToggleableState
-import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.InclusionState
 import app.shosetsu.android.common.enums.InclusionState.EXCLUDE
 import app.shosetsu.android.common.enums.InclusionState.INCLUDE
@@ -37,10 +37,8 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import java.util.Locale.getDefault as LGD
 
 /**
@@ -74,7 +72,7 @@ class LibraryViewModel(
 	override fun selectAll() {
 		launchIO {
 			val category = activeCategory.value
-			val list = liveData.first().novels[category].orEmpty()
+			val list = liveData.value?.novels?.get(category).orEmpty()
 			val selection = copySelected()
 
 			val selectionCategory = selection[category].orEmpty().copy()
@@ -90,11 +88,11 @@ class LibraryViewModel(
 	override fun selectBetween() {
 		launchIO {
 			val category = activeCategory.value
-			val list = liveData.first()
+			val list = liveData.value
 			val selection = copySelected()
 
-			val firstSelected = list.novels[category]?.indexOfFirst { it.isSelected } ?: -1
-			val lastSelected = list.novels[category]?.indexOfLast { it.isSelected } ?: -1
+			val firstSelected = list?.novels?.get(category)?.indexOfFirst { it.isSelected } ?: -1
+			val lastSelected = list?.novels?.get(category)?.indexOfLast { it.isSelected } ?: -1
 
 			if (listOf(firstSelected, lastSelected).any { it == -1 }) {
 				logE("Received -1 index")
@@ -112,7 +110,7 @@ class LibraryViewModel(
 			}
 
 			val selectionCategory = selection[category].orEmpty().copy()
-			list.novels[category].orEmpty().subList(firstSelected + 1, lastSelected).forEach { item ->
+			list?.novels?.get(category).orEmpty().subList(firstSelected + 1, lastSelected).forEach { item ->
 				selectionCategory[item.id] = true
 			}
 			selection[category] = selectionCategory
@@ -136,11 +134,11 @@ class LibraryViewModel(
 	override fun invertSelection() {
 		launchIO {
 			val category = activeCategory.value
-			val list = liveData.first()
+			val list = liveData.value
 			val selection = copySelected()
 
 			val selectionCategory = selection[category].orEmpty().copy()
-			list.novels.get(category).orEmpty().forEach { item ->
+			list?.novels?.get(category).orEmpty().forEach { item ->
 				selectionCategory[item.id] = !item.isSelected
 			}
 			selection[category] = selectionCategory
@@ -151,21 +149,17 @@ class LibraryViewModel(
 
 	private val librarySourceFlow: Flow<LibraryUI> by lazy { libraryAsCardsUseCase() }
 
-	override val isEmptyFlow: Flow<Boolean> by lazy {
+	override val isEmptyFlow: StateFlow<Boolean> by lazy {
 		librarySourceFlow.map {
 			it.novels.isEmpty()
-		}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val hasSelectionFlow: Flow<Boolean> by lazy {
+	override val hasSelection: StateFlow<Boolean> by lazy {
 		selectedNovels.mapLatest { map ->
-			val b = map.values.any { it.any { it.value } }
-			hasSelection = b
-			b
-		}
+			map.values.any { it.any { it.value } }
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
-
-	override var hasSelection: Boolean = false
 
 	override val genresFlow: Flow<List<String>> by lazy {
 		stripOutList { it.genres }
@@ -183,8 +177,10 @@ class LibraryViewModel(
 		stripOutList { it.artists }
 	}
 
-	override val novelCardTypeFlow: Flow<NovelCardType> by lazy {
+	override val novelCardTypeFlow: StateFlow<NovelCardType> by lazy {
 		loadNovelUITypeUseCase()
+			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelCardType.NORMAL)
 	}
 
 	private val novelSortTypeFlow: MutableStateFlow<NovelSortType> by lazy {
@@ -226,7 +222,7 @@ class LibraryViewModel(
 	 *
 	 * This also connects all the filtering as well
 	 */
-	override val liveData: Flow<LibraryUI> by lazy {
+	override val liveData: StateFlow<LibraryUI?> by lazy {
 		librarySourceFlow
 			.addDefaultCategory()
 			.combineSelection()
@@ -238,22 +234,22 @@ class LibraryViewModel(
 			.combineSortType()
 			.combineSortReverse()
 			.combineFilter()
-			// Replay the latest library for library re-load
-			.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, replay = 1)
-			.distinctUntilChanged()
 			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	override val columnsInH by lazy {
 		loadNovelUIColumnsH().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInLandscape.default)
 	}
 
 	override val columnsInV by lazy {
 		loadNovelUIColumnsP().onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInPortait.default)
 	}
 
 	override val badgeUnreadToastFlow by lazy {
-		loadNovelUIBadgeToast().onIO()
+		loadNovelUIBadgeToast()
 	}
 
 	private fun Flow<LibraryUI>.addDefaultCategory() = mapLatest {
@@ -417,7 +413,8 @@ class LibraryViewModel(
 
 	override fun removeSelectedFromLibrary() {
 		launchIO {
-			val selected = liveData.first().novels
+			val selected = liveData.value?.novels
+				.orEmpty()
 				.flatMap { it.value }
 				.distinctBy { it.id }
 				.filter { it.isSelected }
@@ -430,7 +427,7 @@ class LibraryViewModel(
 	}
 
 	override fun getSelectedIds(): Flow<IntArray> = flow {
-		val ints = selectedNovels.first()
+		val ints = selectedNovels.value
 			.flatMap { (_, map) ->
 				map.entries.filter { it.value }
 					.map { it.key }

@@ -34,12 +34,7 @@ import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.*
 
 /**
  * shosetsu
@@ -94,9 +89,7 @@ class ExtensionsViewModel(
 		}
 	}
 
-	private val searchTermFlow: MutableStateFlow<String> by lazy { MutableStateFlow("") }
-
-	override val filteredLanguagesLive: Flow<FilteredLanguages> by lazy {
+	override val filteredLanguagesLive: StateFlow<FilteredLanguages> by lazy {
 		languageListFlow.combine(settingsRepo.getStringSetFlow(BrowseFilteredLanguages)) { languageResult, filteredLanguages ->
 
 			val map = HashMap<String, Boolean>().apply {
@@ -105,16 +98,11 @@ class ExtensionsViewModel(
 				}
 			}
 			FilteredLanguages(languageResult, map)
-		}.onIO()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, FilteredLanguages(emptyList(), emptyMap()))
 	}
 
-	private val onlyInstalledFlow by lazy {
+	override val onlyInstalledLive: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(SettingKey.BrowseOnlyInstalled)
-	}
-
-
-	override val onlyInstalledLive: Flow<Boolean> by lazy {
-		onlyInstalledFlow.onIO()
 	}
 
 	override fun setLanguageFiltered(language: String, state: Boolean) {
@@ -158,42 +146,40 @@ class ExtensionsViewModel(
 	}
 
 	override fun setSearch(name: String) {
-		searchTermFlow.value = name
+		searchTermLive.value = name
 	}
 
 	override fun resetSearch() {
-		searchTermFlow.value = ""
+		searchTermLive.value = ""
 	}
 
-	override val searchTermLive: Flow<String> by lazy {
-		searchTermFlow.onIO()
+	override val searchTermLive: MutableStateFlow<String> by lazy {
+		MutableStateFlow("")
 	}
 
-	override val liveData: Flow<List<BrowseExtensionUI>> by lazy {
-		extensionFlow.transformLatest { list ->
-			emitAll(
-				settingsRepo.getStringSetFlow(BrowseFilteredLanguages)
-					.combine(
-						settingsRepo.getBooleanFlow(SettingKey.BrowseOnlyInstalled)
-							.combine(searchTermFlow) { onlyInstalled, searchTerm ->
-								onlyInstalled to searchTerm
-							}) { languagesToFilter, (onlyInstalled, searchTerm) ->
-						list
-							.asSequence()
-							.let { sequence ->
-								if (searchTerm.isNotBlank())
-									sequence.filter { it.name.contains(searchTerm) }
-								else sequence
-							}
-							.filter { if (onlyInstalled) it.isInstalled else true }
-							.filterNot { languagesToFilter.contains(it.lang) }
-							.sortedBy { it.name }
-							.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.displayLang })
-							.sortedBy { !it.isInstalled }
-							.sortedBy { !it.isUpdateAvailable }
-							.toList()
-					})
-		}.onIO()
+	override val liveData: StateFlow<List<BrowseExtensionUI>?> by lazy {
+		extensionFlow.flatMapLatest { list ->
+			combine(
+				settingsRepo.getStringSetFlow(BrowseFilteredLanguages),
+				settingsRepo.getBooleanFlow(SettingKey.BrowseOnlyInstalled),
+				searchTermLive
+			) { languagesToFilter, onlyInstalled, searchTerm ->
+				list
+					.asSequence()
+					.let { sequence ->
+						if (searchTerm.isNotBlank())
+							sequence.filter { it.name.contains(searchTerm) }
+						else sequence
+					}
+					.filter { if (onlyInstalled) it.isInstalled else true }
+					.filterNot { languagesToFilter.contains(it.lang) }
+					.sortedBy { it.name }
+					.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.displayLang })
+					.sortedBy { !it.isInstalled }
+					.sortedBy { !it.isUpdateAvailable }
+					.toList()
+			}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	override fun isOnline(): Boolean = isOnlineUseCase()

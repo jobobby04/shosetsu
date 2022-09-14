@@ -1,7 +1,7 @@
 package app.shosetsu.android.domain.repository.base
 
 import app.shosetsu.android.common.SettingKey
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -26,17 +26,17 @@ import kotlinx.coroutines.flow.Flow
  */
 interface ISettingsRepository {
 
-	fun getLongFlow(key: SettingKey<Long>): Flow<Long>
+	fun getLongFlow(key: SettingKey<Long>): StateFlow<Long>
 
-	fun getStringFlow(key: SettingKey<String>): Flow<String>
+	fun getStringFlow(key: SettingKey<String>): StateFlow<String>
 
-	fun getIntFlow(key: SettingKey<Int>): Flow<Int>
+	fun getIntFlow(key: SettingKey<Int>): StateFlow<Int>
 
-	fun getBooleanFlow(key: SettingKey<Boolean>): Flow<Boolean>
+	fun getBooleanFlow(key: SettingKey<Boolean>): StateFlow<Boolean>
 
-	fun getFloatFlow(key: SettingKey<Float>): Flow<Float>
+	fun getFloatFlow(key: SettingKey<Float>): StateFlow<Float>
 
-	fun getStringSetFlow(key: SettingKey<Set<String>>): Flow<Set<String>>
+	fun getStringSetFlow(key: SettingKey<Set<String>>): StateFlow<Set<String>>
 
 
 	suspend fun getLong(key: SettingKey<Long>): Long

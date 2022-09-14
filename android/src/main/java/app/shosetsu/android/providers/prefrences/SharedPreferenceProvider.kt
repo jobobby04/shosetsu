@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import app.shosetsu.android.common.*
 import app.shosetsu.android.common.ext.logE
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -47,22 +47,22 @@ class SharedPreferenceProvider(
 	) {
 		private val flowHolder: SharedPreferenceFlowState = SharedPreferenceFlowState()
 
-		fun observeLong(key: SettingKey<Long>): Flow<Long> =
+		fun observeLong(key: SettingKey<Long>): StateFlow<Long> =
 			flowHolder.observeLong(key)
 
-		fun observeString(key: StringKey): Flow<String> =
+		fun observeString(key: StringKey): StateFlow<String> =
 			flowHolder.observeString(key)
 
-		fun observeInt(key: IntKey): Flow<Int> =
+		fun observeInt(key: IntKey): StateFlow<Int> =
 			flowHolder.observeInt(key)
 
-		fun observeBoolean(key: BooleanKey): Flow<Boolean> =
+		fun observeBoolean(key: BooleanKey): StateFlow<Boolean> =
 			flowHolder.observeBoolean(key)
 
-		fun observeStringSet(key: StringSetKey): Flow<Set<String>> =
+		fun observeStringSet(key: StringSetKey): StateFlow<Set<String>> =
 			flowHolder.observeStringSet(key)
 
-		fun observeFloat(key: FloatKey): Flow<Float> =
+		fun observeFloat(key: FloatKey): StateFlow<Float> =
 			flowHolder.observeFloat(key)
 
 
@@ -128,42 +128,42 @@ class SharedPreferenceProvider(
 
 			private val floatMap: SettingKeyFlowMap<Float> by lazyHashMapOf()
 
-			fun observeLong(key: SettingKey<Long>): Flow<Long> =
+			fun observeLong(key: SettingKey<Long>): StateFlow<Long> =
 				longMap.getOrPut(key) {
 					MutableStateFlow(getLong(key)).also {
 						longMap[key] = it
 					}
 				}
 
-			fun observeString(key: StringKey): Flow<String> =
+			fun observeString(key: StringKey): StateFlow<String> =
 				stringMap.getOrPut(key) {
 					MutableStateFlow(getString(key)).also {
 						stringMap[key] = it
 					}
 				}
 
-			fun observeInt(key: IntKey): Flow<Int> =
+			fun observeInt(key: IntKey): StateFlow<Int> =
 				intMap.getOrPut(key) {
 					MutableStateFlow(getInt(key)).also {
 						intMap[key] = it
 					}
 				}
 
-			fun observeBoolean(key: BooleanKey): Flow<Boolean> =
+			fun observeBoolean(key: BooleanKey): StateFlow<Boolean> =
 				booleanMap.getOrPut(key) {
 					MutableStateFlow(getBoolean(key)).also {
 						booleanMap[key] = it
 					}
 				}
 
-			fun observeStringSet(key: StringSetKey): Flow<Set<String>> =
+			fun observeStringSet(key: StringSetKey): StateFlow<Set<String>> =
 				stringSetMap.getOrPut(key) {
 					MutableStateFlow(getStringSet(key)).also {
 						stringSetMap[key] = it
 					}
 				}
 
-			fun observeFloat(key: FloatKey): Flow<Float> =
+			fun observeFloat(key: FloatKey): StateFlow<Float> =
 				floatMap.getOrPut(key) {
 					MutableStateFlow(getFloat(key)).also {
 						floatMap[key] = it
@@ -242,22 +242,22 @@ class SharedPreferenceProvider(
 		}
 
 
-	fun observeLong(name: String, key: SettingKey<Long>): Flow<Long> =
+	fun observeLong(name: String, key: SettingKey<Long>): StateFlow<Long> =
 		getPreferences(name).observeLong(key)
 
-	fun observeString(name: String, key: StringKey): Flow<String> =
+	fun observeString(name: String, key: StringKey): StateFlow<String> =
 		getPreferences(name).observeString(key)
 
-	fun observeInt(name: String, key: IntKey): Flow<Int> =
+	fun observeInt(name: String, key: IntKey): StateFlow<Int> =
 		getPreferences(name).observeInt(key)
 
-	fun observeBoolean(name: String, key: BooleanKey): Flow<Boolean> =
+	fun observeBoolean(name: String, key: BooleanKey): StateFlow<Boolean> =
 		getPreferences(name).observeBoolean(key)
 
-	fun observeStringSet(name: String, key: StringSetKey): Flow<Set<String>> =
+	fun observeStringSet(name: String, key: StringSetKey): StateFlow<Set<String>> =
 		getPreferences(name).observeStringSet(key)
 
-	fun observeFloat(name: String, key: FloatKey): Flow<Float> =
+	fun observeFloat(name: String, key: FloatKey): StateFlow<Float> =
 		getPreferences(name).observeFloat(key)
 
 

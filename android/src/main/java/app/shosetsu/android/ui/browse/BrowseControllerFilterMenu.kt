@@ -46,14 +46,12 @@ import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.LanguageFilter
 
 @Composable
 fun BrowseControllerFilterMenu(viewModel: ABrowseViewModel) {
-	val showOnlyInstalled by viewModel.onlyInstalledLive.collectAsState(initial = false)
-	val languageList: FilteredLanguages by viewModel.filteredLanguagesLive.collectAsState(
-		initial = FilteredLanguages(emptyList(), emptyMap())
-	)
+	val showOnlyInstalled by viewModel.onlyInstalledLive.collectAsState()
+	val languageList: FilteredLanguages by viewModel.filteredLanguagesLive.collectAsState()
 
 	var hideLanguageFilter by remember { mutableStateOf(false) }
 
-	val searchTerm by viewModel.searchTermLive.collectAsState("")
+	val searchTerm by viewModel.searchTermLive.collectAsState()
 
 	Column(
 		modifier = Modifier

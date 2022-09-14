@@ -43,7 +43,7 @@ fun SwitchSettingContent(
 	modifier: Modifier = Modifier,
 	enabled: Boolean = true
 ) {
-	val value by repo.getBooleanFlow(key).collectAsState(key.default)
+	val value by repo.getBooleanFlow(key).collectAsState()
 	SwitchSettingContent(
 		title, description, value, modifier, enabled
 	) {

@@ -134,7 +134,7 @@ class BrowseController : ShosetsuController(),
 		return ComposeView(requireContext()).apply {
 			setContent {
 				ShosetsuCompose {
-					val entities by viewModel.liveData.collectAsState(null)
+					val entities by viewModel.liveData.collectAsState()
 					var isRefreshing by remember { mutableStateOf(false) }
 					BrowseContent(
 						entities,

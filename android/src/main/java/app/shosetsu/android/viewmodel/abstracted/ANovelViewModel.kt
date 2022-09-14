@@ -10,6 +10,8 @@ import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
 
 /*
@@ -39,26 +41,26 @@ import javax.security.auth.Destroyable
 abstract class ANovelViewModel
 	: ShosetsuViewModel(), IsOnlineCheckViewModel, Destroyable {
 
-	abstract val hasSelected: Flow<Boolean>
+	abstract val hasSelected: StateFlow<Boolean>
 	abstract fun clearSelection()
 
-	abstract val itemIndex: Flow<Int>
+	abstract val itemIndex: StateFlow<Int>
 	abstract fun setItemAt(index: Int)
 
-	abstract val isRefreshing: Flow<Boolean>
+	abstract val isRefreshing: StateFlow<Boolean>
 
-	abstract val novelLive: Flow<NovelUI?>
-	abstract val chaptersLive: Flow<List<ChapterUI>>
-	abstract val selectedChaptersState: Flow<SelectedChaptersState>
+	abstract val novelLive: StateFlow<NovelUI?>
+	abstract val chaptersLive: StateFlow<List<ChapterUI>>
+	abstract val selectedChaptersState: StateFlow<SelectedChaptersState>
 
-	abstract val otherException: Flow<Throwable?>
-	abstract val novelException: Flow<Throwable?>
-	abstract val chaptersException: Flow<Throwable?>
+	abstract val otherException: StateFlow<Throwable?>
+	abstract val novelException: StateFlow<Throwable?>
+	abstract val chaptersException: StateFlow<Throwable?>
 
-	abstract val novelSettingFlow: Flow<NovelSettingUI?>
+	abstract val novelSettingFlow: SharedFlow<NovelSettingUI?>
 
-	abstract val categories: Flow<List<CategoryUI>>
-	abstract val novelCategories: Flow<List<Int>>
+	abstract val categories: StateFlow<List<CategoryUI>>
+	abstract val novelCategories: StateFlow<List<Int>>
 
 	/** Set's the value to be loaded */
 	abstract fun setNovelID(novelID: Int)

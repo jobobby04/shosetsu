@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.plus
 
 /*
  * This file is part of Shosetsu.
@@ -38,4 +39,7 @@ abstract class ShosetsuViewModel : ViewModel() {
 	 */
 	fun <T> Flow<T>.onIO(): Flow<T> =
 		flowOn(Dispatchers.IO)
+
+	val viewModelScopeIO
+		get() = viewModelScope + Dispatchers.IO
 }

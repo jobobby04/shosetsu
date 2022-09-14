@@ -4,7 +4,7 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.file.base.IFileSettingsDataSource
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -31,23 +31,23 @@ class SettingsRepository(
 	private val iLocalSettingsDataSource: IFileSettingsDataSource
 ) : ISettingsRepository {
 
-	override fun getLongFlow(key: SettingKey<Long>): Flow<Long> =
-		iLocalSettingsDataSource.observeLong(DEFAULT_NAME, key).onIO()
+	override fun getLongFlow(key: SettingKey<Long>): StateFlow<Long> =
+		iLocalSettingsDataSource.observeLong(DEFAULT_NAME, key)
 
-	override fun getStringFlow(key: SettingKey<String>): Flow<String> =
-		iLocalSettingsDataSource.observeString(DEFAULT_NAME, key).onIO()
+	override fun getStringFlow(key: SettingKey<String>): StateFlow<String> =
+		iLocalSettingsDataSource.observeString(DEFAULT_NAME, key)
 
-	override fun getIntFlow(key: SettingKey<Int>): Flow<Int> =
-		iLocalSettingsDataSource.observeInt(DEFAULT_NAME, key).onIO()
+	override fun getIntFlow(key: SettingKey<Int>): StateFlow<Int> =
+		iLocalSettingsDataSource.observeInt(DEFAULT_NAME, key)
 
-	override fun getBooleanFlow(key: SettingKey<Boolean>): Flow<Boolean> =
-		iLocalSettingsDataSource.observeBoolean(DEFAULT_NAME, key).onIO()
+	override fun getBooleanFlow(key: SettingKey<Boolean>): StateFlow<Boolean> =
+		iLocalSettingsDataSource.observeBoolean(DEFAULT_NAME, key)
 
-	override fun getStringSetFlow(key: SettingKey<Set<String>>): Flow<Set<String>> =
-		iLocalSettingsDataSource.observeStringSet(DEFAULT_NAME, key).onIO()
+	override fun getStringSetFlow(key: SettingKey<Set<String>>): StateFlow<Set<String>> =
+		iLocalSettingsDataSource.observeStringSet(DEFAULT_NAME, key)
 
-	override fun getFloatFlow(key: SettingKey<Float>): Flow<Float> =
-		iLocalSettingsDataSource.observeFloat(DEFAULT_NAME, key).onIO()
+	override fun getFloatFlow(key: SettingKey<Float>): StateFlow<Float> =
+		iLocalSettingsDataSource.observeFloat(DEFAULT_NAME, key)
 
 	override suspend fun getLong(key: SettingKey<Long>): Long =
 		onIO { iLocalSettingsDataSource.getLong(DEFAULT_NAME, key) }

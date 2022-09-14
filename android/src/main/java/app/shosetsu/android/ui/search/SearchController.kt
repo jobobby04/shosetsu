@@ -87,8 +87,8 @@ class SearchController : ShosetsuController(), MenuProvider {
 		return ComposeView(requireContext()).apply {
 			setContent {
 				ShosetsuCompose {
-					val rows by viewModel.listings.collectAsState(emptyList())
-					val isCozy by viewModel.isCozy.collectAsState(false)
+					val rows by viewModel.listings.collectAsState()
+					val isCozy by viewModel.isCozy.collectAsState()
 
 					SearchContent(
 						rows = rows,

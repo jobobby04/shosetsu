@@ -6,8 +6,8 @@ import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
-import kotlinx.coroutines.flow.Flow
-import java.util.Locale
+import kotlinx.coroutines.flow.StateFlow
+import java.util.*
 
 /*
  * This file is part of shosetsu.
@@ -35,7 +35,7 @@ import java.util.Locale
  */
 abstract class ABrowseViewModel :
 	ShosetsuViewModel(),
-	SubscribeViewModel<List<BrowseExtensionUI>>,
+	SubscribeViewModel<List<BrowseExtensionUI>?>,
 	IsOnlineCheckViewModel {
 
 	@Immutable
@@ -71,7 +71,7 @@ abstract class ABrowseViewModel :
 	 * First value is a list of possible strings
 	 * Second value is if it is filtered or not
 	 */
-	abstract val filteredLanguagesLive: Flow<FilteredLanguages>
+	abstract val filteredLanguagesLive: StateFlow<FilteredLanguages>
 
 	/**
 	 * Set if a language is filtered or not
@@ -79,7 +79,7 @@ abstract class ABrowseViewModel :
 	abstract fun setLanguageFiltered(language: String, state: Boolean)
 
 
-	abstract val onlyInstalledLive: Flow<Boolean>
+	abstract val onlyInstalledLive: StateFlow<Boolean>
 
 	/**
 	 * Set if to only show installed or not
@@ -87,7 +87,7 @@ abstract class ABrowseViewModel :
 	abstract fun showOnlyInstalled(state: Boolean)
 
 
-	abstract val searchTermLive: Flow<String>
+	abstract val searchTermLive: StateFlow<String>
 
 	/**
 	 * Filter the extension list to only display extensions matching [name]

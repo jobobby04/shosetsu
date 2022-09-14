@@ -8,6 +8,7 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
 
 /*
@@ -40,33 +41,33 @@ abstract class ACatalogViewModel :
 	 */
 	abstract val itemsLive: Flow<PagingData<ACatalogNovelUI>>
 
-	abstract val exceptionFlow: Flow<Throwable?>
+	abstract val exceptionFlow: StateFlow<Throwable?>
 
 	/**
 	 * The list of items that will be presented as the filter menu
 	 */
-	abstract val filterItemsLive: Flow<List<Filter<*>>>
-	abstract val hasFilters: Flow<Boolean>
+	abstract val filterItemsLive: StateFlow<List<Filter<*>>>
+	abstract val hasFilters: StateFlow<Boolean>
 
 	/**
 	 * enable or disable searching
 	 */
-	abstract val hasSearchLive: Flow<Boolean>
+	abstract val hasSearchLive: StateFlow<Boolean>
 
 	/**
 	 * Name of the extension that is used for its catalogue
 	 */
-	abstract val extensionName: Flow<String>
+	abstract val extensionName: StateFlow<String>
 
 	/**
 	 * What type of card to display
 	 */
-	abstract val novelCardTypeLive: Flow<NovelCardType>
+	abstract val novelCardTypeLive: StateFlow<NovelCardType>
 
-	abstract val columnsInH: Flow<Int>
-	abstract val columnsInV: Flow<Int>
+	abstract val columnsInH: StateFlow<Int>
+	abstract val columnsInV: StateFlow<Int>
 
-	abstract val categories: Flow<List<CategoryUI>>
+	abstract val categories: StateFlow<List<CategoryUI>>
 
 	/**
 	 * Sets the [IExtension]

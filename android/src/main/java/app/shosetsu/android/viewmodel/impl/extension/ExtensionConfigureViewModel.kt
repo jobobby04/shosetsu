@@ -51,36 +51,36 @@ class ExtensionConfigureViewModel(
 ) : AExtensionConfigureViewModel() {
 	private val extensionIdFlow: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
 
-	override val liveData: Flow<InstalledExtensionUI?> by lazy {
-		extensionIdFlow.transformLatest { id ->
-			emitAll(loadInstalledExtension(id))
-		}.onIO()
+	override val liveData: StateFlow<InstalledExtensionUI?> by lazy {
+		extensionIdFlow.flatMapLatest { id ->
+			loadInstalledExtension(id)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	private val extListNamesFlow: Flow<ListingSelectionData> by lazy {
-		extensionIdFlow.transformLatest { extensionID ->
+		extensionIdFlow.flatMapLatest { extensionID ->
 			val listingNames: List<String> = getExtListNames(extensionID)
 
-			emitAll(
-				getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
-					ListingSelectionData(listingNames, selectedListing)
-				}
-			)
+			getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
+				ListingSelectionData(listingNames, selectedListing)
+			}
 		}
 	}
 
 	private val extensionSettingsFlow: Flow<List<FilterEntity>> by lazy {
-		extensionIdFlow.transformLatest { extensionID ->
-			emitAll(getExtensionSettings(extensionID))
+		extensionIdFlow.flatMapLatest { extensionID ->
+			getExtensionSettings(extensionID)
 		}
 	}
 
-	override val extensionSettings: Flow<List<FilterEntity>> by lazy {
+	override val extensionSettings: StateFlow<List<FilterEntity>> by lazy {
 		extensionSettingsFlow.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 
-	override val extensionListing: Flow<ListingSelectionData> by lazy {
+	override val extensionListing: StateFlow<ListingSelectionData?> by lazy {
 		extListNamesFlow.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	override fun setExtensionID(id: Int) {

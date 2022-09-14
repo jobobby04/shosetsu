@@ -6,9 +6,7 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.readAsset
 import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.*
 
 /*
  * This file is part of shosetsu.
@@ -34,30 +32,29 @@ import kotlinx.coroutines.flow.mapLatest
  * @author Doomsdayrs
  */
 class TextAssetReaderViewModel(val application: Application) : ATextAssetReaderViewModel() {
+
+	override val targetLiveData = MutableStateFlow<TextAsset?>(null)
+
 	@OptIn(ExperimentalCoroutinesApi::class)
-	override val liveData: Flow<String?>
-		get() = targetFlow.mapLatest {
+	override val liveData: StateFlow<String?> by lazy {
+		targetLiveData.mapLatest {
 			if (it != null) {
 				application.readAsset(it.assetName + ".txt")
 			} else {
 				null
 			}
-		}
-
-	private val targetFlow = MutableStateFlow<TextAsset?>(null)
-
-	override val targetLiveData: Flow<TextAsset?>
-		get() = targetFlow
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+	}
 
 	override fun setTarget(targetOrdinal: Int) {
 		logI("Opening up asset via ordinal $targetOrdinal")
 		// If target is empty, emit
-		if (targetFlow.value != null) {
+		if (targetLiveData.value != null) {
 			// If the targets are the same, ignore and return
-			if (targetFlow.value!!.ordinal == targetOrdinal)
+			if (targetLiveData.value!!.ordinal == targetOrdinal)
 				return
 		}
-		targetFlow.value = null
-		targetFlow.value = TextAsset.values()[targetOrdinal]
+		targetLiveData.value = null
+		targetLiveData.value = TextAsset.values()[targetOrdinal]
 	}
 }

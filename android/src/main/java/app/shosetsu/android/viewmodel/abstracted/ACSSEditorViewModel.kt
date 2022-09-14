@@ -1,7 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -40,13 +40,13 @@ abstract class ACSSEditorViewModel : ShosetsuViewModel() {
 	abstract fun appendText(pasteContent: String)
 	abstract fun setCSSId(int: Int)
 
-	abstract val cssContent: Flow<String>
-	abstract val cssTitle: Flow<String>
+	abstract val cssContent: StateFlow<String>
+	abstract val cssTitle: StateFlow<String>
 
-	abstract val isCSSValid: Flow<Boolean>
-	abstract val cssInvalidReason: Flow<String?>
+	abstract val isCSSValid: StateFlow<Boolean>
+	abstract val cssInvalidReason: StateFlow<String?>
 
-	abstract val canUndo: Flow<Boolean>
-	abstract val canRedo: Flow<Boolean>
+	abstract val canUndo: StateFlow<Boolean>
+	abstract val canRedo: StateFlow<Boolean>
 
 }

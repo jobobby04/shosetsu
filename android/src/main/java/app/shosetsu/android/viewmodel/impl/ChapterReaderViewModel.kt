@@ -5,7 +5,6 @@ import android.graphics.Color
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
-import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.common.SettingKey.*
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.MarkingType
@@ -37,11 +36,9 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDivide
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.plus
 import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -83,8 +80,10 @@ class ChapterReaderViewModel(
 	private val recordChapterIsRead: RecordChapterIsReadUseCase,
 	private val getExt: GetExtensionUseCase
 ) : AChapterReaderViewModel() {
-	override val appThemeLiveData: Flow<AppThemes> by lazy {
+	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
 		loadLiveAppThemeUseCase()
+			.onIO()
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, replay = 1)
 	}
 
 	private val isHorizontalPageSwapping by lazy {
@@ -103,15 +102,20 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	private val doubleTapSystemFlow: Flow<Boolean> by lazy {
+	private val doubleTapSystemFlow: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapSystem)
-			.combine(enableFullscreen) { doubleTapSystem, enableFullscreen ->
-				doubleTapSystem || !enableFullscreen
+			.let { 
+				it
+					.combine(enableFullscreen) { doubleTapSystem, enableFullscreen ->
+						doubleTapSystem || !enableFullscreen
+					}
+					.combine(matchFullscreenToFocus) { doubleTapSystem, matchFullscreenToFocus ->
+						doubleTapSystem && !matchFullscreenToFocus
+					}
+					.onIO()
+					.stateIn(viewModelScopeIO, SharingStarted.Lazily, (it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value)
 			}
-			.combine(matchFullscreenToFocus) { doubleTapSystem, matchFullscreenToFocus ->
-				doubleTapSystem && !matchFullscreenToFocus
-			}
-			.onIO()
+			
 	}
 
 	/**
@@ -126,20 +130,24 @@ class ChapterReaderViewModel(
 	 *
 	 * To correct this,
 	 */
-	private val progressMapFlow by lazy { MutableStateFlow(HashMap<Int, Double>()) }
+	private val progressMapFlow = MutableStateFlow(HashMap<Int, Double>())
 
-
-	override var ttsPitch: Float = 0.0f
-
-	private val stringMap by lazy { HashMap<Int, Flow<ChapterPassage>>() }
-	private val refreshMap by lazy { HashMap<Int, MutableStateFlow<Boolean>>() }
-
-	override val isFirstFocusFlow: Flow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderIsFirstFocus).onIO()
+	override val ttsPitch by lazy {
+		settingsRepo.getFloatFlow(ReaderPitch)
+	}
+	override val ttsSpeed by lazy {
+		settingsRepo.getFloatFlow(ReaderSpeed)
 	}
 
-	override val isSwipeInverted: Flow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderIsInvertedSwipe).onIO()
+	private val stringMap = HashMap<Int, Flow<ChapterPassage>>()
+	private val refreshMap = HashMap<Int, MutableStateFlow<Boolean>>()
+
+	override val isFirstFocusFlow: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderIsFirstFocus)
+	}
+
+	override val isSwipeInverted: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderIsInvertedSwipe)
 	}
 
 	override fun onFirstFocus() {
@@ -240,7 +248,7 @@ class ChapterReaderViewModel(
 						)
 					}
 				)
-			}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+			}.onIO().shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 		}
 
 		if (cleanStringMapJob == null && stringMap.size > 10) {
@@ -251,7 +259,7 @@ class ChapterReaderViewModel(
 				}
 		}
 
-		return mutableFlow.onIO()
+		return mutableFlow
 	}
 
 	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
@@ -312,7 +320,7 @@ class ChapterReaderViewModel(
 						)
 					}
 				)
-			}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+			}.onIO().shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 		}
 
 		if (cleanStringMapJob == null && stringMap.size > 10) {
@@ -323,17 +331,15 @@ class ChapterReaderViewModel(
 				}
 		}
 
-		return mutableFlow.onIO()
+		return mutableFlow
 	}
 
-	override val isCurrentChapterBookmarked: Flow<Boolean> by lazy {
-		currentChapterID.transformLatest { id ->
-			emitAll(
-				chapterRepository.getChapterBookmarkedFlow(id).map {
-					it ?: false
-				}
-			)
-		}.onIO()
+	override val isCurrentChapterBookmarked: StateFlow<Boolean> by lazy {
+		currentChapterID.flatMapLatest { id ->
+			chapterRepository.getChapterBookmarkedFlow(id).map {
+				it ?: false
+			}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
 	private val extFlow: Flow<IExtension?> by lazy {
@@ -344,12 +350,13 @@ class ChapterReaderViewModel(
 	}
 
 	private val convertStringToHtml by lazy {
-		settingsRepo.getBooleanFlow(ReaderStringToHtml).onIO()
+		settingsRepo.getBooleanFlow(ReaderStringToHtml)
 	}
 
-	private val extensionChapterTypeFlow: Flow<Novel.ChapterType?> by lazy {
+	private val extensionChapterTypeFlow: SharedFlow<Novel.ChapterType?> by lazy {
 		extFlow.map { it?.chapterType }
-			.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+			.onIO()
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
 	/**
@@ -358,40 +365,34 @@ class ChapterReaderViewModel(
 	 * Upon [ReaderStringToHtml] being true, will clear out any previous strings if the prevType was
 	 * not html, causing the content to regenerate.
 	 */
-	override val chapterType: Flow<Novel.ChapterType?> by lazy {
-		extensionChapterTypeFlow.transformLatest { type ->
-			emit(null)
-			if (type == null) return@transformLatest
+	override val chapterType: StateFlow<Novel.ChapterType?> by lazy {
+		extensionChapterTypeFlow.filterNotNull().flatMapLatest { type ->
 			var prevType: Novel.ChapterType? = null
 
-			emitAll(
-				convertStringToHtml.transformLatest { convert ->
-					@Suppress("DEPRECATION")
-					if (convert && type == Novel.ChapterType.STRING) {
-						if (prevType != Novel.ChapterType.HTML)
-							clearMaps()
+			convertStringToHtml.mapLatest { convert ->
+				@Suppress("DEPRECATION")
+				if (convert && type == Novel.ChapterType.STRING) {
+					if (prevType != Novel.ChapterType.HTML)
+						clearMaps()
 
-						prevType = Novel.ChapterType.HTML
-						emit(Novel.ChapterType.HTML)
-					} else {
-						if (prevType != type)
-							clearMaps()
+					prevType = Novel.ChapterType.HTML
+					Novel.ChapterType.HTML
+				} else {
+					if (prevType != type)
+						clearMaps()
 
-						prevType = type
-						emit(type)
-					}
+					prevType = type
+					type
 				}
-			)
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+			}
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	override var ttsSpeed: Float = 0.0f
-
 	private val chaptersFlow: Flow<List<ReaderChapterUI>> by lazy {
-		novelIDLive.transformLatest { nId ->
+		novelIDLive.flatMapLatest { nId ->
 			System.gc() // Run GC to try and mitigate OOM
-			emitAll(loadReaderChaptersUseCase(nId))
-		}.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
+			loadReaderChaptersUseCase(nId)
+		}.onIO().shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
 	override fun getChapterProgress(chapter: ReaderChapterUI): Flow<Double> =
@@ -406,15 +407,14 @@ class ChapterReaderViewModel(
 			)
 		}.onIO()
 
-	override val liveData: Flow<List<ReaderUIItem>> by lazy {
+	override val liveData: StateFlow<List<ReaderUIItem>?> by lazy {
 		chaptersFlow
 			.combineDividers() // Add dividers
-			// todo maybe replace with .distinctUntilChanged()
-			.shareIn(viewModelScope + Dispatchers.IO, SharingStarted.Lazily, 1)
 			.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	override val currentPage: MutableStateFlow<Int> = MutableStateFlow(0)
+	override val currentPage: MutableStateFlow<Int?> = MutableStateFlow(null)
 
 	private fun Flow<List<ReaderChapterUI>>.combineDividers(): Flow<List<ReaderUIItem>> =
 		combine(settingsRepo.getBooleanFlow(ReaderShowChapterDivider)) { list, value ->
@@ -446,60 +446,56 @@ class ChapterReaderViewModel(
 		currentPage.value = page
 	}
 
-	private val readerSettingsFlow: Flow<NovelReaderSettingEntity> by lazy {
-		novelIDLive.transformLatest {
-			emitAll(getReaderSettingsUseCase(it))
-		}
+	private val readerSettingsFlow: StateFlow<NovelReaderSettingEntity> by lazy {
+		novelIDLive.flatMapLatest {
+			getReaderSettingsUseCase(it)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingEntity(-1, 0, 0.0F))
 	}
 
-	private val themeFlow: Flow<Pair<Int, Int>> by lazy {
-		settingsRepo.getIntFlow(ReaderTheme).transformLatest { id: Int ->
+	private val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
+		settingsRepo.getIntFlow(ReaderTheme).mapLatest { id: Int ->
 			settingsRepo.getStringSet(ReaderUserThemes)
 				.map { ColorChoiceData.fromString(it) }
 				.find { it.identifier == id.toLong() }
 				?.let { (_, _, textColor, backgroundColor) ->
-					emit(textColor to backgroundColor)
-				} ?: emit(Color.BLACK to Color.WHITE)
-
-		}
+					(textColor to backgroundColor)
+				} ?: (Color.BLACK to Color.WHITE)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, Color.BLACK to Color.WHITE)
 	}
 
-	override val textColor: Flow<Int> by lazy {
+	override val textColor: StateFlow<Int> by lazy {
 		themeFlow.map { it.first }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, themeFlow.value.first)
 	}
 
-	override val backgroundColor: Flow<Int> by lazy {
+	override val backgroundColor: StateFlow<Int> by lazy {
 		themeFlow.map { it.second }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, themeFlow.value.second)
 	}
 
-	private val textSizeFlow by lazy {
+	override val liveTextSize: StateFlow<Float> by lazy {
 		settingsRepo.getFloatFlow(ReaderTextSize)
 	}
 
-	override val liveTextSize: Flow<Float> by lazy {
-		textSizeFlow.onIO()
+	override val liveKeepScreenOn: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderKeepScreenOn)
 	}
 
-	override val liveKeepScreenOn: Flow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderKeepScreenOn).onIO()
-	}
+	override val currentChapterID: MutableStateFlow<Int> = MutableStateFlow(-1)
 
-	override var currentChapterID: MutableStateFlow<Int> = MutableStateFlow(-1)
-
-	private val novelIDLive: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
-
-	private var _defaultVolumeScroll: Boolean = ReaderVolumeScroll.default
+	private val novelIDLive: MutableStateFlow<Int> = MutableStateFlow(-1)
 
 	private var _isHorizontalReading: Boolean = ReaderHorizontalPageSwap.default
 
-	override val isVolumeScrollEnabled: Boolean
-		get() = _defaultVolumeScroll
+	override val isVolumeScrollEnabled by lazy {
+		settingsRepo.getBooleanFlow(ReaderVolumeScroll)
+	}
 
-	override val isHorizontalReading: Flow<Boolean> by lazy {
-		isHorizontalPageSwapping.mapLatest {
-			_isHorizontalReading = it
-			it
-		}.onIO()
+	override val isHorizontalReading: StateFlow<Boolean> by lazy {
+		isHorizontalPageSwapping
+			.onEach { _isHorizontalReading = it }
+			.launchIn(viewModelScopeIO)
+		isHorizontalPageSwapping
 	}
 
 	override fun setNovelID(novelID: Int) {
@@ -655,34 +651,31 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	override fun getSettings(): Flow<NovelReaderSettingEntity> =
-		readerSettingsFlow.onIO()
+	override fun getSettings(): StateFlow<NovelReaderSettingEntity> = readerSettingsFlow
 
-	private val isScreenRotationLockedFlow = MutableStateFlow(false)
-
-	override val tapToScroll: Flow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderIsTapToScroll).onIO()
+	override val tapToScroll: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
 	}
 
-	private val doubleTapFocus: Flow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus).onIO()
+	private val doubleTapFocus: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus)
 	}
 
 	override val enableFullscreen by lazy {
 		settingsRepo.getBooleanFlow(ReaderEnableFullscreen)
 	}
 
-	override val matchFullscreenToFocus: Flow<Boolean> by lazy {
+	override val matchFullscreenToFocus: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderMatchFullscreenToFocus)
 	}
 
 	override val isFocused: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	private val _isSystemVisible = MutableStateFlow(true)
-	override val isSystemVisible: Flow<Boolean> by lazy {
+	override val isSystemVisible: StateFlow<Boolean> by lazy {
 		_isSystemVisible.combine(enableFullscreen) { isSystemVisible, enableFullscreen ->
 			isSystemVisible || !enableFullscreen
-		}.onIO()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, true)
 	}
 
 
@@ -708,19 +701,19 @@ class ChapterReaderViewModel(
 
 	override fun onReaderDoubleClicked() {
 		launchIO {
-			if (doubleTapFocus.first()) {
+			if (doubleTapFocus.value) {
 				val newValue = !isFocused.value
 				isFocused.value = newValue
-				if (newValue || matchFullscreenToFocus.first())
+				if (newValue || matchFullscreenToFocus.value)
 					_isSystemVisible.value = !newValue
-			} else if (doubleTapSystemFlow.first()) {
+			} else if (doubleTapSystemFlow.value) {
 				toggleSystemVisible()
 			}
 		}
 	}
 
-	private val userCssFlow: Flow<String> by lazy {
-		settingsRepo.getStringFlow(ReaderHtmlCss).onIO()
+	private val userCssFlow: StateFlow<String> by lazy {
+		settingsRepo.getStringFlow(ReaderHtmlCss)
 	}
 
 	data class ShosetsuCSSBuilder(
@@ -779,29 +772,10 @@ class ChapterReaderViewModel(
 		}.onIO()
 	}
 
-	init {
-		launchIO {
-			settingsRepo.getBooleanFlow(ReaderVolumeScroll).collect {
-				_defaultVolumeScroll = it
-			}
-		}
-		launchIO {
-			settingsRepo.getFloatFlow(ReaderPitch).collect {
-				ttsPitch = it
-			}
-		}
-		launchIO {
-			settingsRepo.getFloatFlow(ReaderSpeed).collect {
-				ttsSpeed = it
-			}
-		}
-	}
-
-	override val liveIsScreenRotationLocked: Flow<Boolean>
-		get() = isScreenRotationLockedFlow.onIO()
+	override val liveIsScreenRotationLocked = MutableStateFlow(false)
 
 	override fun toggleScreenRotationLock() {
-		isScreenRotationLockedFlow.value = !isScreenRotationLockedFlow.value
+		liveIsScreenRotationLocked.value = !liveIsScreenRotationLocked.value
 	}
 
 	override fun setCurrentChapterID(chapterId: Int, initial: Boolean) {
@@ -810,7 +784,7 @@ class ChapterReaderViewModel(
 
 		if (initial)
 			launchIO {
-				val items = liveData.first()
+				val items = liveData.first { it != null }!!
 				currentPage.value = items
 					.indexOfFirst { it is ReaderChapterUI && it.id == chapterId }
 			}

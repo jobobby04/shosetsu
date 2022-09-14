@@ -23,7 +23,7 @@ fun DropdownSettingContent(
 	repo: ISettingsRepository,
 	key: SettingKey<Int>
 ) {
-	val choice by repo.getIntFlow(key).collectAsState(key.default)
+	val choice by repo.getIntFlow(key).collectAsState()
 
 	DropdownSettingContent(title, description, choice, choices, modifier) {
 		launchIO { repo.setInt(key, it) }
@@ -42,8 +42,7 @@ fun DropdownSettingContent(
 	stringToInt: (value: String) -> Int,
 	intToString: (value: Int) -> String
 ) {
-	val choice by repo.getStringFlow(key)
-		.collectAsState(key.default)
+	val choice by repo.getStringFlow(key).collectAsState()
 
 	DropdownSettingContent(title, description, stringToInt(choice), choices, modifier) {
 		launchIO { repo.setString(key, intToString(it)) }

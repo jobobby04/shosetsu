@@ -7,8 +7,8 @@ import app.shosetsu.android.datasource.local.file.base.IFileBackupDataSource
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
 /*
@@ -40,8 +40,8 @@ class BackupRepository(
 		)
 	}
 
-	override val backupProgress: Flow<BackupProgress>
-		get() = _backupProgress.onIO()
+	override val backupProgress: StateFlow<BackupProgress>
+		get() = _backupProgress
 
 	override fun updateProgress(result: BackupProgress) {
 		_backupProgress.value = result
