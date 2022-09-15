@@ -1,3 +1,5 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package app.shosetsu.android.ui.catalogue
 
 import android.util.Log
@@ -31,9 +33,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.lib.Filter
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -60,7 +63,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @Composable
 fun CatalogFilterMenuPreview() = ShosetsuCompose {
 	CatalogFilterMenu(
-		persistentListOf(
+		listOf(
 			Filter.Header("This is a header"),
 			Filter.Separator(),
 			Filter.Text(1, "Text input"),
@@ -83,7 +86,7 @@ fun CatalogFilterMenuPreview() = ShosetsuCompose {
 					Filter.Switch(12, "Switch"),
 				)
 			)
-		),
+		).map { StableHolder(it) }.toImmutableList() as ImmutableList<StableHolder<Filter<*>>>,
 		getBoolean = { MutableStateFlow(false) },
 		setBoolean = { _, _ -> },
 		getInt = { MutableStateFlow(1) },
@@ -97,7 +100,7 @@ fun CatalogFilterMenuPreview() = ShosetsuCompose {
 
 @Composable
 fun CatalogFilterMenu(
-	items: ImmutableList<Filter<*>>,
+	items: ImmutableList<StableHolder<Filter<*>>>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
 	setBoolean: (Filter<Boolean>, Boolean) -> Unit,
 	getInt: (Filter<Int>) -> Flow<Int>,
@@ -128,7 +131,7 @@ fun CatalogFilterMenu(
 
 @Composable
 fun CatalogFilterMenuFilterListContent(
-	list: List<Filter<*>>,
+	list: ImmutableList<StableHolder<Filter<*>>>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
 	setBoolean: (Filter<Boolean>, Boolean) -> Unit,
 	getInt: (Filter<Int>) -> Flow<Int>,
@@ -144,29 +147,35 @@ fun CatalogFilterMenuFilterListContent(
 	) {
 		Spacer(Modifier.height(16.dp))
 		list.forEach { filter ->
-			when (filter) {
+			when (filter.item) {
 				is Filter.Header -> Column {
 					Divider()
 				}
 				is Filter.Separator -> Divider()
-				is Filter.Text -> CatalogFilterMenuTextContent(filter, getString, setString)
-				is Filter.Switch -> CatalogFilterMenuSwitchContent(filter, getBoolean, setBoolean)
+				is Filter.Text -> CatalogFilterMenuTextContent(filter as StableHolder<Filter.Text>, getString, setString)
+				is Filter.Switch -> CatalogFilterMenuSwitchContent(filter as StableHolder<Filter.Switch>, getBoolean, setBoolean)
 				is Filter.Checkbox ->
-					CatalogFilterMenuCheckboxContent(filter, getBoolean, setBoolean)
-				is Filter.TriState -> CatalogFilterMenuTriStateContent(filter, getInt, setInt)
-				is Filter.Dropdown -> CatalogFilterMenuDropDownContent(filter, getInt, setInt)
-				is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(filter, getInt, setInt)
+					CatalogFilterMenuCheckboxContent(filter as StableHolder<Filter.Checkbox>, getBoolean, setBoolean)
+				is Filter.TriState -> CatalogFilterMenuTriStateContent(filter as StableHolder<Filter.TriState>, getInt, setInt)
+				is Filter.Dropdown -> CatalogFilterMenuDropDownContent(filter as StableHolder<Filter.Dropdown>, getInt, setInt)
+				is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(filter as StableHolder<Filter.RadioGroup>, getInt, setInt)
 				is Filter.List -> {
 					CatalogFilterMenuFilterListContent(
-						filter.filters.toList(),
-						filter.name,
+						remember {
+							filter.item.filters.toList().map { StableHolder(it) }
+								.toImmutableList()
+						},
+						filter.item.name,
 						getBoolean, setBoolean, getInt, setInt, getString, setString
 					)
 				}
 				is Filter.Group<*> -> {
 					CatalogFilterMenuFilterListContent(
-						filter.filters.toList(),
-						filter.name,
+						remember {
+							filter.item.filters.toList().map { StableHolder(it) }
+								.toImmutableList()
+						},
+						filter.item.name,
 						getBoolean, setBoolean, getInt, setInt, getString, setString
 					)
 				}
@@ -184,7 +193,7 @@ fun PreviewCatalogFilterMenuFilterListContent() = ShosetsuCompose {
 			Filter.Switch(7, "Switch"),
 			Filter.Checkbox(8, "Checkbox"),
 			Filter.TriState(9, "Tri state"),
-		),
+		).map { StableHolder(it) }.toImmutableList() as ImmutableList<StableHolder<Filter<*>>>,
 		name = "A list",
 		getBoolean = { MutableStateFlow(false) },
 		setBoolean = { _, _ -> },
@@ -197,7 +206,7 @@ fun PreviewCatalogFilterMenuFilterListContent() = ShosetsuCompose {
 
 @Composable
 fun CatalogFilterMenuFilterListContent(
-	list: List<Filter<*>>,
+	list: ImmutableList<StableHolder<Filter<*>>>,
 	name: String,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
 	setBoolean: (Filter<Boolean>, Boolean) -> Unit,
@@ -240,34 +249,34 @@ fun CatalogFilterMenuFilterListContent(
 					.padding(horizontal = 16.dp)
 			) {
 				list.forEach { filter ->
-					when (filter) {
+					when (filter.item) {
 						is Filter.Header -> Column {
 							Divider()
 						}
 						is Filter.Separator -> Divider()
-						is Filter.Text -> CatalogFilterMenuTextContent(filter, getString, setString)
+						is Filter.Text -> CatalogFilterMenuTextContent(filter as StableHolder<Filter.Text>, getString, setString)
 						is Filter.Switch -> CatalogFilterMenuSwitchContent(
-							filter,
+							filter as StableHolder<Filter.Switch>,
 							getBoolean,
 							setBoolean
 						)
 						is Filter.Checkbox -> CatalogFilterMenuCheckboxContent(
-							filter,
+							filter as StableHolder<Filter.Checkbox>,
 							getBoolean,
 							setBoolean
 						)
 						is Filter.TriState -> CatalogFilterMenuTriStateContent(
-							filter,
+							filter as StableHolder<Filter.TriState>,
 							getInt,
 							setInt
 						)
 						is Filter.Dropdown -> CatalogFilterMenuDropDownContent(
-							filter,
+							filter as StableHolder<Filter.Dropdown>,
 							getInt,
 							setInt
 						)
 						is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(
-							filter,
+							filter as StableHolder<Filter.RadioGroup>,
 							getInt,
 							setInt
 						)
@@ -277,8 +286,11 @@ fun CatalogFilterMenuFilterListContent(
 								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists"
 							)
 							CatalogFilterMenuFilterListContent(
-								filter.filters.toList(),
-								filter.name,
+								remember {
+									filter.item.filters.toList().map { StableHolder(it) }
+										.toImmutableList()
+								},
+								filter.item.name,
 								getBoolean,
 								setBoolean,
 								getInt,
@@ -293,8 +305,11 @@ fun CatalogFilterMenuFilterListContent(
 								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists"
 							)
 							CatalogFilterMenuFilterListContent(
-								filter.filters.toList(),
-								filter.name,
+								remember {
+									filter.item.filters.toList().map { StableHolder(it) }
+										.toImmutableList()
+								},
+								filter.item.name,
 								getBoolean,
 								setBoolean,
 								getInt,
@@ -316,7 +331,7 @@ fun CatalogFilterMenuFilterListContent(
 fun PreviewCatalogFilterMenuTextContent() =
 	ShosetsuCompose {
 		CatalogFilterMenuTextContent(
-			filter = Filter.Text(0, "This is a text input"),
+			filterHolder = StableHolder(Filter.Text(0, "This is a text input")),
 			{ MutableStateFlow("") },
 			{ _, _ -> }
 		)
@@ -324,10 +339,11 @@ fun PreviewCatalogFilterMenuTextContent() =
 
 @Composable
 fun CatalogFilterMenuTextContent(
-	filter: Filter.Text,
+	filterHolder: StableHolder<Filter.Text>,
 	getString: (Filter<String>) -> Flow<String>,
 	setString: (Filter<String>, String) -> Unit
 ) {
+	val filter = filterHolder.item
 	val text by getString(filter)
 		.collectAsState(initial = "")
 
@@ -348,7 +364,7 @@ fun CatalogFilterMenuTextContent(
 @Composable
 fun PreviewCatalogFilterMenuSwitchContent() = ShosetsuCompose {
 	CatalogFilterMenuSwitchContent(
-		Filter.Switch(0, "Switch"),
+		filterHolder = StableHolder(Filter.Switch(0, "Switch")),
 		{ MutableStateFlow(false) },
 		{ _, _ -> }
 	)
@@ -356,10 +372,11 @@ fun PreviewCatalogFilterMenuSwitchContent() = ShosetsuCompose {
 
 @Composable
 fun CatalogFilterMenuSwitchContent(
-	filter: Filter.Switch,
+	filterHolder: StableHolder<Filter.Switch>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
 	setBoolean: (Filter<Boolean>, Boolean) -> Unit
 ) {
+	val filter = filterHolder.item
 	val state by getBoolean(filter)
 		.collectAsState(initial = false)
 
@@ -383,17 +400,18 @@ fun CatalogFilterMenuSwitchContent(
 @Preview
 @Composable
 fun PreviewCatalogFilterMenuCheckboxContent() = ShosetsuCompose {
-	CatalogFilterMenuCheckboxContent(Filter.Checkbox(0, "Checkbox"),
+	CatalogFilterMenuCheckboxContent(filterHolder = StableHolder(Filter.Checkbox(0, "Checkbox")),
 		{ MutableStateFlow(false) },
 		{ _, _ -> })
 }
 
 @Composable
 fun CatalogFilterMenuCheckboxContent(
-	filter: Filter.Checkbox,
+	filterHolder: StableHolder<Filter.Checkbox>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
 	setBoolean: (Filter<Boolean>, Boolean) -> Unit
 ) {
+	val filter = filterHolder.item
 	val state by getBoolean(filter)
 		.collectAsState(initial = false)
 
@@ -417,17 +435,18 @@ fun CatalogFilterMenuCheckboxContent(
 @Preview
 @Composable
 fun PreviewCatalogFilterMenuTriStateContent() = ShosetsuCompose {
-	CatalogFilterMenuTriStateContent(Filter.TriState(0, "Tristate"),
+	CatalogFilterMenuTriStateContent(filterHolder = StableHolder(Filter.TriState(0, "Tristate")),
 		{ MutableStateFlow(1) },
 		{ _, _ -> })
 }
 
 @Composable
 fun CatalogFilterMenuTriStateContent(
-	filter: Filter.TriState,
+	filterHolder: StableHolder<Filter.TriState>,
 	getInt: (Filter<Int>) -> Flow<Int>,
 	setInt: (Filter<Int>, Int) -> Unit
 ) {
+	val filter = filterHolder.item
 	val triState by getInt(filter)
 		.collectAsState(initial = Filter.TriState.STATE_IGNORED)
 
@@ -469,7 +488,7 @@ fun CatalogFilterMenuTriStateContent(
 @Composable
 fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuCompose {
 	CatalogFilterMenuDropDownContent(
-		Filter.Dropdown(0, "Dropdown", arrayOf("A", "B", "C")),
+		filterHolder = StableHolder(Filter.Dropdown(0, "Dropdown", arrayOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
 		{ _, _ -> }
 	)
@@ -477,10 +496,11 @@ fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuCompose {
 
 @Composable
 fun CatalogFilterMenuDropDownContent(
-	filter: Filter.Dropdown,
+	filterHolder: StableHolder<Filter.Dropdown>,
 	getInt: (Filter<Int>) -> Flow<Int>,
 	setInt: (Filter<Int>, Int) -> Unit
 ) {
+	val filter = filterHolder.item
 	val selection by getInt(filter)
 		.collectAsState(initial = 0)
 	var expanded by remember { mutableStateOf(false) }
@@ -541,7 +561,7 @@ fun CatalogFilterMenuDropDownContent(
 @Composable
 fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuCompose {
 	CatalogFilterMenuRadioGroupContent(
-		Filter.RadioGroup(0, "Dropdown", arrayOf("A", "B", "C")),
+		filterHolder = StableHolder(Filter.RadioGroup(0, "Dropdown", arrayOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
 		{ _, _ -> }
 	)
@@ -549,10 +569,11 @@ fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuCompose {
 
 @Composable
 fun CatalogFilterMenuRadioGroupContent(
-	filter: Filter.RadioGroup,
+	filterHolder: StableHolder<Filter.RadioGroup>,
 	getInt: (Filter<Int>) -> Flow<Int>,
 	setInt: (Filter<Int>, Int) -> Unit
 ) {
+	val filter = filterHolder.item
 	val selection by getInt(filter)
 		.collectAsState(initial = 0)
 	var expanded by remember { mutableStateOf(true) }

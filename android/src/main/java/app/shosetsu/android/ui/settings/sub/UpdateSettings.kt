@@ -7,13 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -35,6 +29,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
+import app.shosetsu.android.BuildConfig
+import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.StringSetKey
 import app.shosetsu.android.common.enums.TriStateState
@@ -47,10 +43,11 @@ import app.shosetsu.android.view.compose.setting.HeaderSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.settings.AUpdateSettingsViewModel
-import app.shosetsu.android.BuildConfig
-import app.shosetsu.android.R
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map
 
 /*
@@ -111,7 +108,7 @@ fun UpdateSettingsContent(viewModel: AUpdateSettingsViewModel) {
 			SliderSettingContent(
 				title = stringResource(R.string.settings_update_novel_frequency_title),
 				description = stringResource(R.string.settings_update_novel_frequency_desc),
-				valueRange = 1..168,
+				valueRange = remember { StableHolder(1..168) },
 				parseValue = {
 					when (it) {
 						12 -> "Bi Daily"
@@ -313,15 +310,15 @@ private fun AUpdateSettingsViewModel.LibraryUpdateCategories(
 	includeKey: StringSetKey,
 	excludeKey: StringSetKey
 ) {
-	val categories by categories.collectAsState(emptyList())
+	val categories by categories.collectAsState()
 	val includedCategoryIds by remember(includeKey) {
 		settingsRepo.getStringSetFlow(includeKey)
-			.map { it.map(String::toInt) }
-	}.collectAsState(emptyList())
+			.map { it.map(String::toInt).toImmutableList() }
+	}.collectAsState(persistentListOf())
 	val excludedCategoryIds by remember(excludeKey) {
 		settingsRepo.getStringSetFlow(excludeKey)
-			.map { it.map(String::toInt) }
-	}.collectAsState(emptyList())
+			.map { it.map(String::toInt).toImmutableList() }
+	}.collectAsState(persistentListOf())
 
 	var dialogOpen by remember(includeKey, excludeKey) {
 		mutableStateOf(false)

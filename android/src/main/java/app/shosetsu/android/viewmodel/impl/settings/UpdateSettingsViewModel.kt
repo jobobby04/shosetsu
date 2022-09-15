@@ -11,9 +11,10 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.settings.AUpdateSettingsViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.*
 
 /*
  * This file is part of shosetsu.
@@ -62,10 +63,10 @@ class UpdateSettingsViewModel(
 		repoUpdateManager.start()
 	}
 
-	override val categories: Flow<List<CategoryUI>> by lazy {
+	override val categories: StateFlow<ImmutableList<CategoryUI>> by lazy {
 		getCategoriesUseCase().mapLatest {
-			listOf(CategoryUI.default()) + it
-		}
+			(listOf(CategoryUI.default()) + it).toImmutableList()
+		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	init {

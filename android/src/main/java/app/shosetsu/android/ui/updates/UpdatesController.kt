@@ -36,6 +36,7 @@ import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.HomeFragment
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
 import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
 import coil.compose.SubcomposeAsyncImage
@@ -133,7 +134,7 @@ fun UpdatesContent(
 				) {
 					items.forEach { (header, updateItems) ->
 						stickyHeader {
-							UpdateHeaderItemContent(header)
+							UpdateHeaderItemContent(remember(header) { StableHolder(header) })
 						}
 
 						items(updateItems, key = { it.chapterID }) {
@@ -151,7 +152,7 @@ fun UpdatesContent(
 @Preview
 @Composable
 fun PreviewUpdateHeaderItemContent() {
-	UpdateHeaderItemContent(DateTime().trimDate())
+	UpdateHeaderItemContent(StableHolder(DateTime().trimDate()))
 }
 
 @ExperimentalMaterialApi
@@ -233,19 +234,19 @@ fun UpdateItemContent(updateUI: UpdatesUI, onClick: () -> Unit) {
 }
 
 @Composable
-fun UpdateHeaderItemContent(dateTime: DateTime) {
+fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
 		elevation = 2.dp
 	) {
 		val context = LocalContext.current
 		val text = remember(dateTime, context) {
-			when (dateTime) {
+			when (dateTime.item) {
 				DateTime(System.currentTimeMillis()).trimDate() ->
 					context.getString(R.string.today)
 				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 					context.getString(R.string.yesterday)
-				else -> "${dateTime.dayOfMonth}/${dateTime.monthOfYear}/${dateTime.year}"
+				else -> "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 			}
 		}
 		Text(

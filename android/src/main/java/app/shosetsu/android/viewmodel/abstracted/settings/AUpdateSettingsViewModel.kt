@@ -2,7 +2,8 @@ package app.shosetsu.android.viewmodel.abstracted.settings
 
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.view.uimodels.model.CategoryUI
-import kotlinx.coroutines.flow.Flow
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -28,5 +29,5 @@ import kotlinx.coroutines.flow.Flow
 abstract class AUpdateSettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
 
-	abstract val categories: Flow<List<CategoryUI>>
+	abstract val categories: StateFlow<ImmutableList<CategoryUI>>
 }

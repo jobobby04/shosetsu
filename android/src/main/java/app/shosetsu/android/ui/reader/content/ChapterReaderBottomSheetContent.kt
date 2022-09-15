@@ -10,6 +10,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.DiscreteSlider
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -151,7 +153,7 @@ fun ChapterReaderBottomSheetContent(
 							)
 						)
 					},
-					0..10,
+					remember { StableHolder(0..10) },
 				)
 			}
 
@@ -168,7 +170,7 @@ fun ChapterReaderBottomSheetContent(
 					{ it, _ ->
 						updateSetting(setting.copy(paragraphIndentSize = it))
 					},
-					0..10,
+					remember { StableHolder(0..10) },
 				)
 			}
 		}

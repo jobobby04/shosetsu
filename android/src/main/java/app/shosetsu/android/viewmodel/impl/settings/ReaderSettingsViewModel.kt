@@ -15,6 +15,7 @@ import app.shosetsu.android.domain.usecases.load.LoadReaderThemes
 import app.shosetsu.android.view.compose.setting.FloatSliderSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.ColorChoiceUI
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
@@ -205,7 +206,7 @@ fun ExposedSettingsRepoViewModel.textSizeOption() {
 	FloatSliderSettingContent(
 		stringResource(R.string.text_size),
 		"",
-		7..50,
+		remember { StableHolder(7..50) },
 		parseValue = { "$it" },
 		settingsRepo,
 		ReaderTextSize,
@@ -221,7 +222,7 @@ fun ExposedSettingsRepoViewModel.paragraphIndentOption() {
 	SliderSettingContent(
 		stringResource(R.string.paragraph_indent),
 		"",
-		0..10,
+		remember { StableHolder(0..10) },
 		{ "$it" },
 		settingsRepo,
 		ReaderIndentSize, modifier = Modifier
@@ -234,7 +235,7 @@ fun ExposedSettingsRepoViewModel.paragraphSpacingOption() {
 	FloatSliderSettingContent(
 		stringResource(R.string.paragraph_spacing),
 		"",
-		0..10,
+		remember { StableHolder(0..10) },
 		{ "$it" },
 		settingsRepo,
 		ReaderParagraphSpacing,

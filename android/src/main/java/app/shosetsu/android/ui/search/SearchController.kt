@@ -12,9 +12,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -36,6 +34,7 @@ import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
@@ -261,7 +260,9 @@ fun SearchContent(
 						val exception by getException(row.extensionID).collectAsState(null)
 						if (exception != null)
 							ExceptionBar(
-								exception!!,
+								remember(exception) {
+									StableHolder(exception!!)
+								},
 								onRefresh = {
 									onRefresh(row.extensionID)
 								}
@@ -270,7 +271,9 @@ fun SearchContent(
 							val refreshState = children.loadState.refresh
 							if (refreshState is LoadState.Error) {
 								ExceptionBar(
-									refreshState.error,
+									remember(refreshState.error) {
+										StableHolder(refreshState.error)
+									},
 									onRefresh = {
 										children.refresh()
 									}
@@ -286,14 +289,14 @@ fun SearchContent(
 
 @Composable
 fun ExceptionBar(
-	exception: Throwable,
+	exception: StableHolder<Throwable>,
 	onRefresh: () -> Unit
 ) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
-			exception.message ?: stringResource(R.string.unknown),
+			exception.item.message ?: stringResource(R.string.unknown),
 			modifier = Modifier.fillMaxWidth(.75f)
 		)
 		Button(onRefresh) {
