@@ -10,8 +10,8 @@ import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
 /*
@@ -41,8 +41,8 @@ class FakeAppUpdatesRepository(
 ) : IAppUpdatesRepository {
 	private val _appUpdateFlow = MutableStateFlow<AppUpdateEntity?>(null)
 
-	override fun loadAppUpdateFlow(): Flow<AppUpdateEntity?> =
-		_appUpdateFlow.onIO()
+	override fun loadAppUpdateFlow(): StateFlow<AppUpdateEntity?> =
+		_appUpdateFlow
 
 	override suspend fun loadRemoteUpdate(): AppUpdateEntity =
 		onIO { loadAppUpdate() }
