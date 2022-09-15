@@ -19,7 +19,7 @@ android {
 	compileSdk = 36
 	buildToolsVersion = "37.0.0"
 	defaultConfig {
-		applicationId = "app.shosetsu.android"
+		applicationId = "app.shosetsu.android.sy"
 		minSdk = 22
 		targetSdk = 36
 		versionCode = 50
