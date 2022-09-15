@@ -55,7 +55,7 @@ val CI_MODE = System.getenv("CI_MODE") == "true"
 android {
 	compileSdk = 34
 	defaultConfig {
-		applicationId = "app.shosetsu.android"
+		applicationId = "app.shosetsu.android.sy"
 		minSdk = 22
 		targetSdk = 34
 		versionCode = 45
