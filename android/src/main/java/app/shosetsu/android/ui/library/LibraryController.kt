@@ -50,6 +50,7 @@ import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.first
@@ -350,7 +351,7 @@ fun LibraryContent(
 ) {
 	if (!isEmpty) {
 		SwipeRefresh(
-			state = SwipeRefreshState(false),
+			state = rememberSwipeRefreshState(false),
 			onRefresh = onRefresh
 		) {
 			val w = LocalConfiguration.current.screenWidthDp

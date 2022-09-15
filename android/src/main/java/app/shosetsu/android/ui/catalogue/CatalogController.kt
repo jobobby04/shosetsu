@@ -49,7 +49,7 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDED
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDING
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -411,10 +411,8 @@ fun CatalogContent(
 		modifier = Modifier.fillMaxSize(),
 	) {
 		SwipeRefresh(
-			state = SwipeRefreshState(false),
-			onRefresh = {
-				items.refresh()
-			},
+			state = rememberSwipeRefreshState(false),
+			onRefresh = items::refresh,
 		) {
 			val w = LocalConfiguration.current.screenWidthDp
 			val o = LocalConfiguration.current.orientation

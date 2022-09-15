@@ -64,10 +64,7 @@ import app.shosetsu.android.common.consts.REPOSITORY_HELP_URL
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.view.ComposeBottomSheetDialog
-import app.shosetsu.android.view.compose.ErrorAction
-import app.shosetsu.android.view.compose.ErrorContent
-import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
@@ -80,7 +77,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
