@@ -37,6 +37,9 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import java.util.Locale.getDefault as LGD
@@ -161,19 +164,19 @@ class LibraryViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val genresFlow: Flow<List<String>> by lazy {
+	override val genresFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.genres }
 	}
 
-	override val tagsFlow: Flow<List<String>> by lazy {
+	override val tagsFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.tags }
 	}
 
-	override val authorsFlow: Flow<List<String>> by lazy {
+	override val authorsFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.authors }
 	}
 
-	override val artistsFlow: Flow<List<String>> by lazy {
+	override val artistsFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.artists }
 	}
 
@@ -254,7 +257,7 @@ class LibraryViewModel(
 
 	private fun Flow<LibraryUI>.addDefaultCategory() = mapLatest {
 		if (it.novels.containsKey(0) || (it.novels.isEmpty() && it.categories.isEmpty())) {
-			it.copy(categories = listOf(CategoryUI.default()) + it.categories)
+			it.copy(categories = (listOf(CategoryUI.default()) + it.categories).toImmutableList())
 		} else {
 			it
 		}
@@ -265,18 +268,16 @@ class LibraryViewModel(
 	 */
 	private fun stripOutList(
 		strip: (LibraryNovelUI) -> List<String>
-	): Flow<List<String>> = librarySourceFlow.mapLatest { result ->
+	): Flow<ImmutableList<String>> = librarySourceFlow.mapLatest { list ->
 		ArrayList<String>().apply {
-			result.novels.flatMap { it.value }.distinctBy { it.id }.let { list ->
-				list.forEach { ui ->
-					strip(ui).forEach { key ->
-						if (!contains(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() }) && key.isNotBlank()) {
-							add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() })
-						}
+			list.novels.flatMap { it.value }.distinctBy { it.id }.forEach { ui ->
+				strip(ui).forEach { key ->
+					if (!contains(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() }) && key.isNotBlank()) {
+						add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() })
 					}
 				}
 			}
-		}
+		}.toImmutableList()
 	}.onIO()
 
 	/**
@@ -302,8 +303,8 @@ class LibraryViewModel(
 											) else it.toString()
 										} == s
 									}
-								}
-							}
+								}.toImmutableList()
+							}.toImmutableMap()
 						)
 					EXCLUDE ->
 						result.copy(
@@ -316,8 +317,8 @@ class LibraryViewModel(
 											) else it.toString()
 										} == s
 									}
-								}
-							}
+								}.toImmutableList()
+							}.toImmutableMap()
 						)
 				}
 			}
@@ -345,7 +346,7 @@ class LibraryViewModel(
 			novelResult.let { library ->
 				if (reversed)
 					library.copy(
-						novels = library.novels.mapValues { it.value.reversed() }
+						novels = library.novels.mapValues { it.value.reversed().toImmutableList() }.toImmutableMap()
 					)
 				else library
 			}
@@ -355,8 +356,8 @@ class LibraryViewModel(
 		combine(queryFlow) { library, query ->
 			library.copy(
 				novels = library.novels.mapValues {
-					it.value.filter { it.title.contains(query, ignoreCase = true) }
-				}
+					it.value.filter { it.title.contains(query, ignoreCase = true) }.toImmutableList()
+				}.toImmutableMap()
 			)
 		}
 
@@ -368,8 +369,8 @@ class LibraryViewModel(
 						it.copy(
 							isSelected = query[category]?.get(it.id) ?: false
 						)
-					}
-				}
+					}.toImmutableList()
+				}.toImmutableMap()
 			)
 		}
 
@@ -378,10 +379,10 @@ class LibraryViewModel(
 		combine(novelSortTypeFlow) { library, sortType ->
 			library.copy(
 				novels = when (sortType) {
-					NovelSortType.BY_TITLE -> library.novels.mapValues { it.value.sortedBy { it.title } }
-					NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues { it.value.sortedBy { it.unread } }
-					NovelSortType.BY_ID -> library.novels.mapValues { it.value.sortedBy { it.id } }
-				}
+					NovelSortType.BY_TITLE -> library.novels.mapValues { it.value.sortedBy { it.title }.toImmutableList() }
+					NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues { it.value.sortedBy { it.unread }.toImmutableList() }
+					NovelSortType.BY_ID -> library.novels.mapValues { it.value.sortedBy { it.id }.toImmutableList() }
+				}.toImmutableMap()
 			)
 		}
 
@@ -392,13 +393,13 @@ class LibraryViewModel(
 					when (sortType) {
 						INCLUDE -> list.copy(
 							novels = list.novels.mapValues {
-								it.value.filter { it.unread > 0 }
-							}
+								it.value.filter { it.unread > 0 }.toImmutableList()
+							}.toImmutableMap()
 						)
 						EXCLUDE -> list.copy(
 							novels = list.novels.mapValues {
-								it.value.filterNot { it.unread > 0 }
-							}
+								it.value.filterNot { it.unread > 0 }.toImmutableList()
+							}.toImmutableMap()
 						)
 					}
 				} ?: list

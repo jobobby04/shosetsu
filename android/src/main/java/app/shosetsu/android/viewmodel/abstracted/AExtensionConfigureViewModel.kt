@@ -5,6 +5,7 @@ import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -36,11 +37,11 @@ abstract class AExtensionConfigureViewModel
 	: ShosetsuViewModel(), SubscribeViewModel<InstalledExtensionUI?> {
 
 	abstract val extensionListing: StateFlow<ListingSelectionData?>
-	abstract val extensionSettings: StateFlow<List<FilterEntity>>
+	abstract val extensionSettings: StateFlow<ImmutableList<FilterEntity>>
 
 	@Immutable
 	data class ListingSelectionData(
-		val choices: List<String>,
+		val choices: ImmutableList<String>,
 		val selection: Int
 	)
 

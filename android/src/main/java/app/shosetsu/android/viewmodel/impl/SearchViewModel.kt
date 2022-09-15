@@ -16,6 +16,9 @@ import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
 import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.mapify
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -73,7 +76,7 @@ class SearchViewModel(
 		HashMap<Int, MutableStateFlow<Throwable?>>()
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	override val listings: StateFlow<List<SearchRowUI>> by lazy {
+	override val listings: StateFlow<ImmutableList<SearchRowUI>> by lazy {
 		loadSearchRowUIUseCase().flatMapLatest { ogList ->
 			combine(ogList.map { rowUI ->
 				getExceptionFlow(rowUI.extensionID).map {
@@ -85,9 +88,12 @@ class SearchViewModel(
 				it.toList()
 			}
 		}.map { list ->
-			list.sortedBy { it.name }.sortedBy { it.extensionID != -1 }.sortedBy { it.hasError }
+			list.sortedBy { it.name }
+				.sortedBy { it.extensionID != -1 }
+				.sortedBy { it.hasError }
+				.toImmutableList()
 		}.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	override val isCozy: StateFlow<Boolean> by lazy {

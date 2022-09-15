@@ -28,6 +28,7 @@ import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+import kotlinx.collections.immutable.toImmutableList
 
 
 /*
@@ -163,7 +164,9 @@ fun AdvancedSettingsContent(
 			DropdownSettingContent(
 				title = stringResource(R.string.theme),
 				description = stringResource(R.string.settings_advanced_theme_desc),
-				choices = stringArrayResource(R.array.application_themes),
+				choices = stringArrayResource(R.array.application_themes)
+					.toList()
+					.toImmutableList(),
 				modifier = Modifier
 					.fillMaxWidth(),
 				selection = choice,

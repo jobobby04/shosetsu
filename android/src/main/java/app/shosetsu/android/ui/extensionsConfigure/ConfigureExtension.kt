@@ -42,6 +42,7 @@ import app.shosetsu.lib.Version
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.random.Random
 
 /*
@@ -127,7 +128,7 @@ fun ConfigureExtensionContent(
 				DropdownSettingContent(
 					title = stringResource(R.string.listings),
 					description = stringResource(R.string.controller_configure_extension_listing_desc),
-					choices = extensionListingResult!!.choices.toTypedArray(),
+					choices = extensionListingResult!!.choices,
 					selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
 					onSelection = { index ->
 						viewModel.setSelectedListing(index)
@@ -225,7 +226,7 @@ fun SettingsItemAsCompose(
 					DropdownSettingContent(
 						title = data.name,
 						description = "",
-						choices = data.choices.toTypedArray(),
+						choices = data.choices.toImmutableList(),
 						selection = data.selected,
 						onSelection = { index ->
 							viewModel.saveSetting(data.id, index)
@@ -272,7 +273,7 @@ fun SettingsItemAsCompose(
 					DropdownSettingContent(
 						title = data.name,
 						description = "",
-						choices = data.choices.toTypedArray(),
+						choices = data.choices.toImmutableList(),
 						selection = data.selected,
 						onSelection = { index ->
 							viewModel.saveSetting(data.id, index)

@@ -9,6 +9,9 @@ import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateChapterUseCase
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
 import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.joda.time.DateTime
@@ -44,7 +47,7 @@ class UpdatesViewModel(
 	private val isOnlineUseCase: IsOnlineUseCase,
 	private val updateChapterUseCase: UpdateChapterUseCase
 ) : AUpdatesViewModel() {
-	override val liveData: StateFlow<Map<DateTime, List<UpdatesUI>>> by lazy {
+	override val liveData: StateFlow<ImmutableMap<DateTime, List<UpdatesUI>>> by lazy {
 		getUpdatesUseCase().transformLatest {
 			isRefreshing.value = true
 			emit(it.ifEmpty { emptyList() }.sortedByDescending { it.time })
@@ -52,8 +55,8 @@ class UpdatesViewModel(
 		}.mapLatest { result ->
 			result.groupBy {
 				DateTime(it.time).trimDate()
-			}
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyMap())
+			}.toImmutableMap()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentMapOf())
 	}
 
 	override fun startUpdateManager(categoryID: Int) = startUpdateWorkerUseCase(categoryID)

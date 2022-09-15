@@ -207,6 +207,8 @@ dependencies {
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
+	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+
 	// Error logging
 	val acraVersion = "5.9.6"
 	fun acra(module: String, version: String = acraVersion) =

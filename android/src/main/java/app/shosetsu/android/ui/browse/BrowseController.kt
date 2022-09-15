@@ -82,6 +82,8 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 /**
  * shosetsu
@@ -265,7 +267,7 @@ fun PreviewBrowseContent() {
 				updateVersion = Version(1, 2, 1),
 				isInstalling = false
 			)
-		},
+		}.toImmutableList(),
 		{},
 		{ _, _ -> },
 		{},
@@ -279,7 +281,7 @@ fun PreviewBrowseContent() {
 
 @Composable
 fun BrowseContent(
-	entities: List<BrowseExtensionUI>?,
+	entities: ImmutableList<BrowseExtensionUI>?,
 	refresh: () -> Unit,
 	installExtension: (BrowseExtensionUI, ExtensionInstallOptionEntity) -> Unit,
 	update: (BrowseExtensionUI) -> Unit,

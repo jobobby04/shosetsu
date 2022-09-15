@@ -7,6 +7,7 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
@@ -46,7 +47,7 @@ abstract class ACatalogViewModel :
 	/**
 	 * The list of items that will be presented as the filter menu
 	 */
-	abstract val filterItemsLive: StateFlow<List<Filter<*>>>
+	abstract val filterItemsLive: StateFlow<ImmutableList<Filter<*>>>
 	abstract val hasFilters: StateFlow<Boolean>
 
 	/**
@@ -67,7 +68,7 @@ abstract class ACatalogViewModel :
 	abstract val columnsInH: StateFlow<Int>
 	abstract val columnsInV: StateFlow<Int>
 
-	abstract val categories: StateFlow<List<CategoryUI>>
+	abstract val categories: StateFlow<ImmutableList<CategoryUI>>
 
 	/**
 	 * Sets the [IExtension]

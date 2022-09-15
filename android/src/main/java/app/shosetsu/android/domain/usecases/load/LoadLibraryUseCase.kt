@@ -5,6 +5,8 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -55,6 +57,6 @@ class LoadLibraryUseCase(
 				)
 			}.groupBy { it.category }
 		}.combine(getCategoriesUseCase()) { novels, categories ->
-			LibraryUI(categories, novels)
+			LibraryUI(categories.toImmutableList(), novels.mapValues { it.value.toImmutableList() }.toImmutableMap())
 		}
 }

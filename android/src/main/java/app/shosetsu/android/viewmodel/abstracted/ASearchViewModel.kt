@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
@@ -36,7 +37,7 @@ abstract class ASearchViewModel : ShosetsuViewModel(), Destroyable {
 
 	abstract val query: StateFlow<String?>
 
-	abstract val listings: StateFlow<List<SearchRowUI>>
+	abstract val listings: StateFlow<ImmutableList<SearchRowUI>>
 
 	abstract val isCozy: StateFlow<Boolean>
 

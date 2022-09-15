@@ -14,6 +14,9 @@ import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
 import app.shosetsu.android.dto.convertList
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -90,12 +93,12 @@ class DownloadsViewModel(
 		it.status == DownloadStatus.DOWNLOADING
 	})
 
-	override val liveData: StateFlow<List<DownloadUI>> by lazy {
+	override val liveData: StateFlow<ImmutableList<DownloadUI>> by lazy {
 		getDownloadsUseCase().combine(selectedDownloads) { list, map ->
 			list.sort().map {
 				it.copy(isSelected = map.getOrElse(it.chapterID) { false })
-			}
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+			}.toImmutableList()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	override val selectedDownloadState: StateFlow<SelectedDownloadsState> by lazy {

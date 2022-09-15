@@ -53,6 +53,7 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import org.acra.ACRA
@@ -108,7 +109,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 					val exception by viewModel.exceptionFlow.collectAsState()
 					val hasFilters by viewModel.hasFilters.collectAsState()
 
-					val categories by viewModel.categories.collectAsState(emptyList())
+					val categories by viewModel.categories.collectAsState()
 					var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
 
 					if (exception != null)
@@ -187,7 +188,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 									categories = it
 								)
 							},
-							novelCategories = emptyList()
+							novelCategories = remember { persistentListOf() }
 						)
 					}
 				}

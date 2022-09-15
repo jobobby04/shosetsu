@@ -69,6 +69,9 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
@@ -421,6 +424,7 @@ class NovelController : ShosetsuController(),
 				val novelInfo by viewModel.novelLive.collectAsState()
 				val chapters by viewModel.chaptersLive.collectAsState()
 				val isRefreshing by viewModel.isRefreshing.collectAsState()
+				val selectedChaptersState by viewModel.selectedChaptersState.collectAsState()
 				val hasSelected by viewModel.hasSelected.collectAsState()
 				val itemAt by viewModel.itemIndex.collectAsState()
 				val categories by viewModel.categories.collectAsState()
@@ -440,7 +444,7 @@ class NovelController : ShosetsuController(),
 					NovelInfoContent(
 						novelInfo = novelInfo,
 						chapters = chapters,
-						selectedChaptersStateFlow = viewModel.selectedChaptersState,
+						selectedChaptersState = selectedChaptersState,
 						itemAt = itemAt,
 						isRefreshing = isRefreshing,
 						onRefresh = {
@@ -726,21 +730,21 @@ fun PreviewNovelInfoContent() {
 			isSaved = it % 2 != 0
 		)
 
-	}
+	}.toImmutableList()
 
 	ShosetsuCompose {
 		NovelInfoContent(
 			novelInfo = info,
 			chapters = chapters,
-			selectedChaptersStateFlow = remember {
-				MutableStateFlow(SelectedChaptersState())
+			selectedChaptersState = remember {
+				SelectedChaptersState()
 			},
 			itemAt = 0,
 			isRefreshing = false,
 			onRefresh = {},
 			openWebView = {},
-			emptyList(),
-			{},
+			categories = persistentListOf(),
+			setCategoriesDialogOpen = {},
 			toggleBookmark = {},
 			openFilter = {},
 			openChapterJump = {},
@@ -766,13 +770,13 @@ fun PreviewNovelInfoContent() {
 @Composable
 fun NovelInfoContent(
 	novelInfo: NovelUI?,
-	chapters: List<ChapterUI>?,
-	selectedChaptersStateFlow: StateFlow<SelectedChaptersState>,
+	chapters: ImmutableList<ChapterUI>?,
+	selectedChaptersState: SelectedChaptersState,
 	itemAt: Int,
 	isRefreshing: Boolean,
 	onRefresh: () -> Unit,
 	openWebView: () -> Unit,
-	categories: List<CategoryUI>,
+	categories: ImmutableList<CategoryUI>,
 	setCategoriesDialogOpen: (Boolean) -> Unit,
 	toggleBookmark: () -> Unit,
 	openFilter: () -> Unit,
@@ -846,7 +850,6 @@ fun NovelInfoContent(
 		}
 
 		if (chapters != null && hasSelected) {
-			val selectedChaptersState by selectedChaptersStateFlow.collectAsState()
 			Card(
 				modifier = Modifier
 					.align(BiasAlignment(0f, 0.7f))
@@ -1053,7 +1056,7 @@ fun PreviewHeaderContent() {
 			info,
 			chapterCount = 0,
 			{},
-			emptyList(),
+			persistentListOf(),
 			{},
 			{},
 			{},
@@ -1093,7 +1096,7 @@ fun NovelInfoHeaderContent(
 	novelInfo: NovelUI,
 	chapterCount: Int,
 	openWebview: () -> Unit,
-	categories: List<CategoryUI>,
+	categories: ImmutableList<CategoryUI>,
 	toggleBookmark: () -> Unit,
 	openFilter: () -> Unit,
 	openChapterJump: () -> Unit,
@@ -1434,8 +1437,8 @@ fun ExpandedText(
 @Composable
 fun CategoriesDialog(
 	onDismissRequest: () -> Unit,
-	categories: List<CategoryUI>,
-	novelCategories: List<Int>,
+	categories: ImmutableList<CategoryUI>,
+	novelCategories: ImmutableList<Int>,
 	setCategories: (IntArray) -> Unit
 ) {
 	val selectedCategories = remember(novelCategories) {

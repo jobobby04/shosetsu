@@ -39,6 +39,7 @@ import app.shosetsu.android.viewmodel.abstracted.AMigrationViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
+import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of Shosetsu.
@@ -156,7 +157,7 @@ fun MigrationExtensionsLoadingContent() {
 
 @Composable
 fun MigrationExtensionsContent(
-	list: List<MigrationExtensionUI>,
+	list: ImmutableList<MigrationExtensionUI>,
 	onClick: (MigrationExtensionUI) -> Unit
 ) {
 	LazyRow(
@@ -245,7 +246,7 @@ fun MigrationNovelsLoadingContent() {
 }
 
 @Composable
-fun MigrationNovelsContent(list: List<MigrationNovelUI>, onClick: (MigrationNovelUI) -> Unit) {
+fun MigrationNovelsContent(list: ImmutableList<MigrationNovelUI>, onClick: (MigrationNovelUI) -> Unit) {
 	LazyRow(
 		horizontalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxWidth()

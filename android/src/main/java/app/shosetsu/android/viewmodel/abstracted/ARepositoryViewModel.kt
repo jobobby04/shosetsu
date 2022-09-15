@@ -4,6 +4,7 @@ import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
 /*
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.Flow
  * 16 / 09 / 2020
  */
 abstract class ARepositoryViewModel
-	: SubscribeViewModel<List<RepositoryUI>>, ShosetsuViewModel(),
+	: SubscribeViewModel<ImmutableList<RepositoryUI>>, ShosetsuViewModel(),
 	IsOnlineCheckViewModel {
 	/**
 	 * Adds a URL via a string the user provides

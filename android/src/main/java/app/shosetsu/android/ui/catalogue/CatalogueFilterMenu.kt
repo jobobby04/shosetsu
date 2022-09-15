@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.lib.Filter
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -58,7 +60,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 @Composable
 fun CatalogFilterMenuPreview() = ShosetsuCompose {
 	CatalogFilterMenu(
-		listOf(
+		persistentListOf(
 			Filter.Header("This is a header"),
 			Filter.Separator(),
 			Filter.Text(1, "Text input"),
@@ -95,7 +97,7 @@ fun CatalogFilterMenuPreview() = ShosetsuCompose {
 
 @Composable
 fun CatalogFilterMenu(
-	items: List<Filter<*>>,
+	items: ImmutableList<Filter<*>>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
 	setBoolean: (Filter<Boolean>, Boolean) -> Unit,
 	getInt: (Filter<Int>) -> Flow<Int>,

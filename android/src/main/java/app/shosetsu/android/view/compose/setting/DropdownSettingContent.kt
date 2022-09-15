@@ -13,12 +13,13 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import kotlinx.collections.immutable.ImmutableList
 
 @Composable
 fun DropdownSettingContent(
 	title: String,
 	description: String,
-	choices: Array<String>,
+	choices: ImmutableList<String>,
 	modifier: Modifier = Modifier,
 	repo: ISettingsRepository,
 	key: SettingKey<Int>
@@ -35,7 +36,7 @@ fun DropdownSettingContent(
 fun DropdownSettingContent(
 	title: String,
 	description: String,
-	choices: Array<String>,
+	choices: ImmutableList<String>,
 	modifier: Modifier = Modifier,
 	repo: ISettingsRepository,
 	key: SettingKey<String>,
@@ -55,7 +56,7 @@ fun DropdownSettingContent(
 	title: String,
 	description: String,
 	selection: Int,
-	choices: Array<String>,
+	choices: ImmutableList<String>,
 	modifier: Modifier = Modifier,
 	onSelection: (newValue: Int) -> Unit
 ) {

@@ -30,6 +30,9 @@ import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -59,7 +62,7 @@ class ExtensionConfigureViewModel(
 
 	private val extListNamesFlow: Flow<ListingSelectionData> by lazy {
 		extensionIdFlow.flatMapLatest { extensionID ->
-			val listingNames: List<String> = getExtListNames(extensionID)
+			val listingNames = getExtListNames(extensionID).toImmutableList()
 
 			getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
 				ListingSelectionData(listingNames, selectedListing)
@@ -67,15 +70,15 @@ class ExtensionConfigureViewModel(
 		}
 	}
 
-	private val extensionSettingsFlow: Flow<List<FilterEntity>> by lazy {
+	private val extensionSettingsFlow: Flow<ImmutableList<FilterEntity>> by lazy {
 		extensionIdFlow.flatMapLatest { extensionID ->
-			getExtensionSettings(extensionID)
+			getExtensionSettings(extensionID).map { it.toImmutableList() }
 		}
 	}
 
-	override val extensionSettings: StateFlow<List<FilterEntity>> by lazy {
+	override val extensionSettings: StateFlow<ImmutableList<FilterEntity>> by lazy {
 		extensionSettingsFlow.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	override val extensionListing: StateFlow<ListingSelectionData?> by lazy {

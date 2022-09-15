@@ -21,9 +21,10 @@ package app.shosetsu.android.viewmodel.abstracted
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
-abstract class ACategoriesViewModel : SubscribeViewModel<List<CategoryUI>>,
+abstract class ACategoriesViewModel : SubscribeViewModel<ImmutableList<CategoryUI>>,
     ShosetsuViewModel() {
     /**
      * Adds a category via a string the user provides

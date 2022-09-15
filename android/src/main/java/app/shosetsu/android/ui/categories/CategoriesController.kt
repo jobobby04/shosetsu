@@ -49,6 +49,7 @@ import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
 class CategoriesController : ShosetsuController(), ExtendedFABController {
@@ -64,7 +65,7 @@ class CategoriesController : ShosetsuController(), ExtendedFABController {
 		return ComposeView(requireContext()).apply {
 			setContent {
 				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState(emptyList())
+					val items by viewModel.liveData.collectAsState()
 
 
 					CategoriesContent(
@@ -167,7 +168,7 @@ class CategoriesController : ShosetsuController(), ExtendedFABController {
 
 @Composable
 fun CategoriesContent(
-	items: List<CategoryUI>,
+	items: ImmutableList<CategoryUI>,
 	onRemove: (CategoryUI) -> Unit,
 	onMoveUp: (CategoryUI) -> Unit,
 	onMoveDown: (CategoryUI) -> Unit,

@@ -44,6 +44,7 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.collections.immutable.ImmutableMap
 import org.joda.time.DateTime
 
 /*
@@ -82,7 +83,7 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 		setViewTitle()
 		setContent {
 			ShosetsuCompose {
-				val items: Map<DateTime, List<UpdatesUI>> by viewModel.liveData.collectAsState()
+				val items by viewModel.liveData.collectAsState()
 				val isRefreshing by viewModel.isRefreshing.collectAsState()
 
 				UpdatesContent(
@@ -106,7 +107,7 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UpdatesContent(
-	items: Map<DateTime, List<UpdatesUI>>,
+	items: ImmutableMap<DateTime, List<UpdatesUI>>,
 	isRefreshing: Boolean,
 	onRefresh: () -> Unit,
 	openChapter: (UpdatesUI) -> Unit

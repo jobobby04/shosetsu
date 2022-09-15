@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import com.google.accompanist.pager.*
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /*
@@ -44,7 +45,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 fun ChapterReaderPagerContent(
 	paddingValues: PaddingValues,
 
-	items: List<ReaderUIItem>,
+	items: ImmutableList<ReaderUIItem>,
 	isHorizontal: Boolean,
 
 	isSwipeInverted: Boolean,
