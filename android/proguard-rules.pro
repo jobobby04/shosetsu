@@ -30,6 +30,8 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+-keep,includedescriptorclasses class app.shosetsu.android.common.* { *; }
+
 # Keep lib intact
 -keepclasseswithmembers class app.shosetsu.lib.** { *; }
 -keepclasseswithmembers class org.luaj.** { *; }
