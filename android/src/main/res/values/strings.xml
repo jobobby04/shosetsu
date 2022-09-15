@@ -26,7 +26,7 @@
     <string name="filter">Filter</string>
 
     <!-- View Titles -->
-    <string name="my_library">My library</string>
+    <string name="library">Library</string>
     <string name="updates">Updates</string>
     <string name="catalogues">Catalogues</string>
     <string name="extensions">Extensions</string>
