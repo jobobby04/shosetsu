@@ -46,19 +46,17 @@ class DBChaptersDataSource(
 
 	@Throws(SQLiteException::class)
 	override suspend fun getChapters(novelID: Int): List<ChapterEntity> =
-		(chaptersDao.getChapters(novelID).convertList())
+		chaptersDao.getChapters(novelID).convertList()
 
 	@Throws(SQLiteException::class)
 	override suspend fun getChaptersByExtension(extensionId: Int): List<ChapterEntity> =
-		(chaptersDao.getChaptersByExtension(extensionId).convertList())
+		chaptersDao.getChaptersByExtension(extensionId).convertList()
 
 	@Throws(SQLiteException::class)
 	override suspend fun getChapter(chapterID: Int): ChapterEntity? =
 		chaptersDao.getChapter(chapterID)?.convertTo()
 
-	override fun getReaderChapters(
-		novelID: Int,
-	): Flow<List<ReaderChapterEntity>> =
+	override fun getReaderChapters(novelID: Int): Flow<List<ReaderChapterEntity>> =
 		chaptersDao.getReaderChaptersFlow(novelID)
 
 	@Throws(SQLiteException::class)

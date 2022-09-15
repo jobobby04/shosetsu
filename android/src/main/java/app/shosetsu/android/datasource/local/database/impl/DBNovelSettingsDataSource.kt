@@ -35,14 +35,14 @@ class DBNovelSettingsDataSource(
 		dao.getFlow(novelID).map { it?.convertTo() }
 
 	override suspend fun update(novelSettingEntity: NovelSettingEntity): Unit =
-		(dao.update(novelSettingEntity.toDB()))
+		dao.update(novelSettingEntity.toDB())
 
 
 	override suspend fun get(novelID: Int): NovelSettingEntity? =
 		dao.get(novelID)?.convertTo()
 
 	override suspend fun insert(novelSettingEntity: NovelSettingEntity): Long =
-		(dao.insertAbort(novelSettingEntity.toDB()))
+		dao.insertAbort(novelSettingEntity.toDB())
 
 
 	private fun NovelSettingEntity.toDB(): DBNovelSettingsEntity =
