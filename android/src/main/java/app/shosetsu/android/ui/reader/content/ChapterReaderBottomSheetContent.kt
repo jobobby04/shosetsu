@@ -17,9 +17,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.view.compose.DiscreteSlider
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
+import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -31,14 +31,14 @@ fun ChapterReaderBottomSheetContent(
 	isTTSPlaying: Boolean,
 	isBookmarked: Boolean,
 	isRotationLocked: Boolean,
-	setting: NovelReaderSettingEntity,
+	setting: NovelReaderSettingUI,
 
 	toggleRotationLock: () -> Unit,
 	toggleBookmark: () -> Unit,
 	exit: () -> Unit,
 	onPlayTTS: () -> Unit,
 	onStopTTS: () -> Unit,
-	updateSetting: (NovelReaderSettingEntity) -> Unit,
+	updateSetting: (NovelReaderSettingUI) -> Unit,
 	lowerSheet: LazyListScope.() -> Unit,
 	toggleFocus: () -> Unit,
 	onShowNavigation: (() -> Unit)?

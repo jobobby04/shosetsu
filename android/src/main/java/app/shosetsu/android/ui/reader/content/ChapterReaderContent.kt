@@ -10,8 +10,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -70,7 +70,7 @@ fun PreviewChapterReaderContent() {
 					isTTSPlaying = false,
 					isBookmarked = false,
 					isRotationLocked = false,
-					setting = NovelReaderSettingEntity(-1, 0, 0f),
+					setting = NovelReaderSettingUI(-1, 0, 0f),
 					toggleRotationLock = {},
 					toggleBookmark = {},
 					exit = {},
