@@ -39,8 +39,8 @@ class DBNovelsDataSource(
 	override suspend fun loadBookmarkedNovels(): List<NovelEntity> =
 		novelsDao.loadBookmarkedNovels().convertList()
 
-	override fun loadBookmarkedNovelsFlow(
-	): Flow<List<LibraryNovelEntity>> = novelsDao.loadBookmarkedNovelsFlow()
+	override fun loadBookmarkedNovelsFlow(): Flow<List<LibraryNovelEntity>> =
+		novelsDao.loadBookmarkedNovelsFlow()
 
 	override suspend fun getNovel(novelID: Int): NovelEntity? =
 		novelsDao.getNovel(novelID)?.convertTo()
@@ -49,16 +49,12 @@ class DBNovelsDataSource(
 		novelsDao.getNovelFlow(novelID).map { it?.convertTo() }
 
 	override suspend fun update(novelEntity: NovelEntity): Unit =
-		(novelsDao.update(novelEntity.toDB()))
+		novelsDao.update(novelEntity.toDB())
 
-	override suspend fun update(
-		list: List<LibraryNovelEntity>
-	): Unit =
-		(novelsDao.update(list))
+	override suspend fun update(list: List<LibraryNovelEntity>): Unit =
+		novelsDao.update(list)
 
-	override suspend fun insertReturnStripped(
-		novelEntity: NovelEntity,
-	): StrippedNovelEntity? =
+	override suspend fun insertReturnStripped(novelEntity: NovelEntity): StrippedNovelEntity? =
 		novelsDao.insertReturnStripped(novelEntity.toDB())?.convertTo()
 
 	override suspend fun insert(novelEntity: NovelEntity): Long =
