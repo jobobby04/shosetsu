@@ -56,7 +56,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
@@ -483,9 +482,13 @@ fun LibraryCategory(
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
 	fab: EFabMaintainer?
 ) {
+	val swipeRefreshState = rememberFakeSwipeRefreshState()
 	SwipeRefresh(
-		state = rememberSwipeRefreshState(false),
-		onRefresh = onRefresh
+		state = swipeRefreshState.state,
+		onRefresh = {
+			onRefresh()
+			swipeRefreshState.animateRefresh()
+		}
 	) {
 		val w = LocalConfiguration.current.screenWidthDp
 		val o = LocalConfiguration.current.orientation

@@ -289,7 +289,8 @@ fun BrowseContent(
 	fab: EFabMaintainer?
 ) {
 	SwipeRefresh(
-		state = SwipeRefreshState(isRefreshing), refresh, modifier = Modifier.fillMaxSize()
+		state = rememberSwipeRefreshState(isRefreshing),
+		onRefresh = refresh,
 	) {
 		if (!entities.isNullOrEmpty()) {
 			val state = rememberLazyListState()

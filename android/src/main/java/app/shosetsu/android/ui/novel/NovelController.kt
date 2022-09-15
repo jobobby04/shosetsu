@@ -47,11 +47,7 @@ import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.databinding.ControllerNovelJumpDialogBinding
 import app.shosetsu.android.ui.migration.MigrationController.Companion.TARGETS_BUNDLE_KEY
-import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.LazyColumnScrollbar
-import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.compose.TextButton
-import app.shosetsu.android.view.compose.coverRatio
+import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
@@ -796,9 +792,13 @@ fun NovelInfoContent(
 	Box(
 		modifier = Modifier.fillMaxSize()
 	) {
+		val swipeRefreshState = rememberFakeSwipeRefreshState()
 		SwipeRefresh(
-			state = rememberSwipeRefreshState(false),
-			onRefresh = onRefresh
+			state = swipeRefreshState.state,
+			onRefresh = {
+				onRefresh()
+				swipeRefreshState.animateRefresh()
+			}
 		) {
 			LazyColumnScrollbar(
 				listState = state,

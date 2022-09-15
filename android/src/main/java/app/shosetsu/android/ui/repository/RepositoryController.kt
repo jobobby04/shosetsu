@@ -23,9 +23,7 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.databinding.RepositoryAddBinding
-import app.shosetsu.android.view.compose.ErrorAction
-import app.shosetsu.android.view.compose.ErrorContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
@@ -267,9 +265,13 @@ fun RepositoriesContent(
 	fab: EFabMaintainer
 ) {
 	if (items.isNotEmpty()) {
+		val swipeRefreshState = rememberFakeSwipeRefreshState()
 		SwipeRefresh(
-			state = rememberSwipeRefreshState(false),
-			onRefresh = onRefresh
+			state = swipeRefreshState.state,
+			onRefresh = {
+				onRefresh()
+				swipeRefreshState.animateRefresh()
+			}
 		) {
 			val state = rememberLazyListState()
 			syncFABWithCompose(state, fab)
