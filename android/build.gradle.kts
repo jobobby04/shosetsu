@@ -117,7 +117,6 @@ android {
 		jvmTarget = "11"
 		freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=enable"
 	}
-	buildToolsVersion = "31.0.0"
 
 	lint {
 		disable.addAll(listOf("MissingTranslation", "ExtraTranslation"))
