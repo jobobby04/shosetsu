@@ -3,14 +3,13 @@ package app.shosetsu.android.domain.usecases.get
 import android.database.sqlite.SQLiteException
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.utils.uifactory.NovelReaderSettingConversionFactory
 import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.domain.repository.base.INovelReaderSettingsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.*
 
 /*
  * This file is part of Shosetsu.
@@ -37,7 +36,7 @@ class GetReaderSettingUseCase(
 	private val settingsRepo: ISettingsRepository,
 ) {
 	@ExperimentalCoroutinesApi
-	operator fun invoke(novelID: Int): Flow<NovelReaderSettingEntity> = flow {
+	operator fun invoke(novelID: Int): Flow<NovelReaderSettingUI> = flow {
 		emitAll(readerRepo.getFlow(novelID).transformLatest { result ->
 			if (result != null) {
 				emit(result)
@@ -55,5 +54,5 @@ class GetReaderSettingUseCase(
 				}
 			}
 		})
-	}
+	}.map { NovelReaderSettingConversionFactory(it).convertTo() }
 }

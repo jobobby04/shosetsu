@@ -2,7 +2,7 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
-import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
+import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
@@ -151,9 +151,9 @@ abstract class AChapterReaderViewModel :
 	/**
 	 * Loads the settings list for the bottom bar
 	 */
-	abstract fun getSettings(): StateFlow<NovelReaderSettingEntity>
+	abstract fun getSettings(): StateFlow<NovelReaderSettingUI>
 
-	abstract fun updateSetting(novelReaderSettingEntity: NovelReaderSettingEntity)
+	abstract fun updateSetting(novelReaderSettingEntity: NovelReaderSettingUI)
 
 	/**
 	 * Toggle the screen lock state

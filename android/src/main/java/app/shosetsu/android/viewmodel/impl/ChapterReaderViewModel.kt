@@ -18,7 +18,6 @@ import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.model.local.ColorChoiceData
-import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.INovelReaderSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
@@ -30,6 +29,7 @@ import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
+import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
@@ -449,10 +449,10 @@ class ChapterReaderViewModel(
 		currentPage.value = page
 	}
 
-	private val readerSettingsFlow: StateFlow<NovelReaderSettingEntity> by lazy {
+	private val readerSettingsFlow: StateFlow<NovelReaderSettingUI> by lazy {
 		novelIDLive.flatMapLatest {
 			getReaderSettingsUseCase(it)
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingEntity(-1, 0, 0.0F))
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingUI(-1, 0, 0.0F))
 	}
 
 	private val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
@@ -648,13 +648,13 @@ class ChapterReaderViewModel(
 	override fun loadChapterCss(): Flow<String> =
 		settingsRepo.getStringFlow(ReaderHtmlCss)
 
-	override fun updateSetting(novelReaderSettingEntity: NovelReaderSettingEntity) {
+	override fun updateSetting(novelReaderSettingEntity: NovelReaderSettingUI) {
 		launchIO {
-			readerSettingsRepo.update(novelReaderSettingEntity)
+			readerSettingsRepo.update(novelReaderSettingEntity.convertTo())
 		}
 	}
 
-	override fun getSettings(): StateFlow<NovelReaderSettingEntity> = readerSettingsFlow
+	override fun getSettings(): StateFlow<NovelReaderSettingUI> = readerSettingsFlow
 
 	override val tapToScroll: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
