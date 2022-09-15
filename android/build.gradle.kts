@@ -118,6 +118,7 @@ android {
 	buildToolsVersion = "31.0.0"
 
 	lint {
+		disable.addAll(listOf("MissingTranslation", "ExtraTranslation"))
 		abortOnError = false
 	}
 	namespace = "app.shosetsu.android"
