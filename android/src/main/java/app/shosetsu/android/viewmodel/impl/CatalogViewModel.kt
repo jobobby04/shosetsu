@@ -31,6 +31,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.sync.Mutex
 
 /*
  * This file is part of shosetsu.
@@ -88,7 +89,7 @@ class CatalogViewModel(
 
 			// Ensure filter is initialized
 			ext?.searchFiltersModel?.toList()?.init()
-			_applyFilter()
+			applyFilter()
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
@@ -201,14 +202,14 @@ class CatalogViewModel(
 
 	override fun applyQuery(newQuery: String) {
 		queryFlow.value = newQuery
-		_applyFilter()
+		applyFilter()
 	}
 
 	override fun resetView() {
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = null
-			_applyFilter()
+			applyFilter()
 		}
 	}
 
@@ -239,21 +240,17 @@ class CatalogViewModel(
 			emit(BackgroundNovelAddProgress.ADDED)
 		}.onIO()
 
-	@Throws(ConcurrentModificationException::class)
-	@Synchronized
-	private fun _applyFilter(retry: Boolean = false) {
-		try {
-			filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
-		} catch (e: ConcurrentModificationException) {
-			if (!retry)
-				_applyFilter(true)
-			else throw e
-		}
-	}
-
+	private val filterMutex = Mutex()
 	override fun applyFilter() {
-		@Suppress("CheckedExceptionsKotlin")
-		_applyFilter()
+		launchIO {
+			if (filterMutex.tryLock()) {
+				try {
+					filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
+				} finally {
+					filterMutex.unlock()
+				}
+			}
+		}
 	}
 
 	override fun getFilterStringState(id: Filter<String>): Flow<String> =
@@ -305,7 +302,7 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-			_applyFilter()
+			applyFilter()
 		}
 	}
 
