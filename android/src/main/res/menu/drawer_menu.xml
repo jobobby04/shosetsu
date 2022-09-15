@@ -7,11 +7,11 @@
         <item
             android:id="@+id/libraryController"
             android:icon="@drawable/library"
-            android:title="@string/my_library" />
+            android:title="@string/library" />
         <item
             android:id="@+id/updatesController"
             android:icon="@drawable/app_update"
-            android:title="@string/library_updates" />
+            android:title="@string/updates" />
 
         <item
             android:id="@+id/browseController"

@@ -5,8 +5,8 @@ import android.content.Intent
 import androidx.core.content.pm.ShortcutInfoCompat.Builder
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat.createWithResource
-import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.R
+import app.shosetsu.android.activity.MainActivity
 
 /*
  * This file is part of shosetsu.
@@ -36,8 +36,8 @@ object ShortCuts {
 			context, listOf(
 				Builder(context, "Library")
 					.setIcon(createWithResource(context, R.drawable.library))
-					.setLongLabel(context.getString(R.string.my_library))
-					.setShortLabel(context.getString(R.string.my_library))
+					.setLongLabel(context.getString(R.string.library))
+					.setShortLabel(context.getString(R.string.library))
 					.setIntent(Intent(context, MainActivity::class.java).apply {
 						action = ACTION_OPEN_LIBRARY
 					})
