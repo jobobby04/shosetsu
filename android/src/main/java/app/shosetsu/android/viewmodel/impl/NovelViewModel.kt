@@ -374,10 +374,10 @@ class NovelViewModel(
 			)
 		}.onIO()
 
-	override fun getNovelURL(): StateFlow<String?> =
+	override fun getNovelURL(): Flow<String?> =
 		flow {
 			emit(getContentURL(novelLive.first { it != null }!!))
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+		}.onIO()
 
 	override fun getShareInfo(): Flow<NovelShareInfo?> =
 		flow {
