@@ -158,6 +158,11 @@
     <string name="remove_novel_cache">Remove Novel Cache</string>
 
 
+    <string name="action_webview_back">Back</string>
+    <string name="action_webview_forward">Forward</string>
+    <string name="action_webview_refresh">Refresh</string>
+
+
     <!-- App Update -->
     <string name="notification_app_update_check">App Update Check</string>
     <string name="notification_app_update_available">App Update available</string>
