@@ -26,6 +26,7 @@ import kotlin.math.floor
 
 @Composable
 fun LazyColumnScrollbar(
+	modifier: Modifier = Modifier,
 	listState: LazyListState,
 	rightSide: Boolean = true,
 	thickness: Dp = 6.dp,
@@ -39,6 +40,7 @@ fun LazyColumnScrollbar(
 	Box {
 		content()
 		LazyColumnScrollbar(
+			modifier = modifier,
 			listState = listState,
 			rightSide = rightSide,
 			thickness = thickness,
@@ -53,6 +55,7 @@ fun LazyColumnScrollbar(
 
 @Composable
 fun LazyColumnScrollbar(
+	modifier: Modifier,
 	listState: LazyListState,
 	rightSide: Boolean = true,
 	thickness: Dp = 6.dp,
@@ -60,7 +63,7 @@ fun LazyColumnScrollbar(
 	thumbMinHeight: Float = 0.1f,
 	thumbColor: Color = MaterialTheme.colors.primary,
 	thumbSelectedColor: Color = MaterialTheme.colors.primarySurface,
-	thumbShape: Shape = CircleShape
+	thumbShape: Shape = CircleShape,
 ) {
 	val coroutineScope = rememberCoroutineScope()
 
@@ -117,7 +120,7 @@ fun LazyColumnScrollbar(
 		)
 	)
 
-	BoxWithConstraints(Modifier.fillMaxWidth()) {
+	BoxWithConstraints(modifier.fillMaxWidth()) {
 
 		val dragState = rememberDraggableState { delta ->
 			setScrollOffset(dragOffset + delta / constraints.maxHeight.toFloat())
