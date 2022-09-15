@@ -7,8 +7,8 @@ import java.io.InputStreamReader
 plugins {
 	id("com.android.application")
 	kotlin("android")
-	kotlin("kapt")
 	kotlin("plugin.serialization")
+	id("com.google.devtools.ksp")
 }
 
 @Throws(IOException::class)
@@ -45,12 +45,6 @@ android {
 		versionName = "2.1.1"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
-
-		javaCompileOptions {
-			annotationProcessorOptions {
-				arguments += "room.schemaLocation" to "$projectDir/schemas"
-			}
-		}
 
 		buildConfigField("String", "acraUsername", acraProperties["username"]?.toString() ?: "\"\"")
 		buildConfigField("String", "acraPassword", acraProperties["password"]?.toString() ?: "\"\"")
@@ -130,6 +124,10 @@ android {
 		abortOnError = false
 	}
 	namespace = "app.shosetsu.android"
+}
+
+ksp {
+	arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 //TODO Fix application variant naming
@@ -237,7 +235,7 @@ dependencies {
 
 	implementation(room("room-runtime"))
 	annotationProcessor(room("room-compiler"))
-	kapt(room("room-compiler"))
+	ksp(room("room-compiler"))
 	implementation(room("room-ktx"))
 	implementation(room("room-paging"))
 
@@ -263,13 +261,13 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
 	// Roomigrant
-	val enableRoomigrant = false
+	/*val enableRoomigrant = false
 
 	val roomigrantVersion = "0.3.4"
 	implementation("com.github.MatrixDev.Roomigrant:RoomigrantLib:$roomigrantVersion")
 	if (enableRoomigrant) {
 		kapt("com.github.MatrixDev.Roomigrant:RoomigrantCompiler:$roomigrantVersion")
-	}
+	}*/
 
 	// Compose
 	val androidxCompose = "1.2.1"

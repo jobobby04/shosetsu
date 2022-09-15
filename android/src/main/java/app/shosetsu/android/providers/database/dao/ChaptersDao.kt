@@ -159,7 +159,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 		SQLiteException::class,
 		IndexOutOfBoundsException::class
 	)
-	private suspend fun insertReturn(
+	suspend fun insertReturn(
 		novelID: Int,
 		extensionID: Int,
 		novelChapter: Novel.Chapter,
