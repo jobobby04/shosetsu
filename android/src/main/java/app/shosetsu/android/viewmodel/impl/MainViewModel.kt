@@ -57,7 +57,7 @@ class MainViewModel(
 		loadRequireDoubleBackUseCase()
 	}
 
-	override fun startAppUpdateCheck(): Flow<AppUpdateEntity?> =
+	override fun startAppUpdateCheck(): StateFlow<AppUpdateEntity?> =
 		loadAppUpdateFlowLiveUseCase()
 
 	override val navigationStyle by lazy {

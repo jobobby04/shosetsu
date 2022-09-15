@@ -12,7 +12,7 @@ import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
 /*
@@ -41,8 +41,8 @@ class AppUpdatesRepository(
 	private val iFileAppUpdateDataSource: IFileCachedAppUpdateDataSource,
 ) : IAppUpdatesRepository {
 
-	override fun loadAppUpdateFlow(): Flow<AppUpdateEntity?> =
-		iFileAppUpdateDataSource.updateAvaLive.onIO()
+	override fun loadAppUpdateFlow(): StateFlow<AppUpdateEntity?> =
+		iFileAppUpdateDataSource.updateAvaLive
 
 	private fun compareVersion(newVersion: AppUpdateEntity): Int {
 		val currentV: Int

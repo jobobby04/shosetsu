@@ -3,7 +3,7 @@ package app.shosetsu.android.datasource.local.file.base
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 import java.io.InputStream
 
@@ -32,7 +32,7 @@ interface IFileCachedAppUpdateDataSource {
 	/**
 	 * Live data of the current update
 	 */
-	val updateAvaLive: Flow<AppUpdateEntity?>
+	val updateAvaLive: StateFlow<AppUpdateEntity?>
 
 	/**
 	 * Accessor method to read the current cached update
