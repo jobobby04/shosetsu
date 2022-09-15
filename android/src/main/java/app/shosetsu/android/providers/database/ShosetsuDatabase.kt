@@ -7,7 +7,6 @@ import app.shosetsu.android.domain.model.database.*
 import app.shosetsu.android.providers.database.converters.*
 import app.shosetsu.android.providers.database.dao.*
 import app.shosetsu.android.providers.database.migrations.*
-import dev.matrix.roomigrant.GenerateRoomMigrations
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -62,7 +61,6 @@ import kotlinx.coroutines.launch
 	VersionConverter::class,
 	ExtensionTypeConverter::class
 )
-@GenerateRoomMigrations
 abstract class ShosetsuDatabase : RoomDatabase() {
 
 	abstract val chaptersDao: ChaptersDao
