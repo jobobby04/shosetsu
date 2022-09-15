@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -765,54 +766,50 @@ fun NovelInfoContent(
 	Box(
 		modifier = Modifier.fillMaxSize()
 	) {
-		Column(
-			modifier = Modifier.fillMaxSize()
-		) {
-			SwipeRefresh(state = SwipeRefreshState(false), onRefresh = onRefresh) {
-				LazyColumnScrollbar(
-					state,
-					thumbColor = MaterialTheme.colors.primary,
-					thumbSelectedColor = Color.Gray
+		SwipeRefresh(state = SwipeRefreshState(false), onRefresh = onRefresh) {
+			LazyColumnScrollbar(
+				listState = state,
+				thumbColor = MaterialTheme.colors.primary,
+				thumbSelectedColor = Color.Gray,
+			) {
+				LazyColumn(
+					modifier = Modifier.fillMaxSize(),
+					state = state,
+					contentPadding = PaddingValues(bottom = 256.dp)
 				) {
-					LazyColumn(
-						modifier = Modifier.fillMaxSize(),
-						state = state,
-						contentPadding = PaddingValues(bottom = 256.dp)
-					) {
-						if (novelInfo != null)
-							item {
-								NovelInfoHeaderContent(
-									novelInfo = novelInfo,
-									openWebview = openWebView,
-									toggleBookmark = toggleBookmark,
-									openChapterJump = openChapterJump,
-									openFilter = openFilter,
-									chapterCount = chapters?.size ?: 0
-								)
-							}
-						else {
-							item {
-								LinearProgressIndicator(
-									modifier = Modifier.fillMaxWidth()
-								)
-							}
-						}
-
-						if (chapters != null)
-							NovelInfoChaptersContent(
-								chapters,
-								chapterContent
+					if (novelInfo != null)
+						item {
+							NovelInfoHeaderContent(
+								novelInfo = novelInfo,
+								openWebview = openWebView,
+								toggleBookmark = toggleBookmark,
+								openChapterJump = openChapterJump,
+								openFilter = openFilter,
+								chapterCount = chapters?.size ?: 0
 							)
-					}
-				}
-
-				// Do not save progress when there is nothing being displayed
-				if (novelInfo != null && chapters != null) {
-					LaunchedEffect(itemAt) {
-						launch {
-							if (!state.isScrollInProgress)
-								state.scrollToItem(itemAt)
 						}
+					else {
+						item {
+							LinearProgressIndicator(
+								modifier = Modifier.fillMaxWidth()
+							)
+						}
+					}
+
+					if (chapters != null)
+						NovelInfoChaptersContent(
+							chapters,
+							chapterContent
+						)
+				}
+			}
+
+			// Do not save progress when there is nothing being displayed
+			if (novelInfo != null && chapters != null) {
+				LaunchedEffect(itemAt) {
+					launch {
+						if (!state.isScrollInProgress)
+							state.scrollToItem(itemAt)
 					}
 				}
 			}
