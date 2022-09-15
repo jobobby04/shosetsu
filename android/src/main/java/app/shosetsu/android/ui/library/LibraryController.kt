@@ -57,6 +57,7 @@ import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -483,9 +484,8 @@ fun LibraryCategory(
 	fab: EFabMaintainer?
 ) {
 	SwipeRefresh(
-		state = SwipeRefreshState(false),
-		onRefresh = onRefresh,
-		modifier = Modifier.fillMaxSize()
+		state = rememberSwipeRefreshState(false),
+		onRefresh = onRefresh
 	) {
 		val w = LocalConfiguration.current.screenWidthDp
 		val o = LocalConfiguration.current.orientation

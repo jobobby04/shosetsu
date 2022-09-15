@@ -69,6 +69,7 @@ import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -795,7 +796,10 @@ fun NovelInfoContent(
 	Box(
 		modifier = Modifier.fillMaxSize()
 	) {
-		SwipeRefresh(state = SwipeRefreshState(false), onRefresh = onRefresh) {
+		SwipeRefresh(
+			state = rememberSwipeRefreshState(false),
+			onRefresh = onRefresh
+		) {
 			LazyColumnScrollbar(
 				listState = state,
 				thumbColor = MaterialTheme.colors.primary,

@@ -33,7 +33,7 @@ import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
@@ -267,7 +267,10 @@ fun RepositoriesContent(
 	fab: EFabMaintainer
 ) {
 	if (items.isNotEmpty()) {
-		SwipeRefresh(SwipeRefreshState(false), onRefresh) {
+		SwipeRefresh(
+			state = rememberSwipeRefreshState(false),
+			onRefresh = onRefresh
+		) {
 			val state = rememberLazyListState()
 			syncFABWithCompose(state, fab)
 			LazyColumn(
