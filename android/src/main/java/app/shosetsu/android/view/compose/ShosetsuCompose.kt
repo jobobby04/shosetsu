@@ -1,6 +1,7 @@
 package app.shosetsu.android.view.compose
 
 import android.content.Context
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -44,6 +45,7 @@ fun ShosetsuCompose(
 	) {
 		Surface(
 			modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+			color = MaterialTheme.colors.background,
 			content = content
 		)
 	}
