@@ -94,7 +94,7 @@ class LibraryController
 	private var fab: EFabMaintainer? = null
 	private var bsg: BottomSheetDialog? = null
 
-	override val viewTitleRes: Int = R.string.my_library
+	override val viewTitleRes: Int = R.string.library
 
 	/***/
 	val viewModel: ALibraryViewModel by viewModel()
