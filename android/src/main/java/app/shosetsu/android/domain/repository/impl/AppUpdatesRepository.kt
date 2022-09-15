@@ -110,6 +110,7 @@ class AppUpdatesRepository(
 
 	@Throws(FilePermissionException::class, IOException::class, HTTPException::class)
 	override suspend fun fetch(): AppUpdateEntity? = onIO {
+		return@onIO null // no updating for my fork
 		// Ignore any attempt to run updater on non-standard debug versions
 		if (flavor() != ProductFlavors.STANDARD && BuildConfig.DEBUG) return@onIO null
 
