@@ -1,11 +1,10 @@
 package app.shosetsu.android.view.compose
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -82,23 +81,32 @@ fun getRandomErrorFace(): String {
 
 data class ErrorAction(val id: Int, val onClick: () -> Unit)
 
+@SuppressLint("ModifierParameter")
 @Composable
 fun ErrorContent(
 	@StringRes messageRes: Int,
 	vararg actions: ErrorAction,
 	stackTrace: String? = null,
+	modifier: Modifier = Modifier,
 ) =
 	ErrorContent(
+		modifier = modifier,
 		message = stringResource(id = messageRes),
 		stackTrace = stackTrace,
 		actions = actions
 	)
 
+@SuppressLint("ModifierParameter")
 @Composable
-fun ErrorContent(message: String, vararg actions: ErrorAction, stackTrace: String? = null) {
+fun ErrorContent(
+	message: String,
+	vararg actions: ErrorAction,
+	stackTrace: String? = null,
+	modifier: Modifier = Modifier,
+) {
 	val face = remember { getRandomErrorFace() }
 	Box(
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxSize()
 			.padding(16.dp), contentAlignment = Alignment.Center
 	) {
@@ -137,10 +145,10 @@ fun ErrorContent(message: String, vararg actions: ErrorAction, stackTrace: Strin
 					}
 				) {
 					Icon(
-						if (!isStacktraceVisible)
+						painter = if (!isStacktraceVisible)
 							painterResource(R.drawable.expand_more)
 						else painterResource(R.drawable.expand_less),
-						if (!isStacktraceVisible)
+						contentDescription = if (!isStacktraceVisible)
 							stringResource(R.string.more)
 						else stringResource(R.string.less)
 					)
@@ -153,7 +161,6 @@ fun ErrorContent(message: String, vararg actions: ErrorAction, stackTrace: Strin
 						""
 					},
 					style = MaterialTheme.typography.caption,
-					modifier = Modifier.verticalScroll(rememberScrollState())
 				)
 			}
 		}

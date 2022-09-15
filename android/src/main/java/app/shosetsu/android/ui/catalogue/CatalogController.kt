@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.LinearProgressIndicator
@@ -433,105 +435,107 @@ fun CatalogContent(
 	Box(
 		modifier = Modifier.fillMaxSize(),
 	) {
-		Column(Modifier.fillMaxHeight()) {
-			SwipeRefresh(
-				state = SwipeRefreshState(false),
-				onRefresh = {
-					items.refresh()
-				},
+		SwipeRefresh(
+			state = SwipeRefreshState(false),
+			onRefresh = {
+				items.refresh()
+			},
+		) {
+			val w = LocalConfiguration.current.screenWidthDp
+			val o = LocalConfiguration.current.orientation
+
+			val size =
+				(w / when (o) {
+					Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+					else -> columnsInV
+				}).dp - 8.dp
+
+			val state = rememberLazyGridState()
+			if (hasFilters)
+				syncFABWithCompose(state, fab)
+			LazyVerticalGrid(
+				columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
+				contentPadding = PaddingValues(
+					bottom = 200.dp,
+					start = 8.dp,
+					end = 8.dp,
+					top = 4.dp
+				),
+				state = state,
+				horizontalArrangement = Arrangement.spacedBy(4.dp),
+				verticalArrangement = Arrangement.spacedBy(4.dp)
 			) {
-				val w = LocalConfiguration.current.screenWidthDp
-				val o = LocalConfiguration.current.orientation
-
-				val size =
-					(w / when (o) {
-						Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-						else -> columnsInV
-					}).dp - 8.dp
-
-				val state = rememberLazyGridState()
-				if (hasFilters)
-					syncFABWithCompose(state, fab)
-				LazyVerticalGrid(
-					columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
-					contentPadding = PaddingValues(
-						bottom = 200.dp,
-						start = 8.dp,
-						end = 8.dp,
-						top = 4.dp
-					),
-					state = state,
-					horizontalArrangement = Arrangement.spacedBy(4.dp),
-					verticalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					itemsIndexed(
-						items,
-						key = { index, item -> item.hashCode() + index }
-					) { _, item ->
-						when (cardType) {
-							NORMAL -> {
-								if (item != null)
-									NovelCardNormalContent(
-										item.title,
-										item.imageURL,
-										onClick = {
-											onClick(item)
-										},
-										onLongClick = {
-											onLongClick(item)
-										},
-										isBookmarked = item.bookmarked
-									)
-							}
-							COMPRESSED -> {
-								if (item != null)
-									NovelCardCompressedContent(
-										item.title,
-										item.imageURL,
-										onClick = {
-											onClick(item)
-										},
-										onLongClick = {
-											onLongClick(item)
-										},
-										isBookmarked = item.bookmarked
-									)
-							}
-							COZY -> {
-								if (item != null)
-									NovelCardCozyContent(
-										item.title,
-										item.imageURL,
-										onClick = {
-											onClick(item)
-										},
-										onLongClick = {
-											onLongClick(item)
-										},
-										isBookmarked = item.bookmarked
-									)
-							}
+				itemsIndexed(
+					items,
+					key = { index, item -> item.hashCode() + index }
+				) { _, item ->
+					when (cardType) {
+						NORMAL -> {
+							if (item != null)
+								NovelCardNormalContent(
+									item.title,
+									item.imageURL,
+									onClick = {
+										onClick(item)
+									},
+									onLongClick = {
+										onLongClick(item)
+									},
+									isBookmarked = item.bookmarked
+								)
+						}
+						COMPRESSED -> {
+							if (item != null)
+								NovelCardCompressedContent(
+									item.title,
+									item.imageURL,
+									onClick = {
+										onClick(item)
+									},
+									onLongClick = {
+										onLongClick(item)
+									},
+									isBookmarked = item.bookmarked
+								)
+						}
+						COZY -> {
+							if (item != null)
+								NovelCardCozyContent(
+									item.title,
+									item.imageURL,
+									onClick = {
+										onClick(item)
+									},
+									onLongClick = {
+										onLongClick(item)
+									},
+									isBookmarked = item.bookmarked
+								)
 						}
 					}
 				}
-			}
-
-			if (items.loadState.append == LoadState.Loading)
-				LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-
-			if (items.loadState.refresh.endOfPaginationReached && items.loadState.append.endOfPaginationReached) {
-				CatalogContentNoMore()
-			}
-
-			val errorState = items.loadState.refresh
-			if (errorState is LoadState.Error) {
-				ErrorContent(
-					errorState.error.message ?: "Unknown",
-					ErrorAction(R.string.retry) {
-						items.refresh()
-					},
-					stackTrace = errorState.error.stackTraceToString()
-				)
+				if (items.loadState.append == LoadState.Loading) {
+					item(span = { GridItemSpan(maxLineSpan) }) {
+						LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+					}
+				}
+				if (items.loadState.refresh.endOfPaginationReached && items.loadState.append.endOfPaginationReached) {
+					item(span = { GridItemSpan(maxLineSpan) }) {
+						CatalogContentNoMore()
+					}
+				}
+				val errorState = items.loadState.refresh
+				if (errorState is LoadState.Error) {
+					item(span = { GridItemSpan(maxLineSpan) }) {
+						ErrorContent(
+							errorState.error.message ?: "Unknown",
+							ErrorAction(R.string.retry) {
+								items.refresh()
+							},
+							stackTrace = errorState.error.stackTraceToString()
+						)
+					}
+				}
 			}
 		}
 
