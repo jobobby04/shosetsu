@@ -26,6 +26,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.pagerTabIndicatorOffset
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -52,15 +54,14 @@ import kotlinx.coroutines.launch
  *
  * Creates the bottom menu for Novel Controller
  */
+@Stable
 class LibraryFilterMenuBuilder constructor(
 	private val context: Context,
 	private val viewModel: ALibraryViewModel
 ) {
 	@OptIn(ExperimentalPagerApi::class)
 	fun build(): View =
-		ComposeView(
-			context
-		).apply {
+		ComposeView(context).apply {
 			setContent {
 				ShosetsuCompose {
 					val pagerState = rememberPagerState()
@@ -109,19 +110,19 @@ class LibraryFilterMenuBuilder constructor(
 
 	@Composable
 	private fun Menu0Content() {
-		val genres by viewModel.genresFlow.collectAsState(emptyList())
+		val genres by viewModel.genresFlow.collectAsState(persistentListOf())
 		val genresIsNotEmpty by derivedStateOf { genres.isNotEmpty() }
 		var genresIsExpanded by remember { mutableStateOf(false) }
 
-		val tags by viewModel.tagsFlow.collectAsState(emptyList())
+		val tags by viewModel.tagsFlow.collectAsState(persistentListOf())
 		val tagsIsNotEmpty by derivedStateOf { tags.isNotEmpty() }
 		var tagsIsExpanded by remember { mutableStateOf(false) }
 
-		val authors by viewModel.authorsFlow.collectAsState(emptyList())
+		val authors by viewModel.authorsFlow.collectAsState(persistentListOf())
 		val authorsIsNotEmpty by derivedStateOf { authors.isNotEmpty() }
 		var authorsIsExpanded by remember { mutableStateOf(false) }
 
-		val artists by viewModel.artistsFlow.collectAsState(emptyList())
+		val artists by viewModel.artistsFlow.collectAsState(persistentListOf())
 		val artistsIsNotEmpty by derivedStateOf { artists.isNotEmpty() }
 		var artistsIsExpanded by remember { mutableStateOf(false) }
 
@@ -234,7 +235,7 @@ class LibraryFilterMenuBuilder constructor(
 	@Composable
 	private fun ColumnScope.FilterContent(
 		name: Int,
-		items: List<String>,
+		items: ImmutableList<String>,
 		isExpanded: Boolean,
 		toggleExpansion: () -> Unit,
 		getState: (String) -> Flow<ToggleableState>,

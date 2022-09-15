@@ -55,7 +55,7 @@ import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDownloadsState
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * Shosetsu
@@ -82,11 +82,12 @@ class DownloadsController : ShosetsuController(),
 			setContent {
 				ShosetsuCompose {
 					val items by viewModel.liveData.collectAsState()
+					val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
 					val hasSelected by viewModel.hasSelectedFlow.collectAsState()
 
 					DownloadsContent(
 						items = items,
-						selectedDownloadStateFlow = viewModel.selectedDownloadState,
+						selectedDownloadState = selectedDownloadState,
 						hasSelected = hasSelected,
 						pauseSelection = viewModel::pauseSelection,
 						startSelection = viewModel::startSelection,
@@ -206,8 +207,8 @@ class DownloadsController : ShosetsuController(),
 
 @Composable
 fun DownloadsContent(
-	items: List<DownloadUI>,
-	selectedDownloadStateFlow: StateFlow<SelectedDownloadsState>,
+	items: ImmutableList<DownloadUI>,
+	selectedDownloadState: SelectedDownloadsState,
 	hasSelected: Boolean,
 	pauseSelection: () -> Unit,
 	startSelection: () -> Unit,
@@ -243,9 +244,6 @@ fun DownloadsContent(
 			}
 
 			if (hasSelected) {
-				val selectedDownloadState by selectedDownloadStateFlow.collectAsState(
-					SelectedDownloadsState()
-				)
 				Card(
 					modifier = Modifier
 						.align(BiasAlignment(0f, 0.7f))

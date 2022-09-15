@@ -13,6 +13,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import com.google.accompanist.pager.ExperimentalPagerApi
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
 /*
@@ -49,7 +50,7 @@ fun PreviewChapterReaderContent() {
 			isFocused = false,
 			content = {
 				ChapterReaderPagerContent(
-					items = emptyList(),
+					items = persistentListOf(),
 					isHorizontal = false,
 					onStopTTS = {},
 					markChapterAsCurrent = {},

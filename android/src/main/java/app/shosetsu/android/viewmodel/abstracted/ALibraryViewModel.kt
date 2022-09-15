@@ -8,6 +8,7 @@ import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.StartUpdateManagerViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -36,7 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @author github.com/doomsdayrs
  */
 abstract class ALibraryViewModel :
-	SubscribeViewModel<List<LibraryNovelUI>>,
+	SubscribeViewModel<ImmutableList<LibraryNovelUI>>,
 	ShosetsuViewModel(),
 	IsOnlineCheckViewModel,
 	StartUpdateManagerViewModel {
@@ -45,16 +46,16 @@ abstract class ALibraryViewModel :
 	abstract val hasSelection: StateFlow<Boolean>
 
 	/** All genres from all [LibraryNovelUI] combined*/
-	abstract val genresFlow: Flow<List<String>>
+	abstract val genresFlow: Flow<ImmutableList<String>>
 
 	/** All tags from all [LibraryNovelUI] combined*/
-	abstract val tagsFlow: Flow<List<String>>
+	abstract val tagsFlow: Flow<ImmutableList<String>>
 
 	/** All authors from all [LibraryNovelUI] combined*/
-	abstract val authorsFlow: Flow<List<String>>
+	abstract val authorsFlow: Flow<ImmutableList<String>>
 
 	/** All artists from all [LibraryNovelUI] combined*/
-	abstract val artistsFlow: Flow<List<String>>
+	abstract val artistsFlow: Flow<ImmutableList<String>>
 
 	abstract val novelCardTypeFlow: StateFlow<NovelCardType>
 

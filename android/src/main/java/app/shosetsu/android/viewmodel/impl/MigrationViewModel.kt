@@ -10,6 +10,9 @@ import app.shosetsu.android.domain.usecases.load.LoadBrowseExtensionsUseCase
 import app.shosetsu.android.view.uimodels.model.MigrationExtensionUI
 import app.shosetsu.android.view.uimodels.model.MigrationNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AMigrationViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -68,37 +71,33 @@ class MigrationViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	override val extensions: StateFlow<List<MigrationExtensionUI>> by lazy {
-		loadBrowseExtensionsFlow().map { hResult ->
-			hResult.let { list ->
-				list.filter { it.isInstalled }.map {
-					MigrationExtensionUI(
-						it.id,
-						it.name,
-						it.imageURL
-					)
-				}
-			}
-		}.transform { extensionsResult ->
-			extensionsResult.let { mExtensions ->
-				emitAll(
-					which.flatMapLatest { selectedId ->
-						selectedExtensionMap.getOrPut(selectedId) {
-							MutableStateFlow(mExtensions.firstOrNull()?.id ?: -1)
-						}.mapLatest { selectedExtension ->
-							mExtensions.map { extension ->
-								extension.copy(
-									isSelected = selectedExtension == extension.id
-								)
-							}
-						}
-					}
+	override val extensions: StateFlow<ImmutableList<MigrationExtensionUI>> by lazy {
+		loadBrowseExtensionsFlow().map { list ->
+			list.filter { it.isInstalled }.map {
+				MigrationExtensionUI(
+					it.id,
+					it.name,
+					it.imageURL
 				)
 			}
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+		}.transform { mExtensions ->
+			emitAll(
+				which.flatMapLatest { selectedId ->
+					selectedExtensionMap.getOrPut(selectedId) {
+						MutableStateFlow(mExtensions.firstOrNull()?.id ?: -1)
+					}.mapLatest { selectedExtension ->
+						mExtensions.map { extension ->
+							extension.copy(
+								isSelected = selectedExtension == extension.id
+							)
+						}.toImmutableList()
+					}
+				}
+			)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
-	override val novels: StateFlow<List<MigrationNovelUI>> by lazy {
+	override val novels: StateFlow<ImmutableList<MigrationNovelUI>> by lazy {
 		novelIds.flatMapLatest { ids ->
 			combine(
 				ids.map {
@@ -112,16 +111,14 @@ class MigrationViewModel(
 				MigrationNovelUI(it.id, it.title, it.imageURL)
 			}
 		}.combine(which) { list, id ->
-			val result = list.let {
-				it.map { novelUI ->
-					novelUI.copy(
-						isSelected = novelUI.id == id
-					)
-				}
-			}
+			val result = list.map { novelUI ->
+				novelUI.copy(
+					isSelected = novelUI.id == id
+				)
+			}.toImmutableList()
 			logV("New list: $result")
 			result
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	/**

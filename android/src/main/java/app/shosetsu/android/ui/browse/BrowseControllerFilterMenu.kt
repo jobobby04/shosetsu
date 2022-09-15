@@ -18,6 +18,7 @@ import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.FilteredLanguages
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.LanguageFilter
+import kotlinx.collections.immutable.*
 
 /*
  * This file is part of shosetsu.
@@ -102,7 +103,7 @@ fun BrowseControllerNameFilter(searchTerm: String, setSearchTerm: (newTerm: Stri
 @Composable
 fun PreviewBrowseControllerLanguagesFilter() {
 	BrowseControllerLanguagesFilter(
-		FilteredLanguages(listOf(LanguageFilter("en")), mapOf("en" to true)),
+		FilteredLanguages(listOf(LanguageFilter("en")).toImmutableList(), mapOf("en" to true).toImmutableMap()),
 		false,
 		{ _, _ -> },
 		{}
@@ -168,16 +169,16 @@ fun BrowseControllerLanguagesFilter(
 fun PreviewBrowseControllerLanguages() {
 	ShosetsuCompose {
 		BrowseControllerLanguagesContent(
-			languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter),
-			state = mapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),
+			languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter).toImmutableList(),
+			state = persistentMapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),
 			onLanguageChecked = { _, _ -> })
 	}
 }
 
 @Composable
 fun BrowseControllerLanguagesContent(
-	languages: List<LanguageFilter>,
-	state: Map<String, Boolean>,
+	languages: ImmutableList<LanguageFilter>,
+	state: ImmutableMap<String, Boolean>,
 	onLanguageChecked: (String, Boolean) -> Unit
 ) {
 	Column(

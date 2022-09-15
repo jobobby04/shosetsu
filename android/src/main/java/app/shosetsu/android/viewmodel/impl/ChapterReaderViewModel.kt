@@ -36,6 +36,8 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDivide
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -407,9 +409,10 @@ class ChapterReaderViewModel(
 			)
 		}.onIO()
 
-	override val liveData: StateFlow<List<ReaderUIItem>?> by lazy {
+	override val liveData: StateFlow<ImmutableList<ReaderUIItem>?> by lazy {
 		chaptersFlow
 			.combineDividers() // Add dividers
+			.map { it.toImmutableList() }
 			.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}

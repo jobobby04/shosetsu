@@ -34,6 +34,9 @@ import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import java.util.Locale.getDefault as LGD
@@ -146,19 +149,19 @@ class LibraryViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val genresFlow: Flow<List<String>> by lazy {
+	override val genresFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.genres }
 	}
 
-	override val tagsFlow: Flow<List<String>> by lazy {
+	override val tagsFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.tags }
 	}
 
-	override val authorsFlow: Flow<List<String>> by lazy {
+	override val authorsFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.authors }
 	}
 
-	override val artistsFlow: Flow<List<String>> by lazy {
+	override val artistsFlow: Flow<ImmutableList<String>> by lazy {
 		stripOutList { it.artists }
 	}
 
@@ -207,7 +210,7 @@ class LibraryViewModel(
 	 *
 	 * This also connects all the filtering as well
 	 */
-	override val liveData: StateFlow<List<LibraryNovelUI>> by lazy {
+	override val liveData: StateFlow<ImmutableList<LibraryNovelUI>> by lazy {
 		librarySourceFlow
 			.combineSelection()
 			.combineArtistFilter()
@@ -218,8 +221,9 @@ class LibraryViewModel(
 			.combineSortType()
 			.combineSortReverse()
 			.combineFilter()
+			.map { it.toImmutableList() }
 			.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	override val columnsInH by lazy {
@@ -241,18 +245,16 @@ class LibraryViewModel(
 	 */
 	private fun stripOutList(
 		strip: (LibraryNovelUI) -> List<String>
-	): Flow<List<String>> = librarySourceFlow.mapLatest { result ->
+	): Flow<ImmutableList<String>> = librarySourceFlow.mapLatest { list ->
 		ArrayList<String>().apply {
-			result.let { list ->
-				list.forEach { ui ->
-					strip(ui).forEach { key ->
-						if (!contains(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() }) && key.isNotBlank()) {
-							add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() })
-						}
+			list.forEach { ui ->
+				strip(ui).forEach { key ->
+					if (!contains(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() }) && key.isNotBlank()) {
+						add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() })
 					}
 				}
 			}
-		}
+		}.toImmutableList()
 	}.onIO()
 
 	/**

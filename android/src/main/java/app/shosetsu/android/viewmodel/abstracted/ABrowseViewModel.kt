@@ -6,6 +6,8 @@ import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
 
@@ -35,7 +37,7 @@ import java.util.*
  */
 abstract class ABrowseViewModel :
 	ShosetsuViewModel(),
-	SubscribeViewModel<List<BrowseExtensionUI>?>,
+	SubscribeViewModel<ImmutableList<BrowseExtensionUI>?>,
 	IsOnlineCheckViewModel {
 
 	@Immutable
@@ -45,8 +47,8 @@ abstract class ABrowseViewModel :
 
 	@Immutable
 	data class FilteredLanguages(
-		val languages: List<LanguageFilter>,
-		val states: Map<String, Boolean>
+		val languages: ImmutableList<LanguageFilter>,
+		val states: ImmutableMap<String, Boolean>
 	)
 
 	/** Refreshes the repositories and data values */

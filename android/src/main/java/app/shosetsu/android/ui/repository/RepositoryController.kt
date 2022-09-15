@@ -36,6 +36,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.collections.immutable.ImmutableList
 import org.acra.ACRA
 import androidx.appcompat.app.AlertDialog.Builder as AlertDialogBuilder
 
@@ -258,7 +259,7 @@ class RepositoryController : ShosetsuController(),
 
 @Composable
 fun RepositoriesContent(
-	items: List<RepositoryUI>,
+	items: ImmutableList<RepositoryUI>,
 	toggleEnabled: (RepositoryUI) -> Unit,
 	onRemove: (RepositoryUI) -> Unit,
 	addRepository: () -> Unit,

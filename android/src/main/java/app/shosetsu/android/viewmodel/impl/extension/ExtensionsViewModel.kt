@@ -33,6 +33,7 @@ import app.shosetsu.android.domain.usecases.load.LoadBrowseExtensionsUseCase
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
+import kotlinx.collections.immutable.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -97,8 +98,8 @@ class ExtensionsViewModel(
 					this[language.lang] = filteredLanguages.none { language.lang == it }
 				}
 			}
-			FilteredLanguages(languageResult, map)
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, FilteredLanguages(emptyList(), emptyMap()))
+			FilteredLanguages(languageResult.toImmutableList(), map.toImmutableMap())
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, FilteredLanguages(persistentListOf(), persistentMapOf()))
 	}
 
 	override val onlyInstalledLive: StateFlow<Boolean> by lazy {
@@ -157,7 +158,7 @@ class ExtensionsViewModel(
 		MutableStateFlow("")
 	}
 
-	override val liveData: StateFlow<List<BrowseExtensionUI>?> by lazy {
+	override val liveData: StateFlow<ImmutableList<BrowseExtensionUI>?> by lazy {
 		extensionFlow.flatMapLatest { list ->
 			combine(
 				settingsRepo.getStringSetFlow(BrowseFilteredLanguages),
@@ -177,7 +178,7 @@ class ExtensionsViewModel(
 					.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.displayLang })
 					.sortedBy { !it.isInstalled }
 					.sortedBy { !it.isUpdateAvailable }
-					.toList()
+					.toImmutableList()
 			}
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}

@@ -46,6 +46,7 @@ import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.*
+import kotlinx.collections.immutable.toImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -122,7 +123,7 @@ fun ReaderSettingsContent(
 			DropdownSettingContent(
 				title = stringResource(R.string.settings_reader_text_alignment_title),
 				description = stringResource(R.string.settings_reader_text_alignment_desc),
-				choices = stringArrayResource(R.array.text_alignments),
+				choices = stringArrayResource(R.array.text_alignments).toList().toImmutableList(),
 				modifier = Modifier
 					.fillMaxWidth(),
 				repo = viewModel.settingsRepo,
@@ -250,7 +251,9 @@ fun ReaderSettingsContent(
 			DropdownSettingContent(
 				stringResource(R.string.marking_mode),
 				stringResource(R.string.settings_reader_marking_mode_desc),
-				choices = stringArrayResource(R.array.marking_names),
+				choices = stringArrayResource(R.array.marking_names)
+					.toList()
+					.toImmutableList(),
 				repo = viewModel.settingsRepo,
 				key = ReadingMarkingType,
 				stringToInt = {

@@ -10,6 +10,8 @@ import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartExportBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -50,8 +52,8 @@ class BackupSettingsViewModel(
 		}
 	}
 
-	override fun loadInternalOptions(): Flow<List<String>> = flow {
-		emit(loadInternalBackupNamesUseCase().sorted())
+	override fun loadInternalOptions(): Flow<ImmutableList<String>> = flow {
+		emit(loadInternalBackupNamesUseCase().sorted().toImmutableList())
 	}.onIO()
 
 	override fun restore(path: String) {

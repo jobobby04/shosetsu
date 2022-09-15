@@ -5,6 +5,7 @@ import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -32,7 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @author github.com/doomsdayrs
  */
 abstract class ADownloadsViewModel :
-	SubscribeViewModel<List<DownloadUI>>,
+	SubscribeViewModel<ImmutableList<DownloadUI>>,
 	ShosetsuViewModel(),
 	IsOnlineCheckViewModel {
 

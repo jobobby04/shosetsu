@@ -33,7 +33,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.*
@@ -52,6 +51,7 @@ import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -114,11 +114,11 @@ class LibraryController
 					}
 
 					LibraryContent(
-						items,
+						items = items,
 						isEmpty = isEmpty,
-						type,
-						columnsInV,
-						columnsInH,
+						cardType = type,
+						columnsInV = columnsInV,
+						columnsInH = columnsInH,
 						hasSelected = hasSelected,
 						onRefresh = {
 							onRefresh()
@@ -154,7 +154,7 @@ class LibraryController
 								}
 							}
 						} else null,
-						fab
+						fab = fab
 					)
 				}
 			}
@@ -336,7 +336,7 @@ class LibraryController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LibraryContent(
-	items: List<LibraryNovelUI>,
+	items: ImmutableList<LibraryNovelUI>,
 	isEmpty: Boolean,
 	cardType: NovelCardType,
 	columnsInV: Int,

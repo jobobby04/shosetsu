@@ -8,6 +8,7 @@ import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,7 +50,7 @@ abstract class ANovelViewModel
 	abstract val isRefreshing: StateFlow<Boolean>
 
 	abstract val novelLive: StateFlow<NovelUI?>
-	abstract val chaptersLive: StateFlow<List<ChapterUI>>
+	abstract val chaptersLive: StateFlow<ImmutableList<ChapterUI>>
 	abstract val selectedChaptersState: StateFlow<SelectedChaptersState>
 
 	abstract val otherException: StateFlow<Throwable?>

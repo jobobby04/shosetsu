@@ -31,6 +31,9 @@ import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
 import io.github.g0dkar.qrcode.QRCode
 import io.github.g0dkar.qrcode.render.QRCodeCanvasFactory
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -91,7 +94,7 @@ class NovelViewModel(
 
 	private val novelIDLive = MutableStateFlow(-1)
 
-	override val chaptersLive: StateFlow<List<ChapterUI>> by lazy {
+	override val chaptersLive: StateFlow<ImmutableList<ChapterUI>> by lazy {
 		novelIDLive.flatMapLatest { id: Int ->
 			getChapterUIsUseCase(id)
 				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
@@ -101,9 +104,10 @@ class NovelViewModel(
 				.combineSort()
 				.combineReverse()
 				.combineSelection()
+				.map { it.toImmutableList() }
 		}.catch {
 			chaptersException.value = it
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	override val selectedChaptersState: StateFlow<SelectedChaptersState> by lazy {

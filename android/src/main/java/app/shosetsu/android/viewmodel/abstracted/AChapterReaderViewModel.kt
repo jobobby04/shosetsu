@@ -9,6 +9,7 @@ import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import app.shosetsu.lib.Novel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
  * 06 / 05 / 2020
  */
 abstract class AChapterReaderViewModel :
-	SubscribeViewModel<List<ReaderUIItem>?>,
+	SubscribeViewModel<ImmutableList<ReaderUIItem>?>,
 	ShosetsuViewModel(),
 	ExposedSettingsRepoViewModel {
 

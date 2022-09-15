@@ -22,6 +22,9 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -143,13 +146,13 @@ class CatalogViewModel(
 		}.cachedIn(viewModelScope)
 	}
 
-	override val filterItemsLive: StateFlow<List<Filter<*>>> by lazy {
+	override val filterItemsLive: StateFlow<ImmutableList<Filter<*>>> by lazy {
 		iExtensionFlow.mapLatest {
 			it?.searchFiltersModel?.toList() ?: emptyList()
 		}.mapLatest {
 			filterDataState.clear() // Reset filter state so no data conflicts occur
-			it
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, emptyList())
+			it.toImmutableList()
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
 	}
 
 	override val hasFilters: StateFlow<Boolean> by lazy {

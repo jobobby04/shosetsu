@@ -44,6 +44,9 @@ import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -172,13 +175,15 @@ class SearchController : ShosetsuController(), MenuProvider {
 @Composable
 fun PreviewSearchContent() {
 	SearchContent(
-		rows = listOf(SearchRowUI(-1, "Library", null)) + List(5) {
-			SearchRowUI(
-				it,
-				"Test",
-				null
-			)
-		},
+		rows = persistentListOf(SearchRowUI(-1, "Library", null)).addAll(
+			List(5) {
+				SearchRowUI(
+					it,
+					"Test",
+					null
+				)
+			}
+		),
 		getException = {
 			flow { emit(null) }
 		},
@@ -193,7 +198,7 @@ fun PreviewSearchContent() {
 
 @Composable
 fun SearchContent(
-	rows: List<SearchRowUI>,
+	rows: ImmutableList<SearchRowUI>,
 	isCozy: Boolean = false,
 	getChildren: (id: Int) -> Flow<PagingData<ACatalogNovelUI>>,
 	getException: (id: Int) -> Flow<Throwable?>,

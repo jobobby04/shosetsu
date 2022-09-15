@@ -6,6 +6,7 @@ import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.StartUpdateManagerViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.StateFlow
 import org.joda.time.DateTime
 
@@ -35,7 +36,7 @@ import org.joda.time.DateTime
  */
 abstract class AUpdatesViewModel
 	: ShosetsuViewModel(),
-	SubscribeViewModel<Map<DateTime, List<UpdatesUI>>>,
+	SubscribeViewModel<ImmutableMap<DateTime, List<UpdatesUI>>>,
 	StartUpdateManagerViewModel, IsOnlineCheckViewModel {
 
 	abstract val isRefreshing: StateFlow<Boolean>

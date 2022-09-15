@@ -9,6 +9,9 @@ import app.shosetsu.android.domain.usecases.load.LoadRepositoriesUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateRepositoryUseCase
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.*
 
 /*
@@ -42,8 +45,9 @@ class RepositoryViewModel(
 	private val isOnlineUseCase: IsOnlineUseCase
 ) : ARepositoryViewModel() {
 
-	override val liveData: StateFlow<List<RepositoryUI>> by lazy {
-		loadRepositoriesUseCase().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+	override val liveData: StateFlow<ImmutableList<RepositoryUI>> by lazy {
+		loadRepositoriesUseCase().map { it.toImmutableList() }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
 	override fun addRepository(name: String, url: String) = flow {

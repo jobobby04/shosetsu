@@ -28,6 +28,7 @@ import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.material.composethemeadapter.MdcTheme
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -264,7 +265,7 @@ class ChapterReader
 					content = { paddingValues ->
 						ChapterReaderPagerContent(
 							paddingValues = paddingValues,
-							items = items.orEmpty(),
+							items = items ?: persistentListOf(),
 							isHorizontal = isHorizontalReading,
 							isSwipeInverted = isSwipeInverted,
 							currentPage = currentPage,
