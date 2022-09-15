@@ -15,9 +15,7 @@ import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.reader.ChapterReader
 import app.shosetsu.android.ui.webView.WebViewApp
 import app.shosetsu.android.view.uimodels.model.ChapterUI
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
 
 /*
  * This file is part of shosetsu.
@@ -92,15 +90,14 @@ fun Activity.openChapter(chapterID: Int, novelID: Int) {
 fun Context.readAsset(name: String): String {
 	val string = StringBuilder()
 	try {
-		val reader = BufferedReader(InputStreamReader(assets.open(name)))
-
-		// do reading, usually loop until end of file reading
-		var mLine: String? = reader.readLine()
-		while (mLine != null) {
-			string.append("\n").append(mLine)
-			mLine = reader.readLine()
+		assets.open(name).reader().buffered().use { reader ->
+			// do reading, usually loop until end of file reading
+			var mLine: String? = reader.readLine()
+			while (mLine != null) {
+				string.append("\n").append(mLine)
+				mLine = reader.readLine()
+			}
 		}
-		reader.close()
 	} catch (e: IOException) {
 		Log.e(javaClass.name, "Failed to read asset of $name", e)
 	}
