@@ -279,8 +279,6 @@ dependencies {
 
 	implementation(androidxCompose("ui"))
 
-	implementation(androidxCompose("compiler", version = "1.3.0"))
-
 	//- Tooling support (Previews, etc.)
 	implementation(androidxCompose("ui-tooling", "ui"))
 
