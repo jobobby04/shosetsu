@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
@@ -24,6 +25,7 @@ import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
 import com.google.android.material.snackbar.Snackbar
 
@@ -132,7 +134,7 @@ fun DownloadSettingsContent(
 			SliderSettingContent(
 				"Download thread pool size",
 				"How many simultaneous downloads occur at once",
-				1..6,
+				remember { StableHolder(1..6) },
 				{ "$it" },
 				viewModel.settingsRepo,
 				SettingKey.DownloadThreadPool,
@@ -145,7 +147,7 @@ fun DownloadSettingsContent(
 			SliderSettingContent(
 				"Download threads per Extension",
 				"How many simultaneous downloads per extension that can occur at once",
-				1..6,
+				remember { StableHolder(1..6) },
 				{ "$it" },
 				viewModel.settingsRepo,
 				SettingKey.DownloadExtThreads,

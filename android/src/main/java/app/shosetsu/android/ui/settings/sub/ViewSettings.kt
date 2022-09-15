@@ -33,6 +33,7 @@ import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map
@@ -104,7 +105,7 @@ fun ViewSettingsContent(viewModel: AViewSettingsViewModel, finishActivity: () ->
 			NumberPickerSettingContent(
 				title = stringResource(R.string.columns_of_novel_listing_p),
 				description = stringResource(R.string.columns_zero_automatic),
-				range = 0..10,
+				range = remember { StableHolder(0..10) },
 				repo = viewModel.settingsRepo,
 				key = ChapterColumnsInPortait,
 				modifier = Modifier
@@ -116,7 +117,7 @@ fun ViewSettingsContent(viewModel: AViewSettingsViewModel, finishActivity: () ->
 			NumberPickerSettingContent(
 				title = stringResource(R.string.columns_of_novel_listing_h),
 				description = stringResource(R.string.columns_zero_automatic),
-				range = 0..10,
+				range = remember { StableHolder(0..10) },
 				repo = viewModel.settingsRepo,
 				key = ChapterColumnsInLandscape,
 				modifier = Modifier

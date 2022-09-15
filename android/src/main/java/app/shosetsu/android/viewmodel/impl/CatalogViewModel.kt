@@ -18,6 +18,7 @@ import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsPUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.lib.Filter
@@ -146,12 +147,12 @@ class CatalogViewModel(
 		}.cachedIn(viewModelScope)
 	}
 
-	override val filterItemsLive: StateFlow<ImmutableList<Filter<*>>> by lazy {
+	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> by lazy {
 		iExtensionFlow.mapLatest {
 			it?.searchFiltersModel?.toList() ?: emptyList()
 		}.mapLatest {
 			filterDataState.clear() // Reset filter state so no data conflicts occur
-			it.toImmutableList()
+			it.map { StableHolder(it) }.toImmutableList()
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
 	}
 
@@ -221,7 +222,7 @@ class CatalogViewModel(
 	}
 
 	private fun resetFilterDataState() {
-		filterItemsLive.value.forEach { filter -> resetFilter(filter) }
+		filterItemsLive.value.forEach { filter -> resetFilter(filter.item) }
 	}
 
 	override fun backgroundNovelAdd(novelID: Int): Flow<BackgroundNovelAddProgress> =

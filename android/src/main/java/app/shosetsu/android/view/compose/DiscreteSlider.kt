@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
+import app.shosetsu.android.view.uimodels.StableHolder
 import kotlin.math.roundToInt
 
 @Preview
@@ -31,7 +32,7 @@ fun PreviewSeekBar() {
 				{ it, _ ->
 					value = it
 				},
-				0..10,
+				StableHolder(0..10),
 			)
 		}
 	}
@@ -51,7 +52,7 @@ fun DiscreteSlider(
 	value: Int,
 	parsedValue: String,
 	updateValue: (Int, fromDialog: Boolean) -> Unit,
-	valueRange: IntRange,
+	valueRange: StableHolder<IntRange>,
 	haveSteps: Boolean = true,
 	maxHeaderSize: Dp? = null,
 ) {
@@ -88,8 +89,8 @@ fun DiscreteSlider(
 						Text(
 							stringResource(
 								R.string.input_int_range_desc,
-								valueRange.first,
-								valueRange.last
+								valueRange.item.first,
+								valueRange.item.last
 							),
 							style = MaterialTheme.typography.body1,
 							modifier = Modifier.padding(
@@ -105,7 +106,7 @@ fun DiscreteSlider(
 								val value = it.toIntOrNull()
 
 								if (value != null) {
-									if (value in valueRange) {
+									if (value in valueRange.item) {
 										newValue = value
 										isTextError = false
 										return@TextField
@@ -171,8 +172,8 @@ fun DiscreteSlider(
 			{
 				updateValue(it.roundToInt(), false)
 			},
-			valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
-			steps = if (haveSteps) valueRange.count() - 2 else 0
+			valueRange = valueRange.item.first.toFloat()..valueRange.item.last.toFloat(),
+			steps = if (haveSteps) valueRange.item.count() - 2 else 0
 		)
 	}
 }
@@ -190,7 +191,7 @@ fun DiscreteSlider(
 	value: Float,
 	parsedValue: String,
 	updateValue: (Float, fromDialog: Boolean) -> Unit,
-	valueRange: IntRange,
+	valueRange: StableHolder<IntRange>,
 	haveSteps: Boolean = true,
 	maxHeaderSize: Dp? = null
 ) {
@@ -227,8 +228,8 @@ fun DiscreteSlider(
 						Text(
 							stringResource(
 								R.string.input_float_range_desc,
-								valueRange.first,
-								valueRange.last
+								valueRange.item.first,
+								valueRange.item.last
 							),
 							style = MaterialTheme.typography.body1,
 							modifier = Modifier.padding(
@@ -245,7 +246,7 @@ fun DiscreteSlider(
 
 								// Set text as error if the value is invalid
 								isTextError = if (newFloat != null) {
-									!(valueRange.first <= newFloat || newFloat <= valueRange.last)
+									!(valueRange.item.first <= newFloat || newFloat <= valueRange.item.last)
 								} else {
 									true
 								}
@@ -310,8 +311,8 @@ fun DiscreteSlider(
 			{
 				updateValue(it, false)
 			},
-			valueRange = valueRange.first.toFloat()..valueRange.last.toFloat(),
-			steps = if (haveSteps) valueRange.count() - 2 else 0
+			valueRange = valueRange.item.first.toFloat()..valueRange.item.last.toFloat(),
+			steps = if (haveSteps) valueRange.item.count() - 2 else 0
 		)
 	}
 }

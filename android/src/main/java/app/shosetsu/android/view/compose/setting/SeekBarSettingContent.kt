@@ -9,13 +9,14 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.view.compose.DiscreteSlider
+import app.shosetsu.android.view.uimodels.StableHolder
 import kotlin.math.roundToInt
 
 @Composable
 fun SliderSettingContent(
 	title: String,
 	description: String,
-	valueRange: IntRange,
+	valueRange: StableHolder<IntRange>,
 	parseValue: (Int) -> String,
 	repo: ISettingsRepository,
 	key: SettingKey<Int>,
@@ -53,7 +54,7 @@ fun SliderSettingContent(
 fun FloatSliderSettingContent(
 	title: String,
 	description: String,
-	valueRange: IntRange,
+	valueRange: StableHolder<IntRange>,
 	parseValue: (Float) -> String,
 	repo: ISettingsRepository,
 	key: SettingKey<Float>,

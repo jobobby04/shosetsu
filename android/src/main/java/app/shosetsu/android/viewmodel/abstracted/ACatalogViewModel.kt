@@ -2,6 +2,7 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.paging.PagingData
 import app.shosetsu.android.common.enums.NovelCardType
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.lib.Filter
@@ -46,7 +47,7 @@ abstract class ACatalogViewModel :
 	/**
 	 * The list of items that will be presented as the filter menu
 	 */
-	abstract val filterItemsLive: StateFlow<ImmutableList<Filter<*>>>
+	abstract val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>>
 	abstract val hasFilters: StateFlow<Boolean>
 
 	/**
