@@ -368,6 +368,7 @@ fun LibraryContent(
 				syncFABWithCompose(state, fab)
 
 			LazyVerticalGrid(
+				modifier = Modifier.fillMaxSize(),
 				columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
 				contentPadding = PaddingValues(
 					bottom = 300.dp,
