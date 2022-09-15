@@ -410,9 +410,13 @@ fun CatalogContent(
 	Box(
 		modifier = Modifier.fillMaxSize(),
 	) {
+		val swipeRefreshState = rememberFakeSwipeRefreshState()
 		SwipeRefresh(
-			state = rememberSwipeRefreshState(false),
-			onRefresh = items::refresh,
+			state = swipeRefreshState.state,
+			onRefresh = {
+				items.refresh()
+				swipeRefreshState.animateRefresh()
+			}
 		) {
 			val w = LocalConfiguration.current.screenWidthDp
 			val o = LocalConfiguration.current.orientation

@@ -49,7 +49,6 @@ import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
@@ -350,9 +349,13 @@ fun LibraryContent(
 	fab: EFabMaintainer?
 ) {
 	if (!isEmpty) {
+		val swipeRefreshState = rememberFakeSwipeRefreshState()
 		SwipeRefresh(
-			state = rememberSwipeRefreshState(false),
-			onRefresh = onRefresh
+			state = swipeRefreshState.state,
+			onRefresh = {
+				onRefresh()
+				swipeRefreshState.animateRefresh()
+			}
 		) {
 			val w = LocalConfiguration.current.screenWidthDp
 			val o = LocalConfiguration.current.orientation

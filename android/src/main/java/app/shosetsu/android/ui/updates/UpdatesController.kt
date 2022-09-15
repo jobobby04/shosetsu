@@ -126,20 +126,18 @@ fun UpdatesContent(
 				)
 			}
 		} else {
-			SwipeRefresh(rememberSwipeRefreshState(false), onRefresh) {
-				LazyColumn(
-					contentPadding = PaddingValues(bottom = 112.dp),
-					verticalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					items.forEach { (header, updateItems) ->
-						stickyHeader {
-							UpdateHeaderItemContent(remember(header) { StableHolder(header) })
-						}
+			LazyColumn(
+				contentPadding = PaddingValues(bottom = 112.dp),
+				verticalArrangement = Arrangement.spacedBy(4.dp)
+			) {
+				items.forEach { (header, updateItems) ->
+					stickyHeader {
+						UpdateHeaderItemContent(remember(header) { StableHolder(header) })
+					}
 
-						items(updateItems, key = { it.chapterID }) {
-							UpdateItemContent(it) {
-								openChapter(it)
-							}
+					items(updateItems, key = { it.chapterID }) {
+						UpdateItemContent(it) {
+							openChapter(it)
 						}
 					}
 				}

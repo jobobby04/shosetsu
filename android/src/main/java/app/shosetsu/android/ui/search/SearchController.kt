@@ -12,7 +12,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -45,7 +48,6 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -205,9 +207,13 @@ fun SearchContent(
 	onRefresh: (id: Int) -> Unit,
 	onRefreshAll: () -> Unit
 ) {
+	val swipeRefreshState = rememberFakeSwipeRefreshState()
 	SwipeRefresh(
-		rememberSwipeRefreshState(false),
-		onRefresh = onRefreshAll
+		state = swipeRefreshState.state,
+		onRefresh = {
+			onRefreshAll()
+			swipeRefreshState.animateRefresh()
+		}
 	) {
 		LazyColumn(
 			modifier = Modifier.fillMaxSize(),
