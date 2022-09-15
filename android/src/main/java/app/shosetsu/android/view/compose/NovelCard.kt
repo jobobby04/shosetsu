@@ -100,7 +100,10 @@ fun NovelCardNormalContent(
 	) {
 		Box {
 			SubcomposeAsyncImage(
-				imageURL,
+				ImageRequest.Builder(LocalContext.current)
+					.data(imageURL)
+					.crossfade(true)
+					.build(),
 				stringResource(R.string.controller_novel_info_image),
 				modifier = Modifier
 					.fillMaxSize()
