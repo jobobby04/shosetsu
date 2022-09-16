@@ -9,10 +9,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -394,10 +391,10 @@ fun LibraryContent(
 					if (!hasSelected)
 						toggleSelection(item)
 				}
-				items(
+				itemsIndexed(
 					items,
-					key = { it.hashCode() }
-				) { item ->
+					key = { index, item -> "$index-${item.id}" }
+				) { _, item ->
 					val onClickBadge = if (toastNovel != null) {
 						{ toastNovel(item) }
 					} else null
