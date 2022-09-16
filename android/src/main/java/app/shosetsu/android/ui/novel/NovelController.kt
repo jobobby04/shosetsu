@@ -169,8 +169,7 @@ class NovelController : ShosetsuController(),
 	}
 
 	private fun openLastRead() {
-		var job: Job? = null
-		job = viewModel.openLastRead().firstLa(this, catch = {
+		viewModel.openLastRead().firstLa(this, catch = {
 			logE("Loading last read hit an error")
 		}) { chapterUI ->
 			if (chapterUI != null) {
@@ -178,7 +177,6 @@ class NovelController : ShosetsuController(),
 			} else {
 				makeSnackBar(string.controller_novel_snackbar_finished_reading)?.show()
 			}
-			job?.cancel()
 		}
 	}
 
@@ -568,8 +566,7 @@ class NovelController : ShosetsuController(),
 	}
 
 	private fun openWebView() {
-		var job: Job? = null
-		job = viewModel.getNovelURL().firstLa(
+		viewModel.getNovelURL().firstLa(
 			this,
 			catch = {
 				makeSnackBar(
@@ -585,7 +582,6 @@ class NovelController : ShosetsuController(),
 		) {
 			if (it != null) {
 				activity?.openInWebView(it)
-				job?.cancel("")
 			}
 		}
 	}

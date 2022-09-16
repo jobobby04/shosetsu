@@ -1,13 +1,11 @@
 package app.shosetsu.android.common.ext
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /*
@@ -34,37 +32,29 @@ fun <T : Any?> Flow<T>.collectLA(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,
 	onCollect: FlowCollector<T>
-) =
-	owner.lifecycleScope.launch {
-		owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-			catch(catch).collect(onCollect)
-		}
-	}
+) = flowWithLifecycle(owner.lifecycle)
+	.catch(catch)
+	.onEach(onCollect::emit)
+	.launchIn(owner.lifecycleScope)
 
 fun <T> Flow<T>.firstLa(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,
 	onCollect: (T) -> Unit
-) =
-	owner.lifecycleScope.launch {
-		owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-			val value = catch(catch).firstOrNull()
-			if (value != null)
-				onCollect(value)
-		}
-	}
+) = flowWithLifecycle(owner.lifecycle)
+	.take(1)
+	.catch(catch)
+	.onEach(onCollect)
+	.launchIn(owner.lifecycleScope)
 
 fun <T> Flow<T>.collectLatestLA(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,
 	onCollect: FlowCollector<T>
-) = owner.lifecycleScope.launch {
-	owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-		collectLatest {
-			catch(catch).collect(onCollect)
-		}
-	}
-}
+) = flowWithLifecycle(owner.lifecycle)
+	.catch(catch)
+	.mapLatest(onCollect::emit)
+	.launchIn(owner.lifecycleScope)
 
 /**
  * Run the flow on the IO dispatcher

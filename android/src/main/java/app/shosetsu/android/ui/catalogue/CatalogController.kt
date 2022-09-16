@@ -324,8 +324,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 		}
 
 	private fun openInWebView() {
-		var job: Job? = null
-		job = viewModel.getBaseURL().firstLa(
+		viewModel.getBaseURL().firstLa(
 			this,
 			catch = {
 				makeSnackBar(
@@ -339,7 +338,6 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 			}
 		) {
 			activity?.openInWebView(it)
-			job?.cancel("Done")
 		}
 	}
 
