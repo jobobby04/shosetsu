@@ -307,7 +307,7 @@ fun BrowseContent(
 				state = state,
 				verticalArrangement = Arrangement.spacedBy(4.dp)
 			) {
-				items(entities, key = { it.id }) { entity ->
+				items(entities) { entity ->
 					BrowseExtensionContent(
 						entity,
 						install = {
