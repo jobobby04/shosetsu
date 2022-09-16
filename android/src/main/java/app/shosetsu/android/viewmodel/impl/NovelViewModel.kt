@@ -436,7 +436,7 @@ class NovelViewModel(
 				return@flow
 			}
 			emit(ToggleBookmarkResponse.Nothing)
-		}.onIO().shareIn(viewModelScopeIO, SharingStarted.Eagerly)
+		}.onIO()
 	}
 
 	override fun isBookmarked(): Flow<Boolean> = flow {
