@@ -157,27 +157,26 @@ class NovelUpdateWorker(
 			val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 			if (categoryID >= 0) {
 				list.filter { it.category == categoryID }
-			} else list
+			} else {
+				val includedCategories = includedCategoriesInLibraryUpdate()
+				val includedNovels = if (includedCategories.isNotEmpty()) {
+					list.filter { it.category in includedCategories }
+				} else {
+					list
+				}
+				val excludedCategories = excludedCategoriesInLibraryUpdate()
+				val excludedNovels = if (excludedCategories.isNotEmpty()) {
+					list.filter { it.category in excludedCategories }.map { it.id }.toSet()
+				} else {
+					emptySet()
+				}
+
+				includedNovels.filterNot { it.id in excludedNovels }
+			}
 		}.let { list ->
 			if (onlyUpdateOngoing())
 				list.filter { it.status != Novel.Status.COMPLETED }
 			else list
-		}.let { list ->
-			val includedCategories = includedCategoriesInLibraryUpdate()
-			val includedNovels = if (includedCategories.isNotEmpty()) {
-				list.filter { it.category in includedCategories }
-			} else {
-				list
-			}
-
-			val excludedCategories = excludedCategoriesInLibraryUpdate()
-			val excludedNovels = if (excludedCategories.isNotEmpty()) {
-				list.filter { it.category in excludedCategories }.map { it.id }.toSet()
-			} else {
-				emptySet()
-			}
-
-			includedNovels.filterNot { it.id in excludedNovels }
 		}.let { list ->
 			list.distinctBy { it.id }
 				.sortedBy { it.title }
