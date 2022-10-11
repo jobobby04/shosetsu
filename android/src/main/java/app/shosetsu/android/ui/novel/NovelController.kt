@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -62,15 +61,14 @@ import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.SelectedChapter
 import app.shosetsu.lib.Novel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -1224,7 +1222,8 @@ fun NovelInfoHeaderContent(
 
 				// Bookmark & Web view
 				Row(
-					modifier = Modifier.fillMaxWidth(),
+					modifier = Modifier.fillMaxWidth()
+						.padding(bottom = 8.dp),
 					horizontalArrangement = Arrangement.SpaceEvenly,
 					verticalAlignment = Alignment.CenterVertically
 				) {
@@ -1303,35 +1302,16 @@ fun NovelInfoHeaderContent(
 						}
 					}
 				}
-
-				LazyRow(
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(bottom = 8.dp),
-					horizontalArrangement = Arrangement.Center,
-					contentPadding = PaddingValues(start = 8.dp, end = 8.dp)
-				) {
-					items(novelInfo.genres) {
-						Card(
-							modifier = Modifier.padding(end = 8.dp),
-						) {
-							Text(
-								it,
-								modifier = Modifier.padding(8.dp),
-								style = MaterialTheme.typography.body2
-							)
-						}
-					}
-				}
 			}
 		}
 
 		// Description
 		ExpandedText(
-			text = novelInfo.description,
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = 8.dp, end = 8.dp, top = 8.dp),
+				.padding(top = 8.dp),
+			text = novelInfo.description,
+			genre = novelInfo.displayGenre
 		)
 
 		Divider()
@@ -1399,8 +1379,9 @@ fun NovelInfoHeaderContent(
 
 @Composable
 fun ExpandedText(
-	text: String,
 	modifier: Modifier = Modifier,
+	text: String,
+	genre: ImmutableList<String>
 ) {
 	var isExpanded by remember { mutableStateOf(false) }
 
@@ -1422,8 +1403,35 @@ fun ExpandedText(
 					else it
 				}
 			},
-			style = MaterialTheme.typography.body2
+			style = MaterialTheme.typography.body2,
+			modifier = Modifier.padding(start = 8.dp, end = 8.dp)
 		)
+
+		if (!isExpanded) {
+			LazyRow(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(vertical = 8.dp),
+				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+				contentPadding = PaddingValues(horizontal = 8.dp)
+			) {
+				items(genre) {
+					NovelGenre(it)
+				}
+			}
+		} else {
+			FlowRow(
+				modifier = Modifier.fillMaxWidth()
+					.padding(vertical = 8.dp),
+				mainAxisSpacing = 8.dp,
+				crossAxisSpacing = 4.dp,
+				mainAxisAlignment = FlowMainAxisAlignment.Center,
+			) {
+				genre.forEach {
+					NovelGenre(it)
+				}
+			}
+		}
 
 		if (!isExpanded)
 			Icon(
@@ -1433,6 +1441,19 @@ fun ExpandedText(
 		else Icon(
 			painterResource(drawable.expand_less),
 			contentDescription = stringResource(string.less)
+		)
+	}
+}
+
+@Composable
+private fun NovelGenre(
+	text: String
+) {
+	Card {
+		Text(
+			text,
+			modifier = Modifier.padding(8.dp),
+			style = MaterialTheme.typography.body2
 		)
 	}
 }

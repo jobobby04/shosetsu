@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.Novel
+import kotlinx.collections.immutable.toImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -59,6 +60,7 @@ data class NovelUI(
 
 	val displayAuthors = authors.joinToString(", ")
 	val displayArtists = artists.joinToString(", ")
+	val displayGenre = genres.toImmutableList()
 
 	override fun convertTo(): NovelEntity = NovelEntity(
 		id = id,
