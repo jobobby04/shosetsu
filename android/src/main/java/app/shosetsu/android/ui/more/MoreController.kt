@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -101,7 +104,7 @@ fun MoreView(
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreItemContent(
 	@StringRes title: Int,
@@ -110,10 +113,13 @@ fun MoreItemContent(
 ) {
 	Card(
 		shape = RectangleShape,
-		backgroundColor = colorResource(android.R.color.transparent),
-		onClick = onClick,
-		modifier = Modifier.fillMaxWidth(),
-		elevation = 0.dp
+		colors = CardDefaults.cardColors(
+			containerColor =  colorResource(android.R.color.transparent),
+				),
+		modifier = Modifier
+			.clickable(onClick = onClick)
+			.fillMaxWidth(),
+		elevation = cardElevation(0.dp)
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically
@@ -124,7 +130,7 @@ fun MoreItemContent(
 				modifier = Modifier
 					.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)
 					.size(24.dp),
-				tint = MaterialTheme.colors.primary
+				tint = MaterialTheme.colorScheme.primary
 			)
 			Text(stringResource(title))
 		}
@@ -147,16 +153,15 @@ fun MoreContent(
 		contentPadding = PaddingValues(bottom = 80.dp)
 	) {
 		item {
-			Card(
-				elevation = 0.dp,
-				shape = RectangleShape,
+			Box(
 				modifier = Modifier.fillMaxWidth()
 			) {
 				Image(
 					painterResource(R.drawable.shou_icon_thick),
 					stringResource(R.string.app_name),
 					modifier = Modifier
-						.height(120.dp),
+						.height(120.dp)
+						.align(Alignment.Center),
 				)
 			}
 		}
