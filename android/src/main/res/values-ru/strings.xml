@@ -412,9 +412,9 @@
 	<string name="settings_advanced_log_desc">Включение записи журналов в файл, но может привести к замедлению работы.\nТребуется перезагрузка</string>
 	<string name="update_to">Обновление: %s</string>
 	<string name="download_chapter_updates_desc">Скачать главы, которые были недавно добавлены в Обновления</string>
-	<string name="input_int_range_desc">Пожалуйста, введите целое число в диапазоне от %d до %d (включительно)</string>
+	<string name="input_int_range_desc">Пожалуйста, введите целое число в диапазоне от %1$d до %2$d (включительно)</string>
 	<string name="input_float">Входной поплавок</string>
-	<string name="input_float_range_desc">Пожалуйста, введите число с плавающей запятой в диапазоне от %d до %d (включительно).</string>
+	<string name="input_float_range_desc">Пожалуйста, введите число с плавающей запятой в диапазоне от %1$d до %2$d (включительно).</string>
 	<string name="style_add">Добавить стиль в Shosetsu</string>
 	<string name="style_wait">Таблицы стилей скоро появятся</string>
 	<string name="styles">Стили</string>

@@ -494,10 +494,10 @@
     <string name="settings_advanced_log_desc">Enabling logs to a file, but may cause slow downs.\nRequires a restart</string>
     <string name="update_to">Update: %s</string>
     <string name="download_chapter_updates_desc">Download chapters that have been recently added to Updates</string>
-    <string name="input_int_range_desc">Please input an integer between a range of %d and %d (inclusive)</string>
+    <string name="input_int_range_desc">Please input an integer between a range of %1$d and %2$d (inclusive)</string>
 
     <string name="input_float">Input Float</string>
-    <string name="input_float_range_desc">Please input an float between a range of %d and %d (inclusive)</string>
+    <string name="input_float_range_desc">Please input an float between a range of %1$d and %2$d (inclusive)</string>
     <string name="style_add">Add Style to Shosetsu</string>
     <string name="style_wait">Style sheets coming soon</string>
     <string name="styles">Styles</string>
