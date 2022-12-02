@@ -13,10 +13,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -102,7 +102,7 @@ class ReaderSettings : ShosetsuController() {
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReaderSettingsContent(
 	viewModel: AReaderSettingsViewModel,
@@ -154,7 +154,7 @@ fun ReaderSettingsContent(
 						Card(
 							border = if (themeItem.isSelected) BorderStroke(
 								SELECTED_STROKE_WIDTH.dp,
-								MaterialTheme.colors.secondary
+								MaterialTheme.colorScheme.tertiary
 							) else null,
 							onClick = {
 								launchIO {

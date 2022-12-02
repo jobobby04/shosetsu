@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,14 +73,17 @@ class ComposeSettingsController : ShosetsuController() {
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClick: () -> Unit) {
 	Card(
-		modifier = Modifier.fillMaxWidth(),
-		elevation = 0.dp,
-		onClick = onClick,
-		backgroundColor = colorResource(android.R.color.transparent),
+		modifier = Modifier
+			.clickable(onClick = onClick)
+			.fillMaxWidth(),
+		elevation = cardElevation(0.dp),
+		colors = CardDefaults.cardColors(
+			containerColor =  colorResource(android.R.color.transparent),
+		),
 		shape = RectangleShape
 	) {
 		Row(
@@ -90,7 +95,7 @@ fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClic
 				modifier = Modifier
 					.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)
 					.size(24.dp),
-				tint = MaterialTheme.colors.primary
+				tint = MaterialTheme.colorScheme.primary
 			)
 			Text(stringResource(title))
 		}
