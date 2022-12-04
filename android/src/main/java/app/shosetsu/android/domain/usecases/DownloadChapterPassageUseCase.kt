@@ -32,7 +32,9 @@ import app.shosetsu.android.view.uimodels.model.ChapterUI
  * 14 / 05 / 2020
  *
  *
- * Takes either a [ChapterEntity] or a [ChapterUI] and downloads it
+ * Takes either a [ChapterEntity] or a [ChapterUI] and downloads it.
+ *
+ * Will sort out input to follow order variable.
  */
 class DownloadChapterPassageUseCase(
 	private val novelRepo: INovelsRepository,
@@ -40,7 +42,8 @@ class DownloadChapterPassageUseCase(
 	private var iSettingsRepository: ISettingsRepository
 ) {
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(chapters: List<ChapterEntity>) {
+	suspend operator fun invoke(originalChapters: List<ChapterEntity>) {
+		val chapters = originalChapters.sortedBy { it.order }
 		val first = chapters.first()
 		val novel = novelRepo.getNovel(first.novelID)
 
