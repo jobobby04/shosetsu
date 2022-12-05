@@ -264,7 +264,15 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			if (!extensionsRepo.isExtensionInstalled(extensionEntity)) {
 				logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
 				notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
-				installExtension(extensionEntity)
+				try {
+					installExtension(extensionEntity)
+				} catch (e: Exception) {
+					notify(
+						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
+						notificationId = extensionID
+					)
+					return
+				}
 			} else {
 				logI("Extension is installed, moving on")
 			}

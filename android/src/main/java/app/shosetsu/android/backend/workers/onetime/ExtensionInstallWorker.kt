@@ -28,6 +28,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -212,6 +213,16 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			withContext(Dispatchers.IO) {
 				installExtension(extension)
 			}
+		} catch (e: SerializationException) {
+			markExtensionDownloadAsError()
+
+			logE("SerializationException", e)
+			notifyError(
+				e.message ?: "Unknown SerializationException",
+				getString(R.string.worker_extension_install_error_lua)
+			)
+
+			return Result.failure()
 		} catch (e: LuaError) {
 			markExtensionDownloadAsError()
 
