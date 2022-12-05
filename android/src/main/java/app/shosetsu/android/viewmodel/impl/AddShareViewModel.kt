@@ -25,6 +25,7 @@ import app.shosetsu.lib.share.RepositoryLink
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.serialization.SerializationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.acra.ACRA
@@ -337,6 +338,9 @@ class AddShareViewModel(
 
 				val iExt = try {
 					iExtRepo.get(extEntity!!.generify())
+				} catch (e: SerializationException) {
+					exception.value = e
+					return@launchIO
 				} catch (e: IncompatibleExtensionException) {
 					exception.value = e
 					return@launchIO

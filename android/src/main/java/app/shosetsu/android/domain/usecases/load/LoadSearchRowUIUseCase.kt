@@ -11,6 +11,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.serialization.SerializationException
 
 class LoadSearchRowUIUseCase(
 	private val iExtensionsRepository: IExtensionsRepository,
@@ -30,6 +31,8 @@ class LoadSearchRowUIUseCase(
 										arrayList.add(extension)
 									}
 								}
+							} catch (e: SerializationException) {
+								logE("Broken extension, ignoring", e)
 							} catch (e: IncompatibleExtensionException) {
 								logE("Incompatible extension, ignoring", e)
 							}

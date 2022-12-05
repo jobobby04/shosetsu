@@ -6,6 +6,7 @@ import app.shosetsu.android.common.ext.generify
 import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.lib.IExtension
+import kotlinx.serialization.SerializationException
 
 /*
  * This file is part of shosetsu.
@@ -42,7 +43,11 @@ class GetExtensionUseCase(
 	private val extRepo: IExtensionsRepository,
 	private val extEntitiesRepo: IExtensionEntitiesRepository
 ) {
-	@Throws(SQLiteException::class, IncompatibleExtensionException::class)
+	@Throws(
+		SQLiteException::class,
+		IncompatibleExtensionException::class,
+		SerializationException::class
+	)
 	suspend operator fun invoke(extensionId: Int): IExtension? {
 		if (extensionId == -1)
 			return null

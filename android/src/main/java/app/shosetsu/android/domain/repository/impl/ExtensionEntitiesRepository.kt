@@ -11,6 +11,7 @@ import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
+import kotlinx.serialization.SerializationException
 import java.io.IOException
 
 /*
@@ -42,7 +43,7 @@ class ExtensionEntitiesRepository(
 	private val settingsSource: IFileSettingsDataSource
 ) : IExtensionEntitiesRepository {
 
-	@Throws(IncompatibleExtensionException::class)
+	@Throws(IncompatibleExtensionException::class, SerializationException::class)
 	override suspend fun get(extensionEntity: GenericExtensionEntity): IExtension = onIO {
 		try {
 			memorySource.loadExtensionFromMemory(extensionEntity.id)!!
