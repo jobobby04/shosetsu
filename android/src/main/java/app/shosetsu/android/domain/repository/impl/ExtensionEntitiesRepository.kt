@@ -52,7 +52,7 @@ class ExtensionEntitiesRepository(
 			if (!it.exMetaData.libVersion.isCompatible())
 				throw IncompatibleExtensionException(extensionEntity, it.exMetaData.libVersion)
 
-			setSettings(it, it.settingsModel)
+			setSettings(it, it.settingsModel.toList())
 			memorySource.putExtensionInMemory(it)
 			it
 		}
@@ -102,7 +102,7 @@ class ExtensionEntitiesRepository(
 	): Float =
 		settingsSource.getFloat("$extensionID", SettingKey.CustomFloat("$settingID", default))
 
-	private suspend fun setSettings(extension: IExtension, filters: Array<out Filter<out Any?>>) {
+	private suspend fun setSettings(extension: IExtension, filters: List<Filter<out Any?>>) {
 		filters.forEach { filter ->
 			when (filter) {
 				is Filter.Text -> {
@@ -141,7 +141,7 @@ class ExtensionEntitiesRepository(
 						getInt(extension.formatterID, filter.id, filter.state)
 					)
 				}
-				is Filter.List -> {
+				is Filter.FList -> {
 					setSettings(extension, filter.filters)
 				}
 				is Filter.Group<*> -> {

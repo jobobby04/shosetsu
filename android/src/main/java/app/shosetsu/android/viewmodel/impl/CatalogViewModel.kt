@@ -97,13 +97,14 @@ class CatalogViewModel(
 	private fun List<Filter<*>>.init() {
 		forEach { filter ->
 			when (filter) {
+				is Filter.Password -> getFilterStringState(filter)
 				is Filter.Text -> getFilterStringState(filter)
 				is Filter.Switch -> getFilterBooleanState(filter)
 				is Filter.Checkbox -> getFilterBooleanState(filter)
 				is Filter.TriState -> getFilterIntState(filter)
 				is Filter.Dropdown -> getFilterIntState(filter)
 				is Filter.RadioGroup -> getFilterIntState(filter)
-				is Filter.List -> {
+				is Filter.FList -> {
 					filter.filters.toList().init()
 				}
 				is Filter.Group<*> -> {
@@ -215,15 +216,17 @@ class CatalogViewModel(
 
 	private fun resetFilter(filter: Filter<*>) {
 		when (filter) {
+			is Filter.Password -> _setFilterStringState(filter, filter.state)
 			is Filter.Text -> _setFilterStringState(filter, filter.state)
 			is Filter.Switch -> _setFilterBooleanState(filter, filter.state)
 			is Filter.Checkbox -> _setFilterBooleanState(filter, filter.state)
 			is Filter.TriState -> _setFilterIntState(filter, filter.state)
 			is Filter.Dropdown -> _setFilterIntState(filter, filter.state)
 			is Filter.RadioGroup -> _setFilterIntState(filter, filter.state)
-			is Filter.List -> filter.filters.forEach { resetFilter(it) }
+			is Filter.FList -> filter.filters.forEach { resetFilter(it) }
 			is Filter.Group<*> -> filter.filters.forEach { resetFilter(it) }
-			else -> {}
+			is Filter.Header -> {}
+			Filter.Separator -> {}
 		}
 	}
 

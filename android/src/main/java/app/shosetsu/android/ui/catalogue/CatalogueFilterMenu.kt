@@ -66,22 +66,22 @@ fun CatalogFilterMenuPreview() = ShosetsuCompose {
 	CatalogFilterMenu(
 		listOf(
 			Filter.Header("This is a header"),
-			Filter.Separator(),
+			Filter.Separator,
 			Filter.Text(1, "Text input"),
 			Filter.Switch(2, "Switch"),
 			Filter.Checkbox(3, "Checkbox"),
 			Filter.TriState(4, "Tri state"),
-			Filter.Dropdown(5, "Drop down", arrayOf("A", "B", "C")),
-			Filter.RadioGroup(6, "Radio group", arrayOf("A", "B", "C")),
-			Filter.List(
-				"List", arrayOf(
+			Filter.Dropdown(5, "Drop down", listOf("A", "B", "C")),
+			Filter.RadioGroup(6, "Radio group", listOf("A", "B", "C")),
+			Filter.FList(
+				"List", listOf(
 					Filter.Switch(7, "Switch"),
 					Filter.Checkbox(8, "Checkbox"),
 					Filter.TriState(9, "Tri state"),
 				)
 			),
 			Filter.Group(
-				"Group", arrayOf(
+				"Group", listOf(
 					Filter.Switch(10, "Switch"),
 					Filter.Switch(11, "Switch"),
 					Filter.Switch(12, "Switch"),
@@ -153,14 +153,43 @@ fun CatalogFilterMenuFilterListContent(
 					Divider()
 				}
 				is Filter.Separator -> Divider()
-				is Filter.Text -> CatalogFilterMenuTextContent(filter as StableHolder<Filter.Text>, getString, setString)
-				is Filter.Switch -> CatalogFilterMenuSwitchContent(filter as StableHolder<Filter.Switch>, getBoolean, setBoolean)
+				is Filter.Password -> CatalogFilterMenuTextContent(
+					filter as StableHolder<Filter.Text>,
+					getString,
+					setString
+				)
+				is Filter.Text -> CatalogFilterMenuTextContent(
+					filter as StableHolder<Filter.Text>,
+					getString,
+					setString
+				)
+				is Filter.Switch -> CatalogFilterMenuSwitchContent(
+					filter as StableHolder<Filter.Switch>,
+					getBoolean,
+					setBoolean
+				)
 				is Filter.Checkbox ->
-					CatalogFilterMenuCheckboxContent(filter as StableHolder<Filter.Checkbox>, getBoolean, setBoolean)
-				is Filter.TriState -> CatalogFilterMenuTriStateContent(filter as StableHolder<Filter.TriState>, getInt, setInt)
-				is Filter.Dropdown -> CatalogFilterMenuDropDownContent(filter as StableHolder<Filter.Dropdown>, getInt, setInt)
-				is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(filter as StableHolder<Filter.RadioGroup>, getInt, setInt)
-				is Filter.List -> {
+					CatalogFilterMenuCheckboxContent(
+						filter as StableHolder<Filter.Checkbox>,
+						getBoolean,
+						setBoolean
+					)
+				is Filter.TriState -> CatalogFilterMenuTriStateContent(
+					filter as StableHolder<Filter.TriState>,
+					getInt,
+					setInt
+				)
+				is Filter.Dropdown -> CatalogFilterMenuDropDownContent(
+					filter as StableHolder<Filter.Dropdown>,
+					getInt,
+					setInt
+				)
+				is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(
+					filter as StableHolder<Filter.RadioGroup>,
+					getInt,
+					setInt
+				)
+				is Filter.FList -> {
 					CatalogFilterMenuFilterListContent(
 						remember {
 							filter.item.filters.toList().map { StableHolder(it) }
@@ -255,7 +284,16 @@ fun CatalogFilterMenuFilterListContent(
 							Divider()
 						}
 						is Filter.Separator -> Divider()
-						is Filter.Text -> CatalogFilterMenuTextContent(filter as StableHolder<Filter.Text>, getString, setString)
+						is Filter.Password -> CatalogFilterMenuTextContent(
+							filter as StableHolder<Filter.Text>,
+							getString,
+							setString
+						)
+						is Filter.Text -> CatalogFilterMenuTextContent(
+							filter as StableHolder<Filter.Text>,
+							getString,
+							setString
+						)
 						is Filter.Switch -> CatalogFilterMenuSwitchContent(
 							filter as StableHolder<Filter.Switch>,
 							getBoolean,
@@ -281,7 +319,7 @@ fun CatalogFilterMenuFilterListContent(
 							getInt,
 							setInt
 						)
-						is Filter.List -> {
+						is Filter.FList -> {
 							Log.e(
 								"FilterListContent",
 								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists"
@@ -490,7 +528,7 @@ fun CatalogFilterMenuTriStateContent(
 @Composable
 fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuCompose {
 	CatalogFilterMenuDropDownContent(
-		filterHolder = StableHolder(Filter.Dropdown(0, "Dropdown", arrayOf("A", "B", "C"))),
+		filterHolder = StableHolder(Filter.Dropdown(0, "Dropdown", listOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
 		{ _, _ -> }
 	)
@@ -563,7 +601,7 @@ fun CatalogFilterMenuDropDownContent(
 @Composable
 fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuCompose {
 	CatalogFilterMenuRadioGroupContent(
-		filterHolder = StableHolder(Filter.RadioGroup(0, "Dropdown", arrayOf("A", "B", "C"))),
+		filterHolder = StableHolder(Filter.RadioGroup(0, "Dropdown", listOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
 		{ _, _ -> }
 	)

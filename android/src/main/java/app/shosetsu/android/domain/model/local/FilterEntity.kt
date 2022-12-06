@@ -125,8 +125,9 @@ sealed class FilterEntity {
 					filter.choices.toList(),
 					filter.state
 				)
-				is Filter.List -> FList(filter.name, filter.filters.map { fromFilter(it) })
+				is Filter.FList -> FList(filter.name, filter.filters.map { fromFilter(it) })
 				is Filter.Group<*> -> Group(filter.name, filter.filters.map { fromFilter(it) })
+				is Filter.Password -> Text(filter.id, filter.name, filter.state)
 			}
 	}
 }
