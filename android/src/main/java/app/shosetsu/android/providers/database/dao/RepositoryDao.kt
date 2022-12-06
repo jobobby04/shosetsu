@@ -83,10 +83,25 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 	@Throws(SQLiteException::class)
 	suspend fun initializeData() {
 		// Create the Main repository with supportive code
+		val repoMain = "https://gitlab.com/shosetsuorg/extensions-main/-/raw/main/"
+		val repoUniv = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/"
+
+		// Migrate from github to gitlab
+		loadRepositories().forEach { repo ->
+			if (repo.url == "https://raw.githubusercontent.com/shosetsuorg/extensions-main/main") {
+				update(repo.copy(url = repoMain))
+			}
+
+			if (repo.url == "https://raw.githubusercontent.com/shosetsuorg/extensions/dev") {
+				update(repo.copy(url = repoUniv))
+
+			}
+		}
+
 		createIfNotExist(
 			DBRepositoryEntity(
 				null,
-				url = "https://raw.githubusercontent.com/shosetsuorg/extensions-main/main",
+				url = repoMain,
 				name = "Main",
 				isEnabled = true
 			)
@@ -97,7 +112,7 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 			createIfNotExist(
 				DBRepositoryEntity(
 					null,
-					url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev",
+					url = repoUniv,
 					//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
 					name = "Universe",
 					isEnabled = true
