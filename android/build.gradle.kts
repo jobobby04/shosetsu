@@ -240,9 +240,9 @@ dependencies {
 
 	// Test classes
 	testImplementation("junit:junit:4.13.2")
-	testImplementation("androidx.test.ext:junit:1.1.3")
-	androidTestImplementation("androidx.test:runner:1.4.0")
-	androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+	testImplementation("androidx.test.ext:junit:1.1.4")
+	androidTestImplementation("androidx.test:runner:1.5.1")
+	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
 
 	// Annotations
 	implementation("org.jetbrains:annotations:23.0.0")
@@ -256,7 +256,7 @@ dependencies {
 	implementation("io.coil-kt:coil-compose:2.2.2")
 
 	// Time control
-	implementation("joda-time:joda-time:2.12.1")
+	implementation("joda-time:joda-time:2.12.2")
 
 	// Cloud flare calculator
 	//implementation("com.zhkrb.cloudflare-scrape-android:scrape-webview:0.0.3")
@@ -369,11 +369,11 @@ dependencies {
 	implementation(accompanist("accompanist-flowlayout"))
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata:1.3.0")
+	implementation("androidx.compose.runtime:runtime-livedata:1.3.1")
 
 	// MDC Adapter
-	implementation("com.google.android.material:compose-theme-adapter:1.2.0")
-	implementation("com.google.android.material:compose-theme-adapter-3:1.1.0")
+	implementation("com.google.android.material:compose-theme-adapter:1.2.1")
+	implementation("com.google.android.material:compose-theme-adapter-3:1.1.1")
 
 	val androidxActivity = "1.6.1"
 	fun androidxActivity(module: String, version: String = androidxActivity) =
