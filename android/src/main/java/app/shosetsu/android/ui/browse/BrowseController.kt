@@ -465,13 +465,15 @@ fun BrowseExtensionContent(
 										isDropdownVisible = false
 									},
 									text = {
-										Text(
-											text = AnnotatedString(s.repoName)
-										)
-										Text(
-											text = AnnotatedString(s.version.toString()),
-											modifier = Modifier.padding(start = 8.dp)
-										)
+										Column {
+											Text(
+												text = AnnotatedString(s.repoName)
+											)
+											Text(
+												text = AnnotatedString(s.version.toString()),
+												modifier = Modifier.padding(start = 8.dp)
+											)
+										}
 									}
 								)
 							}
