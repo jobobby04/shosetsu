@@ -11,6 +11,8 @@ import app.shosetsu.android.domain.model.database.DBRepositoryEntity
 import app.shosetsu.android.domain.model.local.CountIDTuple
 import app.shosetsu.android.providers.database.dao.base.BaseDao
 import kotlinx.coroutines.flow.Flow
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /*
  * This file is part of shosetsu.
@@ -83,17 +85,23 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 	@Throws(SQLiteException::class)
 	suspend fun initializeData() {
 		// Create the Main repository with supportive code
-		val repoMain = "https://gitlab.com/shosetsuorg/extensions-main/-/raw/main/"
-		val repoUniv = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/"
+		val repoMain =
+			"https://gitlab.com/shosetsuorg/extensions-main/-/raw/main/".toHttpUrl()
+		val repoUniv =
+			"https://gitlab.com/shosetsuorg/extensions/-/raw/dev/".toHttpUrl()
+		val oldMain =
+			"https://raw.githubusercontent.com/shosetsuorg/extensions-main/main".toHttpUrl()
+		val oldUniv =
+			"https://raw.githubusercontent.com/shosetsuorg/extensions/dev".toHttpUrl()
 
 		// Migrate from github to gitlab
 		loadRepositories().forEach { repo ->
-			if (repo.url == "https://raw.githubusercontent.com/shosetsuorg/extensions-main/main") {
-				update(repo.copy(url = repoMain))
+			if (repo.url.toHttpUrlOrNull() == oldMain) {
+				update(repo.copy(url = repoMain.toString()))
 			}
 
-			if (repo.url == "https://raw.githubusercontent.com/shosetsuorg/extensions/dev") {
-				update(repo.copy(url = repoUniv))
+			if (repo.url.toHttpUrlOrNull() == oldUniv) {
+				update(repo.copy(url = repoUniv.toString()))
 
 			}
 		}
@@ -101,7 +109,7 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 		createIfNotExist(
 			DBRepositoryEntity(
 				null,
-				url = repoMain,
+				url = repoMain.toString(),
 				name = "Main",
 				isEnabled = true
 			)
@@ -112,7 +120,7 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 			createIfNotExist(
 				DBRepositoryEntity(
 					null,
-					url = repoUniv,
+					url = repoUniv.toString(),
 					//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
 					name = "Universe",
 					isEnabled = true
