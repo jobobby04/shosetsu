@@ -306,7 +306,7 @@ dependencies {
 	implementation("com.google.guava:guava:31.1-android")
 
 	// kode-in
-	val kodeinVersion = "7.14.0"
+	val kodeinVersion = "7.16.0"
 	fun kodein(module: String, version: String = kodeinVersion) =
 		"org.kodein.di:$module:$version"
 
