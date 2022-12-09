@@ -1,6 +1,7 @@
 package app.shosetsu.android.ui.reader.page
 
 import android.annotation.SuppressLint
+import android.content.pm.ApplicationInfo
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
@@ -13,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.view.compose.ScrollStateBar
@@ -86,6 +88,13 @@ fun WebViewPageContent(
 
 				webView.addJavascriptInterface(inter, "shosetsuScript")
 				webView.isScrollContainer = false
+
+				// Debug mode (chrome://inspect/#devices)
+				if (BuildConfig.DEBUG &&
+					0 != webView.context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
+				) {
+					WebView.setWebContentsDebuggingEnabled(true)
+				}
 			},
 			modifier = Modifier
 				.fillMaxWidth()
