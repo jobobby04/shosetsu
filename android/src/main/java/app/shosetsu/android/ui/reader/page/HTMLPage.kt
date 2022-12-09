@@ -13,6 +13,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.view.compose.ScrollStateBar
 import com.google.accompanist.web.AccompanistWebViewClient
@@ -108,7 +109,8 @@ fun WebViewPageContent(
 						ViewGroup.LayoutParams.WRAP_CONTENT
 					)
 				}
-			}
+			},
+			chromeClient = ShosetsuAccompanistWebChromeClient()
 		)
 	}
 
