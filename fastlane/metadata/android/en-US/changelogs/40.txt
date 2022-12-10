@@ -7,6 +7,7 @@
 - Add 1em margin to all of reader content
 - Add table hack option in reader
 - Add Russian Translation
+- Add github to gitlab translation layer for repositories, no more microsoft!
 
 ## Fixes
 - Only check major version in compatibility check for backups
@@ -22,20 +23,9 @@
 ## Misc
 - Update kotlin-lib to 1.1.1
 - Add uptodown to readme
-- Upgrade AGP to 7.3.1
-- Update androidx.activity to 1.6.1
-- Update joda-time to 2.12.2
-- Update kotlinx-serialization-json to 1.4.1
-- Update android.material to 1.7.0
-- Update androidx.compose to 1.3.0
-- Update google.accompanist to 0.27.0
-- Update runtime-livedata to 1.3.1
-- Update compose-theme-adapter to 1.2.1
-- Update navigation to 2.5.3
-- Swap to material 3 components for compose
+- Upgrade dependencies
 - Do not export internal activities
 - Replace straight quotes with directional quotes in strings
-- Removed unused resources
+- Removed unused resources & classes
 - Remove "untranslatable" from support dev on patreon
 - Silence proguard warnings
-- Remove unused classes
