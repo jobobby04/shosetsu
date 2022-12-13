@@ -224,7 +224,7 @@ class ChapterReader
 
 												}
 												ChapterType.HTML -> {
-													viewModel.getChapterStringPassage(item)
+													viewModel.getChapterHTMLPassage(item)
 														.collectLA(
 															this@ChapterReader,
 															catch = {}) { content ->
