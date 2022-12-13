@@ -31,6 +31,7 @@ import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
@@ -266,11 +267,18 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
 				try {
 					installExtension(extensionEntity)
+				} catch (e: InvalidMetaDataException) {
+					notify(
+						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
+						notificationId = extensionID
+					)
+					return
 				} catch (e: Exception) {
 					notify(
 						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
 						notificationId = extensionID
 					)
+					ACRA.errorReporter.handleSilentException(e)
 					return
 				}
 			} else {

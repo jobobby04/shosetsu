@@ -7,6 +7,7 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 
 /*
  * This file is part of Shosetsu.
@@ -36,7 +37,11 @@ class UpdateExtensionSettingUseCase(
 	private val extEntitiesRepo: IExtensionEntitiesRepository,
 	private val extSettingsRepo: IExtensionSettingsRepository
 ) {
-	@Throws(SQLiteException::class, IncompatibleExtensionException::class)
+	@Throws(
+		SQLiteException::class,
+		IncompatibleExtensionException::class,
+		InvalidMetaDataException::class
+	)
 	private suspend fun update(extensionId: Int, settingId: Int, value: Any?) =
 		extRepo.getInstalledExtension(extensionId)?.let { entity ->
 			extEntitiesRepo.get(entity.generify()).let {

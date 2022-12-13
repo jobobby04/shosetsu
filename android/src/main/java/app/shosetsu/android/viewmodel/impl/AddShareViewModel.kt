@@ -19,13 +19,13 @@ import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
 import app.shosetsu.android.domain.usecases.get.GetURLUseCase
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
 import app.shosetsu.lib.IExtension.Companion.KEY_NOVEL_URL
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.serialization.SerializationException
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.acra.ACRA
@@ -338,7 +338,7 @@ class AddShareViewModel(
 
 				val iExt = try {
 					iExtRepo.get(extEntity!!.generify())
-				} catch (e: SerializationException) {
+				} catch (e: InvalidMetaDataException) {
 					exception.value = e
 					return@launchIO
 				} catch (e: IncompatibleExtensionException) {

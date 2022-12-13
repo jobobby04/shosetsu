@@ -6,7 +6,7 @@ import app.shosetsu.android.common.ext.generify
 import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.lib.IExtension
-import kotlinx.serialization.SerializationException
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 
 /*
  * This file is part of shosetsu.
@@ -46,7 +46,7 @@ class GetExtensionUseCase(
 	@Throws(
 		SQLiteException::class,
 		IncompatibleExtensionException::class,
-		SerializationException::class
+		InvalidMetaDataException::class
 	)
 	suspend operator fun invoke(extensionId: Int): IExtension? {
 		if (extensionId == -1)

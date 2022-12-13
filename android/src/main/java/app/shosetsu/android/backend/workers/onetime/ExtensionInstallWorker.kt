@@ -23,12 +23,12 @@ import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.InstallExtensionUseCase
 import app.shosetsu.lib.exceptions.HTTPException
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.SerializationException
 import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -213,12 +213,12 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			withContext(Dispatchers.IO) {
 				installExtension(extension)
 			}
-		} catch (e: SerializationException) {
+		} catch (e: InvalidMetaDataException) {
 			markExtensionDownloadAsError()
 
-			logE("SerializationException", e)
+			logE("InvalidMetaDataException", e)
 			notifyError(
-				e.message ?: "Unknown SerializationException",
+				e.message ?: "Unknown InvalidMetaDataException",
 				getString(R.string.worker_extension_install_error_lua)
 			)
 

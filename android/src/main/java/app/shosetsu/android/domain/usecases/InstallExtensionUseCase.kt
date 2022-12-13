@@ -12,7 +12,7 @@ import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository.InstallExtensionFlags
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.serialization.SerializationException
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import java.io.IOException
 
 /*
@@ -48,7 +48,7 @@ class InstallExtensionUseCase(
 		SQLiteException::class,
 		FilePermissionException::class,
 		IOException::class,
-		SerializationException::class
+		InvalidMetaDataException::class
 	)
 	suspend operator fun invoke(extToInstall: GenericExtensionEntity): InstallExtensionFlags {
 		val repo = extensionRepoRepository.getRepo(extToInstall.repoID)!!
