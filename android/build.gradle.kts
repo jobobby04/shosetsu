@@ -50,7 +50,7 @@ fun loadSProperties(name: String): Properties {
 	return properties
 }
 
-
+val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
 	compileSdk = 33
@@ -99,8 +99,8 @@ android {
 
 	buildTypes {
 		named("release") {
-			isMinifyEnabled = true
-			isShrinkResources = true
+			isMinifyEnabled = !CI_MODE
+			isShrinkResources = !CI_MODE
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
@@ -112,8 +112,8 @@ android {
 			versionNameSuffix = "-${getCommitCount()}"
 			applicationIdSuffix = ".debug"
 			isDebuggable = true
-			isMinifyEnabled = true
-			isShrinkResources = true
+			isMinifyEnabled = !CI_MODE
+			isShrinkResources = !CI_MODE
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
