@@ -90,8 +90,6 @@ assembleStandard:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleStandard
-  cache:
-     policy: pull-push
 
 assembleFdroid:
   interruptible: true
@@ -99,8 +97,6 @@ assembleFdroid:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleFdroid
-  cache:
-    policy: pull
 
 assembleUptodown:
   interruptible: true
@@ -108,8 +104,6 @@ assembleUptodown:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleUptodown
-  cache:
-    policy: pull
 
 assemblePlaystore:
   interruptible: true
@@ -117,8 +111,6 @@ assemblePlaystore:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assemblePlaystore
-  cache:
-    policy: pull
 
 # Run all tests, if any fails, interrupt the pipeline(fail it)
 #debugTests:
