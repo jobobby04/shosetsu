@@ -24,8 +24,10 @@ before_script:
   - export ANDROID_HOME="${PWD}/android-home"
   - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/tools/bin/
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export CI_MODE=true
 
 cache:
+  key: "$CI_COMMIT_REF_NAME"
   paths:
     - .gradle/
     - android/build/
@@ -51,10 +53,14 @@ packages:
   # (the key thing here is the url from where you are downloading these sdk tool for command line, so please do note this url pattern there and here as well)
   # after that unzipping those tools and
   # then running a series of SDK manager commands to install necessary android SDK packages that'll allow the app to build
-  - if ! [ -F "${ANDROID_HOME}/cmdline-tools.zip"] ; then wget -q --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip ; fi
+  - wget -q --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
   # move to the archive at ANDROID_HOME
   - pushd $ANDROID_HOME
-  - if ! [ -D "${ANDROID_HOME}/cmdline-tools"] ; then unzip -d cmdline-tools cmdline-tools.zip ; pushd cmdline-tools ; mv cmdline-tools tools || true ; popd ; popd ; fi
+  - unzip -d cmdline-tools cmdline-tools.zip
+  - pushd cmdline-tools
+  - mv cmdline-tools tools || true
+  - popd
+  - popd
 
   # Nothing fancy here, just checking sdkManager version
   - sdkmanager --version
@@ -84,6 +90,8 @@ assembleStandard:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleStandard
+  cache:
+     policy: pull-push
 
 assembleFdroid:
   interruptible: true
@@ -91,6 +99,8 @@ assembleFdroid:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleFdroid
+  cache:
+    policy: pull
 
 assembleUptodown:
   interruptible: true
@@ -98,6 +108,8 @@ assembleUptodown:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleUptodown
+  cache:
+    policy: pull
 
 assemblePlaystore:
   interruptible: true
@@ -105,6 +117,8 @@ assemblePlaystore:
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assemblePlaystore
+  cache:
+    policy: pull
 
 # Run all tests, if any fails, interrupt the pipeline(fail it)
 #debugTests:
