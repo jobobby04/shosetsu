@@ -84,28 +84,28 @@ lint:
     - ./gradlew -Pci --console=plain :android:lint -PbuildDir=lint
 
 # Make Project
-assembleStandard:
+.assembleStandard:
   interruptible: true
   stage: standard
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleStandard
 
-assembleFdroid:
+.assembleFdroid:
   interruptible: true
   stage: fdroid
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleFdroid
 
-assembleUptodown:
+.assembleUptodown:
   interruptible: true
   stage: uptodown
   timeout: 2 hours # We need extra time for building
   script:
     - ./gradlew assembleUptodown
 
-assemblePlaystore:
+.assemblePlaystore:
   interruptible: true
   stage: playstore
   timeout: 2 hours # We need extra time for building
