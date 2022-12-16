@@ -7,6 +7,7 @@ import app.shosetsu.android.domain.model.database.*
 import app.shosetsu.android.providers.database.converters.*
 import app.shosetsu.android.providers.database.dao.*
 import app.shosetsu.android.providers.database.migrations.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -82,6 +83,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 		@Volatile
 		private lateinit var databaseShosetsu: ShosetsuDatabase
 
+		@OptIn(DelicateCoroutinesApi::class)
 		@Synchronized
 		fun getRoomDatabase(context: Context): ShosetsuDatabase {
 			if (!Companion::databaseShosetsu.isInitialized)

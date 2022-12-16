@@ -4,6 +4,7 @@ import app.shosetsu.android.datasource.local.database.base.IDBNovelReaderSetting
 import app.shosetsu.android.domain.model.database.DBNovelReaderSettingEntity
 import app.shosetsu.android.domain.model.local.NovelReaderSettingEntity
 import app.shosetsu.android.providers.database.dao.NovelReaderSettingsDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
 
@@ -33,6 +34,7 @@ class DBNovelReaderSettingsDataSource(
 	override suspend fun get(novelID: Int): NovelReaderSettingEntity? =
 		dao.get(novelID)
 
+	@OptIn(ExperimentalCoroutinesApi::class)
 	override fun getFlow(novelID: Int): Flow<NovelReaderSettingEntity?> =
 		dao.getFlow(novelID).mapLatest { it?.convertTo() }
 
