@@ -507,7 +507,7 @@ class NovelViewModel(
 	override fun downloadAllUnreadChapters() {
 		launchIO {
 			downloadChapter(
-				chaptersLive.value.filter { it.readingStatus == ReadingStatus.UNREAD }
+				chaptersLive.value.filter { it.readingStatus == ReadingStatus.UNREAD && !it.isSaved }
 					.toTypedArray())
 			startDownloadWorkerUseCase()
 		}
@@ -515,7 +515,8 @@ class NovelViewModel(
 
 	override fun downloadAllChapters() {
 		launchIO {
-			downloadChapter(chaptersLive.value.toTypedArray())
+			downloadChapter(chaptersLive.value.filter{ !it.isSaved }
+				.toTypedArray())
 			startDownloadWorkerUseCase()
 		}
 	}
