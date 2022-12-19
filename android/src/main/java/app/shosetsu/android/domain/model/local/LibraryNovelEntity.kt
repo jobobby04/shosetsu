@@ -37,6 +37,7 @@ data class LibraryNovelEntity(
 	val imageURL: String,
 	var bookmarked: Boolean,
 	val unread: Int,
+	val downloaded: Int,
 	val genres: List<String>,
 	val authors: List<String>,
 	val artists: List<String>,

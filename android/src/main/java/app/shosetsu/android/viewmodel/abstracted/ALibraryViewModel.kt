@@ -67,6 +67,9 @@ abstract class ALibraryViewModel :
 	abstract fun cycleUnreadFilter(currentState: ToggleableState)
 	abstract fun getUnreadFilter(): Flow<ToggleableState>
 
+	abstract fun cycleDownloadedFilter(currentState: ToggleableState)
+	abstract fun getDownloadedFilter(): Flow<ToggleableState>
+
 	abstract fun getSortType(): Flow<NovelSortType>
 	abstract fun setSortType(novelSortType: NovelSortType)
 
