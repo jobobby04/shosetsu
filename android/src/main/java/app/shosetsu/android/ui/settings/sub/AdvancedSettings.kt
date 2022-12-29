@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
@@ -23,8 +24,10 @@ import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
+import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
@@ -281,6 +284,20 @@ fun AdvancedSettingsContent(
 					.fillMaxWidth(),
 				repo = viewModel.settingsRepo,
 				key = ACRAEnabled
+			)
+		}
+
+		item {
+			SliderSettingContent(
+				title = stringResource(R.string.settings_advanced_site_protection_title),
+				description = stringResource(R.string.settings_advanced_site_protection_desc),
+				valueRange = remember { StableHolder(300..5000) },
+				parseValue = {
+					"$it ms"
+				},
+				repo = viewModel.settingsRepo,
+				key = SiteProtectionDelay,
+				haveSteps = false,
 			)
 		}
 	}
