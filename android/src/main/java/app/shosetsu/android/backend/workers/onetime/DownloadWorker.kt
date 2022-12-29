@@ -29,7 +29,9 @@ import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -308,7 +310,7 @@ class DownloadWorker(
 			supervisorScope {
 				// Launch download threads
 				repeat(getDownloadThreads()) {
-					launchIO {
+					launch(Dispatchers.IO) {
 						// Will not run if there are no downloads to complete or if the download is paused
 						while (getDownloadCount() >= 1 && !isDownloadPaused()) {
 							// Download the
