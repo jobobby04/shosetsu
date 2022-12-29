@@ -595,6 +595,8 @@
     <string name="settings_reader_table_hack_desc">Force tables to have a scroll bar for overflows. Enabling this can break accessibility functionality.</string>
     <string name="pin_on_top">Pinned on top</string>
     <string name="toggle_pin">Toggle Pin</string>
+    <string name="settings_advanced_site_protection_title">Site Protection Delayer</string>
+    <string name="settings_advanced_site_protection_desc">Determines the delay between each request to a site. Preventing site bans.</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

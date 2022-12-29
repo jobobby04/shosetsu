@@ -273,6 +273,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 	object RequireDoubleBackToExit : BooleanKey("requireDoubleBackToExit", false)
 
+	/**
+	 * Delay between each request to a site
+	 */
+	object SiteProtectionDelay : IntKey("site_protection_delay", 300)
+
 	class CustomString(
 		name: String,
 		default: String

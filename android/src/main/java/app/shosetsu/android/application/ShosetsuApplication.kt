@@ -19,6 +19,7 @@ import app.shosetsu.android.common.ext.fileOut
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
+import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.di.*
 import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
@@ -32,6 +33,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import com.google.android.material.color.DynamicColors
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -186,6 +188,11 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 					startRepositoryUpdateManagerUseCase()
 			} catch (e: SQLiteException) {
 				ACRA.errorReporter.handleException(e)
+			}
+		}
+		launchIO {
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionDelay).collectLatest {
+				SiteProtector.requestDelay = it.toLong()
 			}
 		}
 		super.onCreate()
