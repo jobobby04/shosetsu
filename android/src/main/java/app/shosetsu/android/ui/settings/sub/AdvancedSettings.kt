@@ -300,5 +300,21 @@ fun AdvancedSettingsContent(
 				haveSteps = false,
 			)
 		}
+
+		item {
+			SwitchSettingContent(
+				title = "Concurrent memory experiment",
+				description =
+				"""
+					Enable if you experience random crashes during reading, this might help.
+					Please tell developers you use this, as we are testing this.
+					Requires restart.
+				""".trimIndent(),
+				modifier = Modifier
+					.fillMaxWidth(),
+				repo = viewModel.settingsRepo,
+				key = ConcurrentMemoryExperiment
+			)
+		}
 	}
 }

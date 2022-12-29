@@ -278,6 +278,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object SiteProtectionDelay : IntKey("site_protection_delay", 300)
 
+	/**
+	 * Flag for concurrent memory experimentation
+	 */
+	object ConcurrentMemoryExperiment : BooleanKey("concurrent_memory", false)
+
 	class CustomString(
 		name: String,
 		default: String

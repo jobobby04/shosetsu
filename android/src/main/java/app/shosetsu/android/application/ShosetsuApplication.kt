@@ -11,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
+import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
@@ -178,6 +179,8 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		runBlocking {
 			if (settingsRepo.getBoolean(SettingKey.LogToFile))
 				setupDualOutput()
+
+			FLAG_CONCURRENT_MEMORY = settingsRepo.getBoolean(SettingKey.ConcurrentMemoryExperiment)
 		}
 
 		setupCoreLib()
