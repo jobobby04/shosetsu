@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Off
+import androidx.compose.ui.state.ToggleableState.On
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.NovelSortType
@@ -29,6 +30,7 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /*
@@ -206,6 +208,20 @@ class LibraryFilterMenuBuilder constructor(
 	}
 
 	@Composable
+	private fun PinOnTopOption() {
+		SimpleFilter(
+			modifier = Modifier.padding(top = 8.dp),
+			name = stringResource(R.string.pin_on_top),
+			getState = {
+				viewModel.isPinnedOnTop().map { if (it) On else Off }
+			},
+			cycleState = { state ->
+				viewModel.setPinnedOnTop(state != On)
+			}
+		)
+	}
+
+	@Composable
 	private fun SimpleFilter(
 		modifier: Modifier = Modifier,
 		name: String,
@@ -327,6 +343,8 @@ class LibraryFilterMenuBuilder constructor(
 				.fillMaxSize()
 				.verticalScroll(rememberScrollState()),
 		) {
+			PinOnTopOption()
+
 			Menu1Item(
 				R.string.controller_library_menu_tri_by_title,
 				state,

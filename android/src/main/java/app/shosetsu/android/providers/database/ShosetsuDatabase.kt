@@ -47,11 +47,12 @@ import kotlinx.coroutines.launch
 		DBNovelCategoryEntity::class,
 		DBNovelReaderSettingEntity::class,
 		DBNovelEntity::class,
+		DBNovelPinEntity::class,
 		DBNovelSettingsEntity::class,
 		DBRepositoryEntity::class,
 		DBUpdate::class,
 	],
-	version = 7
+	version = 8
 )
 @TypeConverters(
 	ChapterSortTypeConverter::class,
@@ -75,6 +76,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 	abstract val novelCategoriesDao: NovelCategoriesDao
 	abstract val novelReaderSettingsDao: NovelReaderSettingsDao
 	abstract val novelsDao: NovelsDao
+	abstract val novelPinsDao: NovelPinsDao
 	abstract val novelSettingsDao: NovelSettingsDao
 	abstract val repositoryDao: RepositoryDao
 	abstract val updatesDao: UpdatesDao
@@ -97,7 +99,8 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 					Migration3To4,
 					Migration4To5,
 					Migration5To6,
-					Migration6To7
+					Migration6To7,
+					Migration7to8
 				).build()
 
 			GlobalScope.launch {

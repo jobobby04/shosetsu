@@ -6,28 +6,21 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
@@ -55,7 +48,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -167,7 +159,9 @@ class LibraryController
 					if (categoriesDialogOpen) {
 						CategoriesDialog(
 							onDismissRequest = { categoriesDialogOpen = false },
-							categories = remember(items?.categories) { items?.categories ?: persistentListOf() },
+							categories = remember(items?.categories) {
+								items?.categories ?: persistentListOf()
+							},
 							novelCategories = remember { persistentListOf() },
 							setCategories = viewModel::setCategories
 						)
@@ -307,6 +301,10 @@ class LibraryController
 			R.id.view_type_cozy -> {
 				item.isChecked = !item.isChecked
 				viewModel.setViewType(COZY)
+				true
+			}
+			R.id.pin -> {
+				viewModel.togglePinSelected()
 				true
 			}
 			else -> false
@@ -469,6 +467,7 @@ fun LibraryPager(
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryCategory(
 	items: ImmutableList<LibraryNovelUI>,
@@ -534,6 +533,48 @@ fun LibraryCategory(
 				val onClickBadge = if (toastNovel != null) {
 					{ toastNovel(item) }
 				} else null
+
+				@Composable
+				fun badge() {
+					if (item.unread > 0)
+						Badge(
+							modifier = Modifier.clickable(
+								onClick = {
+									onClickBadge?.invoke()
+								}
+							)
+						) {
+							Text(item.unread.toString())
+						}
+				}
+
+				@Composable
+				fun pin() {
+					if (item.pinned)
+						Badge(
+							modifier = Modifier.clickable { }
+						) {
+							Icon(
+								painterResource(R.drawable.ic_baseline_push_pin_24),
+								stringResource(R.string.pin_on_top),
+								modifier = Modifier.size(16.dp)
+							)
+						}
+				}
+
+				@Composable
+				fun BoxScope.topBar() {
+					Row(
+						modifier = Modifier
+							.align(Alignment.TopStart)
+							.padding(4.dp),
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.spacedBy(4.dp)
+					) {
+						badge()
+						pin()
+					}
+				}
 				when (cardType) {
 					NORMAL -> {
 						NovelCardNormalContent(
@@ -546,14 +587,7 @@ fun LibraryCategory(
 								onLongClick(item)
 							},
 							overlay = {
-								if (item.unread > 0)
-									Badge(
-										Modifier
-											.align(Alignment.TopStart)
-											.padding(top = 4.dp, start = 4.dp),
-										text = item.unread.toString(),
-										onClick = onClickBadge
-									)
+								topBar()
 							},
 							isSelected = item.isSelected
 						)
@@ -569,12 +603,8 @@ fun LibraryCategory(
 								onLongClick(item)
 							},
 							overlay = {
-								if (item.unread > 0)
-									Badge(
-										Modifier.padding(8.dp),
-										text = item.unread.toString(),
-										onClick = onClickBadge
-									)
+								pin()
+								badge()
 							},
 							isSelected = item.isSelected
 						)
@@ -590,14 +620,7 @@ fun LibraryCategory(
 								onLongClick(item)
 							},
 							overlay = {
-								if (item.unread > 0)
-									Badge(
-										Modifier
-											.align(Alignment.TopStart)
-											.padding(top = 4.dp, start = 4.dp),
-										text = item.unread.toString(),
-										onClick = onClickBadge
-									)
+								topBar()
 							},
 							isSelected = item.isSelected
 						)
@@ -605,28 +628,5 @@ fun LibraryCategory(
 				}
 			}
 		}
-	}
-}
-
-@Composable
-fun Badge(modifier: Modifier, text: String, onClick: (() -> Unit)? = null) {
-	Box(
-		modifier = modifier then Modifier
-			.height(20.dp)
-			.background(MaterialTheme.colorScheme.tertiary, MaterialTheme.shapes.medium)
-			.clip(MaterialTheme.shapes.medium)
-			.let {
-				if (onClick != null) {
-					it.clickable(onClick = onClick)
-				} else it
-			},
-		contentAlignment = Alignment.Center
-	) {
-		Text(
-			text,
-			fontSize = 12.sp,
-			color = MaterialTheme.colorScheme.onSecondary,
-			modifier = Modifier.padding(vertical = 2.dp, horizontal = 4.dp)
-		)
 	}
 }

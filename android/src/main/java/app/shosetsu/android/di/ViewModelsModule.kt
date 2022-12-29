@@ -62,7 +62,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			setNovelsCategoriesUseCase = instance(),
 			loadNovelUIColumnsH = instance(),
 			loadNovelUIColumnsP = instance(),
-			loadNovelUIBadgeToast = instance()
+			loadNovelUIBadgeToast = instance(),
+			toggleNovelPin = instance()
 		)
 	}
 

@@ -1,6 +1,7 @@
-package app.shosetsu.android.domain.model.local
+package app.shosetsu.android.datasource.local.database.base
 
-import app.shosetsu.lib.Novel
+import android.database.sqlite.SQLiteException
+import app.shosetsu.android.domain.model.local.NovelPinEntity
 
 /*
  * This file is part of shosetsu.
@@ -20,28 +21,22 @@ import app.shosetsu.lib.Novel
  */
 
 /**
- * shosetsu
- * 06 / 06 / 2020
+ * Shosetsu
  *
- * For displaying novels in library owo
- *
- * @param id of the novel
- * @param title of the novel
- * @param imageURL of the novel
- * @param bookmarked if this novel is bookmarked or not
- * @param unread chapters of this novel
+ * @since 01 / 11 / 2022
+ * @author Doomsdayrs
  */
-data class LibraryNovelEntity(
-	val id: Int,
-	val title: String,
-	val imageURL: String,
-	var bookmarked: Boolean,
-	val unread: Int,
-	val pinned: Boolean,
-	val genres: List<String>,
-	val authors: List<String>,
-	val artists: List<String>,
-	val tags: List<String>,
-	val status: Novel.Status,
-	val category: Int,
-)
+interface IDBNovelPinsDataSource {
+
+	/**
+	 * Toggle the pin state of the following novel ids
+	 */
+	@Throws(SQLiteException::class)
+	suspend fun togglePin(ids: List<Int>)
+
+	@Throws(SQLiteException::class)
+	suspend fun isPinned(id: Int): Boolean
+
+	@Throws(SQLiteException::class)
+	suspend fun updateOrInsert(pinEntity: NovelPinEntity)
+}

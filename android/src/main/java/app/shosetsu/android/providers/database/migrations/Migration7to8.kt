@@ -1,6 +1,8 @@
-package app.shosetsu.android.domain.model.local
+package app.shosetsu.android.providers.database.migrations
 
-import app.shosetsu.lib.Novel
+import android.database.SQLException
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 /*
  * This file is part of shosetsu.
@@ -20,28 +22,14 @@ import app.shosetsu.lib.Novel
  */
 
 /**
- * shosetsu
- * 06 / 06 / 2020
+ * Shosetsu
  *
- * For displaying novels in library owo
- *
- * @param id of the novel
- * @param title of the novel
- * @param imageURL of the novel
- * @param bookmarked if this novel is bookmarked or not
- * @param unread chapters of this novel
+ * @since 08 / 08 / 2022
  */
-data class LibraryNovelEntity(
-	val id: Int,
-	val title: String,
-	val imageURL: String,
-	var bookmarked: Boolean,
-	val unread: Int,
-	val pinned: Boolean,
-	val genres: List<String>,
-	val authors: List<String>,
-	val artists: List<String>,
-	val tags: List<String>,
-	val status: Novel.Status,
-	val category: Int,
-)
+object Migration7to8 : Migration(7, 8) {
+
+	@Throws(SQLException::class)
+	override fun migrate(database: SupportSQLiteDatabase) {
+		database.execSQL("CREATE TABLE IF NOT EXISTS `novel_pins` (`novelId` INTEGER NOT NULL, `pinned` INTEGER NOT NULL, PRIMARY KEY(`novelId`), FOREIGN KEY(`novelId`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+	}
+}

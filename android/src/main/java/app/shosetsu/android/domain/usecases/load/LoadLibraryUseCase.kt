@@ -46,6 +46,7 @@ class LoadLibraryUseCase(
 							 imageURL,
 							 bookmarked,
 							 unread,
+							 pinned,
 							 genres,
 							 authors,
 							 artists,
@@ -58,6 +59,7 @@ class LoadLibraryUseCase(
 					imageURL,
 					bookmarked,
 					unread,
+					pinned,
 					genres,
 					authors,
 					artists,
@@ -67,6 +69,9 @@ class LoadLibraryUseCase(
 				)
 			}.groupBy { it.category }
 		}.combine(getCategoriesUseCase()) { novels, categories ->
-			LibraryUI(categories.toImmutableList(), novels.mapValues { it.value.toImmutableList() }.toImmutableMap())
+			LibraryUI(
+				categories.toImmutableList(),
+				novels.mapValues { it.value.toImmutableList() }.toImmutableMap()
+			)
 		}
 }

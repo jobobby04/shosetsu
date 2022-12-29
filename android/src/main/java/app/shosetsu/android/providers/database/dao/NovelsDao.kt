@@ -68,6 +68,12 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 					WHERE novelID = novels.id
 					AND readingStatus != 2
 				) as unread,
+				(
+					SELECT IFNULL(pinned, 0)
+					FROM novel_pins
+					WHERE novelId = novels.id
+				)
+				as pinned,
 				novels.genres,
 				novels.authors,
 				novels.artists,
