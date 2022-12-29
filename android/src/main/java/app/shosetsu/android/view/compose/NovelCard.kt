@@ -293,7 +293,9 @@ fun NovelCardCompressedContent(
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.SpaceBetween,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(end = 4.dp)
 			) {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
@@ -327,7 +329,12 @@ fun NovelCardCompressedContent(
 				}
 
 				if (overlay != null)
-					overlay()
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.spacedBy(4.dp),
+					) {
+						overlay()
+					}
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
-import app.shosetsu.lib.Novel
+import app.shosetsu.android.domain.model.database.DBNovelPinEntity
+import app.shosetsu.android.dto.Convertible
 
 /*
  * This file is part of shosetsu.
@@ -20,29 +21,14 @@ import app.shosetsu.lib.Novel
  */
 
 /**
- * shosetsu
- * 06 / 06 / 2020
+ * Shosetsu
  *
- * For displaying novels in library owo
+ * @since 01 / 11 / 2022
+ * @author Doomsdayrs
  *
- * @param id of the novel
- * @param title of the novel
- * @param imageURL of the novel
- * @param bookmarked if this novel is bookmarked or not
- * @param unread chapters of this novel
+ * @param novelId id of the novel
+ * @param pinned if the novel specified by [novelId] is pinned or not
  */
-data class LibraryNovelEntity(
-	val id: Int,
-	val title: String,
-	val imageURL: String,
-	var bookmarked: Boolean,
-	val unread: Int,
-	val downloaded: Int,
-	val pinned: Boolean,
-	val genres: List<String>,
-	val authors: List<String>,
-	val artists: List<String>,
-	val tags: List<String>,
-	val status: Novel.Status,
-	val category: Int,
-)
+data class NovelPinEntity(val novelId: Int, val pinned: Boolean) : Convertible<DBNovelPinEntity> {
+	override fun convertTo(): DBNovelPinEntity = DBNovelPinEntity(novelId, pinned)
+}

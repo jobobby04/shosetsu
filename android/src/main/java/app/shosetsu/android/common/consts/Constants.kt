@@ -62,7 +62,7 @@ const val APK_MIME = "application/vnd.android.package-archive"
 /**
  * The version of backups this build of shosetsu supports
  */
-const val VERSION_BACKUP: String = "1.1.0"
+const val VERSION_BACKUP: String = "1.2.0"
 const val BACKUP_FILE_EXTENSION = "sbk"
 const val REPOSITORY_HELP_URL = "https://shosetsu.app/help/guides/repositories/"
 const val BROWSE_HELP_URL = "https://shosetsu.app/help/guides/browse/"

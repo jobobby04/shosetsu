@@ -49,6 +49,7 @@ val dbDataSourceModule = DI.Module("database_data_source") {
 	bind<IDBNovelCategoriesDataSource>() with singleton { DBNovelCategoriesDataSource(instance()) }
 
 	bind<IDBNovelsDataSource>() with singleton { DBNovelsDataSource(instance()) }
+	bind<IDBNovelPinsDataSource>() with singleton { DBNovelPinsDataSource(instance()) }
 
 	bind<IDBExtRepoDataSource>() with singleton { DBExtRepoDataSource(instance()) }
 

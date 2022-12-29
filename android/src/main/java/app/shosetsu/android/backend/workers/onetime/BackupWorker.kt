@@ -62,6 +62,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 	override val di: DI by closestDI(appContext)
 	private val novelRepository by instance<INovelsRepository>()
+	private val novelPinRepository by instance<INovelPinsRepository>()
 	private val iSettingsRepository by instance<ISettingsRepository>()
 
 	/**
@@ -251,7 +252,8 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 											novel.imageURL,
 											chapters,
 											settings = bSettings,
-											categories = novelCategories
+											categories = novelCategories,
+											pinned = novelPinRepository.isPinned(novel.id!!)
 										)
 									}
 								)

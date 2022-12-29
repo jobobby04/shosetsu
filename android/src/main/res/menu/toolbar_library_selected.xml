@@ -13,6 +13,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/pin"
+        android:title="@string/toggle_pin"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/set_categories"
         android:title="@string/set_categories"
         app:showAsAction="never" />

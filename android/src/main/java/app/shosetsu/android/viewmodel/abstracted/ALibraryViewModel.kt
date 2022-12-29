@@ -76,6 +76,9 @@ abstract class ALibraryViewModel :
 	abstract fun isSortReversed(): Flow<Boolean>
 	abstract fun setIsSortReversed(reversed: Boolean)
 
+	abstract fun isPinnedOnTop(): Flow<Boolean>
+	abstract fun setPinnedOnTop(onTop: Boolean)
+
 	abstract fun cycleFilterGenreState(genre: String, currentState: ToggleableState)
 	abstract fun getFilterGenreState(name: String): Flow<ToggleableState>
 
@@ -107,5 +110,10 @@ abstract class ALibraryViewModel :
 
 	abstract val activeCategory: StateFlow<Int>
 	abstract fun setActiveCategory(category: Int)
+
+	/**
+	 * Toggle pin of selected novels
+	 */
+	abstract fun togglePinSelected()
 
 }

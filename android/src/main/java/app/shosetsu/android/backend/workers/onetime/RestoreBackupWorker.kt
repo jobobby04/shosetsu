@@ -81,6 +81,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	private val extensionEntitiesRepo by instance<IExtensionEntitiesRepository>()
 	private val installExtension: InstallExtensionUseCase by instance()
 	private val novelsRepo by instance<INovelsRepository>()
+	private val novelPinsRepo by instance<INovelPinsRepository>()
 	private val novelsSettingsRepo by instance<INovelSettingsRepository>()
 	private val chaptersRepo by instance<IChaptersRepository>()
 	private val backupUriRepo by instance<IBackupUriRepository>()
@@ -564,6 +565,14 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					)
 				}
 			)
+		}
+
+		if (backupNovelEntity.pinned) {
+			try {
+				novelPinsRepo.updateOrInsert(NovelPinEntity(targetNovelID, true))
+			} catch (ignored: SQLiteException) {
+				// TODO how to handle this issue?
+			}
 		}
 
 		loadImageJob.join() // Finish the image loading job
