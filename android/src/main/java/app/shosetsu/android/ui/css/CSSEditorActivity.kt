@@ -35,9 +35,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -55,7 +53,13 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
+import okhttp3.internal.immutableListOf
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -162,7 +166,7 @@ fun PreviewCSSEditorContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun CSSEditorContent(
 	cssTitle: String,
@@ -302,28 +306,97 @@ fun CSSEditorContent(
 		}
 	) {
 		Column(Modifier.padding(it)) {
-			AndroidView(
-				factory = { context ->
-					WebView(context).apply {
-						@SuppressLint("SetJavaScriptEnabled")
-						settings.javaScriptEnabled = true
-						settings.apply {
-							cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-						}
-						loadData(
-							context.getString(R.string.activity_css_example),
-							"text/html",
-							"UTF-8"
-						)
+			val pages = immutableListOf(
+				stringResource(
+					R.string.editor
+				),
+				stringResource(
+					R.string.preview
+				)
+			)
 
+			val pagerState = rememberPagerState()
+			val scope = rememberCoroutineScope()
+
+			TabRow(
+				// Our selected tab is our current page
+				selectedTabIndex = pagerState.currentPage,
+				// Override the indicator, using the provided pagerTabIndicatorOffset modifier
+				indicator = { tabPositions ->
+					TabRowDefaults.Indicator(
+						Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+					)
+				}
+			) {
+
+				// Add tabs for all of our pages
+				pages.forEachIndexed { index, title ->
+					Tab(
+						text = { Text(title) },
+						selected = pagerState.currentPage == index,
+						onClick = {
+							scope.launch {
+								pagerState.scrollToPage(index)
+							}
+						},
+					)
+				}
+			}
+			HorizontalPager(
+				pages.size,
+				state = pagerState,
+				modifier = Modifier.fillMaxSize(),
+				userScrollEnabled = false
+			) { page ->
+				when (page) {
+					0 -> {
+						TextField(
+							cssContent,
+							onNewText,
+							modifier = Modifier
+								.fillMaxSize()
+								.verticalScroll(rememberScrollState())
+								.padding(bottom = 92.dp),
+							shape = RectangleShape,
+							isError = !isCSSInvalid
+						)
 					}
-				},
-				update = { webView ->
-					logI("Updating style")
-					val base64String =
-						Base64.encodeToString(cssContent.encodeToByteArray(), Base64.DEFAULT)
-					webView.evaluateJavascript(
-						"""
+					else -> {
+						CSSPreview(cssContent)
+					}
+				}
+			}
+		}
+
+	}
+}
+
+@Composable
+fun CSSPreview(
+	cssContent: String,
+) {
+	AndroidView(
+		factory = { context ->
+			WebView(context).apply {
+				@SuppressLint("SetJavaScriptEnabled")
+				settings.javaScriptEnabled = true
+				settings.apply {
+					cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+				}
+				loadData(
+					context.getString(R.string.activity_css_example),
+					"text/html",
+					"UTF-8"
+				)
+
+			}
+		},
+		update = { webView ->
+			webView.logI("Updating style")
+			val base64String =
+				Base64.encodeToString(cssContent.encodeToByteArray(), Base64.DEFAULT)
+			webView.evaluateJavascript(
+				"""
 				style = document.getElementById('example-css');
 				if(!style){
 					style = document.createElement('style');
@@ -333,24 +406,10 @@ fun CSSEditorContent(
 				}
 				style.textContent = atob(`$base64String`);
 			""".trimIndent(),
-						null
-					)
-				},
-				modifier = Modifier
-					.fillMaxWidth()
-					.fillMaxHeight(0.25f)
+				null
 			)
-			TextField(
-				cssContent,
-				onNewText,
-				modifier = Modifier
-					.fillMaxSize()
-					.verticalScroll(rememberScrollState())
-					.padding(bottom = 92.dp),
-				shape = RectangleShape,
-				isError = !isCSSInvalid
-			)
-		}
-
-	}
+		},
+		modifier = Modifier
+			.fillMaxSize()
+	)
 }
