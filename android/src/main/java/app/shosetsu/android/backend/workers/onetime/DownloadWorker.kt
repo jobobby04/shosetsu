@@ -182,10 +182,18 @@ class DownloadWorker(
 			setContentTitle(downloadEntity.novelName + "\t" + downloadEntity.chapterName)
 			priority = NotificationCompat.PRIORITY_LOW
 			setSilent(true)
-			if (isComplete)
+			if (isComplete) {
 				removeProgress()
-			else if (downloadEntity.status == DownloadStatus.DOWNLOADING)
-				setProgress(1, 0, true)
+			} else {
+				when (downloadEntity.status) {
+					DownloadStatus.DOWNLOADING -> {
+						setProgress(1, 0, true)
+					}
+					else -> {
+						removeProgress()
+					}
+				}
+			}
 		}
 
 		if (isComplete) {
