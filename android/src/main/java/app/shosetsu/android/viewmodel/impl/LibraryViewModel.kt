@@ -228,6 +228,10 @@ class LibraryViewModel(
 		)
 	}
 
+	private val downloadedFlow: MutableStateFlow<InclusionState?> by lazy {
+		MutableStateFlow(null)
+	}
+
 	/**
 	 * This is outputed to the UI to display all the novels
 	 *
@@ -249,6 +253,7 @@ class LibraryViewModel(
 			.combineGenreFilter()
 			.combineTagsFilter()
 			.combineUnreadStatus()
+			.combineDownloadedFilter()
 			.combineSortType()
 			.combineSortReverse()
 			.combinePinTop()
@@ -451,6 +456,27 @@ class LibraryViewModel(
 			}
 		}
 
+	private fun Flow<LibraryUI>.combineDownloadedFilter() =
+		combine(downloadedFlow) { novelResult, sortType ->
+			novelResult.let { list ->
+				sortType?.let {
+					when (sortType) {
+						INCLUDE -> list.copy(
+							novels = list.novels.mapValues {
+								it.value.filter { it.downloaded > 0 }.toImmutableList()
+							}.toImmutableMap()
+						)
+						EXCLUDE -> list.copy(
+							novels = list.novels.mapValues {
+								it.value.filterNot { it.downloaded > 0 }.toImmutableList()
+							}.toImmutableMap()
+						)
+					}
+				} ?: list
+			}
+		}
+
+
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
 	override fun startUpdateManager(categoryID: Int) {
@@ -592,6 +618,13 @@ class LibraryViewModel(
 
 	override fun getUnreadFilter(): Flow<ToggleableState> =
 		unreadStatusFlow.map { it.toToggleableState() }
+
+	override fun cycleDownloadedFilter(currentState: ToggleableState) {
+		downloadedFlow.value = currentState.toInclusionState().cycle()
+	}
+
+	override fun getDownloadedFilter(): Flow<ToggleableState> =
+		downloadedFlow.map { it.toToggleableState() }
 
 	fun ToggleableState.toInclusionState(): InclusionState? = when (this) {
 		ToggleableState.On -> INCLUDE

@@ -134,6 +134,7 @@ class LibraryFilterMenuBuilder constructor(
 				.verticalScroll(rememberScrollState()),
 		) {
 			UnreadStatusFilter()
+			DownloadedFilter()
 
 			if (genresIsNotEmpty)
 				FilterContent(
@@ -203,6 +204,20 @@ class LibraryFilterMenuBuilder constructor(
 			},
 			cycleState = { state ->
 				viewModel.cycleUnreadFilter(state)
+			}
+		)
+	}
+
+	@Composable
+	private fun DownloadedFilter() {
+		SimpleFilter(
+			modifier = Modifier.padding(top = 8.dp),
+			name = stringResource(R.string.downloaded),
+			getState = {
+				viewModel.getDownloadedFilter()
+			},
+			cycleState = { state ->
+				viewModel.cycleDownloadedFilter(state)
 			}
 		)
 	}

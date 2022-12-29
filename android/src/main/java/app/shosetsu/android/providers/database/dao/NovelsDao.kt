@@ -69,11 +69,16 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 					AND readingStatus != 2
 				) as unread,
 				(
+					SELECT count(*)
+					FROM chapters
+					WHERE novelID = novels.id
+					AND isSaved = 1
+				) as downloaded,
+				(
 					SELECT IFNULL(pinned, 0)
 					FROM novel_pins
 					WHERE novelId = novels.id
-				)
-				as pinned,
+				) as pinned,
 				novels.genres,
 				novels.authors,
 				novels.artists,
