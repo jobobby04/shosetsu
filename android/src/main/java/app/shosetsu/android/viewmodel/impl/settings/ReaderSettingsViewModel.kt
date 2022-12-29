@@ -113,6 +113,18 @@ fun ExposedSettingsRepoViewModel.enableFullscreen() {
 }
 
 @Composable
+fun ExposedSettingsRepoViewModel.readerTextSelectionToggle() {
+	SwitchSettingContent(
+		stringResource(R.string.settings_reader_text_sel_title),
+		stringResource(R.string.settings_reader_text_sel_desc),
+		settingsRepo,
+		ReaderDisableTextSelection,
+		modifier = Modifier
+			.fillMaxWidth(),
+	)
+}
+
+@Composable
 fun ExposedSettingsRepoViewModel.matchFullscreenToFocus() {
 	val enableFullscreen by remember {
 		settingsRepo.getBooleanFlow(ReaderEnableFullscreen)

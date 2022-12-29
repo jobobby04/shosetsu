@@ -301,6 +301,8 @@ fun ReaderSettingsContent(
 
 		item { viewModel.enableFullscreen() }
 
+		item { viewModel.readerTextSelectionToggle() }
+
 		item { viewModel.matchFullscreenToFocus() }
 
 		item {

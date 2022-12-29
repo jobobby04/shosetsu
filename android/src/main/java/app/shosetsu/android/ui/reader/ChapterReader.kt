@@ -259,6 +259,7 @@ class ChapterReader
 									item { viewModel.doubleTapFocus() }
 									item { viewModel.doubleTapSystem() }
 									item { viewModel.readerTableHackOption() }
+									item { viewModel.readerTextSelectionToggle() }
 								},
 								toggleFocus = viewModel::toggleFocus,
 								onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
@@ -292,6 +293,7 @@ class ChapterReader
 														textSizeFlow = { viewModel.liveTextSize },
 														textColorFlow = { viewModel.textColor },
 														backgroundColorFlow = { viewModel.backgroundColor },
+														disableTextSelFlow = { viewModel.disableTextSelection },
 														onScroll = viewModel::onScroll,
 														onClick = viewModel::onReaderClicked,
 														onDoubleClick = viewModel::onReaderDoubleClicked,

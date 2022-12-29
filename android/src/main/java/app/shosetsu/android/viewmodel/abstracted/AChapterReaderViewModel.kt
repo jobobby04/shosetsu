@@ -78,6 +78,11 @@ abstract class AChapterReaderViewModel :
 	abstract val tapToScroll: StateFlow<Boolean>
 
 	/**
+	 * Is text selection disabled?
+	 */
+	abstract val disableTextSelection: StateFlow<Boolean>
+
+	/**
 	 * Double tap required to focus/unfocus the reader
 	 */
 	abstract val isFocused: StateFlow<Boolean>

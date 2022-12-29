@@ -140,6 +140,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object ReaderShowChapterDivider : BooleanKey("reader_show_divider_page", true)
 
+	/**
+	 * Disable text selection in the reader
+	 */
+	object ReaderDisableTextSelection : BooleanKey("reader_disable_text_sel", false)
+
 	//- Some things
 	object ChaptersResumeFirstUnread : BooleanKey(
 		"readerResumeFirstUnread",

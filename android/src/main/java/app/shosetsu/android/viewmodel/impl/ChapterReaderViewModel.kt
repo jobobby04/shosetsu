@@ -119,7 +119,11 @@ class ChapterReaderViewModel(
 						doubleTapSystem && !matchFullscreenToFocus
 					}
 					.onIO()
-					.stateIn(viewModelScopeIO, SharingStarted.Lazily, (it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value)
+					.stateIn(
+						viewModelScopeIO,
+						SharingStarted.Lazily,
+						(it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value
+					)
 			}
 
 	}
@@ -641,6 +645,10 @@ class ChapterReaderViewModel(
 		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
 	}
 
+	override val disableTextSelection: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderDisableTextSelection)
+	}
+
 	private val doubleTapFocus: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus)
 	}
@@ -706,7 +714,8 @@ class ChapterReaderViewModel(
 		val textSize: Float = ReaderTextSize.default,
 		val indentSize: Int = ReaderIndentSize.default,
 		val paragraphSpacing: Float = ReaderParagraphSpacing.default,
-		val tableHackEnabled: Boolean = false
+		val tableHackEnabled: Boolean = ReaderTableHack.default,
+		val disableTextSelection: Boolean = ReaderDisableTextSelection.default
 	)
 
 	private val shosetsuCss: Flow<String> by lazy {
@@ -728,6 +737,10 @@ class ChapterReaderViewModel(
 			builder.copy(
 				tableHackEnabled = enabled
 			)
+		}.combine(disableTextSelection) { builder, enabled ->
+			builder.copy(
+				disableTextSelection = enabled
+			)
 		}.map {
 			val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
 
@@ -735,6 +748,13 @@ class ChapterReaderViewModel(
 				shosetsuStyle.getOrPut(elem) { hashMapOf() }.apply(action)
 
 			fun Int.cssColor(): String = "rgb($red,$green,$blue)"
+
+			if (it.disableTextSelection) {
+				setShosetsuStyle("*") {
+					this["-webkit-user-select"] = "none"
+					this["user-select"] = "none"
+				}
+			}
 
 			setShosetsuStyle("body") {
 				this["background-color"] = it.backgroundColor.cssColor()

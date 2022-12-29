@@ -21,6 +21,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -59,6 +60,7 @@ fun ChapterReaderStringContent(
 	textSizeFlow: () -> Flow<Float>,
 	textColorFlow: () -> Flow<Int>,
 	backgroundColorFlow: () -> Flow<Int>,
+	disableTextSelFlow: () -> StateFlow<Boolean>,
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
 	onClick: () -> Unit,
 	onDoubleClick: () -> Unit
@@ -103,6 +105,7 @@ fun ChapterReaderStringContent(
 			val backgroundColor by remember { backgroundColorFlow() }.collectAsState(
 				Color.Gray.toArgb()
 			)
+			val disableTextSel by remember { disableTextSelFlow() }.collectAsState()
 
 
 			StringPageContent(
@@ -114,6 +117,7 @@ fun ChapterReaderStringContent(
 				},
 				textColor = textColor,
 				backgroundColor = backgroundColor,
+				disableTextSelection = disableTextSel,
 				onClick = onClick,
 				onDoubleClick = onDoubleClick
 				//	isTapToScroll=isTapToScroll
