@@ -245,7 +245,7 @@ dependencies {
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
 
 	// Annotations
-	implementation("org.jetbrains:annotations:23.0.0")
+	implementation("org.jetbrains:annotations:23.1.0")
 
 	// Core libraries
 	implementation("org.luaj:luaj-jse:3.0.1")
@@ -369,7 +369,7 @@ dependencies {
 	implementation(accompanist("accompanist-flowlayout"))
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata:1.3.1")
+	implementation("androidx.compose.runtime:runtime-livedata:1.3.2")
 
 	// MDC Adapter
 	implementation("com.google.android.material:compose-theme-adapter:1.2.1")
