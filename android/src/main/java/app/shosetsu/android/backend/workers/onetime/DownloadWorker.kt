@@ -270,9 +270,6 @@ class DownloadWorker(
 						notify(it)
 					}
 				)
-				launchUI {
-					toast { e.message ?: "Download error" }
-				}
 			} finally {
 				activeExtensions.remove(downloadEntity.extensionID)
 			}
