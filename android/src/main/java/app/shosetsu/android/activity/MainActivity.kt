@@ -364,7 +364,6 @@ class MainActivity : AppCompatActivity(), DIAware {
 			DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
 			binding.navDrawer
 		)
-		androidx.navigation.ui.R.animator.nav_default_enter_anim
 		getMaterialNav().setupWithNavController(navController)
 	}
 
