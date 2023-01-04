@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -53,11 +52,9 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDED
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDING
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import org.acra.ACRA
 
 /*
@@ -180,7 +177,12 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 							}
 						},
 						hasFilters = hasFilters,
-						fab
+						fab,
+						openWebView = ::openInWebView,
+						clearCookies = {
+							viewModel.clearCookies()
+							items.refresh()
+						}
 					)
 					if (categoriesDialogItem != null) {
 						CategoriesDialog(
@@ -435,7 +437,9 @@ fun CatalogContent(
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
 	hasFilters: Boolean,
-	fab: EFabMaintainer
+	fab: EFabMaintainer,
+	clearCookies: () -> Unit,
+	openWebView: () -> Unit
 ) {
 	Box(
 		modifier = Modifier.fillMaxSize(),
@@ -537,9 +541,17 @@ fun CatalogContent(
 					item(span = { GridItemSpan(maxLineSpan) }) {
 						ErrorContent(
 							errorState.error.message ?: "Unknown",
-							ErrorAction(R.string.retry) {
-								items.refresh()
-							},
+							actions = arrayOf(
+								ErrorAction(R.string.retry) {
+									items.refresh()
+								},
+								ErrorAction(R.string.action_open_in_webview) {
+									openWebView()
+								},
+								ErrorAction(R.string.settings_advanced_clear_cookies_title) {
+									clearCookies()
+								},
+							),
 							stackTrace = errorState.error.stackTraceToString()
 						)
 					}

@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
+import android.webkit.CookieManager
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,6 +10,7 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
@@ -323,12 +325,20 @@ class CatalogViewModel(
 
 	override val columnsInH: StateFlow<Int> by lazy {
 		loadNovelUIColumnsHUseCase().onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInLandscape.default)
+			.stateIn(
+				viewModelScopeIO,
+				SharingStarted.Lazily,
+				SettingKey.ChapterColumnsInLandscape.default
+			)
 	}
 
 	override val columnsInV: StateFlow<Int> by lazy {
 		loadNovelUIColumnsPUseCase().onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, SettingKey.ChapterColumnsInPortait.default)
+			.stateIn(
+				viewModelScopeIO,
+				SharingStarted.Lazily,
+				SettingKey.ChapterColumnsInPortait.default
+			)
 	}
 
 	override val categories: StateFlow<ImmutableList<CategoryUI>> by lazy {
@@ -358,6 +368,13 @@ class CatalogViewModel(
 				@Suppress("UNCHECKED_CAST")
 				put(key, defaultValue as V)
 			}
+	}
+
+	override fun clearCookies() {
+		CookieManager.getInstance().removeAllCookies {
+			logV("Cookies cleared")
+			resetView()
+		}
 	}
 }
 
