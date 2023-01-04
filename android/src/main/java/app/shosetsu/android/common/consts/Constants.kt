@@ -20,7 +20,7 @@ import androidx.compose.ui.text.TextStyle
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-const val USER_AGENT = "Mozilla/5.0 (Android 13; Mobile; rv:108.0) Gecko/108.0 Firefox/108.0"
+const val USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0"
 
 const val SELECTED_STROKE_WIDTH: Int = 8
 
