@@ -1,10 +1,7 @@
 package app.shosetsu.android.view.compose
 
-import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,7 +35,15 @@ import kotlin.random.Random
 @Preview
 @Composable
 fun PreviewErrorContent() {
-	ErrorContent(R.string.todo, ErrorAction(R.string.todo) { }, stackTrace = "l\nl\nl\nl\nl\n")
+	ErrorContent(
+		R.string.todo,
+		actions = arrayOf(
+			ErrorAction(R.string.todo) { },
+			ErrorAction(R.string.todo) { },
+			ErrorAction(R.string.todo) { },
+		),
+		stackTrace = "l\nl\nl\nl\nl\n"
+	)
 }
 
 private val ERROR_FACES = listOf(
@@ -81,13 +86,25 @@ fun getRandomErrorFace(): String {
 
 data class ErrorAction(val id: Int, val onClick: () -> Unit)
 
-@SuppressLint("ModifierParameter")
 @Composable
 fun ErrorContent(
 	@StringRes messageRes: Int,
-	vararg actions: ErrorAction,
-	stackTrace: String? = null,
+	actions: ErrorAction,
 	modifier: Modifier = Modifier,
+	stackTrace: String? = null,
+) = ErrorContent(
+	messageRes = messageRes,
+	actions = arrayOf(actions),
+	modifier = modifier,
+	stackTrace = stackTrace
+)
+
+@Composable
+fun ErrorContent(
+	@StringRes messageRes: Int,
+	modifier: Modifier = Modifier,
+	actions: Array<ErrorAction> = arrayOf(),
+	stackTrace: String? = null,
 ) =
 	ErrorContent(
 		modifier = modifier,
@@ -96,13 +113,25 @@ fun ErrorContent(
 		actions = actions
 	)
 
-@SuppressLint("ModifierParameter")
 @Composable
 fun ErrorContent(
 	message: String,
-	vararg actions: ErrorAction,
-	stackTrace: String? = null,
+	actions: ErrorAction,
 	modifier: Modifier = Modifier,
+	stackTrace: String? = null,
+) = ErrorContent(
+	message = message,
+	actions = arrayOf(actions),
+	modifier = modifier,
+	stackTrace = stackTrace
+)
+
+@Composable
+fun ErrorContent(
+	message: String,
+	modifier: Modifier = Modifier,
+	actions: Array<ErrorAction> = arrayOf(),
+	stackTrace: String? = null,
 ) {
 	val face = remember { getRandomErrorFace() }
 	Box(
@@ -112,6 +141,7 @@ fun ErrorContent(
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
+			modifier = Modifier
 		) {
 			Text(
 				face,
@@ -124,14 +154,13 @@ fun ErrorContent(
 				textAlign = TextAlign.Center,
 				modifier = Modifier.padding(bottom = 8.dp)
 			)
-			LazyRow {
-				items(actions) {
-					TextButton(
-						onClick = { it.onClick() },
-						contentPadding = PaddingValues(16.dp)
-					) {
-						Text(stringResource(it.id))
-					}
+
+			actions.forEach {
+				TextButton(
+					onClick = { it.onClick() },
+					contentPadding = PaddingValues(16.dp)
+				) {
+					Text(stringResource(it.id))
 				}
 			}
 
