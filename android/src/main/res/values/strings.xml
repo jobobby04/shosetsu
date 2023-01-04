@@ -524,7 +524,7 @@
     <string name="controller_library_menu_tri_by_source">By source</string>
     <string name="controller_library_menu_tri_by_date">By date</string>
     <string name="controller_novel_info_image">Image of the novel</string>
-    <string name="controller_novel_info_open_web">Open in webview</string>
+    <string name="action_open_in_webview">Open in webview</string>
     <string name="reader_first_focus">Click the content to unfocus.</string>
     <string name="reader_first_focus_dismiss">Dismiss</string>
     <string name="controller_catalogue_toast_background_add_fail">Failed to add: %s</string>

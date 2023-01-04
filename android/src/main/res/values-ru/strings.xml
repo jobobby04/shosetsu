@@ -441,7 +441,7 @@
 	<string name="controller_library_menu_tri_by_source">По источнику</string>
 	<string name="controller_library_menu_tri_by_date">По дате</string>
 	<string name="controller_novel_info_image">Иллюстрация к новелле</string>
-	<string name="controller_novel_info_open_web">Открыть в веб-просмотре</string>
+	<string name="action_open_in_webview">Открыть в веб-просмотре</string>
 	<string name="reader_first_focus">Нажмите на содержимое, чтобы расфокусировать его.</string>
 	<string name="reader_first_focus_dismiss">Отклонить</string>
 	<string name="controller_catalogue_toast_background_add_fail">Не удалось добавить: %s</string>
