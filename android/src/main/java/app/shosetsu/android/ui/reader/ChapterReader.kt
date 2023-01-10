@@ -4,7 +4,6 @@ import android.content.ComponentCallbacks2
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.view.KeyEvent
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.compose.setContent
@@ -17,13 +16,15 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.collectLA
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.setTheme
+import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.ui.reader.content.*
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
-import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel.ChapterPassage
 import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -36,7 +37,6 @@ import kotlinx.coroutines.runBlocking
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
-import java.util.*
 
 
 /*
@@ -68,6 +68,7 @@ class ChapterReader
 	private val isTTSCapable = MutableStateFlow(false)
 	private val isTTSPlaying = MutableStateFlow(false)
 
+	/*
 	private val ttsInitListener: TextToSpeech.OnInitListener by lazy {
 		TextToSpeech.OnInitListener {
 			when (it) {
@@ -89,9 +90,8 @@ class ChapterReader
 		}
 	}
 
-	private val tts: TextToSpeech by lazy {
-		TextToSpeech(this, ttsInitListener)
-	}
+	private val tts: TextToSpeech by lazy { TextToSpeech(this, ttsInitListener) }
+	 */
 
 	override fun onTrimMemory(level: Int) {
 		super.onTrimMemory(level)
@@ -205,21 +205,24 @@ class ChapterReader
 										.filterIsInstance<ReaderChapterUI>()
 										.find { it.id == currentChapterID }
 										?.let { item ->
-											tts.setPitch(viewModel.ttsPitch.value)
-											tts.setSpeechRate(viewModel.ttsSpeed.value)
+											//tts.setPitch(viewModel.ttsPitch.value)
+											//tts.setSpeechRate(viewModel.ttsSpeed.value)
 											when (chapterType!!) {
 												ChapterType.STRING -> {
 													viewModel.getChapterStringPassage(item)
 														.collectLA(
 															this@ChapterReader,
 															catch = {}) { content ->
+															/*
 															if (content is ChapterPassage.Success)
+
 																tts.speak(
 																	content.content,
 																	TextToSpeech.QUEUE_FLUSH,
 																	null,
 																	content.hashCode().toString()
 																)
+															 */
 														}
 
 												}
@@ -228,6 +231,7 @@ class ChapterReader
 														.collectLA(
 															this@ChapterReader,
 															catch = {}) { content ->
+															/*
 															if (content is ChapterPassage.Success)
 																tts.speak(
 																	content.content,
@@ -235,6 +239,7 @@ class ChapterReader
 																	null,
 																	content.hashCode().toString()
 																)
+															 */
 														}
 												}
 												else -> {}
@@ -242,7 +247,7 @@ class ChapterReader
 										}
 								},
 								onStopTTS = {
-									tts.stop()
+									//tts.stop()
 								},
 								updateSetting = viewModel::updateSetting,
 								lowerSheet = {
@@ -279,7 +284,7 @@ class ChapterReader
 								},
 								onChapterRead = viewModel::updateChapterAsRead,
 								onStopTTS = {
-									tts.stop()
+									//tts.stop()
 								},
 								createPage = { page ->
 									when (val item = items.orEmpty()[page]) {
@@ -365,8 +370,8 @@ class ChapterReader
 	/** On Destroy */
 	override fun onDestroy() {
 		logV("")
-		tts.stop()
-		tts.shutdown()
+		//tts.stop()
+		//tts.shutdown()
 		super.onDestroy()
 	}
 
