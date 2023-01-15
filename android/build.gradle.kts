@@ -369,7 +369,7 @@ dependencies {
 	implementation(accompanist("accompanist-flowlayout"))
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata:1.3.2")
+	implementation("androidx.compose.runtime:runtime-livedata:1.3.3")
 
 	// MDC Adapter
 	implementation("com.google.android.material:compose-theme-adapter:1.2.1")
