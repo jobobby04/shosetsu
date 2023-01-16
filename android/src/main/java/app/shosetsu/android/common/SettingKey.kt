@@ -1,7 +1,7 @@
 package app.shosetsu.android.common
 
 import app.shosetsu.android.common.enums.MarkingType
-import app.shosetsu.android.domain.model.local.LibrarySortFilterEntity
+import app.shosetsu.android.domain.model.local.LibraryFilterState
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -274,7 +274,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object VerifyCheckSum : BooleanKey("verifyCheckSum", false)
 
 	object LibraryFilter :
-		StringKey("libraryFilter", Json.encodeToString(LibrarySortFilterEntity()))
+		StringKey("libraryFilter", Json.encodeToString(LibraryFilterState()))
 
 	object RequireDoubleBackToExit : BooleanKey("requireDoubleBackToExit", false)
 

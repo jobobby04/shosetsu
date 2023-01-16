@@ -3,6 +3,7 @@ package app.shosetsu.android.domain.model.local
 import app.shosetsu.android.common.enums.InclusionState
 import app.shosetsu.android.common.enums.NovelSortType
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 /*
  * This file is part of Shosetsu.
@@ -25,13 +26,22 @@ import kotlinx.serialization.Serializable
  * 03 / 01 / 2021
  */
 @Serializable
-data class LibrarySortFilterEntity(
-	var sortType: NovelSortType = NovelSortType.BY_TITLE,
-	var reversedSort: Boolean = false,
-	var unreadInclusion: InclusionState? = null,
+data class LibraryFilterState(
+	val sortType: NovelSortType = NovelSortType.BY_TITLE,
+	val reversedSort: Boolean = false,
+	val unreadInclusion: InclusionState? = null,
 
-	var genreFilter: Map<String, InclusionState> = emptyMap(),
-	var authorFilter: Map<String, InclusionState> = emptyMap(),
-	var artistFilter: Map<String, InclusionState> = emptyMap(),
-	var tagFilter: Map<String, InclusionState> = emptyMap(),
-)
+	val genreFilter: Map<String, InclusionState> = emptyMap(),
+	val authorFilter: Map<String, InclusionState> = emptyMap(),
+	val artistFilter: Map<String, InclusionState> = emptyMap(),
+	val tagFilter: Map<String, InclusionState> = emptyMap(),
+	val arePinsOnTop: Boolean = true,
+	val downloadedOnly: InclusionState? = null
+) {
+	companion object {
+		val libraryFilterStateJson = Json {
+			encodeDefaults = true
+			ignoreUnknownKeys = true
+		}
+	}
+}

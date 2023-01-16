@@ -27,6 +27,7 @@ import app.shosetsu.android.common.enums.NovelSortType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.utils.copy
+import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
 import app.shosetsu.android.domain.usecases.ToggleNovelPinUseCase
@@ -34,6 +35,7 @@ import app.shosetsu.android.domain.usecases.load.*
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
+import app.shosetsu.android.domain.usecases.update.UpdateLibraryFilterStateUseCase
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
@@ -63,7 +65,9 @@ class LibraryViewModel(
 	private val loadNovelUIBadgeToast: LoadNovelUIBadgeToastUseCase,
 	private val setNovelUITypeUseCase: SetNovelUITypeUseCase,
 	private val setNovelsCategoriesUseCase: SetNovelsCategoriesUseCase,
-	private val toggleNovelPin: ToggleNovelPinUseCase
+	private val toggleNovelPin: ToggleNovelPinUseCase,
+	private val loadLibraryFilterSettings: LoadLibraryFilterSettingsUseCase,
+	private val _updateLibraryFilterState: UpdateLibraryFilterStateUseCase
 ) : ALibraryViewModel() {
 
 	private val selectedNovels = MutableStateFlow<Map<Int, Map<Int, Boolean>>>(emptyMap())
@@ -189,47 +193,54 @@ class LibraryViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelCardType.NORMAL)
 	}
 
-	private val novelSortTypeFlow: MutableStateFlow<NovelSortType> by lazy {
-		MutableStateFlow(
-			NovelSortType.BY_TITLE
-		)
-	}
-	private val areNovelsReversedFlow: MutableStateFlow<Boolean> by lazy {
-		MutableStateFlow(
-			false
-		)
-	}
-	private val genreFilterFlow: MutableStateFlow<Map<String, InclusionState>> by lazy {
-		MutableStateFlow(
-			hashMapOf()
-		)
-	}
-	private val authorFilterFlow: MutableStateFlow<Map<String, InclusionState>> by lazy {
-		MutableStateFlow(
-			hashMapOf()
-		)
-	}
-	private val artistFilterFlow: MutableStateFlow<Map<String, InclusionState>> by lazy {
-		MutableStateFlow(
-			hashMapOf()
-		)
-	}
-	private val tagFilterFlow: MutableStateFlow<Map<String, InclusionState>> by lazy {
-		MutableStateFlow(
-			hashMapOf()
-		)
-	}
-	private val unreadStatusFlow: MutableStateFlow<InclusionState?> by lazy {
-		MutableStateFlow(null)
-	}
-	private val arePinsOnTop: MutableStateFlow<Boolean> by lazy {
-		MutableStateFlow(
-			true
-		)
+	private val libraryMemory: StateFlow<LibraryFilterState> by lazy {
+		loadLibraryFilterSettings()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, LibraryFilterState())
 	}
 
-	private val downloadedFlow: MutableStateFlow<InclusionState?> by lazy {
-		MutableStateFlow(null)
+	private val novelSortTypeFlow: StateFlow<NovelSortType> by lazy {
+		libraryMemory.map { it.sortType }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelSortType.BY_TITLE)
+	}
+
+	private val areNovelsReversedFlow: StateFlow<Boolean> by lazy {
+		libraryMemory.map { it.reversedSort }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
+	}
+
+	private val genreFilterFlow: StateFlow<Map<String, InclusionState>> by lazy {
+		libraryMemory.map { it.genreFilter }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, hashMapOf())
+	}
+
+	private val authorFilterFlow: StateFlow<Map<String, InclusionState>> by lazy {
+		libraryMemory.map { it.authorFilter }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, hashMapOf())
+	}
+
+	private val artistFilterFlow: StateFlow<Map<String, InclusionState>> by lazy {
+		libraryMemory.map { it.artistFilter }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, hashMapOf())
+	}
+
+	private val tagFilterFlow: StateFlow<Map<String, InclusionState>> by lazy {
+		libraryMemory.map { it.tagFilter }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, hashMapOf())
+	}
+
+	private val unreadStatusFlow: StateFlow<InclusionState?> by lazy {
+		libraryMemory.map { it.unreadInclusion }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+	}
+
+	private val arePinsOnTop: StateFlow<Boolean> by lazy {
+		libraryMemory.map { it.arePinsOnTop }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, true)
+	}
+
+	private val downloadedFlow: StateFlow<InclusionState?> by lazy {
+		libraryMemory.map { it.downloadedOnly }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	/**
@@ -516,23 +527,44 @@ class LibraryViewModel(
 		}
 	}
 
+	@Synchronized
+	private fun updateLibraryFilterState(mem: LibraryFilterState) {
+		launchIO {
+			_updateLibraryFilterState(
+				mem
+			)
+		}
+	}
+
 	override fun getSortType(): Flow<NovelSortType> = novelSortTypeFlow
 
 	override fun setSortType(novelSortType: NovelSortType) {
-		novelSortTypeFlow.value = novelSortType
-		areNovelsReversedFlow.value = false
+		updateLibraryFilterState(
+			libraryMemory.value.copy(
+				sortType = novelSortType,
+				reversedSort = false
+			)
+		)
 	}
 
 	override fun isSortReversed(): Flow<Boolean> = areNovelsReversedFlow
 
 	override fun setIsSortReversed(reversed: Boolean) {
-		areNovelsReversedFlow.value = reversed
+		updateLibraryFilterState(
+			libraryMemory.value.copy(
+				reversedSort = reversed
+			)
+		)
 	}
 
 	override fun isPinnedOnTop(): Flow<Boolean> = arePinsOnTop
 
 	override fun setPinnedOnTop(onTop: Boolean) {
-		arePinsOnTop.value = onTop
+		updateLibraryFilterState(
+			libraryMemory.value.copy(
+				arePinsOnTop = onTop
+			)
+		)
 	}
 
 	override fun cycleFilterGenreState(genre: String, currentState: ToggleableState) {
@@ -541,7 +573,11 @@ class LibraryViewModel(
 			currentState.toInclusionState().cycle()?.let {
 				map[genre] = it
 			} ?: map.remove(genre)
-			genreFilterFlow.value = map
+			_updateLibraryFilterState(
+				libraryMemory.value.copy(
+					genreFilter = map
+				)
+			)
 		}
 	}
 
@@ -555,7 +591,11 @@ class LibraryViewModel(
 			currentState.toInclusionState().cycle()?.let {
 				map[author] = it
 			} ?: map.remove(author)
-			authorFilterFlow.value = map
+			_updateLibraryFilterState(
+				libraryMemory.value.copy(
+					authorFilter = map
+				)
+			)
 		}
 	}
 
@@ -569,7 +609,11 @@ class LibraryViewModel(
 			currentState.toInclusionState().cycle()?.let {
 				map[artist] = it
 			} ?: map.remove(artist)
-			artistFilterFlow.value = map
+			_updateLibraryFilterState(
+				libraryMemory.value.copy(
+					artistFilter = map
+				)
+			)
 		}
 	}
 
@@ -583,7 +627,11 @@ class LibraryViewModel(
 			currentState.toInclusionState().cycle()?.let {
 				map[tag] = it
 			} ?: map.remove(tag)
-			tagFilterFlow.value = map
+			_updateLibraryFilterState(
+				libraryMemory.value.copy(
+					tagFilter = map
+				)
+			)
 		}
 	}
 
@@ -592,13 +640,7 @@ class LibraryViewModel(
 	}
 
 	override fun resetSortAndFilters() {
-		genreFilterFlow.value = hashMapOf()
-		tagFilterFlow.value = hashMapOf()
-		authorFilterFlow.value = hashMapOf()
-		artistFilterFlow.value = hashMapOf()
-
-		novelSortTypeFlow.value = NovelSortType.BY_TITLE
-		areNovelsReversedFlow.value = false
+		updateLibraryFilterState(LibraryFilterState())
 	}
 
 	override fun setViewType(cardType: NovelCardType) {
@@ -613,14 +655,22 @@ class LibraryViewModel(
 	}
 
 	override fun cycleUnreadFilter(currentState: ToggleableState) {
-		unreadStatusFlow.value = currentState.toInclusionState().cycle()
+		updateLibraryFilterState(
+			libraryMemory.value.copy(
+				unreadInclusion = currentState.toInclusionState().cycle()
+			)
+		)
 	}
 
 	override fun getUnreadFilter(): Flow<ToggleableState> =
 		unreadStatusFlow.map { it.toToggleableState() }
 
 	override fun cycleDownloadedFilter(currentState: ToggleableState) {
-		downloadedFlow.value = currentState.toInclusionState().cycle()
+		updateLibraryFilterState(
+			libraryMemory.value.copy(
+				downloadedOnly = currentState.toInclusionState().cycle()
+			)
+		)
 	}
 
 	override fun getDownloadedFilter(): Flow<ToggleableState> =

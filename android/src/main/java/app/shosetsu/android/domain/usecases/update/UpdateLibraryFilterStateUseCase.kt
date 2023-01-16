@@ -1,10 +1,9 @@
 package app.shosetsu.android.domain.usecases.update
 
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.domain.model.local.LibrarySortFilterEntity
+import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 /*
  * This file is part of Shosetsu.
@@ -26,13 +25,13 @@ import kotlinx.serialization.json.Json
 /**
  * 09 / 03 / 2021
  */
-class UpdateLibraryFilterSettingsUseCase(
+class UpdateLibraryFilterStateUseCase(
 	private val iSettingsRepository: ISettingsRepository
 ) {
-	suspend operator fun invoke(librarySortFilterEntity: LibrarySortFilterEntity) {
+	suspend operator fun invoke(librarySortFilterEntity: LibraryFilterState) {
 		iSettingsRepository.setString(
 			SettingKey.LibraryFilter,
-			Json.encodeToString(librarySortFilterEntity)
+			LibraryFilterState.libraryFilterStateJson.encodeToString(librarySortFilterEntity)
 		)
 	}
 }
