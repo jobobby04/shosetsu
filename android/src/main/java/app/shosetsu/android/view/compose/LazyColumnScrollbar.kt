@@ -77,7 +77,9 @@ fun LazyColumnScrollbar(
 			.run { 1f - (it.viewportEndOffset - offset).toFloat() / size.toFloat() }
 		val realVisibleSize = it.visibleItemsInfo.size.toFloat() - firstPartial - lastPartial
 		realVisibleSize / it.totalItemsCount.toFloat()
-	}.coerceAtLeast(thumbMinHeight)
+	}
+		.coerceAtLeast(thumbMinHeight)
+		.coerceAtMost( 2 * thumbMinHeight)
 
 	fun normalizedOffsetPosition() = listState.layoutInfo.let {
 		if (it.totalItemsCount == 0 || it.visibleItemsInfo.isEmpty()) 0f
