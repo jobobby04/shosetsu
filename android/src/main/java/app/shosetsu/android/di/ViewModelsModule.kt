@@ -53,7 +53,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	// Library
 	bind<ALibraryViewModel>() with provider {
 		LibraryViewModel(
-			libraryAsCardsUseCase = instance(),
+			loadLibrary = instance(),
 			updateBookmarkedNovelUseCase = instance(),
 			isOnlineUseCase = instance(),
 			startUpdateWorkerUseCase = instance(),

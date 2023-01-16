@@ -55,7 +55,7 @@ import java.util.Locale.getDefault as LGD
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class LibraryViewModel(
-	private val libraryAsCardsUseCase: LoadLibraryUseCase,
+	private val loadLibrary: LoadLibraryUseCase,
 	private val updateBookmarkedNovelUseCase: UpdateBookmarkedNovelUseCase,
 	private val isOnlineUseCase: IsOnlineUseCase,
 	private var startUpdateWorkerUseCase: StartUpdateWorkerUseCase,
@@ -157,7 +157,7 @@ class LibraryViewModel(
 		}
 	}
 
-	private val librarySourceFlow: Flow<LibraryUI> by lazy { libraryAsCardsUseCase() }
+	private val librarySourceFlow: Flow<LibraryUI> by lazy { loadLibrary() }
 
 	override val isEmptyFlow: StateFlow<Boolean> by lazy {
 		librarySourceFlow.map {
@@ -442,6 +442,9 @@ class LibraryViewModel(
 					}
 					NovelSortType.BY_ID -> library.novels.mapValues {
 						it.value.sortedBy { it.id }.toImmutableList()
+					}
+					NovelSortType.BY_UPDATED -> library.novels.mapValues {
+						it.value.sortedBy { it.lastUpdate }.toImmutableList()
 					}
 				}.toImmutableMap()
 			)

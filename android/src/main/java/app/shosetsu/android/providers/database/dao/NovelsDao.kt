@@ -83,7 +83,12 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 				novels.authors,
 				novels.artists,
 				novels.tags,
-				novels.status
+				novels.status,
+				(
+					SELECT IFNULL(time, 0)
+					FROM updates
+					WHERE novelID = novels.id
+				) as lastUpdate
 			  FROM novels
 			  WHERE novels.bookmarked = 1
 		) AS M

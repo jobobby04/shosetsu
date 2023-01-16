@@ -20,7 +20,8 @@ data class LibraryNovelUI(
 	val tags: List<String>,
 	val status: Novel.Status,
 	val category: Int,
-	val isSelected: Boolean = false
+	val lastUpdate: Long,
+	val isSelected: Boolean = false,
 ) : Convertible<LibraryNovelEntity> {
 	override fun convertTo(): LibraryNovelEntity =
 		LibraryNovelEntity(
@@ -36,6 +37,7 @@ data class LibraryNovelUI(
 			artists,
 			tags,
 			status,
-			category
+			category,
+			lastUpdate
 		)
 }

@@ -27,4 +27,5 @@ enum class NovelSortType {
 	BY_TITLE,
 	BY_UNREAD_COUNT,
 	BY_ID,
+	BY_UPDATED
 }

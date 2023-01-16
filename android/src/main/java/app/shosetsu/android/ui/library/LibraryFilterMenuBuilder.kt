@@ -378,6 +378,12 @@ class LibraryFilterMenuBuilder constructor(
 				BY_ID,
 				reversed
 			)
+			Menu1Item(
+				R.string.controller_library_menu_tri_by_updated,
+				state,
+				BY_UPDATED,
+				reversed
+			)
 		}
 	}
 

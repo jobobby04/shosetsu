@@ -45,4 +45,5 @@ data class LibraryNovelEntity(
 	val tags: List<String>,
 	val status: Novel.Status,
 	val category: Int,
+	val lastUpdate: Long
 )
