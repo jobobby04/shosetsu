@@ -33,9 +33,9 @@ import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.CookieJarSync
+import com.google.accompanist.themeadapter.material.MdcTheme
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.accompanist.web.*
-import com.google.android.material.composethemeadapter.MdcTheme
-import com.google.android.material.composethemeadapter3.Mdc3Theme
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.kodein.di.DI
