@@ -237,9 +237,9 @@ fun MoreContent(
 				)
 			}
 
-			item {
+			/*item {
 				MoreItemContent(R.string.styles, R.drawable.ic_baseline_style_24, showStyleBar)
-			}
+			}*/
 
 			item {
 				MoreItemContent(
