@@ -1325,6 +1325,9 @@ fun NovelInfoHeaderContent(
 								setCategoriesDialogOpen(true)
 							}
 						},
+						onLongClick = {
+							setCategoriesDialogOpen(true)
+						},
 						modifier = Modifier
 							.padding(vertical = 8.dp, horizontal = 4.dp)
 							.weight(1F)
