@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -192,11 +191,11 @@ fun MoreContent(
 			}
 		}
 
-		item {
+		/*item {
 			MoreItemContent(R.string.styles, R.drawable.ic_baseline_style_24) {
 				showStyleBar()
 			}
-		}
+		}*/
 
 		item {
 			MoreItemContent(R.string.qr_code_scan, R.drawable.ic_baseline_link_24) {
