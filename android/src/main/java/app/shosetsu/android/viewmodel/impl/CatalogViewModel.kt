@@ -120,11 +120,11 @@ class CatalogViewModel(
 				is Filter.Dropdown -> getFilterIntState(filter)
 				is Filter.RadioGroup -> getFilterIntState(filter)
 				is Filter.FList -> {
-					filter.filters.toList().init()
+					filter.filters.init()
 				}
 
 				is Filter.Group<*> -> {
-					filter.filters.toList().init()
+					filter.filters.init()
 				}
 
 				is Filter.Header -> {
