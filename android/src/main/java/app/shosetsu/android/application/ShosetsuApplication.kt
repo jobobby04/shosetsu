@@ -1,10 +1,13 @@
 package app.shosetsu.android.application
 
+import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteException
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -41,6 +44,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import com.google.android.material.color.DynamicColors
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -276,5 +280,13 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 				}.build()
 			}
+
+			crossfade((300 * Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)).toInt())
+			allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
+
+			// Coil spawns a new thread for every image load by default
+			fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
+			decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
+			transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
 		}.build()
 }
