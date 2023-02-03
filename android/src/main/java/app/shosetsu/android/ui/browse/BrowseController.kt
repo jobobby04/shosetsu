@@ -34,6 +34,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -375,7 +376,8 @@ fun BrowseExtensionContent(
 	cancelInstall: () -> Unit
 ) {
 	Column(
-		Modifier.clickable(onClick = openCatalogue)
+		Modifier
+			.clickable(onClick = openCatalogue)
 			.padding(horizontal = 8.dp)
 	) {
 		Row(
@@ -397,14 +399,26 @@ fun BrowseExtensionContent(
 						contentDescription = stringResource(R.string.controller_browse_ext_icon_desc),
 						modifier = Modifier.size(64.dp),
 						error = {
-							ImageLoadingError()
+							Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+								ImageLoadingError(
+									Modifier
+										.size(52.dp)
+										.clip(MaterialTheme.shapes.extraSmall)
+								)
+							}
 						},
 						loading = {
 							Box(Modifier.placeholder(true))
 						}
 					)
 				} else {
-					ImageLoadingError(Modifier.size(64.dp))
+					Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+						ImageLoadingError(
+							Modifier
+								.size(52.dp)
+								.clip(MaterialTheme.shapes.extraSmall)
+						)
+					}
 				}
 				Column(
 					modifier = Modifier.padding(start = 8.dp)
