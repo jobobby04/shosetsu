@@ -62,10 +62,7 @@ import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.view.ComposeBottomSheetDialog
-import app.shosetsu.android.view.compose.ErrorAction
-import app.shosetsu.android.view.compose.ErrorContent
-import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
@@ -256,20 +253,16 @@ fun BrowseView(
 ) {
 	ShosetsuCompose {
 		val entities by viewModel.liveData.collectAsState()
-		var isRefreshing by remember { mutableStateOf(false) }
 		BrowseContent(
 			entities,
 			refresh = {
-				isRefreshing = true
 				onRefresh()
-				isRefreshing = false
 			},
 			installExtension = installExtension,
 			update = viewModel::updateExtension,
 			openCatalogue = openCatalogue,
 			openSettings = openSettings,
 			cancelInstall = viewModel::cancelInstall,
-			isRefreshing = isRefreshing,
 			fab
 		)
 	}
@@ -301,7 +294,6 @@ fun PreviewBrowseContent() {
 		{},
 		{},
 		{},
-		false,
 		fab = null
 	)
 }
@@ -316,10 +308,9 @@ fun BrowseContent(
 	openCatalogue: (BrowseExtensionUI) -> Unit,
 	openSettings: (BrowseExtensionUI) -> Unit,
 	cancelInstall: (BrowseExtensionUI) -> Unit,
-	isRefreshing: Boolean,
 	fab: EFabMaintainer?
 ) {
-	val pullRefreshState = rememberPullRefreshState(isRefreshing, refresh)
+	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(refresh)
 
 	Box(Modifier.pullRefresh(pullRefreshState)) {
 		if (!entities.isNullOrEmpty()) {

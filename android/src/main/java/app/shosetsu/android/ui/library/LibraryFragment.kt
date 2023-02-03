@@ -548,7 +548,7 @@ fun LibraryCategory(
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
 	fab: EFabMaintainer?
 ) {
-	val pullRefreshState = rememberPullRefreshState(false, onRefresh)
+	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Box(Modifier.pullRefresh(pullRefreshState)) {
 		val w = LocalConfiguration.current.screenWidthDp
 		val o = LocalConfiguration.current.orientation
@@ -694,6 +694,6 @@ fun LibraryCategory(
 			}
 		}
 
-		PullRefreshIndicator(false, pullRefreshState, Modifier.align(Alignment.TopCenter))
+		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }

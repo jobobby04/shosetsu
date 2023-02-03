@@ -57,6 +57,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.coverRatio
+import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -158,14 +159,11 @@ fun UpdatesView(
 ) {
 	ShosetsuCompose {
 		val items by viewModel.liveData.collectAsState()
-		val isRefreshing by viewModel.isRefreshing.collectAsState()
 		val isOnline by viewModel.isOnlineFlow.collectAsState()
-		val state = remember { SnackbarHostState() }
 
 		Scaffold {
 			UpdatesContent(
 				items = items,
-				isRefreshing = isRefreshing,
 				onRefresh = {
 					if (isOnline)
 						viewModel.startUpdateManager(-1)
@@ -183,12 +181,11 @@ fun UpdatesView(
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
-	isRefreshing: Boolean,
 	onRefresh: () -> Unit,
 	openChapter: (UpdatesUI) -> Unit,
 	modifier: Modifier = Modifier
 ) {
-	val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Box(modifier.pullRefresh(pullRefreshState)) {
 		if (items.isEmpty()) {
 			Column {
