@@ -2,7 +2,7 @@ package app.shosetsu.android.view
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,7 +45,7 @@ import kotlinx.coroutines.delay
  * @author Doomsdayrs
  */
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 fun openShareMenu(
 	context: Context,
 	owner: LifecycleOwner,
@@ -62,15 +62,15 @@ fun openShareMenu(
 			setContent {
 				ShosetsuCompose {
 					Column(
-						modifier = Modifier.padding(start = 16.dp)
+						modifier = Modifier
 					) {
 						Box(
-							modifier = Modifier.height(56.dp),
+							modifier = Modifier.height(56.dp).padding(start = 16.dp),
 							contentAlignment = Alignment.CenterStart
 						) {
 							Text(
 								stringResource(R.string.share),
-								style = MaterialTheme.typography.body1,
+								style = MaterialTheme.typography.bodyLarge,
 								modifier = Modifier.alpha(0.8f)
 							)
 						}
@@ -86,14 +86,13 @@ fun openShareMenu(
 								this@bottomSheet.dismiss()
 							},
 							modifier = Modifier
-								.height(56.dp)
 								.fillMaxWidth(),
 							shape = RectangleShape,
-							backgroundColor = Color.Transparent,
-							elevation = 0.dp
+							colors = CardDefaults.cardColors(containerColor = Color.Transparent),
 						) {
 							Row(
 								verticalAlignment = Alignment.CenterVertically,
+								modifier = Modifier.height(56.dp).padding(start = 16.dp)
 							) {
 								Icon(
 									painterResource(
@@ -104,7 +103,7 @@ fun openShareMenu(
 								)
 								Text(
 									stringResource(R.string.menu_share_url),
-									style = MaterialTheme.typography.body1
+									style = MaterialTheme.typography.bodyLarge
 								)
 							}
 						}
@@ -119,14 +118,13 @@ fun openShareMenu(
 								this@bottomSheet.dismiss()
 							},
 							modifier = Modifier
-								.height(56.dp)
 								.fillMaxWidth(),
 							shape = RectangleShape,
-							backgroundColor = Color.Transparent,
-							elevation = 0.dp
+							colors = CardDefaults.cardColors(containerColor = Color.Transparent),
 						) {
 							Row(
-								verticalAlignment = Alignment.CenterVertically
+								verticalAlignment = Alignment.CenterVertically,
+								modifier = Modifier.height(56.dp).padding(start = 16.dp)
 							) {
 								Icon(
 									painterResource(
@@ -137,7 +135,7 @@ fun openShareMenu(
 								)
 								Text(
 									stringResource(R.string.menu_share_qr),
-									style = MaterialTheme.typography.body1
+									style = MaterialTheme.typography.bodyLarge
 								)
 							}
 						}
