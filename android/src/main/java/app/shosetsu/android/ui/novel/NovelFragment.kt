@@ -1446,7 +1446,7 @@ fun ExpandedText(
 				FlowRow(
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(vertical = 8.dp),
+						.padding(horizontal = 8.dp, vertical = 8.dp),
 					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
 					verticalArrangement = Arrangement.spacedBy(4.dp)
 				) {
