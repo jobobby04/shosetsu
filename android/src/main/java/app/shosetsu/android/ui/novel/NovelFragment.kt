@@ -118,6 +118,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -1348,7 +1349,8 @@ fun NovelInfoHeaderContent(
 					.fillMaxWidth()
 					.padding(top = 8.dp),
 				text = novelInfo.description,
-				genre = novelInfo.displayGenre
+				genre = novelInfo.displayGenre,
+				mappedGenre = novelInfo.mappedGenre
 			)
 		}
 	}
@@ -1432,7 +1434,8 @@ fun NovelChapterBar(
 fun ExpandedText(
 	modifier: Modifier = Modifier,
 	text: String,
-	genre: ImmutableList<String>
+	genre: ImmutableList<String>,
+	mappedGenre: ImmutableMap<String, ImmutableList<String>>
 ) {
 	var isExpanded by remember { mutableStateOf(false) }
 
@@ -1471,15 +1474,34 @@ fun ExpandedText(
 				}
 			}
 		} else {
-			FlowRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(horizontal = 8.dp, vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				genre.forEach {
-					NovelGenre(it)
+			if (mappedGenre.isNotEmpty()) {
+				mappedGenre.forEach { (namespace, genre) ->
+					Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+						NovelGenre(text = namespace)
+						FlowRow(
+							modifier = Modifier
+								.fillMaxWidth()
+								.padding(horizontal = 8.dp),
+							horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+							verticalArrangement = Arrangement.spacedBy(4.dp)
+						) {
+							genre.forEach {
+								NovelGenre(it)
+							}
+						}
+					}
+				}
+			} else {
+				FlowRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 8.dp, vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					genre.forEach {
+						NovelGenre(it)
+					}
 				}
 			}
 		}

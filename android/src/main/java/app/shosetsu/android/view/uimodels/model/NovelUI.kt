@@ -4,7 +4,9 @@ import androidx.compose.runtime.Immutable
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.Novel
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 /*
  * This file is part of shosetsu.
@@ -61,6 +63,15 @@ data class NovelUI(
 	val displayAuthors = authors.joinToString(", ")
 	val displayArtists = artists.joinToString(", ")
 	val displayGenre = genres.toImmutableList()
+	val mappedGenre = if (genres.all { it.contains(':') }) {
+		genres.fold(mutableMapOf<String, MutableList<String>>()) { genres, namespaceAndGenre ->
+			val (namespace, genre) = namespaceAndGenre.split(':')
+			genres.getOrPut(namespace.trim()) { mutableListOf() } += genre.trim()
+			genres
+		}.mapValues { it.value.toImmutableList() }.toImmutableMap()
+	} else {
+		persistentMapOf()
+	}
 
 	override fun convertTo(): NovelEntity = NovelEntity(
 		id = id,
