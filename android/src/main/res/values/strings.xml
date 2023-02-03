@@ -113,6 +113,7 @@
     <string name="action_webview_back">Back</string>
     <string name="action_webview_forward">Forward</string>
     <string name="action_webview_refresh">Refresh</string>
+    <string name="action_webview_clear_cookies">Clear Cookies</string>
 
 
     <!-- App Update -->
