@@ -83,6 +83,14 @@ class WebViewApp : AppCompatActivity(), DIAware {
 		}
 	}
 
+	private fun clearCookies(url: String) {
+		val manager = CookieManager.getInstance()
+		val cookies = manager.getCookie(url) ?: return
+		cookies.split(";")
+			.map { it.substringBefore("=") }
+			.onEach { manager.setCookie(url, "$it=;Max-Age=-1") }
+	}
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
@@ -99,7 +107,8 @@ class WebViewApp : AppCompatActivity(), DIAware {
 						onUp = ::finish,
 						url = url,
 						onShare = ::shareWebpage,
-						onOpenInBrowser = ::openInBrowser
+						onOpenInBrowser = ::openInBrowser,
+						onClearCookies = ::clearCookies
 					)
 				}
 			}
@@ -115,6 +124,7 @@ fun WebViewScreen(
 	url: String,
 	onShare: (String) -> Unit,
 	onOpenInBrowser: (String) -> Unit,
+	onClearCookies: (String) -> Unit
 ) {
 	val state = rememberWebViewState(url = url)
 	val navigator = rememberWebViewNavigator()
@@ -170,6 +180,10 @@ fun WebViewScreen(
 							)
 							DropdownMenuItem(onClick = { onOpenInBrowser(state.content.getCurrentUrl()!!); overflow = false },
 								text = { Text(text = stringResource(R.string.open_in_browser))
+								}
+							)
+							DropdownMenuItem(onClick = { onClearCookies(state.content.getCurrentUrl()!!); overflow = false },
+								text = { Text(text = stringResource(R.string.action_webview_clear_cookies))
 								}
 							)
 						}
