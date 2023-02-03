@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +33,7 @@ import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
@@ -445,7 +445,7 @@ fun RepositoriesContent(
 	fab: EFabMaintainer
 ) {
 	if (items.isNotEmpty()) {
-		val pullRefreshState = rememberPullRefreshState(false, onRefresh)
+		val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 		Box(Modifier.pullRefresh(pullRefreshState)) {
 			val state = rememberLazyListState()
 			syncFABWithCompose(state, fab)
@@ -471,7 +471,7 @@ fun RepositoriesContent(
 				}
 			}
 
-			PullRefreshIndicator(false, pullRefreshState, Modifier.align(Alignment.TopCenter))
+			PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 		}
 	} else {
 		ErrorContent(

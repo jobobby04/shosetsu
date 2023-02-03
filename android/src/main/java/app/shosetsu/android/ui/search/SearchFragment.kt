@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LinearProgressIndicator
@@ -214,7 +213,7 @@ fun SearchContent(
 	onRefresh: (id: Int) -> Unit,
 	onRefreshAll: () -> Unit
 ) {
-	val pullRefreshState = rememberPullRefreshState(false, onRefreshAll)
+	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefreshAll)
 	Box(Modifier.pullRefresh(pullRefreshState)) {
 		LazyColumn(
 			modifier = Modifier.fillMaxSize(),
@@ -292,7 +291,7 @@ fun SearchContent(
 			}
 		}
 
-		PullRefreshIndicator(false, pullRefreshState, Modifier.align(Alignment.TopCenter))
+		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }
 

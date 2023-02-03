@@ -464,7 +464,8 @@ fun CatalogContent(
 	) {
 		val pullRefreshState = rememberPullRefreshState(
 			items.loadState.refresh == LoadState.Loading,
-			onRefresh = { items.refresh() })
+			onRefresh = { items.refresh() }
+		)
 
 		Box(Modifier.pullRefresh(pullRefreshState)) {
 			val w = LocalConfiguration.current.screenWidthDp
