@@ -43,7 +43,6 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.collections.immutable.ImmutableMap
 import org.joda.time.DateTime
 
@@ -112,9 +111,13 @@ fun UpdatesContent(
 	onRefresh: () -> Unit,
 	openChapter: (UpdatesUI) -> Unit
 ) {
+	val swipeRefreshState = rememberFakeSwipeRefreshState()
 	SwipeRefresh(
-		state = rememberSwipeRefreshState(isRefreshing),
-		onRefresh = onRefresh
+		state = swipeRefreshState.state,
+		onRefresh = {
+			swipeRefreshState.animateRefresh()
+			onRefresh()
+		}
 	) {
 		if (items.isEmpty()) {
 			Column {
