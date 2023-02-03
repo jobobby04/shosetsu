@@ -65,7 +65,6 @@ import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.ToggleBookmarkR
 import app.shosetsu.lib.Novel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.android.material.snackbar.Snackbar
@@ -1518,7 +1517,7 @@ fun ExpandedText(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
 				contentPadding = PaddingValues(horizontal = 8.dp)
 			) {
 				items(genre) {
@@ -1529,10 +1528,9 @@ fun ExpandedText(
 			FlowRow(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(vertical = 8.dp),
+					.padding(horizontal = 8.dp, vertical = 8.dp),
 				mainAxisSpacing = 8.dp,
 				crossAxisSpacing = 4.dp,
-				mainAxisAlignment = FlowMainAxisAlignment.Center,
 			) {
 				genre.forEach {
 					NovelGenre(it)
