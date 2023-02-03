@@ -57,10 +57,7 @@ import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.view.ComposeBottomSheetDialog
-import app.shosetsu.android.view.compose.ErrorAction
-import app.shosetsu.android.view.compose.ErrorContent
-import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
@@ -73,7 +70,6 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -130,20 +126,14 @@ class BrowseController : ShosetsuController(),
 			setContent {
 				ShosetsuCompose {
 					val entities by viewModel.liveData.collectAsState()
-					var isRefreshing by remember { mutableStateOf(false) }
 					BrowseContent(
 						entities,
-						refresh = {
-							isRefreshing = true
-							onRefresh()
-							isRefreshing = false
-						},
+						refresh = ::onRefresh,
 						installExtension = ::installExtension,
 						update = viewModel::updateExtension,
 						openCatalogue = ::openCatalogue,
 						openSettings = ::openSettings,
 						cancelInstall = viewModel::cancelInstall,
-						isRefreshing = isRefreshing,
 						fab
 					)
 				}
@@ -267,7 +257,6 @@ fun PreviewBrowseContent() {
 		{},
 		{},
 		{},
-		false,
 		fab = null
 	)
 }
@@ -281,12 +270,15 @@ fun BrowseContent(
 	openCatalogue: (BrowseExtensionUI) -> Unit,
 	openSettings: (BrowseExtensionUI) -> Unit,
 	cancelInstall: (BrowseExtensionUI) -> Unit,
-	isRefreshing: Boolean,
 	fab: EFabMaintainer?
 ) {
+	val swipeRefreshState = rememberFakeSwipeRefreshState()
 	SwipeRefresh(
-		state = rememberSwipeRefreshState(isRefreshing),
-		onRefresh = refresh,
+		state = swipeRefreshState.state,
+		onRefresh = {
+			swipeRefreshState.animateRefresh()
+			refresh()
+		},
 	) {
 		if (!entities.isNullOrEmpty()) {
 			val state = rememberLazyListState()
