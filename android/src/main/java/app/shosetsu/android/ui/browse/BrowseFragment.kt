@@ -24,6 +24,7 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -330,8 +331,6 @@ fun BrowseContent(
 				contentPadding = PaddingValues(
 					bottom = 198.dp,
 					top = 4.dp,
-					start = 8.dp,
-					end = 8.dp
 				),
 				state = state,
 				verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -412,170 +411,168 @@ fun BrowseExtensionContent(
 	openSettings: () -> Unit,
 	cancelInstall: () -> Unit
 ) {
-	Card(
-		onClick = openCatalogue,
-		shape = RoundedCornerShape(16.dp)
+	Column(
+		Modifier.clickable(onClick = openCatalogue)
+			.padding(horizontal = 8.dp)
 	) {
-		Column {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(end = 8.dp),
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically
+		) {
 			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(end = 8.dp),
-				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
 			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
+				if (item.imageURL.isNotEmpty()) {
+					SubcomposeAsyncImage(
+						ImageRequest.Builder(LocalContext.current)
+							.data(item.imageURL)
+							.crossfade(true)
+							.build(),
+						contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
+						modifier = Modifier.size(64.dp),
+						error = {
+							ImageLoadingError()
+						},
+						loading = {
+							Box(Modifier.placeholder(true))
+						}
+					)
+				} else {
+					ImageLoadingError(Modifier.size(64.dp))
+				}
+				Column(
+					modifier = Modifier.padding(start = 8.dp)
 				) {
-					if (item.imageURL.isNotEmpty()) {
-						SubcomposeAsyncImage(
-							ImageRequest.Builder(LocalContext.current)
-								.data(item.imageURL)
-								.crossfade(true)
-								.build(),
-							contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
-							modifier = Modifier.size(64.dp),
-							error = {
-								ImageLoadingError()
-							},
-							loading = {
-								Box(Modifier.placeholder(true))
-							}
-						)
-					} else {
-						ImageLoadingError(Modifier.size(64.dp))
-					}
-					Column(
-						modifier = Modifier.padding(start = 8.dp)
-					) {
-						Text(item.name)
-						Row {
-							Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
+					Text(item.name)
+					Row {
+						Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
 
-							if (item.isInstalled && item.installedVersion != null)
+						if (item.isInstalled && item.installedVersion != null)
+							Text(
+								item.installedVersion.toString(),
+								modifier = Modifier.padding(start = 8.dp),
+								fontSize = TextUnit(14f, TextUnitType.Sp)
+							)
+
+						if (item.isUpdateAvailable && item.updateVersion != null) {
+							if (item.updateVersion != Version(-9, -9, -9))
 								Text(
-									item.installedVersion.toString(),
+									stringResource(
+										R.string.update_to,
+										item.updateVersion.toString()
+									),
 									modifier = Modifier.padding(start = 8.dp),
-									fontSize = TextUnit(14f, TextUnitType.Sp)
+									fontSize = TextUnit(14f, TextUnitType.Sp),
+									color = MaterialTheme.colorScheme.tertiary
 								)
-
-							if (item.isUpdateAvailable && item.updateVersion != null) {
-								if (item.updateVersion != Version(-9, -9, -9))
-									Text(
-										stringResource(
-											R.string.update_to,
-											item.updateVersion.toString()
-										),
-										modifier = Modifier.padding(start = 8.dp),
-										fontSize = TextUnit(14f, TextUnitType.Sp),
-										color = MaterialTheme.colorScheme.tertiary
-									)
-							}
 						}
 					}
 				}
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.End
-				) {
-					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
-						var isDropdownVisible by remember { mutableStateOf(false) }
-						IconButton(
-							onClick = {
-								// We can skip to dropdown if there is only 1 install option
-								if (item.installOptions.size != 1)
-									isDropdownVisible = true
-								else install(item.installOptions[0])
-							}
-						) {
-							Icon(painterResource(R.drawable.download), null)
+			}
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.End
+			) {
+				if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
+					var isDropdownVisible by remember { mutableStateOf(false) }
+					IconButton(
+						onClick = {
+							// We can skip to dropdown if there is only 1 install option
+							if (item.installOptions.size != 1)
+								isDropdownVisible = true
+							else install(item.installOptions[0])
 						}
-						DropdownMenu(
-							expanded = isDropdownVisible,
-							onDismissRequest = { isDropdownVisible = false },
-						) {
-							item.installOptions.forEach { s ->
-								DropdownMenuItem(
-									onClick = {
-										install(s)
-										isDropdownVisible = false
-									},
-									text = {
-										Column {
-											Text(
-												text = AnnotatedString(s.repoName)
-											)
-											Text(
-												text = AnnotatedString(s.version.toString()),
-												modifier = Modifier.padding(start = 8.dp)
-											)
-										}
+					) {
+						Icon(painterResource(R.drawable.download), null)
+					}
+					DropdownMenu(
+						expanded = isDropdownVisible,
+						onDismissRequest = { isDropdownVisible = false },
+					) {
+						item.installOptions.forEach { s ->
+							DropdownMenuItem(
+								onClick = {
+									install(s)
+									isDropdownVisible = false
+								},
+								text = {
+									Column {
+										Text(
+											text = AnnotatedString(s.repoName)
+										)
+										Text(
+											text = AnnotatedString(s.version.toString()),
+											modifier = Modifier.padding(start = 8.dp)
+										)
 									}
-								)
-							}
-						}
-					}
-
-					if (item.isUpdateAvailable) {
-						IconButton(
-							onClick = update
-						) {
-							Icon(
-								painterResource(R.drawable.download),
-								stringResource(R.string.update),
-								modifier = Modifier.rotate(180f),
-								tint = MaterialTheme.colorScheme.tertiary
-							)
-						}
-					}
-
-					if (item.isInstalled) {
-						IconButton(
-							onClick = openSettings
-						) {
-							Icon(
-								painterResource(R.drawable.settings),
-								stringResource(R.string.settings)
-							)
-						}
-					}
-
-					if (item.isInstalling) {
-						IconButton(
-							onClick = {},
-							modifier = Modifier.combinedClickable(
-								onClick = {},
-								onLongClick = cancelInstall,
-							)
-						) {
-							val image =
-								AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
-
-							Icon(
-								rememberAnimatedVectorPainter(image, false),
-								stringResource(R.string.installing)
+								}
 							)
 						}
 					}
 				}
 
+				if (item.isUpdateAvailable) {
+					IconButton(
+						onClick = update
+					) {
+						Icon(
+							painterResource(R.drawable.download),
+							stringResource(R.string.update),
+							modifier = Modifier.rotate(180f),
+							tint = MaterialTheme.colorScheme.tertiary
+						)
+					}
+				}
+
+				if (item.isInstalled) {
+					IconButton(
+						onClick = openSettings
+					) {
+						Icon(
+							painterResource(R.drawable.settings),
+							stringResource(R.string.settings)
+						)
+					}
+				}
+
+				if (item.isInstalling) {
+					IconButton(
+						onClick = {},
+						modifier = Modifier.combinedClickable(
+							onClick = {},
+							onLongClick = cancelInstall,
+						)
+					) {
+						val image =
+							AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
+
+						Icon(
+							rememberAnimatedVectorPainter(image, false),
+							stringResource(R.string.installing)
+						)
+					}
+				}
 			}
 
-			if (item.isUpdateAvailable && item.updateVersion != null) {
-				if (item.updateVersion == Version(-9, -9, -9)) {
-					Box(
+		}
+
+		if (item.isUpdateAvailable && item.updateVersion != null) {
+			if (item.updateVersion == Version(-9, -9, -9)) {
+				Box(
+					modifier = Modifier
+						.background(MaterialTheme.colorScheme.tertiary)
+						.fillMaxWidth()
+				) {
+					Text(
+						stringResource(R.string.obsolete_extension),
+						color = colorResource(com.google.android.material.R.color.design_default_color_on_primary),
 						modifier = Modifier
-							.background(MaterialTheme.colorScheme.tertiary)
-							.fillMaxWidth()
-					) {
-						Text(
-							stringResource(R.string.obsolete_extension),
-							color = colorResource(com.google.android.material.R.color.design_default_color_on_primary),
-							modifier = Modifier
-								.padding(8.dp)
-								.align(Alignment.Center)
-						)
-					}
+							.padding(8.dp)
+							.align(Alignment.Center)
+					)
 				}
 			}
 		}
