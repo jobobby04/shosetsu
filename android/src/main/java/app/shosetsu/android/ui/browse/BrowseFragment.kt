@@ -23,6 +23,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
@@ -306,8 +306,6 @@ fun BrowseContent(
 					contentPadding = PaddingValues(
 						bottom = 198.dp,
 						top = 4.dp,
-						start = 8.dp,
-						end = 8.dp
 					),
 					state = state,
 					verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -393,9 +391,9 @@ fun BrowseExtensionContent(
 	openSettings: () -> Unit,
 	cancelInstall: () -> Unit
 ) {
-	Card(
-		onClick = openCatalogue,
-		shape = RoundedCornerShape(16.dp)
+	Column(
+		Modifier.clickable(onClick = openCatalogue)
+			.padding(horizontal = 8.dp)
 	) {
 		Column {
 			Row(
