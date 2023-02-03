@@ -3,8 +3,6 @@ package app.shosetsu.android.providers.network
 import app.shosetsu.android.common.consts.USER_AGENT
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.utils.CookieJarSync
-import app.shosetsu.android.common.utils.SiteProtector
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -36,13 +34,8 @@ fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
 	.cookieJar(CookieJarSync)
 	.addInterceptor {
 		val r = it.request().newBuilder().header("User-Agent", USER_AGENT).build()
-		val response = runBlocking {
-			// Await for chance to access the site
-			SiteProtector.await(r.url.host) {
-				it.logI(r.toString())
-				it.proceed(r)
-			}
-		}
+		it.logI(r.toString())
+		val response = it.proceed(r)
 		it.logI(response.toString())
 		return@addInterceptor response
 	}.apply {
