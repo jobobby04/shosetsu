@@ -67,6 +67,7 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -1305,7 +1306,8 @@ fun NovelInfoHeaderContent(
 					.fillMaxWidth()
 					.padding(top = 8.dp),
 				text = novelInfo.description,
-				genre = novelInfo.displayGenre
+				genre = novelInfo.displayGenre,
+				mappedGenre = novelInfo.mappedGenre
 			)
 		}
 		Divider()
@@ -1375,7 +1377,8 @@ fun NovelInfoHeaderContent(
 fun ExpandedText(
 	modifier: Modifier = Modifier,
 	text: String,
-	genre: ImmutableList<String>
+	genre: ImmutableList<String>,
+	mappedGenre: ImmutableMap<String, ImmutableList<String>>
 ) {
 	var isExpanded by remember { mutableStateOf(false) }
 
@@ -1414,15 +1417,34 @@ fun ExpandedText(
 				}
 			}
 		} else {
-			FlowRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(horizontal = 8.dp, vertical = 8.dp),
-				mainAxisSpacing = 8.dp,
-				crossAxisSpacing = 4.dp,
-			) {
-				genre.forEach {
-					NovelGenre(it)
+			if (mappedGenre.isNotEmpty()) {
+				mappedGenre.forEach { (namespace, genre) ->
+					Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+						NovelGenre(text = namespace)
+						FlowRow(
+							modifier = Modifier
+								.fillMaxWidth()
+								.padding(horizontal = 8.dp),
+							mainAxisSpacing = 8.dp,
+							crossAxisSpacing = 4.dp,
+						) {
+							genre.forEach {
+								NovelGenre(it)
+							}
+						}
+					}
+				}
+			} else {
+				FlowRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(horizontal = 8.dp, vertical = 8.dp),
+					mainAxisSpacing = 8.dp,
+					crossAxisSpacing = 4.dp,
+				) {
+					genre.forEach {
+						NovelGenre(it)
+					}
 				}
 			}
 		}
