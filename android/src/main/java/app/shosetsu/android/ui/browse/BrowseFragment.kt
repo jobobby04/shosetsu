@@ -23,6 +23,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
@@ -306,8 +306,6 @@ fun BrowseContent(
 					contentPadding = PaddingValues(
 						bottom = 198.dp,
 						top = 4.dp,
-						start = 8.dp,
-						end = 8.dp
 					),
 					state = state,
 					verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -393,64 +391,63 @@ fun BrowseExtensionContent(
 	openSettings: () -> Unit,
 	cancelInstall: () -> Unit
 ) {
-	Card(
-		onClick = openCatalogue,
-		shape = RoundedCornerShape(16.dp)
+	Column(
+		Modifier.clickable(onClick = openCatalogue)
+			.padding(horizontal = 8.dp)
 	) {
-		Column {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(end = 8.dp),
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically
+		) {
 			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(end = 8.dp),
-				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
 			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-				) {
-					if (item.imageURL.isNotEmpty()) {
-						SubcomposeAsyncImage(
-							ImageRequest.Builder(LocalContext.current)
-								.data(item.imageURL)
-								.crossfade(true)
-								.build(),
-							contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
-							modifier = Modifier.size(64.dp),
-							error = {
-								Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-									ImageLoadingError(
-										Modifier
-											.size(52.dp)
-											.clip(MaterialTheme.shapes.extraSmall)
-									)
-								}
-							},
-							loading = {
-								Box(Modifier.placeholder(true))
-							}
-						)
-					} else {
-						Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-							ImageLoadingError(
-								Modifier
-									.size(52.dp)
-									.clip(MaterialTheme.shapes.extraSmall)
-							)
-						}
-					}
-					Column(
-						modifier = Modifier.padding(start = 8.dp)
-					) {
-						Text(item.name)
-						Row {
-							Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
-
-							if (item.isInstalled && item.installedVersion != null)
-								Text(
-									item.installedVersion.toString(),
-									modifier = Modifier.padding(start = 8.dp),
-									fontSize = TextUnit(14f, TextUnitType.Sp)
+				if (item.imageURL.isNotEmpty()) {
+					SubcomposeAsyncImage(
+						ImageRequest.Builder(LocalContext.current)
+							.data(item.imageURL)
+							.crossfade(true)
+							.build(),
+						contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
+						modifier = Modifier.size(64.dp),
+						error = {
+							Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+								ImageLoadingError(
+									Modifier
+										.size(52.dp)
+										.clip(MaterialTheme.shapes.extraSmall)
 								)
+							}
+						},
+						loading = {
+							Box(Modifier.placeholder(true))
+						}
+					)
+				} else {
+					Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+						ImageLoadingError(
+							Modifier
+								.size(52.dp)
+								.clip(MaterialTheme.shapes.extraSmall)
+						)
+					}
+				}
+				Column(
+					modifier = Modifier.padding(start = 8.dp)
+				) {
+					Text(item.name)
+					Row {
+						Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
+
+						if (item.isInstalled && item.installedVersion != null)
+							Text(
+								item.installedVersion.toString(),
+								modifier = Modifier.padding(start = 8.dp),
+								fontSize = TextUnit(14f, TextUnitType.Sp)
+							)
 
 							if (item.isUpdateAvailable && item.updateVersion != null) {
 								if (item.updateVersion != Version(-9, -9, -9))
@@ -540,8 +537,6 @@ fun BrowseExtensionContent(
 						}
 					}
 				}
-
-			}
 
 			if (item.isUpdateAvailable && item.updateVersion != null) {
 				if (item.updateVersion == Version(-9, -9, -9)) {
