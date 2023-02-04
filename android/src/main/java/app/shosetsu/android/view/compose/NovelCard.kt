@@ -13,12 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -98,14 +99,15 @@ fun NovelCardNormalContent(
 	isSelected: Boolean = false,
 	isBookmarked: Boolean = false,
 ) {
-	Card(
+	Box(
 		modifier = Modifier
 			.selectedOutline(isSelected)
+			.alpha(if (isBookmarked) .5f else 1f)
+			.clip(MaterialTheme.shapes.extraSmall)
 			.combinedClickable(
 				onClick = onClick,
 				onLongClick = onLongClick,
-			)
-			.alpha(if (isBookmarked) .5f else 1f),
+			),
 	) {
 		Box {
 			SubcomposeAsyncImage(
@@ -117,7 +119,8 @@ fun NovelCardNormalContent(
 				modifier = Modifier
 					.fillMaxSize()
 					.aspectRatio(COVER_RATIO)
-					.placeholder(visible = isPlaceholder),
+					.placeholder(visible = isPlaceholder)
+					.clip(MaterialTheme.shapes.small),
 				contentScale = ContentScale.Crop,
 				error = {
 					ImageLoadingError(title)
@@ -207,38 +210,36 @@ fun NovelCardCozyContent(
 	Column(
 		modifier = Modifier
 			.selectedOutline(isSelected)
-			.alpha(if (isBookmarked) .5f else 1f),
+			.alpha(if (isBookmarked) .5f else 1f)
+			.clip(MaterialTheme.shapes.extraSmall)
+			.combinedClickable(
+				onClick = onClick,
+				onLongClick = onLongClick,
+			),
 	) {
-		Card(
-			modifier = Modifier
-				.combinedClickable(
-					onClick = onClick,
-					onLongClick = onLongClick,
-				),
-		) {
-			Box {
-				SubcomposeAsyncImage(
-					ImageRequest.Builder(LocalContext.current)
-						.data(imageURL)
-						.crossfade(true)
-						.build(),
-					stringResource(R.string.fragment_novel_info_image),
-					modifier = Modifier
-						.fillMaxSize()
-						.aspectRatio(COVER_RATIO)
-						.placeholder(visible = isPlaceholder),
-					contentScale = ContentScale.Crop,
-					error = {
-						ImageLoadingError(title)
-					},
-					loading = {
-						Box(Modifier.placeholder(true))
-					},
-				)
+		Box {
+			SubcomposeAsyncImage(
+				ImageRequest.Builder(LocalContext.current)
+					.data(imageURL)
+					.crossfade(true)
+					.build(),
+				stringResource(R.string.fragment_novel_info_image),
+				modifier = Modifier
+					.fillMaxSize()
+					.aspectRatio(COVER_RATIO)
+					.placeholder(visible = isPlaceholder)
+					.clip(MaterialTheme.shapes.small),
+				contentScale = ContentScale.Crop,
+				error = {
+					ImageLoadingError(title)
+				},
+				loading = {
+					Box(Modifier.placeholder(true))
+				},
+			)
 
-				if (overlay != null) {
-					overlay()
-				}
+			if (overlay != null) {
+				overlay()
 			}
 		}
 
@@ -298,14 +299,18 @@ fun NovelCardCompressedContent(
 	isBookmarked: Boolean = false,
 	showImages: Boolean,
 ) {
-	Card(
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.SpaceBetween,
 		modifier = Modifier
 			.selectedOutline(isSelected)
+			.clip(MaterialTheme.shapes.extraSmall)
+			.alpha(if (isBookmarked) .5f else 1f)
 			.combinedClickable(
 				onClick = onClick,
 				onLongClick = onLongClick,
 			)
-			.alpha(if (isBookmarked) .5f else 1f),
+			.padding(end = 4.dp),
 	) {
 		Box {
 			Row(
@@ -319,7 +324,8 @@ fun NovelCardCompressedContent(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.fillMaxWidth(.70f)
-						.minimumTouchTargetSize(),
+						.minimumTouchTargetSize()
+						.clip(MaterialTheme.shapes.extraSmall),
 				) {
 					if (showImages) {
 						SubcomposeAsyncImage(
