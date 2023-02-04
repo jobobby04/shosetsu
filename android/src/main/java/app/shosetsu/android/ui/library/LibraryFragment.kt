@@ -474,6 +474,8 @@ fun LibraryPager(
 				},
 				containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1F),
 				edgePadding = 0.dp,
+				contentColor = MaterialTheme.colorScheme.onPrimary,
+				divider = {}
 			) {
 				library.categories.forEachIndexed { index, category ->
 					Tab(
@@ -487,6 +489,7 @@ fun LibraryPager(
 					)
 				}
 			}
+			Divider()
 		}
 		HorizontalPager(
 			state = categoryPagerState,
