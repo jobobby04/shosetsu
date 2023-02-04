@@ -28,11 +28,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.displayOfflineSnackBar
-import app.shosetsu.android.common.ext.openChapter
-import app.shosetsu.android.common.ext.trimDate
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.HomeFragment
@@ -83,15 +84,24 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 		setContent {
 			ShosetsuCompose {
 				val items by viewModel.liveData.collectAsState()
-				val isRefreshing by viewModel.isRefreshing.collectAsState()
 
 				UpdatesContent(
 					items = items,
-					isRefreshing = isRefreshing,
-					onRefresh = this@ComposeUpdatesController::onRefresh
-				) { (chapterID, novelID) ->
-					activity?.openChapter(chapterID, novelID)
-				}
+					onRefresh = this@ComposeUpdatesController::onRefresh,
+					openNovel = {
+						findNavController().navigateSafely(
+							R.id.action_updatesController_to_novelController,
+							bundleOf(BundleKeys.BUNDLE_NOVEL_ID to it.novelID),
+							navOptions = navOptions {
+								launchSingleTop = true
+								setShosetsuTransition()
+							}
+						)
+					},
+					openChapter = { (chapterID, novelID) ->
+						activity?.openChapter(chapterID, novelID)
+					}
+				)
 			}
 		}
 	}
@@ -107,8 +117,8 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
-	isRefreshing: Boolean,
 	onRefresh: () -> Unit,
+	openNovel: (UpdatesUI) -> Unit,
 	openChapter: (UpdatesUI) -> Unit
 ) {
 	val swipeRefreshState = rememberFakeSwipeRefreshState()
@@ -139,9 +149,11 @@ fun UpdatesContent(
 					}
 
 					items(updateItems, key = { it.chapterID }) {
-						UpdateItemContent(it) {
-							openChapter(it)
-						}
+						UpdateItemContent(
+							it,
+							onCoverClick = { openNovel(it) },
+							onClick = { openChapter(it) }
+						)
 					}
 				}
 			}
@@ -168,13 +180,18 @@ fun PreviewUpdateItemContent() {
 			"This is a novel",
 			""
 		),
-	) {
-	}
+		{},
+		{}
+	)
 }
 
 
 @Composable
-fun UpdateItemContent(updateUI: UpdatesUI, onClick: () -> Unit) {
+fun UpdateItemContent(
+	updateUI: UpdatesUI,
+	onCoverClick: () -> Unit,
+	onClick: () -> Unit
+) {
 	Row(
 		Modifier
 			.fillMaxWidth()
@@ -192,18 +209,21 @@ fun UpdateItemContent(updateUI: UpdatesUI, onClick: () -> Unit) {
 				contentDescription = null,
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
-					.clip(MaterialTheme.shapes.medium)
-					.aspectRatio(coverRatio),
+					.aspectRatio(coverRatio)
+					.clip(MaterialTheme.shapes.small)
+					.clickable(onClick = onCoverClick),
 				error = {
 					ImageLoadingError()
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
-				}
+				},
 			)
 		} else {
 			ImageLoadingError(
 				Modifier.aspectRatio(coverRatio)
+					.clip(MaterialTheme.shapes.small)
+					.clickable(onClick = onCoverClick)
 			)
 		}
 		Column(

@@ -49,9 +49,7 @@ class UpdatesViewModel(
 ) : AUpdatesViewModel() {
 	override val liveData: StateFlow<ImmutableMap<DateTime, List<UpdatesUI>>> by lazy {
 		getUpdatesUseCase().transformLatest {
-			isRefreshing.value = true
 			emit(it.ifEmpty { emptyList() }.sortedByDescending { it.time })
-			isRefreshing.value = false
 		}.mapLatest { result ->
 			result.groupBy {
 				DateTime(it.time).trimDate()
@@ -62,8 +60,6 @@ class UpdatesViewModel(
 	override fun startUpdateManager(categoryID: Int) = startUpdateWorkerUseCase(categoryID)
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
-
-	override val isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	@SuppressLint("StopShip")
 	override suspend fun updateChapter(
