@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -340,7 +341,12 @@ fun ConfigureExtensionHeaderContent(
 						}
 					)
 				} else {
-					ImageLoadingError(Modifier.size(100.dp))
+					Box(Modifier.size(100.dp), contentAlignment = Alignment.Center) {
+						ImageLoadingError(
+							Modifier.size(80.dp)
+								.clip(MaterialTheme.shapes.extraSmall)
+						)
+					}
 				}
 
 				Column {
