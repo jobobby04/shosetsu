@@ -1540,17 +1540,15 @@ fun ExpandedText(
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NovelGenre(
 	text: String
 ) {
-	Card {
-		Text(
-			text,
-			modifier = Modifier.padding(8.dp),
-			style = MaterialTheme.typography.bodyMedium
-		)
-	}
+	ElevatedSuggestionChip(
+		onClick = {},
+		label = { Text(text) },
+	)
 }
 
 @Composable
