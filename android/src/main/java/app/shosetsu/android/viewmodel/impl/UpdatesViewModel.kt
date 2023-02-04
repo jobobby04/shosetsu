@@ -48,26 +48,22 @@ class UpdatesViewModel(
 	private val isOnlineUseCase: IsOnlineUseCase,
 ) : AUpdatesViewModel() {
 	override val liveData: StateFlow<ImmutableMap<DateTime, List<UpdatesUI>>> by lazy {
-		updatesRepository.getCompleteUpdatesFlow().transformLatest { list ->
-			isRefreshing.value = true
-			emit(
-				list.map { (chapterID, novelID, time, chapterName, novelName, novelImageURL) ->
-					UpdatesUI(
-						chapterID = chapterID,
-						novelID = novelID,
-						time = time,
-						chapterName = chapterName,
-						novelName = novelName,
-						novelImageURL = novelImageURL,
-					)
-				}
-					.ifEmpty { emptyList() }
-					.sortedByDescending { it.time }
-					.groupBy {
-						DateTime(it.time).trimDate()
-					}.toImmutableMap()
-			)
-			isRefreshing.value = false
+		updatesRepository.getCompleteUpdatesFlow().mapLatest { list ->
+			list.map { (chapterID, novelID, time, chapterName, novelName, novelImageURL) ->
+				UpdatesUI(
+					chapterID = chapterID,
+					novelID = novelID,
+					time = time,
+					chapterName = chapterName,
+					novelName = novelName,
+					novelImageURL = novelImageURL,
+				)
+			}
+				.ifEmpty { emptyList() }
+				.sortedByDescending { it.time }
+				.groupBy {
+					DateTime(it.time).trimDate()
+				}.toImmutableMap()
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentMapOf())
 	}
 
@@ -77,8 +73,6 @@ class UpdatesViewModel(
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, false)
 
 	override fun isOnline(): Boolean = isOnlineFlow.value
-
-	override val isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	@SuppressLint("StopShip")
 	override suspend fun updateChapter(

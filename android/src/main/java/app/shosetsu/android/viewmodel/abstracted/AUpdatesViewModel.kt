@@ -39,8 +39,6 @@ abstract class AUpdatesViewModel
 	SubscribeViewModel<ImmutableMap<DateTime, List<UpdatesUI>>>,
 	StartUpdateManagerViewModel, IsOnlineCheckViewModel {
 
-	abstract val isRefreshing: StateFlow<Boolean>
-
 	abstract suspend fun updateChapter(updateUI: UpdatesUI, readingStatus: ReadingStatus)
 
 	/**
