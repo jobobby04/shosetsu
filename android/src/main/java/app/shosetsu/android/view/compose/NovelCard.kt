@@ -3,12 +3,13 @@ package app.shosetsu.android.view.compose
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -89,14 +90,15 @@ fun NovelCardNormalContent(
 	isSelected: Boolean = false,
 	isBookmarked: Boolean = false
 ) {
-	Card(
+	Box(
 		modifier = Modifier
 			.selectedOutline(isSelected)
+			.alpha(if (isBookmarked) .5f else 1f)
+			.clip(MaterialTheme.shapes.extraSmall)
 			.combinedClickable(
 				onClick = onClick,
 				onLongClick = onLongClick
-			)
-			.alpha(if (isBookmarked) .5f else 1f),
+			),
 	) {
 		Box {
 			SubcomposeAsyncImage(
@@ -108,7 +110,8 @@ fun NovelCardNormalContent(
 				modifier = Modifier
 					.fillMaxSize()
 					.aspectRatio(coverRatio)
-					.placeholder(visible = isPlaceholder),
+					.placeholder(visible = isPlaceholder)
+					.clip(MaterialTheme.shapes.small),
 				contentScale = ContentScale.Crop,
 				error = {
 					ImageLoadingError()
@@ -201,38 +204,35 @@ fun NovelCardCozyContent(
 		modifier = Modifier
 			.selectedOutline(isSelected)
 			.alpha(if (isBookmarked) .5f else 1f)
+			.clip(MaterialTheme.shapes.extraSmall)
+			.combinedClickable(
+				onClick = onClick,
+				onLongClick = onLongClick
+			)
 	) {
-		Card(
-			modifier = Modifier
-				.combinedClickable(
-					onClick = onClick,
-					onLongClick = onLongClick
-				),
-		) {
-			Box {
-				SubcomposeAsyncImage(
-					ImageRequest.Builder(LocalContext.current)
-						.data(imageURL)
-						.crossfade(true)
-						.build(),
-					stringResource(R.string.fragment_novel_info_image),
-					modifier = Modifier
-						.fillMaxSize()
-						.aspectRatio(coverRatio)
-						.placeholder(visible = isPlaceholder),
-					contentScale = ContentScale.Crop,
-					error = {
-						ImageLoadingError()
-					},
-					loading = {
-						Box(Modifier.placeholder(true))
-					}
-				)
+		Box {
+			SubcomposeAsyncImage(
+				ImageRequest.Builder(LocalContext.current)
+					.data(imageURL)
+					.crossfade(true)
+					.build(),
+				stringResource(R.string.fragment_novel_info_image),
+				modifier = Modifier
+					.fillMaxSize()
+					.aspectRatio(coverRatio)
+					.placeholder(visible = isPlaceholder)
+					.clip(MaterialTheme.shapes.small),
+				contentScale = ContentScale.Crop,
+				error = {
+					ImageLoadingError()
+				},
+				loading = {
+					Box(Modifier.placeholder(true))
+				}
+			)
 
-				if (overlay != null)
-					overlay()
-
-			}
+			if (overlay != null)
+				overlay()
 		}
 
 		Box(
@@ -280,62 +280,58 @@ fun NovelCardCompressedContent(
 	isSelected: Boolean = false,
 	isBookmarked: Boolean = false
 ) {
-	Card(
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.SpaceBetween,
 		modifier = Modifier
+			.fillMaxWidth()
 			.selectedOutline(isSelected)
+			.alpha(if (isBookmarked) .5f else 1f)
+			.clip(MaterialTheme.shapes.extraSmall)
 			.combinedClickable(
 				onClick = onClick,
 				onLongClick = onLongClick
 			)
-			.alpha(if (isBookmarked) .5f else 1f),
+			.padding(end = 4.dp)
 	) {
-		Box {
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier.fillMaxSize(.70f)
+		) {
+			SubcomposeAsyncImage(
+				ImageRequest.Builder(LocalContext.current)
+					.data(imageURL)
+					.crossfade(true)
+					.build(),
+				stringResource(R.string.fragment_novel_info_image),
+				modifier = Modifier
+					.width(64.dp)
+					.aspectRatio(1.0f)
+					.clip(MaterialTheme.shapes.small),
+				contentScale = ContentScale.Crop,
+				error = {
+					ImageLoadingError()
+				},
+				loading = {
+					Box(Modifier.placeholder(true))
+				}
+			)
+
+			Text(
+				title,
+				modifier = Modifier
+					.placeholder(visible = isPlaceholder)
+					.padding(start = 8.dp)
+					.fillMaxSize()
+			)
+		}
+
+		if (overlay != null)
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.SpaceBetween,
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(end = 4.dp)
+				horizontalArrangement = Arrangement.spacedBy(4.dp),
 			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.fillMaxSize(.70f)
-				) {
-					SubcomposeAsyncImage(
-						ImageRequest.Builder(LocalContext.current)
-							.data(imageURL)
-							.crossfade(true)
-							.build(),
-						stringResource(R.string.fragment_novel_info_image),
-						modifier = Modifier
-							.width(64.dp)
-							.aspectRatio(1.0f),
-						contentScale = ContentScale.Crop,
-						error = {
-							ImageLoadingError()
-						},
-						loading = {
-							Box(Modifier.placeholder(true))
-						}
-					)
-
-					Text(
-						title,
-						modifier = Modifier
-							.placeholder(visible = isPlaceholder)
-							.padding(start = 8.dp)
-							.fillMaxSize()
-					)
-				}
-
-				if (overlay != null)
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy(4.dp),
-					) {
-						overlay()
-					}
+				overlay()
 			}
-		}
 	}
 }
