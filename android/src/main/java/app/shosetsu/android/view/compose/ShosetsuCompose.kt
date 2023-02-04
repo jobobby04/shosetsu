@@ -1,8 +1,8 @@
 package app.shosetsu.android.view.compose
 
 import android.content.Context
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -43,7 +43,7 @@ fun ShosetsuCompose(
 		Mdc3Theme(context = context) {
 			Surface(
 				modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-				color = MaterialTheme.colors.background,
+				color = MaterialTheme.colorScheme.background,
 				content = content
 			)
 		}
