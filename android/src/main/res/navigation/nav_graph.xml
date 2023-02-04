@@ -274,6 +274,9 @@
         <action
             android:id="@+id/action_updatesController_to_libraryController"
             app:destination="@id/libraryController" />
+        <action
+            android:id="@+id/action_updatesController_to_novelController"
+            app:destination="@id/novelController" />
     </fragment>
     <fragment
         android:id="@+id/viewSettings"
