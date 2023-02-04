@@ -83,7 +83,7 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		requestWindowFeature(Window.FEATURE_NO_TITLE)
+		supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
 		if (savedInstanceState != null)
 			viewModel.setCSSId(savedInstanceState.getInt(CSS_ID, -1))
 
@@ -186,6 +186,17 @@ fun CSSEditorContent(
 	onSave: () -> Unit
 ) {
 	val fabShape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50))
+	val pages = immutableListOf(
+		stringResource(
+			R.string.editor
+		),
+		stringResource(
+			R.string.preview
+		)
+	)
+
+	val pagerState = rememberPagerState()
+	val scope = rememberCoroutineScope()
 
 	Scaffold(
 		topBar = {
@@ -216,12 +227,36 @@ fun CSSEditorContent(
 						}
 					}
 				)
+
+				TabRow(
+					// Our selected tab is our current page
+					selectedTabIndex = pagerState.currentPage,
+					// Override the indicator, using the provided pagerTabIndicatorOffset modifier
+					indicator = { tabPositions ->
+						TabRowDefaults.Indicator(
+							Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+						)
+					}
+				) {
+					// Add tabs for all of our pages
+					pages.forEachIndexed { index, title ->
+						Tab(
+							text = { Text(title) },
+							selected = pagerState.currentPage == index,
+							onClick = {
+								scope.launch {
+									pagerState.scrollToPage(index)
+								}
+							},
+						)
+					}
+				}
 			}
 		},
 		bottomBar = {
 			Column {
 				if (!isCSSInvalid && cssInvalidReason != null)
-					Card(
+					Surface(
 						border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
 						modifier = Modifier
 							.align(Alignment.CenterHorizontally)
@@ -306,42 +341,6 @@ fun CSSEditorContent(
 		}
 	) {
 		Column(Modifier.padding(it)) {
-			val pages = immutableListOf(
-				stringResource(
-					R.string.editor
-				),
-				stringResource(
-					R.string.preview
-				)
-			)
-
-			val pagerState = rememberPagerState()
-			val scope = rememberCoroutineScope()
-
-			TabRow(
-				// Our selected tab is our current page
-				selectedTabIndex = pagerState.currentPage,
-				// Override the indicator, using the provided pagerTabIndicatorOffset modifier
-				indicator = { tabPositions ->
-					TabRowDefaults.Indicator(
-						Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-					)
-				}
-			) {
-
-				// Add tabs for all of our pages
-				pages.forEachIndexed { index, title ->
-					Tab(
-						text = { Text(title) },
-						selected = pagerState.currentPage == index,
-						onClick = {
-							scope.launch {
-								pagerState.scrollToPage(index)
-							}
-						},
-					)
-				}
-			}
 			HorizontalPager(
 				pages.size,
 				state = pagerState,
@@ -367,7 +366,6 @@ fun CSSEditorContent(
 				}
 			}
 		}
-
 	}
 }
 
