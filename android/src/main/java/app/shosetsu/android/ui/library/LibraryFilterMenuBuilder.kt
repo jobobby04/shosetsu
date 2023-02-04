@@ -95,16 +95,19 @@ class LibraryFilterMenuBuilder constructor(
 								)
 							}
 						}
-						HorizontalPager(count = pages.size, state = pagerState) {
-							when (it) {
-								0 -> {
-									Menu0Content()
-								}
-								1 -> {
-									Menu1Content()
+						Surface {
+							HorizontalPager(count = pages.size, state = pagerState) {
+								when (it) {
+									0 -> {
+										Menu0Content()
+									}
+									1 -> {
+										Menu1Content()
+									}
 								}
 							}
 						}
+
 					}
 				}
 			}
@@ -272,14 +275,13 @@ class LibraryFilterMenuBuilder constructor(
 		getState: (String) -> Flow<ToggleableState>,
 		cycleState: (String, ToggleableState) -> Unit
 	) {
-		Card(
+		Surface(
 			onClick = toggleExpansion,
-			modifier = Modifier.padding(horizontal = 8.dp)
 		) {
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(8.dp)
+					.padding(vertical = 8.dp, horizontal = 16.dp)
 			) {
 				Icon(
 					painterResource(if (isExpanded) R.drawable.expand_less else R.drawable.expand_more),
