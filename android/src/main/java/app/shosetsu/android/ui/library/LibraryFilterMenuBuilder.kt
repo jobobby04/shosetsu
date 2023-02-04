@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
+/**
  * shosetsu
  * 22 / 11 / 2020
  */
@@ -84,80 +84,82 @@ fun LibraryFilterMenuView(
 				)
 			}
 		}
-		HorizontalPager(pageCount = pages.size, state = pagerState) {
-			when (it) {
-				0 -> {
-					val genres by viewModel.genresFlow.collectAsState(persistentListOf())
-					val genresIsNotEmpty by derivedStateOf { genres.isNotEmpty() }
-					var genresIsExpanded by remember { mutableStateOf(false) }
+		Surface {
+			HorizontalPager(pageCount = pages.size, state = pagerState) {
+				when (it) {
+					0 -> {
+						val genres by viewModel.genresFlow.collectAsState(persistentListOf())
+						val genresIsNotEmpty by derivedStateOf { genres.isNotEmpty() }
+						var genresIsExpanded by remember { mutableStateOf(false) }
 
-					val tags by viewModel.tagsFlow.collectAsState(persistentListOf())
-					val tagsIsNotEmpty by derivedStateOf { tags.isNotEmpty() }
-					var tagsIsExpanded by remember { mutableStateOf(false) }
+						val tags by viewModel.tagsFlow.collectAsState(persistentListOf())
+						val tagsIsNotEmpty by derivedStateOf { tags.isNotEmpty() }
+						var tagsIsExpanded by remember { mutableStateOf(false) }
 
-					val authors by viewModel.authorsFlow.collectAsState(persistentListOf())
-					val authorsIsNotEmpty by derivedStateOf { authors.isNotEmpty() }
-					var authorsIsExpanded by remember { mutableStateOf(false) }
+						val authors by viewModel.authorsFlow.collectAsState(persistentListOf())
+						val authorsIsNotEmpty by derivedStateOf { authors.isNotEmpty() }
+						var authorsIsExpanded by remember { mutableStateOf(false) }
 
-					val artists by viewModel.artistsFlow.collectAsState(persistentListOf())
-					val artistsIsNotEmpty by derivedStateOf { artists.isNotEmpty() }
-					var artistsIsExpanded by remember { mutableStateOf(false) }
-					val unreadStatusFilterState by viewModel.getUnreadFilter().collectAsState(Off)
-					val downloadFilterState by viewModel.getDownloadedFilter().collectAsState(Off)
+						val artists by viewModel.artistsFlow.collectAsState(persistentListOf())
+						val artistsIsNotEmpty by derivedStateOf { artists.isNotEmpty() }
+						var artistsIsExpanded by remember { mutableStateOf(false) }
+						val unreadStatusFilterState by viewModel.getUnreadFilter().collectAsState(Off)
+						val downloadFilterState by viewModel.getDownloadedFilter().collectAsState(Off)
 
-					LibraryFilterMenuFilterContent(
-						genres,
-						genresIsNotEmpty,
-						genresIsExpanded,
-						{
-							genresIsExpanded = it
-						},
-						tags,
-						tagsIsNotEmpty,
-						tagsIsExpanded,
-						{
-							tagsIsExpanded = it
-						},
-						authors,
-						authorsIsNotEmpty,
-						authorsIsExpanded,
-						{
-							authorsIsExpanded = it
-						},
-						artists,
-						artistsIsNotEmpty,
-						artistsIsExpanded,
-						{
-							artistsIsExpanded = it
-						},
-						getFilterGenreState = viewModel::getFilterGenreState,
-						cycleFilterGenreState = viewModel::cycleFilterGenreState,
-						getFilterTagState = viewModel::getFilterTagState,
-						cycleFilterTagState = viewModel::cycleFilterTagState,
-						getFilterAuthorState = viewModel::getFilterAuthorState,
-						cycleFilterAuthorState = viewModel::cycleFilterAuthorState,
-						getFilterArtistState = viewModel::getFilterArtistState,
-						cycleFilterArtistState = viewModel::cycleFilterArtistState,
-						unreadStatusFilterState = unreadStatusFilterState,
-						cycleUnreadStatusFilterState = viewModel::cycleUnreadFilter,
-						downloadFilterState = downloadFilterState,
-						cycleDownloadFilterState = viewModel::cycleDownloadedFilter
-					)
-				}
+						LibraryFilterMenuFilterContent(
+							genres,
+							genresIsNotEmpty,
+							genresIsExpanded,
+							{
+								genresIsExpanded = it
+							},
+							tags,
+							tagsIsNotEmpty,
+							tagsIsExpanded,
+							{
+								tagsIsExpanded = it
+							},
+							authors,
+							authorsIsNotEmpty,
+							authorsIsExpanded,
+							{
+								authorsIsExpanded = it
+							},
+							artists,
+							artistsIsNotEmpty,
+							artistsIsExpanded,
+							{
+								artistsIsExpanded = it
+							},
+							getFilterGenreState = viewModel::getFilterGenreState,
+							cycleFilterGenreState = viewModel::cycleFilterGenreState,
+							getFilterTagState = viewModel::getFilterTagState,
+							cycleFilterTagState = viewModel::cycleFilterTagState,
+							getFilterAuthorState = viewModel::getFilterAuthorState,
+							cycleFilterAuthorState = viewModel::cycleFilterAuthorState,
+							getFilterArtistState = viewModel::getFilterArtistState,
+							cycleFilterArtistState = viewModel::cycleFilterArtistState,
+							unreadStatusFilterState = unreadStatusFilterState,
+							cycleUnreadStatusFilterState = viewModel::cycleUnreadFilter,
+							downloadFilterState = downloadFilterState,
+							cycleDownloadFilterState = viewModel::cycleDownloadedFilter
+						)
+					}
 
-				1 -> {
-					val sortType by viewModel.getSortType().collectAsState(BY_TITLE)
-					val isSortReversed by viewModel.isSortReversed().collectAsState(false)
-					val pinOnTopState: Boolean by viewModel.isPinnedOnTop().collectAsState(false)
+					1 -> {
+						val sortType by viewModel.getSortType().collectAsState(BY_TITLE)
+						val isSortReversed by viewModel.isSortReversed().collectAsState(false)
+						val pinOnTopState: Boolean by viewModel.isPinnedOnTop().collectAsState(false)
 
-					LibraryFilterMenuSortContent(
-						sortType,
-						isSortReversed,
-						viewModel::setIsSortReversed,
-						viewModel::setSortType,
-						pinOnTopState,
-						viewModel::setPinnedOnTop
-					)
+						LibraryFilterMenuSortContent(
+							sortType,
+							isSortReversed,
+							viewModel::setIsSortReversed,
+							viewModel::setSortType,
+							pinOnTopState,
+							viewModel::setPinnedOnTop
+						)
+					}
 				}
 			}
 		}
