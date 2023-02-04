@@ -420,6 +420,7 @@ fun LibraryPager(
 				},
 				containerColor = MaterialTheme.colorScheme.background,
 				edgePadding = 0.dp,
+				contentColor = MaterialTheme.colorScheme.onPrimary,
 				divider = { }, // replaced with our own divider that stretches to the full width
 			) {
 				library.categories.forEachIndexed { index, category ->
