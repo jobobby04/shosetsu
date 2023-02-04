@@ -1,14 +1,14 @@
 package app.shosetsu.android.view.compose
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 
 /*
@@ -40,7 +40,9 @@ fun ScrollStateBar(scrollState: ScrollState, content: @Composable () -> Unit) {
 	BoxWithConstraints(
 		modifier = Modifier.fillMaxSize()
 	) {
-		val viewMaxHeight = constraints.maxHeight.toFloat() - 160f
+		val viewMaxHeight = constraints.maxHeight.toFloat() - with(LocalDensity.current) {
+			16.dp.toPx() // remove scrollbar height
+		}
 
 		// Ensure divide by zero does not occur
 		val scrollPercentage =
@@ -50,23 +52,20 @@ fun ScrollStateBar(scrollState: ScrollState, content: @Composable () -> Unit) {
 				0f
 			}
 
-		val paddingSize = (scrollPercentage * viewMaxHeight) + 64f
+		val paddingSize = (scrollPercentage * viewMaxHeight)
 
 		content()
 
-		if (scrollState.isScrollInProgress)
-			Card(
-				modifier = Modifier
-					.align(Alignment.TopEnd)
-					.graphicsLayer {
-						translationY = paddingSize
-					}
-					.padding(horizontal = 4.dp)
-					.width(2.dp)
-					.height(16.dp),
-				colors = CardDefaults.cardColors(
-					containerColor = MaterialTheme.colorScheme.primary
-				)
-			) {}
+		Box(
+			modifier = Modifier
+				.align(Alignment.TopEnd)
+				.graphicsLayer {
+					translationY = paddingSize
+				}
+				.padding(horizontal = 4.dp)
+				.background(MaterialTheme.colorScheme.primary)
+				.width(2.dp)
+				.height(16.dp),
+		)
 	}
 }
