@@ -30,6 +30,7 @@ import org.kodein.di.singleton
 val dbDataSourceModule = DI.Module("database_data_source") {
 	bind<IDBCategoriesDataSource>() with singleton { DBCategoriesDataSource(instance()) }
 	bind<IDBChaptersDataSource>() with singleton { DBChaptersDataSource(instance()) }
+	bind<DBChapterHistoryDataSource>() with singleton { DBChapterHistoryDataSourceImpl(instance()) }
 	bind<IDBDownloadsDataSource>() with singleton { DBDownloadsDataSource(instance()) }
 
 	bind<IDBInstalledExtensionsDataSource>() with singleton {

@@ -219,4 +219,7 @@ class ChaptersRepository(
 		dbSource.updateChapterBookmark(chapterIds, bookmarked)
 	}
 
+	override fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?> =
+		dbSource.getChapterFlow(chapterId).onIO()
+
 }

@@ -293,4 +293,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<AIntroViewModel>() with provider {
 		IntroViewModel(instance())
 	}
+
+	bind<HistoryViewModel>() with provider {
+		HistoryViewModelImpl(instance(), instance(), instance())
+	}
 }

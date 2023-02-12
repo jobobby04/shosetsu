@@ -631,6 +631,9 @@
     <string name="support_disagree_3">I don\'t want updates.</string>
 
 
+    <string name="fragment_history">History</string>
+    <string name="fragment_history_error_empty">No history yet, Get reading!</string>
+    <string name="fragment_more_dest_history">@string/fragment_history</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

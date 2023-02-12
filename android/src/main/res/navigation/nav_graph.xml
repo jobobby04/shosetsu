@@ -231,6 +231,9 @@
         <action
             android:id="@+id/action_moreController_to_categoriesController"
             app:destination="@id/categoriesController" />
+        <action
+            android:id="@+id/action_moreController_to_historyFragment"
+            app:destination="@id/historyFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsController"
@@ -277,5 +280,16 @@
     <fragment
         android:id="@+id/categoriesController"
         android:name="app.shosetsu.android.ui.categories.CategoriesController"
-        android:label="NovelController"/>
+        android:label="NovelController" />
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="app.shosetsu.android.ui.history.HistoryFragment"
+        android:label="HistoryFragment">
+        <action
+            android:id="@+id/action_historyFragment_to_moreController"
+            app:destination="@id/moreController" />
+        <action
+            android:id="@+id/action_historyFragment_to_chapterReader"
+            app:destination="@id/chapterReader" />
+    </fragment>
 </navigation>

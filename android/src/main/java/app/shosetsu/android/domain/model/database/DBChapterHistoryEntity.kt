@@ -1,4 +1,9 @@
-package app.shosetsu.android.domain.model.local
+package app.shosetsu.android.domain.model.database
+
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 
 /*
  * This file is part of shosetsu.
@@ -24,8 +29,29 @@ package app.shosetsu.android.domain.model.local
  * @author Doomsdayrs
  *
  */
-data class ChapterHistoryEntity(
-	val id: Int,
+@Entity(
+	tableName = "chapter_history",
+	foreignKeys = [
+		ForeignKey(
+			entity = DBNovelEntity::class,
+			parentColumns = ["id"],
+			childColumns = ["novelId"],
+			onDelete = ForeignKey.CASCADE
+		),
+		ForeignKey(
+			entity = DBChapterEntity::class,
+			parentColumns = ["id"],
+			childColumns = ["chapterId"],
+			onDelete = ForeignKey.CASCADE
+		)
+	],
+	indices = [
+		Index(value = ["novelId", "chapterId"], unique = true),
+	]
+)
+data class DBChapterHistoryEntity(
+	@PrimaryKey(autoGenerate = true)
+	val id: Int?,
 	val novelId: Int,
 	val chapterId: Int,
 	val startedReadingAt: Long,

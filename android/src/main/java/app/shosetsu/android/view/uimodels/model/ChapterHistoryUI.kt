@@ -1,4 +1,8 @@
-package app.shosetsu.android.domain.model.local
+package app.shosetsu.android.view.uimodels.model
+
+import android.text.format.DateFormat
+import androidx.compose.runtime.Immutable
+import java.util.*
 
 /*
  * This file is part of shosetsu.
@@ -20,14 +24,24 @@ package app.shosetsu.android.domain.model.local
 /**
  * Shosetsu
  *
- * @since 11 / 11 / 2021
+ * @since 12 / 02 / 2023
  * @author Doomsdayrs
- *
  */
-data class ChapterHistoryEntity(
+@Immutable
+data class ChapterHistoryUI(
 	val id: Int,
 	val novelId: Int,
+	val novelTitle: String,
+	val novelImageURL: String,
 	val chapterId: Int,
+	val chapterTitle: String,
 	val startedReadingAt: Long,
 	val endedReadingAt: Long?
-)
+) {
+	val startedTime = DateFormat.format("hh:mm", Date(startedReadingAt)).toString()
+	val endedTime = if (endedReadingAt != null) {
+		DateFormat.format("hh:mm", Date(endedReadingAt)).toString()
+	} else {
+		null
+	}
+}

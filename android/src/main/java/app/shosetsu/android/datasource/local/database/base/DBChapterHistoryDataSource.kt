@@ -1,6 +1,6 @@
-package app.shosetsu.android.domain.repository.base
+package app.shosetsu.android.datasource.local.database.base
 
-import app.shosetsu.android.domain.model.local.ChapterEntity
+import android.database.sqlite.SQLiteException
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -24,32 +24,30 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Shosetsu
  *
- * Contain a history of chapters.
- *
- * @since 11 / 11 / 2021
+ * @since 16 / 01 / 2023
  * @author Doomsdayrs
+ *
+ * Denotes the read history,
+ *  containing a map of the chapter id to the time the user finished reading the chatper.
  */
-interface IChapterHistoryRepository {
+interface DBChapterHistoryDataSource {
+	@Throws(SQLiteException::class)
+	fun getHistory(): Flow<List<ChapterHistoryEntity>>
 
-	/**
-	 * Mark a chapter as having been read
-	 */
-	fun markChapterAsRead(chapter: ChapterEntity)
+	@Throws(SQLiteException::class)
+	suspend fun get(novelId: Int, chapterId: Int): ChapterHistoryEntity?
 
-	/**
-	 * Mark a chapter as being read
-	 */
-	fun markChapterAsReading(chapter: ChapterEntity)
+	@Throws(SQLiteException::class)
+	suspend fun update(chapterHistoryEntity: ChapterHistoryEntity)
 
-	/**
-	 * Get the last read chapter for a novel
-	 *
-	 * @return a chapter is found, empty if nothing is there
-	 */
-	fun getLastRead(novelId: Int): ChapterHistoryEntity?
+	@Throws(SQLiteException::class)
+	suspend fun insert(
+		novelId: Int,
+		chapterId: Int,
+		startedReadingAt: Long,
+		endedReadingAt: Long?
+	)
 
-	/**
-	 * Live view of the history
-	 */
-	val history: Flow<List<ChapterHistoryEntity>>
+	@Throws(SQLiteException::class)
+	suspend fun getLastRead(novelId: Int): ChapterHistoryEntity?
 }

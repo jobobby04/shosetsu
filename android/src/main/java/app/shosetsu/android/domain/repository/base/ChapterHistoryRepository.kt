@@ -1,7 +1,8 @@
-package app.shosetsu.android.domain.usecases.get
+package app.shosetsu.android.domain.repository.base
 
+import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
-import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
+import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -23,17 +24,32 @@ import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 /**
  * Shosetsu
  *
- * @since 13 / 11 / 2021
+ * Contain a history of chapters.
+ *
+ * @since 11 / 11 / 2021
  * @author Doomsdayrs
- *
- * Get the last read chapter of a novel
- *
- * This is useful when you need to act upon a certain chapter or its neighbors
  */
-class GetLastReadChapterUseCase(
-	private val chapterHistory: ChapterHistoryRepository
-) {
-	suspend operator fun invoke(novelId: Int): ChapterHistoryEntity? {
-		return chapterHistory.getLastRead(novelId)
-	}
+interface ChapterHistoryRepository {
+
+	/**
+	 * Mark a chapter as having been read
+	 */
+	suspend fun markChapterAsRead(chapter: ChapterEntity)
+
+	/**
+	 * Mark a chapter as being read
+	 */
+	suspend fun markChapterAsReading(chapter: ChapterEntity)
+
+	/**
+	 * Get the last read chapter for a novel
+	 *
+	 * @return a chapter is found, empty if nothing is there
+	 */
+	suspend fun getLastRead(novelId: Int): ChapterHistoryEntity?
+
+	/**
+	 * Live view of the history
+	 */
+	fun getHistory(): Flow<List<ChapterHistoryEntity>>
 }

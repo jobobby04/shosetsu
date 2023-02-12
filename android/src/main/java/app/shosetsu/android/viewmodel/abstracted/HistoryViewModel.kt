@@ -1,4 +1,8 @@
-package app.shosetsu.android.domain.model.local
+package app.shosetsu.android.viewmodel.abstracted
+
+import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
+import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -20,14 +24,14 @@ package app.shosetsu.android.domain.model.local
 /**
  * Shosetsu
  *
- * @since 11 / 11 / 2021
- * @author Doomsdayrs
+ * View model for History view
  *
+ * @since 12 / 02 / 2023
+ * @author Doomsdayrs
  */
-data class ChapterHistoryEntity(
-	val id: Int,
-	val novelId: Int,
-	val chapterId: Int,
-	val startedReadingAt: Long,
-	val endedReadingAt: Long?
-)
+abstract class HistoryViewModel : ShosetsuViewModel() {
+	/**
+	 * History items
+	 */
+	abstract val items: Flow<List<ChapterHistoryUI>>
+}

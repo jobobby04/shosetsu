@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 	entities = [
 		DBCategoryEntity::class,
 		DBChapterEntity::class,
+		DBChapterHistoryEntity::class,
 		DBDownloadEntity::class,
 		DBInstalledExtensionEntity::class,
 		DBRepositoryExtensionEntity::class,
@@ -52,7 +53,7 @@ import kotlinx.coroutines.launch
 		DBRepositoryEntity::class,
 		DBUpdate::class,
 	],
-	version = 8
+	version = 9
 )
 @TypeConverters(
 	ChapterSortTypeConverter::class,
@@ -69,6 +70,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 
 	abstract val categoriesDao: CategoriesDao
 	abstract val chaptersDao: ChaptersDao
+	abstract val chapterHistoryDao: ChapterHistoryDao
 	abstract val downloadsDao: DownloadsDao
 	abstract val extensionLibraryDao: ExtensionLibraryDao
 	abstract val installedExtensionsDao: InstalledExtensionsDao

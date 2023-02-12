@@ -84,4 +84,5 @@ interface IDBChaptersDataSource {
 	 * Mark the chapters as deleted
 	 */
 	suspend fun markChaptersDeleted(chapterIds: List<Int>)
+	fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?>
 }

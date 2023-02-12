@@ -3,7 +3,7 @@ package app.shosetsu.android.domain.usecases
 import android.database.sqlite.SQLiteException
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
-import app.shosetsu.android.domain.repository.base.IChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
@@ -32,10 +32,10 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapte
  * @author Doomsdayrs
  */
 class RecordChapterIsReadingUseCase(
-	private val iChapterHistoryRepository: IChapterHistoryRepository,
+	private val iChapterHistoryRepository: ChapterHistoryRepository,
 	private val iChapterRepository: IChaptersRepository
 ) {
-	operator fun invoke(chapter: ChapterEntity) {
+	suspend operator fun invoke(chapter: ChapterEntity) {
 		iChapterHistoryRepository.markChapterAsReading(chapter)
 	}
 
@@ -43,7 +43,7 @@ class RecordChapterIsReadingUseCase(
 	suspend operator fun invoke(readerChapter: ReaderChapterEntity) =
 		iChapterRepository.getChapter(readerChapter.id)?.let { invoke(it) }
 
-	operator fun invoke(chapter: ChapterUI) {
+	suspend operator fun invoke(chapter: ChapterUI) {
 		invoke(chapter.convertTo())
 	}
 
