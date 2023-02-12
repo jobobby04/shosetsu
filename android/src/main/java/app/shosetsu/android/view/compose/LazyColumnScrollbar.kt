@@ -79,7 +79,7 @@ fun LazyColumnScrollbar(
 		realVisibleSize / it.totalItemsCount.toFloat()
 	}
 		.coerceAtLeast(thumbMinHeight)
-		.coerceAtMost( 2 * thumbMinHeight)
+		.coerceAtMost(2 * thumbMinHeight)
 
 	fun normalizedOffsetPosition() = listState.layoutInfo.let {
 		if (it.totalItemsCount == 0 || it.visibleItemsInfo.isEmpty()) 0f

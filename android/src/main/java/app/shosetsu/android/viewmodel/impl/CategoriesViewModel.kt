@@ -36,11 +36,11 @@ class CategoriesViewModel(
 	private val moveCategoryUseCase: MoveCategoryUseCase
 ) : ACategoriesViewModel() {
 
-    override val liveData: StateFlow<ImmutableList<CategoryUI>> by lazy {
-        getCategoriesUseCase()
-            .map { it.toImmutableList() }
-            .stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
-    }
+	override val liveData: StateFlow<ImmutableList<CategoryUI>> by lazy {
+		getCategoriesUseCase()
+			.map { it.toImmutableList() }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
+	}
 
 	override fun addCategory(name: String): Flow<Unit> = flow {
 		addCategoryUseCase(name)

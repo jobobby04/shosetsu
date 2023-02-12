@@ -8,12 +8,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -217,7 +217,8 @@ fun IntroTitlePage() {
 	) {
 		Icon(painterResource(R.drawable.shou_icon), stringResource(R.string.app_name))
 		Text(
-			stringResource(R.string.intro_title_greet), style = MaterialTheme.typography.headlineMedium,
+			stringResource(R.string.intro_title_greet),
+			style = MaterialTheme.typography.headlineMedium,
 			textAlign = TextAlign.Center
 		)
 	}
@@ -240,7 +241,10 @@ fun IntroExplanationPage() {
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Icon(Icons.Default.Info, null, modifier = Modifier.size(64.dp))
-		Text(stringResource(R.string.intro_what_is_app), style = MaterialTheme.typography.headlineSmall)
+		Text(
+			stringResource(R.string.intro_what_is_app),
+			style = MaterialTheme.typography.headlineSmall
+		)
 		Text(
 			stringResource(R.string.intro_what_is_app_desc_new),
 			style = MaterialTheme.typography.bodyLarge,
@@ -284,7 +288,10 @@ fun IntroLicensePage(
 				verticalArrangement = Arrangement.Center,
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				Text(stringResource(R.string.license), style = MaterialTheme.typography.headlineSmall)
+				Text(
+					stringResource(R.string.license),
+					style = MaterialTheme.typography.headlineSmall
+				)
 				Text(
 					stringResource(R.string.intro_license_desc_new),
 					style = MaterialTheme.typography.bodyLarge,
@@ -375,7 +382,10 @@ fun IntroPermissionPage() {
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		Text(stringResource(R.string.intro_perm_title), style = MaterialTheme.typography.headlineSmall)
+		Text(
+			stringResource(R.string.intro_perm_title),
+			style = MaterialTheme.typography.headlineSmall
+		)
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 			IntroPermissionRow(
 				android.Manifest.permission.POST_NOTIFICATIONS,
@@ -432,7 +442,10 @@ fun IntroEndPage() {
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally
 	) {
-		Text(stringResource(R.string.intro_happy_end), style = MaterialTheme.typography.headlineSmall)
+		Text(
+			stringResource(R.string.intro_happy_end),
+			style = MaterialTheme.typography.headlineSmall
+		)
 		Text(
 			stringResource(R.string.intro_happy_end_desc),
 			style = MaterialTheme.typography.bodyLarge,

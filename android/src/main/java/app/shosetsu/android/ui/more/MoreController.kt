@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -114,8 +113,8 @@ fun MoreItemContent(
 	Card(
 		shape = RectangleShape,
 		colors = CardDefaults.cardColors(
-			containerColor =  colorResource(android.R.color.transparent),
-				),
+			containerColor = colorResource(android.R.color.transparent),
+		),
 		modifier = Modifier
 			.clickable(onClick = onClick)
 			.fillMaxWidth(),

@@ -143,7 +143,10 @@ fun WebViewScreen(
 							},
 							enabled = navigator.canGoBack,
 						) {
-							Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.action_webview_back))
+							Icon(
+								imageVector = Icons.Default.ArrowBack,
+								contentDescription = stringResource(R.string.action_webview_back)
+							)
 						}
 						IconButton(
 							onClick = {
@@ -153,23 +156,36 @@ fun WebViewScreen(
 							},
 							enabled = navigator.canGoForward,
 						) {
-							Icon(imageVector = Icons.Default.ArrowForward, contentDescription = stringResource(R.string.action_webview_forward))
+							Icon(
+								imageVector = Icons.Default.ArrowForward,
+								contentDescription = stringResource(R.string.action_webview_forward)
+							)
 						}
 						var overflow by remember { mutableStateOf(false) }
 						IconButton(onClick = { overflow = !overflow }) {
-							Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.more))
+							Icon(
+								Icons.Default.MoreVert,
+								contentDescription = stringResource(R.string.more)
+							)
 						}
 						DropdownMenu(expanded = overflow, onDismissRequest = { overflow = false }) {
 							DropdownMenuItem(onClick = { navigator.reload(); overflow = false },
-								text = { Text(text = stringResource(R.string.action_webview_refresh))
+								text = {
+									Text(text = stringResource(R.string.action_webview_refresh))
 								}
 							)
-							DropdownMenuItem(onClick = { onShare(state.content.getCurrentUrl()!!); overflow = false }, 
-								text = { Text(text = stringResource(R.string.share))
+							DropdownMenuItem(onClick = {
+								onShare(state.content.getCurrentUrl()!!); overflow = false
+							},
+								text = {
+									Text(text = stringResource(R.string.share))
 								}
 							)
-							DropdownMenuItem(onClick = { onOpenInBrowser(state.content.getCurrentUrl()!!); overflow = false },
-								text = { Text(text = stringResource(R.string.open_in_browser))
+							DropdownMenuItem(onClick = {
+								onOpenInBrowser(state.content.getCurrentUrl()!!); overflow = false
+							},
+								text = {
+									Text(text = stringResource(R.string.open_in_browser))
 								}
 							)
 						}

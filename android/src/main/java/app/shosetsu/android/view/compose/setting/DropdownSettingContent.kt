@@ -93,9 +93,9 @@ fun DropdownSettingContent(
 						onClick = {
 							onSelection(index)
 							expanded = false
-						}, 
+						},
 						text = {
-							Text( text = AnnotatedString(s))
+							Text(text = AnnotatedString(s))
 						}
 					)
 				}

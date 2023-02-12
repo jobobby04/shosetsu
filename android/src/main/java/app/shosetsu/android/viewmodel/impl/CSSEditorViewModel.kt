@@ -45,7 +45,11 @@ class CSSEditorViewModel(
 
 	override val cssContent = MutableStateFlow("")
 	override val cssTitle: StateFlow<String> by lazy {
-		styleFlow.map { it.title }.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, app.resources.getString(R.string.loading))
+		styleFlow.map { it.title }.onIO().stateIn(
+			viewModelScopeIO,
+			SharingStarted.Lazily,
+			app.resources.getString(R.string.loading)
+		)
 	}
 	override val isCSSValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
 	override val cssInvalidReason: MutableStateFlow<String?> = MutableStateFlow(null)

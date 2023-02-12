@@ -247,7 +247,10 @@ fun MigrationNovelsLoadingContent() {
 }
 
 @Composable
-fun MigrationNovelsContent(list: ImmutableList<MigrationNovelUI>, onClick: (MigrationNovelUI) -> Unit) {
+fun MigrationNovelsContent(
+	list: ImmutableList<MigrationNovelUI>,
+	onClick: (MigrationNovelUI) -> Unit
+) {
 	LazyRow(
 		horizontalArrangement = Arrangement.Center,
 		modifier = Modifier.fillMaxWidth()

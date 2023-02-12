@@ -104,7 +104,10 @@ fun BrowseControllerNameFilter(searchTerm: String, setSearchTerm: (newTerm: Stri
 @Composable
 fun PreviewBrowseControllerLanguagesFilter() {
 	BrowseControllerLanguagesFilter(
-		FilteredLanguages(listOf(LanguageFilter("en")).toImmutableList(), mapOf("en" to true).toImmutableMap()),
+		FilteredLanguages(
+			listOf(LanguageFilter("en")).toImmutableList(),
+			mapOf("en" to true).toImmutableMap()
+		),
 		false,
 		{ _, _ -> },
 		{}
