@@ -25,8 +25,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.bundleOf
+import androidx.navigation.findNavController
+import androidx.navigation.navOptions
 import app.shosetsu.android.R
+import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.openChapter
+import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
@@ -70,28 +76,43 @@ class HistoryFragment : ShosetsuController() {
 	): View = ComposeView(requireContext()).apply {
 		setViewTitle()
 		setContent {
-			HistoryView {
-				activity?.openChapter(it.chapterId, it.novelId)
-			}
+			HistoryView(
+				{ history ->
+					findNavController().navigateSafely(
+						R.id.action_historyFragment_to_novelController, bundleOf(
+							BundleKeys.BUNDLE_NOVEL_ID to history.novelId
+						),
+						navOptions = navOptions {
+							launchSingleTop = true
+							setShosetsuTransition()
+						}
+					)
+				}, {
+					activity?.openChapter(it.chapterId, it.novelId)
+				}
+			)
 		}
 	}
 }
 
 @Composable
 fun HistoryView(
+	openNovel: (ChapterHistoryUI) -> Unit,
 	openChapter: (ChapterHistoryUI) -> Unit
 ) {
 	val viewModel = viewModelDi<HistoryViewModel>()
 	val items by viewModel.items.collectAsState(listOf())
 
 	ShosetsuCompose {
-		HistoryContent(items, openChapter)
+		HistoryContent(items, openNovel, openChapter)
 	}
 }
 
 @Composable
 fun HistoryContent(
-	items: List<ChapterHistoryUI>, openChapter: (ChapterHistoryUI) -> Unit
+	items: List<ChapterHistoryUI>,
+	openNovel: (ChapterHistoryUI) -> Unit,
+	openChapter: (ChapterHistoryUI) -> Unit
 ) {
 	if (items.isEmpty()) {
 		ErrorContent(R.string.fragment_history_error_empty)
@@ -101,9 +122,15 @@ fun HistoryContent(
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
 			items(items, key = { it.id }) {
-				HistoryItemContent(it) {
-					openChapter(it)
-				}
+				HistoryItemContent(
+					updateUI = it,
+					openNovel = {
+						openNovel(it)
+					},
+					onClick = {
+						openChapter(it)
+					}
+				)
 			}
 		}
 	}
@@ -116,13 +143,15 @@ fun PreviewHistoryItemContent() {
 	HistoryItemContent(
 		ChapterHistoryUI(
 			1, 1, "", "", 1, "", System.currentTimeMillis(), null
-		)
-	) {}
+		),
+		{},
+		{}
+	)
 }
 
 
 @Composable
-fun HistoryItemContent(updateUI: ChapterHistoryUI, onClick: () -> Unit) {
+fun HistoryItemContent(updateUI: ChapterHistoryUI, openNovel: () -> Unit, onClick: () -> Unit) {
 	Row(
 		Modifier
 			.fillMaxWidth()
@@ -137,7 +166,8 @@ fun HistoryItemContent(updateUI: ChapterHistoryUI, onClick: () -> Unit) {
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.clip(MaterialTheme.shapes.medium)
-					.aspectRatio(coverRatio),
+					.aspectRatio(coverRatio)
+					.clickable(onClick = openNovel),
 				error = {
 					ImageLoadingError()
 				},

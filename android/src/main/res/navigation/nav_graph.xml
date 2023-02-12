@@ -141,6 +141,9 @@
         <action
             android:id="@+id/action_novelController_to_searchController"
             app:destination="@id/searchController" />
+        <action
+            android:id="@+id/action_novelController_to_historyFragment"
+            app:destination="@id/historyFragment" />
     </fragment>
     <fragment
         android:id="@+id/readerSettings"
@@ -291,5 +294,8 @@
         <action
             android:id="@+id/action_historyFragment_to_chapterReader"
             app:destination="@id/chapterReader" />
+        <action
+            android:id="@+id/action_historyFragment_to_novelController"
+            app:destination="@id/novelController" />
     </fragment>
 </navigation>
