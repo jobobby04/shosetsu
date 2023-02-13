@@ -102,7 +102,8 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 					Migration4To5,
 					Migration5To6,
 					Migration6To7,
-					Migration7to8
+					Migration7to8,
+					Migration8to9
 				).build()
 
 			GlobalScope.launch {
