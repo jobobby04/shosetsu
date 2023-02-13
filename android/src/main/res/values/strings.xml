@@ -602,6 +602,9 @@
     <string name="editor">Editor</string>
     <string name="preview">Preview</string>
     <string name="controller_library_menu_tri_by_updated">By last updated</string>
+    <string name="clear">Clear</string>
+    <string name="before">Before</string>
+    <string name="fragment_updates_clear">Select date to clear updates before</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

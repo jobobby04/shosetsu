@@ -73,4 +73,12 @@ interface UpdatesDao : BaseDao<DBUpdate> {
 				"""
 	)
 	fun loadCompleteUpdates(): Flow<List<UpdateCompleteEntity>>
+
+	@Throws(SQLiteException::class)
+	@Query("DELETE FROM updates")
+	suspend fun clearAll()
+
+	@Throws(SQLiteException::class)
+	@Query("DELETE FROM updates WHERE time < :date")
+	suspend fun clearBefore(date: Long)
 }

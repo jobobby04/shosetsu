@@ -90,10 +90,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 	bind<AUpdatesViewModel>() with provider {
 		UpdatesViewModel(
-			getUpdatesUseCase = instance(),
 			startUpdateWorkerUseCase = instance(),
 			isOnlineUseCase = instance(),
-			updateChapterUseCase = instance()
+			updatesRepository = instance()
 		)
 	}
 

@@ -32,12 +32,18 @@ import kotlinx.coroutines.flow.Flow
 interface IDBUpdatesDataSource {
 
 	/** Loads [Flow] of a [List] of [UpdateEntity] */
-	suspend fun getUpdates(): Flow<List<UpdateEntity>>
+	fun getUpdates(): Flow<List<UpdateEntity>>
 
 	/** Insert a [List] of [UpdateEntity] and returns an [Array] of [Long] */
 	@Throws(SQLiteException::class)
 	suspend fun insertUpdates(list: List<UpdateEntity>): Array<Long>
 
 	/** Loads [Flow] of a [List] of [UpdateCompleteEntity] */
-	suspend fun getCompleteUpdates(): Flow<List<UpdateCompleteEntity>>
+	fun getCompleteUpdates(): Flow<List<UpdateCompleteEntity>>
+
+	@Throws(SQLiteException::class)
+	suspend fun clearAll()
+
+	@Throws(SQLiteException::class)
+	suspend fun clearBefore(date: Long)
 }

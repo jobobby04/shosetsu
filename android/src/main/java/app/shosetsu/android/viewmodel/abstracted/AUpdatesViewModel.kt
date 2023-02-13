@@ -42,4 +42,14 @@ abstract class AUpdatesViewModel
 	abstract val isRefreshing: StateFlow<Boolean>
 
 	abstract suspend fun updateChapter(updateUI: UpdatesUI, readingStatus: ReadingStatus)
+
+	/**
+	 * Clear all updates
+	 */
+	abstract fun clearAll()
+
+	/**
+	 * Clear all updates before provided date
+	 */
+	abstract fun clearBefore(date: Long)
 }

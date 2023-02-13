@@ -1,9 +1,7 @@
 package app.shosetsu.android.ui.updates
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.openChapter
@@ -44,6 +43,7 @@ import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.collections.immutable.ImmutableMap
 import org.joda.time.DateTime
 
@@ -70,7 +70,7 @@ import org.joda.time.DateTime
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-class ComposeUpdatesController : ShosetsuController(), HomeFragment {
+class ComposeUpdatesController : ShosetsuController(), HomeFragment, MenuProvider {
 	override val viewTitleRes: Int = R.string.updates
 
 	private val viewModel: AUpdatesViewModel by viewModel()
@@ -79,19 +79,22 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
-		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				val items by viewModel.liveData.collectAsState()
-				val isRefreshing by viewModel.isRefreshing.collectAsState()
+	): View {
+		activity?.addMenuProvider(this, viewLifecycleOwner)
+		return ComposeView(requireContext()).apply {
+			setViewTitle()
+			setContent {
+				ShosetsuCompose {
+					val items by viewModel.liveData.collectAsState()
+					val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-				UpdatesContent(
-					items = items,
-					isRefreshing = isRefreshing,
-					onRefresh = this@ComposeUpdatesController::onRefresh
-				) { (chapterID, novelID) ->
-					activity?.openChapter(chapterID, novelID)
+					UpdatesContent(
+						items = items,
+						isRefreshing = isRefreshing,
+						onRefresh = this@ComposeUpdatesController::onRefresh
+					) { (chapterID, novelID) ->
+						activity?.openChapter(chapterID, novelID)
+					}
 				}
 			}
 		}
@@ -102,6 +105,35 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 			viewModel.startUpdateManager(-1)
 		else displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
 	}
+
+	private fun onUserClearBefore() {
+		MaterialDatePicker.Builder.datePicker()
+			.setTitleText(R.string.fragment_updates_clear)
+			.build()
+			.apply {
+				addOnPositiveButtonClickListener {
+					viewModel.clearBefore(it)
+				}
+			}
+			.show(childFragmentManager, tag)
+	}
+
+	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+		menuInflater.inflate(R.menu.toolbar_updates, menu)
+	}
+
+	override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+		when (menuItem.itemId) {
+			R.id.fragment_updates_clear_all -> {
+				viewModel.clearAll()
+				true
+			}
+			R.id.fragment_updates_clear_before -> {
+				onUserClearBefore()
+				true
+			}
+			else -> false
+		}
 }
 
 @OptIn(ExperimentalFoundationApi::class)
