@@ -44,4 +44,13 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 	@Throws(SQLiteException::class)
 	@Query("SELECT * FROM chapter_history WHERE novelId = :novelId ORDER BY endedReadingAt LIMIT 1")
 	suspend fun getLastRead(novelId: Int): DBChapterHistoryEntity?
+
+
+	@Throws(SQLiteException::class)
+	@Query("DELETE FROM chapter_history")
+	suspend fun clearAll()
+
+	@Throws(SQLiteException::class)
+	@Query("DELETE FROM chapter_history WHERE IFNULL(endedReadingAt, startedReadingAt) < :date")
+	suspend fun clearBefore(date: Long)
 }

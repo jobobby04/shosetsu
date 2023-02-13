@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
+import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -34,7 +36,7 @@ import kotlinx.coroutines.flow.stateIn
  * @author Doomsdayrs
  */
 class HistoryViewModelImpl(
-	historyRepo: ChapterHistoryRepository,
+	private val historyRepo: ChapterHistoryRepository,
 	private val chapterRepo: IChaptersRepository,
 	private val novelRepo: INovelsRepository
 ) : HistoryViewModel() {
@@ -60,4 +62,16 @@ class HistoryViewModelImpl(
 		}.map { list ->
 			list.sortedByDescending { it.endedReadingAt ?: it.startedReadingAt }
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+
+	override fun clearAll() {
+		viewModelScope.launch {
+			historyRepo.clearAll()
+		}
+	}
+
+	override fun clearBefore(date: Long) {
+		viewModelScope.launch {
+			historyRepo.clearBefore(date)
+		}
+	}
 }

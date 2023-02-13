@@ -86,4 +86,16 @@ class ChapterHistoryRepositoryImpl(
 	@Throws(SQLiteException::class)
 	override fun getHistory(): Flow<List<ChapterHistoryEntity>> =
 		chapterHistoryDatabase.getHistory()
+
+	override suspend fun clearAll() {
+		onIO {
+			chapterHistoryDatabase.clearAll()
+		}
+	}
+
+	override suspend fun clearBefore(date: Long) {
+		onIO {
+			chapterHistoryDatabase.clearBefore(date)
+		}
+	}
 }

@@ -50,4 +50,8 @@ interface DBChapterHistoryDataSource {
 
 	@Throws(SQLiteException::class)
 	suspend fun getLastRead(novelId: Int): ChapterHistoryEntity?
+
+	suspend fun clearAll()
+
+	suspend fun clearBefore(date: Long)
 }

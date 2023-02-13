@@ -1,9 +1,7 @@
 package app.shosetsu.android.ui.history
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,14 +24,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
-import app.shosetsu.android.common.ext.navigateSafely
-import app.shosetsu.android.common.ext.openChapter
-import app.shosetsu.android.common.ext.setShosetsuTransition
-import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -44,6 +40,7 @@ import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
+import com.google.android.material.datepicker.MaterialDatePicker
 
 /*
  * This file is part of shosetsu.
@@ -68,39 +65,74 @@ import com.google.accompanist.placeholder.material.placeholder
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-class HistoryFragment : ShosetsuController() {
+class HistoryFragment : ShosetsuController(), MenuProvider {
 	override val viewTitleRes: Int = R.string.fragment_history
+
+	private val viewModel: HistoryViewModel by viewModel()
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?, savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
-		setViewTitle()
-		setContent {
-			HistoryView(
-				{ history ->
-					findNavController().navigateSafely(
-						R.id.action_historyFragment_to_novelController, bundleOf(
-							BundleKeys.BUNDLE_NOVEL_ID to history.novelId
-						),
-						navOptions = navOptions {
-							launchSingleTop = true
-							setShosetsuTransition()
-						}
-					)
-				}, {
-					activity?.openChapter(it.chapterId, it.novelId)
-				}
-			)
+	): View {
+		activity?.addMenuProvider(this, viewLifecycleOwner)
+		return ComposeView(requireContext()).apply {
+			setViewTitle()
+			setContent {
+				HistoryView(
+					viewModel = viewModel,
+					openNovel = { history ->
+						findNavController().navigateSafely(
+							R.id.action_historyFragment_to_novelController, bundleOf(
+								BundleKeys.BUNDLE_NOVEL_ID to history.novelId
+							),
+							navOptions = navOptions {
+								launchSingleTop = true
+								setShosetsuTransition()
+							}
+						)
+					},
+					openChapter = {
+						activity?.openChapter(it.chapterId, it.novelId)
+					}
+				)
+			}
 		}
+	}
+
+	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+		menuInflater.inflate(R.menu.toolbar_history, menu)
+	}
+
+	override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+		when (menuItem.itemId) {
+			R.id.fragment_history_clear_all -> {
+				viewModel.clearAll()
+				true
+			}
+			R.id.fragment_history_clear_before -> {
+				onUserClearBefore()
+				true
+			}
+			else -> false
+		}
+
+	private fun onUserClearBefore() {
+		MaterialDatePicker.Builder.datePicker()
+			.setTitleText(R.string.fragment_history_picker_date)
+			.build()
+			.apply {
+				addOnPositiveButtonClickListener {
+					viewModel.clearBefore(it)
+				}
+			}.show(parentFragmentManager, tag)
 	}
 }
 
 @Composable
 fun HistoryView(
+	viewModel: HistoryViewModel = viewModelDi(),
 	openNovel: (ChapterHistoryUI) -> Unit,
 	openChapter: (ChapterHistoryUI) -> Unit
 ) {
-	val viewModel = viewModelDi<HistoryViewModel>()
 	val items by viewModel.items.collectAsState(listOf())
 
 	ShosetsuCompose {

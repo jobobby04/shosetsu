@@ -52,4 +52,14 @@ interface ChapterHistoryRepository {
 	 * Live view of the history
 	 */
 	fun getHistory(): Flow<List<ChapterHistoryEntity>>
+
+	/**
+	 * Clear all history
+	 */
+	suspend fun clearAll()
+
+	/**
+	 * Clear all history before date provided
+	 */
+	suspend fun clearBefore(date: Long)
 }

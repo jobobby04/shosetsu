@@ -34,4 +34,16 @@ abstract class HistoryViewModel : ShosetsuViewModel() {
 	 * History items
 	 */
 	abstract val items: Flow<List<ChapterHistoryUI>>
+
+	/**
+	 * Remove all history
+	 */
+	abstract fun clearAll()
+
+	/**
+	 * Clear out all history before the date provided
+	 *
+	 * @param date, in system time format
+	 */
+	abstract fun clearBefore(date: Long)
 }
