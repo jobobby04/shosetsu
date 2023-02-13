@@ -47,6 +47,7 @@ import androidx.room.PrimaryKey
 	],
 	indices = [
 		Index(value = ["novelId", "chapterId"], unique = true),
+		Index("chapterId")
 	]
 )
 data class DBChapterHistoryEntity(

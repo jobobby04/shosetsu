@@ -32,5 +32,6 @@ object Migration8to9 : Migration(8, 9) {
 	override fun migrate(database: SupportSQLiteDatabase) {
 		database.execSQL("CREATE TABLE IF NOT EXISTS `chapter_history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `novelId` INTEGER NOT NULL, `chapterId` INTEGER NOT NULL, `startedReadingAt` INTEGER NOT NULL, `endedReadingAt` INTEGER, FOREIGN KEY(`novelId`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chapterId`) REFERENCES `chapters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
 		database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_chapter_history_novelId_chapterId` ON `chapter_history` (`novelId`, `chapterId`)")
+		database.execSQL("CREATE INDEX IF NOT EXISTS `index_chapter_history_chapterId` ON `chapter_history` (`chapterId`)")
 	}
 }
