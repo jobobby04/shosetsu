@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,13 +20,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.logD
+import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
+import app.shosetsu.android.common.consts.URL_KOFI
+import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.ext.readAsset
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.common.ext.viewModelDi
@@ -107,6 +111,16 @@ fun IntroView(
 			viewModel.setFinished()
 	}
 
+	fun nextPage() {
+		if (state.currentPage != IntroPages.End.ordinal)
+			scope.launch {
+				state.scrollToPage(state.currentPage + 1)
+			}
+		else {
+			exit()
+		}
+	}
+
 	Scaffold(
 		bottomBar = {
 			BottomAppBar {
@@ -132,30 +146,23 @@ fun IntroView(
 						}
 					}
 					Box {
-						//if (state.currentPage != IntroPages.License.ordinal || isLicenseRead) {
-						IconButton(
-							onClick = {
-								if (state.currentPage != IntroPages.End.ordinal)
-									scope.launch {
-										state.scrollToPage(state.currentPage + 1)
-									}
-								else {
-									logD("Icon exit")
-									exit()
+						if (state.currentPage != IntroPages.Support.ordinal) {
+							IconButton(
+								onClick = {
+									nextPage()
 								}
-							}
-						) {
-							Icon(
-								if (state.currentPage != IntroPages.End.ordinal)
-									Icons.Default.ArrowForward
-								else Icons.Default.Close,
-								stringResource(
+							) {
+								Icon(
 									if (state.currentPage != IntroPages.End.ordinal)
-										R.string.intro_page_next else R.string.intro_close
+										Icons.Default.ArrowForward
+									else Icons.Default.Close,
+									stringResource(
+										if (state.currentPage != IntroPages.End.ordinal)
+											R.string.intro_page_next else R.string.intro_close
+									)
 								)
-							)
+							}
 						}
-						//}
 
 					}
 				}
@@ -163,10 +170,10 @@ fun IntroView(
 		}
 	) {
 		HorizontalPager(
-			6,
+			IntroPages.values().size,
 			state = state,
 			modifier = Modifier.padding(it),
-			//userScrollEnabled = state.currentPage != IntroPages.License.ordinal || isLicenseRead
+			userScrollEnabled = state.currentPage != IntroPages.Support.ordinal
 		) { page ->
 			when (page) {
 				IntroPages.Title.ordinal -> IntroTitlePage()
@@ -184,6 +191,9 @@ fun IntroView(
 						viewModel.setACRAEnabled(it)
 					}
 				}
+				IntroPages.Support.ordinal -> IntroSupportPage {
+					nextPage()
+				}
 				IntroPages.Permissions.ordinal -> IntroPermissionPage()
 				IntroPages.End.ordinal -> IntroEndPage()
 			}
@@ -197,6 +207,7 @@ enum class IntroPages {
 	License,
 	ACRA,
 	Permissions,
+	Support,
 	End
 }
 
@@ -400,6 +411,120 @@ fun IntroPermissionPage() {
 		}
 	}
 
+}
+
+@Composable
+fun IntroSupportPage(
+	next: () -> Unit,
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(16.dp),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
+		Text(
+			stringResource(R.string.intro_support_title),
+			style = MaterialTheme.typography.headlineSmall
+		)
+		Text(
+			stringResource(R.string.intro_support_desc),
+			style = MaterialTheme.typography.bodyMedium,
+		)
+		val uriHandler = LocalUriHandler.current
+
+		var highlight by remember { mutableStateOf(false) }
+
+		IntroSupportItem(R.string.patreon, URL_PATREON, highlight) {
+			uriHandler.openUri(URL_PATREON)
+		}
+
+		IntroSupportItem(R.string.kofi, URL_KOFI, highlight) {
+			uriHandler.openUri(URL_KOFI)
+		}
+
+		val agree by remember {
+			derivedStateOf {
+				listOf(
+					R.string.support_agree_1,
+					R.string.support_agree_2,
+					R.string.support_agree_3
+				).random()
+			}
+		}
+
+		val disagree by remember {
+			derivedStateOf {
+				listOf(
+					R.string.support_disagree_1,
+					R.string.support_disagree_2,
+					R.string.support_disagree_3
+				).random()
+			}
+		}
+		var clicked by remember { mutableStateOf(false) }
+
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(16.dp),
+			horizontalArrangement = Arrangement.SpaceBetween,
+		) {
+			TextButton(next) {
+				Text(stringResource(disagree))
+			}
+
+			TextButton(onClick = {
+				if (clicked) {
+					next()
+				} else {
+					highlight = true
+					clicked = true
+				}
+			}) {
+				Text(stringResource(agree))
+			}
+		}
+	}
+}
+
+@Preview
+@Composable
+fun PreviewIntroSupportItem() {
+	IntroSupportItem(
+		R.string.pause,
+		"link",
+		true
+	) {
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun IntroSupportItem(textId: Int, link: String, highlight: Boolean, onClick: () -> Unit) {
+	Card(
+		onClick = onClick,
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(top = 4.dp),
+		border = if (highlight) {
+			BorderStroke(
+				SELECTED_STROKE_WIDTH.dp,
+				MaterialTheme.colorScheme.primary
+			)
+		} else {
+			null
+		}
+	) {
+		Column(
+			modifier = Modifier
+				.padding(8.dp)
+				.fillMaxWidth()
+		) {
+			Text(stringResource(textId), style = MaterialTheme.typography.titleSmall)
+			Text(link, style = MaterialTheme.typography.bodySmall)
+		}
+	}
 }
 
 @OptIn(ExperimentalPermissionsApi::class)

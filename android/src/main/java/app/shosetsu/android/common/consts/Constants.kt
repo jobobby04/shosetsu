@@ -22,7 +22,7 @@ import androidx.compose.ui.text.TextStyle
  */
 const val USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0"
 
-const val SELECTED_STROKE_WIDTH: Int = 8
+const val SELECTED_STROKE_WIDTH: Int = 4
 
 /** How fast the user must fling inorder to activate the scroll to last */
 const val FLING_THRESHOLD = 19999

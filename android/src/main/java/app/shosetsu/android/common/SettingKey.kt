@@ -55,7 +55,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	/**
 	 * Is this the first time the application ran?
 	 */
-	object FirstTime : BooleanKey("first_time2", true)
+	object FirstTime : BooleanKey("first_time3", true)
 
 
 	/**

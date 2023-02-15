@@ -622,6 +622,15 @@
         Either by helping financially, programming new features / fixes, or spreading this message.\n
         Thank you for your time.
     </string>
+    <string name="support_agree_1">Support the developer.</string>
+    <string name="support_agree_2">I love Shosetsu.</string>
+    <string name="support_agree_3">I want updates.</string>
+
+    <string name="support_disagree_1">No.</string>
+    <string name="support_disagree_2">I don\'t love Shosetsu.</string>
+    <string name="support_disagree_3">I don\'t want updates.</string>
+
+
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>
