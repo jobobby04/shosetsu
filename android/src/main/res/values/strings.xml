@@ -8,8 +8,11 @@
     <string name="matrix" translatable="false">Matrix</string>
     <string name="discord" translatable="false">Discord</string>
 
-    <string name="patreon">Support the dev on Patreon</string>
+    <string name="patreon_support">Support the developer on Patreon</string>
+    <string name="patreon" translatable="false">Patreon</string>
 
+    <string name="kofi" translatable="false">Ko-fi</string>
+    <string name="kofi_support">Support the developer on Ko-fi</string>
 
     <string name="header_text">Novel reading right on your phone!</string>
     <string name="todo">TODO</string>
@@ -605,6 +608,20 @@
     <string name="clear">Clear</string>
     <string name="before">Before</string>
     <string name="fragment_updates_clear">Select date to clear updates before</string>
+    <string name="intro_support_title">Support the Developer</string>
+    <string name="intro_support_desc">
+        \tHi I am Doomsdayrs and I develop Shosetsu.\n
+        Due to college, I am currently struggling financially,\n
+        and I am aware that there at least over 4000 users using Shosetsu.\n\n
+
+        \tAll I am asking is that you consider donating at least $1 (USD) via the services below.\n
+        - If 500 people donate once a month, I will be financially stable again.\n
+        - If 1000 donate once a month, I will be able to work on Shosetsu nearly full time.\n\n
+
+        Please, do consider supporting.\n
+        Either by helping financially, programming new features / fixes, or spreading this message.\n
+        Thank you for your time.
+    </string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

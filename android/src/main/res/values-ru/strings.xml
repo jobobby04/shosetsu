@@ -5,7 +5,7 @@
 	<string name="github" translatable="false">Gitlab</string>
 	<string name="matrix" translatable="false">Matrix</string>
 	<string name="discord" translatable="false">Discord</string>
-	<string name="patreon">Поддержите разработчика на Patreon</string>
+	<string name="patreon_support">Поддержите разработчика на Patreon</string>
 	<string name="header_text">Читайте новеллы прямо на своем телефоне!</string>
 	<string name="todo">TODO</string>
 	<string name="navigation_drawer_open">Открыть навигационный ящик</string>

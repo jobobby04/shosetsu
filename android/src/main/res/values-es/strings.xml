@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Shosetsu</string>
     <string name="website">Sitio web</string>
-    <string name="patreon">Apoya al desarrollador en Patreon</string>
+    <string name="patreon_support">Apoya al desarrollador en Patreon</string>
     <string name="header_text">¡Lectura de novelas directamente en su teléfono!</string>
     <string name="todo">HACER</string>
     <string name="navigation_drawer_open">Cajón de navegación abierto</string>
