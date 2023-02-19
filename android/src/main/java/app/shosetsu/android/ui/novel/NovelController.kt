@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.novel
 
-import android.content.Context
 import android.content.res.Resources
 import android.database.sqlite.SQLiteException
 import android.os.Bundle
@@ -127,11 +126,6 @@ class NovelController : ShosetsuController(),
 			requireActivity().layoutInflater,
 			viewModel
 		).build()
-
-	override fun onAttach(context: Context) {
-		if (viewModel.isFromChapterReader) viewModel.deletePrevious().collectDeletePrevious()
-		super.onAttach(context)
-	}
 
 	private fun startSelectionAction() {
 		if (actionMode != null) return
@@ -454,7 +448,6 @@ class NovelController : ShosetsuController(),
 							NovelChapterContent(
 								chapter = it,
 								openChapter = {
-									viewModel.isFromChapterReader = true
 									activity?.openChapter(it)
 								},
 								onToggleSelection = {
@@ -521,7 +514,6 @@ class NovelController : ShosetsuController(),
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		viewModel.setNovelID(requireArguments().getNovelID())
-		if (viewModel.isFromChapterReader) viewModel.deletePrevious().collectDeletePrevious()
 
 		viewModel.hasSelected.collectLatestLA(this, catch = {}) { hasSelected ->
 			if (hasSelected) {

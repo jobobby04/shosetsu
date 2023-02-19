@@ -181,11 +181,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			isChaptersResumeFirstUnread = instance(),
 			getNovelSettingFlowUseCase = instance(),
 			updateNovelSettingUseCase = instance(),
-			loadDeletePreviousChapterUseCase = instance(),
 			startDownloadWorkerUseCase = instance(),
 			startDownloadWorkerAfterUpdateUseCase = instance(),
 			getContentURL = instance(),
-			getLastReadChapter = instance(),
 			getTrueDelete = instance(),
 			trueDeleteChapter = instance(),
 			getInstalledExtensionUseCase = instance(),
@@ -212,6 +210,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
+			instance(),
+			instance(),
+			instance()
 		)
 	}
 	bind<ARepositoryViewModel>() with provider {

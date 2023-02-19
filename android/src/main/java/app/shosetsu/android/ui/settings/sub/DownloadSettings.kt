@@ -232,12 +232,11 @@ fun DownloadSettingsContent(
 			)
 		}
 
-		/*
 		item {
 			SliderSettingContent(
 				stringResource(R.string.settings_download_delete_on_read_title),
 				stringResource(R.string.settings_download_delete_on_read_desc),
-				-1..3,
+				remember { StableHolder(-1..3) },
 				{
 					when (it) {
 						-1 -> "Disabled"
@@ -252,11 +251,8 @@ fun DownloadSettingsContent(
 				SettingKey.DeleteReadChapter,
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(bottom = 8.dp),
-				maxHeaderSize = 80.dp
 			)
 		}
-		 */
 
 		item {
 			SwitchSettingContent(

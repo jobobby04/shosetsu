@@ -636,6 +636,8 @@
     <string name="fragment_more_dest_history">@string/fragment_history</string>
     <string name="fragment_history_menu_clear">Clear History</string>
     <string name="fragment_history_picker_date">Select date to clear before</string>
+    <string name="settings_download_delete_on_read_title">Delete on read</string>
+    <string name="settings_download_delete_on_read_desc">What chapter to delete when a chapter is read (includes previous chapters).</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

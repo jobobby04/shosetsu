@@ -111,9 +111,6 @@ abstract class ANovelViewModel
 	 */
 	abstract fun getChapterURL(chapterUI: ChapterUI): Flow<String?>
 
-	/** Deletes the previous chapter */
-	abstract fun deletePrevious(): Flow<Boolean>
-
 	/**
 	 * Will return the next chapter to read & scroll to said chapter
 	 *
@@ -148,15 +145,6 @@ abstract class ANovelViewModel
 	abstract fun downloadAllChapters()
 
 	abstract fun updateNovelSetting(novelSettingUI: NovelSettingUI)
-
-	/**
-	 * Remember that the next time the novel controller is rendered,
-	 * that it is from the chapter reader
-	 *
-	 * If returns true, will be false on next get
-	 */
-	abstract var isFromChapterReader: Boolean
-
 
 	abstract fun getIfAllowTrueDelete(): Flow<Boolean>
 

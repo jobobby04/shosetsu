@@ -130,7 +130,7 @@ interface IChaptersRepository {
 	 */
 	@Throws(SQLiteException::class, FilePermissionException::class)
 	suspend fun deleteChapterPassage(
-		chapters: Array<ChapterEntity>,
+		chapters: List<ChapterEntity>,
 		chapterType: Novel.ChapterType
 	)
 

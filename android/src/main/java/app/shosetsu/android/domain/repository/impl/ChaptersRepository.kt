@@ -179,7 +179,7 @@ class ChaptersRepository(
 	}
 
 	override suspend fun deleteChapterPassage(
-		chapters: Array<ChapterEntity>,
+		chapters: List<ChapterEntity>,
 		chapterType: Novel.ChapterType
 	) {
 		onIO {

@@ -35,11 +35,11 @@ class DeleteChapterPassageUseCase(
 	private val iExtensionsRepository: IExtensionsRepository
 ) {
 	suspend operator fun invoke(chapterUI: ChapterUI) {
-		this(arrayOf(chapterUI.convertTo()))
+		this(listOf(chapterUI.convertTo()))
 	}
 
 	suspend operator fun invoke(chapter: ChapterEntity) {
-		this(arrayOf(chapter))
+		this(listOf(chapter))
 	}
 
 	@Throws(
@@ -47,8 +47,8 @@ class DeleteChapterPassageUseCase(
 		NoSuchExtensionException::class,
 		FilePermissionException::class
 	)
-	suspend operator fun invoke(chapters: List<ChapterUI>) {
-		invoke(chapters.convertList().toTypedArray())
+	suspend fun invokeUI(chapters: List<ChapterUI>) {
+		invoke(chapters.convertList())
 	}
 
 	@Throws(
@@ -56,7 +56,7 @@ class DeleteChapterPassageUseCase(
 		NoSuchExtensionException::class,
 		FilePermissionException::class
 	)
-	suspend operator fun invoke(chapters: Array<ChapterEntity>) {
+	suspend operator fun invoke(chapters: List<ChapterEntity>) {
 		val ext = iExtensionsRepository.getInstalledExtension(chapters.first().extensionID)
 			?: throw NoSuchExtensionException(chapters.first().extensionID)
 
