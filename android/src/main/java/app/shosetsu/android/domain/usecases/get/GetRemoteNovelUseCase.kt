@@ -1,6 +1,7 @@
 package app.shosetsu.android.domain.usecases.get
 
 import android.database.sqlite.SQLiteException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.NovelEntity
@@ -53,12 +54,13 @@ class GetRemoteNovelUseCase(
 		IndexOutOfBoundsException::class,
 		HTTPException::class,
 		IOException::class,
-		LuaError::class
+		LuaError::class,
+		MissingExtensionException::class
 	)
 	private suspend fun main(
 		novel: NovelEntity,
 		loadChapters: Boolean = true,
-	): UpdatedNovelInfo? {
+	): UpdatedNovelInfo {
 		logI("Loading novel data from internet for ${novel.id}")
 		if (loadChapters) logI("And loading chapters for ${novel.id}")
 		else logI("and not loading chapters for ${novel.id}")
@@ -100,7 +102,7 @@ class GetRemoteNovelUseCase(
 					UpdatedNovelInfo()
 				}
 			}
-		}
+		} ?: throw MissingExtensionException(novel.extensionID)
 	}
 
 	@Throws(
@@ -108,12 +110,13 @@ class GetRemoteNovelUseCase(
 		IndexOutOfBoundsException::class,
 		HTTPException::class,
 		IOException::class,
-		LuaError::class
+		LuaError::class,
+		MissingExtensionException::class
 	)
 	suspend operator fun invoke(
 		novel: NovelEntity,
 		loadChapters: Boolean = true,
-	): UpdatedNovelInfo? = main(
+	): UpdatedNovelInfo = main(
 		novel = novel,
 		loadChapters = loadChapters
 	)
