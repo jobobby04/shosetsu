@@ -57,6 +57,7 @@ class DeleteChapterPassageUseCase(
 		FilePermissionException::class
 	)
 	suspend operator fun invoke(chapters: List<ChapterEntity>) {
+		if (chapters.isEmpty()) return
 		val ext = iExtensionsRepository.getInstalledExtension(chapters.first().extensionID)
 			?: throw NoSuchExtensionException(chapters.first().extensionID)
 
