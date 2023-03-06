@@ -54,7 +54,8 @@ class LoadLibraryUseCase(
 							 tags,
 							 status,
 							 category,
-							 lastUpdate) ->
+							 lastUpdate,
+							 readTime) ->
 				LibraryNovelUI(
 					id,
 					title,
@@ -69,7 +70,8 @@ class LoadLibraryUseCase(
 					tags,
 					status,
 					category,
-					lastUpdate
+					lastUpdate,
+					readTime
 				)
 			}.groupBy { it.category }
 		}.combine(getCategoriesUseCase()) { novels, categories ->

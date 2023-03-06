@@ -21,6 +21,7 @@ data class LibraryNovelUI(
 	val status: Novel.Status,
 	val category: Int,
 	val lastUpdate: Long,
+	val readTime: Long?,
 	val isSelected: Boolean = false,
 ) : Convertible<LibraryNovelEntity> {
 	override fun convertTo(): LibraryNovelEntity =
@@ -38,6 +39,7 @@ data class LibraryNovelUI(
 			tags,
 			status,
 			category,
-			lastUpdate
+			lastUpdate,
+			readTime
 		)
 }

@@ -88,7 +88,12 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 					SELECT IFNULL(time, 0)
 					FROM updates
 					WHERE novelID = novels.id
-				) as lastUpdate
+				) as lastUpdate,
+				(
+					SELECT IFNULL(endedReadingAt, IFNULL(startedReadingAt, 0))
+					FROM chapter_history
+					WHERE novelId = novels.id
+				) as readTime
 			  FROM novels
 			  WHERE novels.bookmarked = 1
 		) AS M

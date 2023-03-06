@@ -446,6 +446,9 @@ class LibraryViewModel(
 					NovelSortType.BY_UPDATED -> library.novels.mapValues {
 						it.value.sortedBy { it.lastUpdate }.toImmutableList()
 					}
+					NovelSortType.BY_READ_TIME -> library.novels.mapValues {
+						it.value.sortedBy { it -> it.readTime }.toImmutableList()
+					}
 				}.toImmutableMap()
 			)
 		}
