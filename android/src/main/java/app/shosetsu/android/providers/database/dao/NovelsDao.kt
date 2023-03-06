@@ -90,7 +90,7 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 					WHERE novelID = novels.id
 				) as lastUpdate,
 				(
-					SELECT IFNULL(endedReadingAt, IFNULL(startedReadingAt, 0))
+					SELECT MAX(IFNULL(endedReadingAt, IFNULL(startedReadingAt, 0)))
 					FROM chapter_history
 					WHERE novelId = novels.id
 				) as readTime
