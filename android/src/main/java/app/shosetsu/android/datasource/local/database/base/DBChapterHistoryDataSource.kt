@@ -1,8 +1,9 @@
 package app.shosetsu.android.datasource.local.database.base
 
 import android.database.sqlite.SQLiteException
+import androidx.paging.PagingSource
+import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
-import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -32,7 +33,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface DBChapterHistoryDataSource {
 	@Throws(SQLiteException::class)
-	fun getHistory(): Flow<List<ChapterHistoryEntity>>
+	fun getHistory(): PagingSource<Int, DBChapterHistoryEntity>
 
 	@Throws(SQLiteException::class)
 	suspend fun get(novelId: Int, chapterId: Int): ChapterHistoryEntity?

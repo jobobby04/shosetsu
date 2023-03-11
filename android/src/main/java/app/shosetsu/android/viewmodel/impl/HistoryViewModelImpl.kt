@@ -1,15 +1,17 @@
 package app.shosetsu.android.viewmodel.impl
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /*
@@ -43,13 +45,15 @@ class HistoryViewModelImpl(
 	/**
 	 * History items, generated from combining data from 3 repositories
 	 */
-	override val items: Flow<List<ChapterHistoryUI>> =
-		historyRepo.getHistory().map { list ->
+	override val items: Flow<PagingData<ChapterHistoryUI>> =
+		Pager(PagingConfig(10)) {
+			historyRepo.getHistory()
+		}.flow.map { list ->
 			list.map { (id, novelId, chapterId, startedReadingAt, endedReadingAt) ->
 				val novel = novelRepo.getNovel(novelId)!!
 				val chapter = chapterRepo.getChapter(chapterId)!!
 				ChapterHistoryUI(
-					id = id,
+					id = id!!,
 					novelId = novelId,
 					novelTitle = novel.title,
 					novelImageURL = novel.imageURL,
@@ -59,9 +63,7 @@ class HistoryViewModelImpl(
 					endedReadingAt = endedReadingAt,
 				)
 			}
-		}.map { list ->
-			list.sortedByDescending { it.endedReadingAt ?: it.startedReadingAt }
-		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
+		}
 
 	override fun clearAll() {
 		viewModelScope.launch {

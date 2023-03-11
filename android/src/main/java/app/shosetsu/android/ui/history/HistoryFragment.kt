@@ -5,13 +5,10 @@ import android.view.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,6 +24,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import androidx.navigation.navOptions
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.*
@@ -133,7 +133,7 @@ fun HistoryView(
 	openNovel: (ChapterHistoryUI) -> Unit,
 	openChapter: (ChapterHistoryUI) -> Unit
 ) {
-	val items by viewModel.items.collectAsState(listOf())
+	val items = viewModel.items.collectAsLazyPagingItems()
 
 	ShosetsuCompose {
 		HistoryContent(items, openNovel, openChapter)
@@ -142,11 +142,11 @@ fun HistoryView(
 
 @Composable
 fun HistoryContent(
-	items: List<ChapterHistoryUI>,
+	items: LazyPagingItems<ChapterHistoryUI>,
 	openNovel: (ChapterHistoryUI) -> Unit,
 	openChapter: (ChapterHistoryUI) -> Unit
 ) {
-	if (items.isEmpty()) {
+	if (items.itemCount == 0) {
 		ErrorContent(R.string.fragment_history_error_empty)
 	} else {
 		LazyColumn(
@@ -154,15 +154,17 @@ fun HistoryContent(
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
 			items(items, key = { it.id }) {
-				HistoryItemContent(
-					updateUI = it,
-					openNovel = {
-						openNovel(it)
-					},
-					onClick = {
-						openChapter(it)
-					}
-				)
+				if (it != null) {
+					HistoryItemContent(
+						updateUI = it,
+						openNovel = {
+							openNovel(it)
+						},
+						onClick = {
+							openChapter(it)
+						}
+					)
+				}
 			}
 		}
 	}
@@ -183,7 +185,7 @@ fun PreviewHistoryItemContent() {
 
 
 @Composable
-fun HistoryItemContent(updateUI: ChapterHistoryUI, openNovel: () -> Unit, onClick: () -> Unit) {
+fun HistoryItemContent(updateUI: ChapterHistoryUI?, openNovel: () -> Unit, onClick: () -> Unit) {
 	Row(
 		Modifier
 			.fillMaxWidth()
@@ -191,9 +193,10 @@ fun HistoryItemContent(updateUI: ChapterHistoryUI, openNovel: () -> Unit, onClic
 			.clickable(onClick = onClick)
 			.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically
 	) {
-		if (updateUI.novelImageURL.isNotEmpty()) {
-			SubcomposeAsyncImage(ImageRequest.Builder(LocalContext.current)
-				.data(updateUI.novelImageURL).crossfade(true).build(),
+		if (updateUI?.novelImageURL?.isNotEmpty() == true) {
+			SubcomposeAsyncImage(
+				ImageRequest.Builder(LocalContext.current)
+					.data(updateUI.novelImageURL).crossfade(true).build(),
 				contentDescription = null,
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
@@ -208,7 +211,9 @@ fun HistoryItemContent(updateUI: ChapterHistoryUI, openNovel: () -> Unit, onClic
 				})
 		} else {
 			ImageLoadingError(
-				Modifier.aspectRatio(coverRatio)
+				Modifier
+					.aspectRatio(coverRatio)
+					.placeholder(updateUI == null)
 			)
 		}
 		Column(
@@ -218,20 +223,25 @@ fun HistoryItemContent(updateUI: ChapterHistoryUI, openNovel: () -> Unit, onClic
 				.padding(4.dp),
 		) {
 			Text(
-				updateUI.chapterTitle, maxLines = 1, overflow = TextOverflow.Ellipsis
+				updateUI?.chapterTitle ?: "", maxLines = 1, overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.placeholder(updateUI == null)
 			)
 			Text(
-				updateUI.novelTitle,
+				updateUI?.novelTitle ?: "",
 				fontSize = 14.sp,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.alpha(.75f)
+				modifier = Modifier
+					.alpha(.75f)
+					.placeholder(updateUI == null)
 			)
 			Text(
-				updateUI.endedTime ?: updateUI.startedTime,
+				updateUI?.endedTime ?: updateUI?.startedTime ?: "",
 				fontSize = 12.sp,
 				maxLines = 1,
-				modifier = Modifier.alpha(.5f)
+				modifier = Modifier
+					.alpha(.5f)
+					.placeholder(updateUI == null)
 			)
 		}
 	}

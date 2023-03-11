@@ -1,11 +1,11 @@
 package app.shosetsu.android.providers.database.dao
 
 import android.database.sqlite.SQLiteException
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.providers.database.dao.base.BaseDao
-import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.Flow
 interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 
 	@Throws(SQLiteException::class)
-	@Query("SELECT * FROM chapter_history")
-	fun getHistory(): Flow<List<DBChapterHistoryEntity>>
+	@Query("SELECT * FROM chapter_history ORDER BY IFNULL(endedReadingAt, startedReadingAt) DESC")
+	fun getHistory(): PagingSource<Int, DBChapterHistoryEntity>
 
 	@Throws(SQLiteException::class)
 	@Query("SELECT * FROM chapter_history WHERE novelId = :novelId AND chapterId = :chapterId")

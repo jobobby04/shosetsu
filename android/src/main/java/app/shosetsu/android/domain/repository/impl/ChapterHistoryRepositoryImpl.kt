@@ -1,12 +1,13 @@
 package app.shosetsu.android.domain.repository.impl
 
 import android.database.sqlite.SQLiteException
+import androidx.paging.PagingSource
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.database.base.DBChapterHistoryDataSource
+import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
-import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -84,7 +85,7 @@ class ChapterHistoryRepositoryImpl(
 	}
 
 	@Throws(SQLiteException::class)
-	override fun getHistory(): Flow<List<ChapterHistoryEntity>> =
+	override fun getHistory(): PagingSource<Int, DBChapterHistoryEntity> =
 		chapterHistoryDatabase.getHistory()
 
 	override suspend fun clearAll() {

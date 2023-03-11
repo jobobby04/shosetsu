@@ -1,12 +1,11 @@
 package app.shosetsu.android.datasource.local.database.impl
 
 import android.database.sqlite.SQLiteException
+import androidx.paging.PagingSource
 import app.shosetsu.android.datasource.local.database.base.DBChapterHistoryDataSource
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
 import app.shosetsu.android.providers.database.dao.ChapterHistoryDao
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 /*
  * This file is part of shosetsu.
@@ -35,12 +34,8 @@ class DBChapterHistoryDataSourceImpl(
 	private val dao: ChapterHistoryDao
 ) : DBChapterHistoryDataSource {
 	@Throws(SQLiteException::class)
-	override fun getHistory(): Flow<List<ChapterHistoryEntity>> =
-		dao.getHistory().map { list ->
-			list.map {
-				it.toEntity()
-			}
-		}
+	override fun getHistory(): PagingSource<Int, DBChapterHistoryEntity> =
+		dao.getHistory()
 
 	private fun ChapterHistoryEntity.toDB(): DBChapterHistoryEntity =
 		DBChapterHistoryEntity(id, novelId, chapterId, startedReadingAt, endedReadingAt)

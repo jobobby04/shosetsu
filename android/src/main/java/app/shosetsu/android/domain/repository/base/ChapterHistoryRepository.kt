@@ -1,8 +1,9 @@
 package app.shosetsu.android.domain.repository.base
 
+import androidx.paging.PagingSource
+import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
-import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -51,7 +52,7 @@ interface ChapterHistoryRepository {
 	/**
 	 * Live view of the history
 	 */
-	fun getHistory(): Flow<List<ChapterHistoryEntity>>
+	fun getHistory(): PagingSource<Int, DBChapterHistoryEntity>
 
 	/**
 	 * Clear all history

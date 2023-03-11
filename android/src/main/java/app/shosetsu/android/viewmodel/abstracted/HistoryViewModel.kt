@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import androidx.paging.PagingData
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +34,7 @@ abstract class HistoryViewModel : ShosetsuViewModel() {
 	/**
 	 * History items
 	 */
-	abstract val items: Flow<List<ChapterHistoryUI>>
+	abstract val items: Flow<PagingData<ChapterHistoryUI>>
 
 	/**
 	 * Remove all history
