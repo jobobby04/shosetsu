@@ -83,7 +83,7 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		requestWindowFeature(Window.FEATURE_NO_TITLE)
+		supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
 		if (savedInstanceState != null)
 			viewModel.setCSSId(savedInstanceState.getInt(CSS_ID, -1))
 
