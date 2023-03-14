@@ -20,9 +20,11 @@ package app.shosetsu.android.ui.css
 import android.annotation.SuppressLint
 import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
 import android.content.ClipboardManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.view.Window
+import android.view.WindowManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.compose.setContent
@@ -84,6 +86,11 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			window.setDecorFitsSystemWindows(false)
+		} else {
+			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+		}
 		if (savedInstanceState != null)
 			viewModel.setCSSId(savedInstanceState.getInt(CSS_ID, -1))
 
@@ -303,7 +310,8 @@ fun CSSEditorContent(
 					}
 				}
 			}
-		}
+		},
+		modifier = Modifier.imePadding()
 	) {
 		Column(Modifier.padding(it)) {
 			val pages = immutableListOf(
