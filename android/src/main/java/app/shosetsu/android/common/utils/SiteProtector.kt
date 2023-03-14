@@ -28,16 +28,35 @@ object SiteProtector {
 	private val lastUsed = ConcurrentHashMap<String, Long>()
 
 	/**
+	 * Filled with delays provided by HTTP 429s
+	 * If entry is found, then it should be removed afterwards.
+	 */
+	private val retryAfter = ConcurrentHashMap<String, Long>()
+
+	fun setRetryAfter(host: String, after: Long) {
+		retryAfter[host] = after
+	}
+
+	/**
 	 * The delay between each request to a site
 	 */
 	var requestDelay: Long = SettingKey.SiteProtectionDelay.default.toLong()
 
 	/**
-	 * Check if we can continue operating
+	 * Get delay, respects [retryAfter] defaults to [requestDelay]
 	 */
 	@Suppress("NOTHING_TO_INLINE")
-	private inline fun checkTime(time: Long): Boolean =
-		time + requestDelay < System.currentTimeMillis()
+	private inline fun getDelay(host: String) =
+		retryAfter[host] ?: requestDelay
+
+	/**
+	 * Check if we can continue operating.
+	 *
+	 * @return false if one can continue, true if to delay
+	 */
+	@Suppress("NOTHING_TO_INLINE")
+	private inline fun checkNotTime(host: String, time: Long): Boolean =
+		time + getDelay(host) < System.currentTimeMillis()
 
 	/**
 	 * Ask to use the site, once received
@@ -56,7 +75,7 @@ object SiteProtector {
 			block()
 		} else {
 			// Site has been accessed, check if we can operate
-			if (checkTime(time)) {
+			if (checkNotTime(host, time)) {
 				// We can not operate rn, delay until we can
 				/** Represents the loop count, delaying the time increasingly until 10 loops */
 				var delayedCount = 0
@@ -65,15 +84,16 @@ object SiteProtector {
 					// + progressive delay
 					// This ensures that two awaits never occur at the same time
 					delay(
-						(requestDelay / Random.nextInt(1, 10)) +
+						(getDelay(host) / Random.nextInt(1, 10)) +
 								delayedCount * 100
 					)
 					if (delayedCount < 10) delayedCount++
 
 					time = lastUsed[host]
-				} while (time != null && !checkTime(time))
+				} while (time != null && !checkNotTime(host, time))
 			}
 			lastUsed[host] = System.currentTimeMillis()
+			retryAfter.remove(host) // Clear out retry after, we respected it.
 			block()
 		}
 	}
