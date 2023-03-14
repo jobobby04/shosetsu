@@ -13,9 +13,9 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
+import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
-import app.shosetsu.android.common.consts.USER_AGENT
 import app.shosetsu.android.common.ext.fileOut
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
@@ -226,7 +226,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		}
 
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
-			"User-Agent" to USER_AGENT
+			"User-Agent" to DEFAULT_USER_AGENT
 		)
 	}
 

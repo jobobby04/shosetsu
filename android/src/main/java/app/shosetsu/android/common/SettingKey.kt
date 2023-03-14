@@ -1,5 +1,6 @@
 package app.shosetsu.android.common
 
+import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.domain.model.local.LibraryFilterState
 import kotlinx.serialization.encodeToString
@@ -261,6 +262,13 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 
 	// Advanced settings
+
+	/**
+	 * Setting to hold user agent, so users can have their own UA,
+	 * 	allowing diversity to avoid app bans.
+	 */
+	object UserAgent : StringKey("user_agent", DEFAULT_USER_AGENT)
+
 	object ACRAEnabled : BooleanKey("is_ACRA_enabled", false)
 
 	/**

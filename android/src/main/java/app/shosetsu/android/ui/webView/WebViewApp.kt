@@ -27,7 +27,7 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
-import app.shosetsu.android.common.consts.USER_AGENT
+import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.openInBrowser
@@ -239,7 +239,7 @@ fun WebViewScreen(
 			navigator = navigator,
 			onCreated = { webView ->
 				webView.settings.apply {
-					userAgentString = USER_AGENT
+					userAgentString = DEFAULT_USER_AGENT
 					javaScriptEnabled = true
 				}
 

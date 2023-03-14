@@ -1,8 +1,10 @@
 package app.shosetsu.android.common.consts
 
+import android.os.Build
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
+import app.shosetsu.android.BuildConfig
 
 /*
  * This file is part of shosetsu.
@@ -20,7 +22,20 @@ import androidx.compose.ui.text.TextStyle
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-const val USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0"
+
+/**
+ * A default user agent string, should not be used
+ */
+@Deprecated("Use setting key")
+const val DEFAULT_USER_AGENT =
+	"Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0"
+
+/**
+ * User agent for when we want to be soft and cuddly to sites.
+ */
+val SHOSETSU_USER_AGENT =
+	"Shosetsu/${BuildConfig.VERSION_NAME} " +
+			"(Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL})"
 
 const val SELECTED_STROKE_WIDTH: Int = 4
 
