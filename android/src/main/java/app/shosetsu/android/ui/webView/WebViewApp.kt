@@ -27,12 +27,12 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
-import app.shosetsu.android.common.consts.USER_AGENT
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.CookieJarSync
+import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import com.google.accompanist.web.*
@@ -41,6 +41,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 /*
  * This file is part of Shosetsu.
@@ -70,6 +71,7 @@ import org.kodein.di.android.closestDI
  */
 class WebViewApp : AppCompatActivity(), DIAware {
 	override val di: DI by closestDI()
+	private val getUserAgent: GetUserAgentUseCase by instance()
 
 	private fun shareWebpage(url: String) {
 		try {
@@ -95,9 +97,12 @@ class WebViewApp : AppCompatActivity(), DIAware {
 		setContent {
 			MdcTheme {
 				Mdc3Theme {
+					val userAgent by getUserAgent.flow().collectAsState("")
+
 					WebViewScreen(
 						onUp = ::finish,
 						url = url,
+						userAgent = userAgent,
 						onShare = ::shareWebpage,
 						onOpenInBrowser = ::openInBrowser
 					)
@@ -113,6 +118,7 @@ class WebViewApp : AppCompatActivity(), DIAware {
 fun WebViewScreen(
 	onUp: () -> Unit,
 	url: String,
+	userAgent: String,
 	onShare: (String) -> Unit,
 	onOpenInBrowser: (String) -> Unit,
 ) {
@@ -239,7 +245,7 @@ fun WebViewScreen(
 			navigator = navigator,
 			onCreated = { webView ->
 				webView.settings.apply {
-					userAgentString = USER_AGENT
+					userAgentString = userAgent
 					javaScriptEnabled = true
 				}
 

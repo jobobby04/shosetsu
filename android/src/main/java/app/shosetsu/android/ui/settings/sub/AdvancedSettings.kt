@@ -6,32 +6,38 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.compose.setting.ButtonSettingContent
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
-import app.shosetsu.android.view.compose.setting.SliderSettingContent
-import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.LENGTH_LONG
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.runBlocking
 
 
 /*
@@ -153,6 +159,9 @@ fun AdvancedSettingsContent(
 	onForceRepoSync: () -> Unit,
 	onClearCookies: () -> Unit
 ) {
+	val useShosetsuAgent by viewModel.settingsRepo.getBooleanFlow(UseShosetsuAgent)
+		.collectAsState()
+
 	LazyColumn(
 		contentPadding = PaddingValues(
 			top = 16.dp,
@@ -315,6 +324,45 @@ fun AdvancedSettingsContent(
 				repo = viewModel.settingsRepo,
 				key = ConcurrentMemoryExperiment
 			)
+		}
+
+		item {
+			SwitchSettingContent(
+				title = stringResource(R.string.settings_advanced_sua_title),
+				description = stringResource(R.string.settings_advanced_sua_desc),
+				repo = viewModel.settingsRepo,
+				modifier = Modifier
+					.fillMaxWidth(),
+				key = UseShosetsuAgent
+			)
+		}
+
+		item {
+			Column(
+				modifier = Modifier
+					.alpha(if (useShosetsuAgent) .5f else 1f),
+				horizontalAlignment = Alignment.CenterHorizontally
+			) {
+				StringSettingContent(
+					title = stringResource(R.string.settings_advanced_ua_title),
+					description = stringResource(R.string.settings_advanced_ua_desc),
+					repo = viewModel.settingsRepo,
+					modifier = Modifier
+						.fillMaxWidth(),
+					key = UserAgent,
+					enabled = !useShosetsuAgent
+				)
+				IconButton(
+					onClick = {
+						runBlocking {
+							viewModel.settingsRepo.setString(UserAgent, DEFAULT_USER_AGENT)
+						}
+					},
+					enabled = !useShosetsuAgent
+				) {
+					Icon(Icons.Default.Refresh, stringResource(R.string.reset))
+				}
+			}
 		}
 	}
 }
