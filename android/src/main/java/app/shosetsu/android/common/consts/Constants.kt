@@ -26,7 +26,6 @@ import app.shosetsu.android.BuildConfig
 /**
  * A default user agent string, should not be used
  */
-@Deprecated("Use setting key")
 const val DEFAULT_USER_AGENT =
 	"Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0"
 

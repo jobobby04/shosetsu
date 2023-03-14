@@ -269,6 +269,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object UserAgent : StringKey("user_agent", DEFAULT_USER_AGENT)
 
+	/**
+	 * Use a user agent that explicitly states Shosetsu
+	 */
+	object UseShosetsuAgent : BooleanKey("use_shosetsu_agent", false)
+
 	object ACRAEnabled : BooleanKey("is_ACRA_enabled", false)
 
 	/**

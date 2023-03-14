@@ -13,7 +13,6 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
 import app.shosetsu.android.common.ext.fileOut
@@ -26,6 +25,7 @@ import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
+import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
 import app.shosetsu.android.viewmodel.factory.ViewModelFactory
 import app.shosetsu.lib.ShosetsuSharedLib
 import app.shosetsu.lib.lua.ShosetsuLuaLib
@@ -80,6 +80,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	private val startRepositoryUpdateManagerUseCase: StartRepositoryUpdateManagerUseCase by instance()
 	private val extensionsRepo: IExtensionsRepository by instance()
 	private val settingsRepo: ISettingsRepository by instance()
+	private val getUserAgent: GetUserAgentUseCase by instance()
 
 	override val di: DI by DI.lazy {
 		bind<ViewModelFactory>() with singleton { ViewModelFactory(applicationContext) }
@@ -226,7 +227,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		}
 
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
-			"User-Agent" to DEFAULT_USER_AGENT
+			"User-Agent" to runBlocking { getUserAgent() }
 		)
 	}
 

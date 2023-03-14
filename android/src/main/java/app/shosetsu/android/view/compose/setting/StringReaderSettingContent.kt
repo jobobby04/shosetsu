@@ -2,16 +2,17 @@ package app.shosetsu.android.view.compose.setting
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.common.SettingKey
+import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 
@@ -62,19 +63,29 @@ fun StringSettingContent(
 	repo: ISettingsRepository,
 	key: SettingKey<String>,
 	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
 ) {
 	val value by repo.getStringFlow(key).collectAsState()
 
-	Column {
+	Column(
+		Modifier
+			.padding(horizontal = 16.dp)
+	) {
 		TextField(
 			value = value,
 			onValueChange = {
 				launchIO { repo.setString(key, it) }
 			},
 			modifier = modifier,
-			label = { Text(title) }
+			label = { Text(title) },
+			enabled = enabled
 		)
-		Text(description)
+		Text(
+			description,
+			style = SUB_TEXT_SIZE,
+			modifier = Modifier.alpha(0.7f),
+			color = LocalContentColor.current
+		)
 	}
 }
 

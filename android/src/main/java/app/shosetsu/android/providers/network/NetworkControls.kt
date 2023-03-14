@@ -1,7 +1,6 @@
 package app.shosetsu.android.providers.network
 
 import androidx.core.text.isDigitsOnly
-import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.utils.CookieJarSync
@@ -40,7 +39,7 @@ import java.util.logging.Logger
 fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
 	.cookieJar(CookieJarSync)
 	.addInterceptor { chain ->
-		val r = chain.request().newBuilder().header("User-Agent", DEFAULT_USER_AGENT).build()
+		val r = chain.request()
 		val response = runBlocking {
 			// Await for chance to access the site
 			SiteProtector.await(r.url.host) {

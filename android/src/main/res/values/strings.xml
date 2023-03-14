@@ -599,7 +599,7 @@
     <string name="pin_on_top">Pinned on top</string>
     <string name="toggle_pin">Toggle Pin</string>
     <string name="settings_advanced_site_protection_title">Site Protection Delayer</string>
-    <string name="settings_advanced_site_protection_desc">Determines the delay between each request to a site. Preventing site bans.</string>
+    <string name="settings_advanced_site_protection_desc">Determines the delay between each request to a site. Helping prevent site bans.</string>
     <string name="settings_reader_text_sel_title">Disable reader text selection</string>
     <string name="settings_reader_text_sel_desc">If you have issues with accidently selecting text, this can help you.</string>
     <string name="editor">Editor</string>
@@ -639,6 +639,10 @@
     <string name="settings_download_delete_on_read_title">Delete on read</string>
     <string name="settings_download_delete_on_read_desc">What chapter to delete when a chapter is read (includes previous chapters).</string>
     <string name="controller_library_menu_tri_by_read_time">By last read</string>
+    <string name="settings_advanced_ua_title">User agent</string>
+    <string name="settings_advanced_ua_desc">Identification to send to sites when making requests. Changes applied after restart.</string>
+    <string name="settings_advanced_sua_title">Enable shosetsu user agent</string>
+    <string name="settings_advanced_sua_desc">Explicitly state the program is Shosetsu. Disabled by default due to possible site block.</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>
