@@ -206,6 +206,15 @@ fun MoreContent(
 
 		item {
 			MoreItemContent(
+				R.string.fragment_more_dest_analytics,
+				R.drawable.baseline_analytics_24
+			) {
+				pushController(R.id.action_moreController_to_analyticsFragment, true)
+			}
+		}
+
+		item {
+			MoreItemContent(
 				R.string.fragment_more_dest_history,
 				R.drawable.baseline_history_edu_24
 			) {

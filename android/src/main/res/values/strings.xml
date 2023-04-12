@@ -643,6 +643,8 @@
     <string name="settings_advanced_ua_desc">Identification to send to sites when making requests. Changes applied after restart.</string>
     <string name="settings_advanced_sua_title">Enable shosetsu user agent</string>
     <string name="settings_advanced_sua_desc">Explicitly state the program is Shosetsu. Disabled by default due to possible site block.</string>
+    <string name="analytics">Analytics</string>
+    <string name="fragment_more_dest_analytics">Analytics</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

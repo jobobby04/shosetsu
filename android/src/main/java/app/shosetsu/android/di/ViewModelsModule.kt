@@ -298,4 +298,10 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<HistoryViewModel>() with provider {
 		HistoryViewModelImpl(instance(), instance(), instance())
 	}
+	bind<AnalyticsViewModel>() with provider {
+		AnalyticsViewModelImpl(
+			instance(),
+			instance()
+		)
+	}
 }

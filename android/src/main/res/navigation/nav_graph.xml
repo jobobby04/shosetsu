@@ -237,6 +237,9 @@
         <action
             android:id="@+id/action_moreController_to_historyFragment"
             app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/action_moreController_to_analyticsFragment"
+            app:destination="@id/analyticsFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsController"
@@ -297,5 +300,13 @@
         <action
             android:id="@+id/action_historyFragment_to_novelController"
             app:destination="@id/novelController" />
+    </fragment>
+    <fragment
+        android:id="@+id/analyticsFragment"
+        android:name="app.shosetsu.android.ui.analytics.AnalyticsFragment"
+        android:label="AnalyticsFragment">
+        <action
+            android:id="@+id/action_analyticsFragment_to_moreController"
+            app:destination="@id/moreController" />
     </fragment>
 </navigation>
