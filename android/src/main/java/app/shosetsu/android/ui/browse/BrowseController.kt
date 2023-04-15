@@ -30,6 +30,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,8 +75,6 @@ import app.shosetsu.lib.Version
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -192,11 +194,13 @@ class BrowseController : ShosetsuController(),
 			openHelpMenu()
 			true
 		}
+
 		R.id.search -> true
 		R.id.browse_import -> {
 			makeSnackBar(R.string.regret)?.show()
 			true
 		}
+
 		else -> false
 	}
 
@@ -271,6 +275,7 @@ fun PreviewBrowseContent() {
 	)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BrowseContent(
 	entities: ImmutableList<BrowseExtensionUI>?,
@@ -283,10 +288,9 @@ fun BrowseContent(
 	isRefreshing: Boolean,
 	fab: EFabMaintainer?
 ) {
-	SwipeRefresh(
-		state = rememberSwipeRefreshState(isRefreshing),
-		onRefresh = refresh,
-	) {
+	val pullRefreshState = rememberPullRefreshState(isRefreshing, refresh)
+
+	Box(Modifier.pullRefresh(pullRefreshState)) {
 		if (!entities.isNullOrEmpty()) {
 			val state = rememberLazyListState()
 			if (fab != null)
@@ -331,6 +335,8 @@ fun BrowseContent(
 				}
 			)
 		}
+
+		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }
 

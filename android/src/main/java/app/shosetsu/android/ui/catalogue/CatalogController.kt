@@ -9,6 +9,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +54,6 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDED
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDING
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
@@ -233,6 +235,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 				ADDING -> {
 					makeSnackBar(R.string.controller_catalogue_toast_background_add)?.show()
 				}
+
 				ADDED -> {
 					makeSnackBar(
 						getString(
@@ -279,9 +282,11 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 					NORMAL -> {
 						menu.findItem(R.id.view_type_normal)?.isChecked = true
 					}
+
 					COMPRESSED -> {
 						menu.findItem(R.id.view_type_comp)?.isChecked = true
 					}
+
 					COZY -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
 				}
 			}
@@ -315,20 +320,24 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 				viewModel.setViewType(NORMAL)
 				true
 			}
+
 			R.id.view_type_comp -> {
 				item.isChecked = true
 				viewModel.setViewType(COMPRESSED)
 				true
 			}
+
 			R.id.view_type_cozy -> {
 				item.isChecked = true
 				viewModel.setViewType(COZY)
 				true
 			}
+
 			R.id.web_view -> {
 				openInWebView()
 				true
 			}
+
 			else -> false
 		}
 
@@ -428,6 +437,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 	}
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CatalogContent(
 	items: LazyPagingItems<ACatalogNovelUI>,
@@ -444,14 +454,11 @@ fun CatalogContent(
 	Box(
 		modifier = Modifier.fillMaxSize(),
 	) {
-		val swipeRefreshState = rememberFakeSwipeRefreshState()
-		SwipeRefresh(
-			state = swipeRefreshState.state,
-			onRefresh = {
-				items.refresh()
-				swipeRefreshState.animateRefresh()
-			}
-		) {
+		val pullRefreshState = rememberPullRefreshState(
+			items.loadState.refresh == LoadState.Loading,
+			onRefresh = { items.refresh() })
+
+		Box(Modifier.pullRefresh(pullRefreshState)) {
 			val w = LocalConfiguration.current.screenWidthDp
 			val o = LocalConfiguration.current.orientation
 
@@ -496,6 +503,7 @@ fun CatalogContent(
 									isBookmarked = item.bookmarked
 								)
 						}
+
 						COMPRESSED -> {
 							if (item != null)
 								NovelCardCompressedContent(
@@ -510,6 +518,7 @@ fun CatalogContent(
 									isBookmarked = item.bookmarked
 								)
 						}
+
 						COZY -> {
 							if (item != null)
 								NovelCardCozyContent(

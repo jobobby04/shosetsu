@@ -1,12 +1,29 @@
 package app.shosetsu.android.ui.updates
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,7 +49,11 @@ import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModel
-import app.shosetsu.android.view.compose.*
+import app.shosetsu.android.view.compose.ErrorAction
+import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -41,8 +62,6 @@ import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.collections.immutable.ImmutableMap
 import org.joda.time.DateTime
@@ -128,15 +147,17 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment, MenuProvide
 				viewModel.clearAll()
 				true
 			}
+
 			R.id.fragment_updates_clear_before -> {
 				onUserClearBefore()
 				true
 			}
+
 			else -> false
 		}
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
@@ -144,10 +165,8 @@ fun UpdatesContent(
 	onRefresh: () -> Unit,
 	openChapter: (UpdatesUI) -> Unit
 ) {
-	SwipeRefresh(
-		state = rememberSwipeRefreshState(isRefreshing),
-		onRefresh = onRefresh
-	) {
+	val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+	Box(Modifier.pullRefresh(pullRefreshState)) {
 		if (items.isEmpty()) {
 			Column {
 				ErrorContent(
@@ -175,6 +194,8 @@ fun UpdatesContent(
 				}
 			}
 		}
+
+		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }
 
@@ -275,8 +296,10 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
 			when (dateTime.item) {
 				DateTime(System.currentTimeMillis()).trimDate() ->
 					context.getString(R.string.today)
+
 				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 					context.getString(R.string.yesterday)
+
 				else -> "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 			}
 		}

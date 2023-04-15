@@ -13,7 +13,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,7 +69,6 @@ import coil.request.ImageRequest
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -749,6 +752,7 @@ fun PreviewNovelInfoContent() {
 	}
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NovelInfoContent(
 	novelInfo: NovelUI?,
@@ -776,14 +780,8 @@ fun NovelInfoContent(
 	Box(
 		modifier = Modifier.fillMaxSize()
 	) {
-		val swipeRefreshState = rememberFakeSwipeRefreshState()
-		SwipeRefresh(
-			state = swipeRefreshState.state,
-			onRefresh = {
-				onRefresh()
-				swipeRefreshState.animateRefresh()
-			}
-		) {
+		val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+		Box(Modifier.pullRefresh(pullRefreshState)) {
 			LazyColumnScrollbar(
 				listState = state,
 				thumbColor = MaterialTheme.colorScheme.primary,
@@ -832,6 +830,12 @@ fun NovelInfoContent(
 					}
 				}
 			}
+
+			PullRefreshIndicator(
+				isRefreshing,
+				pullRefreshState,
+				Modifier.align(Alignment.TopCenter)
+			)
 		}
 
 		if (chapters != null && hasSelected) {

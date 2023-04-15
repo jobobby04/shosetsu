@@ -15,6 +15,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -47,7 +51,6 @@ import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -481,7 +484,7 @@ fun LibraryPager(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun LibraryCategory(
 	items: ImmutableList<LibraryNovelUI>,
@@ -495,14 +498,8 @@ fun LibraryCategory(
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
 	fab: EFabMaintainer?
 ) {
-	val swipeRefreshState = rememberFakeSwipeRefreshState()
-	SwipeRefresh(
-		state = swipeRefreshState.state,
-		onRefresh = {
-			onRefresh()
-			swipeRefreshState.animateRefresh()
-		}
-	) {
+	val pullRefreshState = rememberPullRefreshState(false, onRefresh)
+	Box(Modifier.pullRefresh(pullRefreshState)) {
 		val w = LocalConfiguration.current.screenWidthDp
 		val o = LocalConfiguration.current.orientation
 
@@ -644,5 +641,7 @@ fun LibraryCategory(
 				}
 			}
 		}
+
+		PullRefreshIndicator(false, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }

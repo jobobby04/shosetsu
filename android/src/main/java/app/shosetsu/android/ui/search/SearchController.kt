@@ -8,6 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LinearProgressIndicator
@@ -44,8 +48,6 @@ import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
@@ -197,6 +199,7 @@ fun PreviewSearchContent() {
 	)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchContent(
 	rows: ImmutableList<SearchRowUI>,
@@ -207,14 +210,8 @@ fun SearchContent(
 	onRefresh: (id: Int) -> Unit,
 	onRefreshAll: () -> Unit
 ) {
-	val swipeRefreshState = rememberFakeSwipeRefreshState()
-	SwipeRefresh(
-		state = swipeRefreshState.state,
-		onRefresh = {
-			onRefreshAll()
-			swipeRefreshState.animateRefresh()
-		}
-	) {
+	val pullRefreshState = rememberPullRefreshState(false, onRefreshAll)
+	Box(Modifier.pullRefresh(pullRefreshState)) {
 		LazyColumn(
 			modifier = Modifier.fillMaxSize(),
 			contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
@@ -290,6 +287,8 @@ fun SearchContent(
 				)
 			}
 		}
+
+		PullRefreshIndicator(false, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }
 
