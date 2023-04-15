@@ -4,6 +4,7 @@ import android.database.Cursor
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logID
 
 /*
@@ -97,7 +98,7 @@ abstract class RemoveMigration(from: Int, to: Int) : Migration(from, to) {
 
 					if (createIndexSql.isNotEmpty()) {
 						createIndexSql.forEach {
-							Log.i(logID(), "Creating index: $it")
+							logI("Creating index: $it")
 							database.execSQL(it)
 						}
 					}

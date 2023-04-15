@@ -13,22 +13,51 @@ import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ExistingWorkPolicy.REPLACE
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.DownloadNewNovelChapters
+import app.shosetsu.android.common.SettingKey.ExcludedCategoriesInUpdate
+import app.shosetsu.android.common.SettingKey.IncludeCategoriesInUpdate
+import app.shosetsu.android.common.SettingKey.NovelUpdateClassicFinish
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowBattery
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowStorage
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnMeteredConnection
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnlyWhenIdle
+import app.shosetsu.android.common.SettingKey.NovelUpdateShowProgress
+import app.shosetsu.android.common.SettingKey.OnlyUpdateOngoingNovels
+import app.shosetsu.android.common.SettingKey.UpdateNotificationStyle
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.LogConstants.SERVICE_EXECUTE
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_UPDATE
 import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.UPDATE_WORK_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.getString
+import app.shosetsu.android.common.ext.intent
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logD
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logID
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.removeProgress
+import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setOngoing
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.LibraryNovelEntity
 import app.shosetsu.android.domain.repository.base.INovelsRepository
@@ -453,6 +482,7 @@ class NovelUpdateWorker(
 					).setInputData(data).build()
 				)
 				workerManager.getWorkInfosForUniqueWork(UPDATE_WORK_ID).await()[0].let {
+					logD("State ${it.state}")
 					Log.d(logID(), "State ${it.state}")
 				}
 			}
