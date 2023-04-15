@@ -4,7 +4,7 @@ import java.io.BufferedReader
 import java.io.IOException
 
 plugins {
-	id("com.google.devtools.ksp") version "1.7.20-1.0.6"
+	id("com.google.devtools.ksp") version "1.8.20-1.0.10"
 }
 
 buildscript {

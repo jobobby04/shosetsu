@@ -83,7 +83,7 @@ android {
 	}
 
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.4.4"
+		kotlinCompilerExtensionVersion = "1.4.5"
 	}
 
 	/*
@@ -172,11 +172,11 @@ android {
 		}
 	}
 	compileOptions {
-		sourceCompatibility = JavaVersion.VERSION_11
-		targetCompatibility = JavaVersion.VERSION_11
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
 	}
 	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_11.toString()
+		jvmTarget = JavaVersion.VERSION_17.toString()
 		freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all-compatibility"
 	}
 
@@ -232,11 +232,15 @@ dependencies {
 	implementation("androidx.window:window:1.0.0")
 
 	// - Life Cycle
-	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-	implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-	implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
+	val lifecycleVersion = "2.6.1"
+	fun lifecycle(module: String, version: String = lifecycleVersion) =
+		"androidx.lifecycle:lifecycle-$module:$version"
+	implementation(lifecycle("viewmodel-ktx"))
+	implementation(lifecycle("viewmodel-compose"))
+	implementation(lifecycle("viewmodel-savedstate"))
+	implementation(lifecycle("runtime-ktx"))
+
 
 	// Test classes
 	testImplementation("junit:junit:4.13.2")

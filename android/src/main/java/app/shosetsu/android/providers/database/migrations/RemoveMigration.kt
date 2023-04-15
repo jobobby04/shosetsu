@@ -44,7 +44,7 @@ abstract class RemoveMigration(from: Int, to: Int) : Migration(from, to) {
 
 		val backupTableName = "data_backup"
 		database.execSQL("DROP TABLE IF EXISTS $backupTableName;")
-		val columnInfo = database.query("PRAGMA table_info('$tableName')", null)
+		val columnInfo = database.query("PRAGMA table_info('$tableName')")
 		val foreignKeys = database.query("PRAGMA foreign_key_list('$tableName')")
 		val uniqueIndex = database.query("PRAGMA index_list('$tableName')")
 		if (columnInfo.count != 0) {
