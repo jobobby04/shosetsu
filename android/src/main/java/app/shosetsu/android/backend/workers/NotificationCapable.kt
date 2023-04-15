@@ -1,10 +1,14 @@
 package app.shosetsu.android.backend.workers
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat.Builder
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.CoroutineWorker
 
 /*
  * This file is part of Shosetsu.
@@ -45,17 +49,25 @@ interface NotificationCapable {
 
 	val defaultNotificationID: Int
 
-	fun notify(
+	fun CoroutineWorker.notify(
 		@StringRes messageId: Int,
-		notificationId: Int = this.defaultNotificationID,
+		notificationId: Int = defaultNotificationID,
 		action: Builder.() -> Unit = {}
 	) = notify(notifyContext.getText(messageId), notificationId, action)
 
-	fun notify(
-		contentText: CharSequence,
-		notificationId: Int = this.defaultNotificationID,
+	fun CoroutineWorker.notify(
+		contentText: CharSequence? = null,
+		notificationId: Int = defaultNotificationID,
 		action: Builder.() -> Unit = {}
 	) {
+		if (
+			ActivityCompat.checkSelfPermission(
+				applicationContext,
+				POST_NOTIFICATIONS
+			) != PERMISSION_GRANTED
+		) {
+			return
+		}
 		notificationManager.notify(
 			notificationId,
 			baseNotificationBuilder.apply {

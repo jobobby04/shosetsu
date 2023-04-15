@@ -6,7 +6,14 @@ import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
@@ -16,7 +23,16 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.WorkerTags.EXTENSION_INSTALL_WORK_ID
 import app.shosetsu.android.common.enums.DownloadStatus
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.getString
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logD
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.removeProgress
+import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IExtensionDownloadRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
@@ -305,9 +321,9 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 		extensionDownloadRepository.remove(extensionId)
 
 		if (notify)
-			notificationManager.notify(
-				extensionId * -1,
-				baseNotificationBuilder.apply {
+			notify(
+				notificationId = extensionId * -1,
+				action = {
 					setContentTitle(
 						applicationContext.getString(
 							R.string.notification_content_text_extension_installed,
@@ -318,7 +334,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 					setLargeIcon(imageBitmap)
 					removeProgress()
 					setNotOngoing()
-				}.build()
+				}
 			)
 
 		if (flags.deleteChapters) {
