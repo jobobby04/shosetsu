@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
-import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
@@ -41,7 +40,7 @@ import kotlinx.coroutines.launch
  * @since 26 / 05 / 2022
  * @author Doomsdayrs
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun PreviewChapterReaderContent() {

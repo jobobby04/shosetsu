@@ -1,9 +1,13 @@
 package app.shosetsu.android.ui.reader.content
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import com.google.accompanist.pager.*
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -39,7 +42,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  * @author Doomsdayrs
  * Content of pager itself
  */
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName", "DEPRECATION")
 @Composable
 fun ChapterReaderPagerContent(
@@ -58,7 +61,7 @@ fun ChapterReaderPagerContent(
 
 	onStopTTS: () -> Unit,
 
-	createPage: @Composable PagerScope.(page: Int) -> Unit
+	createPage: @Composable (page: Int) -> Unit
 ) {
 	// Do not create the pager if the currentPage has not been set yet
 	if (currentPage == null) {
@@ -82,6 +85,7 @@ fun ChapterReaderPagerContent(
 						markChapterAsCurrent(item)
 						curChapter = item
 					}
+
 					is ReaderUIItem.ReaderDividerUI -> {
 						// Do not mark read backwards
 						if (item.next?.id != curChapter?.id)
@@ -94,7 +98,7 @@ fun ChapterReaderPagerContent(
 
 	if (isHorizontal) {
 		HorizontalPager(
-			count = items.size,
+			pageCount = items.size,
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
@@ -103,13 +107,13 @@ fun ChapterReaderPagerContent(
 					bottom = paddingValues.calculateBottomPadding()
 				),
 			reverseLayout = isSwipeInverted,
-			content = {
-				createPage(this, it)
+			pageContent = {
+				createPage(it)
 			}
 		)
 	} else {
 		VerticalPager(
-			count = items.size,
+			pageCount = items.size,
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
@@ -117,8 +121,8 @@ fun ChapterReaderPagerContent(
 					top = paddingValues.calculateTopPadding(),
 					bottom = paddingValues.calculateBottomPadding()
 				),
-			content = {
-				createPage(this, it)
+			pageContent = {
+				createPage(it)
 			}
 		)
 	}

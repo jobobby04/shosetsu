@@ -27,7 +27,6 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDivide
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.themeadapter.material.MdcTheme
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 import kotlinx.collections.immutable.persistentListOf
@@ -145,7 +144,7 @@ class ChapterReader
 	}
 
 	/** On Create */
-	@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+	@OptIn(ExperimentalMaterialApi::class)
 	public override fun onCreate(savedInstanceState: Bundle?) {
 		logV("")
 		viewModel.apply {
@@ -226,6 +225,7 @@ class ChapterReader
 														}
 
 												}
+
 												ChapterType.HTML -> {
 													viewModel.getChapterHTMLPassage(item)
 														.collectLA(
@@ -242,6 +242,7 @@ class ChapterReader
 															 */
 														}
 												}
+
 												else -> {}
 											}
 										}
@@ -307,6 +308,7 @@ class ChapterReader
 														}
 													)
 												}
+
 												ChapterType.HTML -> {
 													ChapterReaderHTMLContent(
 														item = item,
@@ -320,10 +322,12 @@ class ChapterReader
 														}
 													)
 												}
+
 												else -> {
 												}
 											}
 										}
+
 										is ReaderDividerUI -> {
 											DividierPageContent(
 												item.prev.title,
@@ -385,10 +389,12 @@ class ChapterReader
 					viewModel.incrementProgress()
 					true
 				}
+
 				KeyEvent.KEYCODE_VOLUME_UP -> {
 					viewModel.depleteProgress()
 					true
 				}
+
 				else -> super.onKeyDown(keyCode, event)
 			}
 		else super.onKeyDown(keyCode, event)

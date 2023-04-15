@@ -364,7 +364,6 @@ dependencies {
 		"com.google.accompanist:$module:$version"
 
 	implementation(accompanist("accompanist-appcompat-theme"))
-	implementation(accompanist("accompanist-pager"))
 	implementation(accompanist("accompanist-swiperefresh"))
 	implementation(accompanist("accompanist-webview"))
 	implementation(accompanist("accompanist-placeholder-material"))

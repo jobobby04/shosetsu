@@ -6,7 +6,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -36,9 +39,6 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ScrollStateBar
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -90,7 +90,7 @@ class IntroductionActivity : AppCompatActivity(), DIAware {
 /**
  * Introduction view in compose
  */
-@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun IntroView(
 	viewModel: AIntroViewModel = viewModelDi(),
@@ -183,6 +183,7 @@ fun IntroView(
 						viewModel.setLicenseRead()
 					}
 				}
+
 				IntroPages.ACRA.ordinal -> {
 					val isACRA by viewModel.isACRAEnabled.collectAsState()
 					IntroACRAPage(
@@ -191,9 +192,11 @@ fun IntroView(
 						viewModel.setACRAEnabled(it)
 					}
 				}
+
 				IntroPages.Support.ordinal -> IntroSupportPage {
 					nextPage()
 				}
+
 				IntroPages.Permissions.ordinal -> IntroPermissionPage()
 				IntroPages.End.ordinal -> IntroEndPage()
 			}

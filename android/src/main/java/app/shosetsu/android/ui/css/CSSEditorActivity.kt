@@ -30,7 +30,10 @@ import android.webkit.WebView
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
@@ -57,9 +60,6 @@ import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import okhttp3.internal.immutableListOf
 import org.kodein.di.DI
@@ -132,10 +132,12 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 						!clipboardManager.hasPrimaryClip() -> {
 							false
 						}
+
 						!(clipboardManager.primaryClipDescription!!.hasMimeType(MIMETYPE_TEXT_PLAIN)) -> {
 							// This disables the paste menu item, since the clipboard has data but it is not plain text
 							false
 						}
+
 						else -> {
 							// This enables the paste menu item, since the clipboard contains plain text.
 							true
@@ -173,7 +175,10 @@ fun PreviewCSSEditorContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+@OptIn(
+	ExperimentalMaterial3Api::class,
+	ExperimentalFoundationApi::class
+)
 @Composable
 fun CSSEditorContent(
 	cssTitle: String,
@@ -369,6 +374,7 @@ fun CSSEditorContent(
 							isError = !isCSSInvalid
 						)
 					}
+
 					else -> {
 						CSSPreview(cssContent)
 					}

@@ -6,12 +6,15 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,9 +47,6 @@ import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
@@ -225,9 +225,11 @@ class LibraryController
 				NORMAL -> {
 					menu.findItem(R.id.view_type_normal)?.isChecked = true
 				}
+
 				COMPRESSED -> {
 					menu.findItem(R.id.view_type_comp)?.isChecked = true
 				}
+
 				COZY -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
 			}
 		}
@@ -251,26 +253,32 @@ class LibraryController
 				else displayOfflineSnackBar()
 				true
 			}
+
 			R.id.library_select_all -> {
 				selectAll()
 				true
 			}
+
 			R.id.library_deselect_all -> {
 				deselectAll()
 				true
 			}
+
 			R.id.library_inverse_selection -> {
 				invertSelection()
 				true
 			}
+
 			R.id.library_select_between -> {
 				selectBetween()
 				true
 			}
+
 			R.id.remove_from_library -> {
 				viewModel.removeSelectedFromLibrary()
 				true
 			}
+
 			R.id.source_migrate -> {
 				viewModel.getSelectedIds().firstLa(this, catch = {}) {
 					findNavController().navigateSafely(
@@ -284,29 +292,35 @@ class LibraryController
 
 				true
 			}
+
 			R.id.set_categories -> {
 				categoriesDialogOpen = true
 				true
 			}
+
 			R.id.view_type_normal -> {
 				item.isChecked = !item.isChecked
 				viewModel.setViewType(NORMAL)
 				true
 			}
+
 			R.id.view_type_comp -> {
 				item.isChecked = !item.isChecked
 				viewModel.setViewType(COMPRESSED)
 				true
 			}
+
 			R.id.view_type_cozy -> {
 				item.isChecked = !item.isChecked
 				viewModel.setViewType(COZY)
 				true
 			}
+
 			R.id.pin -> {
 				viewModel.togglePinSelected()
 				true
 			}
+
 			else -> false
 		}
 
@@ -392,7 +406,7 @@ fun LibraryContent(
 	}
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryPager(
 	library: LibraryUI,
@@ -439,7 +453,7 @@ fun LibraryPager(
 			}
 		}
 		HorizontalPager(
-			count = library.categories.size,
+			pageCount = library.categories.size,
 			state = state,
 			modifier = Modifier.fillMaxSize()
 		) {
@@ -592,6 +606,7 @@ fun LibraryCategory(
 							isSelected = item.isSelected
 						)
 					}
+
 					COMPRESSED -> {
 						NovelCardCompressedContent(
 							item.title,
@@ -609,6 +624,7 @@ fun LibraryCategory(
 							isSelected = item.isSelected
 						)
 					}
+
 					COZY -> {
 						NovelCardCozyContent(
 							item.title,
