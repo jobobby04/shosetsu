@@ -3,13 +3,23 @@ package app.shosetsu.android.backend.workers.perodic
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES
-import androidx.work.*
-import androidx.work.ExistingPeriodicWorkPolicy.REPLACE
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.NovelUpdateCycle
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowBattery
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowStorage
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnMeteredConnection
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnlyWhenIdle
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.WorkerTags.UPDATE_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
@@ -133,7 +143,7 @@ class NovelUpdateCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					UPDATE_CYCLE_WORK_ID,
-					REPLACE,
+					CANCEL_AND_REENQUEUE,
 					PWRB<NovelUpdateCycleWorker>(
 						updateCycle(),
 						HOURS
