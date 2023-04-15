@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
@@ -42,11 +41,9 @@ data class DBInstalledExtensionEntity(
 	val repoID: Int,
 
 	/** Name of the extension, can be changed */
-	@NonNull
 	var name: String = "",
 
 	/** FileName of the extension */
-	@NonNull
 	val fileName: String = "",
 
 	/** Image URL of the extension*/

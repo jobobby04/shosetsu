@@ -10,7 +10,6 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.TIRAMISU
 import android.widget.Toast.LENGTH_SHORT
 import android.widget.Toast.makeText
-import androidx.annotation.NonNull
 import androidx.annotation.StringRes
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -62,7 +61,7 @@ fun Context.toast(string: String, duration: Int = LENGTH_SHORT) {
 	makeText(this, string, duration).show()
 }
 
-fun Context.checkActivitySelfPermission(@NonNull permission: String): Int =
+fun Context.checkActivitySelfPermission(permission: String): Int =
 	ActivityCompat.checkSelfPermission(this, permission)
 
 /**

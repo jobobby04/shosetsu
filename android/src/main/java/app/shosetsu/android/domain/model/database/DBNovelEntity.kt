@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
@@ -41,7 +40,6 @@ data class DBNovelEntity(
 	/** ID of this novel */
 	var id: Int? = null,
 
-	@NonNull
 	/** URL of the novel */
 	var url: String,
 
@@ -55,11 +53,9 @@ data class DBNovelEntity(
 	/** Says if the data is loaded or now, if it is not it needs to be loaded */
 	var loaded: Boolean = false,
 
-	@NonNull
 	/** The title of the novel */
 	var title: String,
 
-	@NonNull
 	/** Image URL of the novel */
 	var imageURL: String = "",
 
@@ -81,7 +77,6 @@ data class DBNovelEntity(
 	/** Tags this novel matches, in case genres were not enough*/
 	var tags: List<String> = emptyList(),
 
-	@NonNull
 	/** The publishing status of this novel */
 	var status: Novel.Status = Novel.Status.UNKNOWN,
 ) : Convertible<NovelEntity> {

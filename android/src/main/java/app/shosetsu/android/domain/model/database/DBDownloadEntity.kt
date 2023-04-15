@@ -1,7 +1,10 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import app.shosetsu.android.common.enums.DownloadStatus
 import app.shosetsu.android.domain.model.local.DownloadEntity
 import app.shosetsu.android.dto.Convertible
@@ -55,7 +58,6 @@ data class DBDownloadEntity(
 	val chapterURL: String,
 	val chapterName: String,
 	val novelName: String,
-	@NonNull
 	@ColumnInfo(name = "formatterID")
 	val extensionID: Int,
 	var status: DownloadStatus = DownloadStatus.PENDING,
