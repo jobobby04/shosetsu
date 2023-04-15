@@ -1,5 +1,6 @@
 package app.shosetsu.android.view.controller.base
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import androidx.annotation.CallSuper
@@ -79,6 +80,7 @@ interface ExtendedFABController {
 	fun manipulateFAB(fab: EFabMaintainer)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun syncFABWithCompose(
 	state: LazyListState,
@@ -98,6 +100,7 @@ fun syncFABWithCompose(
 	}
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun syncFABWithCompose(
 	state: LazyGridState,

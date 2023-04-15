@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.impl.settings
 
+import android.annotation.SuppressLint
 import android.app.Application
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -56,6 +57,7 @@ class ReaderSettingsViewModel(
 
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.stringAsHtmlOption() {
 	SwitchSettingContent(
@@ -67,6 +69,7 @@ fun ExposedSettingsRepoViewModel.stringAsHtmlOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.horizontalSwitchOption() {
 	SwitchSettingContent(
@@ -78,6 +81,7 @@ fun ExposedSettingsRepoViewModel.horizontalSwitchOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.invertChapterSwipeOption() {
 	SwitchSettingContent(
@@ -89,6 +93,7 @@ fun ExposedSettingsRepoViewModel.invertChapterSwipeOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.showReaderDivider() {
 	SwitchSettingContent(
@@ -100,6 +105,7 @@ fun ExposedSettingsRepoViewModel.showReaderDivider() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.enableFullscreen() {
 	SwitchSettingContent(
@@ -112,6 +118,7 @@ fun ExposedSettingsRepoViewModel.enableFullscreen() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.readerTextSelectionToggle() {
 	SwitchSettingContent(
@@ -124,6 +131,7 @@ fun ExposedSettingsRepoViewModel.readerTextSelectionToggle() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.matchFullscreenToFocus() {
 	val enableFullscreen by remember {
@@ -139,6 +147,7 @@ fun ExposedSettingsRepoViewModel.matchFullscreenToFocus() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.doubleTapFocus() {
 	SwitchSettingContent(
@@ -150,6 +159,7 @@ fun ExposedSettingsRepoViewModel.doubleTapFocus() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.doubleTapSystem() {
 	val enableFullscreen by remember {
@@ -170,6 +180,7 @@ fun ExposedSettingsRepoViewModel.doubleTapSystem() {
 }
 
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.continuousScrollOption() {
 	SwitchSettingContent(
@@ -181,6 +192,7 @@ fun ExposedSettingsRepoViewModel.continuousScrollOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.tapToScrollOption() {
 	SwitchSettingContent(
@@ -192,6 +204,7 @@ fun ExposedSettingsRepoViewModel.tapToScrollOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.readerKeepScreenOnOption() {
 	SwitchSettingContent(
@@ -203,6 +216,7 @@ fun ExposedSettingsRepoViewModel.readerKeepScreenOnOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.readerTableHackOption() {
 	SwitchSettingContent(
@@ -214,6 +228,7 @@ fun ExposedSettingsRepoViewModel.readerTableHackOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.volumeScrollingOption() {
 	SwitchSettingContent(
@@ -225,6 +240,7 @@ fun ExposedSettingsRepoViewModel.volumeScrollingOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.textSizeOption() {
 	FloatSliderSettingContent(
@@ -241,6 +257,7 @@ fun ExposedSettingsRepoViewModel.textSizeOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.paragraphIndentOption() {
 	SliderSettingContent(
@@ -254,6 +271,7 @@ fun ExposedSettingsRepoViewModel.paragraphIndentOption() {
 	)
 }
 
+@SuppressLint("ComposableNaming")
 @Composable
 fun ExposedSettingsRepoViewModel.paragraphSpacingOption() {
 	FloatSliderSettingContent(
