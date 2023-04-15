@@ -312,13 +312,15 @@ dependencies {
 	// kode-in
 	val kodeinVersion = "7.20.1"
 	fun kodein(module: String, version: String = kodeinVersion) =
-		"org.kodein.di:$module:$version"
+		"org.kodein.di:kodein-di$module:$version"
 
-	implementation(kodein("kodein-di"))
-	implementation(kodein("kodein-di-jvm"))
-	implementation(kodein("kodein-di-framework-android-core"))
-	implementation(kodein("kodein-di-framework-android-support"))
-	implementation(kodein("kodein-di-framework-android-x"))
+	implementation(kodein(""))
+	implementation(kodein("-jvm"))
+	implementation(kodein("-framework-android-core"))
+	implementation(kodein("-framework-android-support"))
+	implementation(kodein("-framework-android-x"))
+	implementation(kodein("-framework-android-x-viewmodel"))
+	implementation(kodein("-framework-android-x-viewmodel-savedstate"))
 
 	// KTX
 
@@ -364,7 +366,6 @@ dependencies {
 		"com.google.accompanist:$module:$version"
 
 	implementation(accompanist("accompanist-appcompat-theme"))
-	implementation(accompanist("accompanist-swiperefresh"))
 	implementation(accompanist("accompanist-webview"))
 	implementation(accompanist("accompanist-placeholder-material"))
 	implementation(accompanist("accompanist-pager-indicators"))

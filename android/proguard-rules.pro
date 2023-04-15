@@ -127,3 +127,11 @@
 -dontwarn org.apache.bcel.generic.ReturnInstruction
 -dontwarn org.apache.bcel.generic.StackInstruction
 -dontwarn org.apache.bcel.generic.Type
+
+# Kodein
+-keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference
+-keep, allowobfuscation, allowoptimization class org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
+
+-keep, allowobfuscation, allowoptimization class * extends org.kodein.type.TypeReference
+-keep, allowobfuscation, allowoptimization class * extends org.kodein.type.JVMAbstractTypeToken$Companion$WrappingTest
+
