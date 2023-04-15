@@ -181,14 +181,14 @@ fun WebViewScreen(
 								}
 							)
 							DropdownMenuItem(onClick = {
-								onShare(state.content.getCurrentUrl()!!); overflow = false
+								onShare(state.lastLoadedUrl!!); overflow = false
 							},
 								text = {
 									Text(text = stringResource(R.string.share))
 								}
 							)
 							DropdownMenuItem(onClick = {
-								onOpenInBrowser(state.content.getCurrentUrl()!!); overflow = false
+								onOpenInBrowser(state.lastLoadedUrl!!); overflow = false
 							},
 								text = {
 									Text(text = stringResource(R.string.open_in_browser))
