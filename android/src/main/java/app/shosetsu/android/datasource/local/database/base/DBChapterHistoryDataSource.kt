@@ -36,7 +36,7 @@ interface DBChapterHistoryDataSource {
 	fun getHistory(): PagingSource<Int, DBChapterHistoryEntity>
 
 	@Throws(SQLiteException::class)
-	suspend fun get(novelId: Int, chapterId: Int): ChapterHistoryEntity?
+	suspend fun get(chapterId: Int): ChapterHistoryEntity?
 
 	@Throws(SQLiteException::class)
 	suspend fun update(chapterHistoryEntity: ChapterHistoryEntity)
@@ -52,7 +52,9 @@ interface DBChapterHistoryDataSource {
 	@Throws(SQLiteException::class)
 	suspend fun getLastRead(novelId: Int): ChapterHistoryEntity?
 
+	@Throws(SQLiteException::class)
 	suspend fun clearAll()
 
+	@Throws(SQLiteException::class)
 	suspend fun clearBefore(date: Long)
 }

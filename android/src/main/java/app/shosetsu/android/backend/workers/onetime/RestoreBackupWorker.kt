@@ -84,6 +84,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	private val novelPinsRepo by instance<INovelPinsRepository>()
 	private val novelsSettingsRepo by instance<INovelSettingsRepository>()
 	private val chaptersRepo by instance<IChaptersRepository>()
+	private val chapterHistoryRepo by instance<ChapterHistoryRepository>()
 	private val backupUriRepo by instance<IBackupUriRepository>()
 	private val categoriesRepo by instance<ICategoryRepository>()
 	private val novelCategoriesRepo by instance<INovelCategoryRepository>()
@@ -601,6 +602,8 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		val bookmarked = backupChapterEntity.bookmarked
 		val rS = backupChapterEntity.rS
 		val rP = backupChapterEntity.rP
+		val startedAt = backupChapterEntity.startedReadingAt
+		val endedAt = backupChapterEntity.endedReadingAt
 
 		repoChapters.find { it.url == chapterURL }?.let { chapterEntity ->
 
@@ -629,6 +632,13 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					}
 				}
 			)
+
+			if (startedAt != null) {
+				chapterHistoryRepo.markChapterAsReading(chapterEntity, startedAt)
+
+				if (endedAt != null)
+					chapterHistoryRepo.markChapterAsRead(chapterEntity, endedAt)
+			}
 		}
 	}
 

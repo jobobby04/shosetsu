@@ -38,8 +38,8 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 	fun getHistory(): PagingSource<Int, DBChapterHistoryEntity>
 
 	@Throws(SQLiteException::class)
-	@Query("SELECT * FROM chapter_history WHERE novelId = :novelId AND chapterId = :chapterId")
-	suspend fun get(novelId: Int, chapterId: Int): DBChapterHistoryEntity?
+	@Query("SELECT * FROM chapter_history WHERE chapterId = :chapterId")
+	suspend fun get(chapterId: Int): DBChapterHistoryEntity?
 
 	@Throws(SQLiteException::class)
 	@Query("SELECT * FROM chapter_history WHERE novelId = :novelId ORDER BY endedReadingAt LIMIT 1")

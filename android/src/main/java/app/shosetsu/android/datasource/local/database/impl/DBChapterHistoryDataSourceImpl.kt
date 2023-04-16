@@ -44,8 +44,8 @@ class DBChapterHistoryDataSourceImpl(
 		ChapterHistoryEntity(id!!, novelId, chapterId, startedReadingAt, endedReadingAt)
 
 	@Throws(SQLiteException::class)
-	override suspend fun get(novelId: Int, chapterId: Int): ChapterHistoryEntity? =
-		dao.get(novelId, chapterId)?.toEntity()
+	override suspend fun get(chapterId: Int): ChapterHistoryEntity? =
+		dao.get(chapterId)?.toEntity()
 
 	@Throws(SQLiteException::class)
 	override suspend fun update(chapterHistoryEntity: ChapterHistoryEntity) {
@@ -74,10 +74,12 @@ class DBChapterHistoryDataSourceImpl(
 	override suspend fun getLastRead(novelId: Int): ChapterHistoryEntity? =
 		dao.getLastRead(novelId)?.toEntity()
 
+	@Throws(SQLiteException::class)
 	override suspend fun clearAll() {
 		dao.clearAll()
 	}
 
+	@Throws(SQLiteException::class)
 	override suspend fun clearBefore(date: Long) {
 		dao.clearBefore(date)
 	}

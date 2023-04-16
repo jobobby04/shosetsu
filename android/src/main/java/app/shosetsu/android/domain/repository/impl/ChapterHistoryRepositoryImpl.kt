@@ -36,13 +36,13 @@ class ChapterHistoryRepositoryImpl(
 	private val chapterHistoryDatabase: DBChapterHistoryDataSource
 ) : ChapterHistoryRepository {
 	@Throws(SQLiteException::class)
-	override suspend fun markChapterAsRead(chapter: ChapterEntity) {
+	override suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long) {
 		onIO {
-			val history = chapterHistoryDatabase.get(chapter.novelID, chapter.id!!)
+			val history = get(chapter.id!!)
 			if (history != null) {
 				chapterHistoryDatabase.update(
 					history.copy(
-						endedReadingAt = System.currentTimeMillis()
+						endedReadingAt = time
 					)
 				)
 			} else {
@@ -59,13 +59,13 @@ class ChapterHistoryRepositoryImpl(
 	}
 
 	@Throws(SQLiteException::class)
-	override suspend fun markChapterAsReading(chapter: ChapterEntity) {
+	override suspend fun markChapterAsReading(chapter: ChapterEntity, time: Long) {
 		onIO {
-			val history = chapterHistoryDatabase.get(chapter.novelID, chapter.id!!)
+			val history = get(chapter.id!!)
 			if (history != null) {
 				chapterHistoryDatabase.update(
 					history.copy(
-						startedReadingAt = System.currentTimeMillis()
+						startedReadingAt = time
 					)
 				)
 			} else {
@@ -98,5 +98,10 @@ class ChapterHistoryRepositoryImpl(
 		onIO {
 			chapterHistoryDatabase.clearBefore(date)
 		}
+	}
+
+	@Throws(SQLiteException::class)
+	override suspend fun get(chapterId: Int): ChapterHistoryEntity? = onIO {
+		chapterHistoryDatabase.get(chapterId)
 	}
 }

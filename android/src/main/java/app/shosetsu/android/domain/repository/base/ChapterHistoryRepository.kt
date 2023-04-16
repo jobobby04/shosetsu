@@ -1,5 +1,6 @@
 package app.shosetsu.android.domain.repository.base
 
+import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterEntity
@@ -35,18 +36,24 @@ interface ChapterHistoryRepository {
 	/**
 	 * Mark a chapter as having been read
 	 */
-	suspend fun markChapterAsRead(chapter: ChapterEntity)
+	@Throws(SQLiteException::class)
+	suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long = System.currentTimeMillis())
 
 	/**
 	 * Mark a chapter as being read
 	 */
-	suspend fun markChapterAsReading(chapter: ChapterEntity)
+	@Throws(SQLiteException::class)
+	suspend fun markChapterAsReading(
+		chapter: ChapterEntity,
+		time: Long = System.currentTimeMillis()
+	)
 
 	/**
 	 * Get the last read chapter for a novel
 	 *
 	 * @return a chapter is found, empty if nothing is there
 	 */
+	@Throws(SQLiteException::class)
 	suspend fun getLastRead(novelId: Int): ChapterHistoryEntity?
 
 	/**
@@ -57,10 +64,18 @@ interface ChapterHistoryRepository {
 	/**
 	 * Clear all history
 	 */
+	@Throws(SQLiteException::class)
 	suspend fun clearAll()
 
 	/**
 	 * Clear all history before date provided
 	 */
+	@Throws(SQLiteException::class)
 	suspend fun clearBefore(date: Long)
+
+	/**
+	 * Get [ChapterHistoryEntity] for the specific chapter
+	 */
+	@Throws(SQLiteException::class)
+	suspend fun get(chapterId: Int): ChapterHistoryEntity?
 }
