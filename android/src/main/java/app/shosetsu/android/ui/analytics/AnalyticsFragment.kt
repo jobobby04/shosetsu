@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NovelCardNormalContent
@@ -49,21 +48,12 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * @since 27 / 03 / 2023
  * @author Doomsdayrs
  */
-class AnalyticsFragment : ShosetsuController(), MenuProvider {
+class AnalyticsFragment : ShosetsuController() {
 	override val viewTitleRes: Int = R.string.analytics
-
-	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-		menuInflater.inflate(R.menu.toolbar_analytics, menu)
-	}
-
-	override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
-		else -> false
-	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
 	): View {
-		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
 		return ComposeView(requireContext()).apply {
 			setContent {
@@ -75,7 +65,9 @@ class AnalyticsFragment : ShosetsuController(), MenuProvider {
 	}
 }
 
-
+/**
+ * UI of [AnalyticsFragment]
+ */
 @Composable
 fun AnalyticsView() {
 	val viewModel = viewModelDi<AnalyticsViewModel>()
@@ -119,6 +111,9 @@ fun AnalyticsView() {
 	)
 }
 
+/**
+ * Preview of [AnalyticsContent]
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
@@ -310,6 +305,9 @@ fun AnalyticsContent(
 	}
 }
 
+/**
+ * Preview of [PreviewAnalyticsUnitCard]
+ */
 @Preview
 @Composable
 fun PreviewAnalyticsUnitCard() {
@@ -335,6 +333,9 @@ fun AnalyticsUnitCard(
 	}
 }
 
+/**
+ * Preview of [AnalyticsNovelCard]
+ */
 @Preview
 @Composable
 fun PreviewAnalyticsNovelCard() {
