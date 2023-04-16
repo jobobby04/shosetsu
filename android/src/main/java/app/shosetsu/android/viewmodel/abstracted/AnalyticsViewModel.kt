@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import app.shosetsu.android.view.uimodels.model.AnalyticsNovelUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.Flow
 
@@ -43,4 +44,6 @@ abstract class AnalyticsViewModel : ShosetsuViewModel() {
 
 	abstract val topGenres: Flow<List<String>>
 	abstract val topExtensions: Flow<List<String>>
+
+	abstract val novels: Flow<List<AnalyticsNovelUI>>
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -19,8 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.uimodels.model.AnalyticsNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
 
 /*
@@ -77,6 +80,7 @@ class AnalyticsFragment : ShosetsuController(), MenuProvider {
 fun AnalyticsView() {
 	val viewModel = viewModelDi<AnalyticsViewModel>()
 
+	val novels by viewModel.novels.collectAsState(emptyList())
 	val days by viewModel.days.collectAsState(0)
 	val hours by viewModel.hours.collectAsState(0)
 	val minutes by viewModel.minutes.collectAsState(0)
@@ -110,7 +114,8 @@ fun AnalyticsView() {
 		totalReadChapterCount,
 
 		topGenres,
-		topExtensions
+		topExtensions,
+		novels
 	)
 }
 
@@ -133,7 +138,21 @@ fun PreviewAnalyticsContent() {
 				10,
 				10,
 				listOf("Fantasy", "Sci-Fi", "History"),
-				listOf("MyExt", "YourExt")
+				listOf("MyExt", "YourExt"),
+				listOf(
+					AnalyticsNovelUI(
+						0,
+						"Novel",
+						"",
+						20,
+						10,
+						5,
+						10,
+						5,
+						3,
+						2
+					)
+				)
 			)
 		}
 	}
@@ -156,7 +175,9 @@ fun AnalyticsContent(
 	totalReadChapterCount: Int,
 
 	topGenres: List<String>,
-	topExtensions: List<String>
+	topExtensions: List<String>,
+
+	novels: List<AnalyticsNovelUI>
 ) {
 	Column(
 		modifier = Modifier
@@ -278,7 +299,14 @@ fun AnalyticsContent(
 		}
 		// Per novel
 
-		LazyRow { }
+		LazyRow(
+			horizontalArrangement = Arrangement.spacedBy(4.dp),
+			contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
+		) {
+			items(novels, key = { it.id }) {
+				AnalyticsNovelCard(it)
+			}
+		}
 	}
 }
 
@@ -303,6 +331,58 @@ fun AnalyticsUnitCard(
 		) {
 			Text(value.toString(), style = MaterialTheme.typography.titleMedium)
 			Text(description, style = MaterialTheme.typography.bodyMedium)
+		}
+	}
+}
+
+@Preview
+@Composable
+fun PreviewAnalyticsNovelCard() {
+	AnalyticsNovelCard(
+		AnalyticsNovelUI(
+			0,
+			"Novel",
+			"",
+			20,
+			10,
+			5,
+			10,
+			5,
+			3,
+			2
+		)
+	)
+}
+
+@Composable
+fun AnalyticsNovelCard(
+	entity: AnalyticsNovelUI
+) {
+	Card(
+	) {
+		Column(
+			modifier = Modifier
+				.padding(8.dp)
+				.width(144.dp),
+			verticalArrangement = Arrangement.spacedBy(4.dp),
+		) {
+			Box(
+				Modifier
+					.width(128.dp)
+					.align(Alignment.CenterHorizontally)
+			) {
+				NovelCardNormalContent(
+					entity.title,
+					entity.imageURL,
+					onClick = {},
+					onLongClick = {},
+				)
+			}
+
+			Text("Chapter(s): %d".format(entity.chapterCount))
+			Text("Unread: %d".format(entity.unreadChapterCount))
+			Text("Reading: %d".format(entity.readingChapterCount))
+			Text("Read: %d".format(entity.readChapterCount))
 		}
 	}
 }
