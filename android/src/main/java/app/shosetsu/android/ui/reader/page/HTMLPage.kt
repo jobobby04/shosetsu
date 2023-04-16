@@ -6,7 +6,6 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -112,10 +111,6 @@ fun WebViewPageContent(
 						window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
 						window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
 						""".trimIndent(), null
-					)
-					view?.layoutParams = FrameLayout.LayoutParams(
-						FrameLayout.LayoutParams.MATCH_PARENT,
-						FrameLayout.LayoutParams.WRAP_CONTENT
 					)
 				}
 			},
