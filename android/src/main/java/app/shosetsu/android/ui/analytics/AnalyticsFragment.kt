@@ -324,7 +324,7 @@ fun AnalyticsUnitCard(
 	description: String,
 	value: Int
 ) {
-	Card {
+	Box {
 		Column(
 			modifier = Modifier.padding(8.dp),
 			horizontalAlignment = Alignment.CenterHorizontally
