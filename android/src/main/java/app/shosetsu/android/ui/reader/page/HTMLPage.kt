@@ -2,11 +2,11 @@ package app.shosetsu.android.ui.reader.page
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
-import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -113,9 +113,9 @@ fun WebViewPageContent(
 						window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
 						""".trimIndent(), null
 					)
-					view?.layoutParams = ViewGroup.LayoutParams(
-						ViewGroup.LayoutParams.MATCH_PARENT,
-						ViewGroup.LayoutParams.WRAP_CONTENT
+					view?.layoutParams = FrameLayout.LayoutParams(
+						FrameLayout.LayoutParams.MATCH_PARENT,
+						FrameLayout.LayoutParams.WRAP_CONTENT
 					)
 				}
 			},
