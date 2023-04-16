@@ -358,31 +358,27 @@ fun PreviewAnalyticsNovelCard() {
 fun AnalyticsNovelCard(
 	entity: AnalyticsNovelUI
 ) {
-	Card(
+	Column(
+		modifier = Modifier
+			.padding(8.dp)
+			.width(144.dp),
+		verticalArrangement = Arrangement.spacedBy(4.dp),
 	) {
-		Column(
-			modifier = Modifier
-				.padding(8.dp)
-				.width(144.dp),
-			verticalArrangement = Arrangement.spacedBy(4.dp),
+		Box(
+			Modifier
+				.align(Alignment.CenterHorizontally)
 		) {
-			Box(
-				Modifier
-					.width(128.dp)
-					.align(Alignment.CenterHorizontally)
-			) {
-				NovelCardNormalContent(
-					entity.title,
-					entity.imageURL,
-					onClick = {},
-					onLongClick = {},
-				)
-			}
-
-			Text("Chapter(s): %d".format(entity.chapterCount))
-			Text("Unread: %d".format(entity.unreadChapterCount))
-			Text("Reading: %d".format(entity.readingChapterCount))
-			Text("Read: %d".format(entity.readChapterCount))
+			NovelCardNormalContent(
+				entity.title,
+				entity.imageURL,
+				onClick = {},
+				onLongClick = {},
+			)
 		}
+
+		Text("Chapter(s): %d".format(entity.chapterCount))
+		Text("Unread: %d".format(entity.unreadChapterCount))
+		Text("Reading: %d".format(entity.readingChapterCount))
+		Text("Read: %d".format(entity.readChapterCount))
 	}
 }
