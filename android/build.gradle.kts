@@ -227,7 +227,7 @@ dependencies {
 	implementation("androidx.annotation:annotation:1.6.0")
 	implementation("androidx.core:core-ktx:1.10.0")
 	implementation("androidx.collection:collection-ktx:1.2.0")
-	implementation("androidx.core:core-splashscreen:1.0.0")
+	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 	implementation("androidx.window:window:1.0.0")
 
@@ -373,7 +373,7 @@ dependencies {
 	implementation(accompanist("accompanist-flowlayout"))
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata:1.4.1")
+	implementation("androidx.compose.runtime:runtime-livedata:1.4.2")
 
 	// MDC Adapter
 	implementation(accompanist("accompanist-themeadapter-material"))
