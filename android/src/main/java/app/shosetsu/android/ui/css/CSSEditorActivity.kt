@@ -36,6 +36,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -44,7 +45,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -318,7 +319,10 @@ fun CSSEditorContent(
 		},
 		modifier = Modifier.imePadding()
 	) {
-		Column(Modifier.padding(it)) {
+		Column(
+			Modifier
+				.padding(it)
+				.verticalScroll(rememberScrollState())) {
 			val pages = immutableListOf(
 				stringResource(
 					R.string.editor
@@ -363,15 +367,14 @@ fun CSSEditorContent(
 			) { page ->
 				when (page) {
 					0 -> {
-						TextField(
-							cssContent,
-							onNewText,
+						BasicTextField(
+							value = cssContent,
+							onValueChange = onNewText,
 							modifier = Modifier
 								.fillMaxSize()
-								.verticalScroll(rememberScrollState())
-								.padding(bottom = 92.dp),
-							shape = RectangleShape,
-							isError = !isCSSInvalid
+								.padding(bottom = 92.dp, start = 16.dp, top = 8.dp, end = 16.dp),
+							cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+							textStyle = MaterialTheme.typography.bodyMedium.copy(color = LocalContentColor.current),
 						)
 					}
 
