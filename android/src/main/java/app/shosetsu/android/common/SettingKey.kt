@@ -260,6 +260,8 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 		false
 	)
 
+	object ReaderTrackLongReading : BooleanKey("reader_track_long_reading", true)
+
 
 	// Advanced settings
 

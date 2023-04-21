@@ -85,6 +85,21 @@ class ChapterReaderViewModel(
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {
+	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
+		MutableStateFlow(false)
+	}
+
+	override val trackLongReading: StateFlow<Boolean> =
+		settingsRepo.getBooleanFlow(ReaderTrackLongReading)
+
+	override fun userIsReadingTooLong() {
+		isReadingTooLong.value = true
+	}
+
+	override fun dismissReadingTooLong() {
+		isReadingTooLong.value = false
+	}
+
 	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
 		loadLiveAppThemeUseCase()
 			.onIO()
@@ -495,9 +510,11 @@ class ChapterReaderViewModel(
 			novelIDLive.value == -1 -> {
 				//logD("Setting NovelID")
 			}
+
 			novelIDLive.value != novelID -> {
 				//logD("NovelID not equal, resetting")
 			}
+
 			novelIDLive.value == novelID -> {
 				//logD("NovelID equal, ignoring")
 				return

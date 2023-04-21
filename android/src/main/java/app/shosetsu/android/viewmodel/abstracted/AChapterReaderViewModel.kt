@@ -40,6 +40,28 @@ abstract class AChapterReaderViewModel :
 	ShosetsuViewModel(),
 	ExposedSettingsRepoViewModel {
 
+	/**
+	 * Has the user been reading for too long?
+	 *
+	 * If so, then the user will be notified
+	 */
+	abstract val isReadingTooLong: StateFlow<Boolean>
+
+	/**
+	 * Whether or not to track if the user is reading too long or not
+	 */
+	abstract val trackLongReading: StateFlow<Boolean>
+
+	/**
+	 * Called when the user reads for too long
+	 */
+	abstract fun userIsReadingTooLong()
+
+	/**
+	 * Dismiss reading for too long
+	 */
+	abstract fun dismissReadingTooLong()
+
 	abstract val appThemeLiveData: SharedFlow<AppThemes>
 
 	abstract fun retryChapter(item: ReaderChapterUI)

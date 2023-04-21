@@ -242,6 +242,18 @@ fun ExposedSettingsRepoViewModel.volumeScrollingOption() {
 
 @SuppressLint("ComposableNaming")
 @Composable
+fun ExposedSettingsRepoViewModel.trackLongReadingOption() {
+	SwitchSettingContent(
+		stringResource(R.string.settings_reader_track_long_reading_title),
+		stringResource(R.string.settings_reader_track_long_reading_desc),
+		settingsRepo,
+		ReaderTrackLongReading, modifier = Modifier
+			.fillMaxWidth()
+	)
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
 fun ExposedSettingsRepoViewModel.textSizeOption() {
 	FloatSliderSettingContent(
 		stringResource(R.string.text_size),
@@ -286,3 +298,4 @@ fun ExposedSettingsRepoViewModel.paragraphSpacingOption() {
 			.fillMaxWidth()
 	)
 }
+

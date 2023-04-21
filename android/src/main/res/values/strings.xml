@@ -645,6 +645,10 @@
     <string name="settings_advanced_sua_desc">Explicitly state the program is Shosetsu. Disabled by default due to possible site block.</string>
     <string name="analytics">Analytics</string>
     <string name="fragment_more_dest_analytics">Analytics</string>
+    <string name="reader_long_reading_title">Long Reading Detected</string>
+    <string name="reader_long_reading_desc">Please look at something at least 5–10 meters away for 20 seconds to avoid eye damage.</string>
+    <string name="settings_reader_track_long_reading_title">Track long reading</string>
+    <string name="settings_reader_track_long_reading_desc">Track users reading time to ensure the user maintains their eye health by requiring the user to look at something 5-10 meters away for 20 seconds every 20 minutes.</string>
     <plurals name="controller_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

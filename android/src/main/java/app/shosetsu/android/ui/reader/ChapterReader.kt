@@ -8,16 +8,26 @@ import android.view.KeyEvent
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
+import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
 import app.shosetsu.android.common.ext.collectLA
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.setTheme
@@ -25,12 +35,14 @@ import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.ui.reader.content.*
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.TextButton
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -240,6 +252,7 @@ class ChapterReader
 	}
 }
 
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChapterReaderView(
@@ -265,6 +278,18 @@ fun ChapterReaderView(
 	val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
 	val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
 	val owner = LocalLifecycleOwner.current
+
+	val isReadingTooLong by viewModel.isReadingTooLong.collectAsState()
+	val trackLongReading by viewModel.trackLongReading.collectAsState()
+
+	if (trackLongReading)
+		LaunchedEffect(isReadingTooLong) {
+			while (!isReadingTooLong) {
+				delay(MAX_CONTINOUS_READING_TIME)
+				viewModel.userIsReadingTooLong()
+			}
+		}
+
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
 	ShosetsuCompose {
 		ChapterReaderContent(
@@ -350,6 +375,7 @@ fun ChapterReaderView(
 						item { viewModel.doubleTapSystem() }
 						item { viewModel.readerTableHackOption() }
 						item { viewModel.readerTextSelectionToggle() }
+						item { viewModel.trackLongReadingOption() }
 					},
 					toggleFocus = viewModel::toggleFocus,
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
@@ -421,8 +447,48 @@ fun ChapterReaderView(
 						}
 					}
 				)
-			}
+			},
 			//isTapToScroll = isTapToScroll
 		)
+		if (isReadingTooLong) {
+			AlertDialog(
+				onDismissRequest = {},
+				title = {
+					Text(stringResource(R.string.reader_long_reading_title))
+				},
+				text = {
+					Text(stringResource(R.string.reader_long_reading_desc))
+
+				},
+				confirmButton = {
+					var isEnabled by remember { mutableStateOf(false) }
+					var timeLeft by remember { mutableStateOf(20) }
+
+					LaunchedEffect(Unit) {
+						repeat(20) {
+							delay(1000)
+							timeLeft--
+						}
+						isEnabled = true
+					}
+
+					TextButton(onClick = {
+						if (isEnabled) {
+							viewModel.dismissReadingTooLong()
+						}
+					}) {
+						if (isEnabled) {
+							Text(stringResource(android.R.string.ok))
+						} else {
+							Text("$timeLeft")
+						}
+					}
+				},
+				properties = DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false
+				)
+			)
+		}
 	}
 }

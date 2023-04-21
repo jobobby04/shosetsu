@@ -73,6 +73,12 @@ const val APP_UPDATE_CACHE_FILE = "SHOSETSU_APP_UPDATE.json"
 
 const val APK_MIME = "application/vnd.android.package-archive"
 
+
+/**
+ * Constant of twenty minutes
+ */
+const val MAX_CONTINOUS_READING_TIME: Long = 1000L * 60 * 20
+
 /**
  * The version of backups this build of shosetsu supports
  */
