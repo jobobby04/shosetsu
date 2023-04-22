@@ -11,6 +11,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import app.shosetsu.android.R
 import app.shosetsu.android.view.uimodels.StableHolder
 import kotlin.math.roundToInt
@@ -152,7 +153,7 @@ fun DiscreteSliderDialog(
 			it.toIntOrNull() ?: valueRange.item.first
 		},
 		validateInput = {
-			it.matches(Regex("^[0-9]+$")) && it.toInt() in valueRange.item
+			it.isDigitsOnly() && it.toInt() in valueRange.item
 		},
 		updateValue
 	)
