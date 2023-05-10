@@ -33,12 +33,15 @@ object SiteProtector {
 	 */
 	private val retryAfter = ConcurrentHashMap<String, Long>()
 
+	/**
+	 * @param after delay in ms
+	 */
 	fun setRetryAfter(host: String, after: Long) {
 		retryAfter[host] = after
 	}
 
 	/**
-	 * The delay between each request to a site
+	 * The delay between each request to a site in milliseconds
 	 */
 	var requestDelay: Long = SettingKey.SiteProtectionDelay.default.toLong()
 
@@ -52,11 +55,11 @@ object SiteProtector {
 	/**
 	 * Check if we can continue operating.
 	 *
-	 * @return false if one can continue, true if to delay
+	 * @return true if we can, false if delay must occur
 	 */
 	@Suppress("NOTHING_TO_INLINE")
-	private inline fun checkNotTime(host: String, time: Long): Boolean =
-		time + getDelay(host) < System.currentTimeMillis()
+	private inline fun checkIfCan(host: String, lastUsedTime: Long): Boolean =
+		(lastUsedTime + getDelay(host)) > System.currentTimeMillis()
 
 	/**
 	 * Ask to use the site, once received
@@ -75,12 +78,12 @@ object SiteProtector {
 			block()
 		} else {
 			// Site has been accessed, check if we can operate
-			if (checkNotTime(host, time)) {
+			if (checkIfCan(host, time)) {
 				// We can not operate rn, delay until we can
 				/** Represents the loop count, delaying the time increasingly until 10 loops */
 				var delayedCount = 0
 				do {
-					// Delay a random interval between requestDelay / 1 - 4
+					// Delay a random interval between (requestDelay / 1 - 10)
 					// + progressive delay
 					// This ensures that two awaits never occur at the same time
 					delay(
@@ -90,7 +93,7 @@ object SiteProtector {
 					if (delayedCount < 10) delayedCount++
 
 					time = lastUsed[host]
-				} while (time != null && !checkNotTime(host, time))
+				} while (time != null && checkIfCan(host, time))
 			}
 			lastUsed[host] = System.currentTimeMillis()
 			retryAfter.remove(host) // Clear out retry after, we respected it.
