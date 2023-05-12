@@ -20,7 +20,14 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.SiteProtector
-import app.shosetsu.android.di.*
+import app.shosetsu.android.di.dataSourceModule
+import app.shosetsu.android.di.databaseModule
+import app.shosetsu.android.di.networkModule
+import app.shosetsu.android.di.othersModule
+import app.shosetsu.android.di.providersModule
+import app.shosetsu.android.di.repositoryModule
+import app.shosetsu.android.di.useCaseModule
+import app.shosetsu.android.di.viewModelsModule
 import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -43,14 +50,19 @@ import org.acra.config.httpSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender.Method
-import org.kodein.di.*
+import org.kodein.di.DI
+import org.kodein.di.DIAware
 import org.kodein.di.android.x.androidXModule
+import org.kodein.di.bind
+import org.kodein.di.instance
+import org.kodein.di.singleton
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.PrintStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -257,6 +269,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 	override fun newImageLoader(): ImageLoader =
 		ImageLoader.Builder(this).apply {
+			okHttpClient(okHttpClient)
 			diskCache {
 				DiskCache.Builder().apply {
 					directory(cacheDir.resolve("image_cache"))
