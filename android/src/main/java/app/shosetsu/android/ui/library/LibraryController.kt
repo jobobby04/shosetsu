@@ -553,7 +553,8 @@ fun LibraryCategory(
 								onClick = {
 									onClickBadge?.invoke()
 								}
-							)
+							),
+							containerColor = MaterialTheme.colorScheme.secondaryContainer
 						) {
 							Text(item.unread.toString())
 						}
@@ -563,7 +564,8 @@ fun LibraryCategory(
 				fun pin() {
 					if (item.pinned)
 						Badge(
-							modifier = Modifier.clickable { }
+							modifier = Modifier.clickable { },
+							containerColor = MaterialTheme.colorScheme.secondaryContainer
 						) {
 							Icon(
 								painterResource(R.drawable.ic_baseline_push_pin_24),
