@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.consts.URL_KOFI
 import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.ext.readAsset
@@ -99,6 +97,7 @@ fun IntroView(
 	val state = rememberPagerState()
 	val scope = rememberCoroutineScope()
 	val isLicenseRead by viewModel.isLicenseRead.collectAsState()
+	val shouldSupportShowNext by viewModel.shouldSupportShowNext.collectAsState()
 
 	BackHandler {
 		if (viewModel.isFinished) {
@@ -146,7 +145,10 @@ fun IntroView(
 						}
 					}
 					Box {
-						if (state.currentPage != IntroPages.Support.ordinal) {
+						if (
+							state.currentPage != IntroPages.Support.ordinal ||
+							shouldSupportShowNext
+						) {
 							IconButton(
 								onClick = {
 									nextPage()
@@ -193,9 +195,12 @@ fun IntroView(
 					}
 				}
 
-				IntroPages.Support.ordinal -> IntroSupportPage {
-					nextPage()
-				}
+				IntroPages.Support.ordinal -> IntroSupportPage(
+					{
+						viewModel.supportShowNext()
+					},
+					::nextPage
+				)
 
 				IntroPages.Permissions.ordinal -> IntroPermissionPage()
 				IntroPages.End.ordinal -> IntroEndPage()
@@ -418,74 +423,77 @@ fun IntroPermissionPage() {
 
 @Composable
 fun IntroSupportPage(
+	showNext: () -> Unit,
 	next: () -> Unit,
 ) {
 	Column(
-		modifier = Modifier
-			.fillMaxSize()
-			.padding(16.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
-		Text(
-			stringResource(R.string.intro_support_title),
-			style = MaterialTheme.typography.headlineSmall
-		)
-		Text(
-			stringResource(R.string.intro_support_desc),
-			style = MaterialTheme.typography.bodyMedium,
-		)
-		val uriHandler = LocalUriHandler.current
-
-		var highlight by remember { mutableStateOf(false) }
-
-		IntroSupportItem(R.string.patreon, URL_PATREON, highlight) {
-			uriHandler.openUri(URL_PATREON)
-		}
-
-		IntroSupportItem(R.string.kofi, URL_KOFI, highlight) {
-			uriHandler.openUri(URL_KOFI)
-		}
-
-		val agree by remember {
-			derivedStateOf {
-				listOf(
-					R.string.support_agree_1,
-					R.string.support_agree_2,
-					R.string.support_agree_3
-				).random()
-			}
-		}
-
-		val disagree by remember {
-			derivedStateOf {
-				listOf(
-					R.string.support_disagree_1,
-					R.string.support_disagree_2,
-					R.string.support_disagree_3
-				).random()
-			}
-		}
-		var clicked by remember { mutableStateOf(false) }
-
-		Row(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(16.dp),
-			horizontalArrangement = Arrangement.SpaceBetween,
+		// Header
+		Card(
+			shape = RectangleShape
 		) {
-			TextButton(next) {
-				Text(stringResource(disagree))
+			Text(
+				stringResource(R.string.intro_support_title),
+				style = MaterialTheme.typography.headlineSmall,
+				modifier = Modifier
+					.padding(16.dp)
+					.fillMaxWidth(),
+				textAlign = TextAlign.Center
+			)
+		}
+
+		// Body
+		Column(
+			modifier = Modifier
+				.fillMaxSize()
+				.verticalScroll(rememberScrollState()),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(8.dp)
+		) {
+			Text(
+				stringResource(R.string.intro_support_desc),
+				style = MaterialTheme.typography.bodyMedium,
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+			)
+			val uriHandler = LocalUriHandler.current
+
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(4.dp),
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+			) {
+				IntroSupportItem(R.string.patreon, URL_PATREON) {
+					showNext()
+					uriHandler.openUri(URL_PATREON)
+				}
+
+				IntroSupportItem(R.string.kofi, URL_KOFI) {
+					showNext()
+					uriHandler.openUri(URL_KOFI)
+				}
 			}
 
-			TextButton(onClick = {
-				if (clicked) {
-					next()
-				} else {
-					highlight = true
-					clicked = true
+			val disagree by remember {
+				derivedStateOf {
+					listOf(
+						R.string.support_disagree_1,
+						R.string.support_disagree_2,
+						R.string.support_disagree_3
+					).random()
 				}
-			}) {
-				Text(stringResource(agree))
+			}
+
+			TextButton(
+				{
+					showNext()
+					next()
+				},
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+			) {
+				Text(stringResource(disagree))
 			}
 		}
 	}
@@ -496,28 +504,18 @@ fun IntroSupportPage(
 fun PreviewIntroSupportItem() {
 	IntroSupportItem(
 		R.string.pause,
-		"link",
-		true
+		"link"
 	) {
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IntroSupportItem(textId: Int, link: String, highlight: Boolean, onClick: () -> Unit) {
+fun IntroSupportItem(textId: Int, link: String, onClick: () -> Unit) {
 	Card(
 		onClick = onClick,
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(top = 4.dp),
-		border = if (highlight) {
-			BorderStroke(
-				SELECTED_STROKE_WIDTH.dp,
-				MaterialTheme.colorScheme.primary
-			)
-		} else {
-			null
-		}
 	) {
 		Column(
 			modifier = Modifier

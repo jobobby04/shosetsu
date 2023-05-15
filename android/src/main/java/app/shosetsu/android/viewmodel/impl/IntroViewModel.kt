@@ -38,6 +38,12 @@ class IntroViewModel(
 ) : AIntroViewModel() {
 	override val isLicenseRead: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
+	override val shouldSupportShowNext: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+	override fun supportShowNext() {
+		shouldSupportShowNext.value = true
+	}
+
 	override fun setLicenseRead() {
 		isLicenseRead.value = true
 	}

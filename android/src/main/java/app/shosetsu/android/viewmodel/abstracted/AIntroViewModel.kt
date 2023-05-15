@@ -28,6 +28,10 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class AIntroViewModel : ShosetsuViewModel() {
 
+	abstract val shouldSupportShowNext: StateFlow<Boolean>
+
+	abstract fun supportShowNext()
+
 	/**
 	 * Is license read, the user must read it
 	 */

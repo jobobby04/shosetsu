@@ -610,15 +610,15 @@
     <string name="fragment_updates_clear">Select date to clear updates before</string>
     <string name="intro_support_title">Support the Developer</string>
     <string name="intro_support_desc">
-        \tHi I am Doomsdayrs and I develop Shosetsu.\n
-        Due to college, I am currently struggling financially,\n
+        Hi I am Doomsdayrs the developer.\n
+        Due to college, I am currently struggling financially,
         and I am aware that there at least over 4000 users using Shosetsu.\n\n
 
-        \tAll I am asking is that you consider donating at least $1 (USD) via the services below.\n
+        All I am asking is that you consider donating at least $1 (USD) via the services below.\n
         - If 500 people donate once a month, I will be financially stable again.\n
         - If 1000 donate once a month, I will be able to work on Shosetsu nearly full time.\n\n
 
-        Please, do consider supporting.\n
+        Please, do consider supporting.
         Either by helping financially, programming new features / fixes, or spreading this message.\n
         Thank you for your time.
     </string>
