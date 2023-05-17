@@ -153,7 +153,7 @@ fun DiscreteSliderDialog(
 			it.toIntOrNull() ?: valueRange.item.first
 		},
 		validateInput = {
-			it.isDigitsOnly() && it.toInt() in valueRange.item
+			it.isDigitsOnly() && it.isNotEmpty() && it.toInt() in valueRange.item
 		},
 		updateValue
 	)
