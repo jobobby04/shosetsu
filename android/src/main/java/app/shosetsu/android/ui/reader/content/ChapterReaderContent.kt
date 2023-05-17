@@ -46,9 +46,9 @@ import kotlinx.coroutines.launch
 fun PreviewChapterReaderContent() {
 	ShosetsuCompose {
 		ChapterReaderContent(
-			isFirstFocus = false,
+			isFirstFocusProvider = { false },
 			onFirstFocus = {},
-			isFocused = false,
+			isFocusedProvider = { false },
 			content = {
 				ChapterReaderPagerContent(
 					items = persistentListOf(),
@@ -92,8 +92,8 @@ fun PreviewChapterReaderContent() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChapterReaderContent(
-	isFocused: Boolean,
-	isFirstFocus: Boolean,
+	isFocusedProvider: () -> Boolean,
+	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
 	content: @Composable (PaddingValues) -> Unit,
@@ -101,19 +101,6 @@ fun ChapterReaderContent(
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
-
-	if (isFocused && isFirstFocus) {
-		val string = stringResource(R.string.reader_first_focus)
-		val dismiss = stringResource(R.string.reader_first_focus_dismiss)
-		LaunchedEffect(scaffoldState.snackbarHostState) {
-			launch {
-				when (scaffoldState.snackbarHostState.showSnackbar(string, dismiss)) {
-					SnackbarResult.Dismissed -> onFirstFocus()
-					SnackbarResult.ActionPerformed -> onFirstFocus()
-				}
-			}
-		}
-	}
 
 	BackHandler(scaffoldState.bottomSheetState.isExpanded) {
 		scope.launch {
@@ -126,10 +113,24 @@ fun ChapterReaderContent(
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocused) BottomSheetScaffoldDefaults.SheetPeekHeight else 0.dp,
+		sheetPeekHeight = if (!isFocusedProvider()) BottomSheetScaffoldDefaults.SheetPeekHeight else 0.dp,
 		content = { paddingValues ->
 			content(paddingValues)
 		},
 		sheetShape = RectangleShape
 	)
+
+	if (isFocusedProvider() && isFirstFocusProvider()) {
+		val string = stringResource(R.string.reader_first_focus)
+		val dismiss = stringResource(R.string.reader_first_focus_dismiss)
+		LaunchedEffect(scaffoldState.snackbarHostState) {
+			launch {
+				when (scaffoldState.snackbarHostState.showSnackbar(string, dismiss)) {
+					SnackbarResult.Dismissed -> onFirstFocus()
+					SnackbarResult.ActionPerformed -> onFirstFocus()
+				}
+			}
+		}
+	}
+
 }

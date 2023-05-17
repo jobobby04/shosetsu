@@ -294,8 +294,8 @@ fun ChapterReaderView(
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
 	ShosetsuCompose {
 		ChapterReaderContent(
-			isFirstFocus = isFirstFocus,
-			isFocused = isFocused,
+			isFirstFocusProvider = { isFirstFocus },
+			isFocusedProvider = { isFocused },
 			onFirstFocus = viewModel::onFirstFocus,
 			sheetContent = { state ->
 				ChapterReaderBottomSheetContent(
