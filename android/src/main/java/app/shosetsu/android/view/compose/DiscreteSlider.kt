@@ -144,7 +144,7 @@ fun DiscreteSliderDialog(
 	updateValue: (Int, fromDialog: Boolean) -> Unit,
 ) {
 	DiscreteSliderDialog(
-		title = stringResource(R.string.input_float),
+		title = stringResource(R.string.input_int),
 		description = stringResource(R.string.input_int_range_desc),
 		value,
 		valueRange,
