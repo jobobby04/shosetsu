@@ -218,14 +218,14 @@ dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
 	// Google view things
-	implementation("com.google.android.material:material:1.8.0")
+	implementation("com.google.android.material:material:1.9.0")
 
 	// Androidx
 	implementation("androidx.work:work-runtime:2.8.1")
 	implementation("androidx.work:work-runtime-ktx:2.8.1")
 	implementation("androidx.appcompat:appcompat:1.6.1")
 	implementation("androidx.annotation:annotation:1.6.0")
-	implementation("androidx.core:core-ktx:1.10.0")
+	implementation("androidx.core:core-ktx:1.10.1")
 	implementation("androidx.collection:collection-ktx:1.2.0")
 	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
@@ -324,7 +324,7 @@ dependencies {
 
 	// KTX
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.0")
 
 	// KTX - Serialization
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
@@ -374,7 +374,7 @@ dependencies {
 	implementation(accompanist("accompanist-systemuicontroller"))
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata:1.4.2")
+	implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
 
 	// MDC Adapter
 	implementation(accompanist("accompanist-themeadapter-material"))
