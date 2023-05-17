@@ -56,6 +56,7 @@ import androidx.navigation.navOptions
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.consts.BROWSE_HELP_URL
+import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
@@ -102,8 +103,10 @@ class BrowseController : ShosetsuController(),
 
 	override fun onPrepareMenu(menu: Menu) {
 		(menu.findItem(R.id.search)?.actionView as? SearchView)?.apply {
-			setOnQueryTextListener(BrowseSearchQuery(findNavController()))
-			isSubmitButtonEnabled = true
+			//setOnQueryTextListener(BrowseSearchQuery(findNavController()))
+			isSubmitButtonEnabled = false
+
+			setOnQueryTextListener(BrowseFilterExtensions(viewModel))
 		}
 	}
 
@@ -195,7 +198,17 @@ class BrowseController : ShosetsuController(),
 			true
 		}
 
-		R.id.search -> true
+		R.id.global_search -> {
+			findNavController().navigate(
+				R.id.action_browseController_to_searchController,
+				bundleOf(BundleKeys.BUNDLE_QUERY to null),
+				navOptions {
+					setShosetsuTransition()
+				}
+			)
+			true
+		}
+
 		R.id.browse_import -> {
 			makeSnackBar(R.string.regret)?.show()
 			true

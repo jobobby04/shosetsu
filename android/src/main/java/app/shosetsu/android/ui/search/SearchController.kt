@@ -156,7 +156,7 @@ class SearchController : ShosetsuController(), MenuProvider {
 	override fun onMenuItemSelected(item: MenuItem): Boolean = true
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.initQuery(requireArguments().getString(BundleKeys.BUNDLE_QUERY, "")!!)
+		viewModel.initQuery(requireArguments().getString(BundleKeys.BUNDLE_QUERY, null))
 	}
 
 	/** Class that handles querying */
