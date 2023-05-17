@@ -32,6 +32,7 @@ import app.shosetsu.android.common.ext.collectLA
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.setTheme
 import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.reader.content.*
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -256,7 +257,7 @@ class ChapterReader
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChapterReaderView(
-	viewModel: AChapterReaderViewModel,
+	viewModel: AChapterReaderViewModel = viewModelDi(),
 	isTTSCapable: MutableStateFlow<Boolean>,
 	isTTSPlaying: MutableStateFlow<Boolean>,
 	onExit: () -> Unit

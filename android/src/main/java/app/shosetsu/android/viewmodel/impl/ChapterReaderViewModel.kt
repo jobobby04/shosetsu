@@ -703,26 +703,22 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onReaderClicked() {
-		launchIO {
-			if (!doubleTapFocus.first()) {
-				val newValue = !isFocused.value
-				isFocused.value = newValue
-				if (newValue || matchFullscreenToFocus.first())
-					_isSystemVisible.value = !newValue
-			}
+		if (!doubleTapFocus.value) {
+			val newValue = !isFocused.value
+			isFocused.value = newValue
+			if (newValue || matchFullscreenToFocus.value)
+				_isSystemVisible.value = !newValue
 		}
 	}
 
 	override fun onReaderDoubleClicked() {
-		launchIO {
-			if (doubleTapFocus.value) {
-				val newValue = !isFocused.value
-				isFocused.value = newValue
-				if (newValue || matchFullscreenToFocus.value)
-					_isSystemVisible.value = !newValue
-			} else if (doubleTapSystemFlow.value) {
-				toggleSystemVisible()
-			}
+		if (doubleTapFocus.value) {
+			val newValue = !isFocused.value
+			isFocused.value = newValue
+			if (newValue || matchFullscreenToFocus.value)
+				_isSystemVisible.value = !newValue
+		} else if (doubleTapSystemFlow.value) {
+			toggleSystemVisible()
 		}
 	}
 
