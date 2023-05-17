@@ -21,8 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.view.WindowInsetsCompat.Type
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
@@ -42,6 +40,7 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDivide
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -171,7 +170,6 @@ class ChapterReader
 			setTheme(it)
 		}
 		super.onCreate(savedInstanceState)
-		val insetsController = WindowInsetsControllerCompat(window, window.decorView)
 
 		setContent {
 			ChapterReaderView(
@@ -180,18 +178,6 @@ class ChapterReader
 				isTTSPlaying,
 				onExit = { finish() }
 			)
-		}
-
-		viewModel.isSystemVisible.collectLA(this, catch = {
-		}) {
-			if (!it) {
-				insetsController.hide(Type.systemBars())
-				insetsController.hide(Type.displayCutout())
-				insetsController.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-			} else {
-				insetsController.show(Type.systemBars())
-				insetsController.show(Type.displayCutout())
-			}
 		}
 
 		viewModel.liveIsScreenRotationLocked.collectLA(this, catch = {}) {
@@ -262,6 +248,12 @@ fun ChapterReaderView(
 	isTTSPlaying: MutableStateFlow<Boolean>,
 	onExit: () -> Unit
 ) {
+	val uiController = rememberSystemUiController()
+	uiController.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+	val isSystemVisible by viewModel.isSystemVisible.collectAsState()
+	uiController.isSystemBarsVisible = isSystemVisible
+
 	val items by viewModel.liveData.collectAsState()
 	val isHorizontalReading by viewModel.isHorizontalReading.collectAsState()
 	val isBookmarked by viewModel.isCurrentChapterBookmarked.collectAsState()
