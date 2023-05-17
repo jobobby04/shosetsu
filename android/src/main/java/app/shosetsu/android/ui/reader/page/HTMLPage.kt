@@ -99,6 +99,7 @@ fun WebViewPageContent(
 				.fillMaxWidth()
 				.verticalScroll(scrollState),
 			client = object : AccompanistWebViewClient() {
+				private var applied = false
 				override fun shouldOverrideUrlLoading(
 					view: WebView?,
 					request: WebResourceRequest?
@@ -106,12 +107,15 @@ fun WebViewPageContent(
 
 				override fun onPageFinished(view: WebView?, url: String?) {
 					super.onPageFinished(view, url)
-					view?.evaluateJavascript(
-						"""
-						window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
-						window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
-						""".trimIndent(), null
-					)
+					if (!applied) {
+						view?.evaluateJavascript(
+							"""
+							window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
+							window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
+							""".trimIndent(), null
+						)
+						applied = true
+					}
 				}
 			},
 			chromeClient = ShosetsuAccompanistWebChromeClient()
