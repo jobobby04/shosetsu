@@ -48,7 +48,7 @@ fun PreviewChapterReaderContent() {
 		ChapterReaderContent(
 			isFirstFocusProvider = { false },
 			onFirstFocus = {},
-			isFocusedProvider = { false },
+			isFocused = false,
 			content = {
 				ChapterReaderPagerContent(
 					items = persistentListOf(),
@@ -92,7 +92,7 @@ fun PreviewChapterReaderContent() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChapterReaderContent(
-	isFocusedProvider: () -> Boolean,
+	isFocused: Boolean,
 	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
@@ -113,14 +113,14 @@ fun ChapterReaderContent(
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocusedProvider()) BottomSheetScaffoldDefaults.SheetPeekHeight else 0.dp,
+		sheetPeekHeight = if (!isFocused) BottomSheetScaffoldDefaults.SheetPeekHeight else 0.dp,
 		content = { paddingValues ->
 			content(paddingValues)
 		},
 		sheetShape = RectangleShape
 	)
 
-	if (isFocusedProvider() && isFirstFocusProvider()) {
+	if (isFocused && isFirstFocusProvider()) {
 		val string = stringResource(R.string.reader_first_focus)
 		val dismiss = stringResource(R.string.reader_first_focus_dismiss)
 		LaunchedEffect(scaffoldState.snackbarHostState) {

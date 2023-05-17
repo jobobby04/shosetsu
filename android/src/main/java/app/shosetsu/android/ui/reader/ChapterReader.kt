@@ -287,7 +287,7 @@ fun ChapterReaderView(
 	ShosetsuCompose {
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
-			isFocusedProvider = { isFocused },
+			isFocused = isFocused,
 			onFirstFocus = viewModel::onFirstFocus,
 			sheetContent = { state ->
 				ChapterReaderBottomSheetContent(
