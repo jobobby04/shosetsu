@@ -621,7 +621,7 @@ class NovelViewModel(
 		}
 	}
 
-	override fun getChapterCount(): Flow<Int> = flowOf(chaptersLive.value.size)
+	override fun getChapterCount(): Int = chaptersLive.value.size
 
 	override fun deleteChapters() {
 		launchIO {

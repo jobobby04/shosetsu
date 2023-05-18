@@ -171,7 +171,11 @@ abstract class ANovelViewModel
 	abstract fun scrollTo(predicate: (ChapterUI) -> Boolean): Flow<Boolean>
 
 	abstract fun toggleSelection(it: ChapterUI)
-	abstract fun getChapterCount(): Flow<Int>
+
+	/**
+	 * Get the count of chapters as declared from [chaptersLive]
+	 */
+	abstract fun getChapterCount(): Int
 
 	/**
 	 * Delete downloaded chapters

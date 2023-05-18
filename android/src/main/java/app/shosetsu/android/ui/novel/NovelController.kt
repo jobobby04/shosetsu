@@ -229,42 +229,52 @@ class NovelController : ShosetsuController(),
 			migrateOpen()
 			true
 		}
+
 		R.id.share -> {
 			openShare()
 			true
 		}
+
 		R.id.option_chapter_jump -> {
 			openChapterJumpDialog()
 			true
 		}
+
 		R.id.download_next -> {
 			viewModel.downloadNextChapter()
 			true
 		}
+
 		R.id.download_next_5 -> {
 			viewModel.downloadNext5Chapters()
 			true
 		}
+
 		R.id.download_next_10 -> {
 			viewModel.downloadNext10Chapters()
 			true
 		}
+
 		R.id.download_custom -> {
 			downloadCustom()
 			true
 		}
+
 		R.id.download_unread -> {
 			viewModel.downloadAllUnreadChapters()
 			true
 		}
+
 		R.id.download_all -> {
 			viewModel.downloadAllChapters()
 			true
 		}
+
 		R.id.set_categories -> {
 			categoriesDialogOpen = true
 			true
 		}
+
 		else -> false
 	}
 
@@ -338,25 +348,24 @@ class NovelController : ShosetsuController(),
 	 */
 	private fun downloadCustom() {
 		if (context == null) return
-		viewModel.getChapterCount().collectLA(this, catch = {}) { max ->
-			AlertDialog.Builder(requireActivity()).apply {
-				setTitle(string.download_custom_chapters)
-				val numberPicker = NumberPicker(requireActivity()).apply {
-					minValue = 0
-					maxValue = max
-				}
-				setView(numberPicker)
+		val max = viewModel.getChapterCount()
 
-				setPositiveButton(android.R.string.ok) { d, _ ->
-					viewModel.downloadNextCustomChapters(numberPicker.value)
-					d.dismiss()
-				}
-				setNegativeButton(android.R.string.cancel) { d, _ ->
-					d.cancel()
-				}
-			}.show()
-		}
+		AlertDialog.Builder(requireActivity()).apply {
+			setTitle(string.download_custom_chapters)
+			val numberPicker = NumberPicker(requireActivity()).apply {
+				minValue = 0
+				maxValue = max
+			}
+			setView(numberPicker)
 
+			setPositiveButton(android.R.string.ok) { d, _ ->
+				viewModel.downloadNextCustomChapters(numberPicker.value)
+				d.dismiss()
+			}
+			setNegativeButton(android.R.string.cancel) { d, _ ->
+				d.cancel()
+			}
+		}.show()
 	}
 
 	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
@@ -393,6 +402,7 @@ class NovelController : ShosetsuController(),
 						viewModel.deleteChapters()
 					}?.show()
 				}
+
 				ANovelViewModel.ToggleBookmarkResponse.Nothing -> {
 				}
 			}
@@ -495,6 +505,7 @@ class NovelController : ShosetsuController(),
 							it.message ?: ""
 						)
 					)?.show()
+
 				is FilePermissionException ->
 					makeSnackBar(
 						getString(
@@ -502,6 +513,7 @@ class NovelController : ShosetsuController(),
 							it.message ?: ""
 						)
 					)?.show()
+
 				is NoSuchExtensionException ->
 					makeSnackBar(
 						getString(
@@ -648,18 +660,22 @@ class NovelController : ShosetsuController(),
 					selectAll()
 					true
 				}
+
 				R.id.chapter_select_between -> {
 					selectBetween()
 					true
 				}
+
 				R.id.chapter_inverse -> {
 					invertSelection()
 					true
 				}
+
 				R.id.true_delete -> {
 					trueDeleteSelection()
 					true
 				}
+
 				else -> false
 			}
 
@@ -707,6 +723,7 @@ fun PreviewNovelInfoContent() {
 				it % 2 == 0 -> {
 					ReadingStatus.READING
 				}
+
 				else -> {
 					ReadingStatus.READ
 				}
