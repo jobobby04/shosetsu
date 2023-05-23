@@ -28,6 +28,7 @@
 - Add mechanism to respect Retry-After HTTP header response
 - Fix CSS keyboard overlap
 - Fix scroll position reset in CSS text editor
+- Use OkHTTP client for image loading
 
 ## Misc
 - Add OptIn flags
@@ -49,3 +50,5 @@
 - Use lastLoadedUrl in WebViewApp
 - Separate ChapterReader and ChapterReaderView
 - Disabled view size forcing in HTMLPage.kt for ChapterReader
+- Prevent javascript from being applied twice
+- ANovelViewModel: Swap getChapterCount to integer return
