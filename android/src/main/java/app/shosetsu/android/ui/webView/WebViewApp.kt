@@ -259,7 +259,7 @@ fun WebViewScreen(
 				}
 			},
 			client = webClient,
-			chromeClient = ShosetsuAccompanistWebChromeClient()
+			chromeClient = ShosetsuAccompanistWebChromeClient
 		)
 	}
 }

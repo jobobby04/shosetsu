@@ -2,8 +2,6 @@ package app.shosetsu.android.ui.reader.page
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
-import android.webkit.JavascriptInterface
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
-import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.view.compose.ScrollStateBar
-import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 import kotlinx.coroutines.launch
@@ -43,7 +39,7 @@ import kotlinx.coroutines.launch
  */
 
 @Composable
-fun WebViewPageContent(
+fun HTMLPage(
 	html: String,
 	progress: Double,
 	onScroll: (perc: Double) -> Unit,
@@ -73,10 +69,11 @@ fun WebViewPageContent(
 				webView.settings.apply {
 					@SuppressLint("SetJavaScriptEnabled")
 					javaScriptEnabled = true
-					blockNetworkLoads = false
-					blockNetworkImage = false
-					loadsImagesAutomatically = true
-					allowFileAccess = true
+					blockNetworkLoads = false // enable content loading
+					blockNetworkImage = false // enable image loading
+					loadsImagesAutomatically = true // ensure images are loaded
+					allowFileAccess = true // allow to cache content
+					// try to use loaded cache
 					cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 				}
 
@@ -98,27 +95,8 @@ fun WebViewPageContent(
 			modifier = Modifier
 				.fillMaxWidth()
 				.verticalScroll(scrollState),
-			client = object : AccompanistWebViewClient() {
-				private var applied = false
-				override fun shouldOverrideUrlLoading(
-					view: WebView?,
-					request: WebResourceRequest?
-				): Boolean = true
-
-				override fun onPageFinished(view: WebView?, url: String?) {
-					super.onPageFinished(view, url)
-					if (!applied) {
-						view?.evaluateJavascript(
-							"""
-							window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
-							window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
-							""".trimIndent(), null
-						)
-						applied = true
-					}
-				}
-			},
-			chromeClient = ShosetsuAccompanistWebChromeClient()
+			client = ShosetsuAccompanistWebViewClient,
+			chromeClient = ShosetsuAccompanistWebChromeClient
 		)
 	}
 
@@ -132,27 +110,6 @@ fun WebViewPageContent(
 					first = false
 				}
 			}
-		}
-	}
-}
-
-class ShosetsuScript(
-	val onClickMethod: () -> Unit,
-	val onDClickMethod: () -> Unit
-) {
-	@Suppress("unused")
-	@JavascriptInterface
-	fun onClick() {
-		launchUI {
-			onClickMethod()
-		}
-	}
-
-	@Suppress("unused")
-	@JavascriptInterface
-	fun onDClick() {
-		launchUI {
-			onDClickMethod()
 		}
 	}
 }

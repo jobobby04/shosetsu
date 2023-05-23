@@ -12,9 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import app.shosetsu.android.R
-import app.shosetsu.android.ui.reader.page.WebViewPageContent
+import app.shosetsu.android.ui.reader.page.HTMLPage
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
@@ -74,6 +73,7 @@ fun ChapterReaderHTMLContent(
 				stackTrace = throwable?.stackTraceToString()
 			)
 		}
+
 		AChapterReaderViewModel.ChapterPassage.Loading -> {
 			Box(
 				Modifier
@@ -87,9 +87,10 @@ fun ChapterReaderHTMLContent(
 				)
 			}
 		}
+
 		is AChapterReaderViewModel.ChapterPassage.Success -> {
 			val progress by remember { progressFlow() }.collectAsState(0.0)
-			WebViewPageContent(
+			HTMLPage(
 				html = (html as AChapterReaderViewModel.ChapterPassage.Success).content,
 				progress = progress,
 				onScroll = {

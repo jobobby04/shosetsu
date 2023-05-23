@@ -27,7 +27,11 @@ import com.google.accompanist.web.AccompanistWebChromeClient
  * @since 09 / 12 / 2022
  * @author Doomsdayrs
  */
-class ShosetsuAccompanistWebChromeClient : AccompanistWebChromeClient() {
+object ShosetsuAccompanistWebChromeClient : AccompanistWebChromeClient() {
+
+	/**
+	 * Implement logging for [app.shosetsu.android.ui.reader.page.HTMLPage]
+	 */
 	override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
 		val sourceId = consoleMessage?.sourceId()
 		val lineNumber = consoleMessage?.lineNumber()
