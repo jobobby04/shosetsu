@@ -416,7 +416,15 @@ fun LibraryContent(
 ) {
 	if (!isEmpty) {
 		if (items == null) {
-			LinearProgressIndicator(Modifier.fillMaxWidth())
+			Box(
+				modifier = Modifier.fillMaxSize()
+			) {
+				LinearProgressIndicator(
+					Modifier
+						.fillMaxWidth()
+						.align(Alignment.TopCenter)
+				)
+			}
 		} else {
 			LibraryPager(
 				library = items,
