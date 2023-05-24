@@ -158,6 +158,14 @@ class LibraryViewModel(
 	}
 
 	private val librarySourceFlow: Flow<LibraryUI> by lazy { loadLibrary() }
+	override val isCategoryDialogOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
+	override fun showCategoryDialog() {
+		isCategoryDialogOpen.value = true
+	}
+
+	override fun hideCategoryDialog() {
+		isCategoryDialogOpen.value = false
+	}
 
 	override val isEmptyFlow: StateFlow<Boolean> by lazy {
 		librarySourceFlow.map {

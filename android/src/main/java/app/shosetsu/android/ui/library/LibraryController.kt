@@ -90,10 +90,9 @@ class LibraryController
 
 	override val viewTitleRes: Int = R.string.library
 
-	/***/
-	val viewModel: ALibraryViewModel by viewModel()
-	var categoriesDialogOpen by mutableStateOf(false)
+	private val viewModel: ALibraryViewModel by viewModel()
 
+	/***/
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -103,77 +102,47 @@ class LibraryController
 		setViewTitle()
 		return ComposeView(requireContext()).apply {
 			setContent {
-				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState()
-					val isEmpty by viewModel.isEmptyFlow.collectAsState()
-					val hasSelected by viewModel.hasSelection.collectAsState()
-					val type by viewModel.novelCardTypeFlow.collectAsState()
-					val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
-
-					val columnsInV by viewModel.columnsInV.collectAsState()
-					val columnsInH by viewModel.columnsInH.collectAsState()
-
-					BackHandler(hasSelected) {
-						viewModel.deselectAll()
-					}
-
-					LibraryContent(
-						items = items,
-						isEmpty = isEmpty,
-						setActiveCategory = viewModel::setActiveCategory,
-						cardType = type,
-						columnsInV = columnsInV,
-						columnsInH = columnsInH,
-						hasSelected = hasSelected,
-						onRefresh = {
-							onRefresh(it)
-						},
-						onOpen = { (id) ->
-							try {
-								findNavController().navigateSafely(
-									R.id.action_libraryController_to_novelController,
-									bundleOf(BundleKeys.BUNDLE_NOVEL_ID to id),
-									navOptions = navOptions {
-										launchSingleTop = true
-										setShosetsuTransition()
-									}
-								)
-							} catch (ignored: Exception) {
-								// ignore dup
-							}
-						},
-						toggleSelection = viewModel::toggleSelection,
-						toastNovel = if (badgeToast) {
-							{ item ->
-								try {
-									makeSnackBar(
-										resources!!.getQuantityString(
-											R.plurals.toast_unread_count,
-											item.unread,
-											item.unread
-										)
-									)?.show()
-								} catch (e: Resources.NotFoundException) {
-								}
-							}
-						} else null,
-						fab = fab
-					)
-					if (categoriesDialogOpen) {
-						CategoriesDialog(
-							onDismissRequest = { categoriesDialogOpen = false },
-							categories = remember(items?.categories) {
-								items?.categories ?: persistentListOf()
-							},
-							novelCategories = remember { persistentListOf() },
-							setCategories = viewModel::setCategories
-						)
-					}
-				}
+				LibraryView(
+					viewModel = viewModel,
+					onRefresh = ::onRefresh,
+					onOpenNovel = ::onOpenNovel,
+					onToastNovel = ::onToastNovel,
+					fab
+				)
 			}
 		}
 	}
 
+	private fun onToastNovel(item: LibraryNovelUI) {
+		try {
+			makeSnackBar(
+				resources.getQuantityString(
+					R.plurals.toast_unread_count,
+					item.unread,
+					item.unread
+				)
+			)?.show()
+		} catch (ignored: Resources.NotFoundException) {
+			// oops!
+		}
+	}
+
+	private fun onOpenNovel(novelId: Int) {
+		try {
+			findNavController().navigateSafely(
+				R.id.action_libraryController_to_novelController,
+				bundleOf(BundleKeys.BUNDLE_NOVEL_ID to novelId),
+				navOptions = navOptions {
+					launchSingleTop = true
+					setShosetsuTransition()
+				}
+			)
+		} catch (ignored: Exception) {
+			// ignore dup
+		}
+	}
+
+	/***/
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		startObservation()
 	}
@@ -190,6 +159,7 @@ class LibraryController
 		}
 	}
 
+	/***/
 	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
 		if (!viewModel.hasSelection.value) {
 			inflater.inflate(R.menu.toolbar_library, menu)
@@ -200,6 +170,7 @@ class LibraryController
 
 	private var searchView: SearchView? = null
 
+	/***/
 	override fun onPrepareMenu(menu: Menu) {
 		logI("Preparing options menu")
 		searchView = (menu.findItem(R.id.library_search)?.actionView as? SearchView)
@@ -297,7 +268,7 @@ class LibraryController
 			}
 
 			R.id.set_categories -> {
-				categoriesDialogOpen = true
+				viewModel.showCategoryDialog()
 				true
 			}
 
@@ -362,13 +333,72 @@ class LibraryController
 		fab.setIconResource(R.drawable.filter)
 	}
 
-	fun onRefresh(categoryID: Int) {
+	private fun onRefresh(categoryID: Int) {
 		if (viewModel.isOnline())
 			viewModel.startUpdateManager(categoryID)
 		else displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
 	}
 }
 
+/**
+ * Main view of the users saved novels.
+ */
+@Suppress("IncompleteDestructuring")
+@Composable
+fun LibraryView(
+	viewModel: ALibraryViewModel = viewModelDi(),
+	onRefresh: (categoryId: Int) -> Unit,
+	onOpenNovel: (novelId: Int) -> Unit,
+	onToastNovel: (LibraryNovelUI) -> Unit,
+	fab: EFabMaintainer?
+) {
+	ShosetsuCompose {
+		val items by viewModel.liveData.collectAsState()
+		val isEmpty by viewModel.isEmptyFlow.collectAsState()
+		val hasSelected by viewModel.hasSelection.collectAsState()
+		val type by viewModel.novelCardTypeFlow.collectAsState()
+		val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
+
+		val columnsInV by viewModel.columnsInV.collectAsState()
+		val columnsInH by viewModel.columnsInH.collectAsState()
+		val isCategoriesDialogOpen by viewModel.isCategoryDialogOpen.collectAsState()
+
+		BackHandler(hasSelected) {
+			viewModel.deselectAll()
+		}
+
+		LibraryContent(
+			items = items,
+			isEmpty = isEmpty,
+			setActiveCategory = viewModel::setActiveCategory,
+			cardType = type,
+			columnsInV = columnsInV,
+			columnsInH = columnsInH,
+			hasSelected = hasSelected,
+			onRefresh = onRefresh,
+			onOpen = { (id) -> onOpenNovel(id) },
+			toggleSelection = viewModel::toggleSelection,
+			toastNovel = if (badgeToast) {
+				onToastNovel
+			} else null,
+			fab = fab
+		)
+		if (isCategoriesDialogOpen) {
+			CategoriesDialog(
+				onDismissRequest = { viewModel.hideCategoryDialog() },
+				categories = remember(items?.categories) {
+					items?.categories ?: persistentListOf()
+				},
+				novelCategories = remember { persistentListOf() },
+				setCategories = viewModel::setCategories
+			)
+		}
+	}
+}
+
+/**
+ * Content of [LibraryView]
+ */
 @Composable
 fun LibraryContent(
 	items: LibraryUI?,
@@ -409,6 +439,9 @@ fun LibraryContent(
 	}
 }
 
+/**
+ * Pager for categories
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryPager(
@@ -484,6 +517,11 @@ fun LibraryPager(
 	}
 }
 
+/**
+ * A page of novels fitting in a category.
+ *
+ * Also is used for the default page.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun LibraryCategory(

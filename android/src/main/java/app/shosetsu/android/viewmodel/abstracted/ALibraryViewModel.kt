@@ -43,6 +43,23 @@ abstract class ALibraryViewModel :
 	IsOnlineCheckViewModel,
 	StartUpdateManagerViewModel {
 
+	/**
+	 * View state of if the category dialog is open or not.
+	 *
+	 * This is here due to legacy non-compose frameworks.
+	 */
+	abstract val isCategoryDialogOpen: StateFlow<Boolean>
+
+	/**
+	 * Show the category dialog
+	 */
+	abstract fun showCategoryDialog()
+
+	/**
+	 * Hide the category dialog
+	 */
+	abstract fun hideCategoryDialog()
+
 	abstract val isEmptyFlow: StateFlow<Boolean>
 	abstract val hasSelection: StateFlow<Boolean>
 
