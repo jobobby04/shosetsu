@@ -5,18 +5,23 @@ import android.content.pm.ApplicationInfo
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.view.compose.ScrollStateBar
+import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
+import com.google.accompanist.web.WebViewState
+import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 /*
  * This file is part of shosetsu.
@@ -46,13 +51,26 @@ fun HTMLPage(
 	onClick: () -> Unit,
 	onDoubleClick: () -> Unit
 ) {
+	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
 	val state = rememberWebViewStateWithHTMLData(html)
+	val navigator = rememberWebViewNavigator(scope)
+
+	/*
+	LaunchedEffect(navigator) {
+		val bundle = state.viewState
+		if (bundle == null) {
+			navigator.loadHtml(html)
+		}
+	}
+	 */
+
 	var first by remember { mutableStateOf(true) }
 
 	if (scrollState.isScrollInProgress)
 		DisposableEffect(Unit) {
 			onDispose {
+				println("Scrolling: ${scrollState.value} out of ${scrollState.maxValue}")
 				if (scrollState.value != 0)
 					onScroll((scrollState.value.toDouble() / scrollState.maxValue))
 				else onScroll(0.0)
@@ -62,7 +80,7 @@ fun HTMLPage(
 	val backgroundColor = MaterialTheme.colors.background
 	ScrollStateBar(scrollState) {
 		WebView(
-			state,
+			state = state,
 			captureBackPresses = false,
 			onCreated = { webView ->
 				webView.setBackgroundColor(backgroundColor.toArgb())
@@ -94,18 +112,25 @@ fun HTMLPage(
 			},
 			modifier = Modifier
 				.fillMaxWidth()
+				.heightIn(min = 1.dp)
 				.verticalScroll(scrollState),
-			client = ShosetsuAccompanistWebViewClient,
-			chromeClient = ShosetsuAccompanistWebChromeClient
+			client = ShosetsuAccompanistWebViewClient(),
+			chromeClient = ShosetsuAccompanistWebChromeClient(),
+			navigator = navigator,
 		)
 	}
 
-	// Avoid scrolling when the state has not fully loaded
-	if (scrollState.maxValue != 0 && scrollState.maxValue != Int.MAX_VALUE && !state.isLoading) {
+	LaunchedEffect(scrollState.maxValue, state.loadingState) {
+		delay(250)
+		// Ensure this only occurs on the first time
 		if (first) {
-			LaunchedEffect(progress) {
-				launch {
+			// We can tell the view is not loaded properly by the scroll state
+			if (scrollState.maxValue != 0 && scrollState.maxValue != Int.MAX_VALUE) {
+				// Ensure state is loading
+				if (!state.sIsLoading) {
+					println("I am scrolling!: ${scrollState.maxValue} by $progress")
 					val result = (scrollState.maxValue * progress).toInt()
+					println("Scrolling to $result from ${scrollState.value}")
 					scrollState.scrollTo(result)
 					first = false
 				}
@@ -113,3 +138,7 @@ fun HTMLPage(
 		}
 	}
 }
+
+val WebViewState.sIsLoading: Boolean
+	get() = isLoading || (loadingState is LoadingState.Loading &&
+			(loadingState as LoadingState.Loading).progress != 1f)

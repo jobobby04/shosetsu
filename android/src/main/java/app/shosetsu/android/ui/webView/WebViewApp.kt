@@ -203,6 +203,7 @@ fun WebViewScreen(
 							.fillMaxWidth()
 							.align(Alignment.BottomCenter),
 					)
+
 					is LoadingState.Loading -> {
 						val animatedProgress by animateFloatAsState(
 							(loadingState as? LoadingState.Loading)?.progress ?: 1f,
@@ -215,6 +216,7 @@ fun WebViewScreen(
 								.align(Alignment.BottomCenter),
 						)
 					}
+
 					else -> {}
 				}
 			}
@@ -259,7 +261,7 @@ fun WebViewScreen(
 				}
 			},
 			client = webClient,
-			chromeClient = ShosetsuAccompanistWebChromeClient
+			chromeClient = ShosetsuAccompanistWebChromeClient()
 		)
 	}
 }

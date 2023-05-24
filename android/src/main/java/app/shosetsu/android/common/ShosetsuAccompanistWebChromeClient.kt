@@ -27,7 +27,7 @@ import com.google.accompanist.web.AccompanistWebChromeClient
  * @since 09 / 12 / 2022
  * @author Doomsdayrs
  */
-object ShosetsuAccompanistWebChromeClient : AccompanistWebChromeClient() {
+class ShosetsuAccompanistWebChromeClient : AccompanistWebChromeClient() {
 
 	/**
 	 * Implement logging for [app.shosetsu.android.ui.reader.page.HTMLPage]
