@@ -284,22 +284,6 @@ class DownloadWorker(
 		}
 	}
 
-	/**
-	 * Delay maintainer. Handles a progressively increasing delay.
-	 */
-	class ProgressiveDelayer {
-		private var count: Int = 0
-
-		suspend fun delay() {
-			count + 1
-			delay(count * 100L)
-		}
-
-		fun reset() {
-			count = 0
-		}
-	}
-
 	override suspend fun doWork(): Result {
 		logI("Starting loop")
 		if (isDownloadPaused())

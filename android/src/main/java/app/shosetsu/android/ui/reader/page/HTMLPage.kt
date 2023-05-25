@@ -15,13 +15,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
+import app.shosetsu.android.common.utils.ProgressiveDelayer
 import app.shosetsu.android.view.compose.ScrollStateBar
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
-import kotlinx.coroutines.delay
 
 /*
  * This file is part of shosetsu.
@@ -120,19 +120,21 @@ fun HTMLPage(
 		)
 	}
 
+	val delayer = remember { ProgressiveDelayer(25) }
 	LaunchedEffect(scrollState.maxValue, state.loadingState) {
-		delay(250)
 		// Ensure this only occurs on the first time
 		if (first) {
 			// We can tell the view is not loaded properly by the scroll state
 			if (scrollState.maxValue != 0 && scrollState.maxValue != Int.MAX_VALUE) {
 				// Ensure state is loading
 				if (!state.sIsLoading) {
+					delayer.delay() // each call makes the delay longer
 					println("I am scrolling!: ${scrollState.maxValue} by $progress")
 					val result = (scrollState.maxValue * progress).toInt()
 					println("Scrolling to $result from ${scrollState.value}")
 					scrollState.scrollTo(result)
 					first = false
+					delayer.reset()
 				}
 			}
 		}
