@@ -120,7 +120,7 @@ fun HTMLPage(
 		)
 	}
 
-	val delayer = remember { ProgressiveDelayer(25) }
+	val delayer = remember { ProgressiveDelayer(50) }
 	LaunchedEffect(scrollState.maxValue, state.loadingState) {
 		// Ensure this only occurs on the first time
 		if (first) {
