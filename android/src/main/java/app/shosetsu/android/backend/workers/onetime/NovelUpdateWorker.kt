@@ -130,7 +130,6 @@ class NovelUpdateWorker(
 		)
 	}
 
-
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_UPDATE)
 			.setSmallIcon(R.drawable.refresh)
@@ -349,45 +348,7 @@ class NovelUpdateWorker(
 		if (!classicFinale())
 			for (novel in updateNovels) {
 				launchIO { // Run each novel notification on it's own seperate thread
-					val uniqueChapters = updatedChapters.filter { it.novelID == novel.id }
-					val chapterSize: Int = uniqueChapters.size
-					val firstChapterId = uniqueChapters.minByOrNull { it.order }?.id
-					val bitmap: Bitmap? =
-						applicationContext.imageLoader.execute(
-							ImageRequest.Builder(applicationContext).data(novel.imageURL)
-								.build()
-						).drawable?.toBitmap()
-
-					notify(
-						applicationContext.resources.getQuantityString(
-							R.plurals.worker_novel_update_updated_novel_count,
-							chapterSize,
-							chapterSize
-						),
-						10000 + novel.id
-					) {
-						setContentTitle(
-							getString(
-								R.string.worker_novel_update_updated_novel,
-								novel.title
-							)
-						)
-
-
-						setLargeIcon(bitmap)
-
-						setNotOngoing()
-						removeProgress()
-
-						if (firstChapterId != null) {
-							addOpenReader(
-								novel.id,
-								firstChapterId
-							)
-							setAutoCancel(true)
-						}
-
-					}
+					notifyUpdate(novel, updatedChapters.filter { it.novelID == novel.id })
 				}
 			}
 
@@ -396,6 +357,55 @@ class NovelUpdateWorker(
 			startDownloadWorker(updatedChapters)
 
 		return Result.success()
+	}
+
+	/**
+	 * Notify an update for a novel
+	 *
+	 * @param novel that has been updated
+	 * @param chapters chapters that have been added
+	 */
+	private suspend fun notifyUpdate(
+		novel: LibraryNovelEntity,
+		chapters: List<ChapterEntity>
+	) {
+		val chapterSize: Int = chapters.size
+		val firstChapterId = chapters.minByOrNull { it.order }?.id
+		val bitmap: Bitmap? =
+			applicationContext.imageLoader.execute(
+				ImageRequest.Builder(applicationContext).data(novel.imageURL)
+					.build()
+			).drawable?.toBitmap()
+
+		notify(
+			contentText = applicationContext.resources.getQuantityString(
+				R.plurals.worker_novel_update_updated_novel_count,
+				chapterSize,
+				chapterSize
+			),
+			notificationId = 10000 + novel.id
+		) {
+			setContentTitle(
+				getString(
+					R.string.worker_novel_update_updated_novel,
+					novel.title
+				)
+			)
+
+			setLargeIcon(bitmap)
+
+			setNotOngoing()
+			removeProgress()
+
+			if (firstChapterId != null) {
+				setContentIntent(null)
+				addOpenReader(
+					novel.id,
+					firstChapterId
+				)
+				setAutoCancel(true)
+			}
+		}
 	}
 
 	/**
