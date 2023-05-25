@@ -142,5 +142,6 @@ fun HTMLPage(
 }
 
 val WebViewState.sIsLoading: Boolean
-	get() = isLoading || (loadingState is LoadingState.Loading &&
-			(loadingState as LoadingState.Loading).progress != 1f)
+	get() = (loadingState is LoadingState.Loading &&
+			(loadingState as LoadingState.Loading).progress != 1f) ||
+			loadingState is LoadingState.Initializing
