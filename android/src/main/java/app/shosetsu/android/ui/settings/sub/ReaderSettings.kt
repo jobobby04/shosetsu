@@ -313,6 +313,9 @@ fun ReaderSettingsContent(
 
 		item { viewModel.doubleTapFocus() }
 		item { viewModel.doubleTapSystem() }
+
+		item { viewModel.readerPitchOption() }
+		item { viewModel.readerSpeedOption() }
 	}
 
 }

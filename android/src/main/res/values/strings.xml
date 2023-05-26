@@ -54,6 +54,9 @@
     <string name="read">Read</string>
     <string name="unread">Unread</string>
 
+    <string name="reader_pitch">TTS Pitch</string>
+    <string name="reader_speed">TTS Speed</string>
+
     <!-- Migration View -->
 
     <!-- Settings Info -->
