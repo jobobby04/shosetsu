@@ -4,6 +4,7 @@ import android.content.ComponentCallbacks2
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.view.KeyEvent
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.compose.setContent
@@ -12,12 +13,14 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
@@ -27,6 +30,8 @@ import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
 import app.shosetsu.android.common.ext.collectLA
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.setTheme
 import app.shosetsu.android.common.ext.viewModel
@@ -38,14 +43,15 @@ import app.shosetsu.android.view.compose.TextButton
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
+import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel.ChapterPassage
 import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import org.jsoup.Jsoup
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -76,34 +82,6 @@ class ChapterReader
 	: AppCompatActivity(), DIAware {
 	override val di: DI by closestDI()
 	internal val viewModel: AChapterReaderViewModel by viewModel()
-
-	private val isTTSCapable = MutableStateFlow(false)
-	private val isTTSPlaying = MutableStateFlow(false)
-
-	/*
-	private val ttsInitListener: TextToSpeech.OnInitListener by lazy {
-		TextToSpeech.OnInitListener {
-			when (it) {
-				TextToSpeech.SUCCESS -> {
-					val result = tts.setLanguage(Locale.getDefault())
-
-					if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-						logE("Language not supported for TTS")
-						isTTSCapable.value = false
-					} else {
-						isTTSCapable.value = true
-					}
-				}
-				else -> {
-					logE("TTS Initialization failed")
-					isTTSCapable.value = false
-				}
-			}
-		}
-	}
-
-	private val tts: TextToSpeech by lazy { TextToSpeech(this, ttsInitListener) }
-	 */
 
 	override fun onTrimMemory(level: Int) {
 		super.onTrimMemory(level)
@@ -174,8 +152,6 @@ class ChapterReader
 		setContent {
 			ChapterReaderView(
 				viewModel,
-				isTTSCapable,
-				isTTSPlaying,
 				onExit = { finish() }
 			)
 		}
@@ -193,14 +169,6 @@ class ChapterReader
 				window.clearFlags(FLAG_KEEP_SCREEN_ON)
 			}
 		}
-	}
-
-	/** On Destroy */
-	override fun onDestroy() {
-		logV("")
-		//tts.stop()
-		//tts.shutdown()
-		super.onDestroy()
 	}
 
 	/**
@@ -244,8 +212,6 @@ class ChapterReader
 @Composable
 fun ChapterReaderView(
 	viewModel: AChapterReaderViewModel = viewModelDi(),
-	isTTSCapable: MutableStateFlow<Boolean>,
-	isTTSPlaying: MutableStateFlow<Boolean>,
 	onExit: () -> Unit
 ) {
 	val uiController = rememberSystemUiController()
@@ -263,8 +229,8 @@ fun ChapterReaderView(
 	val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
 	val chapterType by viewModel.chapterType.collectAsState()
 	val currentChapterID by viewModel.currentChapterID.collectAsState()
-	val isTTSCapable by isTTSCapable.collectAsState()
-	val isTTSPlaying by isTTSPlaying.collectAsState()
+	val isTTSCapable by viewModel.isTTSCapable.collectAsState()
+	val isTTSPlaying by viewModel.isTTSPlaying.collectAsState()
 	val setting by viewModel.getSettings().collectAsState()
 	val currentPage by viewModel.currentPage.collectAsState()
 
@@ -274,6 +240,24 @@ fun ChapterReaderView(
 
 	val isReadingTooLong by viewModel.isReadingTooLong.collectAsState()
 	val trackLongReading by viewModel.trackLongReading.collectAsState()
+
+	val context = LocalContext.current
+	val utteranceListener =
+		remember { ShosetsuUtteranceProgressListener(viewModel::setIsTTSPlaying) }
+
+	lateinit var tts: TextToSpeech
+	val initListener = remember {
+		ShosetsuTextToSpeechInitListener({ tts }, viewModel::setIsTTSCapable)
+	}
+	tts = remember {
+		TextToSpeech(
+			context,
+			initListener
+		).apply {
+			if (setOnUtteranceProgressListener(utteranceListener) != 0)
+				logE("Could not set utterance progress listener")
+		}
+	}
 
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
@@ -301,56 +285,70 @@ fun ChapterReaderView(
 					toggleBookmark = viewModel::toggleBookmark,
 					exit = onExit,
 					onPlayTTS = {
-						if (chapterType == null) return@ChapterReaderBottomSheetContent
-						items
-							.orEmpty()
-							.filterIsInstance<ReaderChapterUI>()
-							.find { it.id == currentChapterID }
-							?.let { item ->
-								//tts.setPitch(viewModel.ttsPitch.value)
-								//tts.setSpeechRate(viewModel.ttsSpeed.value)
-								when (chapterType!!) {
-									ChapterType.STRING -> {
-										viewModel.getChapterStringPassage(item)
-											.collectLA(owner,
-												catch = {}) { content ->
-												/*
-												if (content is ChapterPassage.Success)
+						launchIO {
+							if (chapterType == null) return@launchIO
+							items
+								.orEmpty()
+								.filterIsInstance<ReaderChapterUI>()
+								.find { it.id == currentChapterID }
+								?.let { item ->
+									tts.setPitch(viewModel.ttsPitch.value)
+									tts.setSpeechRate(viewModel.ttsSpeed.value)
+									tts.setPitch(viewModel.ttsPitch.value / 10)
+									tts.setSpeechRate(viewModel.ttsSpeed.value / 10)
+									when (chapterType!!) {
+										ChapterType.STRING -> {
+											viewModel.getChapterStringPassage(item)
+												.collectLA(
+													owner,
+													catch = {}) { content ->
+													if (content is ChapterPassage.Success)
+														tts.speak(
+															content.content,
+															TextToSpeech.QUEUE_FLUSH,
+															null,
+															content.hashCode().toString()
+														)
+													if (content is ChapterPassage.Success) {
+														customSpeak(
+															tts,
+															content.content,
+															content.hashCode()
+														)
+													}
+												}
 
-													tts.speak(
-														content.content,
-														TextToSpeech.QUEUE_FLUSH,
-														null,
-														content.hashCode().toString()
-													)
-												 */
-											}
+										}
 
+										ChapterType.HTML -> {
+											viewModel.getChapterHTMLPassage(item)
+												.collectLA(
+													owner,
+													catch = {}) { content ->
+													if (content is ChapterPassage.Success)
+														tts.speak(
+															content.content,
+															TextToSpeech.QUEUE_FLUSH,
+															null,
+															content.hashCode().toString()
+														)
+													if (content is ChapterPassage.Success) {
+														customSpeak(
+															tts,
+															Jsoup.parse(content.content).text(),
+															content.hashCode()
+														)
+													}
+												}
+										}
+
+										else -> {}
 									}
-
-									ChapterType.HTML -> {
-										viewModel.getChapterHTMLPassage(item)
-											.collectLA(
-												owner,
-												catch = {}) { content ->
-												/*
-												if (content is ChapterPassage.Success)
-													tts.speak(
-														content.content,
-														TextToSpeech.QUEUE_FLUSH,
-														null,
-														content.hashCode().toString()
-													)
-												 */
-											}
-									}
-
-									else -> {}
 								}
-							}
+						}
 					},
 					onStopTTS = {
-						//tts.stop()
+						tts.stop()
 					},
 					updateSetting = viewModel::updateSetting,
 					lowerSheet = {
@@ -369,6 +367,8 @@ fun ChapterReaderView(
 						item { viewModel.readerTableHackOption() }
 						item { viewModel.readerTextSelectionToggle() }
 						item { viewModel.trackLongReadingOption() }
+						item { viewModel.readerPitchOption() }
+						item { viewModel.readerSpeedOption() }
 					},
 					toggleFocus = viewModel::toggleFocus,
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
@@ -388,7 +388,7 @@ fun ChapterReaderView(
 					},
 					onChapterRead = viewModel::updateChapterAsRead,
 					onStopTTS = {
-						//tts.stop()
+						tts.stop()
 					},
 					createPage = { page ->
 						when (val item = items.orEmpty()[page]) {
@@ -482,6 +482,12 @@ fun ChapterReaderView(
 					dismissOnClickOutside = false
 				)
 			)
+		}
+	}
+
+	DisposableEffect(Unit) {
+		onDispose {
+			tts.stop()
 		}
 	}
 }

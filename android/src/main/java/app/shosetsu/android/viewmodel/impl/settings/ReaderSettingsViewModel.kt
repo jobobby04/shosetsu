@@ -299,3 +299,32 @@ fun ExposedSettingsRepoViewModel.paragraphSpacingOption() {
 	)
 }
 
+@Composable
+fun ExposedSettingsRepoViewModel.readerPitchOption() {
+	FloatSliderSettingContent(
+		stringResource(R.string.reader_pitch),
+		"",
+		remember { StableHolder(1..30) },
+		{ "${it / 10}" },
+		settingsRepo,
+		ReaderPitch,
+		flip = true,
+		modifier = Modifier
+			.fillMaxWidth()
+	)
+}
+
+@Composable
+fun ExposedSettingsRepoViewModel.readerSpeedOption() {
+	FloatSliderSettingContent(
+		stringResource(R.string.reader_speed),
+		"",
+		remember { StableHolder(1..30) },
+		{ "${it / 10}" },
+		settingsRepo,
+		ReaderSpeed,
+		flip = true,
+		modifier = Modifier
+			.fillMaxWidth()
+	)
+}

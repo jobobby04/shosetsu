@@ -40,6 +40,14 @@ abstract class AChapterReaderViewModel :
 	ShosetsuViewModel(),
 	ExposedSettingsRepoViewModel {
 
+	abstract val isTTSCapable: StateFlow<Boolean>
+
+	abstract fun setIsTTSCapable(newValue: Boolean)
+
+	abstract val isTTSPlaying: StateFlow<Boolean>
+
+	abstract fun setIsTTSPlaying(newValue: Boolean)
+
 	/**
 	 * Has the user been reading for too long?
 	 *

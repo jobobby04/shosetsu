@@ -318,6 +318,8 @@ fun ReaderSettingsContent(
 		item {
 			viewModel.trackLongReadingOption()
 		}
+		item { viewModel.readerPitchOption() }
+		item { viewModel.readerSpeedOption() }
 	}
 
 }

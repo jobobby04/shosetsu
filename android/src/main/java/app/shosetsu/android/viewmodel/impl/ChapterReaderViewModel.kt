@@ -85,6 +85,19 @@ class ChapterReaderViewModel(
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {
+
+	override val isTTSCapable = MutableStateFlow(false)
+
+	override fun setIsTTSCapable(newValue: Boolean) {
+		isTTSCapable.value = newValue
+	}
+
+	override val isTTSPlaying = MutableStateFlow(false)
+
+	override fun setIsTTSPlaying(newValue: Boolean) {
+		isTTSPlaying.value = newValue
+	}
+
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
 	}
