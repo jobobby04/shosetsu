@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -44,10 +43,8 @@ data class DBNovelReaderSettingEntity(
 	@PrimaryKey
 	val novelID: Int,
 
-	@NonNull
 	var paragraphIndentSize: Int,
 
-	@NonNull
 	var paragraphSpacingSize: Float,
 ) : Convertible<NovelReaderSettingEntity> {
 	override fun convertTo(): NovelReaderSettingEntity =

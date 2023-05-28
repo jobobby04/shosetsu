@@ -27,7 +27,7 @@ import kotlinx.coroutines.runBlocking
  *
  * This provides limitation features and expiration times, along with more thread safety then normally
  */
-abstract class AbstractMemoryDataSource<K, V : Any> {
+abstract class AbstractMemoryDataSource<K : Any, V : Any> {
 
 	/**
 	 * How long something can last in memory in MS

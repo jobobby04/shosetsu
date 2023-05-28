@@ -37,10 +37,20 @@ interface IUpdatesRepository {
 	/**
 	 * [Flow] of [List] of [UpdateEntity] of all entities present
 	 */
-	suspend fun getUpdatesFlow(): Flow<List<UpdateEntity>>
+	fun getUpdatesFlow(): Flow<List<UpdateEntity>>
 
 	/**
 	 * [Flow] of [List] of [UpdateCompleteEntity] of all entities present
 	 */
-	suspend fun getCompleteUpdatesFlow(): Flow<List<UpdateCompleteEntity>>
+	fun getCompleteUpdatesFlow(): Flow<List<UpdateCompleteEntity>>
+
+	/**
+	 * Clear all updates
+	 */
+	suspend fun clearAll()
+
+	/**
+	 * Clear all updates before provided date
+	 */
+	suspend fun clearBefore(date: Long)
 }

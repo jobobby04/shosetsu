@@ -11,19 +11,28 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
+import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
-import app.shosetsu.android.common.consts.USER_AGENT
 import app.shosetsu.android.common.ext.fileOut
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
-import app.shosetsu.android.di.*
+import app.shosetsu.android.common.utils.SiteProtector
+import app.shosetsu.android.di.dataSourceModule
+import app.shosetsu.android.di.databaseModule
+import app.shosetsu.android.di.networkModule
+import app.shosetsu.android.di.othersModule
+import app.shosetsu.android.di.providersModule
+import app.shosetsu.android.di.repositoryModule
+import app.shosetsu.android.di.useCaseModule
+import app.shosetsu.android.di.viewModelsModule
 import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
+import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
 import app.shosetsu.android.viewmodel.factory.ViewModelFactory
 import app.shosetsu.lib.ShosetsuSharedLib
 import app.shosetsu.lib.lua.ShosetsuLuaLib
@@ -32,6 +41,7 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import com.google.android.material.color.DynamicColors
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.acra.ACRA
@@ -40,14 +50,19 @@ import org.acra.config.httpSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender.Method
-import org.kodein.di.*
+import org.kodein.di.DI
+import org.kodein.di.DIAware
 import org.kodein.di.android.x.androidXModule
+import org.kodein.di.bind
+import org.kodein.di.instance
+import org.kodein.di.singleton
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.PrintStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -77,6 +92,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	private val startRepositoryUpdateManagerUseCase: StartRepositoryUpdateManagerUseCase by instance()
 	private val extensionsRepo: IExtensionsRepository by instance()
 	private val settingsRepo: ISettingsRepository by instance()
+	private val getUserAgent: GetUserAgentUseCase by instance()
 
 	override val di: DI by DI.lazy {
 		bind<ViewModelFactory>() with singleton { ViewModelFactory(applicationContext) }
@@ -176,6 +192,8 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		runBlocking {
 			if (settingsRepo.getBoolean(SettingKey.LogToFile))
 				setupDualOutput()
+
+			FLAG_CONCURRENT_MEMORY = settingsRepo.getBoolean(SettingKey.ConcurrentMemoryExperiment)
 		}
 
 		setupCoreLib()
@@ -186,6 +204,11 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 					startRepositoryUpdateManagerUseCase()
 			} catch (e: SQLiteException) {
 				ACRA.errorReporter.handleException(e)
+			}
+		}
+		launchIO {
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionDelay).collectLatest {
+				SiteProtector.requestDelay = it.toLong()
 			}
 		}
 		super.onCreate()
@@ -216,7 +239,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		}
 
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
-			"User-Agent" to USER_AGENT
+			"User-Agent" to runBlocking { getUserAgent() }
 		)
 	}
 
@@ -246,6 +269,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 	override fun newImageLoader(): ImageLoader =
 		ImageLoader.Builder(this).apply {
+			okHttpClient(okHttpClient)
 			diskCache {
 				DiskCache.Builder().apply {
 					directory(cacheDir.resolve("image_cache"))

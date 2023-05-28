@@ -5,6 +5,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 
@@ -46,6 +47,7 @@ fun <T> Flow<T>.firstLa(
 	.onEach(onCollect)
 	.launchIn(owner.lifecycleScope)
 
+@OptIn(ExperimentalCoroutinesApi::class)
 fun <T> Flow<T>.collectLatestLA(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,

@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import app.shosetsu.android.domain.model.local.CategoryEntity
@@ -36,11 +35,9 @@ data class DBCategoryEntity(
 	val id: Int? = null,
 
 	/** Name of this category */
-	@NonNull
 	val name: String,
 
 	/** order of this category */
-	@NonNull
 	val order: Int,
 ) : Convertible<CategoryEntity> {
 	override fun convertTo(): CategoryEntity = CategoryEntity(

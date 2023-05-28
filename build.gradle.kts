@@ -4,11 +4,11 @@ import java.io.BufferedReader
 import java.io.IOException
 
 plugins {
-	id("com.google.devtools.ksp") version "1.7.20-1.0.6"
+	id("com.google.devtools.ksp") version "1.8.20-1.0.10"
 }
 
 buildscript {
-	val kotlinVersion: String by extra("1.7.20")
+	val kotlinVersion: String by extra("1.8.0")
 
 	repositories {
 		google()
@@ -16,7 +16,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath("com.android.tools.build:gradle:7.3.1")
+		classpath("com.android.tools.build:gradle:8.0.2")
 		classpath(kotlin("gradle-plugin", version = kotlinVersion))
 		classpath(kotlin("serialization", version = kotlinVersion))
 	}

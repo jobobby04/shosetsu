@@ -2,12 +2,22 @@ package app.shosetsu.android.backend.workers.perodic
 
 import android.content.Context
 import android.os.Build
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.Operation
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.AppUpdateCheckWorker
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.AppUpdateCycle
+import app.shosetsu.android.common.SettingKey.AppUpdateOnMeteredConnection
+import app.shosetsu.android.common.SettingKey.AppUpdateOnlyWhenIdle
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.WorkerTags.APP_UPDATE_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
@@ -116,7 +126,7 @@ class AppUpdateCheckCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					APP_UPDATE_CYCLE_WORK_ID,
-					ExistingPeriodicWorkPolicy.REPLACE,
+					ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
 					PeriodicWorkRequestBuilder<AppUpdateCheckCycleWorker>(
 						appUpdateCycle(),
 						TimeUnit.HOURS

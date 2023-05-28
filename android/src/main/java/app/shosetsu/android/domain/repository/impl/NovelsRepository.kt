@@ -6,10 +6,7 @@ import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.database.base.IDBNovelsDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteNovelDataSource
-import app.shosetsu.android.domain.model.local.LibraryNovelEntity
-import app.shosetsu.android.domain.model.local.NovelEntity
-import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
-import app.shosetsu.android.domain.model.local.StrippedNovelEntity
+import app.shosetsu.android.domain.model.local.*
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
@@ -148,5 +145,8 @@ class NovelsRepository(
 		listing: Int,
 		data: Map<Int, Any>,
 	): List<Novel.Listing> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data) }
+
+	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> =
+		database.getAnalytics()
 
 }

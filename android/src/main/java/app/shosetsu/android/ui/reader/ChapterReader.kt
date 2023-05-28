@@ -4,39 +4,51 @@ import android.content.ComponentCallbacks2
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.view.KeyEvent
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.core.view.WindowInsetsCompat.Type
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
+import app.shosetsu.android.common.ext.collectLA
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.setTheme
+import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.reader.content.*
 import app.shosetsu.android.ui.reader.page.DividierPageContent
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.TextButton
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
-import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel.ChapterPassage
 import app.shosetsu.android.viewmodel.impl.settings.*
 import app.shosetsu.lib.Novel.ChapterType
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.android.material.composethemeadapter.MdcTheme
-import com.google.android.material.composethemeadapter3.Mdc3Theme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
-import java.util.*
 
 
 /*
@@ -68,6 +80,7 @@ class ChapterReader
 	private val isTTSCapable = MutableStateFlow(false)
 	private val isTTSPlaying = MutableStateFlow(false)
 
+	/*
 	private val ttsInitListener: TextToSpeech.OnInitListener by lazy {
 		TextToSpeech.OnInitListener {
 			when (it) {
@@ -89,9 +102,8 @@ class ChapterReader
 		}
 	}
 
-	private val tts: TextToSpeech by lazy {
-		TextToSpeech(this, ttsInitListener)
-	}
+	private val tts: TextToSpeech by lazy { TextToSpeech(this, ttsInitListener) }
+	 */
 
 	override fun onTrimMemory(level: Int) {
 		super.onTrimMemory(level)
@@ -145,7 +157,6 @@ class ChapterReader
 	}
 
 	/** On Create */
-	@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
 	public override fun onCreate(savedInstanceState: Bundle?) {
 		logV("")
 		viewModel.apply {
@@ -159,190 +170,14 @@ class ChapterReader
 			setTheme(it)
 		}
 		super.onCreate(savedInstanceState)
-		val insetsController = WindowInsetsControllerCompat(window, window.decorView)
 
 		setContent {
-			val items by viewModel.liveData.collectAsState()
-			val isHorizontalReading by viewModel.isHorizontalReading.collectAsState()
-			val isBookmarked by viewModel.isCurrentChapterBookmarked.collectAsState()
-			val isRotationLocked by viewModel.liveIsScreenRotationLocked.collectAsState()
-			val isFocused by viewModel.isFocused.collectAsState()
-			val enableFullscreen by viewModel.enableFullscreen.collectAsState()
-			val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
-			val chapterType by viewModel.chapterType.collectAsState()
-			val currentChapterID by viewModel.currentChapterID.collectAsState()
-			val isTTSCapable by isTTSCapable.collectAsState()
-			val isTTSPlaying by isTTSPlaying.collectAsState()
-			val setting by viewModel.getSettings().collectAsState()
-			val currentPage by viewModel.currentPage.collectAsState()
-
-			val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
-			val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
-			//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
-			MdcTheme {
-				Mdc3Theme {
-					ChapterReaderContent(
-						isFirstFocus = isFirstFocus,
-						isFocused = isFocused,
-						onFirstFocus = viewModel::onFirstFocus,
-						sheetContent = { state ->
-							ChapterReaderBottomSheetContent(
-								scaffoldState = state,
-								isTTSCapable = isTTSCapable,
-								isTTSPlaying = isTTSPlaying,
-								isBookmarked = isBookmarked,
-								isRotationLocked = isRotationLocked,
-								setting = setting,
-								toggleRotationLock = viewModel::toggleScreenRotationLock,
-								toggleBookmark = viewModel::toggleBookmark,
-								exit = {
-									finish()
-								},
-								onPlayTTS = {
-									if (chapterType == null) return@ChapterReaderBottomSheetContent
-									items
-										.orEmpty()
-										.filterIsInstance<ReaderChapterUI>()
-										.find { it.id == currentChapterID }
-										?.let { item ->
-											tts.setPitch(viewModel.ttsPitch.value)
-											tts.setSpeechRate(viewModel.ttsSpeed.value)
-											when (chapterType!!) {
-												ChapterType.STRING -> {
-													viewModel.getChapterStringPassage(item)
-														.collectLA(
-															this@ChapterReader,
-															catch = {}) { content ->
-															if (content is ChapterPassage.Success)
-																tts.speak(
-																	content.content,
-																	TextToSpeech.QUEUE_FLUSH,
-																	null,
-																	content.hashCode().toString()
-																)
-														}
-
-												}
-												ChapterType.HTML -> {
-													viewModel.getChapterHTMLPassage(item)
-														.collectLA(
-															this@ChapterReader,
-															catch = {}) { content ->
-															if (content is ChapterPassage.Success)
-																tts.speak(
-																	content.content,
-																	TextToSpeech.QUEUE_FLUSH,
-																	null,
-																	content.hashCode().toString()
-																)
-														}
-												}
-												else -> {}
-											}
-										}
-								},
-								onStopTTS = {
-									tts.stop()
-								},
-								updateSetting = viewModel::updateSetting,
-								lowerSheet = {
-									item { viewModel.textSizeOption() }
-									//item { viewModel.tapToScrollOption() }
-									//item { viewModel.volumeScrollingOption() }
-									//item { viewModel.horizontalSwitchOption() }
-									item { viewModel.invertChapterSwipeOption() }
-									item { viewModel.readerKeepScreenOnOption() }
-									item { viewModel.enableFullscreen() }
-									item { viewModel.matchFullscreenToFocus() }
-									item { viewModel.showReaderDivider() }
-									item { viewModel.stringAsHtmlOption() }
-									item { viewModel.doubleTapFocus() }
-									item { viewModel.doubleTapSystem() }
-									item { viewModel.readerTableHackOption() }
-								},
-								toggleFocus = viewModel::toggleFocus,
-								onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
-							)
-						},
-						content = { paddingValues ->
-							ChapterReaderPagerContent(
-								paddingValues = paddingValues,
-								items = items ?: persistentListOf(),
-								isHorizontal = isHorizontalReading,
-								isSwipeInverted = isSwipeInverted,
-								currentPage = currentPage,
-								onPageChanged = viewModel::setCurrentPage,
-								markChapterAsCurrent = {
-									viewModel.onViewed(it)
-									viewModel.setCurrentChapterID(it.id)
-								},
-								onChapterRead = viewModel::updateChapterAsRead,
-								onStopTTS = {
-									tts.stop()
-								},
-								createPage = { page ->
-									when (val item = items.orEmpty()[page]) {
-										is ReaderChapterUI -> {
-											when (chapterType) {
-												ChapterType.STRING -> {
-													ChapterReaderStringContent(
-														item = item,
-														getStringContent = viewModel::getChapterStringPassage,
-														retryChapter = viewModel::retryChapter,
-														textSizeFlow = { viewModel.liveTextSize },
-														textColorFlow = { viewModel.textColor },
-														backgroundColorFlow = { viewModel.backgroundColor },
-														onScroll = viewModel::onScroll,
-														onClick = viewModel::onReaderClicked,
-														onDoubleClick = viewModel::onReaderDoubleClicked,
-														progressFlow = {
-															viewModel.getChapterProgress(item)
-														}
-													)
-												}
-												ChapterType.HTML -> {
-													ChapterReaderHTMLContent(
-														item = item,
-														getHTMLContent = viewModel::getChapterHTMLPassage,
-														retryChapter = viewModel::retryChapter,
-														onScroll = viewModel::onScroll,
-														onClick = viewModel::onReaderClicked,
-														onDoubleClick = viewModel::onReaderDoubleClicked,
-														progressFlow = {
-															viewModel.getChapterProgress(item)
-														}
-													)
-												}
-												else -> {
-												}
-											}
-										}
-										is ReaderDividerUI -> {
-											DividierPageContent(
-												item.prev.title,
-												item.next?.title
-											)
-										}
-									}
-								}
-							)
-						}
-						//isTapToScroll = isTapToScroll
-					)
-				}
-			}
-		}
-
-		viewModel.isSystemVisible.collectLA(this, catch = {
-		}) {
-			if (!it) {
-				insetsController.hide(Type.systemBars())
-				insetsController.hide(Type.displayCutout())
-				insetsController.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-			} else {
-				insetsController.show(Type.systemBars())
-				insetsController.show(Type.displayCutout())
-			}
+			ChapterReaderView(
+				viewModel,
+				isTTSCapable,
+				isTTSPlaying,
+				onExit = { finish() }
+			)
 		}
 
 		viewModel.liveIsScreenRotationLocked.collectLA(this, catch = {}) {
@@ -363,8 +198,8 @@ class ChapterReader
 	/** On Destroy */
 	override fun onDestroy() {
 		logV("")
-		tts.stop()
-		tts.shutdown()
+		//tts.stop()
+		//tts.shutdown()
 		super.onDestroy()
 	}
 
@@ -378,10 +213,12 @@ class ChapterReader
 					viewModel.incrementProgress()
 					true
 				}
+
 				KeyEvent.KEYCODE_VOLUME_UP -> {
 					viewModel.depleteProgress()
 					true
 				}
+
 				else -> super.onKeyDown(keyCode, event)
 			}
 		else super.onKeyDown(keyCode, event)
@@ -399,5 +236,252 @@ class ChapterReader
 	private fun unlockRotation() {
 		//window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 		requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
+	}
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ChapterReaderView(
+	viewModel: AChapterReaderViewModel = viewModelDi(),
+	isTTSCapable: MutableStateFlow<Boolean>,
+	isTTSPlaying: MutableStateFlow<Boolean>,
+	onExit: () -> Unit
+) {
+	val uiController = rememberSystemUiController()
+	uiController.systemBarsBehavior = BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+	val isSystemVisible by viewModel.isSystemVisible.collectAsState()
+	uiController.isSystemBarsVisible = isSystemVisible
+
+	val items by viewModel.liveData.collectAsState()
+	val isHorizontalReading by viewModel.isHorizontalReading.collectAsState()
+	val isBookmarked by viewModel.isCurrentChapterBookmarked.collectAsState()
+	val isRotationLocked by viewModel.liveIsScreenRotationLocked.collectAsState()
+	val isFocused by viewModel.isFocused.collectAsState()
+	val enableFullscreen by viewModel.enableFullscreen.collectAsState()
+	val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
+	val chapterType by viewModel.chapterType.collectAsState()
+	val currentChapterID by viewModel.currentChapterID.collectAsState()
+	val isTTSCapable by isTTSCapable.collectAsState()
+	val isTTSPlaying by isTTSPlaying.collectAsState()
+	val setting by viewModel.getSettings().collectAsState()
+	val currentPage by viewModel.currentPage.collectAsState()
+
+	val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
+	val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
+	val owner = LocalLifecycleOwner.current
+
+	val isReadingTooLong by viewModel.isReadingTooLong.collectAsState()
+	val trackLongReading by viewModel.trackLongReading.collectAsState()
+
+	if (trackLongReading)
+		LaunchedEffect(isReadingTooLong) {
+			while (!isReadingTooLong) {
+				delay(MAX_CONTINOUS_READING_TIME)
+				viewModel.userIsReadingTooLong()
+			}
+		}
+
+	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
+	ShosetsuCompose {
+		ChapterReaderContent(
+			isFirstFocusProvider = { isFirstFocus },
+			isFocused = isFocused,
+			onFirstFocus = viewModel::onFirstFocus,
+			sheetContent = { state ->
+				ChapterReaderBottomSheetContent(
+					scaffoldState = state,
+					isTTSCapable = isTTSCapable,
+					isTTSPlaying = isTTSPlaying,
+					isBookmarked = isBookmarked,
+					isRotationLocked = isRotationLocked,
+					setting = setting,
+					toggleRotationLock = viewModel::toggleScreenRotationLock,
+					toggleBookmark = viewModel::toggleBookmark,
+					exit = onExit,
+					onPlayTTS = {
+						if (chapterType == null) return@ChapterReaderBottomSheetContent
+						items
+							.orEmpty()
+							.filterIsInstance<ReaderChapterUI>()
+							.find { it.id == currentChapterID }
+							?.let { item ->
+								//tts.setPitch(viewModel.ttsPitch.value)
+								//tts.setSpeechRate(viewModel.ttsSpeed.value)
+								when (chapterType!!) {
+									ChapterType.STRING -> {
+										viewModel.getChapterStringPassage(item)
+											.collectLA(owner,
+												catch = {}) { content ->
+												/*
+												if (content is ChapterPassage.Success)
+
+													tts.speak(
+														content.content,
+														TextToSpeech.QUEUE_FLUSH,
+														null,
+														content.hashCode().toString()
+													)
+												 */
+											}
+
+									}
+
+									ChapterType.HTML -> {
+										viewModel.getChapterHTMLPassage(item)
+											.collectLA(
+												owner,
+												catch = {}) { content ->
+												/*
+												if (content is ChapterPassage.Success)
+													tts.speak(
+														content.content,
+														TextToSpeech.QUEUE_FLUSH,
+														null,
+														content.hashCode().toString()
+													)
+												 */
+											}
+									}
+
+									else -> {}
+								}
+							}
+					},
+					onStopTTS = {
+						//tts.stop()
+					},
+					updateSetting = viewModel::updateSetting,
+					lowerSheet = {
+						item { viewModel.textSizeOption() }
+						//item { viewModel.tapToScrollOption() }
+						//item { viewModel.volumeScrollingOption() }
+						//item { viewModel.horizontalSwitchOption() }
+						item { viewModel.invertChapterSwipeOption() }
+						item { viewModel.readerKeepScreenOnOption() }
+						item { viewModel.enableFullscreen() }
+						item { viewModel.matchFullscreenToFocus() }
+						item { viewModel.showReaderDivider() }
+						item { viewModel.stringAsHtmlOption() }
+						item { viewModel.doubleTapFocus() }
+						item { viewModel.doubleTapSystem() }
+						item { viewModel.readerTableHackOption() }
+						item { viewModel.readerTextSelectionToggle() }
+						item { viewModel.trackLongReadingOption() }
+					},
+					toggleFocus = viewModel::toggleFocus,
+					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
+				)
+			},
+			content = { paddingValues ->
+				ChapterReaderPagerContent(
+					paddingValues = paddingValues,
+					items = items ?: persistentListOf(),
+					isHorizontal = isHorizontalReading,
+					isSwipeInverted = isSwipeInverted,
+					currentPage = currentPage,
+					onPageChanged = viewModel::setCurrentPage,
+					markChapterAsCurrent = {
+						viewModel.onViewed(it)
+						viewModel.setCurrentChapterID(it.id)
+					},
+					onChapterRead = viewModel::updateChapterAsRead,
+					onStopTTS = {
+						//tts.stop()
+					},
+					createPage = { page ->
+						when (val item = items.orEmpty()[page]) {
+							is ReaderChapterUI -> {
+								when (chapterType) {
+									ChapterType.STRING -> {
+										ChapterReaderStringContent(
+											item = item,
+											getStringContent = viewModel::getChapterStringPassage,
+											retryChapter = viewModel::retryChapter,
+											textSizeFlow = { viewModel.liveTextSize },
+											textColorFlow = { viewModel.textColor },
+											backgroundColorFlow = { viewModel.backgroundColor },
+											disableTextSelFlow = { viewModel.disableTextSelection },
+											onScroll = viewModel::onScroll,
+											onClick = viewModel::onReaderClicked,
+											onDoubleClick = viewModel::onReaderDoubleClicked,
+											progressFlow = {
+												viewModel.getChapterProgress(item)
+											}
+										)
+									}
+
+									ChapterType.HTML -> {
+										ChapterReaderHTMLContent(
+											item = item,
+											getHTMLContent = viewModel::getChapterHTMLPassage,
+											retryChapter = viewModel::retryChapter,
+											onScroll = viewModel::onScroll,
+											onClick = viewModel::onReaderClicked,
+											onDoubleClick = viewModel::onReaderDoubleClicked,
+											progressFlow = {
+												viewModel.getChapterProgress(item)
+											}
+										)
+									}
+
+									else -> {
+									}
+								}
+							}
+
+							is ReaderDividerUI -> {
+								DividierPageContent(
+									item.prev.title,
+									item.next?.title
+								)
+							}
+						}
+					}
+				)
+			},
+			//isTapToScroll = isTapToScroll
+		)
+		if (isReadingTooLong) {
+			AlertDialog(
+				onDismissRequest = {},
+				title = {
+					Text(stringResource(R.string.reader_long_reading_title))
+				},
+				text = {
+					Text(stringResource(R.string.reader_long_reading_desc))
+
+				},
+				confirmButton = {
+					var isEnabled by remember { mutableStateOf(false) }
+					var timeLeft by remember { mutableStateOf(20) }
+
+					LaunchedEffect(Unit) {
+						repeat(20) {
+							delay(1000)
+							timeLeft--
+						}
+						isEnabled = true
+					}
+
+					TextButton(onClick = {
+						if (isEnabled) {
+							viewModel.dismissReadingTooLong()
+						}
+					}) {
+						if (isEnabled) {
+							Text(stringResource(android.R.string.ok))
+						} else {
+							Text("$timeLeft")
+						}
+					}
+				},
+				properties = DialogProperties(
+					dismissOnBackPress = false,
+					dismissOnClickOutside = false
+				)
+			)
+		}
 	}
 }

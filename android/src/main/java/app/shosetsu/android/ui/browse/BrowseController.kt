@@ -30,6 +30,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -52,6 +56,7 @@ import androidx.navigation.navOptions
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.consts.BROWSE_HELP_URL
+import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
@@ -71,8 +76,6 @@ import app.shosetsu.lib.Version
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -100,8 +103,10 @@ class BrowseController : ShosetsuController(),
 
 	override fun onPrepareMenu(menu: Menu) {
 		(menu.findItem(R.id.search)?.actionView as? SearchView)?.apply {
-			setOnQueryTextListener(BrowseSearchQuery(findNavController()))
-			isSubmitButtonEnabled = true
+			//setOnQueryTextListener(BrowseSearchQuery(findNavController()))
+			isSubmitButtonEnabled = false
+
+			setOnQueryTextListener(BrowseFilterExtensions(viewModel))
 		}
 	}
 
@@ -192,11 +197,23 @@ class BrowseController : ShosetsuController(),
 			openHelpMenu()
 			true
 		}
-		R.id.search -> true
+
+		R.id.global_search -> {
+			findNavController().navigate(
+				R.id.action_browseController_to_searchController,
+				bundleOf(BundleKeys.BUNDLE_QUERY to null),
+				navOptions {
+					setShosetsuTransition()
+				}
+			)
+			true
+		}
+
 		R.id.browse_import -> {
 			makeSnackBar(R.string.regret)?.show()
 			true
 		}
+
 		else -> false
 	}
 
@@ -271,6 +288,7 @@ fun PreviewBrowseContent() {
 	)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BrowseContent(
 	entities: ImmutableList<BrowseExtensionUI>?,
@@ -283,10 +301,9 @@ fun BrowseContent(
 	isRefreshing: Boolean,
 	fab: EFabMaintainer?
 ) {
-	SwipeRefresh(
-		state = rememberSwipeRefreshState(isRefreshing),
-		onRefresh = refresh,
-	) {
+	val pullRefreshState = rememberPullRefreshState(isRefreshing, refresh)
+
+	Box(Modifier.pullRefresh(pullRefreshState)) {
 		if (!entities.isNullOrEmpty()) {
 			val state = rememberLazyListState()
 			if (fab != null)
@@ -331,6 +348,8 @@ fun BrowseContent(
 				}
 			)
 		}
+
+		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }
 

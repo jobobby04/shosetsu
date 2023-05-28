@@ -282,16 +282,18 @@ fun AddShareContent(
 	} else if (isNovelAlreadyPresent && novelLink != null) {
 		ErrorContent(
 			stringResource(R.string.controller_add_present_novel, novelLink.name),
-			ErrorAction(
-				android.R.string.ok,
-			) {
-				reject()
-			},
-			ErrorAction(
-				R.string.controller_add_open_novel,
-			) {
-				openNovel()
-			},
+			actions = arrayOf(
+				ErrorAction(
+					android.R.string.ok,
+				) {
+					reject()
+				},
+				ErrorAction(
+					R.string.controller_add_open_novel,
+				) {
+					openNovel()
+				},
+			)
 		)
 	} else if (isStyleAlreadyPresent && styleLink != null) {
 		ErrorContent(

@@ -58,8 +58,8 @@ android {
 		applicationId = "app.shosetsu.android"
 		minSdk = 22
 		targetSdk = 33
-		versionCode = 40
-		versionName = "2.3.0"
+		versionCode = 41
+		versionName = "2.4.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 
@@ -83,7 +83,7 @@ android {
 	}
 
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.3.2"
+		kotlinCompilerExtensionVersion = "1.4.5"
 	}
 
 	/*
@@ -172,11 +172,11 @@ android {
 		}
 	}
 	compileOptions {
-		sourceCompatibility = JavaVersion.VERSION_11
-		targetCompatibility = JavaVersion.VERSION_11
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
 	}
 	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_11.toString()
+		jvmTarget = JavaVersion.VERSION_17.toString()
 		freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all-compatibility"
 	}
 
@@ -218,45 +218,49 @@ dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
 	// Google view things
-	implementation("com.google.android.material:material:1.7.0")
+	implementation("com.google.android.material:material:1.9.0")
 
 	// Androidx
-	implementation("androidx.work:work-runtime:2.7.1")
-	implementation("androidx.work:work-runtime-ktx:2.7.1")
-	implementation("androidx.appcompat:appcompat:1.5.1")
-	implementation("androidx.annotation:annotation:1.5.0")
-	implementation("androidx.core:core-ktx:1.9.0")
+	implementation("androidx.work:work-runtime:2.8.1")
+	implementation("androidx.work:work-runtime-ktx:2.8.1")
+	implementation("androidx.appcompat:appcompat:1.6.1")
+	implementation("androidx.annotation:annotation:1.6.0")
+	implementation("androidx.core:core-ktx:1.10.1")
 	implementation("androidx.collection:collection-ktx:1.2.0")
-	implementation("androidx.core:core-splashscreen:1.0.0")
+	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 	implementation("androidx.window:window:1.0.0")
 
 	// - Life Cycle
-	implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-	implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
-	implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
+	val lifecycleVersion = "2.6.1"
+	fun lifecycle(module: String, version: String = lifecycleVersion) =
+		"androidx.lifecycle:lifecycle-$module:$version"
+	implementation(lifecycle("viewmodel-ktx"))
+	implementation(lifecycle("viewmodel-compose"))
+	implementation(lifecycle("viewmodel-savedstate"))
+	implementation(lifecycle("runtime-ktx"))
+
 
 	// Test classes
 	testImplementation("junit:junit:4.13.2")
-	testImplementation("androidx.test.ext:junit:1.1.4")
-	androidTestImplementation("androidx.test:runner:1.5.1")
-	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
+	testImplementation("androidx.test.ext:junit:1.1.5")
+	androidTestImplementation("androidx.test:runner:1.5.2")
+	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
 	// Annotations
-	implementation("org.jetbrains:annotations:23.0.0")
+	implementation("org.jetbrains:annotations:24.0.1")
 
 	// Core libraries
 	implementation("org.luaj:luaj-jse:3.0.1")
-	implementation("com.gitlab.shosetsuorg:kotlin-lib:1.1.1")
-	implementation("org.jsoup:jsoup:1.15.3")
+	implementation("com.gitlab.shosetsuorg:kotlin-lib:1.2.0")
+	implementation("org.jsoup:jsoup:1.16.1")
 
 	// Image loading
-	implementation("io.coil-kt:coil-compose:2.2.2")
+	implementation("io.coil-kt:coil-compose:2.4.0")
 
 	// Time control
-	implementation("joda-time:joda-time:2.12.2")
+	implementation("joda-time:joda-time:2.12.5")
 
 	// Cloud flare calculator
 	//implementation("com.zhkrb.cloudflare-scrape-android:scrape-webview:0.0.3")
@@ -268,12 +272,12 @@ dependencies {
 	implementation(kotlin("stdlib-jdk8"))
 	//implementation(kotlin("reflect"))
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
 
 	// Error logging
-	val acraVersion = "5.9.6"
+	val acraVersion = "5.9.7"
 	fun acra(module: String, version: String = acraVersion) =
 		"ch.acra:$module:$version"
 
@@ -292,7 +296,7 @@ dependencies {
 	 */
 
 	// Room
-	val roomVersion = "2.4.3"
+	val roomVersion = "2.5.1"
 	fun room(module: String, version: String = roomVersion) =
 		"androidx.room:$module:$version"
 
@@ -306,22 +310,24 @@ dependencies {
 	implementation("com.google.guava:guava:31.1-android")
 
 	// kode-in
-	val kodeinVersion = "7.16.0"
+	val kodeinVersion = "7.20.1"
 	fun kodein(module: String, version: String = kodeinVersion) =
-		"org.kodein.di:$module:$version"
+		"org.kodein.di:kodein-di$module:$version"
 
-	implementation(kodein("kodein-di"))
-	implementation(kodein("kodein-di-jvm"))
-	implementation(kodein("kodein-di-framework-android-core"))
-	implementation(kodein("kodein-di-framework-android-support"))
-	implementation(kodein("kodein-di-framework-android-x"))
+	implementation(kodein(""))
+	implementation(kodein("-jvm"))
+	implementation(kodein("-framework-android-core"))
+	implementation(kodein("-framework-android-support"))
+	implementation(kodein("-framework-android-x"))
+	implementation(kodein("-framework-android-x-viewmodel"))
+	implementation(kodein("-framework-android-x-viewmodel-savedstate"))
 
 	// KTX
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.1")
 
 	// KTX - Serialization
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
 	// Roomigrant
 	/*val enableRoomigrant = false
@@ -333,7 +339,7 @@ dependencies {
 	}*/
 
 	// Compose
-	val androidxCompose = "1.3.1"
+	val androidxCompose = "1.4.1"
 	fun androidxCompose(
 		module: String,
 		submodule: String = module,
@@ -355,27 +361,26 @@ dependencies {
 	implementation(androidxCompose("material3", version = "1.0.1"))
 
 	// - accompanist
-	val accompanistVersion = "0.28.0"
+	val accompanistVersion = "0.30.1"
 	fun accompanist(module: String, version: String = accompanistVersion) =
 		"com.google.accompanist:$module:$version"
 
 	implementation(accompanist("accompanist-appcompat-theme"))
-	implementation(accompanist("accompanist-pager"))
-	implementation(accompanist("accompanist-swiperefresh"))
 	implementation(accompanist("accompanist-webview"))
 	implementation(accompanist("accompanist-placeholder-material"))
 	implementation(accompanist("accompanist-pager-indicators"))
 	implementation(accompanist("accompanist-permissions"))
 	implementation(accompanist("accompanist-flowlayout"))
+	implementation(accompanist("accompanist-systemuicontroller"))
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata:1.3.1")
+	implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
 
 	// MDC Adapter
-	implementation("com.google.android.material:compose-theme-adapter:1.2.1")
-	implementation("com.google.android.material:compose-theme-adapter-3:1.1.1")
+	implementation(accompanist("accompanist-themeadapter-material"))
+	implementation(accompanist("accompanist-themeadapter-material3"))
 
-	val androidxActivity = "1.6.1"
+	val androidxActivity = "1.7.0"
 	fun androidxActivity(module: String, version: String = androidxActivity) =
 		"androidx.activity:$module:$version"
 	implementation(androidxActivity("activity"))

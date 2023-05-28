@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/fragment_updates_clear"
+        android:title="@string/clear">
+        <menu>
+            <item
+                android:id="@+id/fragment_updates_clear_all"
+                android:title="@string/all" />
+            <item
+                android:id="@+id/fragment_updates_clear_before"
+                android:title="@string/before" />
+        </menu>
+    </item>
+</menu>

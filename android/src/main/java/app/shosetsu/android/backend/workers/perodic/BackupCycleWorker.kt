@@ -2,10 +2,21 @@ package app.shosetsu.android.backend.workers.perodic
 
 import android.content.Context
 import android.os.Build
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.Operation
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.BackupWorker
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.BackupCycle
+import app.shosetsu.android.common.SettingKey.BackupOnLowBattery
+import app.shosetsu.android.common.SettingKey.BackupOnLowStorage
+import app.shosetsu.android.common.SettingKey.BackupOnlyWhenIdle
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
@@ -116,7 +127,7 @@ class BackupCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					BACKUP_CYCLE_WORK_ID,
-					ExistingPeriodicWorkPolicy.REPLACE,
+					ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
 					PeriodicWorkRequestBuilder<BackupCycleWorker>(
 						backupCycle(),
 						TimeUnit.HOURS

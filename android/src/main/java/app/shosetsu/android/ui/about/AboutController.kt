@@ -1,7 +1,5 @@
 package app.shosetsu.android.ui.about
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +22,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -93,7 +92,8 @@ fun AboutView(
 	onNavigateSafely: (Int, Bundle, NavOptions) -> Unit
 ) {
 	val viewModel: AAboutViewModel = viewModelDi()
-	val context = LocalContext.current
+	val uriHandler = LocalUriHandler.current
+
 	fun onClickLicense() {
 		onNavigateSafely(
 			R.id.action_aboutController_to_textAssetReader,
@@ -105,34 +105,30 @@ fun AboutView(
 		)
 	}
 
-	fun openSite(url: String) {
-		context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-	}
-
 	fun onClickDisclaimer() {
-		openSite(URL_DISCLAIMER)
+		uriHandler.openUri(URL_DISCLAIMER)
 	}
 
 	fun openWebsite() =
-		openSite(URL_WEBSITE)
+		uriHandler.openUri(URL_WEBSITE)
 
 	fun openExtensions() =
-		openSite(URL_GITHUB_EXTENSIONS)
+		uriHandler.openUri(URL_GITHUB_EXTENSIONS)
 
 	fun openDiscord() =
-		openSite(URL_DISCORD)
+		uriHandler.openUri(URL_DISCORD)
 
 	fun openMatrix() =
-		openSite(URL_MATRIX)
+		uriHandler.openUri(URL_MATRIX)
 
 	fun openPatreon() =
-		openSite(URL_PATREON)
+		uriHandler.openUri(URL_PATREON)
 
 	fun openGithub() =
-		openSite(URL_GITHUB_APP)
+		uriHandler.openUri(URL_GITHUB_APP)
 
 	fun openPrivacy() =
-		openSite(URL_PRIVACY)
+		uriHandler.openUri(URL_PRIVACY)
 
 	ShosetsuCompose {
 		AboutContent(
@@ -146,7 +142,10 @@ fun AboutView(
 			onOpenLicense = ::onClickLicense,
 			onOpenDisclaimer = ::onClickDisclaimer,
 			onOpenMatrix = ::openMatrix,
-			onOpenPrivacy = ::openPrivacy
+			onOpenPrivacy = ::openPrivacy,
+			onOpenKofi = {
+				uriHandler.openUri(URL_KOFI)
+			}
 		)
 	}
 }
@@ -167,7 +166,9 @@ fun PreviewAboutContent() {
 			onOpenLicense = {},
 			onOpenDisclaimer = {},
 			onOpenMatrix = {},
-			onOpenPrivacy = {}
+			onOpenPrivacy = {},
+			onOpenKofi = {
+			}
 		)
 	}
 }
@@ -224,6 +225,7 @@ fun AboutContent(
 	onOpenExtensions: () -> Unit,
 	onOpenDiscord: () -> Unit,
 	onOpenPatreon: () -> Unit,
+	onOpenKofi: () -> Unit,
 	onOpenLicense: () -> Unit,
 	onOpenDisclaimer: () -> Unit,
 	onOpenMatrix: () -> Unit,
@@ -299,9 +301,16 @@ fun AboutContent(
 		}
 		item {
 			AboutItem(
-				R.string.patreon,
+				R.string.patreon_support,
 				URL_PATREON,
 				onClick = onOpenPatreon
+			)
+		}
+		item {
+			AboutItem(
+				R.string.kofi_support,
+				URL_KOFI,
+				onClick = onOpenKofi
 			)
 		}
 		item {
@@ -313,6 +322,7 @@ fun AboutContent(
 		item {
 			AboutItem(
 				R.string.disclaimer,
+				URL_DISCLAIMER,
 				onClick = onOpenDisclaimer
 			)
 		}

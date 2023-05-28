@@ -4,6 +4,7 @@ import android.database.Cursor
 import android.util.Log
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logID
 
 /*
@@ -44,7 +45,7 @@ abstract class RemoveMigration(from: Int, to: Int) : Migration(from, to) {
 
 		val backupTableName = "data_backup"
 		database.execSQL("DROP TABLE IF EXISTS $backupTableName;")
-		val columnInfo = database.query("PRAGMA table_info('$tableName')", null)
+		val columnInfo = database.query("PRAGMA table_info('$tableName')")
 		val foreignKeys = database.query("PRAGMA foreign_key_list('$tableName')")
 		val uniqueIndex = database.query("PRAGMA index_list('$tableName')")
 		if (columnInfo.count != 0) {
@@ -97,7 +98,7 @@ abstract class RemoveMigration(from: Int, to: Int) : Migration(from, to) {
 
 					if (createIndexSql.isNotEmpty()) {
 						createIndexSql.forEach {
-							Log.i(logID(), "Creating index: $it")
+							logI("Creating index: $it")
 							database.execSQL(it)
 						}
 					}

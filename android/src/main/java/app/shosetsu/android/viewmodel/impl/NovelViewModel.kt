@@ -17,7 +17,6 @@ import app.shosetsu.android.domain.usecases.StartDownloadWorkerAfterUpdateUseCas
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.delete.TrueDeleteChapterUseCase
 import app.shosetsu.android.domain.usecases.get.*
-import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadChaptersResumeFirstUnreadUseCase
 import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelSettingUseCase
@@ -77,10 +76,8 @@ class NovelViewModel(
 	private val isChaptersResumeFirstUnread: LoadChaptersResumeFirstUnreadUseCase,
 	private val getNovelSettingFlowUseCase: GetNovelSettingFlowUseCase,
 	private val updateNovelSettingUseCase: UpdateNovelSettingUseCase,
-	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
 	private val startDownloadWorkerAfterUpdateUseCase: StartDownloadWorkerAfterUpdateUseCase,
-	private val getLastReadChapter: GetLastReadChapterUseCase,
 	private val getTrueDelete: GetTrueDeleteChapterUseCase,
 	private val trueDeleteChapter: TrueDeleteChapterUseCase,
 	private val getInstalledExtensionUseCase: GetInstalledExtensionUseCase,
@@ -311,45 +308,6 @@ class NovelViewModel(
 			}
 		}
 
-	/**
-	 * TODO Account for the fact that multiple chapters have to be deleted
-	 */
-	override fun deletePrevious(): Flow<Boolean> {
-		logI("Deleting previous chapters")
-		return flow {
-			loadDeletePreviousChapterUseCase().let { chaptersBackToDelete ->
-				if (chaptersBackToDelete != -1) {
-					val lastUnread =
-						getLastReadChapter(novelLive.first { it != null }!!.id)
-
-					if (lastUnread == null) {
-						logE("Received empty when trying to get lastUnreadResult")
-						emit(false)
-						return@flow
-					}
-
-					val chapters = chaptersLive.value.sortedBy { it.order }
-
-					val indexOfLast = chapters.indexOfFirst { it.id == lastUnread.chapterId }
-
-					if (indexOfLast == -1) {
-						logE("Index of last read chapter turned up negative")
-						emit(false)
-						return@flow
-					}
-
-					if (indexOfLast - chaptersBackToDelete < 0) {
-						emit(false)
-						return@flow
-					}
-
-					deleteChapterPassageUseCase(chapters[indexOfLast - chaptersBackToDelete])
-					emit(true)
-				}
-			}
-		}.onIO()
-	}
-
 	override fun destroy() {
 		novelIDLive.value = -1 // Reset view to nothing
 		itemIndex.value = 0
@@ -507,7 +465,7 @@ class NovelViewModel(
 	override fun downloadAllUnreadChapters() {
 		launchIO {
 			downloadChapter(
-				chaptersLive.value.filter { it.readingStatus == ReadingStatus.UNREAD }
+				chaptersLive.value.filter { it.readingStatus == ReadingStatus.UNREAD && !it.isSaved }
 					.toTypedArray())
 			startDownloadWorkerUseCase()
 		}
@@ -515,7 +473,8 @@ class NovelViewModel(
 
 	override fun downloadAllChapters() {
 		launchIO {
-			downloadChapter(chaptersLive.value.toTypedArray())
+			downloadChapter(chaptersLive.value.filter { !it.isSaved }
+				.toTypedArray())
 			startDownloadWorkerUseCase()
 		}
 	}
@@ -526,13 +485,6 @@ class NovelViewModel(
 			updateNovelSettingUseCase(novelSettingUI)
 		}
 	}
-
-	override var isFromChapterReader: Boolean = false
-		get() = if (field) {
-			val value = field
-			field = !value
-			value
-		} else field
 
 	override val itemIndex: MutableStateFlow<Int> = MutableStateFlow(0)
 	override fun setItemAt(index: Int) {
@@ -556,7 +508,7 @@ class NovelViewModel(
 	override fun deleteSelected() {
 		launchIO {
 			val list = chaptersLive.value.filter { it.isSelected && it.isSaved }
-			deleteChapterPassageUseCase(list)
+			deleteChapterPassageUseCase.invokeUI(list)
 			clearSelected()
 		}
 	}
@@ -669,11 +621,11 @@ class NovelViewModel(
 		}
 	}
 
-	override fun getChapterCount(): Flow<Int> = flowOf(chaptersLive.value.size)
+	override fun getChapterCount(): Int = chaptersLive.value.size
 
 	override fun deleteChapters() {
 		launchIO {
-			deleteChapterPassageUseCase(chaptersLive.value.filter { it.isSaved })
+			deleteChapterPassageUseCase.invokeUI(chaptersLive.value.filter { it.isSaved })
 		}
 	}
 

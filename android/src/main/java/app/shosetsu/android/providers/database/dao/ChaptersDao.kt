@@ -278,4 +278,11 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 			markChaptersDeleted(it)
 		}
 	}
+
+	/**
+	 * Observe a chapter
+	 */
+	@Throws(SQLiteException::class)
+	@Query("SELECT * FROM chapters WHERE id = :chapterId LIMIT 1")
+	fun getChapterFlow(chapterId: Int): Flow<DBChapterEntity?>
 }

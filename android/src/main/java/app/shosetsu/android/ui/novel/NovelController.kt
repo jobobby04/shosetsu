@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.novel
 
-import android.content.Context
 import android.content.res.Resources
 import android.database.sqlite.SQLiteException
 import android.os.Bundle
@@ -14,8 +13,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -66,7 +69,6 @@ import coil.request.ImageRequest
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -127,11 +129,6 @@ class NovelController : ShosetsuController(),
 			requireActivity().layoutInflater,
 			viewModel
 		).build()
-
-	override fun onAttach(context: Context) {
-		if (viewModel.isFromChapterReader) viewModel.deletePrevious().collectDeletePrevious()
-		super.onAttach(context)
-	}
 
 	private fun startSelectionAction() {
 		if (actionMode != null) return
@@ -232,42 +229,52 @@ class NovelController : ShosetsuController(),
 			migrateOpen()
 			true
 		}
+
 		R.id.share -> {
 			openShare()
 			true
 		}
+
 		R.id.option_chapter_jump -> {
 			openChapterJumpDialog()
 			true
 		}
+
 		R.id.download_next -> {
 			viewModel.downloadNextChapter()
 			true
 		}
+
 		R.id.download_next_5 -> {
 			viewModel.downloadNext5Chapters()
 			true
 		}
+
 		R.id.download_next_10 -> {
 			viewModel.downloadNext10Chapters()
 			true
 		}
+
 		R.id.download_custom -> {
 			downloadCustom()
 			true
 		}
+
 		R.id.download_unread -> {
 			viewModel.downloadAllUnreadChapters()
 			true
 		}
+
 		R.id.download_all -> {
 			viewModel.downloadAllChapters()
 			true
 		}
+
 		R.id.set_categories -> {
 			categoriesDialogOpen = true
 			true
 		}
+
 		else -> false
 	}
 
@@ -341,25 +348,24 @@ class NovelController : ShosetsuController(),
 	 */
 	private fun downloadCustom() {
 		if (context == null) return
-		viewModel.getChapterCount().collectLA(this, catch = {}) { max ->
-			AlertDialog.Builder(requireActivity()).apply {
-				setTitle(string.download_custom_chapters)
-				val numberPicker = NumberPicker(requireActivity()).apply {
-					minValue = 0
-					maxValue = max
-				}
-				setView(numberPicker)
+		val max = viewModel.getChapterCount()
 
-				setPositiveButton(android.R.string.ok) { d, _ ->
-					viewModel.downloadNextCustomChapters(numberPicker.value)
-					d.dismiss()
-				}
-				setNegativeButton(android.R.string.cancel) { d, _ ->
-					d.cancel()
-				}
-			}.show()
-		}
+		AlertDialog.Builder(requireActivity()).apply {
+			setTitle(string.download_custom_chapters)
+			val numberPicker = NumberPicker(requireActivity()).apply {
+				minValue = 0
+				maxValue = max
+			}
+			setView(numberPicker)
 
+			setPositiveButton(android.R.string.ok) { d, _ ->
+				viewModel.downloadNextCustomChapters(numberPicker.value)
+				d.dismiss()
+			}
+			setNegativeButton(android.R.string.cancel) { d, _ ->
+				d.cancel()
+			}
+		}.show()
 	}
 
 	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
@@ -396,6 +402,7 @@ class NovelController : ShosetsuController(),
 						viewModel.deleteChapters()
 					}?.show()
 				}
+
 				ANovelViewModel.ToggleBookmarkResponse.Nothing -> {
 				}
 			}
@@ -454,7 +461,6 @@ class NovelController : ShosetsuController(),
 							NovelChapterContent(
 								chapter = it,
 								openChapter = {
-									viewModel.isFromChapterReader = true
 									activity?.openChapter(it)
 								},
 								onToggleSelection = {
@@ -499,6 +505,7 @@ class NovelController : ShosetsuController(),
 							it.message ?: ""
 						)
 					)?.show()
+
 				is FilePermissionException ->
 					makeSnackBar(
 						getString(
@@ -506,6 +513,7 @@ class NovelController : ShosetsuController(),
 							it.message ?: ""
 						)
 					)?.show()
+
 				is NoSuchExtensionException ->
 					makeSnackBar(
 						getString(
@@ -521,7 +529,6 @@ class NovelController : ShosetsuController(),
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		viewModel.setNovelID(requireArguments().getNovelID())
-		if (viewModel.isFromChapterReader) viewModel.deletePrevious().collectDeletePrevious()
 
 		viewModel.hasSelected.collectLatestLA(this, catch = {}) { hasSelected ->
 			if (hasSelected) {
@@ -653,18 +660,22 @@ class NovelController : ShosetsuController(),
 					selectAll()
 					true
 				}
+
 				R.id.chapter_select_between -> {
 					selectBetween()
 					true
 				}
+
 				R.id.chapter_inverse -> {
 					invertSelection()
 					true
 				}
+
 				R.id.true_delete -> {
 					trueDeleteSelection()
 					true
 				}
+
 				else -> false
 			}
 
@@ -712,6 +723,7 @@ fun PreviewNovelInfoContent() {
 				it % 2 == 0 -> {
 					ReadingStatus.READING
 				}
+
 				else -> {
 					ReadingStatus.READ
 				}
@@ -757,6 +769,7 @@ fun PreviewNovelInfoContent() {
 	}
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NovelInfoContent(
 	novelInfo: NovelUI?,
@@ -784,14 +797,8 @@ fun NovelInfoContent(
 	Box(
 		modifier = Modifier.fillMaxSize()
 	) {
-		val swipeRefreshState = rememberFakeSwipeRefreshState()
-		SwipeRefresh(
-			state = swipeRefreshState.state,
-			onRefresh = {
-				onRefresh()
-				swipeRefreshState.animateRefresh()
-			}
-		) {
+		val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+		Box(Modifier.pullRefresh(pullRefreshState)) {
 			LazyColumnScrollbar(
 				listState = state,
 				thumbColor = MaterialTheme.colorScheme.primary,
@@ -840,6 +847,12 @@ fun NovelInfoContent(
 					}
 				}
 			}
+
+			PullRefreshIndicator(
+				isRefreshing,
+				pullRefreshState,
+				Modifier.align(Alignment.TopCenter)
+			)
 		}
 
 		if (chapters != null && hasSelected) {
@@ -1283,7 +1296,7 @@ fun NovelInfoHeaderContent(
 						) {
 							Icon(
 								painterResource(drawable.open_in_browser),
-								stringResource(string.controller_novel_info_open_web),
+								stringResource(string.action_open_in_webview),
 								modifier = Modifier.size(20.dp),
 								tint = MaterialTheme.colorScheme.onSurface
 							)

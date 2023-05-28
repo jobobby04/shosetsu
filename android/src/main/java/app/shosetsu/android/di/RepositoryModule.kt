@@ -64,6 +64,8 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 		)
 	}
 
+	bind<INovelPinsRepository>() with singleton { NovelPinsRepository(instance()) }
+
 	bind<IUpdatesRepository>() with singleton { UpdatesRepository(instance()) }
 
 	bind<IAppUpdatesRepository>() with singleton { AppUpdatesRepository(instance(), instance()) }
@@ -93,6 +95,6 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 		BackupUriRepository()
 	}
 
-	bind<IChapterHistoryRepository>() with singleton { TempChapterHistoryRepository() }
+	bind<ChapterHistoryRepository>() with singleton { ChapterHistoryRepositoryImpl(instance()) }
 
 }

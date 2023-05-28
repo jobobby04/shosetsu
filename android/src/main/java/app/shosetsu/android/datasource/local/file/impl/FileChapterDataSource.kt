@@ -85,7 +85,7 @@ class FileChapterDataSource(
 	}
 
 	override suspend fun delete(
-		chapterEntities: Array<ChapterEntity>,
+		chapterEntities: List<ChapterEntity>,
 		chapterType: Novel.ChapterType
 	) {
 		chapterEntities.map { chapterEntity ->

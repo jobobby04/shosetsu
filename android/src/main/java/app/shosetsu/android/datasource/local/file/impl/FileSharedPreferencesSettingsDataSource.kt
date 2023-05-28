@@ -42,7 +42,10 @@ class FileSharedPreferencesSettingsDataSource(
 	override fun observeBoolean(name: String, key: SettingKey<Boolean>): StateFlow<Boolean> =
 		provider.observeBoolean(name, key)
 
-	override fun observeStringSet(name: String, key: SettingKey<Set<String>>): StateFlow<Set<String>> =
+	override fun observeStringSet(
+		name: String,
+		key: SettingKey<Set<String>>
+	): StateFlow<Set<String>> =
 		provider.observeStringSet(name, key)
 
 	override fun observeFloat(name: String, key: SettingKey<Float>): StateFlow<Float> =

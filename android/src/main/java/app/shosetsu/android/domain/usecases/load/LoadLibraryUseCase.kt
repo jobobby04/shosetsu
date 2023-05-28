@@ -46,27 +46,38 @@ class LoadLibraryUseCase(
 							 imageURL,
 							 bookmarked,
 							 unread,
+							 downloded,
+							 pinned,
 							 genres,
 							 authors,
 							 artists,
 							 tags,
 							 status,
-							 category) ->
+							 category,
+							 lastUpdate,
+							 readTime) ->
 				LibraryNovelUI(
 					id,
 					title,
 					imageURL,
 					bookmarked,
 					unread,
+					downloded,
+					pinned,
 					genres,
 					authors,
 					artists,
 					tags,
 					status,
-					category
+					category,
+					lastUpdate,
+					readTime
 				)
 			}.groupBy { it.category }
 		}.combine(getCategoriesUseCase()) { novels, categories ->
-			LibraryUI(categories.toImmutableList(), novels.mapValues { it.value.toImmutableList() }.toImmutableMap())
+			LibraryUI(
+				categories.toImmutableList(),
+				novels.mapValues { it.value.toImmutableList() }.toImmutableMap()
+			)
 		}
 }

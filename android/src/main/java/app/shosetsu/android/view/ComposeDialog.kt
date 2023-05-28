@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -17,7 +17,7 @@ class ComposeDialog(
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		this.window?.decorView?.let { view ->
-			ViewTreeLifecycleOwner.set(view, owner)
+			view.setViewTreeLifecycleOwner(owner)
 			view.setViewTreeSavedStateRegistryOwner(stateOwner)
 		}
 	}
@@ -31,7 +31,7 @@ class ComposeBottomSheetDialog(
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		this.window?.decorView?.let { view ->
-			ViewTreeLifecycleOwner.set(view, owner)
+			view.setViewTreeLifecycleOwner(owner)
 			view.setViewTreeSavedStateRegistryOwner(stateOwner)
 		}
 	}

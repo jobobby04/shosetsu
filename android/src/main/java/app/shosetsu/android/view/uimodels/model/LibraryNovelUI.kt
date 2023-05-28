@@ -12,13 +12,17 @@ data class LibraryNovelUI(
 	val imageURL: String,
 	val bookmarked: Boolean,
 	val unread: Int,
+	val downloaded: Int,
+	val pinned: Boolean,
 	val genres: List<String>,
 	val authors: List<String>,
 	val artists: List<String>,
 	val tags: List<String>,
 	val status: Novel.Status,
 	val category: Int,
-	val isSelected: Boolean = false
+	val lastUpdate: Long,
+	val readTime: Long?,
+	val isSelected: Boolean = false,
 ) : Convertible<LibraryNovelEntity> {
 	override fun convertTo(): LibraryNovelEntity =
 		LibraryNovelEntity(
@@ -27,11 +31,15 @@ data class LibraryNovelUI(
 			imageURL,
 			bookmarked,
 			unread,
+			downloaded,
+			pinned,
 			genres,
 			authors,
 			artists,
 			tags,
 			status,
-			category
+			category,
+			lastUpdate,
+			readTime
 		)
 }

@@ -25,6 +25,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
@@ -49,6 +50,7 @@ import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.controller.base.LiftOnScrollToolBarController
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.datepicker.MaterialCalendar
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
 import com.google.android.material.snackbar.Snackbar
@@ -364,7 +366,6 @@ class MainActivity : AppCompatActivity(), DIAware {
 			DrawerLayout.LOCK_MODE_LOCKED_CLOSED,
 			binding.navDrawer
 		)
-		androidx.navigation.ui.R.animator.nav_default_enter_anim
 		getMaterialNav().setupWithNavController(navController)
 	}
 
@@ -632,6 +633,11 @@ class MainActivity : AppCompatActivity(), DIAware {
 
 	@SuppressLint("ObjectAnimatorBinding")
 	internal fun syncActivityViewWithFragment(to: Fragment?) {
+		// Ignore dialog fragments and material calendars, they are meant to be dialog like.
+		if (to is DialogFragment || to is MaterialCalendar<*>) {
+			return
+		}
+
 		binding.elevatedAppBarLayout.setExpanded(true)
 
 		// Show hamburg means this is home

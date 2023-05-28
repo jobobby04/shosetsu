@@ -46,6 +46,7 @@ fun PreviewStringPageContent() {
 			onScroll = {},
 			textColor = Color.Black.toArgb(),
 			backgroundColor = Color.White.toArgb(),
+			disableTextSelection = false,
 			onClick = {},
 			onDoubleClick = {}
 			//isTapToScroll = false
@@ -62,6 +63,7 @@ fun StringPageContent(
 	onScroll: (perc: Double) -> Unit,
 	textColor: Int,
 	backgroundColor: Int,
+	disableTextSelection: Boolean,
 	onClick: () -> Unit,
 	onDoubleClick: () -> Unit
 //isTapToScroll: Boolean
@@ -78,25 +80,33 @@ fun StringPageContent(
 			}
 		}
 
-	ScrollStateBar(state) {
-		SelectionContainer(
-			modifier = Modifier.combinedClickable(
-				onDoubleClick = onDoubleClick,
-				onClick = onClick,
-				interactionSource = remember { MutableInteractionSource() },
-				indication = null,
-			)
+	@Composable
+	fun content() {
+		Text(
+			content,
+			fontSize = textSize.sp,
+			modifier = Modifier
+				.fillMaxSize()
+				.verticalScroll(state)
+				.background(Color(backgroundColor)),
+			color = Color(textColor)
+		)
+	}
 
-		) {
-			Text(
-				content,
-				fontSize = textSize.sp,
-				modifier = Modifier
-					.fillMaxSize()
-					.verticalScroll(state)
-					.background(Color(backgroundColor)),
-				color = Color(textColor)
-			)
+	ScrollStateBar(state) {
+		if (disableTextSelection) {
+			content()
+		} else {
+			SelectionContainer(
+				modifier = Modifier.combinedClickable(
+					onDoubleClick = onDoubleClick,
+					onClick = onClick,
+					interactionSource = remember { MutableInteractionSource() },
+					indication = null,
+				)
+			) {
+				content()
+			}
 		}
 	}
 

@@ -29,14 +29,17 @@ import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
 import java.io.IOException
+import java.util.concurrent.CopyOnWriteArrayList
 
 /*
  * This file is part of shosetsu.
@@ -99,14 +102,8 @@ class DownloadWorker(
 	private val settingRepo by instance<ISettingsRepository>()
 	private val getExt by instance<GetExtensionUseCase>()
 
-	/** How many jobs are currently running */
-	@get:Synchronized
-	@set:Synchronized
-	private var activeJobs = 0
-
 	/** Which extensions are currently having network calls */
-	@get:Synchronized
-	private val activeExtensions = ArrayList<Int>()
+	private val activeExtensions = CopyOnWriteArrayList<Int>()
 
 	/** Retrieves the setting for if the download system is paused or not */
 	private suspend fun isDownloadPaused(): Boolean =
@@ -185,10 +182,18 @@ class DownloadWorker(
 			setContentTitle(downloadEntity.novelName + "\t" + downloadEntity.chapterName)
 			priority = NotificationCompat.PRIORITY_LOW
 			setSilent(true)
-			if (isComplete)
+			if (isComplete) {
 				removeProgress()
-			else if (downloadEntity.status == DownloadStatus.DOWNLOADING)
-				setProgress(1, 0, true)
+			} else {
+				when (downloadEntity.status) {
+					DownloadStatus.DOWNLOADING -> {
+						setProgress(1, 0, true)
+					}
+					else -> {
+						removeProgress()
+					}
+				}
+			}
 		}
 
 		if (isComplete) {
@@ -203,7 +208,7 @@ class DownloadWorker(
 	 * This allows the creation of multiple jobs
 	 * This will respect the amount of threads running currently
 	 */
-	private fun launchDownload(): Job = launchIO {
+	private suspend fun download() {
 		downloadsRepo.loadFirstDownload()?.let { downloadEntity ->
 			val extID = downloadEntity.extensionID
 
@@ -223,7 +228,7 @@ class DownloadWorker(
 						)
 					)
 					//		notify("Cancelled", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
-					return@launchIO
+					return
 				}
 
 				/*
@@ -252,30 +257,10 @@ class DownloadWorker(
 					}
 					// Continues the loop, letting the check repeat
 				}
-				// Prevent slowdowns to the application code by delaying each iteration by 100ms
-				delay(100)
 			}
 
 			// Adds the job as working
-			try {
-				activeExtensions.add(extID)
-			} catch (ignored: ArrayIndexOutOfBoundsException) {
-				logE("Adding extID to active extensions failed, attempting again in 100ms")
-				delay(100)
-				try {
-					activeExtensions.add(extID)
-				} catch (ignored: ArrayIndexOutOfBoundsException) {
-					logE("Failed to add job again, aborting")
-					downloadsRepo.update(
-						downloadEntity.copy(
-							status = DownloadStatus.ERROR
-						)
-					)
-					return@launchIO
-				}
-				logD("Added extID to active jobs successfully")
-			}
-			activeJobs++
+			activeExtensions.add(extID)
 
 			logV("Downloading $downloadEntity")
 			notify(downloadEntity)
@@ -293,30 +278,9 @@ class DownloadWorker(
 						notify(it)
 					}
 				)
-				launchUI {
-					toast { e.message ?: "Download error" }
-				}
 			} finally {
-				delay(500) // Runtime delay
-				activeJobs-- // Drops active job count once completed task
 				activeExtensions.remove(downloadEntity.extensionID)
 			}
-		}
-	}
-
-	/**
-	 * Delay maintainer. Handles a progressively increasing delay.
-	 */
-	class ProgressiveDelayer {
-		private var count: Int = 0
-
-		suspend fun delay() {
-			count + 1
-			delay(count * 100L)
-		}
-
-		fun reset() {
-			count = 0
 		}
 	}
 
@@ -331,31 +295,20 @@ class DownloadWorker(
 				addCancelAction()
 			}
 
-			/**
-			 * Maintains delay between each app launch, ensuring there is breathing room before
-			 * each call.
-			 */
-			val launcherDelayer = ProgressiveDelayer()
-
-			// Will not run if there are no downloads to complete or if the download is paused
-			while (getDownloadCount() >= 1 && !isDownloadPaused()) {
-				/*
-				* Launches a job as long as there are threads to download via.
-				* Otherwise will continue, and the while loop will keep repeating until
-				* there is space to launch another thread for downloading.
-				* */
-				if (activeJobs <= getDownloadThreads()) {
-					launchDownload()
-					launcherDelayer.reset() // Reset delay, starting the cycle over again
+			// Will suspend until there are no downloads and the jobs are completed
+			supervisorScope {
+				// Launch download threads
+				repeat(getDownloadThreads()) {
+					launch(Dispatchers.IO) {
+						// Will not run if there are no downloads to complete or if the download is paused
+						while (getDownloadCount() >= 1 && !isDownloadPaused()) {
+							// Download the
+							download()
+						}
+					}
 				}
-
-				// Delay the process, progressively longer to lower system usage
-				launcherDelayer.delay()
 			}
 
-			// Wait untill there are no more jobs
-			while (activeJobs < 0)
-				delay(100)
 
 			// Downloads the chapters
 			notify("Completed") {

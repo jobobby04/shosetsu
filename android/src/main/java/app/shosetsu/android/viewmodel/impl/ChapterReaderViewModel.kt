@@ -14,6 +14,7 @@ import app.shosetsu.android.common.enums.ReadingStatus.READ
 import app.shosetsu.android.common.enums.ReadingStatus.READING
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
@@ -24,10 +25,9 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.RecordChapterIsReadUseCase
 import app.shosetsu.android.domain.usecases.RecordChapterIsReadingUseCase
-import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
-import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
-import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
+import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
+import app.shosetsu.android.domain.usecases.get.*
+import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
@@ -80,8 +80,26 @@ class ChapterReaderViewModel(
 	private val getReaderSettingsUseCase: GetReaderSettingUseCase,
 	private val recordChapterIsReading: RecordChapterIsReadingUseCase,
 	private val recordChapterIsRead: RecordChapterIsReadUseCase,
-	private val getExt: GetExtensionUseCase
+	private val getExt: GetExtensionUseCase,
+	private val getLastReadChapter: GetLastReadChapterUseCase,
+	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
+	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {
+	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
+		MutableStateFlow(false)
+	}
+
+	override val trackLongReading: StateFlow<Boolean> =
+		settingsRepo.getBooleanFlow(ReaderTrackLongReading)
+
+	override fun userIsReadingTooLong() {
+		isReadingTooLong.value = true
+	}
+
+	override fun dismissReadingTooLong() {
+		isReadingTooLong.value = false
+	}
+
 	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
 		loadLiveAppThemeUseCase()
 			.onIO()
@@ -119,7 +137,11 @@ class ChapterReaderViewModel(
 						doubleTapSystem && !matchFullscreenToFocus
 					}
 					.onIO()
-					.stateIn(viewModelScopeIO, SharingStarted.Lazily, (it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value)
+					.stateIn(
+						viewModelScopeIO,
+						SharingStarted.Lazily,
+						(it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value
+					)
 			}
 
 	}
@@ -375,7 +397,7 @@ class ChapterReaderViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	private val chaptersFlow: Flow<List<ReaderChapterUI>> by lazy {
+	private val chaptersFlow: SharedFlow<List<ReaderChapterUI>> by lazy {
 		novelIDLive.flatMapLatest { nId ->
 			System.gc() // Run GC to try and mitigate OOM
 			loadReaderChaptersUseCase(nId)
@@ -488,9 +510,11 @@ class ChapterReaderViewModel(
 			novelIDLive.value == -1 -> {
 				//logD("Setting NovelID")
 			}
+
 			novelIDLive.value != novelID -> {
 				//logD("NovelID not equal, resetting")
 			}
+
 			novelIDLive.value == novelID -> {
 				//logD("NovelID equal, ignoring")
 				return
@@ -532,6 +556,8 @@ class ChapterReaderViewModel(
 				logE("Failed to update chapter as read", e)
 				ACRA.errorReporter.handleSilentException(e)
 			}
+
+			deletePrevious(chapter)
 		}
 	}
 
@@ -641,6 +667,10 @@ class ChapterReaderViewModel(
 		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
 	}
 
+	override val disableTextSelection: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderDisableTextSelection)
+	}
+
 	private val doubleTapFocus: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus)
 	}
@@ -673,26 +703,22 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onReaderClicked() {
-		launchIO {
-			if (!doubleTapFocus.first()) {
-				val newValue = !isFocused.value
-				isFocused.value = newValue
-				if (newValue || matchFullscreenToFocus.first())
-					_isSystemVisible.value = !newValue
-			}
+		if (!doubleTapFocus.value) {
+			val newValue = !isFocused.value
+			isFocused.value = newValue
+			if (newValue || matchFullscreenToFocus.value)
+				_isSystemVisible.value = !newValue
 		}
 	}
 
 	override fun onReaderDoubleClicked() {
-		launchIO {
-			if (doubleTapFocus.value) {
-				val newValue = !isFocused.value
-				isFocused.value = newValue
-				if (newValue || matchFullscreenToFocus.value)
-					_isSystemVisible.value = !newValue
-			} else if (doubleTapSystemFlow.value) {
-				toggleSystemVisible()
-			}
+		if (doubleTapFocus.value) {
+			val newValue = !isFocused.value
+			isFocused.value = newValue
+			if (newValue || matchFullscreenToFocus.value)
+				_isSystemVisible.value = !newValue
+		} else if (doubleTapSystemFlow.value) {
+			toggleSystemVisible()
 		}
 	}
 
@@ -706,7 +732,8 @@ class ChapterReaderViewModel(
 		val textSize: Float = ReaderTextSize.default,
 		val indentSize: Int = ReaderIndentSize.default,
 		val paragraphSpacing: Float = ReaderParagraphSpacing.default,
-		val tableHackEnabled: Boolean = false
+		val tableHackEnabled: Boolean = ReaderTableHack.default,
+		val disableTextSelection: Boolean = ReaderDisableTextSelection.default
 	)
 
 	private val shosetsuCss: Flow<String> by lazy {
@@ -728,6 +755,10 @@ class ChapterReaderViewModel(
 			builder.copy(
 				tableHackEnabled = enabled
 			)
+		}.combine(disableTextSelection) { builder, enabled ->
+			builder.copy(
+				disableTextSelection = enabled
+			)
 		}.map {
 			val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
 
@@ -735,6 +766,13 @@ class ChapterReaderViewModel(
 				shosetsuStyle.getOrPut(elem) { hashMapOf() }.apply(action)
 
 			fun Int.cssColor(): String = "rgb($red,$green,$blue)"
+
+			if (it.disableTextSelection) {
+				setShosetsuStyle("*") {
+					this["-webkit-user-select"] = "none"
+					this["user-select"] = "none"
+				}
+			}
 
 			setShosetsuStyle("body") {
 				this["background-color"] = it.backgroundColor.cssColor()
@@ -859,6 +897,46 @@ class ChapterReaderViewModel(
 				keys.filterNot { excludedKeys.contains(it) }.forEach { key ->
 					map.remove(key)
 				}
+			}
+		}
+	}
+
+	suspend fun deletePrevious(readChapter: ReaderChapterUI) {
+		logI("Deleting previous chapters")
+		loadDeletePreviousChapterUseCase().let { chaptersBackToDelete ->
+			if (chaptersBackToDelete != -1) {
+
+				val chapters = chaptersFlow.first()
+
+				val indexOfLast = chapters.indexOfFirst { it.id == readChapter.id }
+
+				if (indexOfLast == -1) {
+					logE("Index of last read chapter turned up negative")
+					return
+				}
+
+				if (indexOfLast - chaptersBackToDelete < 0) {
+					return
+				}
+
+				val targetToDelete = indexOfLast - chaptersBackToDelete
+
+				deleteChapterPassageUseCase(
+					if (targetToDelete == 0) {
+						listOf(chapters[targetToDelete])
+					} else {
+						chapters.subList(0, targetToDelete + 1)
+					}
+						// Convert reader to
+						.mapNotNull {
+							try {
+								chapterRepository.getChapter(it.id)
+							} catch (e: SQLiteException) {
+								null
+							}
+						}
+						.filter { it.isSaved } // only delete downloaded chapters
+				)
 			}
 		}
 	}

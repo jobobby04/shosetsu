@@ -109,4 +109,7 @@ class DBChaptersDataSource(
 	override suspend fun markChaptersDeleted(chapterIds: List<Int>) {
 		chaptersDao.markChaptersDeletedBulk(chapterIds)
 	}
+
+	override fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?> =
+		chaptersDao.getChapterFlow(chapterId).map { it?.convertTo() }
 }

@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -114,8 +113,8 @@ fun MoreItemContent(
 	Card(
 		shape = RectangleShape,
 		colors = CardDefaults.cardColors(
-			containerColor =  colorResource(android.R.color.transparent),
-				),
+			containerColor = colorResource(android.R.color.transparent),
+		),
 		modifier = Modifier
 			.clickable(onClick = onClick)
 			.fillMaxWidth(),
@@ -201,6 +200,25 @@ fun MoreContent(
 		item {
 			MoreItemContent(R.string.qr_code_scan, R.drawable.ic_baseline_link_24) {
 				pushController(R.id.action_moreController_to_addShareController, true)
+			}
+		}
+
+
+		item {
+			MoreItemContent(
+				R.string.fragment_more_dest_analytics,
+				R.drawable.baseline_analytics_24
+			) {
+				pushController(R.id.action_moreController_to_analyticsFragment, true)
+			}
+		}
+
+		item {
+			MoreItemContent(
+				R.string.fragment_more_dest_history,
+				R.drawable.baseline_history_edu_24
+			) {
+				pushController(R.id.action_moreController_to_historyFragment, true)
 			}
 		}
 

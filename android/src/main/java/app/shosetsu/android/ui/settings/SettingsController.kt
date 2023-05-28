@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.runtime.Composable
@@ -82,7 +82,7 @@ fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClic
 			.fillMaxWidth(),
 		elevation = cardElevation(0.dp),
 		colors = CardDefaults.cardColors(
-			containerColor =  colorResource(android.R.color.transparent),
+			containerColor = colorResource(android.R.color.transparent),
 		),
 		shape = RectangleShape
 	) {

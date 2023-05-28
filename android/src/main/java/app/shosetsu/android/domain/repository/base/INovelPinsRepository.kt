@@ -1,8 +1,7 @@
 package app.shosetsu.android.domain.repository.base
 
-import app.shosetsu.android.domain.model.local.ChapterEntity
-import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
-import kotlinx.coroutines.flow.Flow
+import android.database.sqlite.SQLiteException
+import app.shosetsu.android.domain.model.local.NovelPinEntity
 
 /*
  * This file is part of shosetsu.
@@ -24,32 +23,24 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Shosetsu
  *
- * Contain a history of chapters.
- *
- * @since 11 / 11 / 2021
+ * @since 01 / 11 / 2022
  * @author Doomsdayrs
  */
-interface IChapterHistoryRepository {
+interface INovelPinsRepository {
 
 	/**
-	 * Mark a chapter as having been read
+	 * Toggle the pin state of the following novel ids
 	 */
-	fun markChapterAsRead(chapter: ChapterEntity)
+	suspend fun togglePin(ids: List<Int>)
 
 	/**
-	 * Mark a chapter as being read
+	 * Update or insert a novel pin, this is useful for backup / restore
 	 */
-	fun markChapterAsReading(chapter: ChapterEntity)
+	@Throws(SQLiteException::class)
+	suspend fun updateOrInsert(pinEntity: NovelPinEntity)
 
 	/**
-	 * Get the last read chapter for a novel
-	 *
-	 * @return a chapter is found, empty if nothing is there
+	 * Is the novel pinned or not
 	 */
-	fun getLastRead(novelId: Int): ChapterHistoryEntity?
-
-	/**
-	 * Live view of the history
-	 */
-	val history: Flow<List<ChapterHistoryEntity>>
+	suspend fun isPinned(id: Int): Boolean
 }

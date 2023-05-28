@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import com.google.android.material.composethemeadapter.MdcTheme
-import com.google.android.material.composethemeadapter3.Mdc3Theme
+import com.google.accompanist.themeadapter.material.MdcTheme
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
 /*
  * This file is part of shosetsu.

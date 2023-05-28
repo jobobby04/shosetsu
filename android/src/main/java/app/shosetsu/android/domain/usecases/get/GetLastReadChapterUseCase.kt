@@ -1,7 +1,7 @@
 package app.shosetsu.android.domain.usecases.get
 
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
-import app.shosetsu.android.domain.repository.base.IChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 
 /*
  * This file is part of shosetsu.
@@ -31,9 +31,9 @@ import app.shosetsu.android.domain.repository.base.IChapterHistoryRepository
  * This is useful when you need to act upon a certain chapter or its neighbors
  */
 class GetLastReadChapterUseCase(
-	private val chapterHistory: IChapterHistoryRepository
+	private val chapterHistory: ChapterHistoryRepository
 ) {
-	operator fun invoke(novelId: Int): ChapterHistoryEntity? {
+	suspend operator fun invoke(novelId: Int): ChapterHistoryEntity? {
 		return chapterHistory.getLastRead(novelId)
 	}
 }

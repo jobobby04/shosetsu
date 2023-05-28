@@ -2,26 +2,26 @@ package app.shosetsu.android.ui.reader.page
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
-import android.view.ViewGroup
-import android.webkit.JavascriptInterface
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
-import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.utils.ProgressiveDelayer
 import app.shosetsu.android.view.compose.ScrollStateBar
-import com.google.accompanist.web.AccompanistWebViewClient
+import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
+import com.google.accompanist.web.WebViewState
+import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
-import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -44,20 +44,33 @@ import kotlinx.coroutines.launch
  */
 
 @Composable
-fun WebViewPageContent(
+fun HTMLPage(
 	html: String,
 	progress: Double,
 	onScroll: (perc: Double) -> Unit,
 	onClick: () -> Unit,
 	onDoubleClick: () -> Unit
 ) {
+	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
 	val state = rememberWebViewStateWithHTMLData(html)
+	val navigator = rememberWebViewNavigator(scope)
+
+	/*
+	LaunchedEffect(navigator) {
+		val bundle = state.viewState
+		if (bundle == null) {
+			navigator.loadHtml(html)
+		}
+	}
+	 */
+
 	var first by remember { mutableStateOf(true) }
 
 	if (scrollState.isScrollInProgress)
 		DisposableEffect(Unit) {
 			onDispose {
+				println("Scrolling: ${scrollState.value} out of ${scrollState.maxValue}")
 				if (scrollState.value != 0)
 					onScroll((scrollState.value.toDouble() / scrollState.maxValue))
 				else onScroll(0.0)
@@ -67,17 +80,18 @@ fun WebViewPageContent(
 	val backgroundColor = MaterialTheme.colors.background
 	ScrollStateBar(scrollState) {
 		WebView(
-			state,
+			state = state,
 			captureBackPresses = false,
 			onCreated = { webView ->
 				webView.setBackgroundColor(backgroundColor.toArgb())
 				webView.settings.apply {
 					@SuppressLint("SetJavaScriptEnabled")
 					javaScriptEnabled = true
-					blockNetworkLoads = false
-					blockNetworkImage = false
-					loadsImagesAutomatically = true
-					allowFileAccess = true
+					blockNetworkLoads = false // enable content loading
+					blockNetworkImage = false // enable image loading
+					loadsImagesAutomatically = true // ensure images are loaded
+					allowFileAccess = true // allow to cache content
+					// try to use loaded cache
 					cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 				}
 
@@ -98,62 +112,36 @@ fun WebViewPageContent(
 			},
 			modifier = Modifier
 				.fillMaxWidth()
+				.heightIn(min = 1.dp)
 				.verticalScroll(scrollState),
-			client = object : AccompanistWebViewClient() {
-				override fun shouldOverrideUrlLoading(
-					view: WebView?,
-					request: WebResourceRequest?
-				): Boolean = true
-
-				override fun onPageFinished(view: WebView?, url: String?) {
-					super.onPageFinished(view, url)
-					view?.evaluateJavascript(
-						"""
-						window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
-						window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
-						""".trimIndent(), null
-					)
-					view?.layoutParams = ViewGroup.LayoutParams(
-						ViewGroup.LayoutParams.MATCH_PARENT,
-						ViewGroup.LayoutParams.WRAP_CONTENT
-					)
-				}
-			},
-			chromeClient = ShosetsuAccompanistWebChromeClient()
+			client = ShosetsuAccompanistWebViewClient(),
+			chromeClient = ShosetsuAccompanistWebChromeClient(),
+			navigator = navigator,
 		)
 	}
 
-	// Avoid scrolling when the state has not fully loaded
-	if (scrollState.maxValue != 0 && scrollState.maxValue != Int.MAX_VALUE && !state.isLoading) {
+	val delayer = remember { ProgressiveDelayer(100) }
+	LaunchedEffect(scrollState.maxValue, state.loadingState) {
+		// Ensure this only occurs on the first time
 		if (first) {
-			LaunchedEffect(progress) {
-				launch {
+			// We can tell the view is not loaded properly by the scroll state
+			if (scrollState.maxValue != 0 && scrollState.maxValue != Int.MAX_VALUE) {
+				// Ensure state is loading
+				if (!state.sIsLoading) {
+					delayer.delay() // each call makes the delay longer
+					println("I am scrolling!: ${scrollState.maxValue} by $progress")
 					val result = (scrollState.maxValue * progress).toInt()
+					println("Scrolling to $result from ${scrollState.value}")
 					scrollState.scrollTo(result)
 					first = false
+					delayer.reset()
 				}
 			}
 		}
 	}
 }
 
-class ShosetsuScript(
-	val onClickMethod: () -> Unit,
-	val onDClickMethod: () -> Unit
-) {
-	@Suppress("unused")
-	@JavascriptInterface
-	fun onClick() {
-		launchUI {
-			onClickMethod()
-		}
-	}
-
-	@Suppress("unused")
-	@JavascriptInterface
-	fun onDClick() {
-		launchUI {
-			onDClickMethod()
-		}
-	}
-}
+val WebViewState.sIsLoading: Boolean
+	get() = (loadingState is LoadingState.Loading &&
+			(loadingState as LoadingState.Loading).progress != 1f) ||
+			loadingState is LoadingState.Initializing

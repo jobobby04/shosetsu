@@ -1,10 +1,11 @@
 package app.shosetsu.android.domain.usecases.load
 
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.domain.model.local.LibrarySortFilterEntity
+import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 /*
  * This file is part of Shosetsu.
@@ -29,11 +30,11 @@ import kotlinx.serialization.json.Json
 class LoadLibraryFilterSettingsUseCase(
 	private val iSettingsRepository: ISettingsRepository
 ) {
-	suspend operator fun invoke(): LibrarySortFilterEntity {
-		return iSettingsRepository.getString(
+	operator fun invoke(): Flow<LibraryFilterState> {
+		return iSettingsRepository.getStringFlow(
 			SettingKey.LibraryFilter
-		).let {
-			Json.decodeFromString(it)
+		).map {
+			LibraryFilterState.libraryFilterStateJson.decodeFromString(it)
 		}
 	}
 }

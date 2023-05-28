@@ -2,11 +2,26 @@ package app.shosetsu.android.ui.browse
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,7 +33,11 @@ import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.FilteredLanguages
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.LanguageFilter
-import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 /*
  * This file is part of shosetsu.
@@ -60,8 +79,6 @@ fun BrowseControllerFilterMenu(viewModel: ABrowseViewModel) {
 			.padding(vertical = 16.dp)
 			.verticalScroll(rememberScrollState())
 	) {
-		BrowseControllerNameFilter(searchTerm, viewModel::setSearch)
-
 		BrowseControllerLanguagesFilter(languageList, hideLanguageFilter,
 			setLanguageFilterState = { l, s ->
 				viewModel.setLanguageFiltered(l, s)
@@ -81,30 +98,12 @@ fun BrowseControllerFilterMenu(viewModel: ABrowseViewModel) {
 
 @Preview
 @Composable
-fun PreviewBrowseControllerNameFilter() {
-	BrowseControllerNameFilter("") {}
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BrowseControllerNameFilter(searchTerm: String, setSearchTerm: (newTerm: String) -> Unit) {
-	OutlinedTextField(
-		value = searchTerm,
-		onValueChange = setSearchTerm,
-		modifier = Modifier
-			.fillMaxWidth()
-			.padding(horizontal = 16.dp),
-		label = {
-			Text(stringResource(R.string.controller_browse_filter_name_label))
-		}
-	)
-}
-
-@Preview
-@Composable
 fun PreviewBrowseControllerLanguagesFilter() {
 	BrowseControllerLanguagesFilter(
-		FilteredLanguages(listOf(LanguageFilter("en")).toImmutableList(), mapOf("en" to true).toImmutableMap()),
+		FilteredLanguages(
+			listOf(LanguageFilter("en")).toImmutableList(),
+			mapOf("en" to true).toImmutableMap()
+		),
 		false,
 		{ _, _ -> },
 		{}

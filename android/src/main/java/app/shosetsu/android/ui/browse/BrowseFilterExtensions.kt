@@ -1,10 +1,7 @@
-package app.shosetsu.android.domain.usecases.update
+package app.shosetsu.android.ui.browse
 
-import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.domain.model.local.LibrarySortFilterEntity
-import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import androidx.appcompat.widget.SearchView
+import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 
 /*
  * This file is part of Shosetsu.
@@ -24,15 +21,19 @@ import kotlinx.serialization.json.Json
  */
 
 /**
- * 09 / 03 / 2021
+ * Shosetsu
+ * 9 / June / 2019
+ *
+ * @author github.com/doomsdayrs
  */
-class UpdateLibraryFilterSettingsUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
-	suspend operator fun invoke(librarySortFilterEntity: LibrarySortFilterEntity) {
-		iSettingsRepository.setString(
-			SettingKey.LibraryFilter,
-			Json.encodeToString(librarySortFilterEntity)
-		)
+class BrowseFilterExtensions(
+	private val viewModel: ABrowseViewModel
+) :
+	SearchView.OnQueryTextListener {
+	override fun onQueryTextSubmit(s: String): Boolean = false
+
+	override fun onQueryTextChange(s: String): Boolean {
+		viewModel.setSearch(s)
+		return true
 	}
 }

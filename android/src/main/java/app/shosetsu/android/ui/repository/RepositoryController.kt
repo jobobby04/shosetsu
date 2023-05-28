@@ -8,6 +8,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,14 +31,12 @@ import app.shosetsu.android.databinding.RepositoryAddBinding
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.compose.rememberFakeSwipeRefreshState
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
@@ -279,10 +281,12 @@ class RepositoryController : ShosetsuController(),
 				activity?.openInWebView(REPOSITORY_HELP_URL)
 				true
 			}
+
 			else -> false
 		}
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RepositoriesContent(
 	items: ImmutableList<RepositoryUI>,
@@ -293,14 +297,8 @@ fun RepositoriesContent(
 	fab: EFabMaintainer
 ) {
 	if (items.isNotEmpty()) {
-		val swipeRefreshState = rememberFakeSwipeRefreshState()
-		SwipeRefresh(
-			state = swipeRefreshState.state,
-			onRefresh = {
-				onRefresh()
-				swipeRefreshState.animateRefresh()
-			}
-		) {
+		val pullRefreshState = rememberPullRefreshState(false, onRefresh)
+		Box(Modifier.pullRefresh(pullRefreshState)) {
 			val state = rememberLazyListState()
 			syncFABWithCompose(state, fab)
 			LazyColumn(
@@ -324,6 +322,8 @@ fun RepositoriesContent(
 					)
 				}
 			}
+
+			PullRefreshIndicator(false, pullRefreshState, Modifier.align(Alignment.TopCenter))
 		}
 	} else {
 		ErrorContent(

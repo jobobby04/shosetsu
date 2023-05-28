@@ -43,6 +43,23 @@ abstract class ALibraryViewModel :
 	IsOnlineCheckViewModel,
 	StartUpdateManagerViewModel {
 
+	/**
+	 * View state of if the category dialog is open or not.
+	 *
+	 * This is here due to legacy non-compose frameworks.
+	 */
+	abstract val isCategoryDialogOpen: StateFlow<Boolean>
+
+	/**
+	 * Show the category dialog
+	 */
+	abstract fun showCategoryDialog()
+
+	/**
+	 * Hide the category dialog
+	 */
+	abstract fun hideCategoryDialog()
+
 	abstract val isEmptyFlow: StateFlow<Boolean>
 	abstract val hasSelection: StateFlow<Boolean>
 
@@ -67,11 +84,17 @@ abstract class ALibraryViewModel :
 	abstract fun cycleUnreadFilter(currentState: ToggleableState)
 	abstract fun getUnreadFilter(): Flow<ToggleableState>
 
+	abstract fun cycleDownloadedFilter(currentState: ToggleableState)
+	abstract fun getDownloadedFilter(): Flow<ToggleableState>
+
 	abstract fun getSortType(): Flow<NovelSortType>
 	abstract fun setSortType(novelSortType: NovelSortType)
 
 	abstract fun isSortReversed(): Flow<Boolean>
 	abstract fun setIsSortReversed(reversed: Boolean)
+
+	abstract fun isPinnedOnTop(): Flow<Boolean>
+	abstract fun setPinnedOnTop(onTop: Boolean)
 
 	abstract fun cycleFilterGenreState(genre: String, currentState: ToggleableState)
 	abstract fun getFilterGenreState(name: String): Flow<ToggleableState>
@@ -104,5 +127,10 @@ abstract class ALibraryViewModel :
 
 	abstract val activeCategory: StateFlow<Int>
 	abstract fun setActiveCategory(category: Int)
+
+	/**
+	 * Toggle pin of selected novels
+	 */
+	abstract fun togglePinSelected()
 
 }

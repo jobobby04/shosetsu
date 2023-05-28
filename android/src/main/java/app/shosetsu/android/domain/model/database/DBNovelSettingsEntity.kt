@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -48,18 +47,14 @@ data class DBNovelSettingsEntity(
 	val novelID: Int,
 
 	// how chapters are sorted
-	@NonNull
 	var sortType: ChapterSortType,
 
 	var showOnlyReadingStatusOf: ReadingStatus?,
 
-	@NonNull
 	var showOnlyBookmarked: Boolean = false,
 
-	@NonNull
 	var showOnlyDownloaded: Boolean = false,
 
-	@NonNull
 	var reverseOrder: Boolean = false,
 
 

@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -57,37 +56,28 @@ import app.shosetsu.lib.Version
 
 data class DBRepositoryExtensionEntity(
 	/** Repository extension belongs too*/
-	@NonNull
 	val repoId: Int,
 
 	/** Extension ID */
-	@NonNull
 	val id: Int,
 
 	/** Name of the extension, can be changed */
-	@NonNull
 	var name: String,
 
 	/** FileName of the extension */
-	@NonNull
 	val fileName: String,
 
 	/** Image URL of the extension*/
-	@NonNull
 	var imageURL: String,
 
 	/** The language of the extension */
-	@NonNull
 	val lang: String,
 
-	@NonNull
 	val version: Version,
 
 	/** MD5 to check against */
-	@NonNull
 	var md5: String,
 
-	@NonNull
 	val type: ExtensionType
 ) : Convertible<GenericExtensionEntity> {
 	override fun convertTo(): GenericExtensionEntity = GenericExtensionEntity(

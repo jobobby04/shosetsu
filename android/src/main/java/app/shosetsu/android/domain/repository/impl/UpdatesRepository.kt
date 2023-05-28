@@ -34,16 +34,30 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  * @author github.com/doomsdayrs
  */
 class UpdatesRepository(
-	private val IDBUpdatesDataSource: IDBUpdatesDataSource,
+	private val database: IDBUpdatesDataSource,
 ) : IUpdatesRepository {
 
 	@Throws(SQLiteException::class)
 	override suspend fun addUpdates(list: List<UpdateEntity>): Array<Long> =
-		onIO { IDBUpdatesDataSource.insertUpdates(list) }
+		onIO { database.insertUpdates(list) }
 
-	override suspend fun getUpdatesFlow(): Flow<List<UpdateEntity>> =
-		IDBUpdatesDataSource.getUpdates().onIO()
+	override fun getUpdatesFlow(): Flow<List<UpdateEntity>> =
+		database.getUpdates().onIO()
 
-	override suspend fun getCompleteUpdatesFlow(): Flow<List<UpdateCompleteEntity>> =
-		IDBUpdatesDataSource.getCompleteUpdates().distinctUntilChanged().onIO()
+	override fun getCompleteUpdatesFlow(): Flow<List<UpdateCompleteEntity>> =
+		database.getCompleteUpdates().distinctUntilChanged().onIO()
+
+	@Throws(SQLiteException::class)
+	override suspend fun clearAll() {
+		onIO {
+			database.clearAll()
+		}
+	}
+
+	@Throws(SQLiteException::class)
+	override suspend fun clearBefore(date: Long) {
+		onIO {
+			database.clearBefore(date)
+		}
+	}
 }

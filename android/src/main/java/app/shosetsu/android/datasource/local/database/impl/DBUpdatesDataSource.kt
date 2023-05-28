@@ -1,5 +1,6 @@
 package app.shosetsu.android.datasource.local.database.impl
 
+import android.database.sqlite.SQLiteException
 import app.shosetsu.android.common.ext.toDB
 import app.shosetsu.android.datasource.local.database.base.IDBUpdatesDataSource
 import app.shosetsu.android.domain.model.local.UpdateCompleteEntity
@@ -33,13 +34,26 @@ import kotlinx.coroutines.flow.map
 class DBUpdatesDataSource(
 	private val updatesDao: UpdatesDao,
 ) : IDBUpdatesDataSource {
-	override suspend fun getUpdates(): Flow<List<UpdateEntity>> =
+	@Throws(SQLiteException::class)
+	override fun getUpdates(): Flow<List<UpdateEntity>> =
 		updatesDao.loadUpdates().map { it.convertList() }
 
+	@Throws(SQLiteException::class)
 	override suspend fun insertUpdates(list: List<UpdateEntity>): Array<Long> =
 		(updatesDao.insertAllReplace(list.toDB()))
 
-	override suspend fun getCompleteUpdates(
+	@Throws(SQLiteException::class)
+	override fun getCompleteUpdates(
 	): Flow<List<UpdateCompleteEntity>> =
 		updatesDao.loadCompleteUpdates()
+
+	@Throws(SQLiteException::class)
+	override suspend fun clearAll() {
+		updatesDao.clearAll()
+	}
+
+	@Throws(SQLiteException::class)
+	override suspend fun clearBefore(date: Long) {
+		updatesDao.clearBefore(date)
+	}
 }

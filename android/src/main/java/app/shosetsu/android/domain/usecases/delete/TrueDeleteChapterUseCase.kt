@@ -42,7 +42,7 @@ class TrueDeleteChapterUseCase(
 	suspend operator fun invoke(chapterUIs: List<ChapterUI>) {
 		val chapters = chapterUIs.convertList()
 
-		deleteChapter(chapters.toTypedArray())
+		deleteChapter(chapters)
 		repo.delete(chapters)
 	}
 

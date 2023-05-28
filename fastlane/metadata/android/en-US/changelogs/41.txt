@@ -1,0 +1,61 @@
+# v2.4.0
+
+## New
+- Added novel pinning
+- Improved downloader manager by Jobobby04
+- Add site protector to prevent DDOSing sites
+- Add download filter to library by Suhan Paradkar
+- Add setting to disable reader text selection
+- Split CSSEditorActivity.kt preview and editor
+- Add open in web view & clear cookies to catalog error screen
+- Enable monochrome icons in additional configurations by JFronny
+- Add scroll bar to downloads by Suhan G Paradkar
+- Add last update sort to Library
+- Add clear options to Updates Controller
+- Add kofi support
+- Add support page to introduction (please 1$)
+- Implement chapter history
+- Add open novel feature for history
+- Implement Custom User Agent
+- Add Analytics
+- Add long reading detection
+- Replace Filter>Extension search with split search & global search topbar
+
+## Fixes
+- Remove Toast from DownloadWorker.kt (spammy)
+- Fix TTS
+- Handle missing extension in GetRemoteNovelUseCase.kt
+- Fix deleting previously read chapters
+- Add mechanism to respect Retry-After HTTP header response
+- Fix CSS keyboard overlap
+- Fix scroll position reset in CSS text editor
+- Use OkHTTP client for image loading
+- Fix novel update notification not working
+- Fix loading indicator for library filling entire screen
+
+## Misc
+- Add OptIn flags
+- Updated dependencies
+- Ensure keys are not nullable in AbstractMemoryDataSource.kt
+- Add concurrent memory experiment (Please check it out in advanced)
+- Remove random resource
+- Improve DownloadWorker.kt notifier
+- Rename controller_novel_info_open_web to generic action form
+- Remove vararg from EmptyDataContent.kt
+- Update to Firefox 108 user agent
+- Migrate compose adapter to accompanist
+- Attach LibraryFilterState memory to Library filter (I forgot to)
+- Fix various formatting issues
+- Remove github FUNDING.yml
+- Replace REPLACE with CANCEL_AND_REENQUEUE in WorkerManagers
+- Migrate to Pager foundation
+- Add notification permission check in NotificationCapable
+- Use lastLoadedUrl in WebViewApp
+- Separate ChapterReader and ChapterReaderView
+- Disabled view size forcing in HTMLPage.kt for ChapterReader
+- Prevent javascript from being applied twice
+- ANovelViewModel: Swap getChapterCount to integer return
+- NovelUpdateWorker: Swap update notification to its own function
+- ChapterReader: Control screen insets from compose instead
+- Make reader tapping occur in sync with the UI thread
+- Enable monochrome icons in additional configurations

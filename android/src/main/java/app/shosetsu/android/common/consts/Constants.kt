@@ -1,8 +1,10 @@
 package app.shosetsu.android.common.consts
 
+import android.os.Build
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
+import app.shosetsu.android.BuildConfig
 
 /*
  * This file is part of shosetsu.
@@ -20,9 +22,21 @@ import androidx.compose.ui.text.TextStyle
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-const val USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101 Firefox/107.0"
 
-const val SELECTED_STROKE_WIDTH: Int = 8
+/**
+ * A default user agent string, should not be used
+ */
+const val DEFAULT_USER_AGENT =
+	"Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0"
+
+/**
+ * User agent for when we want to be soft and cuddly to sites.
+ */
+val SHOSETSU_USER_AGENT =
+	"Shosetsu/${BuildConfig.VERSION_NAME} " +
+			"(Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL})"
+
+const val SELECTED_STROKE_WIDTH: Int = 4
 
 /** How fast the user must fling inorder to activate the scroll to last */
 const val FLING_THRESHOLD = 19999
@@ -59,10 +73,16 @@ const val APP_UPDATE_CACHE_FILE = "SHOSETSU_APP_UPDATE.json"
 
 const val APK_MIME = "application/vnd.android.package-archive"
 
+
+/**
+ * Constant of twenty minutes
+ */
+const val MAX_CONTINOUS_READING_TIME: Long = 1000L * 60 * 20
+
 /**
  * The version of backups this build of shosetsu supports
  */
-const val VERSION_BACKUP: String = "1.1.0"
+const val VERSION_BACKUP: String = "1.2.0"
 const val BACKUP_FILE_EXTENSION = "sbk"
 const val REPOSITORY_HELP_URL = "https://shosetsu.app/help/guides/repositories/"
 const val BROWSE_HELP_URL = "https://shosetsu.app/help/guides/browse/"
@@ -73,5 +93,6 @@ const val URL_DISCLAIMER = "https://shosetsu.app/disclaimer"
 const val URL_GITHUB_APP = "https://gitlab.com/shosetsuorg/shosetsu"
 const val URL_GITHUB_EXTENSIONS = "https://github.com/shosetsuorg/extensions"
 const val URL_PATREON = "https://www.patreon.com/doomsdayrs"
+const val URL_KOFI = "https://ko-fi.com/doomsdayrs"
 const val URL_DISCORD = "https://discord.gg/ttSX7gB"
 const val URL_MATRIX = "https://matrix.to/#/#shosetsu:matrix.org"

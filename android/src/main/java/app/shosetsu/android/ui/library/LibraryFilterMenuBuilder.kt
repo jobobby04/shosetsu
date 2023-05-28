@@ -3,8 +3,11 @@ package app.shosetsu.android.ui.library
 import android.content.Context
 import android.view.View
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -16,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Off
+import androidx.compose.ui.state.ToggleableState.On
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.NovelSortType
@@ -23,12 +27,10 @@ import app.shosetsu.android.common.enums.NovelSortType.*
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /*
@@ -59,7 +61,7 @@ class LibraryFilterMenuBuilder constructor(
 	private val context: Context,
 	private val viewModel: ALibraryViewModel
 ) {
-	@OptIn(ExperimentalPagerApi::class)
+	@OptIn(ExperimentalFoundationApi::class)
 	fun build(): View =
 		ComposeView(context).apply {
 			setContent {
@@ -93,11 +95,12 @@ class LibraryFilterMenuBuilder constructor(
 								)
 							}
 						}
-						HorizontalPager(count = pages.size, state = pagerState) {
+						HorizontalPager(pageCount = pages.size, state = pagerState) {
 							when (it) {
 								0 -> {
 									Menu0Content()
 								}
+
 								1 -> {
 									Menu1Content()
 								}
@@ -132,6 +135,7 @@ class LibraryFilterMenuBuilder constructor(
 				.verticalScroll(rememberScrollState()),
 		) {
 			UnreadStatusFilter()
+			DownloadedFilter()
 
 			if (genresIsNotEmpty)
 				FilterContent(
@@ -201,6 +205,34 @@ class LibraryFilterMenuBuilder constructor(
 			},
 			cycleState = { state ->
 				viewModel.cycleUnreadFilter(state)
+			}
+		)
+	}
+
+	@Composable
+	private fun DownloadedFilter() {
+		SimpleFilter(
+			modifier = Modifier.padding(top = 8.dp),
+			name = stringResource(R.string.downloaded),
+			getState = {
+				viewModel.getDownloadedFilter()
+			},
+			cycleState = { state ->
+				viewModel.cycleDownloadedFilter(state)
+			}
+		)
+	}
+
+	@Composable
+	private fun PinOnTopOption() {
+		SimpleFilter(
+			modifier = Modifier.padding(top = 8.dp),
+			name = stringResource(R.string.pin_on_top),
+			getState = {
+				viewModel.isPinnedOnTop().map { if (it) On else Off }
+			},
+			cycleState = { state ->
+				viewModel.setPinnedOnTop(state != On)
 			}
 		)
 	}
@@ -327,6 +359,8 @@ class LibraryFilterMenuBuilder constructor(
 				.fillMaxSize()
 				.verticalScroll(rememberScrollState()),
 		) {
+			PinOnTopOption()
+
 			Menu1Item(
 				R.string.controller_library_menu_tri_by_title,
 				state,
@@ -343,6 +377,18 @@ class LibraryFilterMenuBuilder constructor(
 				R.string.controller_library_menu_tri_by_id,
 				state,
 				BY_ID,
+				reversed
+			)
+			Menu1Item(
+				R.string.controller_library_menu_tri_by_updated,
+				state,
+				BY_UPDATED,
+				reversed
+			)
+			Menu1Item(
+				R.string.controller_library_menu_tri_by_read_time,
+				state,
+				BY_READ_TIME,
 				reversed
 			)
 		}

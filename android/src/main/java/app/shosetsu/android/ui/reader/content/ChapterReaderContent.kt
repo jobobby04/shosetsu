@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
-import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
@@ -41,13 +40,13 @@ import kotlinx.coroutines.launch
  * @since 26 / 05 / 2022
  * @author Doomsdayrs
  */
-@OptIn(ExperimentalMaterialApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun PreviewChapterReaderContent() {
 	ShosetsuCompose {
 		ChapterReaderContent(
-			isFirstFocus = false,
+			isFirstFocusProvider = { false },
 			onFirstFocus = {},
 			isFocused = false,
 			content = {
@@ -94,7 +93,7 @@ fun PreviewChapterReaderContent() {
 @Composable
 fun ChapterReaderContent(
 	isFocused: Boolean,
-	isFirstFocus: Boolean,
+	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
 	content: @Composable (PaddingValues) -> Unit,
@@ -102,19 +101,6 @@ fun ChapterReaderContent(
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
-
-	if (isFocused && isFirstFocus) {
-		val string = stringResource(R.string.reader_first_focus)
-		val dismiss = stringResource(R.string.reader_first_focus_dismiss)
-		LaunchedEffect(scaffoldState.snackbarHostState) {
-			launch {
-				when (scaffoldState.snackbarHostState.showSnackbar(string, dismiss)) {
-					SnackbarResult.Dismissed -> onFirstFocus()
-					SnackbarResult.ActionPerformed -> onFirstFocus()
-				}
-			}
-		}
-	}
 
 	BackHandler(scaffoldState.bottomSheetState.isExpanded) {
 		scope.launch {
@@ -133,4 +119,18 @@ fun ChapterReaderContent(
 		},
 		sheetShape = RectangleShape
 	)
+
+	if (isFocused && isFirstFocusProvider()) {
+		val string = stringResource(R.string.reader_first_focus)
+		val dismiss = stringResource(R.string.reader_first_focus_dismiss)
+		LaunchedEffect(scaffoldState.snackbarHostState) {
+			launch {
+				when (scaffoldState.snackbarHostState.showSnackbar(string, dismiss)) {
+					SnackbarResult.Dismissed -> onFirstFocus()
+					SnackbarResult.ActionPerformed -> onFirstFocus()
+				}
+			}
+		}
+	}
+
 }

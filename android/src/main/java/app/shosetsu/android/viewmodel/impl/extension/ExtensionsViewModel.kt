@@ -99,7 +99,11 @@ class ExtensionsViewModel(
 				}
 			}
 			FilteredLanguages(languageResult.toImmutableList(), map.toImmutableMap())
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, FilteredLanguages(persistentListOf(), persistentMapOf()))
+		}.onIO().stateIn(
+			viewModelScopeIO,
+			SharingStarted.Lazily,
+			FilteredLanguages(persistentListOf(), persistentMapOf())
+		)
 	}
 
 	override val onlyInstalledLive: StateFlow<Boolean> by lazy {

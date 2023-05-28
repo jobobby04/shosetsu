@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import app.shosetsu.android.domain.model.database.DBNovelEntity
 import app.shosetsu.android.domain.model.database.DBStrippedNovelEntity
+import app.shosetsu.android.domain.model.local.AnalyticsNovelEntity
 import app.shosetsu.android.domain.model.local.LibraryNovelEntity
 import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.providers.database.dao.base.BaseDao
@@ -68,11 +69,32 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 					WHERE novelID = novels.id
 					AND readingStatus != 2
 				) as unread,
+				(
+					SELECT count(*)
+					FROM chapters
+					WHERE novelID = novels.id
+					AND isSaved = 1
+				) as downloaded,
+				(
+					SELECT IFNULL(pinned, 0)
+					FROM novel_pins
+					WHERE novelId = novels.id
+				) as pinned,
 				novels.genres,
 				novels.authors,
 				novels.artists,
 				novels.tags,
-				novels.status
+				novels.status,
+				(
+					SELECT IFNULL(time, 0)
+					FROM updates
+					WHERE novelID = novels.id
+				) as lastUpdate,
+				(
+					SELECT MAX(IFNULL(endedReadingAt, IFNULL(startedReadingAt, 0)))
+					FROM chapter_history
+					WHERE novelId = novels.id
+				) as readTime
 			  FROM novels
 			  WHERE novels.bookmarked = 1
 		) AS M
@@ -124,6 +146,40 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 
 	@Query("SELECT id, title, imageURL FROM novels WHERE title like '%'||:query||'%' AND novels.bookmarked = 1")
 	fun searchBookmarked(query: String): PagingSource<Int, StrippedBookmarkedNovelEntity>
+
+	@Query(
+		"""
+		SELECT 
+			id, 
+			title, 
+			imageURL, 
+
+			formatterID as extensionId, 
+			genres,
+			
+			(
+				SELECT 
+					SUM(IFNULL(endedReadingAt, startedReadingAt) - startedReadingAt) 
+				FROM chapter_history 
+				WHERE novelId = novels.id
+			) as totalReadingTime,
+			(
+				SELECT COUNT(*) FROM chapters WHERE novelID = novels.id
+			) as chapterCount,
+			(
+				SELECT COUNT(*) FROM chapters WHERE novelID = novels.id AND readingStatus = 0
+			) as unreadChapterCount,
+			(
+				SELECT COUNT(*) FROM chapters WHERE novelID = novels.id AND readingStatus = 2
+			) as readChapterCount,
+			(
+				SELECT COUNT(*) FROM chapters WHERE novelID = novels.id AND readingStatus = 1
+			) as readingChapterCount
+		FROM novels
+		WHERE bookmarked = 1
+		"""
+	)
+	fun getAnalytics(): Flow<List<AnalyticsNovelEntity>>
 
 	//@Query("SELECT * FROM novels WHERE id = :novelID LIMIT 1")
 	//fun loadNovelWithChapters(novelID: Int): DBNovelWithChapters

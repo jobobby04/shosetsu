@@ -179,7 +179,7 @@ class ChaptersRepository(
 	}
 
 	override suspend fun deleteChapterPassage(
-		chapters: Array<ChapterEntity>,
+		chapters: List<ChapterEntity>,
 		chapterType: Novel.ChapterType
 	) {
 		onIO {
@@ -218,5 +218,8 @@ class ChaptersRepository(
 	) = onIO {
 		dbSource.updateChapterBookmark(chapterIds, bookmarked)
 	}
+
+	override fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?> =
+		dbSource.getChapterFlow(chapterId).onIO()
 
 }

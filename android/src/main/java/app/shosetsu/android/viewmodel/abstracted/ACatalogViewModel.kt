@@ -131,4 +131,8 @@ abstract class ACatalogViewModel :
 	 */
 	abstract fun getBaseURL(): Flow<String>
 
+	/**
+	 * Clear the cookies
+	 */
+	abstract fun clearCookies()
 }

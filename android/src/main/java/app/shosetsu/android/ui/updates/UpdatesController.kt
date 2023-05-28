@@ -2,13 +2,28 @@ package app.shosetsu.android.ui.updates
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -28,12 +43,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModel
-import app.shosetsu.android.view.compose.*
+import app.shosetsu.android.view.compose.ErrorAction
+import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -42,8 +62,7 @@ import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.google.android.material.datepicker.MaterialDatePicker
 import kotlinx.collections.immutable.ImmutableMap
 import org.joda.time.DateTime
 
@@ -70,7 +89,7 @@ import org.joda.time.DateTime
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-class ComposeUpdatesController : ShosetsuController(), HomeFragment {
+class ComposeUpdatesController : ShosetsuController(), HomeFragment, MenuProvider {
 	override val viewTitleRes: Int = R.string.updates
 
 	private val viewModel: AUpdatesViewModel by viewModel()
@@ -79,19 +98,22 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
-		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				val items by viewModel.liveData.collectAsState()
-				val isRefreshing by viewModel.isRefreshing.collectAsState()
+	): View {
+		activity?.addMenuProvider(this, viewLifecycleOwner)
+		return ComposeView(requireContext()).apply {
+			setViewTitle()
+			setContent {
+				ShosetsuCompose {
+					val items by viewModel.liveData.collectAsState()
+					val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-				UpdatesContent(
-					items = items,
-					isRefreshing = isRefreshing,
-					onRefresh = this@ComposeUpdatesController::onRefresh
-				) { (chapterID, novelID) ->
-					activity?.openChapter(chapterID, novelID)
+					UpdatesContent(
+						items = items,
+						isRefreshing = isRefreshing,
+						onRefresh = this@ComposeUpdatesController::onRefresh
+					) { (chapterID, novelID) ->
+						activity?.openChapter(chapterID, novelID)
+					}
 				}
 			}
 		}
@@ -102,9 +124,40 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment {
 			viewModel.startUpdateManager(-1)
 		else displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
 	}
+
+	private fun onUserClearBefore() {
+		MaterialDatePicker.Builder.datePicker()
+			.setTitleText(R.string.fragment_updates_clear)
+			.build()
+			.apply {
+				addOnPositiveButtonClickListener {
+					viewModel.clearBefore(it)
+				}
+			}
+			.show(childFragmentManager, tag)
+	}
+
+	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+		menuInflater.inflate(R.menu.toolbar_updates, menu)
+	}
+
+	override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+		when (menuItem.itemId) {
+			R.id.fragment_updates_clear_all -> {
+				viewModel.clearAll()
+				true
+			}
+
+			R.id.fragment_updates_clear_before -> {
+				onUserClearBefore()
+				true
+			}
+
+			else -> false
+		}
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
@@ -112,10 +165,8 @@ fun UpdatesContent(
 	onRefresh: () -> Unit,
 	openChapter: (UpdatesUI) -> Unit
 ) {
-	SwipeRefresh(
-		state = rememberSwipeRefreshState(isRefreshing),
-		onRefresh = onRefresh
-	) {
+	val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+	Box(Modifier.pullRefresh(pullRefreshState)) {
 		if (items.isEmpty()) {
 			Column {
 				ErrorContent(
@@ -143,6 +194,8 @@ fun UpdatesContent(
 				}
 			}
 		}
+
+		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
 	}
 }
 
@@ -243,8 +296,10 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
 			when (dateTime.item) {
 				DateTime(System.currentTimeMillis()).trimDate() ->
 					context.getString(R.string.today)
+
 				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 					context.getString(R.string.yesterday)
+
 				else -> "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 			}
 		}

@@ -7,6 +7,7 @@ import app.shosetsu.android.domain.model.database.*
 import app.shosetsu.android.providers.database.converters.*
 import app.shosetsu.android.providers.database.dao.*
 import app.shosetsu.android.providers.database.migrations.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,7 @@ import kotlinx.coroutines.launch
 	entities = [
 		DBCategoryEntity::class,
 		DBChapterEntity::class,
+		DBChapterHistoryEntity::class,
 		DBDownloadEntity::class,
 		DBInstalledExtensionEntity::class,
 		DBRepositoryExtensionEntity::class,
@@ -46,11 +48,12 @@ import kotlinx.coroutines.launch
 		DBNovelCategoryEntity::class,
 		DBNovelReaderSettingEntity::class,
 		DBNovelEntity::class,
+		DBNovelPinEntity::class,
 		DBNovelSettingsEntity::class,
 		DBRepositoryEntity::class,
 		DBUpdate::class,
 	],
-	version = 7
+	version = 9
 )
 @TypeConverters(
 	ChapterSortTypeConverter::class,
@@ -67,6 +70,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 
 	abstract val categoriesDao: CategoriesDao
 	abstract val chaptersDao: ChaptersDao
+	abstract val chapterHistoryDao: ChapterHistoryDao
 	abstract val downloadsDao: DownloadsDao
 	abstract val extensionLibraryDao: ExtensionLibraryDao
 	abstract val installedExtensionsDao: InstalledExtensionsDao
@@ -74,6 +78,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 	abstract val novelCategoriesDao: NovelCategoriesDao
 	abstract val novelReaderSettingsDao: NovelReaderSettingsDao
 	abstract val novelsDao: NovelsDao
+	abstract val novelPinsDao: NovelPinsDao
 	abstract val novelSettingsDao: NovelSettingsDao
 	abstract val repositoryDao: RepositoryDao
 	abstract val updatesDao: UpdatesDao
@@ -82,6 +87,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 		@Volatile
 		private lateinit var databaseShosetsu: ShosetsuDatabase
 
+		@OptIn(DelicateCoroutinesApi::class)
 		@Synchronized
 		fun getRoomDatabase(context: Context): ShosetsuDatabase {
 			if (!Companion::databaseShosetsu.isInitialized)
@@ -95,7 +101,9 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 					Migration3To4,
 					Migration4To5,
 					Migration5To6,
-					Migration6To7
+					Migration6To7,
+					Migration7to8,
+					Migration8to9
 				).build()
 
 			GlobalScope.launch {

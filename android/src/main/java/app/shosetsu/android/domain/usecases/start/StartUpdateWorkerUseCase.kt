@@ -43,7 +43,11 @@ class StartUpdateWorkerUseCase(
 					return@launchIO
 
 			if (categoryID >= 0) {
-				manager.start(Data(mapOf(NovelUpdateWorker.KEY_CATEGORY to categoryID)))
+				manager.start(
+					Data.Builder()
+						.putInt(NovelUpdateWorker.KEY_CATEGORY, categoryID)
+						.build()
+				)
 			} else {
 				manager.start()
 			}

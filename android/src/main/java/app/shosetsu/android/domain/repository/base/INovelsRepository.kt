@@ -17,10 +17,7 @@ package app.shosetsu.android.domain.repository.base
  */
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
-import app.shosetsu.android.domain.model.local.LibraryNovelEntity
-import app.shosetsu.android.domain.model.local.NovelEntity
-import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
-import app.shosetsu.android.domain.model.local.StrippedNovelEntity
+import app.shosetsu.android.domain.model.local.*
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
@@ -139,4 +136,9 @@ interface INovelsRepository {
 		listing: Int,
 		data: Map<Int, Any>,
 	): List<Novel.Listing>
+
+	/**
+	 * Get analytic entities
+	 */
+	fun getAnalytics(): Flow<List<AnalyticsNovelEntity>>
 }

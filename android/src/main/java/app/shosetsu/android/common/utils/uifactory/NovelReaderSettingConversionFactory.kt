@@ -27,7 +27,8 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 05 / 12 / 2020
  */
-class NovelReaderSettingConversionFactory(data: NovelReaderSettingEntity) : UIConversionFactory<NovelReaderSettingEntity, NovelReaderSettingUI>(data) {
+class NovelReaderSettingConversionFactory(data: NovelReaderSettingEntity) :
+	UIConversionFactory<NovelReaderSettingEntity, NovelReaderSettingUI>(data) {
 	override fun NovelReaderSettingEntity.convertTo(): NovelReaderSettingUI = NovelReaderSettingUI(
 		novelID = novelID,
 		paragraphIndentSize = paragraphIndentSize,

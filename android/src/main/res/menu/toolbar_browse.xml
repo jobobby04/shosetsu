@@ -9,6 +9,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/global_search"
+        android:icon="@drawable/baseline_manage_search_24"
+        android:title="@string/global_search"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/help"
         android:icon="@drawable/help_outline_24"
         android:title="@string/help"

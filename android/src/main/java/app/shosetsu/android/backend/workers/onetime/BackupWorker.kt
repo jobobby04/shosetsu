@@ -62,6 +62,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 	override val di: DI by closestDI(appContext)
 	private val novelRepository by instance<INovelsRepository>()
+	private val novelPinRepository by instance<INovelPinsRepository>()
 	private val iSettingsRepository by instance<ISettingsRepository>()
 
 	/**
@@ -70,6 +71,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 	private val novelSettingsRepository by instance<INovelSettingsRepository>()
 	private val extensionsRepository by instance<IExtensionsRepository>()
 	private val chaptersRepository by instance<IChaptersRepository>()
+	private val chapterHistoryRepository by instance<ChapterHistoryRepository>()
 	private val extensionRepoRepository by instance<IExtensionRepoRepository>()
 	private val backupRepository by instance<IBackupRepository>()
 	private val categoriesRepository by instance<ICategoryRepository>()
@@ -104,21 +106,30 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		return bos.toByteArray()
 	}
 
+	@Suppress("Destructure")
 	@Throws(SQLiteException::class)
 	private suspend fun getBackupChapters(novelID: Int): List<BackupChapterEntity> {
 		if (backupChapters())
 			chaptersRepository.getChapters(novelID).let { list ->
-				return list.filter {
+				return list.filter { chapterEntity ->
 					if (backupOnlyModified()) {
-						it.bookmarked || it.readingStatus != ReadingStatus.UNREAD || it.readingPosition != 0.0
+						chapterEntity.bookmarked || chapterEntity.readingStatus != ReadingStatus.UNREAD || chapterEntity.readingPosition != 0.0
 					} else true
 				}.map { chapterEntity ->
+					val chapterHistory = try {
+						chapterHistoryRepository.get(chapterEntity.id!!)
+					} catch (e: SQLiteException) {
+						null
+					}
+
 					BackupChapterEntity(
 						chapterEntity.url,
 						chapterEntity.title,
 						chapterEntity.bookmarked,
 						chapterEntity.readingStatus,
-						chapterEntity.readingPosition
+						chapterEntity.readingPosition,
+						startedReadingAt = chapterHistory?.startedReadingAt,
+						endedReadingAt = chapterHistory?.endedReadingAt
 					)
 				}
 			}
@@ -251,7 +262,8 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 											novel.imageURL,
 											chapters,
 											settings = bSettings,
-											categories = novelCategories
+											categories = novelCategories,
+											pinned = novelPinRepository.isPinned(novel.id!!)
 										)
 									}
 								)

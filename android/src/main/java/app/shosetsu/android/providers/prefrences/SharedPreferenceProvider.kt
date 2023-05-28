@@ -188,41 +188,52 @@ class SharedPreferenceProvider(
 
 				when (key.default) {
 					is String -> {
+						@Suppress("UNCHECKED_CAST")
 						key as StringKey
 						val value = getString(key)
 						stringMap[key]?.let { it.value = value } ?: MutableStateFlow(value).also {
 							stringMap[key] = it
 						}
 					}
+
 					is Int -> {
+						@Suppress("UNCHECKED_CAST")
 						key as IntKey
 						val value = getInt(key)
 						intMap[key]?.let { it.value = value } ?: MutableStateFlow(value).also {
 							intMap[key] = it
 						}
 					}
+
 					is Boolean -> {
+						@Suppress("UNCHECKED_CAST")
 						key as BooleanKey
 						val value = getBoolean(key)
 						booleanMap[key]?.let { it.value = value } ?: MutableStateFlow(value).also {
 							booleanMap[key] = it
 						}
 					}
+
 					is Long -> {
+						@Suppress("UNCHECKED_CAST")
 						key as SettingKey<Long>
 						val value = getLong(key)
 						longMap[key]?.let { it.value = value } ?: MutableStateFlow(value).also {
 							longMap[key] = it
 						}
 					}
+
 					is Float -> {
+						@Suppress("UNCHECKED_CAST")
 						key as FloatKey
 						val value = getFloat(key)
 						floatMap[key]?.let { it.value = value } ?: MutableStateFlow(value).also {
 							floatMap[key] = it
 						}
 					}
+
 					is Set<*> -> {
+						@Suppress("UNCHECKED_CAST")
 						key as StringSetKey
 						val value = getStringSet(key)
 						stringSetMap[key]?.let { it.value = value }

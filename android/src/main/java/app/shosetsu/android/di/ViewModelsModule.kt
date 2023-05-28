@@ -53,7 +53,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	// Library
 	bind<ALibraryViewModel>() with provider {
 		LibraryViewModel(
-			libraryAsCardsUseCase = instance(),
+			loadLibrary = instance(),
 			updateBookmarkedNovelUseCase = instance(),
 			isOnlineUseCase = instance(),
 			startUpdateWorkerUseCase = instance(),
@@ -62,7 +62,10 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			setNovelsCategoriesUseCase = instance(),
 			loadNovelUIColumnsH = instance(),
 			loadNovelUIColumnsP = instance(),
-			loadNovelUIBadgeToast = instance()
+			loadNovelUIBadgeToast = instance(),
+			toggleNovelPin = instance(),
+			loadLibraryFilterSettings = instance(),
+			_updateLibraryFilterState = instance()
 		)
 	}
 
@@ -87,10 +90,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 	bind<AUpdatesViewModel>() with provider {
 		UpdatesViewModel(
-			getUpdatesUseCase = instance(),
 			startUpdateWorkerUseCase = instance(),
 			isOnlineUseCase = instance(),
-			updateChapterUseCase = instance()
+			updatesRepository = instance()
 		)
 	}
 
@@ -179,11 +181,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			isChaptersResumeFirstUnread = instance(),
 			getNovelSettingFlowUseCase = instance(),
 			updateNovelSettingUseCase = instance(),
-			loadDeletePreviousChapterUseCase = instance(),
 			startDownloadWorkerUseCase = instance(),
 			startDownloadWorkerAfterUpdateUseCase = instance(),
 			getContentURL = instance(),
-			getLastReadChapter = instance(),
 			getTrueDelete = instance(),
 			trueDeleteChapter = instance(),
 			getInstalledExtensionUseCase = instance(),
@@ -210,6 +210,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
+			instance(),
+			instance(),
+			instance()
 		)
 	}
 	bind<ARepositoryViewModel>() with provider {
@@ -290,5 +293,15 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 
 	bind<AIntroViewModel>() with provider {
 		IntroViewModel(instance())
+	}
+
+	bind<HistoryViewModel>() with provider {
+		HistoryViewModelImpl(instance(), instance(), instance())
+	}
+	bind<AnalyticsViewModel>() with provider {
+		AnalyticsViewModelImpl(
+			instance(),
+			instance()
+		)
 	}
 }

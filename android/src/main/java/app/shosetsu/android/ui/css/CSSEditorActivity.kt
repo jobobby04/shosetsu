@@ -20,28 +20,32 @@ package app.shosetsu.android.ui.css
 import android.annotation.SuppressLint
 import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
 import android.content.ClipboardManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.view.Window
+import android.view.WindowManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,7 +59,10 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
+import kotlinx.coroutines.launch
+import okhttp3.internal.immutableListOf
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -79,7 +86,12 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		requestWindowFeature(Window.FEATURE_NO_TITLE)
+		supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			window.setDecorFitsSystemWindows(false)
+		} else {
+			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+		}
 		if (savedInstanceState != null)
 			viewModel.setCSSId(savedInstanceState.getInt(CSS_ID, -1))
 
@@ -121,10 +133,12 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 						!clipboardManager.hasPrimaryClip() -> {
 							false
 						}
+
 						!(clipboardManager.primaryClipDescription!!.hasMimeType(MIMETYPE_TEXT_PLAIN)) -> {
 							// This disables the paste menu item, since the clipboard has data but it is not plain text
 							false
 						}
+
 						else -> {
 							// This enables the paste menu item, since the clipboard contains plain text.
 							true
@@ -162,7 +176,10 @@ fun PreviewCSSEditorContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+	ExperimentalMaterial3Api::class,
+	ExperimentalFoundationApi::class
+)
 @Composable
 fun CSSEditorContent(
 	cssTitle: String,
@@ -299,31 +316,104 @@ fun CSSEditorContent(
 					}
 				}
 			}
-		}
+		},
+		modifier = Modifier.imePadding()
 	) {
-		Column(Modifier.padding(it)) {
-			AndroidView(
-				factory = { context ->
-					WebView(context).apply {
-						@SuppressLint("SetJavaScriptEnabled")
-						settings.javaScriptEnabled = true
-						settings.apply {
-							cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-						}
-						loadData(
-							context.getString(R.string.activity_css_example),
-							"text/html",
-							"UTF-8"
-						)
+		Column(
+			Modifier
+				.padding(it)
+				.verticalScroll(rememberScrollState())) {
+			val pages = immutableListOf(
+				stringResource(
+					R.string.editor
+				),
+				stringResource(
+					R.string.preview
+				)
+			)
 
+			val pagerState = rememberPagerState()
+			val scope = rememberCoroutineScope()
+
+			TabRow(
+				// Our selected tab is our current page
+				selectedTabIndex = pagerState.currentPage,
+				// Override the indicator, using the provided pagerTabIndicatorOffset modifier
+				indicator = { tabPositions ->
+					TabRowDefaults.Indicator(
+						Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+					)
+				}
+			) {
+
+				// Add tabs for all of our pages
+				pages.forEachIndexed { index, title ->
+					Tab(
+						text = { Text(title) },
+						selected = pagerState.currentPage == index,
+						onClick = {
+							scope.launch {
+								pagerState.scrollToPage(index)
+							}
+						},
+					)
+				}
+			}
+			HorizontalPager(
+				pages.size,
+				state = pagerState,
+				modifier = Modifier.fillMaxSize(),
+				userScrollEnabled = false
+			) { page ->
+				when (page) {
+					0 -> {
+						BasicTextField(
+							value = cssContent,
+							onValueChange = onNewText,
+							modifier = Modifier
+								.fillMaxSize()
+								.padding(bottom = 92.dp, start = 16.dp, top = 8.dp, end = 16.dp),
+							cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+							textStyle = MaterialTheme.typography.bodyMedium.copy(color = LocalContentColor.current),
+						)
 					}
-				},
-				update = { webView ->
-					logI("Updating style")
-					val base64String =
-						Base64.encodeToString(cssContent.encodeToByteArray(), Base64.DEFAULT)
-					webView.evaluateJavascript(
-						"""
+
+					else -> {
+						CSSPreview(cssContent)
+					}
+				}
+			}
+		}
+
+	}
+}
+
+@Composable
+fun CSSPreview(
+	cssContent: String,
+) {
+	AndroidView(
+		factory = { context ->
+			WebView(context).apply {
+				@SuppressLint("SetJavaScriptEnabled")
+				settings.javaScriptEnabled = true
+				settings.apply {
+					cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+				}
+				loadData(
+					context.getString(R.string.activity_css_example),
+					"text/html",
+					"UTF-8"
+				)
+
+			}
+		},
+		update = { webView ->
+			webView.logI("Updating style")
+			val base64String =
+				Base64.encodeToString(cssContent.encodeToByteArray(), Base64.DEFAULT)
+			webView.evaluateJavascript(
+				"""
 				style = document.getElementById('example-css');
 				if(!style){
 					style = document.createElement('style');
@@ -333,24 +423,10 @@ fun CSSEditorContent(
 				}
 				style.textContent = atob(`$base64String`);
 			""".trimIndent(),
-						null
-					)
-				},
-				modifier = Modifier
-					.fillMaxWidth()
-					.fillMaxHeight(0.25f)
+				null
 			)
-			TextField(
-				cssContent,
-				onNewText,
-				modifier = Modifier
-					.fillMaxSize()
-					.verticalScroll(rememberScrollState())
-					.padding(bottom = 92.dp),
-				shape = RectangleShape,
-				isError = !isCSSInvalid
-			)
-		}
-
-	}
+		},
+		modifier = Modifier
+			.fillMaxSize()
+	)
 }

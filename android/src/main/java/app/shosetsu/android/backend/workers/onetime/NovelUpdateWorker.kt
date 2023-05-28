@@ -1,7 +1,7 @@
 package app.shosetsu.android.backend.workers.onetime
 
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,22 +13,51 @@ import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ExistingWorkPolicy.REPLACE
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.DownloadNewNovelChapters
+import app.shosetsu.android.common.SettingKey.ExcludedCategoriesInUpdate
+import app.shosetsu.android.common.SettingKey.IncludeCategoriesInUpdate
+import app.shosetsu.android.common.SettingKey.NovelUpdateClassicFinish
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowBattery
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowStorage
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnMeteredConnection
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnlyWhenIdle
+import app.shosetsu.android.common.SettingKey.NovelUpdateShowProgress
+import app.shosetsu.android.common.SettingKey.OnlyUpdateOngoingNovels
+import app.shosetsu.android.common.SettingKey.UpdateNotificationStyle
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.LogConstants.SERVICE_EXECUTE
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_UPDATE
 import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.UPDATE_WORK_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.getString
+import app.shosetsu.android.common.ext.intent
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logD
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logID
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.removeProgress
+import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setOngoing
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.LibraryNovelEntity
 import app.shosetsu.android.domain.repository.base.INovelsRepository
@@ -100,7 +129,6 @@ class NovelUpdateWorker(
 			)
 		)
 	}
-
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_UPDATE)
@@ -320,45 +348,7 @@ class NovelUpdateWorker(
 		if (!classicFinale())
 			for (novel in updateNovels) {
 				launchIO { // Run each novel notification on it's own seperate thread
-					val uniqueChapters = updatedChapters.filter { it.novelID == novel.id }
-					val chapterSize: Int = uniqueChapters.size
-					val firstChapterId = uniqueChapters.minByOrNull { it.order }?.id
-					val bitmap: Bitmap? =
-						applicationContext.imageLoader.execute(
-							ImageRequest.Builder(applicationContext).data(novel.imageURL)
-								.build()
-						).drawable?.toBitmap()
-
-					notify(
-						applicationContext.resources.getQuantityString(
-							R.plurals.worker_novel_update_updated_novel_count,
-							chapterSize,
-							chapterSize
-						),
-						10000 + novel.id
-					) {
-						setContentTitle(
-							getString(
-								R.string.worker_novel_update_updated_novel,
-								novel.title
-							)
-						)
-
-
-						setLargeIcon(bitmap)
-
-						setNotOngoing()
-						removeProgress()
-
-						if (firstChapterId != null) {
-							addOpenReader(
-								novel.id,
-								firstChapterId
-							)
-							setAutoCancel(true)
-						}
-
-					}
+					notifyUpdate(novel, updatedChapters.filter { it.novelID == novel.id })
 				}
 			}
 
@@ -370,13 +360,62 @@ class NovelUpdateWorker(
 	}
 
 	/**
+	 * Notify an update for a novel
+	 *
+	 * @param novel that has been updated
+	 * @param chapters chapters that have been added
+	 */
+	private suspend fun notifyUpdate(
+		novel: LibraryNovelEntity,
+		chapters: List<ChapterEntity>
+	) {
+		val chapterSize: Int = chapters.size
+		val firstChapterId = chapters.minByOrNull { it.order }?.id
+		val bitmap: Bitmap? =
+			applicationContext.imageLoader.execute(
+				ImageRequest.Builder(applicationContext).data(novel.imageURL)
+					.build()
+			).drawable?.toBitmap()
+
+		notify(
+			contentText = applicationContext.resources.getQuantityString(
+				R.plurals.worker_novel_update_updated_novel_count,
+				chapterSize,
+				chapterSize
+			),
+			notificationId = 10000 + novel.id
+		) {
+			setContentTitle(
+				getString(
+					R.string.worker_novel_update_updated_novel,
+					novel.title
+				)
+			)
+
+			setLargeIcon(bitmap)
+
+			setNotOngoing()
+			removeProgress()
+
+			if (firstChapterId != null) {
+				setContentIntent(null)
+				addOpenReader(
+					novel.id,
+					firstChapterId
+				)
+				setAutoCancel(true)
+			}
+		}
+	}
+
+	/**
 	 * Set the content intent of the notification to open up the chapter reader.
 	 */
 	private fun NotificationCompat.Builder.addOpenReader(novelId: Int, chapterId: Int) {
 		setContentIntent(
 			PendingIntent.getActivity(
 				applicationContext,
-				0,
+				novelId,
 				intent(applicationContext, ChapterReader::class.java) {
 					bundleOf(
 						BundleKeys.BUNDLE_CHAPTER_ID to chapterId,
@@ -385,7 +424,7 @@ class NovelUpdateWorker(
 				},
 				(
 						if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-						) or FLAG_UPDATE_CURRENT
+						) or FLAG_ONE_SHOT
 			)
 		)
 	}
@@ -453,6 +492,7 @@ class NovelUpdateWorker(
 					).setInputData(data).build()
 				)
 				workerManager.getWorkInfosForUniqueWork(UPDATE_WORK_ID).await()[0].let {
+					logD("State ${it.state}")
 					Log.d(logID(), "State ${it.state}")
 				}
 			}

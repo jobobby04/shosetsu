@@ -1,7 +1,8 @@
 package app.shosetsu.android.common
 
+import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.enums.MarkingType
-import app.shosetsu.android.domain.model.local.LibrarySortFilterEntity
+import app.shosetsu.android.domain.model.local.LibraryFilterState
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -55,7 +56,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	/**
 	 * Is this the first time the application ran?
 	 */
-	object FirstTime : BooleanKey("first_time2", true)
+	object FirstTime : BooleanKey("first_time3", true)
 
 
 	/**
@@ -139,6 +140,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 * Should the reader display a separator between chapters
 	 */
 	object ReaderShowChapterDivider : BooleanKey("reader_show_divider_page", true)
+
+	/**
+	 * Disable text selection in the reader
+	 */
+	object ReaderDisableTextSelection : BooleanKey("reader_disable_text_sel", false)
 
 	//- Some things
 	object ChaptersResumeFirstUnread : BooleanKey(
@@ -254,8 +260,22 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 		false
 	)
 
+	object ReaderTrackLongReading : BooleanKey("reader_track_long_reading", true)
+
 
 	// Advanced settings
+
+	/**
+	 * Setting to hold user agent, so users can have their own UA,
+	 * 	allowing diversity to avoid app bans.
+	 */
+	object UserAgent : StringKey("user_agent", DEFAULT_USER_AGENT)
+
+	/**
+	 * Use a user agent that explicitly states Shosetsu
+	 */
+	object UseShosetsuAgent : BooleanKey("use_shosetsu_agent", false)
+
 	object ACRAEnabled : BooleanKey("is_ACRA_enabled", false)
 
 	/**
@@ -269,9 +289,19 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object VerifyCheckSum : BooleanKey("verifyCheckSum", false)
 
 	object LibraryFilter :
-		StringKey("libraryFilter", Json.encodeToString(LibrarySortFilterEntity()))
+		StringKey("libraryFilter", Json.encodeToString(LibraryFilterState()))
 
 	object RequireDoubleBackToExit : BooleanKey("requireDoubleBackToExit", false)
+
+	/**
+	 * Delay between each request to a site
+	 */
+	object SiteProtectionDelay : IntKey("site_protection_delay", 300)
+
+	/**
+	 * Flag for concurrent memory experimentation
+	 */
+	object ConcurrentMemoryExperiment : BooleanKey("concurrent_memory", false)
 
 	class CustomString(
 		name: String,

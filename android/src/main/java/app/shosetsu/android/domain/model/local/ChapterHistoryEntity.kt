@@ -1,7 +1,5 @@
 package app.shosetsu.android.domain.model.local
 
-import app.shosetsu.android.common.enums.ReadingStatus
-
 /*
  * This file is part of shosetsu.
  *
@@ -26,19 +24,10 @@ import app.shosetsu.android.common.enums.ReadingStatus
  * @author Doomsdayrs
  *
  */
-sealed class ChapterHistoryEntity {
-	abstract val novelId: Int
-	abstract val chapterId: Int
-
-	/**
-	 * Date this update occurred
-	 */
-	abstract val asOf: Long
-
-	data class StatusUpdate(
-		override val novelId: Int,
-		override val chapterId: Int,
-		override val asOf: Long,
-		val status: ReadingStatus,
-	) : ChapterHistoryEntity()
-}
+data class ChapterHistoryEntity(
+	val id: Int,
+	val novelId: Int,
+	val chapterId: Int,
+	val startedReadingAt: Long,
+	val endedReadingAt: Long?
+)

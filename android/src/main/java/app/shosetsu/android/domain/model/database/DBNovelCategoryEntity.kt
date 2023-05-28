@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.database
 
-import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -51,9 +50,7 @@ data class DBNovelCategoryEntity(
 	/** Extension ID */
 	@PrimaryKey(autoGenerate = true)
 	val id: Int? = null,
-	@NonNull
 	val novelID: Int,
-	@NonNull
 	val categoryID: Int,
 ) : Convertible<NovelCategoryEntity> {
 	override fun convertTo(): NovelCategoryEntity = NovelCategoryEntity(

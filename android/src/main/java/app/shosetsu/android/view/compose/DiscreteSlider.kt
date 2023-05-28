@@ -11,7 +11,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.core.text.isDigitsOnly
 import app.shosetsu.android.R
 import app.shosetsu.android.view.uimodels.StableHolder
 import kotlin.math.roundToInt
@@ -38,7 +38,6 @@ fun PreviewSeekBar() {
 	}
 }
 
-
 /**
  * This creates a sudo discrete slider
  *
@@ -47,7 +46,6 @@ fun PreviewSeekBar() {
  * @param updateValue Called when [Slider] updates its value, is fed a rounded float
  * @param valueRange An integer range of possible values
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscreteSlider(
 	value: Int,
@@ -63,97 +61,7 @@ fun DiscreteSlider(
 		var showDialog by remember { mutableStateOf(false) }
 
 		if (showDialog) {
-			var newValue: Int? by remember { mutableStateOf(value) }
-
-			Dialog(
-				onDismissRequest = {
-					showDialog = false
-				}
-			) {
-				Card {
-					Column(
-						modifier = Modifier.padding(8.dp),
-					) {
-						var isTextError by remember { mutableStateOf(false) }
-
-						Text(
-							stringResource(R.string.input_float),
-							style = MaterialTheme.typography.titleLarge,
-							modifier = Modifier.padding(
-								bottom = 16.dp,
-								top = 8.dp,
-								start = 24.dp,
-								end = 24.dp
-							)
-						)
-
-						Text(
-							stringResource(
-								R.string.input_int_range_desc,
-								valueRange.item.first,
-								valueRange.item.last
-							),
-							style = MaterialTheme.typography.bodyLarge,
-							modifier = Modifier.padding(
-								bottom = 16.dp,
-								start = 24.dp,
-								end = 24.dp
-							)
-						)
-
-						TextField(
-							value = if (newValue != null) "$newValue" else "",
-							onValueChange = {
-								val value = it.toIntOrNull()
-
-								if (value != null) {
-									if (value in valueRange.item) {
-										newValue = value
-										isTextError = false
-										return@TextField
-									}
-								} else if (it.isEmpty()) {
-									newValue = null
-								}
-
-								isTextError = true
-							},
-							singleLine = true,
-							keyboardOptions = KeyboardOptions(
-								keyboardType = KeyboardType.Number
-							),
-							modifier = Modifier
-								.padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
-								.fillMaxWidth()
-						)
-
-						Row(
-							horizontalArrangement = Arrangement.End,
-							modifier = Modifier.fillMaxWidth()
-
-						) {
-							TextButton(
-								onClick = {
-									showDialog = false
-								},
-							) {
-								Text(stringResource(android.R.string.cancel))
-							}
-
-							TextButton(
-								onClick = {
-									updateValue(newValue!!, true)
-									showDialog = false
-								},
-								enabled = !isTextError
-							) {
-								Text(stringResource(R.string.apply))
-							}
-						}
-
-					}
-				}
-			}
+			DiscreteSliderDialog(value, valueRange, { showDialog = false }, updateValue)
 		}
 
 		TextButton(onClick = {
@@ -187,7 +95,6 @@ fun DiscreteSlider(
  * @param updateValue Called when [Slider] updates its value
  * @param valueRange An integer range of possible values
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscreteSlider(
 	value: Float,
@@ -202,99 +109,9 @@ fun DiscreteSlider(
 	) {
 		var showDialog by remember { mutableStateOf(false) }
 
-		if (showDialog) {
-			var fieldContent: String by remember { mutableStateOf("$value") }
+		if (showDialog)
+			DiscreteSliderDialog(value, valueRange, { showDialog = false }, updateValue)
 
-			Dialog(
-				onDismissRequest = {
-					showDialog = false
-				}
-			) {
-				Card {
-					Column(
-						modifier = Modifier.padding(8.dp),
-					) {
-						var isTextError by remember { mutableStateOf(false) }
-
-						Text(
-							stringResource(R.string.input_float),
-							style = MaterialTheme.typography.titleLarge,
-							modifier = Modifier.padding(
-								bottom = 16.dp,
-								top = 8.dp,
-								start = 24.dp,
-								end = 24.dp
-							)
-						)
-
-						Text(
-							stringResource(
-								R.string.input_float_range_desc,
-								valueRange.item.first,
-								valueRange.item.last
-							),
-							style = MaterialTheme.typography.bodyLarge,
-							modifier = Modifier.padding(
-								bottom = 16.dp,
-								start = 24.dp,
-								end = 24.dp
-							)
-						)
-
-						TextField(
-							value = fieldContent,
-							onValueChange = { newString ->
-								val newFloat = newString.toFloatOrNull()
-
-								// Set text as error if the value is invalid
-								isTextError = if (newFloat != null) {
-									!(valueRange.item.first <= newFloat || newFloat <= valueRange.item.last)
-								} else {
-									true
-								}
-
-								fieldContent = newString
-							},
-							singleLine = true,
-							keyboardOptions = KeyboardOptions(
-								keyboardType = KeyboardType.Number
-							),
-							modifier = Modifier
-								.padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
-								.fillMaxWidth()
-						)
-
-						Row(
-							horizontalArrangement = Arrangement.End,
-							modifier = Modifier.fillMaxWidth()
-
-						) {
-							TextButton(
-								onClick = {
-									showDialog = false
-								},
-							) {
-								Text(stringResource(android.R.string.cancel))
-							}
-
-							TextButton(
-								onClick = {
-									updateValue(
-										fieldContent.toFloatOrNull() ?: value,
-										true
-									)
-									showDialog = false
-								},
-								enabled = !isTextError
-							) {
-								Text(stringResource(R.string.apply))
-							}
-						}
-
-					}
-				}
-			}
-		}
 
 		TextButton(onClick = {
 			showDialog = true
@@ -317,4 +134,137 @@ fun DiscreteSlider(
 			steps = if (haveSteps) valueRange.item.count() - 2 else 0
 		)
 	}
+}
+
+@Composable
+fun DiscreteSliderDialog(
+	value: Int,
+	valueRange: StableHolder<IntRange>,
+	onDismissRequest: () -> Unit,
+	updateValue: (Int, fromDialog: Boolean) -> Unit,
+) {
+	DiscreteSliderDialog(
+		title = stringResource(R.string.input_int),
+		description = stringResource(R.string.input_int_range_desc),
+		value,
+		valueRange,
+		onDismissRequest,
+		castInput = {
+			it.toIntOrNull() ?: valueRange.item.first
+		},
+		validateInput = {
+			it.isDigitsOnly() && it.isNotEmpty() && it.toInt() in valueRange.item
+		},
+		updateValue
+	)
+}
+
+@Composable
+fun DiscreteSliderDialog(
+	value: Float,
+	valueRange: StableHolder<IntRange>,
+	onDismissRequest: () -> Unit,
+	updateValue: (Float, fromDialog: Boolean) -> Unit,
+) {
+	DiscreteSliderDialog(
+		title = stringResource(R.string.input_float),
+		description = stringResource(R.string.input_float_range_desc),
+		value,
+		valueRange,
+		onDismissRequest,
+		castInput = {
+			it.toFloatOrNull() ?: valueRange.item.first.toFloat()
+		},
+		validateInput = { newValue ->
+			newValue.matches(Regex("(^[0-9]+$)|(^[0-9]+\\.[0-9]*$)")) &&
+					newValue.toFloat()
+						.let { valueRange.item.first <= it && it <= valueRange.item.last }
+		},
+		updateValue
+	)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> DiscreteSliderDialog(
+	title: String,
+	description: String,
+	value: T,
+	valueRange: StableHolder<IntRange>,
+	onDismissRequest: () -> Unit,
+	castInput: (String) -> T,
+	validateInput: (String) -> Boolean,
+	updateValue: (T, fromDialog: Boolean) -> Unit,
+) {
+	var fieldContent: String by remember { mutableStateOf("$value") }
+	var isTextValid by remember { mutableStateOf(true) }
+
+	androidx.compose.material.AlertDialog(
+		onDismissRequest,
+		title = {
+			Text(
+				title,
+				style = MaterialTheme.typography.titleLarge,
+				modifier = Modifier.padding(
+					bottom = 16.dp,
+					top = 8.dp,
+					start = 24.dp,
+					end = 24.dp
+				)
+			)
+		},
+		text = {
+			Column {
+				Text(
+					description.format(
+						valueRange.item.first,
+						valueRange.item.last
+					),
+					style = MaterialTheme.typography.bodyLarge,
+					modifier = Modifier.padding(
+						bottom = 16.dp,
+						start = 24.dp,
+						end = 24.dp
+					)
+				)
+				TextField(
+					value = fieldContent,
+					onValueChange = { newString ->
+						// Set text as error if the value is invalid
+						isTextValid = validateInput(newString)
+
+						fieldContent = newString
+					},
+					singleLine = true,
+					keyboardOptions = KeyboardOptions(
+						keyboardType = KeyboardType.Number
+					),
+					modifier = Modifier
+						.padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
+						.fillMaxWidth()
+				)
+			}
+		},
+		dismissButton = {
+			androidx.compose.material3.TextButton(
+				onClick = onDismissRequest,
+			) {
+				Text(stringResource(android.R.string.cancel))
+			}
+		},
+		confirmButton = {
+			androidx.compose.material3.TextButton(
+				onClick = {
+					updateValue(
+						castInput(fieldContent),
+						true
+					)
+					onDismissRequest()
+				},
+				enabled = isTextValid
+			) {
+				Text(stringResource(R.string.apply))
+			}
+		}
+	)
 }

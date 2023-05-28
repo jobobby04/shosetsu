@@ -301,6 +301,8 @@ fun ReaderSettingsContent(
 
 		item { viewModel.enableFullscreen() }
 
+		item { viewModel.readerTextSelectionToggle() }
+
 		item { viewModel.matchFullscreenToFocus() }
 
 		item {
@@ -313,6 +315,9 @@ fun ReaderSettingsContent(
 
 		item { viewModel.doubleTapFocus() }
 		item { viewModel.doubleTapSystem() }
+		item {
+			viewModel.trackLongReadingOption()
+		}
 	}
 
 }

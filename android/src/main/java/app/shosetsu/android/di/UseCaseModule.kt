@@ -40,12 +40,13 @@ import org.kodein.di.provider
  * 01 / 05 / 2020
  */
 val useCaseModule: DI.Module = DI.Module("useCase") {
-
+	bind<GetUserAgentUseCase>() with provider { GetUserAgentUseCase(instance()) }
 	bind<LoadDownloadsUseCase>() with provider { LoadDownloadsUseCase(instance()) }
 
 	bind<LoadLibraryUseCase>() with provider { LoadLibraryUseCase(instance(), instance()) }
 
 	bind<SearchBookMarkedNovelsUseCase>() with provider { SearchBookMarkedNovelsUseCase(instance()) }
+	bind<ToggleNovelPinUseCase>() with provider { ToggleNovelPinUseCase(instance()) }
 
 
 	bind<LoadBrowseExtensionsUseCase>() with provider {
@@ -257,8 +258,8 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 		SetNovelsCategoriesUseCase(instance())
 	}
 
-	bind<UpdateLibraryFilterSettingsUseCase>() with provider {
-		UpdateLibraryFilterSettingsUseCase(instance())
+	bind<UpdateLibraryFilterStateUseCase>() with provider {
+		UpdateLibraryFilterStateUseCase(instance())
 	}
 
 	bind<GetExtListingNamesUseCase>() with provider {

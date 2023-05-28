@@ -14,6 +14,7 @@ import app.shosetsu.android.viewmodel.abstracted.settings.AUpdateSettingsViewMod
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
 /*
@@ -63,6 +64,7 @@ class UpdateSettingsViewModel(
 		repoUpdateManager.start()
 	}
 
+	@OptIn(ExperimentalCoroutinesApi::class)
 	override val categories: StateFlow<ImmutableList<CategoryUI>> by lazy {
 		getCategoriesUseCase().mapLatest {
 			(listOf(CategoryUI.default()) + it).toImmutableList()

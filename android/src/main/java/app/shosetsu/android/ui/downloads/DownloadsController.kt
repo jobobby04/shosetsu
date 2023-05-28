@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -44,6 +45,7 @@ import app.shosetsu.android.common.ext.collectLA
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.SelectableBox
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuController
@@ -227,22 +229,28 @@ fun DownloadsContent(
 			val state = rememberLazyListState()
 			if (fab != null)
 				syncFABWithCompose(state, fab)
-			LazyColumn(
-				modifier = Modifier.fillMaxSize(),
-				contentPadding = PaddingValues(bottom = 140.dp),
-				state = state
+			LazyColumnScrollbar(
+				listState = state,
+				thumbColor = MaterialTheme.colorScheme.primary,
+				thumbSelectedColor = Color.Gray,
 			) {
-				items(items, key = { it.chapterID }) {
-					DownloadContent(
-						it,
-						onClick = {
-							if (hasSelected)
+				LazyColumn(
+					modifier = Modifier.fillMaxSize(),
+					contentPadding = PaddingValues(bottom = 140.dp),
+					state = state
+				) {
+					items(items, key = { it.chapterID }) {
+						DownloadContent(
+							it,
+							onClick = {
+								if (hasSelected)
+									toggleSelection(it)
+							},
+							onLongClick = {
 								toggleSelection(it)
-						},
-						onLongClick = {
-							toggleSelection(it)
-						}
-					)
+							}
+						)
+					}
 				}
 			}
 

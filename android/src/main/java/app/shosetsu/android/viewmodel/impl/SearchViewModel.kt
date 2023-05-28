@@ -101,9 +101,9 @@ class SearchViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override fun initQuery(string: String) {
+	override fun initQuery(string: String?) {
 		launchIO {
-			if (query.value == null) {
+			if (string != null && query.value == null) {
 				query.value = string
 				appliedQueryFlow.value = string
 			}
