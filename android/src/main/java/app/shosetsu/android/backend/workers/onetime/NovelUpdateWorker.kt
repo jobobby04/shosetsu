@@ -1,7 +1,7 @@
 package app.shosetsu.android.backend.workers.onetime
 
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -415,7 +415,7 @@ class NovelUpdateWorker(
 		setContentIntent(
 			PendingIntent.getActivity(
 				applicationContext,
-				0,
+				novelId,
 				intent(applicationContext, ChapterReader::class.java) {
 					bundleOf(
 						BundleKeys.BUNDLE_CHAPTER_ID to chapterId,
@@ -424,7 +424,7 @@ class NovelUpdateWorker(
 				},
 				(
 						if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-						) or FLAG_UPDATE_CURRENT
+						) or FLAG_ONE_SHOT
 			)
 		)
 	}
