@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
 import android.view.KeyEvent
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.compose.setContent
@@ -34,7 +33,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.jsoup.Jsoup
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -84,7 +82,7 @@ class ChapterReader
 					}
 				}
 				else -> {
-					logE("TTS Initialization failed: $it")
+					logE("TTS Initialization failed")
 					isTTSCapable.value = false
 				}
 			}
@@ -92,58 +90,7 @@ class ChapterReader
 	}
 
 	private val tts: TextToSpeech by lazy {
-		val tts = TextToSpeech(this, ttsInitListener)
-		if (tts.setOnUtteranceProgressListener(ChapterUtteranceProgressListener(isTTSPlaying)) != 0)
-			logE("Could not set utterance progress listener")
-		tts
-	}
-
-	private val validBreaks = listOf(".\n\n", ".\n", "\n\n", ",\n", ". ", ", ", " ")
-	private fun speak(text: String, utteranceId: Int, flush: Boolean = true) {
-		val trimmed = text.replace("\r\n", "\n")
-			.replace("\t", " ")
-			.trim()
-		val max = TextToSpeech.getMaxSpeechInputLength()
-		if (trimmed.length <= max) {
-			tts.speak(
-				trimmed,
-				if (flush) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,
-				null,
-				utteranceId.toString()
-			)
-		} else {
-			var ind = -1
-			for (br in validBreaks) {
-				if (ind == -1) ind = trimmed.substring(0, max + 1).lastIndexOf(br)
-			}
-			if (ind == -1) ind = max
-			speak(trimmed.substring(0, ind + 1), utteranceId, flush)
-			speak(trimmed.substring(ind + 1), utteranceId + 1, false)
-		}
-	}
-
-	class ChapterUtteranceProgressListener(private val isTTSPlaying: MutableStateFlow<Boolean>) : UtteranceProgressListener() {
-		override fun onStart(p0: String?) {
-			isTTSPlaying.value = true
-		}
-
-		override fun onDone(p0: String?) {
-			isTTSPlaying.value = false
-		}
-
-		@Deprecated("Required to implement UtteranceProgressListener but deprecated in Java")
-		override fun onError(p0: String?) {
-			isTTSPlaying.value = false
-		}
-
-		override fun onStop(utteranceId: String?, interrupted: Boolean) {
-			isTTSPlaying.value = false
-		}
-
-		override fun onError(utteranceId: String?, errorCode: Int) {
-			logI("Error: $utteranceId ($errorCode)")
-			isTTSPlaying.value = false
-		}
+		TextToSpeech(this, ttsInitListener)
 	}
 
 	override fun onTrimMemory(level: Int) {
@@ -258,17 +205,21 @@ class ChapterReader
 										.filterIsInstance<ReaderChapterUI>()
 										.find { it.id == currentChapterID }
 										?.let { item ->
-											tts.setPitch(viewModel.ttsPitch.value / 10)
-											tts.setSpeechRate(viewModel.ttsSpeed.value / 10)
+											tts.setPitch(viewModel.ttsPitch.value)
+											tts.setSpeechRate(viewModel.ttsSpeed.value)
 											when (chapterType!!) {
 												ChapterType.STRING -> {
 													viewModel.getChapterStringPassage(item)
 														.collectLA(
 															this@ChapterReader,
 															catch = {}) { content ->
-															if (content is ChapterPassage.Success) {
-																speak(content.content, content.hashCode())
-															}
+															if (content is ChapterPassage.Success)
+																tts.speak(
+																	content.content,
+																	TextToSpeech.QUEUE_FLUSH,
+																	null,
+																	content.hashCode().toString()
+																)
 														}
 
 												}
@@ -277,9 +228,13 @@ class ChapterReader
 														.collectLA(
 															this@ChapterReader,
 															catch = {}) { content ->
-															if (content is ChapterPassage.Success) {
-																speak(Jsoup.parse(content.content).text(), content.hashCode())
-															}
+															if (content is ChapterPassage.Success)
+																tts.speak(
+																	content.content,
+																	TextToSpeech.QUEUE_FLUSH,
+																	null,
+																	content.hashCode().toString()
+																)
 														}
 												}
 												else -> {}
@@ -304,8 +259,6 @@ class ChapterReader
 									item { viewModel.doubleTapFocus() }
 									item { viewModel.doubleTapSystem() }
 									item { viewModel.readerTableHackOption() }
-									item { viewModel.readerPitchOption() }
-									item { viewModel.readerSpeedOption() }
 								},
 								toggleFocus = viewModel::toggleFocus,
 								onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },

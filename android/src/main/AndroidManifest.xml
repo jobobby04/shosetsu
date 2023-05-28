@@ -14,12 +14,6 @@
     <uses-permission android:name="android.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.TTS_SERVICE" />
-        </intent>
-    </queries>
-
     <application
         android:name="app.shosetsu.android.application.ShosetsuApplication"
         android:allowBackup="true"
@@ -31,7 +25,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents"
         android:usesCleartextTraffic="true"
-        android:localeConfig="@xml/locales_config"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="q">
         <activity
