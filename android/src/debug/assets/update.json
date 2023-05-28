@@ -1,7 +1,11 @@
 {
-  "latestVersion": "2805",
-  "url": "https://cdn.shosetsu.app/debug/r2805/shosetsu-r2805.apk",
+  "latestVersion": "2830",
+  "url": "https://cdn.shosetsu.app/debug/r2830/shosetsu-r2830.apk",
   "releaseNotes": [
+    "## New",
+    "",
+    "Re-release due to git mess.",
+    "",
     "## New",
     "- Added novel pinning",
     "- Improved downloader manager by Jobobby04",
