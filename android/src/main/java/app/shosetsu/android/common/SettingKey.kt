@@ -225,8 +225,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object NavStyle : IntKey("navigationStyle", 0)
 
 	// Backup Options
-	object RestorePrintChapters : BooleanKey("backupPrintChapters", false)
-
 	/**
 	 * If true, backup only contains chapters that have been modified, else they are ignored
 	 */

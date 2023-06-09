@@ -12,6 +12,7 @@ import app.shosetsu.android.datasource.local.memory.base.IMemChaptersDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteChaptersDataSource
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
@@ -222,4 +223,7 @@ class ChaptersRepository(
 	override fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?> =
 		dbSource.getChapterFlow(chapterId).onIO()
 
+	override suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>) = onIO {
+		dbSource.restoreBackup(chapterMap)
+	}
 }

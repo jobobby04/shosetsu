@@ -5,6 +5,7 @@ import androidx.paging.PagingSource
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 
 /*
  * This file is part of shosetsu.
@@ -78,4 +79,11 @@ interface ChapterHistoryRepository {
 	 */
 	@Throws(SQLiteException::class)
 	suspend fun get(chapterId: Int): ChapterHistoryEntity?
+
+	/**
+	 * Restore a backup.
+	 *
+	 * Bulk action.
+	 */
+	suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>)
 }

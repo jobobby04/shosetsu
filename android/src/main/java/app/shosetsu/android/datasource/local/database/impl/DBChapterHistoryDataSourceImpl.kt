@@ -4,7 +4,9 @@ import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import app.shosetsu.android.datasource.local.database.base.DBChapterHistoryDataSource
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.providers.database.dao.ChapterHistoryDao
 
 /*
@@ -59,14 +61,11 @@ class DBChapterHistoryDataSourceImpl(
 		startedReadingAt: Long,
 		endedReadingAt: Long?
 	) {
-		dao.insertAbort(
-			DBChapterHistoryEntity(
-				null,
-				novelId,
-				chapterId,
-				startedReadingAt,
-				endedReadingAt
-			)
+		dao.insert(
+			novelId,
+			chapterId,
+			startedReadingAt,
+			endedReadingAt
 		)
 	}
 
@@ -82,5 +81,17 @@ class DBChapterHistoryDataSourceImpl(
 	@Throws(SQLiteException::class)
 	override suspend fun clearBefore(date: Long) {
 		dao.clearBefore(date)
+	}
+
+	override suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>) {
+		dao.restoreBackup(chapterMap)
+	}
+
+	override suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long) {
+		dao.markChapterAsRead(chapter.id!!, chapter.novelID, time)
+	}
+
+	override suspend fun markChapterAsReading(chapter: ChapterEntity, time: Long) {
+		dao.markChapterAsReading(chapter.id!!, chapter.novelID, time)
 	}
 }

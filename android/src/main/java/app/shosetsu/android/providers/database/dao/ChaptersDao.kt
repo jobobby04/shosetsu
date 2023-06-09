@@ -9,7 +9,9 @@ import app.shosetsu.android.common.ext.entity
 import app.shosetsu.android.common.ext.toDB
 import app.shosetsu.android.common.utils.ensureSQLSizeCompliant
 import app.shosetsu.android.domain.model.database.DBChapterEntity
+import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.providers.database.dao.base.BaseDao
 import app.shosetsu.lib.Novel
 import kotlinx.coroutines.flow.Flow
@@ -285,4 +287,26 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	@Throws(SQLiteException::class)
 	@Query("SELECT * FROM chapters WHERE id = :chapterId LIMIT 1")
 	fun getChapterFlow(chapterId: Int): Flow<DBChapterEntity?>
+
+	@Transaction
+	@Throws(SQLiteException::class)
+	suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>) {
+		chapterMap.onEach { (bChapter, rChapter) ->
+			update(
+				rChapter.copy(
+					title = bChapter.name,
+					bookmarked = bChapter.bookmarked,
+				).let {
+					when (it.readingStatus) {
+						ReadingStatus.READING -> it
+						ReadingStatus.READ -> it
+						else -> it.copy(
+							readingStatus = bChapter.rS,
+							readingPosition = bChapter.rP
+						)
+					}
+				}.toDB()
+			)
+		}
+	}
 }

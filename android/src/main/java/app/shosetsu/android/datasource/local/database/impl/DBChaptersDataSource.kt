@@ -6,6 +6,7 @@ import app.shosetsu.android.common.ext.toDB
 import app.shosetsu.android.datasource.local.database.base.IDBChaptersDataSource
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.dto.convertList
 import app.shosetsu.android.providers.database.dao.ChaptersDao
 import app.shosetsu.lib.Novel
@@ -112,4 +113,7 @@ class DBChaptersDataSource(
 
 	override fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?> =
 		chaptersDao.getChapterFlow(chapterId).map { it?.convertTo() }
+
+	override suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>) =
+		chaptersDao.restoreBackup(chapterMap)
 }

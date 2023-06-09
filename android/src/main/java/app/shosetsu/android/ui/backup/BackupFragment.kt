@@ -10,11 +10,27 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -382,17 +398,6 @@ fun BackupSettingsContent(
 				stringResource(R.string.backup_only_modified_desc),
 				viewModel.settingsRepo,
 				SettingKey.BackupOnlyModifiedChapters,
-				modifier = Modifier
-					.fillMaxWidth()
-			)
-		}
-
-		item {
-			SwitchSettingContent(
-				stringResource(R.string.backup_restore_print_chapters_title),
-				stringResource(R.string.backup_restore_print_chapters_desc),
-				viewModel.settingsRepo,
-				SettingKey.RestorePrintChapters,
 				modifier = Modifier
 					.fillMaxWidth()
 			)

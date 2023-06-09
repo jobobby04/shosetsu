@@ -6,6 +6,7 @@ import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import kotlinx.coroutines.flow.Flow
@@ -150,4 +151,11 @@ interface IChaptersRepository {
 	 * Observe a chapter and it's changes
 	 */
 	fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?>
+
+	/**
+	 * Restore a backup.
+	 *
+	 * Bulk action.
+	 */
+	suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>)
 }

@@ -4,7 +4,11 @@ import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
+import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.ChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.providers.database.dao.base.BaseDao
 
 /*
@@ -53,4 +57,82 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 	@Throws(SQLiteException::class)
 	@Query("DELETE FROM chapter_history WHERE IFNULL(endedReadingAt, startedReadingAt) < :date")
 	suspend fun clearBefore(date: Long)
+
+	@Throws(SQLiteException::class)
+	suspend fun markChapterAsRead(chapterId: Int, novelId: Int, time: Long) {
+		onIO {
+			val history = get(chapterId)
+			if (history != null) {
+				update(
+					history.copy(
+						endedReadingAt = time
+					)
+				)
+			} else {
+				val time = System.currentTimeMillis()
+
+				insert(
+					novelId,
+					chapterId,
+					time - 1000,
+					time
+				)
+			}
+		}
+	}
+
+	@Throws(SQLiteException::class)
+	suspend fun insert(
+		novelId: Int,
+		chapterId: Int,
+		startedReadingAt: Long,
+		endedReadingAt: Long?
+	) {
+		insertAbort(
+			DBChapterHistoryEntity(
+				null,
+				novelId,
+				chapterId,
+				startedReadingAt,
+				endedReadingAt
+			)
+		)
+	}
+
+	@Throws(SQLiteException::class)
+	suspend fun markChapterAsReading(chapterId: Int, novelId: Int, time: Long) {
+		onIO {
+			val history = get(chapterId)
+			if (history != null) {
+				update(
+					history.copy(
+						startedReadingAt = time
+					)
+				)
+			} else {
+				insert(
+					novelId,
+					chapterId,
+					System.currentTimeMillis(),
+					null
+				)
+			}
+		}
+	}
+
+	@Transaction
+	@Throws(SQLiteException::class)
+	suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>) {
+		for ((bChapter, rChapter) in chapterMap.entries) {
+			val startedAt = bChapter.startedReadingAt
+			val endedAt = bChapter.endedReadingAt
+
+			if (startedAt != null) {
+				markChapterAsReading(rChapter.id ?: continue, rChapter.novelID, startedAt)
+
+				if (endedAt != null)
+					markChapterAsRead(rChapter.id ?: continue, rChapter.novelID, endedAt)
+			}
+		}
+	}
 }

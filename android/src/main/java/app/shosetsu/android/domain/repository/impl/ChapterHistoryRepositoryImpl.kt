@@ -7,6 +7,7 @@ import app.shosetsu.android.datasource.local.database.base.DBChapterHistoryDataS
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 
 /*
@@ -37,46 +38,12 @@ class ChapterHistoryRepositoryImpl(
 ) : ChapterHistoryRepository {
 	@Throws(SQLiteException::class)
 	override suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long) {
-		onIO {
-			val history = get(chapter.id!!)
-			if (history != null) {
-				chapterHistoryDatabase.update(
-					history.copy(
-						endedReadingAt = time
-					)
-				)
-			} else {
-				val time = System.currentTimeMillis()
-
-				chapterHistoryDatabase.insert(
-					chapter.novelID,
-					chapter.id!!,
-					time - 1000,
-					time
-				)
-			}
-		}
+		chapterHistoryDatabase.markChapterAsRead(chapter, time)
 	}
 
 	@Throws(SQLiteException::class)
 	override suspend fun markChapterAsReading(chapter: ChapterEntity, time: Long) {
-		onIO {
-			val history = get(chapter.id!!)
-			if (history != null) {
-				chapterHistoryDatabase.update(
-					history.copy(
-						startedReadingAt = time
-					)
-				)
-			} else {
-				chapterHistoryDatabase.insert(
-					chapter.novelID,
-					chapter.id!!,
-					System.currentTimeMillis(),
-					null
-				)
-			}
-		}
+		chapterHistoryDatabase.markChapterAsReading(chapter, time)
 	}
 
 	@Throws(SQLiteException::class)
@@ -103,5 +70,9 @@ class ChapterHistoryRepositoryImpl(
 	@Throws(SQLiteException::class)
 	override suspend fun get(chapterId: Int): ChapterHistoryEntity? = onIO {
 		chapterHistoryDatabase.get(chapterId)
+	}
+
+	override suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>) = onIO {
+		chapterHistoryDatabase.restoreBackup(chapterMap)
 	}
 }

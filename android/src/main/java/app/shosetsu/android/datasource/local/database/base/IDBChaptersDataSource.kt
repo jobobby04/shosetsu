@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.lib.Novel
 import kotlinx.coroutines.flow.Flow
 
@@ -85,4 +86,5 @@ interface IDBChaptersDataSource {
 	 */
 	suspend fun markChaptersDeleted(chapterIds: List<Int>)
 	fun getChapterFlow(chapterId: Int): Flow<ChapterEntity?>
+	suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>)
 }

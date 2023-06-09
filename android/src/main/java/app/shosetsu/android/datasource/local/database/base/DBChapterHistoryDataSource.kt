@@ -3,7 +3,9 @@ package app.shosetsu.android.datasource.local.database.base
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import app.shosetsu.android.domain.model.database.DBChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ChapterHistoryEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 
 /*
  * This file is part of shosetsu.
@@ -57,4 +59,7 @@ interface DBChapterHistoryDataSource {
 
 	@Throws(SQLiteException::class)
 	suspend fun clearBefore(date: Long)
+	suspend fun restoreBackup(chapterMap: Map<BackupChapterEntity, ChapterEntity>)
+	suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long)
+	suspend fun markChapterAsReading(chapter: ChapterEntity, time: Long)
 }

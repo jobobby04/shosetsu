@@ -13,13 +13,11 @@ import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.NullContentResolverException
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.ID_RESTORE
 import app.shosetsu.android.common.consts.VERSION_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.RESTORE_WORK_ID
-import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.*
@@ -35,7 +33,6 @@ import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import org.acra.ACRA
@@ -480,17 +477,17 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		// get the chapters
 		val repoChapters = chaptersRepo.getChapters(targetNovelID)
 
-		// Go through the chapters updating them
-		for (index in bChapters.indices) {
-			restoreChapter(
-				name,
-				repoChapters,
-				bChapters[index],
-				{ bitmap },
-				bChapters.size,
-				index
-			)
+
+		val chapterMap = buildMap {
+			bChapters.forEach { backupChapter ->
+				repoChapters.find { it.url == backupChapter.url }?.let { repoChapter ->
+					this[backupChapter] = repoChapter
+				}
+			}
 		}
+
+		chaptersRepo.restoreBackup(chapterMap)
+		chapterHistoryRepo.restoreBackup(chapterMap)
 
 		notify(R.string.restore_notification_content_settings_restore)
 		{
@@ -581,65 +578,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		clearBitmap() // Remove data from bitmap
 
 		delay(500) // Delay things a bit
-	}
-
-	private val settings: ISettingsRepository by instance()
-	private val printChapter: Boolean
-		get() = runBlocking {
-			settings.getBoolean(SettingKey.RestorePrintChapters)
-		}
-
-	private suspend fun restoreChapter(
-		novelName: String,
-		repoChapters: List<ChapterEntity>,
-		backupChapterEntity: BackupChapterEntity,
-		getBitmap: () -> Bitmap?,
-		size: Int,
-		index: Int
-	) {
-		val chapterURL = backupChapterEntity.url
-		val chapterName = backupChapterEntity.name
-		val bookmarked = backupChapterEntity.bookmarked
-		val rS = backupChapterEntity.rS
-		val rP = backupChapterEntity.rP
-		val startedAt = backupChapterEntity.startedReadingAt
-		val endedAt = backupChapterEntity.endedReadingAt
-
-		repoChapters.find { it.url == chapterURL }?.let { chapterEntity ->
-
-			if (printChapter)
-				logI(chapterName)
-
-			notify(getString(R.string.updating) + ": ${chapterEntity.title}") {
-				setContentTitle(novelName)
-				setLargeIcon(getBitmap())
-				setProgress(size, index, false)
-				setSilent(true)
-			}
-
-			chaptersRepo.updateChapter(
-				chapterEntity.copy(
-					title = chapterName,
-					bookmarked = bookmarked,
-				).let {
-					when (it.readingStatus) {
-						ReadingStatus.READING -> it
-						ReadingStatus.READ -> it
-						else -> it.copy(
-							readingStatus = rS,
-							readingPosition = rP
-						)
-					}
-				}
-			)
-
-			if (startedAt != null) {
-				chapterHistoryRepo.markChapterAsReading(chapterEntity, startedAt)
-
-				if (endedAt != null)
-					chapterHistoryRepo.markChapterAsRead(chapterEntity, endedAt)
-			}
-		}
 	}
 
 	/**
