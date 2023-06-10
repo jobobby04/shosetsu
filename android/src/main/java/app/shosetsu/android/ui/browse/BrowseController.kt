@@ -132,25 +132,14 @@ class BrowseController : ShosetsuController(),
 		setViewTitle()
 		return ComposeView(requireContext()).apply {
 			setContent {
-				ShosetsuCompose {
-					val entities by viewModel.liveData.collectAsState()
-					var isRefreshing by remember { mutableStateOf(false) }
-					BrowseContent(
-						entities,
-						refresh = {
-							isRefreshing = true
-							onRefresh()
-							isRefreshing = false
-						},
-						installExtension = ::installExtension,
-						update = viewModel::updateExtension,
-						openCatalogue = ::openCatalogue,
-						openSettings = ::openSettings,
-						cancelInstall = viewModel::cancelInstall,
-						isRefreshing = isRefreshing,
-						fab
-					)
-				}
+				BrowseView(
+					viewModel,
+					onRefresh = ::onRefresh,
+					installExtension = ::installExtension,
+					openCatalogue = ::openCatalogue,
+					openSettings = ::openSettings,
+					fab
+				)
 			}
 		}
 	}
@@ -254,6 +243,36 @@ class BrowseController : ShosetsuController(),
 		}
 		fab.setText(R.string.filter)
 		fab.setIconResource(R.drawable.filter)
+	}
+}
+
+@Composable
+fun BrowseView(
+	viewModel: ABrowseViewModel = viewModelDi(),
+	onRefresh: () -> Unit,
+	installExtension: (BrowseExtensionUI, ExtensionInstallOptionEntity) -> Unit,
+	openCatalogue: (BrowseExtensionUI) -> Unit,
+	openSettings: (BrowseExtensionUI) -> Unit,
+	fab: EFabMaintainer?
+) {
+	ShosetsuCompose {
+		val entities by viewModel.liveData.collectAsState()
+		var isRefreshing by remember { mutableStateOf(false) }
+		BrowseContent(
+			entities,
+			refresh = {
+				isRefreshing = true
+				onRefresh()
+				isRefreshing = false
+			},
+			installExtension = installExtension,
+			update = viewModel::updateExtension,
+			openCatalogue = openCatalogue,
+			openSettings = openSettings,
+			cancelInstall = viewModel::cancelInstall,
+			isRefreshing = isRefreshing,
+			fab
+		)
 	}
 }
 
