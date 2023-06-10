@@ -1,6 +1,6 @@
 package app.shosetsu.android.ui.library.listener
 
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 
 /*

@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.*
-import android.widget.SearchView
 import androidx.activity.compose.BackHandler
+import androidx.appcompat.widget.SearchView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
