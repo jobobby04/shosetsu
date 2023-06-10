@@ -173,7 +173,7 @@ class ExtensionsViewModel(
 					.asSequence()
 					.let { sequence ->
 						if (searchTerm.isNotBlank())
-							sequence.filter { it.name.contains(searchTerm) }
+							sequence.filter { it.name.contains(searchTerm, true) }
 						else sequence
 					}
 					.filter { if (onlyInstalled) it.isInstalled else true }
