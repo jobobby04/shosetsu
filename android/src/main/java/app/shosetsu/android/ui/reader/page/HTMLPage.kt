@@ -114,7 +114,7 @@ fun HTMLPage(
 				.fillMaxWidth()
 				.heightIn(min = 1.dp)
 				.verticalScroll(scrollState),
-			client = ShosetsuAccompanistWebViewClient(),
+			client = ChapterReaderAccompanistWebViewClient(),
 			chromeClient = ShosetsuAccompanistWebChromeClient(),
 			navigator = navigator,
 		)

@@ -341,6 +341,7 @@
     <!DOCTYPE html>
     <html>
         <head>
+            <style>%s</style>
         </head>
         <body>
             <h1>Encabezado 1</h1>

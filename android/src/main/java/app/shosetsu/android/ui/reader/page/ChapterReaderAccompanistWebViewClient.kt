@@ -27,7 +27,7 @@ import com.google.accompanist.web.AccompanistWebViewClient
  * @since 23 / 05 / 2023
  * @author Doomsdayrs
  */
-class ShosetsuAccompanistWebViewClient : AccompanistWebViewClient() {
+class ChapterReaderAccompanistWebViewClient : AccompanistWebViewClient() {
 	private var applied = false
 
 	/**

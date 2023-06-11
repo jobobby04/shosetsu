@@ -445,6 +445,7 @@
     <!DOCTYPE html>
     <html>
         <head>
+            <style>%s</style>
         </head>
         <body>
             <h1>Header 1</h1>
