@@ -57,7 +57,7 @@ import app.shosetsu.android.view.controller.base.HomeFragment
  *
  * Option for download queue
  */
-class ComposeMoreFragment
+class MoreFragment
 	: ShosetsuFragment(), CollapsedToolBarController, HomeFragment {
 
 	override val viewTitleRes: Int = R.string.more

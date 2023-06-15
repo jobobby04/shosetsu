@@ -205,7 +205,7 @@
         android:label="IntroductionActivity" />
     <fragment
         android:id="@+id/moreController"
-        android:name="app.shosetsu.android.ui.more.ComposeMoreFragment"
+        android:name="app.shosetsu.android.ui.more.MoreFragment"
         android:label="MoreController">
         <action
             android:id="@+id/action_moreController_to_addShareController"
@@ -243,7 +243,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsController"
-        android:name="app.shosetsu.android.ui.settings.ComposeSettingsFragment"
+        android:name="app.shosetsu.android.ui.settings.SettingsFragment"
         android:label="SettingsController">
         <action
             android:id="@+id/action_settingsController_to_viewSettings"
