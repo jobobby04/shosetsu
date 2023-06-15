@@ -1,16 +1,22 @@
 package app.shosetsu.android.providers.network
 
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logW
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import java.net.Authenticator
+import java.net.InetSocketAddress
+import java.net.PasswordAuthentication
+import java.net.Proxy
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.logging.Level
@@ -39,14 +45,52 @@ import java.util.logging.Logger
  * 04 / 05 / 2020
  */
 
-fun createOkHttpClient(): OkHttpClient = OkHttpClient.Builder()
-	.cookieJar(CookieJarSync)
-	.addInterceptor { chain ->
-		return@addInterceptor slowRequest(chain, chain.request())
-	}.apply {
-		Logger.getLogger(OkHttpClient::class.java.name).level = Level.ALL
+fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
+
+	val useProxy = runBlocking {
+		iSettingsRepository.getBoolean(SettingKey.UseProxy)
 	}
-	.build()
+
+	val builder = OkHttpClient.Builder()
+		.cookieJar(CookieJarSync)
+		.addInterceptor { chain ->
+			return@addInterceptor slowRequest(chain, chain.request())
+		}.apply {
+			Logger.getLogger(OkHttpClient::class.java.name).level = Level.ALL
+		}
+
+	if (useProxy) {
+		try {
+			val proxyString = runBlocking {
+				iSettingsRepository.getString(SettingKey.ProxyHost)
+			}
+
+			val (auth, hostname) = proxyString.split('@')
+			val (host, rawPort) = hostname.split(':')
+			val port = rawPort.toInt()
+
+			val proxy = Proxy(Proxy.Type.SOCKS,  InetSocketAddress(host, port))
+			builder.proxy(proxy)
+
+			if (auth.isNotEmpty()) {
+				val (user, pass) = auth.split(':')
+
+				Authenticator.setDefault(object: Authenticator() {
+					override fun getPasswordAuthentication(): PasswordAuthentication? {
+						if (requestingHost.equals(host, ignoreCase = true) and (requestingPort == port)) {
+							return PasswordAuthentication(user, pass.toCharArray())
+						}
+						return null;
+					}
+				})
+			}
+		} catch (e: Exception) {
+			// TODO: report invalid proxy configuration here
+		}
+	}
+
+	return builder.build()
+}
 
 /**
  * Represents the format expected from an HTTP Retry-After response
