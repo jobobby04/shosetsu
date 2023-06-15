@@ -50,7 +50,7 @@ import app.shosetsu.android.view.controller.ShosetsuFragment
  * @since 06 / 10 / 2021
  * @author Doomsdayrs
  */
-class ComposeSettingsFragment : ShosetsuFragment() {
+class SettingsFragment : ShosetsuFragment() {
 
 	override val viewTitleRes: Int = R.string.settings
 
