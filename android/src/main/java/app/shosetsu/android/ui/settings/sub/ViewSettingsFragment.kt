@@ -32,7 +32,7 @@ import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -61,7 +61,7 @@ import kotlinx.coroutines.flow.map
  * @since 02 / 10 / 2021
  * @author Doomsdayrs
  */
-class ViewSettings : ShosetsuController() {
+class ViewSettingsFragment : ShosetsuFragment() {
 	private val viewModel: AViewSettingsViewModel by viewModel()
 
 	override val viewTitleRes: Int = R.string.settings_view

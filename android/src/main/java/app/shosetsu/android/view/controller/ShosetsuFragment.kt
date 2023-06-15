@@ -38,7 +38,7 @@ import org.kodein.di.DIAware
  * @since 04 / 08 / 2021
  * @author Doomsdayrs
  */
-abstract class ShosetsuController : Fragment(), DIAware {
+abstract class ShosetsuFragment : Fragment(), DIAware {
 	/** Title of this view, Applies to the app system */
 	@StringRes
 	open val viewTitleRes: Int = -1
@@ -69,13 +69,13 @@ abstract class ShosetsuController : Fragment(), DIAware {
 		catch: suspend FlowCollector<T>.(Throwable) -> Unit,
 		onCollect: FlowCollector<T>
 	) =
-		collectLA(this@ShosetsuController, catch, onCollect)
+		collectLA(this@ShosetsuFragment, catch, onCollect)
 
 	fun <T> Flow<T>.observeLatest(
 		catch: suspend FlowCollector<T>.(Throwable) -> Unit,
 		onCollect: FlowCollector<T>
 	) =
-		collectLatestLA(this@ShosetsuController, catch, onCollect)
+		collectLatestLA(this@ShosetsuFragment, catch, onCollect)
 
 
 	open fun onLifecycleCreate(owner: LifecycleOwner, registry: ActivityResultRegistry) {}

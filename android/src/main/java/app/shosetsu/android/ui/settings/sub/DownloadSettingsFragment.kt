@@ -20,11 +20,15 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.makeSnackBar
+import app.shosetsu.android.common.ext.setOnDismissed
+import app.shosetsu.android.common.ext.toast
+import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -50,7 +54,7 @@ import com.google.android.material.snackbar.Snackbar
  * Shosetsu
  * 13 / 07 / 2019
  */
-class DownloadSettings : ShosetsuController() {
+class DownloadSettingsFragment : ShosetsuFragment() {
 	override val viewTitleRes: Int = R.string.settings_download
 	val viewModel: ADownloadSettingsViewModel by viewModel()
 

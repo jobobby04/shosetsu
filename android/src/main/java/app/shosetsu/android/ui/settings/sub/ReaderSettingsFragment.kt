@@ -43,7 +43,7 @@ import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.*
 import kotlinx.collections.immutable.toImmutableList
@@ -71,7 +71,7 @@ import kotlinx.collections.immutable.toImmutableList
  * @since 04 / 10 / 2021
  * @author Doomsdayrs
  */
-class ReaderSettings : ShosetsuController() {
+class ReaderSettingsFragment : ShosetsuFragment() {
 	private val viewModel: AReaderSettingsViewModel by viewModel()
 
 	override val viewTitleRes: Int = R.string.settings_reader

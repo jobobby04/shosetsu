@@ -32,7 +32,7 @@ import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.CollapsedToolBarController
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
@@ -68,7 +68,7 @@ import kotlin.random.Random
  *
  * Opens up detailed view of an extension, allows modifications
  */
-class ConfigureExtension : ShosetsuController(),
+class ConfigureExtensionFragment : ShosetsuFragment(),
 	CollapsedToolBarController {
 	val viewModel: AExtensionConfigureViewModel by viewModel()
 

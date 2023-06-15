@@ -31,7 +31,7 @@ import app.shosetsu.android.databinding.RepositoryAddBinding
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
@@ -65,7 +65,7 @@ import androidx.appcompat.app.AlertDialog.Builder as AlertDialogBuilder
  * shosetsu
  * 16 / 09 / 2020
  */
-class RepositoryController : ShosetsuController(),
+class RepositoryFragment : ShosetsuFragment(),
 	ExtendedFABController, MenuProvider {
 	private val viewModel: ARepositoryViewModel by viewModel()
 

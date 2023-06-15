@@ -48,7 +48,7 @@ import org.acra.ACRA
  * Creates the bottom menu for Novel Controller
  */
 class NovelFilterMenuBuilder(
-	private val novelController: NovelController,
+	private val novelController: NovelFragment,
 	private val inflater: LayoutInflater,
 	private val viewModel: ANovelViewModel
 ) {

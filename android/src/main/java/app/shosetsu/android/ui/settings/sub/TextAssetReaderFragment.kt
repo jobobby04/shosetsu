@@ -20,7 +20,7 @@ import androidx.core.os.bundleOf
 import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
 
 /*
@@ -45,7 +45,7 @@ import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
  * Shosetsu
  * 9 / June / 2019
  */
-class TextAssetReader : ShosetsuController() {
+class TextAssetReaderFragment : ShosetsuFragment() {
 
 	private val viewModel: ATextAssetReaderViewModel by viewModel()
 

@@ -32,7 +32,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.MigrationExtensionUI
 import app.shosetsu.android.view.uimodels.model.MigrationNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AMigrationViewModel
@@ -67,7 +67,7 @@ import kotlinx.collections.immutable.ImmutableList
  * @author github.com/doomsdayrs
  * yes, a THIRD ONE
  */
-class MigrationController : ShosetsuController() {
+class MigrationFragment : ShosetsuFragment() {
 	companion object {
 		const val TARGETS_BUNDLE_KEY: String = "targets"
 	}

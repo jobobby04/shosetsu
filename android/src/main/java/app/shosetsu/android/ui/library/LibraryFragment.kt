@@ -39,11 +39,11 @@ import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.*
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.ui.library.listener.LibrarySearchQuery
-import app.shosetsu.android.ui.migration.MigrationController
+import app.shosetsu.android.ui.migration.MigrationFragment
 import app.shosetsu.android.ui.novel.CategoriesDialog
 import app.shosetsu.android.view.ComposeBottomSheetDialog
 import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.HomeFragment
@@ -82,8 +82,8 @@ import kotlinx.coroutines.runBlocking
  *
  * @author github.com/doomsdayrs
  */
-class LibraryController
-	: ShosetsuController(), ExtendedFABController, HomeFragment, MenuProvider {
+class LibraryFragment
+	: ShosetsuFragment(), ExtendedFABController, HomeFragment, MenuProvider {
 
 	private var fab: EFabMaintainer? = null
 	private var bsg: BottomSheetDialog? = null
@@ -257,7 +257,7 @@ class LibraryController
 				viewModel.getSelectedIds().firstLa(this, catch = {}) {
 					findNavController().navigateSafely(
 						R.id.action_libraryController_to_migrationController,
-						bundleOf(MigrationController.TARGETS_BUNDLE_KEY to it),
+						bundleOf(MigrationFragment.TARGETS_BUNDLE_KEY to it),
 						navOptions {
 							setShosetsuTransition()
 						}

@@ -38,9 +38,9 @@ import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.settings.sub.TextAssetReader.Companion.bundle
+import app.shosetsu.android.ui.settings.sub.TextAssetReaderFragment.Companion.bundle
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
 import org.acra.util.Installation
 
@@ -67,7 +67,7 @@ import org.acra.util.Installation
  * @since 21 / 10 / 2021
  * @author Doomsdayrs
  */
-class AboutController : ShosetsuController() {
+class AboutFragment : ShosetsuFragment() {
 
 	override val viewTitleRes: Int = R.string.about
 
