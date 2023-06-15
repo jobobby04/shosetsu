@@ -37,6 +37,8 @@
     "- Use OkHTTP client for image loading",
     "- Fix novel update notification not working",
     "- Fix loading indicator for library filling entire screen",
+    "- Speed up slow chapter restoration during backup restore.",
+    "- Ignore case for extension list filter",
     "",
     "## Misc",
     "- Add OptIn flags",
@@ -63,6 +65,9 @@
     "- NovelUpdateWorker: Swap update notification to its own function",
     "- ChapterReader: Control screen insets from compose instead",
     "- Make reader tapping occur in sync with the UI thread",
-    "- Enable monochrome icons in additional configurations"
+    "- Enable monochrome icons in additional configurations",
+    "- Split BrowseView out of BrowseController",
+    "- Add collapseActionView to search menu items",
+    "- Covert search views to androidx.appcompat"
   ]
 }
