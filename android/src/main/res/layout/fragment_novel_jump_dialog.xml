@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="@string/controller_novel_jump_dialog_hint_chapter_number"
+        android:hint="@string/fragment_novel_jump_dialog_hint_chapter_number"
         android:importantForAutofill="no"
         android:inputType="numberDecimal" />
 
@@ -18,6 +18,6 @@
         android:id="@+id/find_by_chapter_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/controller_novel_jum_dialog_by_title" />
+        android:text="@string/fragment_novel_jum_dialog_by_title" />
 
 </LinearLayout>

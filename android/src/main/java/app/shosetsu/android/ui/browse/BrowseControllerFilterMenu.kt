@@ -247,7 +247,7 @@ fun BrowseControllerInstalledFilter(state: Boolean, updateState: (Boolean) -> Un
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		Text(
-			text = stringResource(R.string.controller_browse_filter_only_installed),
+			text = stringResource(R.string.fragment_browse_filter_only_installed),
 		)
 		Checkbox(
 			checked = state,

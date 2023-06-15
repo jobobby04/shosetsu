@@ -33,7 +33,7 @@
     <string name="open_in_browser">ブラウザで開く</string>
     <string name="paused">一時停止</string>
     <string name="pending">未定</string>
-    <string name="controller_novel_chapter_position">位置</string>
+    <string name="fragment_novel_chapter_position">位置</string>
     <string name="publishing">出版しています</string>
     <string name="reader">読む</string>
     <string name="read">読む</string>

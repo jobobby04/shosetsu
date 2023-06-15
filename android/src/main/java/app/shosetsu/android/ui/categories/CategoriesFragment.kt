@@ -119,7 +119,7 @@ class CategoriesFragment : ShosetsuFragment(), ExtendedFABController {
 		) {
 			// Inform user of the category being removed
 			makeSnackBar(
-				R.string.controller_categories_snackbar_repo_removed,
+				R.string.fragment_categories_snackbar_repo_removed,
 			)?.show()
 		}
 	}
@@ -168,7 +168,7 @@ class CategoriesFragment : ShosetsuFragment(), ExtendedFABController {
 	override fun manipulateFAB(fab: ExtendedFABController.EFabMaintainer) {
 		this.fab = fab
 		fab.setIconResource(R.drawable.add_circle_outline)
-		fab.setText(R.string.controller_categories_action_add)
+		fab.setText(R.string.fragment_categories_action_add)
 
 		// When the FAB is clicked, open a alert dialog to input a new category
 		fab.setOnClickListener { launchAddCategoryDialog(it) }

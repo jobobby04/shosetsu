@@ -255,7 +255,7 @@ fun AddShareContent(
 
 				if (isNovelOpenable)
 					TextButton(onClick = openNovel) {
-						Text(stringResource(R.string.controller_add_open_novel))
+						Text(stringResource(R.string.fragment_add_open_novel))
 					}
 			}
 		}
@@ -276,7 +276,7 @@ fun AddShareContent(
 		}
 	} else if (!isUrlValid) {
 		ErrorContent(
-			R.string.controller_add_invalid,
+			R.string.fragment_add_invalid,
 			ErrorAction(
 				R.string.retry,
 			) {
@@ -285,7 +285,7 @@ fun AddShareContent(
 		)
 	} else if (isNovelAlreadyPresent && novelLink != null) {
 		ErrorContent(
-			stringResource(R.string.controller_add_present_novel, novelLink.name),
+			stringResource(R.string.fragment_add_present_novel, novelLink.name),
 			actions = arrayOf(
 				ErrorAction(
 					android.R.string.ok,
@@ -293,7 +293,7 @@ fun AddShareContent(
 					reject()
 				},
 				ErrorAction(
-					R.string.controller_add_open_novel,
+					R.string.fragment_add_open_novel,
 				) {
 					openNovel()
 				},
@@ -301,7 +301,7 @@ fun AddShareContent(
 		)
 	} else if (isStyleAlreadyPresent && styleLink != null) {
 		ErrorContent(
-			stringResource(R.string.controller_add_present_style, styleLink.name),
+			stringResource(R.string.fragment_add_present_style, styleLink.name),
 			ErrorAction(
 				android.R.string.ok,
 			) {
@@ -310,7 +310,7 @@ fun AddShareContent(
 		)
 	} else if (isExtAlreadyPresent && extensionLink != null && novelLink == null && styleLink == null) {
 		ErrorContent(
-			stringResource(R.string.controller_add_present_ext, extensionLink.name),
+			stringResource(R.string.fragment_add_present_ext, extensionLink.name),
 			ErrorAction(
 				android.R.string.ok,
 			) {
@@ -319,7 +319,7 @@ fun AddShareContent(
 		)
 	} else if (isRepoAlreadyPresent && repositoryLink != null && novelLink == null && styleLink == null && extensionLink == null) {
 		ErrorContent(
-			stringResource(R.string.controller_add_present_repo, repositoryLink.name),
+			stringResource(R.string.fragment_add_present_repo, repositoryLink.name),
 			ErrorAction(
 				android.R.string.ok,
 			) {
@@ -335,7 +335,7 @@ fun AddShareContent(
 			verticalArrangement = Arrangement.SpaceBetween
 		) {
 			Text(
-				stringResource(R.string.controller_add_following),
+				stringResource(R.string.fragment_add_following),
 				modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
 				style = MaterialTheme.typography.headlineSmall
 			)
@@ -349,7 +349,7 @@ fun AddShareContent(
 					item {
 						Column {
 							Text(
-								stringResource(R.string.controller_add_novel),
+								stringResource(R.string.fragment_add_novel),
 								style = MaterialTheme.typography.titleLarge,
 								modifier = Modifier.padding(bottom = 8.dp)
 							)
@@ -408,7 +408,7 @@ fun AddShareContent(
 					item {
 						Column {
 							Text(
-								stringResource(R.string.controller_add_extension),
+								stringResource(R.string.fragment_add_extension),
 								style = MaterialTheme.typography.titleLarge,
 								modifier = Modifier.padding(bottom = 8.dp)
 							)
@@ -453,7 +453,7 @@ fun AddShareContent(
 						Column {
 							Text(
 								stringResource(
-									R.string.controller_add_repository,
+									R.string.fragment_add_repository,
 								),
 								style = MaterialTheme.typography.titleLarge,
 								modifier = Modifier.padding(bottom = 8.dp)

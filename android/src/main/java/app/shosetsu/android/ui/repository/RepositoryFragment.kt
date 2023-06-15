@@ -122,7 +122,7 @@ class RepositoryFragment : ShosetsuFragment(),
 				ACRA.errorReporter.handleSilentException(it)
 
 				// Warn the user that there was an error
-				makeSnackBar(R.string.controller_repositories_snackbar_fail_undo_repo_removal)
+				makeSnackBar(R.string.fragment_repositories_snackbar_fail_undo_repo_removal)
 					// Ask if the user wants to retry
 					?.setAction(R.string.generic_question_retry) {
 						undoRemoveRepository(item)
@@ -152,7 +152,7 @@ class RepositoryFragment : ShosetsuFragment(),
 		) {
 			// Inform user of the repository being removed
 			makeSnackBar(
-				R.string.controller_repositories_snackbar_repo_removed,
+				R.string.fragment_repositories_snackbar_repo_removed,
 			)
 				// Ask the user if they want to undo
 				?.setAction(R.string.generic_undo) {
@@ -220,7 +220,7 @@ class RepositoryFragment : ShosetsuFragment(),
 			error = false
 			if (it.toString().toHttpUrlOrNull() == null) {
 				error = true
-				addBinding.urlInput.error = getString(R.string.controller_repositories_add_error)
+				addBinding.urlInput.error = getString(R.string.fragment_repositories_add_error)
 			}
 		}
 
@@ -246,11 +246,11 @@ class RepositoryFragment : ShosetsuFragment(),
 	 */
 	private fun showWarning() {
 		makeSnackBar(
-			R.string.controller_repositories_snackbar_repo_changed,
+			R.string.fragment_repositories_snackbar_repo_changed,
 			length = Snackbar.LENGTH_LONG
 		)
 			// Ask the user if they want to refresh
-			?.setAction(R.string.controller_repositories_action_repo_update) {
+			?.setAction(R.string.fragment_repositories_action_repo_update) {
 				onRefresh()
 			}?.show()
 	}
@@ -259,7 +259,7 @@ class RepositoryFragment : ShosetsuFragment(),
 	override fun manipulateFAB(fab: EFabMaintainer) {
 		this.fab = fab
 		fab.setIconResource(R.drawable.add_circle_outline)
-		fab.setText(R.string.controller_repositories_action_add)
+		fab.setText(R.string.fragment_repositories_action_add)
 
 		// When the FAB is clicked, open a alert dialog to input a new repository
 		fab.setOnClickListener { launchAddRepositoryDialog(it) }
@@ -268,7 +268,7 @@ class RepositoryFragment : ShosetsuFragment(),
 	private fun onRefresh() {
 		if (viewModel.isOnline()) {
 			viewModel.updateRepositories()
-		} else displayOfflineSnackBar(R.string.controller_repositories_snackbar_offline_no_update)
+		} else displayOfflineSnackBar(R.string.fragment_repositories_snackbar_offline_no_update)
 	}
 
 	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -377,7 +377,7 @@ fun RepositoryContent(
 					Icon(
 						painter = painterResource(R.drawable.close),
 						contentDescription =
-						stringResource(R.string.controller_repositories_action_remove)
+						stringResource(R.string.fragment_repositories_action_remove)
 					)
 				}
 

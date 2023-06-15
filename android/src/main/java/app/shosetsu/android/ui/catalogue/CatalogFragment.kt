@@ -223,7 +223,7 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 			catch = {
 				makeSnackBar(
 					getString(
-						R.string.controller_catalogue_toast_background_add_fail,
+						R.string.fragment_catalogue_toast_background_add_fail,
 						it.message ?: "Unknown exception"
 					)
 				)?.setAction(R.string.report) { _ ->
@@ -233,13 +233,13 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 		) { result ->
 			when (result) {
 				ADDING -> {
-					makeSnackBar(R.string.controller_catalogue_toast_background_add)?.show()
+					makeSnackBar(R.string.fragment_catalogue_toast_background_add)?.show()
 				}
 
 				ADDED -> {
 					makeSnackBar(
 						getString(
-							R.string.controller_catalogue_toast_background_add_success,
+							R.string.fragment_catalogue_toast_background_add_success,
 							item.title.let {
 								if (it.length > 20)
 									it.substring(0, 20) + "..."
@@ -347,7 +347,7 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 			catch = {
 				makeSnackBar(
 					getString(
-						R.string.controller_catalogue_error_base_url,
+						R.string.fragment_catalogue_error_base_url,
 						it.message ?: "Unknown exception"
 					)
 				)?.setAction(R.string.report) { _ ->
@@ -364,7 +364,7 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 		viewModel.extensionName.observe(catch = {
 			makeSnackBar(
 				getString(
-					R.string.controller_catalogue_error_name,
+					R.string.fragment_catalogue_error_name,
 					it.message ?: "Unknown exception"
 				)
 			)?.setAction(R.string.report) { _ ->
@@ -377,7 +377,7 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 		viewModel.hasSearchLive.observe(catch = {
 			makeSnackBar(
 				getString(
-					R.string.controller_catalogue_error_has_search,
+					R.string.fragment_catalogue_error_has_search,
 					it.message ?: "Unknown exception"
 				)
 			)?.setAction(R.string.report) { _ ->
@@ -588,7 +588,7 @@ fun CatalogContentNoMore() {
 		modifier = Modifier.fillMaxWidth()
 	) {
 		Text(
-			stringResource(R.string.controller_catalogue_no_more),
+			stringResource(R.string.fragment_catalogue_no_more),
 			modifier = Modifier
 				.padding(32.dp)
 				.align(Alignment.Center)

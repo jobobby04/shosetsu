@@ -127,7 +127,7 @@ fun ConfigureExtensionContent(
 			item {
 				DropdownSettingContent(
 					title = stringResource(R.string.listings),
-					description = stringResource(R.string.controller_configure_extension_listing_desc),
+					description = stringResource(R.string.fragment_configure_extension_listing_desc),
 					choices = extensionListingResult!!.choices,
 					selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
 					onSelection = { index ->

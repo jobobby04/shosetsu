@@ -79,7 +79,7 @@ import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewMod
  */
 class BackupFragment : ShosetsuFragment() {
 
-	override val viewTitleRes: Int = R.string.controller_backup_title
+	override val viewTitleRes: Int = R.string.fragment_backup_title
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -226,7 +226,7 @@ fun BackupSettingsContent(
 	hasNoBackupSelectedForExport: Boolean,
 ) {
 	val snackbarHostState = remember { SnackbarHostState() }
-	val message = stringResource(R.string.controller_backup_error_unselected)
+	val message = stringResource(R.string.fragment_backup_error_unselected)
 
 	LaunchedEffect(hasNoBackupSelectedForExport) {
 		if (hasNoBackupSelectedForExport)
