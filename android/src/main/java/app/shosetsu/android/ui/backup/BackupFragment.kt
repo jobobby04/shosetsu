@@ -52,7 +52,7 @@ import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
 
@@ -77,7 +77,7 @@ import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewMod
  * Shosetsu
  * 13 / 07 / 2019
  */
-class BackupFragment : ShosetsuController() {
+class BackupFragment : ShosetsuFragment() {
 
 	override val viewTitleRes: Int = R.string.controller_backup_title
 

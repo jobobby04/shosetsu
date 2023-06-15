@@ -25,7 +25,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 
 /*
  * This file is part of shosetsu.
@@ -50,7 +50,7 @@ import app.shosetsu.android.view.controller.ShosetsuController
  * @since 06 / 10 / 2021
  * @author Doomsdayrs
  */
-class ComposeSettingsController : ShosetsuController() {
+class ComposeSettingsFragment : ShosetsuFragment() {
 
 	override val viewTitleRes: Int = R.string.settings
 

@@ -46,7 +46,7 @@ import app.shosetsu.android.ui.catalogue.listeners.CatalogueSearchQuery
 import app.shosetsu.android.ui.novel.CategoriesDialog
 import app.shosetsu.android.view.ComposeBottomSheetDialog
 import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
@@ -83,7 +83,7 @@ import org.acra.ACRA
  *
  * @author github.com/doomsdayrs
  */
-class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvider {
+class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider {
 	private var bsg: BottomSheetDialog? = null
 
 	/***/
@@ -277,7 +277,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 		logI("Preparing option menu")
 		optionSyncJob?.cancel()
 		optionSyncJob =
-			viewModel.novelCardTypeLive.collectLA(this@CatalogController, catch = {}) {
+			viewModel.novelCardTypeLive.collectLA(this@CatalogFragment, catch = {}) {
 				when (it) {
 					NORMAL -> {
 						menu.findItem(R.id.view_type_normal)?.isChecked = true
@@ -299,7 +299,7 @@ class CatalogController : ShosetsuController(), ExtendedFABController, MenuProvi
 				} else {
 					logV("Showing search icon")
 					(searchItem.actionView as SearchView).apply {
-						setOnQueryTextListener(CatalogueSearchQuery(this@CatalogController))
+						setOnQueryTextListener(CatalogueSearchQuery(this@CatalogFragment))
 						setOnCloseListener {
 							logV("closing search view")
 							viewModel.applyQuery("")

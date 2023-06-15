@@ -30,7 +30,7 @@ import app.shosetsu.android.common.ext.makeSnackBar
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.CollapsedToolBarController
 import app.shosetsu.android.view.controller.base.HomeFragment
 
@@ -57,8 +57,8 @@ import app.shosetsu.android.view.controller.base.HomeFragment
  *
  * Option for download queue
  */
-class ComposeMoreController
-	: ShosetsuController(), CollapsedToolBarController, HomeFragment {
+class ComposeMoreFragment
+	: ShosetsuFragment(), CollapsedToolBarController, HomeFragment {
 
 	override val viewTitleRes: Int = R.string.more
 

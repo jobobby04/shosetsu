@@ -65,7 +65,7 @@ import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.HomeFragment
@@ -86,7 +86,7 @@ import kotlinx.collections.immutable.toImmutableList
  *
  * @author github.com/doomsdayrs
  */
-class BrowseController : ShosetsuController(),
+class BrowseFragment : ShosetsuFragment(),
 	ExtendedFABController, HomeFragment, MenuProvider {
 	override val viewTitleRes: Int = R.string.browse
 

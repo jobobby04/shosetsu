@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/libraryController"
-        android:name="app.shosetsu.android.ui.library.LibraryController"
+        android:name="app.shosetsu.android.ui.library.LibraryFragment"
         android:label="LibraryController">
         <action
             android:id="@+id/action_libraryController_to_novelController"
@@ -29,7 +29,7 @@
     </fragment>
     <fragment
         android:id="@+id/addShareController"
-        android:name="app.shosetsu.android.ui.add.AddShareController"
+        android:name="app.shosetsu.android.ui.add.AddShareFragment"
         android:label="AddShareController">
         <action
             android:id="@+id/action_addShareController_to_moreController"
@@ -37,7 +37,7 @@
     </fragment>
     <fragment
         android:id="@+id/advancedSettings"
-        android:name="app.shosetsu.android.ui.settings.sub.AdvancedSettings"
+        android:name="app.shosetsu.android.ui.settings.sub.AdvancedSettingsFragment"
         android:label="AdvancedSettings">
         <action
             android:id="@+id/action_advancedSettings_to_settingsController"
@@ -53,7 +53,7 @@
     </fragment>
     <fragment
         android:id="@+id/browseController"
-        android:name="app.shosetsu.android.ui.browse.BrowseController"
+        android:name="app.shosetsu.android.ui.browse.BrowseFragment"
         android:label="BrowseController">
         <action
             android:id="@+id/action_browseController_to_catalogController"
@@ -67,7 +67,7 @@
     </fragment>
     <fragment
         android:id="@+id/catalogController"
-        android:name="app.shosetsu.android.ui.catalogue.CatalogController"
+        android:name="app.shosetsu.android.ui.catalogue.CatalogFragment"
         android:label="CatalogController">
         <action
             android:id="@+id/action_catalogController_to_novelController"
@@ -75,7 +75,7 @@
     </fragment>
     <fragment
         android:id="@+id/aboutController"
-        android:name="app.shosetsu.android.ui.about.AboutController"
+        android:name="app.shosetsu.android.ui.about.AboutFragment"
         android:label="AboutController">
         <action
             android:id="@+id/action_aboutController_to_textAssetReader"
@@ -86,7 +86,7 @@
     </fragment>
     <fragment
         android:id="@+id/configureExtension"
-        android:name="app.shosetsu.android.ui.extensionsConfigure.ConfigureExtension"
+        android:name="app.shosetsu.android.ui.extensionsConfigure.ConfigureExtensionFragment"
         android:label="ConfigureExtension">
         <action
             android:id="@+id/action_configureExtension_to_browseController"
@@ -94,7 +94,7 @@
     </fragment>
     <fragment
         android:id="@+id/downloadsController"
-        android:name="app.shosetsu.android.ui.downloads.DownloadsController"
+        android:name="app.shosetsu.android.ui.downloads.DownloadsFragment"
         android:label="DownloadsController">
         <action
             android:id="@+id/action_downloadsController_to_moreController"
@@ -102,7 +102,7 @@
     </fragment>
     <fragment
         android:id="@+id/downloadSettings"
-        android:name="app.shosetsu.android.ui.settings.sub.DownloadSettings"
+        android:name="app.shosetsu.android.ui.settings.sub.DownloadSettingsFragment"
         android:label="DownloadSettings">
         <action
             android:id="@+id/action_downloadSettings_to_settingsController"
@@ -110,7 +110,7 @@
     </fragment>
     <fragment
         android:id="@+id/migrationController"
-        android:name="app.shosetsu.android.ui.migration.MigrationController"
+        android:name="app.shosetsu.android.ui.migration.MigrationFragment"
         android:label="MigrationController">
         <action
             android:id="@+id/action_migrationController_to_libraryController"
@@ -121,7 +121,7 @@
     </fragment>
     <fragment
         android:id="@+id/novelController"
-        android:name="app.shosetsu.android.ui.novel.NovelController"
+        android:name="app.shosetsu.android.ui.novel.NovelFragment"
         android:label="NovelController">
         <action
             android:id="@+id/action_novelController_to_chapterReader"
@@ -147,7 +147,7 @@
     </fragment>
     <fragment
         android:id="@+id/readerSettings"
-        android:name="app.shosetsu.android.ui.settings.sub.ReaderSettings"
+        android:name="app.shosetsu.android.ui.settings.sub.ReaderSettingsFragment"
         android:label="ReaderSettings">
         <action
             android:id="@+id/action_readerSettings_to_CSSEditorActivity"
@@ -158,7 +158,7 @@
     </fragment>
     <fragment
         android:id="@+id/searchController"
-        android:name="app.shosetsu.android.ui.search.SearchController"
+        android:name="app.shosetsu.android.ui.search.SearchFragment"
         android:label="SearchController">
         <action
             android:id="@+id/action_searchController_to_browseController"
@@ -169,7 +169,7 @@
     </fragment>
     <fragment
         android:id="@+id/repositoryController"
-        android:name="app.shosetsu.android.ui.repository.RepositoryController"
+        android:name="app.shosetsu.android.ui.repository.RepositoryFragment"
         android:label="RepositoryController">
         <action
             android:id="@+id/action_repositoryController_to_moreController"
@@ -177,7 +177,7 @@
     </fragment>
     <fragment
         android:id="@+id/textAssetReader"
-        android:name="app.shosetsu.android.ui.settings.sub.TextAssetReader"
+        android:name="app.shosetsu.android.ui.settings.sub.TextAssetReaderFragment"
         android:label="TextAssetReader">
         <action
             android:id="@+id/action_textAssetReader_to_aboutController"
@@ -185,7 +185,7 @@
     </fragment>
     <fragment
         android:id="@+id/updateSettings"
-        android:name="app.shosetsu.android.ui.settings.sub.UpdateSettings"
+        android:name="app.shosetsu.android.ui.settings.sub.UpdateSettingsFragment"
         android:label="UpdateSettings">
         <action
             android:id="@+id/action_updateSettings_to_settingsController"
@@ -205,7 +205,7 @@
         android:label="IntroductionActivity" />
     <fragment
         android:id="@+id/moreController"
-        android:name="app.shosetsu.android.ui.more.ComposeMoreController"
+        android:name="app.shosetsu.android.ui.more.ComposeMoreFragment"
         android:label="MoreController">
         <action
             android:id="@+id/action_moreController_to_addShareController"
@@ -243,7 +243,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsController"
-        android:name="app.shosetsu.android.ui.settings.ComposeSettingsController"
+        android:name="app.shosetsu.android.ui.settings.ComposeSettingsFragment"
         android:label="SettingsController">
         <action
             android:id="@+id/action_settingsController_to_viewSettings"
@@ -266,7 +266,7 @@
     </fragment>
     <fragment
         android:id="@+id/updatesController"
-        android:name="app.shosetsu.android.ui.updates.ComposeUpdatesController"
+        android:name="app.shosetsu.android.ui.updates.ComposeUpdatesFragment"
         android:label="UpdatesController">
         <action
             android:id="@+id/action_updatesController_to_chapterReader"
@@ -277,7 +277,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewSettings"
-        android:name="app.shosetsu.android.ui.settings.sub.ViewSettings"
+        android:name="app.shosetsu.android.ui.settings.sub.ViewSettingsFragment"
         android:label="ViewSettings">
         <action
             android:id="@+id/action_viewSettings_to_settingsController"
@@ -285,7 +285,7 @@
     </fragment>
     <fragment
         android:id="@+id/categoriesController"
-        android:name="app.shosetsu.android.ui.categories.CategoriesController"
+        android:name="app.shosetsu.android.ui.categories.CategoriesFragment"
         android:label="NovelController" />
     <fragment
         android:id="@+id/historyFragment"

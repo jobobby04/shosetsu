@@ -54,7 +54,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.coverRatio
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
@@ -89,7 +89,7 @@ import org.joda.time.DateTime
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-class ComposeUpdatesController : ShosetsuController(), HomeFragment, MenuProvider {
+class ComposeUpdatesFragment : ShosetsuFragment(), HomeFragment, MenuProvider {
 	override val viewTitleRes: Int = R.string.updates
 
 	private val viewModel: AUpdatesViewModel by viewModel()
@@ -110,7 +110,7 @@ class ComposeUpdatesController : ShosetsuController(), HomeFragment, MenuProvide
 					UpdatesContent(
 						items = items,
 						isRefreshing = isRefreshing,
-						onRefresh = this@ComposeUpdatesController::onRefresh
+						onRefresh = this@ComposeUpdatesFragment::onRefresh
 					) { (chapterID, novelID) ->
 						activity?.openChapter(chapterID, novelID)
 					}

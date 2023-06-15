@@ -27,7 +27,7 @@ import app.shosetsu.android.common.consts.SHARE_HELP_URL
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.CollapsedToolBarController
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
 import app.shosetsu.lib.share.ExtensionLink
@@ -65,7 +65,7 @@ import com.google.accompanist.placeholder.material.placeholder
  * @since 07 / 03 / 2022
  * @author Doomsdayrs
  */
-class AddShareController : ShosetsuController(), CollapsedToolBarController, MenuProvider {
+class AddShareFragment : ShosetsuFragment(), CollapsedToolBarController, MenuProvider {
 
 	override val viewTitleRes: Int = R.string.qr_code_scan
 

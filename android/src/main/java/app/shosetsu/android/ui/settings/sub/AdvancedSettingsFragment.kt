@@ -27,12 +27,35 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.ACRAEnabled
+import app.shosetsu.android.common.SettingKey.AppTheme
+import app.shosetsu.android.common.SettingKey.AutoBookmarkFromQR
+import app.shosetsu.android.common.SettingKey.ConcurrentMemoryExperiment
+import app.shosetsu.android.common.SettingKey.ExposeTrueChapterDelete
+import app.shosetsu.android.common.SettingKey.LogToFile
+import app.shosetsu.android.common.SettingKey.ProxyHost
+import app.shosetsu.android.common.SettingKey.RequireDoubleBackToExit
+import app.shosetsu.android.common.SettingKey.SiteProtectionDelay
+import app.shosetsu.android.common.SettingKey.UseProxy
+import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
+import app.shosetsu.android.common.SettingKey.UserAgent
+import app.shosetsu.android.common.SettingKey.VerifyCheckSum
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.makeSnackBar
+import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.compose.setting.*
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.compose.setting.ButtonSettingContent
+import app.shosetsu.android.view.compose.setting.DropdownSettingContent
+import app.shosetsu.android.view.compose.setting.ProxySettingsContent
+import app.shosetsu.android.view.compose.setting.SliderSettingContent
+import app.shosetsu.android.view.compose.setting.StringSettingContent
+import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -62,7 +85,7 @@ import kotlinx.coroutines.runBlocking
  * Shosetsu
  * 13 / 07 / 2019
  */
-class AdvancedSettings : ShosetsuController() {
+class AdvancedSettingsFragment : ShosetsuFragment() {
 	val viewModel: AAdvancedSettingsViewModel by viewModel()
 	override val viewTitleRes: Int = R.string.settings_advanced
 

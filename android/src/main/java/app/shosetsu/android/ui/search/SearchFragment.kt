@@ -40,7 +40,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
@@ -80,7 +80,7 @@ import javax.security.auth.DestroyFailedException
  *
  * @author github.com/doomsdayrs
  */
-class SearchController : ShosetsuController(), MenuProvider {
+class SearchFragment : ShosetsuFragment(), MenuProvider {
 	override val viewTitleRes: Int = R.string.search
 	internal val viewModel: ASearchViewModel by viewModel()
 

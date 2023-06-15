@@ -21,7 +21,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.AnalyticsNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
 
@@ -48,7 +48,7 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * @since 27 / 03 / 2023
  * @author Doomsdayrs
  */
-class AnalyticsFragment : ShosetsuController() {
+class AnalyticsFragment : ShosetsuFragment() {
 	override val viewTitleRes: Int = R.string.analytics
 
 	override fun onCreateView(

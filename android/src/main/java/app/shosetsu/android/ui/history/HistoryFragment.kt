@@ -1,9 +1,22 @@
 package app.shosetsu.android.ui.history
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -29,12 +42,16 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.navigateSafely
+import app.shosetsu.android.common.ext.openChapter
+import app.shosetsu.android.common.ext.setShosetsuTransition
+import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.coverRatio
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import coil.compose.SubcomposeAsyncImage
@@ -65,7 +82,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-class HistoryFragment : ShosetsuController(), MenuProvider {
+class HistoryFragment : ShosetsuFragment(), MenuProvider {
 	override val viewTitleRes: Int = R.string.fragment_history
 
 	private val viewModel: HistoryViewModel by viewModel()

@@ -50,9 +50,9 @@ import app.shosetsu.android.common.NoSuchExtensionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.databinding.ControllerNovelJumpDialogBinding
-import app.shosetsu.android.ui.migration.MigrationController.Companion.TARGETS_BUNDLE_KEY
+import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
 import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuController
+import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
@@ -103,7 +103,7 @@ import javax.security.auth.DestroyFailedException
  *
  * The page you see when you select a novel
  */
-class NovelController : ShosetsuController(),
+class NovelFragment : ShosetsuFragment(),
 	ExtendedFABController, MenuProvider {
 
 	/*
@@ -385,7 +385,7 @@ class NovelController : ShosetsuController(),
 	}
 
 	private fun toggleBookmark() {
-		viewModel.toggleNovelBookmark().firstLa(this@NovelController, catch = {}) {
+		viewModel.toggleNovelBookmark().firstLa(this@NovelFragment, catch = {}) {
 			when (it) {
 				is ANovelViewModel.ToggleBookmarkResponse.DeleteChapters -> {
 					makeSnackBar(
@@ -496,7 +496,7 @@ class NovelController : ShosetsuController(),
 	}
 
 	private fun Flow<Boolean>.collectDeletePrevious() {
-		collectLA(this@NovelController, catch = {
+		collectLA(this@NovelFragment, catch = {
 			when (it) {
 				is SQLiteException ->
 					makeSnackBar(
