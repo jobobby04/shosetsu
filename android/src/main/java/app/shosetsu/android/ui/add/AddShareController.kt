@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,6 +25,7 @@ import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
 import app.shosetsu.android.common.consts.SHARE_HELP_URL
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuController
 import app.shosetsu.android.view.controller.base.CollapsedToolBarController
@@ -35,8 +37,6 @@ import app.shosetsu.lib.share.StyleLink
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import org.acra.ACRA
-import javax.security.auth.DestroyFailedException
 
 /*
  * This file is part of shosetsu.
@@ -69,14 +69,6 @@ class AddShareController : ShosetsuController(), CollapsedToolBarController, Men
 
 	override val viewTitleRes: Int = R.string.qr_code_scan
 
-	private val viewModel: AAddShareViewModel by viewModel()
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		arguments?.getString(BUNDLE_URL)?.let {
-			viewModel.setURL(it)
-		}
-	}
-
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -86,75 +78,27 @@ class AddShareController : ShosetsuController(), CollapsedToolBarController, Men
 		setViewTitle()
 		return ComposeView(requireContext()).apply {
 			setContent {
-				ShosetsuCompose {
-					val url by viewModel.url.collectAsState()
-					val showURLInput by viewModel.showURLInput.collectAsState()
-					val isProcessing by viewModel.isProcessing.collectAsState()
-					val isQRCodeValid by viewModel.isURLValid.collectAsState()
-					val isAdding by viewModel.isAdding.collectAsState()
-					val isComplete by viewModel.isComplete.collectAsState()
-					val isNovelOpenable by viewModel.isNovelOpenable.collectAsState()
+				AddShareView(
+					arguments?.getString(BUNDLE_URL),
+					onBackPressed = {
+						requireActivity().onBackPressedDispatcher.onBackPressed()
+					},
+					openNovel = { entity ->
+						activity?.onBackPressedDispatcher?.onBackPressed()
 
-					val isNovelAlreadyPresent by viewModel.isNovelAlreadyPresent.collectAsState()
-					val isStyleAlreadyPresent by viewModel.isStyleAlreadyPresent.collectAsState()
-					val isExtAlreadyPresent by viewModel.isExtAlreadyPresent.collectAsState()
-					val isRepoAlreadyPresent by viewModel.isRepoAlreadyPresent.collectAsState()
-
-					val novelLink by viewModel.novelLink.collectAsState()
-					val extLink by viewModel.extLink.collectAsState()
-					val repoLink by viewModel.repoLink.collectAsState()
-
-					AddShareContent(
-						showURLInput = showURLInput,
-						url = url,
-						setURL = viewModel::setURL,
-						applyURL = viewModel::applyURL,
-						isProcessing = isProcessing,
-						isUrlValid = isQRCodeValid,
-						isAdding = isAdding,
-						add = viewModel::add,
-						reject = {
-							activity?.onBackPressedDispatcher?.onBackPressed()
-						},
-						retry = viewModel::retry,
-						novelLink = novelLink,
-						extensionLink = extLink,
-						repositoryLink = repoLink,
-						isNovelAlreadyPresent = isNovelAlreadyPresent,
-						isStyleAlreadyPresent = isStyleAlreadyPresent,
-						isExtAlreadyPresent = isExtAlreadyPresent,
-						isRepoAlreadyPresent = isRepoAlreadyPresent,
-						isComplete = isComplete,
-						openNovel = {
-							val entity = viewModel.getNovel()
-
-							activity?.onBackPressedDispatcher?.onBackPressed()
-
-							if (entity != null) {
-								findNavController().navigateSafely(
-									R.id.action_moreController_to_novelController,
-									bundleOf(BundleKeys.BUNDLE_NOVEL_ID to entity.id),
-									navOptions {
-										setShosetsuTransition()
-									}
-								)
-							}
-						},
-						isNovelOpenable = isNovelOpenable
-					)
-				}
+						if (entity != null) {
+							findNavController().navigateSafely(
+								R.id.action_moreController_to_novelController,
+								bundleOf(BundleKeys.BUNDLE_NOVEL_ID to entity.id),
+								navOptions {
+									setShosetsuTransition()
+								}
+							)
+						}
+					}
+				)
 			}
 		}
-	}
-
-	override fun onDestroy() {
-		try {
-			viewModel.destroy()
-		} catch (e: DestroyFailedException) {
-			logE("Failed to destroy viewmodel", e)
-			ACRA.errorReporter.handleSilentException(e)
-		}
-		super.onDestroy()
 	}
 
 	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -167,8 +111,68 @@ class AddShareController : ShosetsuController(), CollapsedToolBarController, Men
 				requireActivity().openInWebView(SHARE_HELP_URL)
 				true
 			}
+
 			else -> false
 		}
+}
+
+@Composable
+fun AddShareView(
+	shareURL: String?,
+	viewModel: AAddShareViewModel = viewModelDi(),
+	onBackPressed: () -> Unit,
+	openNovel: (NovelEntity?) -> Unit
+) {
+	LaunchedEffect(shareURL) {
+		if (shareURL != null)
+			viewModel.setURL(shareURL)
+	}
+
+	ShosetsuCompose {
+		val url by viewModel.url.collectAsState()
+		val showURLInput by viewModel.showURLInput.collectAsState()
+		val isProcessing by viewModel.isProcessing.collectAsState()
+		val isQRCodeValid by viewModel.isURLValid.collectAsState()
+		val isAdding by viewModel.isAdding.collectAsState()
+		val isComplete by viewModel.isComplete.collectAsState()
+		val isNovelOpenable by viewModel.isNovelOpenable.collectAsState()
+
+		val isNovelAlreadyPresent by viewModel.isNovelAlreadyPresent.collectAsState()
+		val isStyleAlreadyPresent by viewModel.isStyleAlreadyPresent.collectAsState()
+		val isExtAlreadyPresent by viewModel.isExtAlreadyPresent.collectAsState()
+		val isRepoAlreadyPresent by viewModel.isRepoAlreadyPresent.collectAsState()
+
+		val novelLink by viewModel.novelLink.collectAsState()
+		val extLink by viewModel.extLink.collectAsState()
+		val repoLink by viewModel.repoLink.collectAsState()
+//
+		AddShareContent(
+			showURLInput = showURLInput,
+			url = url,
+			setURL = viewModel::setURL,
+			applyURL = viewModel::applyURL,
+			isProcessing = isProcessing,
+			isUrlValid = isQRCodeValid,
+			isAdding = isAdding,
+			add = viewModel::add,
+			reject = onBackPressed,
+			retry = viewModel::retry,
+			novelLink = novelLink,
+			extensionLink = extLink,
+			repositoryLink = repoLink,
+			isNovelAlreadyPresent = isNovelAlreadyPresent,
+			isStyleAlreadyPresent = isStyleAlreadyPresent,
+			isExtAlreadyPresent = isExtAlreadyPresent,
+			isRepoAlreadyPresent = isRepoAlreadyPresent,
+			isComplete = isComplete,
+			openNovel = {
+				val entity = viewModel.getNovel()
+
+				openNovel(entity)
+			},
+			isNovelOpenable = isNovelOpenable
+		)
+	}
 }
 
 @Preview
