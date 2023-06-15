@@ -104,7 +104,7 @@ fun NovelCardNormalContent(
 					.data(imageURL)
 					.crossfade(true)
 					.build(),
-				stringResource(R.string.controller_novel_info_image),
+				stringResource(R.string.fragment_novel_info_image),
 				modifier = Modifier
 					.fillMaxSize()
 					.aspectRatio(coverRatio)
@@ -215,7 +215,7 @@ fun NovelCardCozyContent(
 						.data(imageURL)
 						.crossfade(true)
 						.build(),
-					stringResource(R.string.controller_novel_info_image),
+					stringResource(R.string.fragment_novel_info_image),
 					modifier = Modifier
 						.fillMaxSize()
 						.aspectRatio(coverRatio)
@@ -306,7 +306,7 @@ fun NovelCardCompressedContent(
 							.data(imageURL)
 							.crossfade(true)
 							.build(),
-						stringResource(R.string.controller_novel_info_image),
+						stringResource(R.string.fragment_novel_info_image),
 						modifier = Modifier
 							.width(64.dp)
 							.aspectRatio(1.0f),

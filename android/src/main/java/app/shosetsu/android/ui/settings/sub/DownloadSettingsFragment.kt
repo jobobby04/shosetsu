@@ -111,7 +111,7 @@ class DownloadSettingsFragment : ShosetsuFragment() {
 
 			makeSnackBar(
 				getString(
-					R.string.controller_settings_restart_worker,
+					R.string.fragment_settings_restart_worker,
 					getString(R.string.worker_title_download)
 				),
 				Snackbar.LENGTH_LONG

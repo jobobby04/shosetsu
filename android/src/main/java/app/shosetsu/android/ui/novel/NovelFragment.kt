@@ -49,7 +49,7 @@ import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.NoSuchExtensionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.databinding.ControllerNovelJumpDialogBinding
+import app.shosetsu.android.databinding.FragmentNovelJumpDialogBinding
 import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
@@ -172,7 +172,7 @@ class NovelFragment : ShosetsuFragment(),
 			if (chapterUI != null) {
 				activity?.openChapter(chapterUI)
 			} else {
-				makeSnackBar(string.controller_novel_snackbar_finished_reading)?.show()
+				makeSnackBar(string.fragment_novel_snackbar_finished_reading)?.show()
 			}
 		}
 	}
@@ -200,7 +200,7 @@ class NovelFragment : ShosetsuFragment(),
 					catch = {
 						makeSnackBar(
 							getString(
-								string.controller_novel_error_share,
+								string.fragment_novel_error_share,
 								it.message ?: "Unknown"
 							)
 						)
@@ -280,16 +280,16 @@ class NovelFragment : ShosetsuFragment(),
 
 	private fun openChapterJumpDialog() {
 		val binding =
-			ControllerNovelJumpDialogBinding.inflate(LayoutInflater.from(requireActivity()))
+			FragmentNovelJumpDialogBinding.inflate(LayoutInflater.from(requireActivity()))
 
 		// Change hint & input type depending on findByChapterName state
 		binding.findByChapterName.setOnCheckedChangeListener { _, isChecked ->
 			if (isChecked) {
 				binding.editTextNumber.inputType = TYPE_TEXT_FLAG_NO_SUGGESTIONS
-				binding.editTextNumber.setHint(string.controller_novel_jump_dialog_hint_chapter_title)
+				binding.editTextNumber.setHint(string.fragment_novel_jump_dialog_hint_chapter_title)
 			} else {
 				binding.editTextNumber.inputType = TYPE_NUMBER_FLAG_DECIMAL
-				binding.editTextNumber.setHint(string.controller_novel_jump_dialog_hint_chapter_number)
+				binding.editTextNumber.setHint(string.fragment_novel_jump_dialog_hint_chapter_number)
 			}
 		}
 
@@ -391,7 +391,7 @@ class NovelFragment : ShosetsuFragment(),
 					makeSnackBar(
 						try {
 							resources.getQuantityString(
-								plurals.controller_novel_toggle_delete_chapters,
+								plurals.fragment_novel_toggle_delete_chapters,
 								it.chapters,
 								it.chapters
 							)
@@ -435,7 +435,7 @@ class NovelFragment : ShosetsuFragment(),
 					if (viewModel.isOnline()) {
 						refresh()
 					} else {
-						displayOfflineSnackBar(string.controller_novel_snackbar_cannot_inital_load_offline)
+						displayOfflineSnackBar(string.fragment_novel_snackbar_cannot_inital_load_offline)
 					}
 				}
 
@@ -501,7 +501,7 @@ class NovelFragment : ShosetsuFragment(),
 				is SQLiteException ->
 					makeSnackBar(
 						getString(
-							string.controller_novel_delete_previous_fail,
+							string.fragment_novel_delete_previous_fail,
 							it.message ?: ""
 						)
 					)?.show()
@@ -509,7 +509,7 @@ class NovelFragment : ShosetsuFragment(),
 				is FilePermissionException ->
 					makeSnackBar(
 						getString(
-							string.controller_novel_delete_previous_fail,
+							string.fragment_novel_delete_previous_fail,
 							it.message ?: ""
 						)
 					)?.show()
@@ -542,7 +542,7 @@ class NovelFragment : ShosetsuFragment(),
 			if (it != null)
 				makeSnackBar(
 					getString(
-						string.controller_novel_error_load,
+						string.fragment_novel_error_load,
 						it.message ?: "Unknown"
 					)
 				)?.setAction(string.report) { _ ->
@@ -554,7 +554,7 @@ class NovelFragment : ShosetsuFragment(),
 			if (it != null)
 				makeSnackBar(
 					getString(
-						string.controller_novel_error_load_chapters,
+						string.fragment_novel_error_load_chapters,
 						it.message ?: "Unknown"
 					)
 				)?.setAction(string.report) { _ ->
@@ -574,7 +574,7 @@ class NovelFragment : ShosetsuFragment(),
 			catch = {
 				makeSnackBar(
 					getString(
-						string.controller_novel_error_url,
+						string.fragment_novel_error_url,
 						it.message ?: "Unknown"
 					)
 				)
@@ -636,7 +636,7 @@ class NovelFragment : ShosetsuFragment(),
 				catch = {
 					makeSnackBar(
 						getString(
-							string.controller_novel_error_true_delete,
+							string.fragment_novel_error_true_delete,
 							it.message ?: "Unknown"
 						)
 					)
@@ -867,7 +867,7 @@ fun NovelInfoContent(
 					) {
 						Icon(
 							painterResource(drawable.download),
-							stringResource(string.controller_novel_selected_download)
+							stringResource(string.fragment_novel_selected_download)
 						)
 					}
 					IconButton(
@@ -876,7 +876,7 @@ fun NovelInfoContent(
 					) {
 						Icon(
 							painterResource(drawable.trash),
-							stringResource(string.controller_novel_selected_delete)
+							stringResource(string.fragment_novel_selected_delete)
 						)
 					}
 					IconButton(
@@ -885,7 +885,7 @@ fun NovelInfoContent(
 					) {
 						Icon(
 							painterResource(drawable.read_mark),
-							stringResource(string.controller_novel_selected_read)
+							stringResource(string.fragment_novel_selected_read)
 						)
 					}
 					IconButton(
@@ -894,7 +894,7 @@ fun NovelInfoContent(
 					) {
 						Icon(
 							painterResource(drawable.unread_mark),
-							stringResource(string.controller_novel_selected_unread)
+							stringResource(string.fragment_novel_selected_unread)
 						)
 					}
 					IconButton(
@@ -903,7 +903,7 @@ fun NovelInfoContent(
 					) {
 						Icon(
 							painterResource(drawable.ic_outline_bookmark_add_24),
-							stringResource(string.controller_novel_selected_bookmark)
+							stringResource(string.fragment_novel_selected_bookmark)
 						)
 					}
 					IconButton(
@@ -912,7 +912,7 @@ fun NovelInfoContent(
 					) {
 						Icon(
 							painterResource(drawable.ic_baseline_bookmark_remove_24),
-							stringResource(string.controller_novel_selected_unbookmark)
+							stringResource(string.fragment_novel_selected_unbookmark)
 						)
 					}
 				}
@@ -1009,7 +1009,7 @@ fun NovelChapterContent(
 					if (chapter.readingStatus == ReadingStatus.READING)
 						Row {
 							Text(
-								stringResource(string.controller_novel_chapter_position),
+								stringResource(string.fragment_novel_chapter_position),
 								fontSize = 12.sp,
 								modifier = Modifier.padding(end = 4.dp)
 							)
@@ -1077,7 +1077,7 @@ fun NovelInfoCoverContent(
 			.data(imageURL)
 			.crossfade(true)
 			.build(),
-		stringResource(string.controller_novel_info_image),
+		stringResource(string.fragment_novel_info_image),
 		modifier = modifier
 			.clickable(onClick = onClick),
 		contentScale = contentScale,
@@ -1125,7 +1125,7 @@ fun NovelInfoHeaderContent(
 					.data(novelInfo.imageURL)
 					.crossfade(true)
 					.build(),
-				stringResource(string.controller_novel_info_image),
+				stringResource(string.fragment_novel_info_image),
 				modifier = Modifier
 					.matchParentSize()
 					.alpha(.10f),
@@ -1270,9 +1270,9 @@ fun NovelInfoHeaderContent(
 							Text(
 								stringResource(
 									if (novelInfo.bookmarked) {
-										string.controller_novel_in_library
+										string.fragment_novel_in_library
 									} else {
-										string.controller_novel_add_to_library
+										string.fragment_novel_add_to_library
 									}
 								),
 								style = MaterialTheme.typography.bodyLarge,
@@ -1302,7 +1302,7 @@ fun NovelInfoHeaderContent(
 							)
 							Spacer(Modifier.height(4.dp))
 							Text(
-								stringResource(string.controller_novel_info_open_web_text),
+								stringResource(string.fragment_novel_info_open_web_text),
 								color = MaterialTheme.colorScheme.onSurface,
 								fontSize = 12.sp,
 								textAlign = TextAlign.Center,

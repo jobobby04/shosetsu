@@ -16,9 +16,9 @@ import app.shosetsu.android.common.ext.collectLatestLA
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.makeSnackBar
-import app.shosetsu.android.databinding.ControllerNovelInfoBottomMenu0Binding
-import app.shosetsu.android.databinding.ControllerNovelInfoBottomMenu1Binding
-import app.shosetsu.android.databinding.ControllerNovelInfoBottomMenuBinding
+import app.shosetsu.android.databinding.FragmentNovelInfoBottomMenu0Binding
+import app.shosetsu.android.databinding.FragmentNovelInfoBottomMenu1Binding
+import app.shosetsu.android.databinding.FragmentNovelInfoBottomMenuBinding
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
 import kotlinx.coroutines.flow.SharedFlow
@@ -59,7 +59,7 @@ class NovelFilterMenuBuilder(
 		viewModel.updateNovelSetting(novelSettingUI)
 
 	fun build(): View =
-		ControllerNovelInfoBottomMenuBinding.inflate(
+		FragmentNovelInfoBottomMenuBinding.inflate(
 			inflater
 		).also { binding ->
 			// The work is done purely on the viewPager
@@ -179,8 +179,8 @@ class NovelFilterMenuBuilder(
 		}
 
 		override fun isViewFromObject(view: View, obj: Any): Boolean = view == obj
-		lateinit var menu0: ControllerNovelInfoBottomMenu0Binding
-		lateinit var menu1: ControllerNovelInfoBottomMenu1Binding
+		lateinit var menu0: FragmentNovelInfoBottomMenu0Binding
+		lateinit var menu1: FragmentNovelInfoBottomMenu1Binding
 
 		private var menu0Created = false
 		private var menu1Created = false
@@ -198,7 +198,7 @@ class NovelFilterMenuBuilder(
 		override fun instantiateItem(container: ViewGroup, position: Int): Any {
 			when (position) {
 				0 -> {
-					val view = ControllerNovelInfoBottomMenu0Binding.inflate(
+					val view = FragmentNovelInfoBottomMenu0Binding.inflate(
 						inflater,
 						container,
 						false
@@ -210,7 +210,7 @@ class NovelFilterMenuBuilder(
 					return view
 				}
 				1 -> {
-					val view = ControllerNovelInfoBottomMenu1Binding.inflate(
+					val view = FragmentNovelInfoBottomMenu1Binding.inflate(
 						inflater,
 						container,
 						false

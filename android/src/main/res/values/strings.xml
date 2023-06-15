@@ -34,7 +34,7 @@
     <string name="settings_view">Settings > View</string>
     <string name="settings_reader">Settings > Reader</string>
     <string name="settings_advanced">Settings > Advanced</string>
-    <string name="controller_backup_title">Backup</string>
+    <string name="fragment_backup_title">Backup</string>
 
 
     <!-- Reader Settings -->
@@ -44,7 +44,7 @@
 
     <string name="novel_author">Author(s): </string>
     <string name="download">Download</string>
-    <string name="controller_novel_chapter_position">Position:</string>
+    <string name="fragment_novel_chapter_position">Position:</string>
     <string name="backup_now">Backup Now</string>
     <string name="pending">Pending</string>
     <string name="downloaded">Downloaded</string>
@@ -203,8 +203,8 @@
     <string name="restart">Restart</string>
     <string name="need_restart">Activity needs to restart</string>
     <string name="never_mind">Nevermind</string>
-    <string name="controller_novel_in_library">In library</string>
-    <string name="controller_novel_add_to_library">Add to library</string>
+    <string name="fragment_novel_in_library">In library</string>
+    <string name="fragment_novel_add_to_library">Add to library</string>
     <string name="obsolete_extension">Obsolete extension! Please uninstall.</string>
     <string name="id_label">ID:</string>
     <string name="repositories">Repositories</string>
@@ -255,9 +255,9 @@
     <string name="toast_repository_added">Repository Added</string>
     <string name="toast_repository_add_fail">Failed to add repository</string>
     <string name="toast_repository_remove_fail">Failed to remove repository!</string>
-    <string name="controller_repositories_snackbar_repo_changed">Refresh the repositories?</string>
-    <string name="controller_repositories_snackbar_repo_removed">Repository removed.</string>
-    <string name="controller_repositories_action_add">Add</string>
+    <string name="fragment_repositories_snackbar_repo_changed">Refresh the repositories?</string>
+    <string name="fragment_repositories_snackbar_repo_removed">Repository removed.</string>
+    <string name="fragment_repositories_action_add">Add</string>
 
     <string name="categories">Categories</string>
     <string name="set_categories">Set categories</string>
@@ -267,8 +267,8 @@
     <string name="toast_categories_add_fail">Failed to add category</string>
     <string name="toast_categories_remove_fail">Failed to remove category!</string>
     <string name="toast_categories_move_fail">Failed to move category</string>
-    <string name="controller_categories_snackbar_repo_removed">Category removed.</string>
-    <string name="controller_categories_action_add">Add</string>
+    <string name="fragment_categories_snackbar_repo_removed">Category removed.</string>
+    <string name="fragment_categories_action_add">Add</string>
     <string name="alert_dialog_title_warn_categories_removal">Category Removal Warning</string>
     <string name="alert_dialog_message_warn_categories_removal">Are you sure about removing this category?</string>
 
@@ -308,10 +308,10 @@
     <string name="empty_repositories_action">Add Repository</string>
 
 
-    <string name="controller_catalogue_toast_background_add">Adding to library in background</string>
+    <string name="fragment_catalogue_toast_background_add">Adding to library in background</string>
     <string name="jump_to_chapter">Jump to Chapter</string>
-    <string name="controller_novel_jump_dialog_hint_chapter_number">Chapter Number</string>
-    <string name="controller_novel_jump_dialog_hint_chapter_title">Chapter Title</string>
+    <string name="fragment_novel_jump_dialog_hint_chapter_number">Chapter Number</string>
+    <string name="fragment_novel_jump_dialog_hint_chapter_title">Chapter Title</string>
     <string name="alert_dialog_jump_positive">Jump</string>
     <string name="help">Help</string>
     <string name="settings_advanced_verify_checksum_title">Verify extension check sum</string>
@@ -328,23 +328,23 @@
     <string name="settings_reader_keep_screen_on">Keep screen on</string>
     <string name="settings_reader_keep_screen_on_desc">The chapter reader will keep the screen on while open</string>
     <string name="toast_error_chapter_jump_invalid_target">No chapter found</string>
-    <string name="controller_novel_jum_dialog_by_title">Search by chapter title</string>
+    <string name="fragment_novel_jum_dialog_by_title">Search by chapter title</string>
 
     <string name="toast_error_chapter_jump_invalid_number">Chapter number required</string>
     <string name="toast_error_chapter_jump_empty_title">Chapter title needed</string>
-    <string name="controller_browse_option_Import">Import Novel</string>
-    <string name="controller_repositories_action_repo_update">Refresh</string>
+    <string name="fragment_browse_option_Import">Import Novel</string>
+    <string name="fragment_repositories_action_repo_update">Refresh</string>
     <string name="generic_undo">Undo</string>
     <string name="generic_question_retry">Retry?</string>
-    <string name="controller_repositories_snackbar_fail_undo_repo_removal">Failed to undo repository removal</string>
+    <string name="fragment_repositories_snackbar_fail_undo_repo_removal">Failed to undo repository removal</string>
     <string name="generic_wifi_settings">Wi-Fi Settings</string>
-    <string name="controller_browse_snackbar_not_installed">Extension is not installed</string>
-    <string name="controller_browse_snackbar_offline_no_extension">Extensions cannot be used offline</string>
-    <string name="controller_browse_snackbar_offline_no_update_extension">Cannot update when offline</string>
-    <string name="controller_browse_snackbar_offline_no_install_extension">Cannot install when offline</string>
+    <string name="fragment_browse_snackbar_not_installed">Extension is not installed</string>
+    <string name="fragment_browse_snackbar_offline_no_extension">Extensions cannot be used offline</string>
+    <string name="fragment_browse_snackbar_offline_no_update_extension">Cannot update when offline</string>
+    <string name="fragment_browse_snackbar_offline_no_install_extension">Cannot install when offline</string>
     <string name="generic_error_cannot_update_library_offline">Novels cannot be updated offline</string>
-    <string name="controller_downloads_snackbar_offline_no_download">Cannot download when offline</string>
-    <string name="controller_repositories_snackbar_offline_no_update">Cannot update repositories offline</string>
+    <string name="fragment_downloads_snackbar_offline_no_download">Cannot download when offline</string>
+    <string name="fragment_repositories_snackbar_offline_no_update">Cannot update repositories offline</string>
     <string name="notification_content_title_extension_download">Extension Downloader</string>
 
     <string name="notification_content_text_extension_download">Downloading %s</string>
@@ -358,18 +358,18 @@
     <string name="settings_download_notify_extension_install_desc">Create a notification displaying progress when an extension is being downloaded/installed.</string>
     <string name="restore_notification_content_settings_restore">Restore novel settings</string>
     <string name="restore_notification_content_categories_restore">Restore novel categories</string>
-    <string name="controller_novel_snackbar_cannot_inital_load_offline">Cannot load novel content while offline</string>
-    <string name="controller_novel_snackbar_finished_reading">You have read all the chapters.</string>
+    <string name="fragment_novel_snackbar_cannot_inital_load_offline">Cannot load novel content while offline</string>
+    <string name="fragment_novel_snackbar_finished_reading">You have read all the chapters.</string>
     <string name="worker_title_download">Chapter Downloader</string>
-    <string name="controller_settings_restart_worker">Restart %s to apply new settings</string>
+    <string name="fragment_settings_restart_worker">Restart %s to apply new settings</string>
     <string name="settings_update_header_repositories">Repositories</string>
     <string name="settings_update_header_novel">Novels</string>
     <string name="settings_advanced_purge_button">PURGE</string>
-    <string name="controller_settings_advanced_snackbar_purge_failure">Failed to purge</string>
-    <string name="controller_settings_advanced_snackbar_purge_success">Purged unbookmarked novels</string>
+    <string name="fragment_settings_advanced_snackbar_purge_failure">Failed to purge</string>
+    <string name="fragment_settings_advanced_snackbar_purge_success">Purged unbookmarked novels</string>
     <string name="worker_novel_update_load_failure">Failed to update %s</string>
-    <string name="controller_settings_advanced_snackbar_ui_change">Press apply to change the UI</string>
-    <string name="controller_catalogue_toast_background_add_success">Added \“%s\” to Library</string>
+    <string name="fragment_settings_advanced_snackbar_ui_change">Press apply to change the UI</string>
+    <string name="fragment_catalogue_toast_background_add_success">Added \“%s\” to Library</string>
     <string name="jump_to_chapter_short">Jump</string>
     <string name="worker_novel_update_updated_novel">New chapters available for \“%s\”</string>
     <string name="worker_novel_updating_silent">Updating novels…</string>
@@ -381,7 +381,7 @@
     <string name="settings_reader_fullscreen_focus">Match fullscreen to focus</string>
     <string name="settings_reader_fullscreen_focus_desc">Match the fullscreen state to the reader focus mode</string>
     <string name="languages">Languages</string>
-    <string name="controller_browse_filter_only_installed">Show only installed</string>
+    <string name="fragment_browse_filter_only_installed">Show only installed</string>
     <string name="activity_main_backup_in_progress">Backup in progress</string>
     <string name="activity_main_backup_in_progress_warning">Please avoid changing data</string>
     <string name="settings_update_repo_disable_on_fail_title">Disable on fail</string>
@@ -428,7 +428,7 @@
     <string name="restore_notification_content_novel_fail_parse">Failed to parse novel</string>
     <string name="restore_notification_content_novel_fail_parse_http">HTTP error occurred, code: %s</string>
     <string name="restore_notification_content_novel_fail_lua">Failed to parse novel, lua: %s</string>
-    <string name="controller_browse_filter_name_label">Extension Name</string>
+    <string name="fragment_browse_filter_name_label">Extension Name</string>
     <string name="settings_view_legacy_nav_title">Use legacy navigation</string>
     <string name="settings_view_legacy_nav_desc">Use legacy drawer navigation</string>
     <string name="settings_reader_text_alignment_title">Text Alignment</string>
@@ -480,21 +480,21 @@
     <string name="settings_advanced_theme_desc">Change the theme that the application uses</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Removes any unbookmarked novels & info from Shosetsu]]></string>
     <string name="settings_advanced_kill_cycle_workers_button">Kill</string>
-    <string name="controller_configure_extension_listing_desc">What list of novels should be displayed when the user opens up the extension to browse</string>
-    <string name="controller_downloads_set_all_pending_title">Set all pending</string>
-    <string name="controller_downloads_delete_all_title">Delete All</string>
-    <string name="controller_novel_true_delete">True Delete</string>
+    <string name="fragment_configure_extension_listing_desc">What list of novels should be displayed when the user opens up the extension to browse</string>
+    <string name="fragment_downloads_set_all_pending_title">Set all pending</string>
+    <string name="fragment_downloads_delete_all_title">Delete All</string>
+    <string name="fragment_novel_true_delete">True Delete</string>
     <string name="settings_advanced_true_chapter_delete_title">Show True Chapter Delete</string>
     <string name="settings_advanced_true_chapter_delete_desc">Expose an option to truly remove a chapter from Shosetsu.\nUseful when a chapter is bugging</string>
     <string name="toast_error_log_failed">Failed to create logfile, No logs will be stored</string>
     <string name="worker_backup_complete">Backup Complete</string>
-    <string name="controller_browse_ext_icon_desc">Icon of the extension</string>
+    <string name="fragment_browse_ext_icon_desc">Icon of the extension</string>
     <string name="backup_restore_print_chapters_title">Print chapter names during restore</string>
     <string name="backup_restore_print_chapters_desc">Print chapter names to log during restore.\nUseful for debugging, not useful otherwise.\nMust be set before restoring</string>
     <string name="restore_notification_content_novel_fail_io">IOException: %s</string>
     <string name="backup_only_modified_title">Backup only modified</string>
     <string name="backup_only_modified_desc">Backup only modified chapters, this saves on memory and file size</string>
-    <string name="controller_backup_error_unselected">No backup has been selected to export</string>
+    <string name="fragment_backup_error_unselected">No backup has been selected to export</string>
     <string name="export_backup_notification_missing_uri">URI not provided to export backup to</string>
     <string name="export_backup_notification_invalid_backup">No such backup exists</string>
     <string name="settings_advanced_log_title">Log to file</string>
@@ -512,42 +512,42 @@
     <string name="qr_code_scan">Add share link</string>
     <string name="menu_share_url">Basic URL</string>
     <string name="menu_share_qr">QR Code</string>
-    <string name="controller_add_following">The following will be added</string>
-    <string name="controller_add_extension">Extension</string>
-    <string name="controller_add_repository">Repository</string>
-    <string name="controller_add_novel">Novel</string>
-    <string name="controller_add_invalid">Invalid URL code</string>
-    <string name="controller_add_present_novel">This novel is already present: %s</string>
-    <string name="controller_add_present_style">This style is already present: %s</string>
-    <string name="controller_add_present_ext">This extension is already present: %s</string>
-    <string name="controller_add_present_repo">This repository is already present: %s</string>
-    <string name="controller_add_open_novel">Open Novel</string>
+    <string name="fragment_add_following">The following will be added</string>
+    <string name="fragment_add_extension">Extension</string>
+    <string name="fragment_add_repository">Repository</string>
+    <string name="fragment_add_novel">Novel</string>
+    <string name="fragment_add_invalid">Invalid URL code</string>
+    <string name="fragment_add_present_novel">This novel is already present: %s</string>
+    <string name="fragment_add_present_style">This style is already present: %s</string>
+    <string name="fragment_add_present_ext">This extension is already present: %s</string>
+    <string name="fragment_add_present_repo">This repository is already present: %s</string>
+    <string name="fragment_add_open_novel">Open Novel</string>
     <string name="settings_advanced_auto_bookmark_title">Bookmark from QR</string>
     <string name="settings_advanced_auto_bookmark_desc">Automatically bookmark novels that are scanned via QR code.</string>
     <string name="reader_last_chapter">Last chapter:</string>
     <string name="reader_next_chapter">Next chapter:</string>
-    <string name="controller_library_menu_tri_by_title">By title</string>
-    <string name="controller_library_menu_tri_by_unread">By unread chapter count</string>
-    <string name="controller_library_menu_tri_by_id">By novel ID</string>
-    <string name="controller_library_menu_tri_by_source">By source</string>
-    <string name="controller_library_menu_tri_by_date">By date</string>
-    <string name="controller_novel_info_image">Image of the novel</string>
+    <string name="fragment_library_menu_tri_by_title">By title</string>
+    <string name="fragment_library_menu_tri_by_unread">By unread chapter count</string>
+    <string name="fragment_library_menu_tri_by_id">By novel ID</string>
+    <string name="fragment_library_menu_tri_by_source">By source</string>
+    <string name="fragment_library_menu_tri_by_date">By date</string>
+    <string name="fragment_novel_info_image">Image of the novel</string>
     <string name="action_open_in_webview">Open in webview</string>
     <string name="reader_first_focus">Click the content to unfocus.</string>
     <string name="reader_first_focus_dismiss">Dismiss</string>
-    <string name="controller_catalogue_toast_background_add_fail">Failed to add: %s</string>
-    <string name="controller_catalogue_error_base_url">Error getting URL for extension: %s</string>
-    <string name="controller_catalogue_error_name">Error getting name of extension: %s</string>
-    <string name="controller_catalogue_error_has_search">Error checking if extension has search: %s</string>
+    <string name="fragment_catalogue_toast_background_add_fail">Failed to add: %s</string>
+    <string name="fragment_catalogue_error_base_url">Error getting URL for extension: %s</string>
+    <string name="fragment_catalogue_error_name">Error getting name of extension: %s</string>
+    <string name="fragment_catalogue_error_has_search">Error checking if extension has search: %s</string>
     <string name="report">Report</string>
     <string name="activity_main_error_theme">Error collecting app theme: %s</string>
     <string name="activity_main_error_update_check">Error running app update: %s</string>
     <string name="activity_main_error_handle_update">Error handling app update: %s</string>
-    <string name="controller_novel_error_url">Error getting novel url: %s</string>
-    <string name="controller_novel_error_load">Error loading novel: %s</string>
-    <string name="controller_novel_error_load_chapters">Error getting chapters: %s</string>
-    <string name="controller_novel_error_share">Error getting share: %s</string>
-    <string name="controller_novel_error_true_delete">Error checking for true delete: %s</string>
+    <string name="fragment_novel_error_url">Error getting novel url: %s</string>
+    <string name="fragment_novel_error_load">Error loading novel: %s</string>
+    <string name="fragment_novel_error_load_chapters">Error getting chapters: %s</string>
+    <string name="fragment_novel_error_share">Error getting share: %s</string>
+    <string name="fragment_novel_error_true_delete">Error checking for true delete: %s</string>
     <string name="worker_export_backup_null_resolver">Null content resolver when trying to write backup</string>
     <string name="worker_export_backup_file_missing">How can the export file be missing</string>
     <string name="worker_export_backup_missing_perm">Missing permissions to write backup</string>
@@ -558,20 +558,20 @@
     <string name="worker_extension_install_error_io">IOException</string>
     <string name="worker_extension_install_error_get_sql">SQL Error when getting extension</string>
     <string name="less">Less</string>
-    <string name="controller_novel_selected_download">Download selected chapters</string>
-    <string name="controller_novel_selected_delete">Delete selected chapters from storage</string>
-    <string name="controller_novel_selected_read">Mark selected chapters as read</string>
-    <string name="controller_novel_selected_unread">Mark selected chapters as unread</string>
-    <string name="controller_novel_selected_bookmark">Bookmark selected chapters</string>
-    <string name="controller_novel_selected_unbookmark">Unbookmark selected chapters</string>
+    <string name="fragment_novel_selected_download">Download selected chapters</string>
+    <string name="fragment_novel_selected_delete">Delete selected chapters from storage</string>
+    <string name="fragment_novel_selected_read">Mark selected chapters as read</string>
+    <string name="fragment_novel_selected_unread">Mark selected chapters as unread</string>
+    <string name="fragment_novel_selected_bookmark">Bookmark selected chapters</string>
+    <string name="fragment_novel_selected_unbookmark">Unbookmark selected chapters</string>
     <string name="settings_reader_double_tap">Double tap to toggle focus</string>
     <string name="settings_reader_double_tap_desc">Instead of a single tap, require a double tap to toggle the focus in the reader.</string>
     <string name="settings_reader_double_tap_system">Double tap to toggle system UI</string>
     <string name="settings_reader_double_tap_system_desc">By double tapping, one can toggle the system UI in the reader.\nDoes not work with double tap to toggle focus.</string>
-    <string name="controller_novel_info_open_web_text">Webview</string>
-    <string name="controller_catalogue_no_more">No more content, Sorry!</string>
+    <string name="fragment_novel_info_open_web_text">Webview</string>
+    <string name="fragment_catalogue_no_more">No more content, Sorry!</string>
 
-    <string name="controller_repositories_action_remove">Remove repository</string>
+    <string name="fragment_repositories_action_remove">Remove repository</string>
 
     <string name="backup_restore_low_storage">Backup on low storage</string>
     <string name="backup_restore_low_storage_desc">Allows backups to occur on low storage, also effects cycle worker</string>
@@ -583,7 +583,7 @@
     <string name="settings_advanced_force_repo_update_title">Force repo sync</string>
     <string name="settings_advanced_force_repo_update_desc">Sometimes, Repo sync does not load properly. This will force the repo to update.</string>
     <string name="force">Force</string>
-    <string name="controller_novel_delete_previous_fail">Failed to delete previous chapter: %s</string>
+    <string name="fragment_novel_delete_previous_fail">Failed to delete previous chapter: %s</string>
     <string name="missing_extension">Extension is missing %i</string>
     <string name="fragment_about_acra_id">ACRA Identification</string>
     <string name="intro_acra">Enable Error Reporting</string>
@@ -597,7 +597,7 @@
     <string name="intro_close">Close introduction</string>
     <string name="settings_backup_cycle_desc">How often should backups be automatically made</string>
     <string name="settings_backup_cycle_title">Backup Frequency</string>
-    <string name="controller_repositories_add_error">Invalid URL</string>
+    <string name="fragment_repositories_add_error">Invalid URL</string>
     <string name="categories_empty">There are no categories, add one!</string>
     <string name="settings_reader_table_hack_title">Enable table hack</string>
     <string name="settings_reader_table_hack_desc">Force tables to have a scroll bar for overflows. Enabling this can break accessibility functionality.</string>
@@ -609,7 +609,7 @@
     <string name="settings_reader_text_sel_desc">If you have issues with accidently selecting text, this can help you.</string>
     <string name="editor">Editor</string>
     <string name="preview">Preview</string>
-    <string name="controller_library_menu_tri_by_updated">By last updated</string>
+    <string name="fragment_library_menu_tri_by_updated">By last updated</string>
     <string name="clear">Clear</string>
     <string name="before">Before</string>
     <string name="fragment_updates_clear">Select date to clear updates before</string>
@@ -643,7 +643,7 @@
     <string name="fragment_history_picker_date">Select date to clear before</string>
     <string name="settings_download_delete_on_read_title">Delete on read</string>
     <string name="settings_download_delete_on_read_desc">What chapter to delete when a chapter is read (includes previous chapters).</string>
-    <string name="controller_library_menu_tri_by_read_time">By last read</string>
+    <string name="fragment_library_menu_tri_by_read_time">By last read</string>
     <string name="settings_advanced_ua_title">User agent</string>
     <string name="settings_advanced_ua_desc">Identification to send to sites when making requests. Changes applied after restart.</string>
     <string name="settings_advanced_sua_title">Enable shosetsu user agent</string>
@@ -655,7 +655,7 @@
     <string name="settings_reader_track_long_reading_title">Track long reading</string>
     <string name="settings_reader_track_long_reading_desc">Track users reading time to ensure the user maintains their eye health by requiring the user to look at something 5-10 meters away for 20 seconds every 20 minutes.</string>
     <string name="global_search">Global Search\n</string>
-    <plurals name="controller_novel_toggle_delete_chapters">
+    <plurals name="fragment_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>
         <item quantity="other">Delete %d chapters?</item>

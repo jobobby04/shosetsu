@@ -127,7 +127,7 @@ class DownloadsFragment : ShosetsuFragment(),
 	}
 
 	private fun togglePause() {
-		if (viewModel.isOnline()) viewModel.togglePause() else displayOfflineSnackBar(R.string.controller_downloads_snackbar_offline_no_download)
+		if (viewModel.isOnline()) viewModel.togglePause() else displayOfflineSnackBar(R.string.fragment_downloads_snackbar_offline_no_download)
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

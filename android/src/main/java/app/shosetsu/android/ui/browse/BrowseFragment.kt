@@ -118,7 +118,7 @@ class BrowseFragment : ShosetsuFragment(),
 			if (viewModel.isOnline()) {
 				viewModel.installExtension(extension, option)
 			} else {
-				displayOfflineSnackBar(R.string.controller_browse_snackbar_offline_no_install_extension)
+				displayOfflineSnackBar(R.string.fragment_browse_snackbar_offline_no_install_extension)
 			}
 		}
 	}
@@ -172,12 +172,12 @@ class BrowseFragment : ShosetsuFragment(),
 						setShosetsuTransition()
 					}
 				)
-			} else makeSnackBar(R.string.controller_browse_snackbar_not_installed)?.setAction(
+			} else makeSnackBar(R.string.fragment_browse_snackbar_not_installed)?.setAction(
 				R.string.install
 			) {
 				// TODO install
 			}?.show()
-		} else displayOfflineSnackBar(R.string.controller_browse_snackbar_offline_no_extension)
+		} else displayOfflineSnackBar(R.string.fragment_browse_snackbar_offline_no_extension)
 
 	}
 
@@ -213,7 +213,7 @@ class BrowseFragment : ShosetsuFragment(),
 	private fun onRefresh() {
 		if (viewModel.isOnline())
 			viewModel.refresh()
-		else displayOfflineSnackBar(R.string.controller_browse_snackbar_offline_no_update_extension)
+		else displayOfflineSnackBar(R.string.fragment_browse_snackbar_offline_no_update_extension)
 	}
 
 	override fun manipulateFAB(fab: EFabMaintainer) {
@@ -435,7 +435,7 @@ fun BrowseExtensionContent(
 								.data(item.imageURL)
 								.crossfade(true)
 								.build(),
-							contentDescription = stringResource(R.string.controller_browse_ext_icon_desc),
+							contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
 							modifier = Modifier.size(64.dp),
 							error = {
 								ImageLoadingError()

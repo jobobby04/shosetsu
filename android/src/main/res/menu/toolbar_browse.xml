@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/browse_import"
-        android:title="@string/controller_browse_option_Import"
+        android:title="@string/fragment_browse_option_Import"
         android:visible="false"
         app:showAsAction="never" />
 </menu>

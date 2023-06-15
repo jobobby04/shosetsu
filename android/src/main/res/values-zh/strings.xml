@@ -32,7 +32,7 @@
     <string name="open_in_browser">在浏览器中打开</string>
     <string name="pending">待定</string>
     <string name="paused">已暂停</string>
-    <string name="controller_novel_chapter_position">位置：</string>
+    <string name="fragment_novel_chapter_position">位置：</string>
     <string name="you_not_online">不在线</string>
     <string name="version">版本</string>
     <string name="publishing">出版</string>

@@ -362,31 +362,31 @@ class LibraryFilterMenuBuilder constructor(
 			PinOnTopOption()
 
 			Menu1Item(
-				R.string.controller_library_menu_tri_by_title,
+				R.string.fragment_library_menu_tri_by_title,
 				state,
 				BY_TITLE,
 				reversed
 			)
 			Menu1Item(
-				R.string.controller_library_menu_tri_by_unread,
+				R.string.fragment_library_menu_tri_by_unread,
 				state,
 				BY_UNREAD_COUNT,
 				reversed
 			)
 			Menu1Item(
-				R.string.controller_library_menu_tri_by_id,
+				R.string.fragment_library_menu_tri_by_id,
 				state,
 				BY_ID,
 				reversed
 			)
 			Menu1Item(
-				R.string.controller_library_menu_tri_by_updated,
+				R.string.fragment_library_menu_tri_by_updated,
 				state,
 				BY_UPDATED,
 				reversed
 			)
 			Menu1Item(
-				R.string.controller_library_menu_tri_by_read_time,
+				R.string.fragment_library_menu_tri_by_read_time,
 				state,
 				BY_READ_TIME,
 				reversed
