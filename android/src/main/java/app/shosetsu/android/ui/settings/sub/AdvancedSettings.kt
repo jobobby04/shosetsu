@@ -8,6 +8,7 @@ import android.webkit.CookieManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
@@ -160,6 +161,9 @@ fun AdvancedSettingsContent(
 	onClearCookies: () -> Unit
 ) {
 	val useShosetsuAgent by viewModel.settingsRepo.getBooleanFlow(UseShosetsuAgent)
+		.collectAsState()
+
+	val useProxy by viewModel.settingsRepo.getBooleanFlow(UseProxy)
 		.collectAsState()
 
 	LazyColumn(
@@ -362,6 +366,18 @@ fun AdvancedSettingsContent(
 				) {
 					Icon(Icons.Default.Refresh, stringResource(R.string.reset))
 				}
+			}
+		}
+
+		item {
+			Row(modifier = Modifier.fillMaxWidth()) {
+				ProxySettingsContent(
+					title = "Use SOCKS5 Proxy",
+					description = "Use proxy for all internal communications. Changes applied after restart",
+					repo = viewModel.settingsRepo,
+					usedKey = UseProxy,
+					settingKey = ProxyHost,
+				)
 			}
 		}
 	}

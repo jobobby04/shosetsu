@@ -269,6 +269,10 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object UserAgent : StringKey("user_agent", DEFAULT_USER_AGENT)
 
+
+	object UseProxy : BooleanKey("use_proxy", false)
+	object ProxyHost : StringKey("proxy_host", "")
+
 	/**
 	 * Use a user agent that explicitly states Shosetsu
 	 */
