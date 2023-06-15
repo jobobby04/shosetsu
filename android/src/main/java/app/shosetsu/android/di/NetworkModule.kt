@@ -4,6 +4,7 @@ import app.shosetsu.android.providers.network.createOkHttpClient
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.bind
+import org.kodein.di.instance
 import org.kodein.di.singleton
 
 /*
@@ -29,5 +30,5 @@ import org.kodein.di.singleton
  * 01 / 05 / 2020
  */
 internal val networkModule = DI.Module("network_module") {
-	bind<OkHttpClient>() with singleton { createOkHttpClient() }
+	bind<OkHttpClient>() with singleton { createOkHttpClient(instance()) }
 }
