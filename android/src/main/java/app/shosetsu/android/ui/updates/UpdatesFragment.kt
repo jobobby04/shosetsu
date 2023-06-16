@@ -92,7 +92,7 @@ import org.joda.time.DateTime
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-class ComposeUpdatesFragment : ShosetsuFragment(), HomeFragment, MenuProvider {
+class UpdatesFragment : ShosetsuFragment(), HomeFragment, MenuProvider {
 	override val viewTitleRes: Int = R.string.updates
 
 	private val viewModel: AUpdatesViewModel by viewModel()

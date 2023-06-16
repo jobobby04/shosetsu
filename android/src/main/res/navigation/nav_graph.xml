@@ -266,7 +266,7 @@
     </fragment>
     <fragment
         android:id="@+id/updatesController"
-        android:name="app.shosetsu.android.ui.updates.ComposeUpdatesFragment"
+        android:name="app.shosetsu.android.ui.updates.UpdatesFragment"
         android:label="UpdatesController">
         <action
             android:id="@+id/action_updatesController_to_chapterReader"
