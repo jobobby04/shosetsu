@@ -58,11 +58,11 @@ class SettingsFragment : ShosetsuFragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				SettingsContent {
+		return ComposeView(requireContext()).apply {
+			setContent {
+				SettingsView {
 					findNavController().navigateSafely(
 						it,
 						null,
@@ -70,6 +70,15 @@ class SettingsFragment : ShosetsuFragment() {
 				}
 			}
 		}
+	}
+}
+
+@Composable
+fun SettingsView(
+	navigate: (Int) -> Unit
+) {
+	ShosetsuCompose {
+		SettingsContent(navigate)
 	}
 }
 
@@ -103,26 +112,26 @@ fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClic
 }
 
 @Composable
-fun SettingsContent(pushController: (Int) -> Unit) {
+fun SettingsContent(navigate: (Int) -> Unit) {
 	Column {
 		SettingMenuItem(R.string.view, R.drawable.view_module) {
-			pushController(R.id.action_settingsController_to_viewSettings)
+			navigate(R.id.action_settingsController_to_viewSettings)
 		}
 
 		SettingMenuItem(R.string.reader, R.drawable.book) {
-			pushController(R.id.action_settingsController_to_readerSettings)
+			navigate(R.id.action_settingsController_to_readerSettings)
 		}
 
 		SettingMenuItem(R.string.download, R.drawable.download) {
-			pushController(R.id.action_settingsController_to_downloadSettings)
+			navigate(R.id.action_settingsController_to_downloadSettings)
 		}
 
 		SettingMenuItem(R.string.update, R.drawable.update) {
-			pushController(R.id.action_settingsController_to_updateSettings)
+			navigate(R.id.action_settingsController_to_updateSettings)
 		}
 
 		SettingMenuItem(R.string.advanced, R.drawable.settings) {
-			pushController(R.id.action_settingsController_to_advancedSettings)
+			navigate(R.id.action_settingsController_to_advancedSettings)
 		}
 	}
 }
