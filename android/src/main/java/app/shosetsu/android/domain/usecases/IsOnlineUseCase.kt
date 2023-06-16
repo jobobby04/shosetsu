@@ -2,9 +2,15 @@ package app.shosetsu.android.domain.usecases
 
 import android.app.Application
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkCapabilities.*
 import android.os.Build
 import androidx.core.content.getSystemService
+import androidx.work.impl.utils.registerDefaultNetworkCallbackCompat
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 /*
  * This file is part of shosetsu.
@@ -61,5 +67,41 @@ class IsOnlineUseCase(
 				else -> false
 			}
 		}
+	}
+
+	fun getFlow(): Flow<Boolean> = callbackFlow {
+		val callback = object : ConnectivityManager.NetworkCallback() {
+			override fun onAvailable(network: Network) {
+				super.onAvailable(network)
+				trySend(invoke())
+			}
+
+			override fun onLosing(network: Network, maxMsToLive: Int) {
+				super.onLosing(network, maxMsToLive)
+				trySend(invoke())
+			}
+
+			override fun onCapabilitiesChanged(
+				network: Network,
+				networkCapabilities: NetworkCapabilities
+			) {
+				super.onCapabilitiesChanged(network, networkCapabilities)
+				trySend(invoke())
+			}
+
+			override fun onLost(network: Network) {
+				super.onLost(network)
+				trySend(invoke())
+			}
+
+			override fun onUnavailable() {
+				super.onUnavailable()
+				trySend(invoke())
+			}
+		}
+
+		connectivityManager.registerDefaultNetworkCallbackCompat(callback)
+
+		awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
 	}
 }

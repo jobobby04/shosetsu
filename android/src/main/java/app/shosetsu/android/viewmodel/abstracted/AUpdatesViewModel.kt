@@ -52,4 +52,6 @@ abstract class AUpdatesViewModel
 	 * Clear all updates before provided date
 	 */
 	abstract fun clearBefore(date: Long)
+
+	abstract val isOnlineFlow: StateFlow<Boolean>
 }

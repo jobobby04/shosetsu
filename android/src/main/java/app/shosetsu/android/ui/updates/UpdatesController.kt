@@ -26,6 +26,8 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,6 +51,7 @@ import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
@@ -103,26 +106,17 @@ class ComposeUpdatesFragment : ShosetsuFragment(), HomeFragment, MenuProvider {
 		return ComposeView(requireContext()).apply {
 			setViewTitle()
 			setContent {
-				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState()
-					val isRefreshing by viewModel.isRefreshing.collectAsState()
-
-					UpdatesContent(
-						items = items,
-						isRefreshing = isRefreshing,
-						onRefresh = this@ComposeUpdatesFragment::onRefresh
-					) { (chapterID, novelID) ->
-						activity?.openChapter(chapterID, novelID)
+				UpdatesView(
+					viewModel,
+					openChapter = {
+						activity?.openChapter(it.chapterID, it.novelID)
+					},
+					offlineMessage = {
+						displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
 					}
-				}
+				)
 			}
 		}
-	}
-
-	fun onRefresh() {
-		if (viewModel.isOnline())
-			viewModel.startUpdateManager(-1)
-		else displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
 	}
 
 	private fun onUserClearBefore() {
@@ -157,16 +151,47 @@ class ComposeUpdatesFragment : ShosetsuFragment(), HomeFragment, MenuProvider {
 		}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UpdatesView(
+	viewModel: AUpdatesViewModel = viewModelDi(),
+	openChapter: (UpdatesUI) -> Unit,
+	offlineMessage: () -> Unit
+) {
+	ShosetsuCompose {
+		val items by viewModel.liveData.collectAsState()
+		val isRefreshing by viewModel.isRefreshing.collectAsState()
+		val isOnline by viewModel.isOnlineFlow.collectAsState()
+		val state = remember { SnackbarHostState() }
+
+		Scaffold {
+			UpdatesContent(
+				items = items,
+				isRefreshing = isRefreshing,
+				onRefresh = {
+					if (isOnline)
+						viewModel.startUpdateManager(-1)
+					else offlineMessage()
+				},
+				openChapter,
+				modifier = Modifier.padding(it)
+			)
+		}
+
+	}
+}
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
 	isRefreshing: Boolean,
 	onRefresh: () -> Unit,
-	openChapter: (UpdatesUI) -> Unit
+	openChapter: (UpdatesUI) -> Unit,
+	modifier: Modifier = Modifier
 ) {
 	val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
-	Box(Modifier.pullRefresh(pullRefreshState)) {
+	Box(modifier.pullRefresh(pullRefreshState)) {
 		if (items.isEmpty()) {
 			Column {
 				ErrorContent(
