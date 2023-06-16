@@ -1,28 +1,46 @@
 package app.shosetsu.android.ui.novel
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.viewpager.widget.PagerAdapter
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.ChapterSortType
 import app.shosetsu.android.common.enums.ChapterSortType.SOURCE
 import app.shosetsu.android.common.enums.ChapterSortType.UPLOAD
 import app.shosetsu.android.common.enums.ReadingStatus.READ
 import app.shosetsu.android.common.enums.ReadingStatus.UNREAD
-import app.shosetsu.android.common.enums.TriStateState.CHECKED
-import app.shosetsu.android.common.enums.TriStateState.UNCHECKED
-import app.shosetsu.android.common.ext.collectLatestLA
-import app.shosetsu.android.common.ext.logD
-import app.shosetsu.android.common.ext.logV
-import app.shosetsu.android.common.ext.makeSnackBar
-import app.shosetsu.android.databinding.FragmentNovelInfoBottomMenu0Binding
-import app.shosetsu.android.databinding.FragmentNovelInfoBottomMenu1Binding
-import app.shosetsu.android.databinding.FragmentNovelInfoBottomMenuBinding
+import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
-import kotlinx.coroutines.flow.SharedFlow
-import org.acra.ACRA
+import com.google.accompanist.placeholder.material.placeholder
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of Shosetsu.
@@ -41,194 +59,295 @@ import org.acra.ACRA
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * shosetsu
  * 22 / 11 / 2020
- *
- * Creates the bottom menu for Novel Controller
  */
-class NovelFilterMenuBuilder(
-	private val novelController: NovelFragment,
-	private val inflater: LayoutInflater,
-	private val viewModel: ANovelViewModel
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun NovelFilterMenuView(
+	viewModel: ANovelViewModel
 ) {
-	private val novelSettingFlow: SharedFlow<NovelSettingUI?> =
-		viewModel.novelSettingFlow
+	val pagerState = rememberPagerState()
+	val pages =
+		listOf(stringResource(R.string.filter), stringResource(R.string.sort))
+	val scope = rememberCoroutineScope()
 
-	private fun updateNovelSetting(novelSettingUI: NovelSettingUI) =
-		viewModel.updateNovelSetting(novelSettingUI)
+	val novelSetting by viewModel.novelSettingFlow.collectAsState(null)
 
-	fun build(): View =
-		FragmentNovelInfoBottomMenuBinding.inflate(
-			inflater
-		).also { binding ->
-			// The work is done purely on the viewPager
-			binding.viewPager.apply {
-				val menuAdapter = MenuAdapter(binding.root.context)
-				this.adapter = menuAdapter
-				var isInitialSetup = true
-				menuAdapter.onMenuCreated = {
-					novelSettingFlow.collectLatestLA(novelController,
-						catch = {
-							novelController
-								.makeSnackBar(it.message ?: "Unknown error loading app theme")
-								?.setAction(R.string.report) { _ ->
-									ACRA.errorReporter.handleSilentException(it)
-								}?.show()
-						}) { settings ->
-						if (settings == null) return@collectLatestLA
-
-						this@NovelFilterMenuBuilder.logV("Settings $settings")
-
-						// Prevents some data overflow by only running certain loads once
-						if (isInitialSetup) {
-							isInitialSetup = false
-							this@NovelFilterMenuBuilder.logD("Initial setup")
-							menuAdapter.menu0.apply {
-								bookmarked.isChecked = settings.showOnlyBookmarked
-								downloaded.isChecked = settings.showOnlyDownloaded
-								when (settings.showOnlyReadingStatusOf) {
-									UNREAD -> unreadRadioButton.isChecked = true
-									READ -> readRadioButton.isChecked = true
-									else -> allRadioButton.isChecked = true
-								}
-							}
-							menuAdapter.menu1.apply {
-								val reversed = settings.reverseOrder
-
-								when (settings.sortType) {
-									SOURCE -> bySource::state
-									UPLOAD -> byDate::state
-								}.set(if (!reversed) CHECKED else UNCHECKED)
-							}
+	Column {
+		TabRow(
+			// Our selected tab is our current page
+			selectedTabIndex = pagerState.currentPage,
+			// Override the indicator, using the provided pagerTabIndicatorOffset modifier
+			indicator = { tabPositions ->
+				TabRowDefaults.Indicator(
+					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+				)
+			}
+		) {
+			// Add tabs for all of our pages
+			pages.forEachIndexed { index, title ->
+				Tab(
+					text = { Text(title) },
+					selected = pagerState.currentPage == index,
+					onClick = {
+						scope.launch {
+							pagerState.animateScrollToPage(index)
 						}
+					},
+				)
+			}
+		}
+		HorizontalPager(pageCount = pages.size, state = pagerState) {
+			when (it) {
+				0 -> NovelFilterMenuFilterContent(
+					novelSetting ?: NovelSettingUI(-1),
+					novelSetting == null,
+					updateNovelSetting = viewModel::updateNovelSetting
+				)
 
-						// refresh all the bindings always
-						this@NovelFilterMenuBuilder.logD("Setting bindings")
-						menuAdapter.menu0.apply {
-							this@NovelFilterMenuBuilder.logD("Menu binding#0")
-							bookmarked.setOnCheckedChangeListener { _, state ->
-								updateNovelSetting(
-									settings.copy(
-										showOnlyBookmarked = state
-									)
-								)
-							}
-
-							downloaded.setOnCheckedChangeListener { _, state ->
-								updateNovelSetting(
-									settings.copy(
-										showOnlyDownloaded = state
-									)
-								)
-							}
-
-							radioGroup.setOnCheckedChangeListener { _, checkedId ->
-								when (checkedId) {
-									R.id.all_radio_button -> updateNovelSetting(
-										settings.copy(
-											showOnlyReadingStatusOf = null
-										)
-									)
-
-									R.id.read_radio_button -> updateNovelSetting(
-										settings.copy(
-											showOnlyReadingStatusOf = READ
-										)
-									)
-
-									R.id.unread_radio_button -> updateNovelSetting(
-										settings.copy(
-											showOnlyReadingStatusOf = UNREAD
-										)
-									)
-
-								}
-							}
-
-						}
-						menuAdapter.menu1.apply {
-							this@NovelFilterMenuBuilder.logD("Menu binding#1")
-							triStateGroup.addOnStateChangeListener { id, state ->
-								updateNovelSetting(
-									settings.copy(
-										sortType = when (id) {
-											R.id.by_date -> UPLOAD
-											R.id.by_source -> SOURCE
-											else -> UPLOAD
-										},
-										reverseOrder = state != CHECKED
-									)
-								)
-							}
-						}
+				1 -> NovelFilterMenuSortContent(
+					(novelSetting ?: NovelSettingUI(-1)).sortType,
+					(novelSetting ?: NovelSettingUI(-1)).reverseOrder,
+					novelSetting == null,
+					update = { a, b ->
+						viewModel.updateNovelSetting(
+							(novelSetting ?: NovelSettingUI(-1)).copy(
+								sortType = a,
+								reverseOrder = b
+							)
+						)
 					}
-				}
+				)
 			}
-		}.root
-
-	inner class MenuAdapter(
-		private val context: Context
-	) : PagerAdapter() {
-
-		override fun getCount(): Int = 2
-		override fun getPageTitle(position: Int): CharSequence? = when (position) {
-			0 -> context.getString(R.string.filter)
-			1 -> context.getString(R.string.sort)
-			else -> null
 		}
+	}
+}
 
-		override fun isViewFromObject(view: View, obj: Any): Boolean = view == obj
-		lateinit var menu0: FragmentNovelInfoBottomMenu0Binding
-		lateinit var menu1: FragmentNovelInfoBottomMenu1Binding
+@Composable
+fun NovelFilterMenuFilterContent(
+	settings: NovelSettingUI,
+	isLoading: Boolean,
+	updateNovelSetting: (NovelSettingUI) -> Unit
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.verticalScroll(rememberScrollState())
+	) {
+		val readingStatus = settings.showOnlyReadingStatusOf
 
-		private var menu0Created = false
-		private var menu1Created = false
-		var onMenuCreated: () -> Unit = {}
-
-		fun markCreated(i: Int) {
-			if (i == 0)
-				menu0Created = true
-			else
-				menu1Created = true
-
-			if (menu0Created && menu1Created) onMenuCreated()
-		}
-
-		override fun instantiateItem(container: ViewGroup, position: Int): Any {
-			when (position) {
-				0 -> {
-					val view = FragmentNovelInfoBottomMenu0Binding.inflate(
-						inflater,
-						container,
-						false
-					).also {
-						menu0 = it
-					}.root
-					container.addView(view)
-					markCreated(0)
-					return view
-				}
-				1 -> {
-					val view = FragmentNovelInfoBottomMenu1Binding.inflate(
-						inflater,
-						container,
-						false
-					).also {
-						menu1 = it
-					}.root
-					container.addView(view)
-					markCreated(1)
-					return view
-				}
+		NovelFilterMenuFilterRadioButtonItem(
+			title = stringResource(R.string.all),
+			selected = readingStatus != UNREAD && readingStatus != READ,
+			isLoading = isLoading,
+			onClick = {
+				updateNovelSetting(
+					settings.copy(
+						showOnlyReadingStatusOf = null
+					)
+				)
 			}
-			return super.instantiateItem(container, position)
-		}
+		)
 
-		override fun destroyItem(container: ViewGroup, position: Int, obj: Any) {
-			(obj as? View)?.let {
-				container.removeView(it)
+		NovelFilterMenuFilterRadioButtonItem(
+			title = stringResource(R.string.read),
+			selected = readingStatus == READ,
+			isLoading = isLoading,
+			onClick = {
+				updateNovelSetting(
+					settings.copy(
+						showOnlyReadingStatusOf = READ
+					)
+				)
 			}
+		)
+
+		NovelFilterMenuFilterRadioButtonItem(
+			title = stringResource(R.string.unread),
+			selected = readingStatus == UNREAD,
+			isLoading = isLoading,
+			onClick = {
+				updateNovelSetting(
+					settings.copy(
+						showOnlyReadingStatusOf = UNREAD
+					)
+				)
+			}
+		)
+
+		NovelFilterMenuFilterCheckboxItem(
+			stringResource(R.string.bookmarked),
+			settings.showOnlyBookmarked,
+			isLoading,
+			onCheckedChange = {
+				updateNovelSetting(
+					settings.copy(
+						showOnlyBookmarked = it
+					)
+				)
+			},
+		)
+
+		NovelFilterMenuFilterCheckboxItem(
+			stringResource(R.string.downloaded),
+			settings.showOnlyDownloaded,
+			isLoading,
+			onCheckedChange = {
+				updateNovelSetting(
+					settings.copy(
+						showOnlyDownloaded = it
+					)
+				)
+			},
+		)
+	}
+}
+
+@Composable
+fun NovelFilterMenuFilterRadioButtonItem(
+	title: String,
+	selected: Boolean,
+	isLoading: Boolean,
+	onClick: () -> Unit
+) {
+	Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.clickable {
+				if (!isLoading) onClick()
+			},
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		RadioButton(
+			selected = selected,
+			onClick = onClick,
+			modifier = Modifier
+				.placeholder(isLoading)
+				.fillMaxWidth(0.25f)
+		)
+		Text(title)
+	}
+}
+
+@Composable
+fun NovelFilterMenuFilterCheckboxItem(
+	title: String,
+	isChecked: Boolean,
+	isLoading: Boolean,
+	onCheckedChange: (Boolean) -> Unit
+) {
+	Row(
+		modifier = Modifier
+			.fillMaxWidth()
+			.clickable {
+				if (!isLoading) onCheckedChange(!isChecked)
+			},
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Checkbox(
+			isChecked,
+			onCheckedChange = {
+				if (!isLoading) onCheckedChange(it)
+			},
+			modifier = Modifier
+				.placeholder(isLoading)
+				.fillMaxWidth(0.25f)
+		)
+		Text(title)
+	}
+}
+
+@Composable
+fun NovelFilterMenuSortContent(
+	chapterSortType: ChapterSortType,
+	isReversed: Boolean,
+	isLoading: Boolean,
+	update: (ChapterSortType, Boolean) -> Unit
+) {
+	Column(
+		modifier = Modifier
+			.fillMaxSize()
+			.verticalScroll(rememberScrollState())
+	) {
+
+		NovelFilterMenuSortItemContent(
+			stringResource(R.string.fragment_library_menu_tri_by_source),
+			state = chapterSortType,
+			expectedState = SOURCE,
+			reversed = isReversed,
+			isPlaceholder = isLoading,
+			setIsSortReversed = {
+				update(SOURCE, it)
+			},
+			setSortType = {
+				update(it, false)
+			},
+		)
+
+		NovelFilterMenuSortItemContent(
+			stringResource(R.string.fragment_library_menu_tri_by_date),
+			state = chapterSortType,
+			expectedState = UPLOAD,
+			reversed = isReversed,
+			isPlaceholder = isLoading,
+			setIsSortReversed = {
+				update(UPLOAD, it)
+			},
+			setSortType = {
+				update(it, false)
+			}
+		)
+	}
+}
+
+
+@Composable
+fun NovelFilterMenuSortItemContent(
+	name: String,
+	state: ChapterSortType,
+	expectedState: ChapterSortType,
+	reversed: Boolean,
+	isPlaceholder: Boolean,
+	setIsSortReversed: (Boolean) -> Unit,
+	setSortType: (ChapterSortType) -> Unit
+) {
+	val isExpected = state == expectedState
+	Box(
+		modifier = Modifier
+			.clickable {
+				if (isExpected)
+					setIsSortReversed(!reversed)
+				else setSortType(expectedState)
+			}
+			.padding(8.dp)
+			.placeholder(isPlaceholder)
+	) {
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.padding(8.dp)
+				.fillMaxWidth()
+		) {
+			Box(modifier = Modifier.size(32.dp)) {
+				if (isExpected)
+					Icon(
+						painterResource(
+							if (reversed) {
+								R.drawable.expand_less
+							} else {
+								R.drawable.expand_more
+							}
+						),
+						null,
+						modifier = Modifier.align(Alignment.Center)
+					)
+			}
+			Text(name, modifier = Modifier.padding(start = 8.dp))
 		}
 	}
 }
