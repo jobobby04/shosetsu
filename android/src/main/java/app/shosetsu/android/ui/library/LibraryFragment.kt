@@ -324,7 +324,13 @@ class LibraryFragment
 			if (bsg?.isShowing == false) {
 				bsg?.apply {
 					setContentView(
-						LibraryFilterMenuBuilder(this.context, viewModel).build()
+						ComposeView(context).apply {
+							setContent {
+								ShosetsuCompose {
+									LibraryFilterMenuView(viewModel)
+								}
+							}
+						}
 					)
 				}?.show()
 			}
