@@ -409,81 +409,79 @@ class NovelFragment : ShosetsuFragment(),
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				if (resume != null)
-					syncFABWithCompose(state, resume!!)
-				val novelInfo by viewModel.novelLive.collectAsState()
-				val chapters by viewModel.chaptersLive.collectAsState()
-				val isRefreshing by viewModel.isRefreshing.collectAsState()
-				val selectedChaptersState by viewModel.selectedChaptersState.collectAsState()
-				val hasSelected by viewModel.hasSelected.collectAsState()
-				val itemAt by viewModel.itemIndex.collectAsState()
-				val categories by viewModel.categories.collectAsState()
-				val novelCategories by viewModel.novelCategories.collectAsState()
+		return ComposeView {
+			if (resume != null)
+				syncFABWithCompose(state, resume!!)
+			val novelInfo by viewModel.novelLive.collectAsState()
+			val chapters by viewModel.chaptersLive.collectAsState()
+			val isRefreshing by viewModel.isRefreshing.collectAsState()
+			val selectedChaptersState by viewModel.selectedChaptersState.collectAsState()
+			val hasSelected by viewModel.hasSelected.collectAsState()
+			val itemAt by viewModel.itemIndex.collectAsState()
+			val categories by viewModel.categories.collectAsState()
+			val novelCategories by viewModel.novelCategories.collectAsState()
 
-				activity?.invalidateOptionsMenu()
-				// If the data is not present, loads it
-				if (novelInfo != null && !novelInfo!!.loaded) {
-					if (viewModel.isOnline()) {
-						refresh()
-					} else {
-						displayOfflineSnackBar(string.fragment_novel_snackbar_cannot_inital_load_offline)
-					}
+			activity?.invalidateOptionsMenu()
+			// If the data is not present, loads it
+			if (novelInfo != null && !novelInfo!!.loaded) {
+				if (viewModel.isOnline()) {
+					refresh()
+				} else {
+					displayOfflineSnackBar(string.fragment_novel_snackbar_cannot_inital_load_offline)
 				}
+			}
 
-				ShosetsuCompose {
-					NovelInfoContent(
-						novelInfo = novelInfo,
-						chapters = chapters,
-						selectedChaptersState = selectedChaptersState,
-						itemAt = itemAt,
-						isRefreshing = isRefreshing,
-						onRefresh = {
-							if (viewModel.isOnline())
-								refresh()
-							else displayOfflineSnackBar()
-						},
-						openWebView = ::openWebView,
-						categories = categories,
-						setCategoriesDialogOpen = { categoriesDialogOpen = true },
-						toggleBookmark = ::toggleBookmark,
-						openFilter = ::openFilterMenu,
-						openChapterJump = ::openChapterJumpDialog,
-						chapterContent = {
-							NovelChapterContent(
-								chapter = it,
-								openChapter = {
-									activity?.openChapter(it)
-								},
-								onToggleSelection = {
-									viewModel.toggleSelection(it)
-								},
-								selectionMode = hasSelected
-							)
-						},
-						downloadSelected = viewModel::downloadSelected,
-						deleteSelected = viewModel::deleteSelected,
-						markSelectedAsRead = {
-							viewModel.markSelectedAs(ReadingStatus.READ)
-						},
-						markSelectedAsUnread = {
-							viewModel.markSelectedAs(ReadingStatus.UNREAD)
-						},
-						bookmarkSelected = viewModel::bookmarkSelected,
-						unbookmarkSelected = viewModel::removeBookmarkFromSelected,
-						hasSelected = hasSelected,
-						state = state
-					)
-
-					if (categoriesDialogOpen)
-						CategoriesDialog(
-							onDismissRequest = { categoriesDialogOpen = false },
-							categories = categories,
-							novelCategories = novelCategories,
-							setCategories = ::setCategories
+			ShosetsuCompose {
+				NovelInfoContent(
+					novelInfo = novelInfo,
+					chapters = chapters,
+					selectedChaptersState = selectedChaptersState,
+					itemAt = itemAt,
+					isRefreshing = isRefreshing,
+					onRefresh = {
+						if (viewModel.isOnline())
+							refresh()
+						else displayOfflineSnackBar()
+					},
+					openWebView = ::openWebView,
+					categories = categories,
+					setCategoriesDialogOpen = { categoriesDialogOpen = true },
+					toggleBookmark = ::toggleBookmark,
+					openFilter = ::openFilterMenu,
+					openChapterJump = ::openChapterJumpDialog,
+					chapterContent = {
+						NovelChapterContent(
+							chapter = it,
+							openChapter = {
+								activity?.openChapter(it)
+							},
+							onToggleSelection = {
+								viewModel.toggleSelection(it)
+							},
+							selectionMode = hasSelected
 						)
-				}
+					},
+					downloadSelected = viewModel::downloadSelected,
+					deleteSelected = viewModel::deleteSelected,
+					markSelectedAsRead = {
+						viewModel.markSelectedAs(ReadingStatus.READ)
+					},
+					markSelectedAsUnread = {
+						viewModel.markSelectedAs(ReadingStatus.UNREAD)
+					},
+					bookmarkSelected = viewModel::bookmarkSelected,
+					unbookmarkSelected = viewModel::removeBookmarkFromSelected,
+					hasSelected = hasSelected,
+					state = state
+				)
+
+				if (categoriesDialogOpen)
+					CategoriesDialog(
+						onDismissRequest = { categoriesDialogOpen = false },
+						categories = categories,
+						novelCategories = novelCategories,
+						setCategories = ::setCategories
+					)
 			}
 		}
 	}

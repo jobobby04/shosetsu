@@ -100,16 +100,14 @@ class LibraryFragment
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				LibraryView(
-					viewModel = viewModel,
-					onRefresh = ::onRefresh,
-					onOpenNovel = ::onOpenNovel,
-					onToastNovel = ::onToastNovel,
-					fab
-				)
-			}
+		return ComposeView {
+			LibraryView(
+				viewModel = viewModel,
+				onRefresh = ::onRefresh,
+				onOpenNovel = ::onOpenNovel,
+				onToastNovel = ::onToastNovel,
+				fab
+			)
 		}
 	}
 

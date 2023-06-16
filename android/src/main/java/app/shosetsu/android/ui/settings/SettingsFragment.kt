@@ -14,14 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -60,14 +60,12 @@ class SettingsFragment : ShosetsuFragment() {
 		savedViewState: Bundle?
 	): View {
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				SettingsView {
-					findNavController().navigateSafely(
-						it,
-						null,
-						navOptions { setShosetsuTransition() })
-				}
+		return ComposeView {
+			SettingsView {
+				findNavController().navigateSafely(
+					it,
+					null,
+					navOptions { setShosetsuTransition() })
 			}
 		}
 	}

@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.DownloadStatus.*
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.collectLA
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.viewModel
@@ -78,25 +78,23 @@ class DownloadsFragment : ShosetsuFragment(),
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState()
-					val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
-					val hasSelected by viewModel.hasSelectedFlow.collectAsState()
+		return ComposeView {
+			ShosetsuCompose {
+				val items by viewModel.liveData.collectAsState()
+				val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
+				val hasSelected by viewModel.hasSelectedFlow.collectAsState()
 
-					DownloadsContent(
-						items = items,
-						selectedDownloadState = selectedDownloadState,
-						hasSelected = hasSelected,
-						pauseSelection = viewModel::pauseSelection,
-						startSelection = viewModel::startSelection,
-						startFailedSelection = viewModel::restartSelection,
-						deleteSelected = viewModel::deleteSelected,
-						toggleSelection = viewModel::toggleSelection,
-						fab
-					)
-				}
+				DownloadsContent(
+					items = items,
+					selectedDownloadState = selectedDownloadState,
+					hasSelected = hasSelected,
+					pauseSelection = viewModel::pauseSelection,
+					startSelection = viewModel::startSelection,
+					startFailedSelection = viewModel::restartSelection,
+					deleteSelected = viewModel::deleteSelected,
+					toggleSelection = viewModel::toggleSelection,
+					fab
+				)
 			}
 		}
 	}
@@ -118,10 +116,12 @@ class DownloadsFragment : ShosetsuFragment(),
 				viewModel.setAllPending()
 				return true
 			}
+
 			R.id.delete_all -> {
 				viewModel.deleteAll()
 				return true
 			}
+
 			else -> false
 		}
 	}
@@ -191,14 +191,17 @@ class DownloadsFragment : ShosetsuFragment(),
 					viewModel.selectAll()
 					true
 				}
+
 				R.id.chapter_select_between -> {
 					viewModel.selectBetween()
 					true
 				}
+
 				R.id.chapter_inverse -> {
 					viewModel.invertSelection()
 					true
 				}
+
 				else -> false
 			}
 
@@ -377,18 +380,23 @@ fun DownloadContent(
 							PENDING -> {
 								R.string.pending
 							}
+
 							DOWNLOADING -> {
 								R.string.downloading
 							}
+
 							PAUSED -> {
 								R.string.paused
 							}
+
 							ERROR -> {
 								R.string.error
 							}
+
 							WAITING -> {
 								R.string.waiting
 							}
+
 							else -> {
 								R.string.completed
 							}

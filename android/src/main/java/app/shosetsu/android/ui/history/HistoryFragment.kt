@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,13 +34,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.setShosetsuTransition
@@ -91,27 +91,25 @@ class HistoryFragment : ShosetsuFragment(), MenuProvider {
 		inflater: LayoutInflater, container: ViewGroup?, savedViewState: Bundle?
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
-		return ComposeView(requireContext()).apply {
-			setViewTitle()
-			setContent {
-				HistoryView(
-					viewModel = viewModel,
-					openNovel = { history ->
-						findNavController().navigateSafely(
-							R.id.action_historyFragment_to_novelController, bundleOf(
-								BundleKeys.BUNDLE_NOVEL_ID to history.novelId
-							),
-							navOptions = navOptions {
-								launchSingleTop = true
-								setShosetsuTransition()
-							}
-						)
-					},
-					openChapter = {
-						activity?.openChapter(it.chapterId, it.novelId)
-					}
-				)
-			}
+		setViewTitle()
+		return ComposeView {
+			HistoryView(
+				viewModel = viewModel,
+				openNovel = { history ->
+					findNavController().navigateSafely(
+						R.id.action_historyFragment_to_novelController, bundleOf(
+							BundleKeys.BUNDLE_NOVEL_ID to history.novelId
+						),
+						navOptions = navOptions {
+							launchSingleTop = true
+							setShosetsuTransition()
+						}
+					)
+				},
+				openChapter = {
+					activity?.openChapter(it.chapterId, it.novelId)
+				}
+			)
 		}
 	}
 
@@ -125,10 +123,12 @@ class HistoryFragment : ShosetsuFragment(), MenuProvider {
 				viewModel.clearAll()
 				true
 			}
+
 			R.id.fragment_history_clear_before -> {
 				onUserClearBefore()
 				true
 			}
+
 			else -> false
 		}
 

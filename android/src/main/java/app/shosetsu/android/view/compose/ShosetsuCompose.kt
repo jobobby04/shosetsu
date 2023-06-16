@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -35,7 +34,6 @@ import com.google.accompanist.themeadapter.material3.Mdc3Theme
  * @since 28 / 06 / 2022
  * @author Doomsdayrs
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ShosetsuCompose(
 	context: Context = LocalContext.current,

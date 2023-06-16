@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,6 +25,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.makeSnackBar
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.setShosetsuTransition
@@ -66,9 +66,9 @@ class MoreFragment
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
+		return ComposeView {
 			MoreView(
 				makeSnackBar = {
 					makeSnackBar(it)?.show()

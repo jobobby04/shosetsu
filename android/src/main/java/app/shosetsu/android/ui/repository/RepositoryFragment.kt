@@ -18,7 +18,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -77,29 +76,27 @@ class RepositoryFragment : ShosetsuFragment(),
 		savedViewState: Bundle?
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
-		return ComposeView(requireContext()).apply {
-			setViewTitle()
-			setContent {
-				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState()
+		setViewTitle()
+		return ComposeView {
+			ShosetsuCompose {
+				val items by viewModel.liveData.collectAsState()
 
-					RepositoriesContent(
-						items = items,
-						toggleEnabled = {
-							toggleIsEnabled(it)
-						},
-						onRemove = {
-							onRemove(it, this.context)
-						},
-						addRepository = {
-							launchAddRepositoryDialog(this)
-						},
-						onRefresh = {
-							onRefresh()
-						},
-						fab
-					)
-				}
+				RepositoriesContent(
+					items = items,
+					toggleEnabled = {
+						toggleIsEnabled(it)
+					},
+					onRemove = {
+						onRemove(it, requireContext())
+					},
+					addRepository = {
+						launchAddRepositoryDialog(requireView())
+					},
+					onRefresh = {
+						onRefresh()
+					},
+					fab
+				)
 			}
 		}
 	}

@@ -44,10 +44,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.makeSnackBar
 import app.shosetsu.android.common.ext.viewModel
@@ -72,26 +72,23 @@ class CategoriesFragment : ShosetsuFragment(), ExtendedFABController {
 		savedViewState: Bundle?
 	): View {
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				ShosetsuCompose {
-					val items by viewModel.liveData.collectAsState()
+		return ComposeView {
+			ShosetsuCompose {
+				val items by viewModel.liveData.collectAsState()
 
-
-					CategoriesContent(
-						items = items,
-						onRemove = {
-							onRemove(it, context)
-						},
-						onMoveUp = {
-							viewModel.moveUp(it).observeMoveCategory()
-						},
-						onMoveDown = {
-							viewModel.moveDown(it).observeMoveCategory()
-						},
-						fab = fab
-					)
-				}
+				CategoriesContent(
+					items = items,
+					onRemove = {
+						onRemove(it, requireContext())
+					},
+					onMoveUp = {
+						viewModel.moveUp(it).observeMoveCategory()
+					},
+					onMoveDown = {
+						viewModel.moveDown(it).observeMoveCategory()
+					},
+					fab = fab
+				)
 			}
 		}
 	}

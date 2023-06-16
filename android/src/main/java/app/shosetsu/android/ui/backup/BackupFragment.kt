@@ -38,13 +38,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
@@ -88,12 +88,12 @@ class BackupFragment : ShosetsuFragment() {
 	): View {
 		setViewTitle()
 
-		return ComposeView(requireContext()).apply {
-			setContent {
-				BackupView(
-					toast = context::toast
-				)
-			}
+		return ComposeView {
+			BackupView(
+				toast = {
+					requireContext().toast(it)
+				}
+			)
 		}
 	}
 }

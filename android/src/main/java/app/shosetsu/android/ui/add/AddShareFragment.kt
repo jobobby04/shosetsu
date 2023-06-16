@@ -11,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,28 +75,26 @@ class AddShareFragment : ShosetsuFragment(), CollapsedToolBarController, MenuPro
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				AddShareView(
-					arguments?.getString(BUNDLE_URL),
-					onBackPressed = {
-						requireActivity().onBackPressedDispatcher.onBackPressed()
-					},
-					openNovel = { entity ->
-						activity?.onBackPressedDispatcher?.onBackPressed()
+		return ComposeView {
+			AddShareView(
+				arguments?.getString(BUNDLE_URL),
+				onBackPressed = {
+					requireActivity().onBackPressedDispatcher.onBackPressed()
+				},
+				openNovel = { entity ->
+					activity?.onBackPressedDispatcher?.onBackPressed()
 
-						if (entity != null) {
-							findNavController().navigateSafely(
-								R.id.action_moreController_to_novelController,
-								bundleOf(BundleKeys.BUNDLE_NOVEL_ID to entity.id),
-								navOptions {
-									setShosetsuTransition()
-								}
-							)
-						}
+					if (entity != null) {
+						findNavController().navigateSafely(
+							R.id.action_moreController_to_novelController,
+							bundleOf(BundleKeys.BUNDLE_NOVEL_ID to entity.id),
+							navOptions {
+								setShosetsuTransition()
+							}
+						)
 					}
-				)
-			}
+				}
+			)
 		}
 	}
 

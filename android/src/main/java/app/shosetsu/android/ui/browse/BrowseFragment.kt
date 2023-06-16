@@ -130,17 +130,15 @@ class BrowseFragment : ShosetsuFragment(),
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				BrowseView(
-					viewModel,
-					onRefresh = ::onRefresh,
-					installExtension = ::installExtension,
-					openCatalogue = ::openCatalogue,
-					openSettings = ::openSettings,
-					fab
-				)
-			}
+		return ComposeView {
+			BrowseView(
+				viewModel,
+				onRefresh = ::onRefresh,
+				installExtension = ::installExtension,
+				openCatalogue = ::openCatalogue,
+				openSettings = ::openSettings,
+				fab
+			)
 		}
 	}
 

@@ -97,108 +97,106 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
-		return ComposeView(requireContext()).apply {
-			setContent {
-				ShosetsuCompose {
-					val type by viewModel.novelCardTypeLive.collectAsState()
+		return ComposeView {
+			ShosetsuCompose {
+				val type by viewModel.novelCardTypeLive.collectAsState()
 
-					val columnsInV by viewModel.columnsInV.collectAsState()
-					val columnsInH by viewModel.columnsInH.collectAsState()
+				val columnsInV by viewModel.columnsInV.collectAsState()
+				val columnsInH by viewModel.columnsInH.collectAsState()
 
-					val items = viewModel.itemsLive.collectAsLazyPagingItems()
+				val items = viewModel.itemsLive.collectAsLazyPagingItems()
 
-					val exception by viewModel.exceptionFlow.collectAsState()
-					val hasFilters by viewModel.hasFilters.collectAsState()
+				val exception by viewModel.exceptionFlow.collectAsState()
+				val hasFilters by viewModel.hasFilters.collectAsState()
 
-					val categories by viewModel.categories.collectAsState()
-					var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
+				val categories by viewModel.categories.collectAsState()
+				var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
 
-					if (exception != null)
-						LaunchedEffect(Unit) {
-							launchUI {
-								makeSnackBar(exception!!.message ?: "Unknown error")
-									?.setAction(R.string.retry) {
-										viewModel.resetView()
-									}
-									?.show()
-							}
-						}
-
-					val prepend = items.loadState.prepend
-					if (prepend is LoadState.Error) {
-						LaunchedEffect(Unit) {
-							launchUI {
-								makeSnackBar(prepend.error.message ?: "Unknown error")
-									?.setAction(R.string.retry) {
-										items.retry()
-									}
-									?.show()
-							}
-						}
-					}
-					val append = items.loadState.prepend
-					if (append is LoadState.Error) {
-						LaunchedEffect(Unit) {
-							launchUI {
-								makeSnackBar(append.error.message ?: "Unknown error")
-									?.setAction(R.string.retry) {
-										items.retry()
-									}
-									?.show()
-							}
+				if (exception != null)
+					LaunchedEffect(Unit) {
+						launchUI {
+							makeSnackBar(exception!!.message ?: "Unknown error")
+								?.setAction(R.string.retry) {
+									viewModel.resetView()
+								}
+								?.show()
 						}
 					}
 
-					CatalogContent(
-						items,
-						type,
-						columnsInV,
-						columnsInH,
-						onClick = {
-							try {
-								findNavController().navigateSafely(
-									R.id.action_catalogController_to_novelController, bundleOf(
-										BUNDLE_NOVEL_ID to it.id,
-										BUNDLE_EXTENSION to requireArguments().getInt(
-											BUNDLE_EXTENSION
-										)
-									),
-									navOptions {
-										setShosetsuTransition()
-									}
-								)
-							} catch (ignored: Exception) {
-								// ignore dup
-							}
-						},
-						onLongClick = {
-							if (categories.isNotEmpty() && !it.bookmarked) {
-								categoriesDialogItem = it
-							} else {
-								itemLongClicked(it)
-							}
-						},
-						hasFilters = hasFilters,
-						fab,
-						openWebView = ::openInWebView,
-						clearCookies = {
-							viewModel.clearCookies()
-							items.refresh()
+				val prepend = items.loadState.prepend
+				if (prepend is LoadState.Error) {
+					LaunchedEffect(Unit) {
+						launchUI {
+							makeSnackBar(prepend.error.message ?: "Unknown error")
+								?.setAction(R.string.retry) {
+									items.retry()
+								}
+								?.show()
 						}
+					}
+				}
+				val append = items.loadState.prepend
+				if (append is LoadState.Error) {
+					LaunchedEffect(Unit) {
+						launchUI {
+							makeSnackBar(append.error.message ?: "Unknown error")
+								?.setAction(R.string.retry) {
+									items.retry()
+								}
+								?.show()
+						}
+					}
+				}
+
+				CatalogContent(
+					items,
+					type,
+					columnsInV,
+					columnsInH,
+					onClick = {
+						try {
+							findNavController().navigateSafely(
+								R.id.action_catalogController_to_novelController, bundleOf(
+									BUNDLE_NOVEL_ID to it.id,
+									BUNDLE_EXTENSION to requireArguments().getInt(
+										BUNDLE_EXTENSION
+									)
+								),
+								navOptions {
+									setShosetsuTransition()
+								}
+							)
+						} catch (ignored: Exception) {
+							// ignore dup
+						}
+					},
+					onLongClick = {
+						if (categories.isNotEmpty() && !it.bookmarked) {
+							categoriesDialogItem = it
+						} else {
+							itemLongClicked(it)
+						}
+					},
+					hasFilters = hasFilters,
+					fab,
+					openWebView = ::openInWebView,
+					clearCookies = {
+						viewModel.clearCookies()
+						items.refresh()
+					}
+				)
+				if (categoriesDialogItem != null) {
+					CategoriesDialog(
+						onDismissRequest = { categoriesDialogItem = null },
+						categories = categories,
+						setCategories = {
+							itemLongClicked(
+								item = categoriesDialogItem ?: return@CategoriesDialog,
+								categories = it
+							)
+						},
+						novelCategories = remember { persistentListOf() }
 					)
-					if (categoriesDialogItem != null) {
-						CategoriesDialog(
-							onDismissRequest = { categoriesDialogItem = null },
-							categories = categories,
-							setCategories = {
-								itemLongClicked(
-									item = categoriesDialogItem ?: return@CategoriesDialog,
-									categories = it
-								)
-							},
-							novelCategories = remember { persistentListOf() }
-						)
-					}
 				}
 			}
 		}
