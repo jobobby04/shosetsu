@@ -51,6 +51,7 @@ import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.databinding.FragmentNovelJumpDialogBinding
 import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
+import app.shosetsu.android.view.ComposeBottomSheetDialog
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
@@ -69,7 +70,6 @@ import coil.request.ImageRequest
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -122,13 +122,6 @@ class NovelFragment : ShosetsuFragment(),
 	private var resume: EFabMaintainer? = null
 
 	private var actionMode: ActionMode? = null
-
-	private val bottomMenuView: View
-		get() = NovelFilterMenuBuilder(
-			this,
-			requireActivity().layoutInflater,
-			viewModel
-		).build()
 
 	private fun startSelectionAction() {
 		if (actionMode != null) return
@@ -590,8 +583,16 @@ class NovelFragment : ShosetsuFragment(),
 	}
 
 	private fun openFilterMenu() {
-		BottomSheetDialog(requireActivity()).apply {
-			setContentView(bottomMenuView)
+		ComposeBottomSheetDialog(requireView().context, this, requireActivity()).apply {
+			setContentView(
+				ComposeView(context).apply {
+					setContent {
+						ShosetsuCompose {
+							NovelFilterMenuView(viewModel)
+						}
+					}
+				}
+			)
 		}.show()
 	}
 
