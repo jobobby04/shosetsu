@@ -73,7 +73,10 @@ class UpdatesViewModel(
 
 	override fun startUpdateManager(categoryID: Int) = startUpdateWorkerUseCase(categoryID)
 
-	override fun isOnline(): Boolean = isOnlineUseCase()
+	override val isOnlineFlow = isOnlineUseCase.getFlow()
+		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, false)
+
+	override fun isOnline(): Boolean = isOnlineFlow.value
 
 	override val isRefreshing: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
