@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.enums.TriStateState
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.view.compose.ImageLoadingError
@@ -80,9 +80,9 @@ class ConfigureExtensionFragment : ShosetsuFragment(),
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
+		return ComposeView {
 			ShosetsuCompose {
 				ConfigureExtensionContent(
 					viewModel,
@@ -164,11 +164,13 @@ fun SettingsItemAsCompose(
 					}
 				}
 			}
+
 			is FilterEntity.Separator -> {
 				column.item(Random.nextInt() + 1000000) {
 					Divider()
 				}
 			}
+
 			is FilterEntity.Text -> {
 				column.item(data.id) {
 					StringSettingContent(
@@ -184,6 +186,7 @@ fun SettingsItemAsCompose(
 					)
 				}
 			}
+
 			is FilterEntity.Switch -> {
 				column.item(data.id) {
 					SwitchSettingContent(
@@ -199,6 +202,7 @@ fun SettingsItemAsCompose(
 					)
 				}
 			}
+
 			is FilterEntity.TriState -> {
 				column.item(data.id) {
 					Row(
@@ -221,6 +225,7 @@ fun SettingsItemAsCompose(
 					}
 				}
 			}
+
 			is FilterEntity.Dropdown -> {
 				column.item(data.id) {
 					DropdownSettingContent(
@@ -237,6 +242,7 @@ fun SettingsItemAsCompose(
 					)
 				}
 			}
+
 			is FilterEntity.FList -> {
 				column.item(Random.nextInt() + 1000000) {
 					Row(
@@ -250,9 +256,11 @@ fun SettingsItemAsCompose(
 				}
 				SettingsItemAsCompose(column, viewModel, data.filters.toList())
 			}
+
 			is FilterEntity.Group -> {
 				SettingsItemAsCompose(column, viewModel, data.filters.toList())
 			}
+
 			is FilterEntity.Checkbox -> {
 				column.item(data.id) {
 					SwitchSettingContent(
@@ -268,6 +276,7 @@ fun SettingsItemAsCompose(
 					)
 				}
 			}
+
 			is FilterEntity.RadioGroup -> {
 				column.item(data.id) {
 					DropdownSettingContent(

@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -35,6 +34,7 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.*
 import app.shosetsu.android.common.enums.TextAsset
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.navigateSafely
 import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.common.ext.viewModelDi
@@ -75,15 +75,16 @@ class AboutFragment : ShosetsuFragment() {
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
+		return ComposeView {
 			AboutView(
 				onNavigateSafely = { id, bundle, options ->
 					findNavController().navigateSafely(id, bundle, options)
 				}
 			)
 		}
+
 	}
 }
 

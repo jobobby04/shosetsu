@@ -22,14 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -90,35 +89,33 @@ class SearchFragment : ShosetsuFragment(), MenuProvider {
 		savedViewState: Bundle?
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
-		return ComposeView(requireContext()).apply {
-			setContent {
-				ShosetsuCompose {
-					val rows by viewModel.listings.collectAsState()
-					val isCozy by viewModel.isCozy.collectAsState()
+		return ComposeView {
+			ShosetsuCompose {
+				val rows by viewModel.listings.collectAsState()
+				val isCozy by viewModel.isCozy.collectAsState()
 
-					SearchContent(
-						rows = rows,
-						isCozy = isCozy,
-						getChildren = {
-							if (it == -1)
-								viewModel.searchLibrary()
-							else
-								viewModel.searchExtension(it)
-						},
-						getException = viewModel::getException,
-						onClick = {
-							findNavController().navigateSafely(
-								R.id.action_searchController_to_novelController,
-								bundleOf(BundleKeys.BUNDLE_NOVEL_ID to it.id),
-								navOptions {
-									setShosetsuTransition()
-								}
-							)
-						},
-						onRefresh = viewModel::refresh,
-						onRefreshAll = viewModel::refresh
-					)
-				}
+				SearchContent(
+					rows = rows,
+					isCozy = isCozy,
+					getChildren = {
+						if (it == -1)
+							viewModel.searchLibrary()
+						else
+							viewModel.searchExtension(it)
+					},
+					getException = viewModel::getException,
+					onClick = {
+						findNavController().navigateSafely(
+							R.id.action_searchController_to_novelController,
+							bundleOf(BundleKeys.BUNDLE_NOVEL_ID to it.id),
+							navOptions {
+								setShosetsuTransition()
+							}
+						)
+					},
+					onRefresh = viewModel::refresh,
+					onRefreshAll = viewModel::refresh
+				)
 			}
 		}
 	}

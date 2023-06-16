@@ -39,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.trimDate
@@ -103,19 +103,17 @@ class UpdatesFragment : ShosetsuFragment(), HomeFragment, MenuProvider {
 		savedViewState: Bundle?
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
-		return ComposeView(requireContext()).apply {
-			setViewTitle()
-			setContent {
-				UpdatesView(
-					viewModel,
-					openChapter = {
-						activity?.openChapter(it.chapterID, it.novelID)
-					},
-					offlineMessage = {
-						displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
-					}
-				)
-			}
+		setViewTitle()
+		return ComposeView {
+			UpdatesView(
+				viewModel,
+				openChapter = {
+					activity?.openChapter(it.chapterID, it.novelID)
+				},
+				offlineMessage = {
+					displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
+				}
+			)
 		}
 	}
 
