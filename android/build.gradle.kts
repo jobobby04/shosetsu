@@ -229,7 +229,7 @@ dependencies {
 	implementation("androidx.collection:collection-ktx:1.2.0")
 	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-	implementation("androidx.window:window:1.0.0")
+	implementation("androidx.window:window:1.1.0")
 
 	// - Life Cycle
 
