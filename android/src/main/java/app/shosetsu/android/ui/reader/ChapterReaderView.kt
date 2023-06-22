@@ -154,8 +154,6 @@ fun ChapterReaderView(
 								.filterIsInstance<ReaderUIItem.ReaderChapterUI>()
 								.find { it.id == currentChapterID }
 								?.let { item ->
-									tts.setPitch(viewModel.ttsPitch.value)
-									tts.setSpeechRate(viewModel.ttsSpeed.value)
 									tts.setPitch(viewModel.ttsPitch.value / 10)
 									tts.setSpeechRate(viewModel.ttsSpeed.value / 10)
 									when (chapterType!!) {
