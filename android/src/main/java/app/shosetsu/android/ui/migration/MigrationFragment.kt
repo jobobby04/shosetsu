@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuFragment
@@ -72,20 +73,26 @@ class MigrationFragment : ShosetsuFragment() {
 		const val TARGETS_BUNDLE_KEY: String = "targets"
 	}
 
-	private val viewModel: AMigrationViewModel by viewModel()
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.setNovels(requireArguments().getIntArray(TARGETS_BUNDLE_KEY)!!)
-	}
-
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
 	): View = ComposeView {
-		ShosetsuCompose {
-			MigrationContent(viewModel)
-		}
+		MigrationView(remember { requireArguments().getIntArray(TARGETS_BUNDLE_KEY)!! })
+	}
+}
+
+@Composable
+fun MigrationView(
+	novelIds: IntArray,
+	viewModel: AMigrationViewModel = viewModelDi()
+) {
+	LaunchedEffect(novelIds) {
+		viewModel.setNovels(novelIds)
+	}
+
+	ShosetsuCompose {
+		MigrationContent(viewModel)
 	}
 }
 
