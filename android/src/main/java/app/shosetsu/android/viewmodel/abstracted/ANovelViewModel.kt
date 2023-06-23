@@ -63,6 +63,24 @@ abstract class ANovelViewModel
 	abstract val categories: StateFlow<ImmutableList<CategoryUI>>
 	abstract val novelCategories: StateFlow<ImmutableList<Int>>
 
+	abstract val isCategoriesDialogVisible: StateFlow<Boolean>
+
+	abstract val toggleBookmarkResponse: StateFlow<ToggleBookmarkResponse>
+
+	abstract val isChapterJumpDialogVisible: StateFlow<Boolean>
+
+	enum class JumpState { UNKNOWN, FAILURE }
+
+	abstract val jumpState: StateFlow<JumpState>
+
+	abstract fun showChapterJumpDialog()
+
+	abstract fun hideChapterJumpDialog()
+
+	abstract fun showCategoriesDialog()
+
+	abstract fun hideCategoriesDialog()
+
 	/** Set's the value to be loaded */
 	abstract fun setNovelID(novelID: Int)
 
@@ -75,7 +93,7 @@ abstract class ANovelViewModel
 	 * Toggles the bookmark of this ui
 	 * @return ToggleBookmarkResponse of what the UI should react with
 	 */
-	abstract fun toggleNovelBookmark(): Flow<ToggleBookmarkResponse>
+	abstract fun toggleNovelBookmark()
 
 	/**
 	 * Response to toggling the novel bookmark
@@ -97,7 +115,7 @@ abstract class ANovelViewModel
 	/**
 	 * Return the novelURL to utilize in some way
 	 */
-	abstract fun getNovelURL(): Flow<String?>
+	abstract val novelURL: StateFlow<String?>
 
 	data class NovelShareInfo(
 		val novelTitle: String,
@@ -163,13 +181,6 @@ abstract class ANovelViewModel
 
 	abstract fun trueDeleteSelected()
 
-	/**
-	 * Try to scroll to a chapter via predicate
-	 *
-	 * @return false if the chapter could not be found
-	 */
-	abstract fun scrollTo(predicate: (ChapterUI) -> Boolean): Flow<Boolean>
-
 	abstract fun toggleSelection(it: ChapterUI)
 
 	/**
@@ -181,6 +192,7 @@ abstract class ANovelViewModel
 	 * Delete downloaded chapters
 	 */
 	abstract fun deleteChapters()
+	abstract fun jump(query: String, byTitle: Boolean)
 
 	/**
 	 * @param showRemoveBookmark If any chapters are bookmarked, show the remove bookmark logo

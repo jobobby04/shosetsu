@@ -1,10 +1,9 @@
 package app.shosetsu.android.ui.novel
 
+import android.app.Activity
 import android.content.res.Resources
 import android.database.sqlite.SQLiteException
 import android.os.Bundle
-import android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-import android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 import android.view.*
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
@@ -12,6 +11,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -31,25 +31,23 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.os.bundleOf
+import androidx.core.text.isDigitsOnly
 import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.R.drawable
-import app.shosetsu.android.R.plurals
-import app.shosetsu.android.R.string
 import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.NoSuchExtensionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.databinding.FragmentNovelJumpDialogBinding
 import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
 import app.shosetsu.android.view.ComposeBottomSheetDialog
 import app.shosetsu.android.view.compose.*
@@ -63,13 +61,16 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
+import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.JumpState
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.SelectedChaptersState
+import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.ToggleBookmarkResponse
 import app.shosetsu.lib.Novel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -154,8 +155,8 @@ class NovelFragment : ShosetsuFragment(),
 	override fun manipulateFAB(fab: EFabMaintainer) {
 		resume = fab
 		fab.setOnClickListener { openLastRead() }
-		fab.setIconResource(drawable.play_arrow)
-		fab.setText(string.resume)
+		fab.setIconResource(R.drawable.play_arrow)
+		fab.setText(R.string.resume)
 	}
 
 	private fun openLastRead() {
@@ -165,7 +166,7 @@ class NovelFragment : ShosetsuFragment(),
 			if (chapterUI != null) {
 				activity?.openChapter(chapterUI)
 			} else {
-				makeSnackBar(string.fragment_novel_snackbar_finished_reading)?.show()
+				makeSnackBar(R.string.fragment_novel_snackbar_finished_reading)?.show()
 			}
 		}
 	}
@@ -193,11 +194,11 @@ class NovelFragment : ShosetsuFragment(),
 					catch = {
 						makeSnackBar(
 							getString(
-								string.fragment_novel_error_share,
+								R.string.fragment_novel_error_share,
 								it.message ?: "Unknown"
 							)
 						)
-							?.setAction(string.report) { _ ->
+							?.setAction(R.string.report) { _ ->
 								ACRA.errorReporter.handleSilentException(it)
 							}?.show()
 					}
@@ -229,7 +230,7 @@ class NovelFragment : ShosetsuFragment(),
 		}
 
 		R.id.option_chapter_jump -> {
-			openChapterJumpDialog()
+			viewModel.showChapterJumpDialog()
 			true
 		}
 
@@ -264,77 +265,13 @@ class NovelFragment : ShosetsuFragment(),
 		}
 
 		R.id.set_categories -> {
-			categoriesDialogOpen = true
+			viewModel.showCategoriesDialog()
 			true
 		}
 
 		else -> false
 	}
 
-	private fun openChapterJumpDialog() {
-		val binding =
-			FragmentNovelJumpDialogBinding.inflate(LayoutInflater.from(requireActivity()))
-
-		// Change hint & input type depending on findByChapterName state
-		binding.findByChapterName.setOnCheckedChangeListener { _, isChecked ->
-			if (isChecked) {
-				binding.editTextNumber.inputType = TYPE_TEXT_FLAG_NO_SUGGESTIONS
-				binding.editTextNumber.setHint(string.fragment_novel_jump_dialog_hint_chapter_title)
-			} else {
-				binding.editTextNumber.inputType = TYPE_NUMBER_FLAG_DECIMAL
-				binding.editTextNumber.setHint(string.fragment_novel_jump_dialog_hint_chapter_number)
-			}
-		}
-
-		AlertDialog.Builder(requireActivity())
-			.setView(binding.root)
-			.setTitle(string.jump_to_chapter)
-			.setNegativeButton(android.R.string.cancel) { _, _ ->
-			}
-			.setPositiveButton(string.alert_dialog_jump_positive) { _, _ ->
-				/**
-				 * The predicate to use to find the chapter to scroll to
-				 */
-				val predicate: (ChapterUI) -> Boolean
-
-				@Suppress("LiftReturnOrAssignment")
-				if (binding.findByChapterName.isChecked) {
-					// Predicate will be searching if the title contains the text
-					val text = binding.editTextNumber.text.toString()
-					if (text.isBlank()) {
-						makeSnackBar(string.toast_error_chapter_jump_empty_title)
-							?.setAction(string.generic_question_retry) { openChapterJumpDialog() }
-							?.show()
-						return@setPositiveButton
-					}
-
-					predicate = { it.title.contains(text) }
-				} else {
-					// Predicate will be searching if the # is equal
-
-					val selectedNumber =
-						binding.editTextNumber.text.toString().toDoubleOrNull()?.plus(1.0) ?: run {
-							makeSnackBar(string.toast_error_chapter_jump_invalid_number)
-								?.setAction(string.generic_question_retry) { openChapterJumpDialog() }
-								?.show()
-							return@setPositiveButton
-						}
-
-					predicate = { it.order == selectedNumber }
-				}
-
-				viewModel.scrollTo(predicate).collectLA(this, catch = {}) {
-					if (!it) {
-						makeSnackBar(string.toast_error_chapter_jump_invalid_target)
-							?.setAction(string.generic_question_retry) {
-								openChapterJumpDialog()
-							}
-							?.show()
-					}
-				}
-			}
-			.show()
-	}
 
 	/**
 	 * download a custom amount of chapters
@@ -344,7 +281,7 @@ class NovelFragment : ShosetsuFragment(),
 		val max = viewModel.getChapterCount()
 
 		AlertDialog.Builder(requireActivity()).apply {
-			setTitle(string.download_custom_chapters)
+			setTitle(R.string.download_custom_chapters)
 			val numberPicker = NumberPicker(requireActivity()).apply {
 				minValue = 0
 				maxValue = max
@@ -371,36 +308,6 @@ class NovelFragment : ShosetsuFragment(),
 	}
 
 	private var state = LazyListState(0)
-	private var categoriesDialogOpen by mutableStateOf(false)
-
-	private fun setCategories(categories: IntArray) {
-		viewModel.setNovelCategories(categories).firstLa(this, catch = {}) {}
-	}
-
-	private fun toggleBookmark() {
-		viewModel.toggleNovelBookmark().firstLa(this@NovelFragment, catch = {}) {
-			when (it) {
-				is ANovelViewModel.ToggleBookmarkResponse.DeleteChapters -> {
-					makeSnackBar(
-						try {
-							resources.getQuantityString(
-								plurals.fragment_novel_toggle_delete_chapters,
-								it.chapters,
-								it.chapters
-							)
-						} catch (e: Resources.NotFoundException) {
-							"Delete ${it.chapters} chapters?"
-						}
-					)?.setAction(string.delete) {
-						viewModel.deleteChapters()
-					}?.show()
-				}
-
-				ANovelViewModel.ToggleBookmarkResponse.Nothing -> {
-				}
-			}
-		}
-	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -410,79 +317,26 @@ class NovelFragment : ShosetsuFragment(),
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
 		return ComposeView {
-			if (resume != null)
-				syncFABWithCompose(state, resume!!)
-			val novelInfo by viewModel.novelLive.collectAsState()
-			val chapters by viewModel.chaptersLive.collectAsState()
-			val isRefreshing by viewModel.isRefreshing.collectAsState()
-			val selectedChaptersState by viewModel.selectedChaptersState.collectAsState()
-			val hasSelected by viewModel.hasSelected.collectAsState()
-			val itemAt by viewModel.itemIndex.collectAsState()
-			val categories by viewModel.categories.collectAsState()
-			val novelCategories by viewModel.novelCategories.collectAsState()
-
-			activity?.invalidateOptionsMenu()
-			// If the data is not present, loads it
-			if (novelInfo != null && !novelInfo!!.loaded) {
-				if (viewModel.isOnline()) {
-					refresh()
-				} else {
-					displayOfflineSnackBar(string.fragment_novel_snackbar_cannot_inital_load_offline)
-				}
-			}
-
-			ShosetsuCompose {
-				NovelInfoContent(
-					novelInfo = novelInfo,
-					chapters = chapters,
-					selectedChaptersState = selectedChaptersState,
-					itemAt = itemAt,
-					isRefreshing = isRefreshing,
-					onRefresh = {
-						if (viewModel.isOnline())
-							refresh()
-						else displayOfflineSnackBar()
-					},
-					openWebView = ::openWebView,
-					categories = categories,
-					setCategoriesDialogOpen = { categoriesDialogOpen = true },
-					toggleBookmark = ::toggleBookmark,
-					openFilter = ::openFilterMenu,
-					openChapterJump = ::openChapterJumpDialog,
-					chapterContent = {
-						NovelChapterContent(
-							chapter = it,
-							openChapter = {
-								activity?.openChapter(it)
-							},
-							onToggleSelection = {
-								viewModel.toggleSelection(it)
-							},
-							selectionMode = hasSelected
-						)
-					},
-					downloadSelected = viewModel::downloadSelected,
-					deleteSelected = viewModel::deleteSelected,
-					markSelectedAsRead = {
-						viewModel.markSelectedAs(ReadingStatus.READ)
-					},
-					markSelectedAsUnread = {
-						viewModel.markSelectedAs(ReadingStatus.UNREAD)
-					},
-					bookmarkSelected = viewModel::bookmarkSelected,
-					unbookmarkSelected = viewModel::removeBookmarkFromSelected,
-					hasSelected = hasSelected,
-					state = state
-				)
-
-				if (categoriesDialogOpen)
-					CategoriesDialog(
-						onDismissRequest = { categoriesDialogOpen = false },
-						categories = categories,
-						novelCategories = novelCategories,
-						setCategories = ::setCategories
-					)
-			}
+			NovelInfoView(
+				viewModel,
+				resume,
+				state,
+				invalidateOptionsMenu = {
+					activity?.invalidateOptionsMenu()
+				},
+				{
+					if (it != null) {
+						displayOfflineSnackBar(it)
+					} else {
+						displayOfflineSnackBar()
+					}
+				},
+				::refresh,
+				makeSnackBar = {
+					makeSnackBar(it)
+				},
+				openFilterMenu = ::openFilterMenu
+			)
 		}
 	}
 
@@ -492,7 +346,7 @@ class NovelFragment : ShosetsuFragment(),
 				is SQLiteException ->
 					makeSnackBar(
 						getString(
-							string.fragment_novel_delete_previous_fail,
+							R.string.fragment_novel_delete_previous_fail,
 							it.message ?: ""
 						)
 					)?.show()
@@ -500,7 +354,7 @@ class NovelFragment : ShosetsuFragment(),
 				is FilePermissionException ->
 					makeSnackBar(
 						getString(
-							string.fragment_novel_delete_previous_fail,
+							R.string.fragment_novel_delete_previous_fail,
 							it.message ?: ""
 						)
 					)?.show()
@@ -508,7 +362,7 @@ class NovelFragment : ShosetsuFragment(),
 				is NoSuchExtensionException ->
 					makeSnackBar(
 						getString(
-							string.missing_extension,
+							R.string.missing_extension,
 							it.extensionId
 						)
 					)?.show()
@@ -533,10 +387,10 @@ class NovelFragment : ShosetsuFragment(),
 			if (it != null)
 				makeSnackBar(
 					getString(
-						string.fragment_novel_error_load,
+						R.string.fragment_novel_error_load,
 						it.message ?: "Unknown"
 					)
-				)?.setAction(string.report) { _ ->
+				)?.setAction(R.string.report) { _ ->
 					ACRA.errorReporter.handleSilentException(it)
 				}?.show()
 		}
@@ -545,10 +399,10 @@ class NovelFragment : ShosetsuFragment(),
 			if (it != null)
 				makeSnackBar(
 					getString(
-						string.fragment_novel_error_load_chapters,
+						R.string.fragment_novel_error_load_chapters,
 						it.message ?: "Unknown"
 					)
-				)?.setAction(string.report) { _ ->
+				)?.setAction(R.string.report) { _ ->
 					ACRA.errorReporter.handleSilentException(it)
 				}?.show()
 		}
@@ -560,16 +414,16 @@ class NovelFragment : ShosetsuFragment(),
 	}
 
 	private fun openWebView() {
-		viewModel.getNovelURL().firstLa(
+		viewModel.novelURL.firstLa(
 			this,
 			catch = {
 				makeSnackBar(
 					getString(
-						string.fragment_novel_error_url,
+						R.string.fragment_novel_error_url,
 						it.message ?: "Unknown"
 					)
 				)
-					?.setAction(string.report) { _ ->
+					?.setAction(R.string.report) { _ ->
 						ACRA.errorReporter.handleSilentException(it)
 					}?.show()
 			}
@@ -635,11 +489,11 @@ class NovelFragment : ShosetsuFragment(),
 				catch = {
 					makeSnackBar(
 						getString(
-							string.fragment_novel_error_true_delete,
+							R.string.fragment_novel_error_true_delete,
 							it.message ?: "Unknown"
 						)
 					)
-						?.setAction(string.report) { _ ->
+						?.setAction(R.string.report) { _ ->
 							ACRA.errorReporter.handleSilentException(it)
 						}?.show()
 				}
@@ -647,7 +501,7 @@ class NovelFragment : ShosetsuFragment(),
 				menu.findItem(R.id.true_delete).isVisible = it
 			}
 
-			mode.setTitle(string.selection)
+			mode.setTitle(R.string.selection)
 			return true
 		}
 
@@ -684,6 +538,236 @@ class NovelFragment : ShosetsuFragment(),
 			viewModel.clearSelection()
 		}
 	}
+}
+
+@Composable
+fun NovelInfoView(
+	viewModel: ANovelViewModel = viewModelDi(),
+	resume: EFabMaintainer?,
+	state: LazyListState = LazyListState(0),
+	invalidateOptionsMenu: () -> Unit,
+	displayOfflineSnackBar: (Int?) -> Unit,
+	refresh: () -> Unit,
+	makeSnackBar: (String) -> Snackbar?,
+	openFilterMenu: () -> Unit
+) {
+	if (resume != null)
+		syncFABWithCompose(state, resume!!)
+	val novelInfo by viewModel.novelLive.collectAsState()
+	val chapters by viewModel.chaptersLive.collectAsState()
+	val isRefreshing by viewModel.isRefreshing.collectAsState()
+	val selectedChaptersState by viewModel.selectedChaptersState.collectAsState()
+	val hasSelected by viewModel.hasSelected.collectAsState()
+	val itemAt by viewModel.itemIndex.collectAsState()
+	val categories by viewModel.categories.collectAsState()
+	val novelCategories by viewModel.novelCategories.collectAsState()
+	val activity = LocalContext.current as Activity
+	val novelURL by viewModel.novelURL.collectAsState()
+	val isCategoriesDialogVisible by viewModel.isCategoriesDialogVisible.collectAsState()
+	val toggleBookmarkResponse by viewModel.toggleBookmarkResponse.collectAsState()
+	val isChapterJumpDialogVisible by viewModel.isChapterJumpDialogVisible.collectAsState()
+	val jumpState by viewModel.jumpState.collectAsState()
+
+
+	invalidateOptionsMenu()
+	// If the data is not present, loads it
+	if (novelInfo != null && !novelInfo!!.loaded) {
+		if (viewModel.isOnline()) {
+			refresh()
+		} else {
+			displayOfflineSnackBar(R.string.fragment_novel_snackbar_cannot_inital_load_offline)
+		}
+	}
+
+
+	ShosetsuCompose {
+		NovelInfoContent(
+			novelInfo = novelInfo,
+			chapters = chapters,
+			selectedChaptersState = selectedChaptersState,
+			itemAt = itemAt,
+			isRefreshing = isRefreshing,
+			onRefresh = {
+				if (viewModel.isOnline())
+					refresh()
+				else displayOfflineSnackBar(null)
+			},
+			openWebView = {
+				if (novelURL != null)
+					activity.openInWebView(novelURL!!)
+			},
+			categories = categories,
+			setCategoriesDialogOpen = { viewModel.showCategoriesDialog() },
+			toggleBookmark = {
+				viewModel.toggleNovelBookmark()
+			},
+			openFilter = openFilterMenu,
+			openChapterJump = {
+				viewModel.showChapterJumpDialog()
+			},
+			chapterContent = {
+				NovelChapterContent(
+					chapter = it,
+					openChapter = {
+						activity?.openChapter(it)
+					},
+					onToggleSelection = {
+						viewModel.toggleSelection(it)
+					},
+					selectionMode = hasSelected
+				)
+			},
+			downloadSelected = viewModel::downloadSelected,
+			deleteSelected = viewModel::deleteSelected,
+			markSelectedAsRead = {
+				viewModel.markSelectedAs(ReadingStatus.READ)
+			},
+			markSelectedAsUnread = {
+				viewModel.markSelectedAs(ReadingStatus.UNREAD)
+			},
+			bookmarkSelected = viewModel::bookmarkSelected,
+			unbookmarkSelected = viewModel::removeBookmarkFromSelected,
+			hasSelected = hasSelected,
+			state = state
+		)
+
+		if (isCategoriesDialogVisible)
+			CategoriesDialog(
+				onDismissRequest = { viewModel.hideCategoriesDialog() },
+				categories = categories,
+				novelCategories = novelCategories,
+				setCategories = viewModel::setNovelCategories
+			)
+
+		if (isChapterJumpDialogVisible) {
+			JumpDialog(
+				dismiss = {
+					viewModel.hideChapterJumpDialog()
+				},
+				confirm = { query, byTitle ->
+					viewModel.jump(query, byTitle)
+				}
+			)
+		}
+
+		val context = LocalContext.current
+		LaunchedEffect(toggleBookmarkResponse) {
+			if (toggleBookmarkResponse is ToggleBookmarkResponse.DeleteChapters) {
+				val chaptersToDelete =
+					(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
+				makeSnackBar(
+					try {
+						context.resources.getQuantityString(
+							R.plurals.fragment_novel_toggle_delete_chapters,
+							chaptersToDelete,
+							chaptersToDelete
+						)
+					} catch (e: Resources.NotFoundException) {
+						"Delete $chaptersToDelete chapters?"
+					}
+				)?.setAction(R.string.delete) {
+					viewModel.deleteChapters()
+				}?.show()
+			}
+		}
+
+		LaunchedEffect(jumpState) {
+			when (jumpState) {
+				JumpState.UNKNOWN -> {}
+				JumpState.FAILURE -> {
+					makeSnackBar(context.getString(R.string.toast_error_chapter_jump_invalid_target))
+						?.setAction(R.string.generic_question_retry) {
+							viewModel.showChapterJumpDialog()
+						}?.show()
+				}
+			}
+		}
+	}
+}
+
+@Preview
+@Composable
+fun PreviewJumpDialog() {
+	JumpDialog(
+		dismiss = {},
+		confirm = { _, _ -> }
+	)
+}
+
+@Composable
+fun JumpDialog(
+	dismiss: () -> Unit,
+	confirm: (query: String, byTitle: Boolean) -> Unit
+) {
+	var query by remember { mutableStateOf("") }
+	var byTitle by remember { mutableStateOf(false) }
+	val isError = if (!byTitle) !query.isDigitsOnly() else false
+	AlertDialog(
+		onDismissRequest = dismiss,
+		confirmButton = {
+			TextButton(
+				onClick = {
+					confirm(query, byTitle)
+					dismiss()
+				},
+				enabled = !isError
+			) {
+				Text(stringResource(android.R.string.ok))
+			}
+		},
+		dismissButton = {
+			TextButton(
+				onClick = dismiss
+			) {
+				Text(stringResource(android.R.string.cancel))
+			}
+		},
+		title = {
+			Text(stringResource(R.string.jump_to_chapter))
+		},
+		text = {
+			Column(
+				verticalArrangement = Arrangement.spacedBy(4.dp)
+			) {
+				OutlinedTextField(
+					query,
+					onValueChange = {
+						if (!it.contains('\n'))
+							query = it
+					},
+					isError = isError,
+					placeholder = {
+						Text(
+							stringResource(
+								if (byTitle) {
+									R.string.fragment_novel_jump_dialog_hint_chapter_title
+								} else {
+									R.string.fragment_novel_jump_dialog_hint_chapter_number
+								}
+							)
+						)
+					},
+					keyboardOptions = KeyboardOptions(
+						keyboardType = if (byTitle) KeyboardType.Ascii else KeyboardType.Decimal
+					),
+					singleLine = true
+				)
+
+				Row(
+					Modifier
+						.clickable {
+							byTitle = !byTitle
+						}
+						.fillMaxWidth(),
+					horizontalArrangement = Arrangement.SpaceBetween,
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Text(stringResource(R.string.fragment_novel_jum_dialog_by_title))
+					Switch(byTitle, { byTitle = it })
+				}
+			}
+		}
+	)
 }
 
 @Preview
@@ -865,8 +949,8 @@ fun NovelInfoContent(
 						enabled = selectedChaptersState.showDownload
 					) {
 						Icon(
-							painterResource(drawable.download),
-							stringResource(string.fragment_novel_selected_download)
+							painterResource(R.drawable.download),
+							stringResource(R.string.fragment_novel_selected_download)
 						)
 					}
 					IconButton(
@@ -874,8 +958,8 @@ fun NovelInfoContent(
 						enabled = selectedChaptersState.showDelete
 					) {
 						Icon(
-							painterResource(drawable.trash),
-							stringResource(string.fragment_novel_selected_delete)
+							painterResource(R.drawable.trash),
+							stringResource(R.string.fragment_novel_selected_delete)
 						)
 					}
 					IconButton(
@@ -883,8 +967,8 @@ fun NovelInfoContent(
 						enabled = selectedChaptersState.showMarkAsRead
 					) {
 						Icon(
-							painterResource(drawable.read_mark),
-							stringResource(string.fragment_novel_selected_read)
+							painterResource(R.drawable.read_mark),
+							stringResource(R.string.fragment_novel_selected_read)
 						)
 					}
 					IconButton(
@@ -892,8 +976,8 @@ fun NovelInfoContent(
 						enabled = selectedChaptersState.showMarkAsUnread
 					) {
 						Icon(
-							painterResource(drawable.unread_mark),
-							stringResource(string.fragment_novel_selected_unread)
+							painterResource(R.drawable.unread_mark),
+							stringResource(R.string.fragment_novel_selected_unread)
 						)
 					}
 					IconButton(
@@ -901,8 +985,8 @@ fun NovelInfoContent(
 						enabled = selectedChaptersState.showBookmark
 					) {
 						Icon(
-							painterResource(drawable.ic_outline_bookmark_add_24),
-							stringResource(string.fragment_novel_selected_bookmark)
+							painterResource(R.drawable.ic_outline_bookmark_add_24),
+							stringResource(R.string.fragment_novel_selected_bookmark)
 						)
 					}
 					IconButton(
@@ -910,8 +994,8 @@ fun NovelInfoContent(
 						enabled = selectedChaptersState.showRemoveBookmark
 					) {
 						Icon(
-							painterResource(drawable.ic_baseline_bookmark_remove_24),
-							stringResource(string.fragment_novel_selected_unbookmark)
+							painterResource(R.drawable.ic_baseline_bookmark_remove_24),
+							stringResource(R.string.fragment_novel_selected_unbookmark)
 						)
 					}
 				}
@@ -1008,7 +1092,7 @@ fun NovelChapterContent(
 					if (chapter.readingStatus == ReadingStatus.READING)
 						Row {
 							Text(
-								stringResource(string.fragment_novel_chapter_position),
+								stringResource(R.string.fragment_novel_chapter_position),
 								fontSize = 12.sp,
 								modifier = Modifier.padding(end = 4.dp)
 							)
@@ -1021,7 +1105,7 @@ fun NovelChapterContent(
 
 				if (chapter.isSaved)
 					Text(
-						stringResource(string.downloaded),
+						stringResource(R.string.downloaded),
 						fontSize = 12.sp
 					)
 			}
@@ -1076,7 +1160,7 @@ fun NovelInfoCoverContent(
 			.data(imageURL)
 			.crossfade(true)
 			.build(),
-		stringResource(string.fragment_novel_info_image),
+		stringResource(R.string.fragment_novel_info_image),
 		modifier = modifier
 			.clickable(onClick = onClick),
 		contentScale = contentScale,
@@ -1124,7 +1208,7 @@ fun NovelInfoHeaderContent(
 					.data(novelInfo.imageURL)
 					.crossfade(true)
 					.build(),
-				stringResource(string.fragment_novel_info_image),
+				stringResource(R.string.fragment_novel_info_image),
 				modifier = Modifier
 					.matchParentSize()
 					.alpha(.10f),
@@ -1179,7 +1263,7 @@ fun NovelInfoHeaderContent(
 								) {
 									if (novelInfo.artists.isEmpty() && novelInfo.artists.none { it.isNotEmpty() })
 										Text(
-											stringResource(string.novel_author),
+											stringResource(R.string.novel_author),
 											style = MaterialTheme.typography.titleSmall
 										)
 									Text(
@@ -1194,7 +1278,7 @@ fun NovelInfoHeaderContent(
 								) {
 									if (novelInfo.authors.isEmpty() && novelInfo.authors.none { it.isNotEmpty() })
 										Text(
-											stringResource(string.artist_s),
+											stringResource(R.string.artist_s),
 											style = MaterialTheme.typography.titleSmall
 										)
 									Text(
@@ -1206,10 +1290,10 @@ fun NovelInfoHeaderContent(
 							Row {
 								Text(
 									when (novelInfo.status) {
-										Novel.Status.PUBLISHING -> stringResource(string.publishing)
-										Novel.Status.COMPLETED -> stringResource(string.completed)
-										Novel.Status.PAUSED -> stringResource(string.paused)
-										Novel.Status.UNKNOWN -> stringResource(string.unknown)
+										Novel.Status.PUBLISHING -> stringResource(R.string.publishing)
+										Novel.Status.COMPLETED -> stringResource(R.string.completed)
+										Novel.Status.PAUSED -> stringResource(R.string.paused)
+										Novel.Status.UNKNOWN -> stringResource(R.string.unknown)
 									},
 									style = MaterialTheme.typography.titleSmall
 								)
@@ -1251,9 +1335,9 @@ fun NovelInfoHeaderContent(
 						) {
 							Icon(
 								if (novelInfo.bookmarked) {
-									painterResource(drawable.ic_heart_svg_filled)
+									painterResource(R.drawable.ic_heart_svg_filled)
 								} else {
-									painterResource(drawable.ic_heart_svg)
+									painterResource(R.drawable.ic_heart_svg)
 								},
 								null,
 								tint = if (novelInfo.bookmarked)
@@ -1266,9 +1350,9 @@ fun NovelInfoHeaderContent(
 							Text(
 								stringResource(
 									if (novelInfo.bookmarked) {
-										string.fragment_novel_in_library
+										R.string.fragment_novel_in_library
 									} else {
-										string.fragment_novel_add_to_library
+										R.string.fragment_novel_add_to_library
 									}
 								),
 								style = MaterialTheme.typography.bodyLarge,
@@ -1291,14 +1375,14 @@ fun NovelInfoHeaderContent(
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
 							Icon(
-								painterResource(drawable.open_in_browser),
-								stringResource(string.action_open_in_webview),
+								painterResource(R.drawable.open_in_browser),
+								stringResource(R.string.action_open_in_webview),
 								modifier = Modifier.size(20.dp),
 								tint = MaterialTheme.colorScheme.onSurface
 							)
 							Spacer(Modifier.height(4.dp))
 							Text(
-								stringResource(string.fragment_novel_info_open_web_text),
+								stringResource(R.string.fragment_novel_info_open_web_text),
 								color = MaterialTheme.colorScheme.onSurface,
 								fontSize = 12.sp,
 								textAlign = TextAlign.Center,
@@ -1330,7 +1414,7 @@ fun NovelInfoHeaderContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Row {
-				Text(stringResource(string.chapters))
+				Text(stringResource(R.string.chapters))
 				Text("$chapterCount", modifier = Modifier.padding(start = 8.dp))
 			}
 
@@ -1351,7 +1435,7 @@ fun NovelInfoHeaderContent(
 						contentAlignment = Alignment.Center
 					) {
 						Text(
-							stringResource(string.jump_to_chapter_short),
+							stringResource(R.string.jump_to_chapter_short),
 						)
 					}
 				}
@@ -1369,10 +1453,10 @@ fun NovelInfoHeaderContent(
 						verticalAlignment = Alignment.CenterVertically,
 					) {
 						Icon(
-							painterResource(drawable.filter),
+							painterResource(R.drawable.filter),
 							null,
 						)
-						Text(stringResource(string.filter))
+						Text(stringResource(R.string.filter))
 					}
 				}
 			}
@@ -1440,14 +1524,14 @@ fun ExpandedText(
 		}
 		Icon(
 			painter = if (!isExpanded) {
-				painterResource(drawable.expand_more)
+				painterResource(R.drawable.expand_more)
 			} else {
-				painterResource(drawable.expand_less)
+				painterResource(R.drawable.expand_less)
 			},
 			contentDescription = if (!isExpanded) {
-				stringResource(string.more)
+				stringResource(R.string.more)
 			} else {
-				stringResource(string.less)
+				stringResource(R.string.less)
 			},
 			modifier = Modifier.padding(bottom = 8.dp)
 		)
@@ -1495,7 +1579,7 @@ fun CategoriesDialog(
 			}
 		},
 		title = {
-			Text(stringResource(string.set_categories))
+			Text(stringResource(R.string.set_categories))
 		},
 		text = {
 			Column(Modifier.verticalScroll(rememberScrollState())) {
