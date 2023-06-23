@@ -96,6 +96,7 @@
             android:theme="@style/AppTheme.Main" />
         <activity
             android:name="app.shosetsu.android.ui.reader.ChapterReader"
+            android:configChanges="orientation|screenSize"
             android:exported="false"
             android:theme="@style/AppTheme.Main" />
         <activity
