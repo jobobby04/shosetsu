@@ -11,6 +11,7 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -64,6 +65,16 @@ class HistoryViewModelImpl(
 				)
 			}
 		}
+
+	override val isClearBeforeDialogShown = MutableStateFlow<Boolean>(false)
+
+	override fun showClearBeforeDialog() {
+		isClearBeforeDialogShown.tryEmit(true)
+	}
+
+	override fun hideClearBeforeDialog() {
+		isClearBeforeDialogShown.tryEmit(false)
+	}
 
 	override fun clearAll() {
 		viewModelScope.launch {

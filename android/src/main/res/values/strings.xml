@@ -640,7 +640,7 @@
     <string name="fragment_history_error_empty">No history yet, Get reading!</string>
     <string name="fragment_more_dest_history">@string/fragment_history</string>
     <string name="fragment_history_menu_clear">Clear History</string>
-    <string name="fragment_history_picker_date">Select date to clear before</string>
+    <string name="fragment_history_picker_date">Select a date to clear before</string>
     <string name="settings_download_delete_on_read_title">Delete on read</string>
     <string name="settings_download_delete_on_read_desc">What chapter to delete when a chapter is read (includes previous chapters).</string>
     <string name="fragment_library_menu_tri_by_read_time">By last read</string>

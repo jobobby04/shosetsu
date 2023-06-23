@@ -18,16 +18,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,7 +64,6 @@ import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.android.material.datepicker.MaterialDatePicker
 
 /*
  * This file is part of shosetsu.
@@ -125,25 +131,15 @@ class HistoryFragment : ShosetsuFragment(), MenuProvider {
 			}
 
 			R.id.fragment_history_clear_before -> {
-				onUserClearBefore()
+				viewModel.showClearBeforeDialog()
 				true
 			}
 
 			else -> false
 		}
-
-	private fun onUserClearBefore() {
-		MaterialDatePicker.Builder.datePicker()
-			.setTitleText(R.string.fragment_history_picker_date)
-			.build()
-			.apply {
-				addOnPositiveButtonClickListener {
-					viewModel.clearBefore(it)
-				}
-			}.show(parentFragmentManager, tag)
-	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryView(
 	viewModel: HistoryViewModel = viewModelDi(),
@@ -151,9 +147,56 @@ fun HistoryView(
 	openChapter: (ChapterHistoryUI) -> Unit
 ) {
 	val items = viewModel.items.collectAsLazyPagingItems()
+	val isClearBeforeDialogVisible by viewModel.isClearBeforeDialogShown.collectAsState()
 
 	ShosetsuCompose {
 		HistoryContent(items, openNovel, openChapter)
+
+		if (isClearBeforeDialogVisible) {
+			val state = rememberDatePickerState()
+
+			DatePickerDialog(
+				onDismissRequest = {
+					viewModel.hideClearBeforeDialog()
+				},
+				confirmButton = {
+					TextButton(
+						onClick = {
+							if (state.selectedDateMillis != null) {
+								viewModel.clearBefore(state.selectedDateMillis!!)
+								viewModel.hideClearBeforeDialog()
+							}
+						}
+					) {
+						Text(stringResource(android.R.string.ok))
+					}
+				},
+				dismissButton = {
+					TextButton(onClick = {
+						viewModel.hideClearBeforeDialog()
+					}) {
+						Text(stringResource(android.R.string.cancel))
+					}
+				}
+			) {
+				DatePicker(
+					state,
+					title = {
+						Text(
+							stringResource(R.string.fragment_history_picker_date),
+							modifier = Modifier.padding(
+								// Taken from DatePickerTitle
+								PaddingValues(
+									start = 24.dp,
+									end = 12.dp,
+									top = 16.dp
+								)
+							)
+						)
+					},
+				)
+			}
+		}
 	}
 }
 
