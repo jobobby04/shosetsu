@@ -4,6 +4,7 @@ import androidx.paging.PagingData
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -35,6 +36,21 @@ abstract class HistoryViewModel : ShosetsuViewModel() {
 	 * History items
 	 */
 	abstract val items: Flow<PagingData<ChapterHistoryUI>>
+
+	/**
+	 * Show clear before dialog or not
+	 */
+	abstract val isClearBeforeDialogShown: StateFlow<Boolean>
+
+	/**
+	 * Show clear before dialog
+	 */
+	abstract fun showClearBeforeDialog()
+
+	/**
+	 * Hide clear before dialog
+	 */
+	abstract fun hideClearBeforeDialog()
 
 	/**
 	 * Remove all history
