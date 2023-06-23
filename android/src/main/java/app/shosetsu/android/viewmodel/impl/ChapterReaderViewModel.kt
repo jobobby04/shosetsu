@@ -176,6 +176,10 @@ class ChapterReaderViewModel(
 	override val ttsPitch by lazy {
 		settingsRepo.getFloatFlow(ReaderPitch)
 	}
+	override val ttsVoice: StateFlow<String> by lazy {
+		settingsRepo.getStringFlow(ReaderVoice)
+	}
+
 	override val ttsSpeed by lazy {
 		settingsRepo.getFloatFlow(ReaderSpeed)
 	}

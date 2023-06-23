@@ -156,6 +156,10 @@ fun ChapterReaderView(
 								?.let { item ->
 									tts.setPitch(viewModel.ttsPitch.value / 10)
 									tts.setSpeechRate(viewModel.ttsSpeed.value / 10)
+									tts.voice =
+										tts.voices?.find { it.name == viewModel.ttsVoice.value }
+											?: tts.defaultVoice
+
 									when (chapterType!!) {
 										Novel.ChapterType.STRING -> {
 											viewModel.getChapterStringPassage(item)
