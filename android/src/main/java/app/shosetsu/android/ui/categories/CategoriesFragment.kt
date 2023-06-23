@@ -18,12 +18,10 @@
 
 package app.shosetsu.android.ui.categories
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -33,25 +31,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.makeSnackBar
 import app.shosetsu.android.common.ext.viewModel
-import app.shosetsu.android.databinding.CategoriesAddBinding
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuFragment
@@ -59,12 +65,17 @@ import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
+import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel.CategoryChangeState
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.Flow
 
 class CategoriesFragment : ShosetsuFragment(), ExtendedFABController {
 
-	val viewModel: ACategoriesViewModel by viewModel()
+	private lateinit var fab: ExtendedFABController.EFabMaintainer
+
+	private val viewModel: ACategoriesViewModel by viewModel()
+
+	override val viewTitleRes: Int = R.string.categories
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -73,104 +84,181 @@ class CategoriesFragment : ShosetsuFragment(), ExtendedFABController {
 	): View {
 		setViewTitle()
 		return ComposeView {
-			ShosetsuCompose {
-				val items by viewModel.liveData.collectAsState()
-
-				CategoriesContent(
-					items = items,
-					onRemove = {
-						onRemove(it, requireContext())
-					},
-					onMoveUp = {
-						viewModel.moveUp(it).observeMoveCategory()
-					},
-					onMoveDown = {
-						viewModel.moveDown(it).observeMoveCategory()
-					},
-					fab = fab
-				)
-			}
+			CategoriesView(
+				viewModel,
+				fab,
+				makeSnackBar = { makeSnackBar(it) }
+			)
 		}
 	}
 
-	private fun onRemove(item: CategoryUI, context: Context) {
-		AlertDialog.Builder(context)
-			.setTitle(R.string.alert_dialog_title_warn_categories_removal)
-			.setMessage(R.string.alert_dialog_message_warn_categories_removal)
-			.setPositiveButton(android.R.string.ok) { _, _ ->
-				removeCategory(item)
-			}.setNegativeButton(android.R.string.cancel) { _, _ ->
-			}.show()
-	}
-
-	private fun removeCategory(item: CategoryUI) {
-		// Pass item to viewModel to remove, observe result
-		viewModel.remove(item).observe(
-			catch = {
-				logE("Failed to remove category $item", it)
-				makeSnackBar(R.string.toast_categories_remove_fail)
-					?.setAction(R.string.generic_question_retry) {
-						removeCategory(item)
-					}?.show()
-			}
-		) {
-			// Inform user of the category being removed
-			makeSnackBar(
-				R.string.fragment_categories_snackbar_repo_removed,
-			)?.show()
-		}
-	}
-
-
-	private fun addCategory(name: String) {
-		viewModel.addCategory(name).observe(
-			catch = {
-				// Inform the user the category couldn't be added
-				makeSnackBar(R.string.toast_categories_add_fail)?.show()
-			}
-		) {
-			// Inform the user that the category was added
-			makeSnackBar(R.string.toast_categories_added)?.show()
-		}
-	}
-
-	private fun Flow<Unit>.observeMoveCategory() {
-		observe(
-			catch = {
-				// Inform the user the category couldn't be added
-				makeSnackBar(R.string.toast_categories_move_fail)?.show()
-			}
-		) {}
-	}
-
-	private fun launchAddCategoryDialog(view: View) {
-		val addBinding = CategoriesAddBinding.inflate(LayoutInflater.from(view.context))
-
-		AlertDialog.Builder(view.context)
-			.setView(addBinding.root)
-			.setTitle(R.string.categories_add_title)
-			.setPositiveButton(android.R.string.ok) { _, _ ->
-				with(addBinding) {
-					// Pass data to view model, observe result
-					addCategory(
-						nameInput.text.toString(),
-					)
-				}
-			}
-			.setNegativeButton(android.R.string.cancel) { _, _ -> }
-			.show()
-	}
-
-	private lateinit var fab: ExtendedFABController.EFabMaintainer
 	override fun manipulateFAB(fab: ExtendedFABController.EFabMaintainer) {
 		this.fab = fab
 		fab.setIconResource(R.drawable.add_circle_outline)
 		fab.setText(R.string.fragment_categories_action_add)
 
 		// When the FAB is clicked, open a alert dialog to input a new category
-		fab.setOnClickListener { launchAddCategoryDialog(it) }
+		fab.setOnClickListener {
+			viewModel.showAddDialog()
+		}
 	}
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoriesView(
+	viewModel: ACategoriesViewModel,
+	fab: ExtendedFABController.EFabMaintainer,
+	makeSnackBar: (
+		stringRes: Int,
+	) -> Snackbar?
+) {
+	ShosetsuCompose {
+		val items by viewModel.liveData.collectAsState()
+
+		val addCategoryState by viewModel.addCategoryState.collectAsState()
+		LaunchedEffect(addCategoryState) {
+			when (addCategoryState) {
+				CategoryChangeState.Finished ->
+					makeSnackBar(R.string.toast_categories_added)?.show()
+
+				is CategoryChangeState.Failure ->
+					makeSnackBar(R.string.toast_categories_add_fail)?.show()
+
+				CategoryChangeState.Unknown -> {}
+			}
+		}
+
+		val removeCategoryState by viewModel.removeCategoryState.collectAsState()
+		LaunchedEffect(removeCategoryState) {
+			when (addCategoryState) {
+				CategoryChangeState.Finished ->
+					makeSnackBar(R.string.fragment_categories_snackbar_repo_removed)?.show()
+
+				is CategoryChangeState.Failure -> {
+					val state = removeCategoryState as CategoryChangeState.Failure
+					logE("Failed to remove category ${state.category}", state.exception)
+					makeSnackBar(R.string.toast_categories_remove_fail)
+						?.setAction(R.string.generic_question_retry) {
+							viewModel.remove(state.category)
+						}?.show()
+				}
+
+				CategoryChangeState.Unknown -> {}
+			}
+		}
+
+		val moveUpCategoryState by viewModel.moveUpCategoryState.collectAsState()
+		LaunchedEffect(moveUpCategoryState) {
+			when (addCategoryState) {
+				CategoryChangeState.Finished -> {}
+				is CategoryChangeState.Failure ->
+					makeSnackBar(R.string.toast_categories_move_fail)?.show()
+
+				CategoryChangeState.Unknown -> {}
+			}
+		}
+
+		val moveDownCategoryState by viewModel.moveDownCategoryState.collectAsState()
+		LaunchedEffect(moveDownCategoryState) {
+			when (addCategoryState) {
+				CategoryChangeState.Finished -> {}
+				is CategoryChangeState.Failure ->
+					makeSnackBar(R.string.toast_categories_move_fail)?.show()
+
+				CategoryChangeState.Unknown -> {}
+			}
+		}
+
+		var itemToRemove: CategoryUI? by remember { mutableStateOf(null) }
+
+		CategoriesContent(
+			items = items,
+			onRemove = {
+				itemToRemove = it
+			},
+			onMoveUp = {
+				viewModel.moveUp(it)
+			},
+			onMoveDown = {
+				viewModel.moveDown(it)
+			},
+			fab = fab
+		)
+
+		if (itemToRemove != null) {
+			AlertDialog(
+				onDismissRequest = {
+					itemToRemove = null
+				},
+				confirmButton = {
+					TextButton(
+						onClick = {
+							viewModel.remove(itemToRemove!!)
+							itemToRemove = null
+						}
+					) {
+						Text(stringResource(android.R.string.ok))
+					}
+				},
+				dismissButton = {
+					TextButton(onClick = { itemToRemove = null }) {
+						Text(stringResource(android.R.string.cancel))
+					}
+				},
+				title = {
+					Text(stringResource(R.string.alert_dialog_title_warn_categories_removal))
+				},
+				text = {
+					Text(stringResource(R.string.alert_dialog_message_warn_categories_removal))
+				}
+			)
+		}
+
+		val isAddDialogVisible by viewModel.isAddDialogVisible.collectAsState()
+
+		if (isAddDialogVisible) {
+			var text by remember { mutableStateOf("") }
+			AlertDialog(
+				onDismissRequest = {
+					viewModel.hideAddDialog()
+				},
+				confirmButton = {
+					TextButton(
+						onClick = {
+							viewModel.addCategory(text)
+							viewModel.hideAddDialog()
+						},
+						enabled = text.isNotBlank()
+					) {
+						Text(stringResource(android.R.string.ok))
+					}
+				},
+				dismissButton = {
+					TextButton(onClick = { viewModel.hideAddDialog() }) {
+						Text(stringResource(android.R.string.cancel))
+					}
+				},
+				title = {
+					Text(stringResource(R.string.categories_add_title))
+				},
+				text = {
+					OutlinedTextField(
+						text,
+						onValueChange = {
+							if (!it.contains('\n'))
+								text = it
+						},
+						label = {
+							Text(stringResource(R.string.categories_add_name_hint))
+						},
+						isError = text.isBlank(),
+						singleLine = true
+					)
+				}
+			)
+		}
+	}
 }
 
 @Composable
