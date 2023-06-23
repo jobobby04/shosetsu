@@ -32,6 +32,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 
@@ -109,11 +110,14 @@ class CatalogViewModel(
 				is Filter.FList -> {
 					filter.filters.toList().init()
 				}
+
 				is Filter.Group<*> -> {
 					filter.filters.toList().init()
 				}
+
 				is Filter.Header -> {
 				}
+
 				is Filter.Separator -> {
 				}
 			}
@@ -193,8 +197,10 @@ class CatalogViewModel(
 		when {
 			extensionIDFlow.value == -1 ->
 				logI("Setting NovelID")
+
 			extensionIDFlow.value != extensionID ->
 				logI("NovelID not equal, resetting")
+
 			extensionIDFlow.value == extensionID -> {
 				logI("Ignore if the same")
 				return
@@ -237,16 +243,39 @@ class CatalogViewModel(
 	}
 
 	override fun backgroundNovelAdd(
-		novelID: Int,
+		item: ACatalogNovelUI,
 		categories: IntArray
-	): Flow<BackgroundNovelAddProgress> =
-		flow {
-			emit(BackgroundNovelAddProgress.ADDING)
-			backgroundAddUseCase(novelID)
-			if (categories.isNotEmpty())
-				setNovelCategoriesUseCase(novelID, categories)
-			emit(BackgroundNovelAddProgress.ADDED)
-		}.onIO()
+	) {
+		launchIO {
+			logI("Adding novel to library in background: $item")
+			if (item.bookmarked) {
+				logI("Ignoring, already bookmarked: $item")
+				return@launchIO
+			}
+
+			backgroundAddState.emit(BackgroundNovelAddProgress.Adding)
+			try {
+				backgroundAddUseCase(item.id)
+				if (categories.isNotEmpty())
+					setNovelCategoriesUseCase(item.id, categories)
+			} catch (e: Exception) {
+				backgroundAddState.emit(BackgroundNovelAddProgress.Failure(e))
+				return@launchIO
+			}
+			backgroundAddState.emit(BackgroundNovelAddProgress.Added(
+				item.title.let {
+					if (it.length > 20)
+						it.substring(0, 20) + "..."
+					else it
+				}
+			))
+			delay(100)
+			backgroundAddState.emit(BackgroundNovelAddProgress.Unknown)
+		}
+	}
+
+	override val backgroundAddState =
+		MutableStateFlow<BackgroundNovelAddProgress>(BackgroundNovelAddProgress.Unknown)
 
 	private val filterMutex = Mutex()
 	override fun applyFilter() {
