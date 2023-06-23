@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,7 +26,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -70,11 +71,6 @@ import kotlin.random.Random
  */
 class ConfigureExtensionFragment : ShosetsuFragment(),
 	CollapsedToolBarController {
-	val viewModel: AExtensionConfigureViewModel by viewModel()
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.setExtensionID(requireArguments().getInt(BUNDLE_EXTENSION))
-	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -83,17 +79,29 @@ class ConfigureExtensionFragment : ShosetsuFragment(),
 	): View {
 		setViewTitle()
 		return ComposeView {
-			ShosetsuCompose {
-				ConfigureExtensionContent(
-					viewModel,
-					onExit = { activity?.onBackPressedDispatcher?.onBackPressed() })
-			}
+			ConfigureExtensionView(
+				requireArguments().getInt(BUNDLE_EXTENSION),
+				onExit = { activity?.onBackPressedDispatcher?.onBackPressed() }
+			)
 		}
 	}
+}
 
-	override fun onDestroy() {
-		super.onDestroy()
-		viewModel.destroy()
+@Composable
+fun ConfigureExtensionView(
+	extensionId: Int,
+	viewModel: AExtensionConfigureViewModel = viewModelDi(),
+	onExit: () -> Unit
+) {
+	LaunchedEffect(extensionId) {
+		viewModel.setExtensionID(extensionId)
+	}
+
+	ShosetsuCompose {
+		ConfigureExtensionContent(
+			viewModel,
+			onExit
+		)
 	}
 }
 
