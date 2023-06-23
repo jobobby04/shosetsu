@@ -92,14 +92,21 @@ abstract class ACatalogViewModel :
 
 	/**
 	 * Bookmarks and loads the specific novel in the background
-	 * @param novelID ID of novel to load
+	 * @param item ID of novel to load
 	 */
 	abstract fun backgroundNovelAdd(
-		novelID: Int,
-		categories: IntArray
-	): Flow<BackgroundNovelAddProgress>
+		item: ACatalogNovelUI,
+		categories: IntArray = intArrayOf()
+	)
 
-	enum class BackgroundNovelAddProgress { ADDING, ADDED }
+	abstract val backgroundAddState: StateFlow<BackgroundNovelAddProgress>
+
+	sealed class BackgroundNovelAddProgress {
+		object Unknown : BackgroundNovelAddProgress()
+		object Adding : BackgroundNovelAddProgress()
+		class Added(val title: String) : BackgroundNovelAddProgress()
+		class Failure(val error: Exception) : BackgroundNovelAddProgress()
+	}
 
 	/**
 	 * Apply filters

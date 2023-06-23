@@ -37,8 +37,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
+import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
-import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.*
 import app.shosetsu.android.common.ext.*
@@ -52,9 +52,11 @@ import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaint
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
-import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDED
-import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.ADDING
+import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
+import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
+import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
 import org.acra.ACRA
@@ -98,160 +100,47 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
 		return ComposeView {
-			ShosetsuCompose {
-				val type by viewModel.novelCardTypeLive.collectAsState()
-
-				val columnsInV by viewModel.columnsInV.collectAsState()
-				val columnsInH by viewModel.columnsInH.collectAsState()
-
-				val items = viewModel.itemsLive.collectAsLazyPagingItems()
-
-				val exception by viewModel.exceptionFlow.collectAsState()
-				val hasFilters by viewModel.hasFilters.collectAsState()
-
-				val categories by viewModel.categories.collectAsState()
-				var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
-
-				if (exception != null)
-					LaunchedEffect(Unit) {
-						launchUI {
-							makeSnackBar(exception!!.message ?: "Unknown error")
-								?.setAction(R.string.retry) {
-									viewModel.resetView()
-								}
-								?.show()
-						}
-					}
-
-				val prepend = items.loadState.prepend
-				if (prepend is LoadState.Error) {
-					LaunchedEffect(Unit) {
-						launchUI {
-							makeSnackBar(prepend.error.message ?: "Unknown error")
-								?.setAction(R.string.retry) {
-									items.retry()
-								}
-								?.show()
-						}
-					}
-				}
-				val append = items.loadState.prepend
-				if (append is LoadState.Error) {
-					LaunchedEffect(Unit) {
-						launchUI {
-							makeSnackBar(append.error.message ?: "Unknown error")
-								?.setAction(R.string.retry) {
-									items.retry()
-								}
-								?.show()
-						}
-					}
-				}
-
-				CatalogContent(
-					items,
-					type,
-					columnsInV,
-					columnsInH,
-					onClick = {
-						try {
-							findNavController().navigateSafely(
-								R.id.action_catalogController_to_novelController, bundleOf(
-									BUNDLE_NOVEL_ID to it.id,
-									BUNDLE_EXTENSION to requireArguments().getInt(
-										BUNDLE_EXTENSION
-									)
-								),
-								navOptions {
-									setShosetsuTransition()
-								}
-							)
-						} catch (ignored: Exception) {
-							// ignore dup
-						}
-					},
-					onLongClick = {
-						if (categories.isNotEmpty() && !it.bookmarked) {
-							categoriesDialogItem = it
-						} else {
-							itemLongClicked(it)
-						}
-					},
-					hasFilters = hasFilters,
-					fab,
-					openWebView = ::openInWebView,
-					clearCookies = {
-						viewModel.clearCookies()
-						items.refresh()
-					}
-				)
-				if (categoriesDialogItem != null) {
-					CategoriesDialog(
-						onDismissRequest = { categoriesDialogItem = null },
-						categories = categories,
-						setCategories = {
-							itemLongClicked(
-								item = categoriesDialogItem ?: return@CategoriesDialog,
-								categories = it
-							)
-						},
-						novelCategories = remember { persistentListOf() }
-					)
-				}
-			}
-		}
-	}
-
-	/**
-	 * A [ACatalogNovelUI] was long clicked, invoking a background add
-	 */
-	private fun itemLongClicked(
-		item: ACatalogNovelUI,
-		categories: IntArray = intArrayOf()
-	): Boolean {
-		logI("Adding novel to library in background: $item")
-
-		if (item.bookmarked) {
-			logI("Ignoring, already bookmarked: $item")
-			return false
-		}
-
-		var job: Job? = null
-		job = viewModel.backgroundNovelAdd(item.id, categories).observe(
-			catch = {
-				makeSnackBar(
-					getString(
-						R.string.fragment_catalogue_toast_background_add_fail,
-						it.message ?: "Unknown exception"
-					)
-				)?.setAction(R.string.report) { _ ->
-					ACRA.errorReporter.handleSilentException(it)
-				}?.show()
-			}
-		) { result ->
-			when (result) {
-				ADDING -> {
-					makeSnackBar(R.string.fragment_catalogue_toast_background_add)?.show()
-				}
-
-				ADDED -> {
-					makeSnackBar(
-						getString(
-							R.string.fragment_catalogue_toast_background_add_success,
-							item.title.let {
-								if (it.length > 20)
-									it.substring(0, 20) + "..."
-								else it
+			CatalogueView(
+				viewModel = viewModel,
+				fab,
+				onOpenNovel = {
+					try {
+						findNavController().navigateSafely(
+							R.id.action_catalogController_to_novelController, bundleOf(
+								BundleKeys.BUNDLE_NOVEL_ID to it.id,
+								BUNDLE_EXTENSION to requireArguments().getInt(
+									BUNDLE_EXTENSION
+								)
+							),
+							navOptions {
+								setShosetsuTransition()
 							}
 						)
-					)?.show()
-					job?.cancel()
+					} catch (ignored: Exception) {
+						// ignore dup
+					}
+				},
+				errorMessage = { message, action ->
+					makeSnackBar(message)
+						?.setAction(R.string.retry) {
+							action()
+						}
+						?.show()
+				},
+				openInWebView = ::openInWebView,
+				makeSnackBar = { res, arg ->
+					makeSnackBar(
+						if (arg != null) {
+							getString(res, arg)
+						} else {
+							getString(res)
+						}
+					)
 				}
-			}
+			)
 		}
-
-		return true
 	}
+
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		viewModel.setExtensionID(requireArguments().getInt(BUNDLE_EXTENSION))
@@ -431,6 +320,127 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 			else {
 				fab.hide()
 			}
+		}
+	}
+}
+
+@Composable
+fun CatalogueView(
+	viewModel: ACatalogViewModel = viewModelDi(),
+	fab: EFabMaintainer,
+	onOpenNovel: (ACatalogNovelUI) -> Unit,
+	errorMessage: (String, () -> Unit) -> Unit,
+	openInWebView: () -> Unit,
+	makeSnackBar: (Int, String?) -> Snackbar?
+) {
+	ShosetsuCompose {
+		val type by viewModel.novelCardTypeLive.collectAsState()
+
+		val columnsInV by viewModel.columnsInV.collectAsState()
+		val columnsInH by viewModel.columnsInH.collectAsState()
+
+		val items = viewModel.itemsLive.collectAsLazyPagingItems()
+
+		val exception by viewModel.exceptionFlow.collectAsState()
+		val hasFilters by viewModel.hasFilters.collectAsState()
+
+		val categories by viewModel.categories.collectAsState()
+		var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
+
+		val backgroundAddState by viewModel.backgroundAddState.collectAsState()
+
+		LaunchedEffect(backgroundAddState) {
+			when (backgroundAddState) {
+				is Added -> {
+					makeSnackBar(
+						R.string.fragment_catalogue_toast_background_add_success,
+						(backgroundAddState as Added).title
+					)?.show()
+				}
+
+				Adding -> {
+					makeSnackBar(R.string.fragment_catalogue_toast_background_add, null)?.show()
+				}
+
+				is BackgroundNovelAddProgress.Failure -> {
+					val error = (backgroundAddState as BackgroundNovelAddProgress.Failure).error
+					makeSnackBar(
+						R.string.fragment_catalogue_toast_background_add_fail,
+						error.message
+							?: "Unknown exception"
+					)?.setAction(R.string.report) { _ ->
+						ACRA.errorReporter.handleSilentException(error)
+					}?.show()
+				}
+
+				BackgroundNovelAddProgress.Unknown -> {
+				}
+			}
+		}
+
+		if (exception != null)
+			LaunchedEffect(Unit) {
+				launchUI {
+					errorMessage(exception!!.message ?: "Unknown error") {
+						viewModel.resetView()
+					}
+				}
+			}
+
+		val prepend = items.loadState.prepend
+		if (prepend is LoadState.Error) {
+			LaunchedEffect(Unit) {
+				launchUI {
+					errorMessage(prepend.error.message ?: "Unknown error") {
+						items.retry()
+					}
+				}
+			}
+		}
+		val append = items.loadState.prepend
+		if (append is LoadState.Error) {
+			LaunchedEffect(Unit) {
+				launchUI {
+					errorMessage(append.error.message ?: "Unknown error") {
+						items.retry()
+					}
+				}
+			}
+		}
+
+		CatalogContent(
+			items,
+			type,
+			columnsInV,
+			columnsInH,
+			onClick = onOpenNovel,
+			onLongClick = {
+				if (categories.isNotEmpty() && !it.bookmarked) {
+					categoriesDialogItem = it
+				} else {
+					viewModel.backgroundNovelAdd(it)
+				}
+			},
+			hasFilters = hasFilters,
+			fab,
+			openWebView = openInWebView,
+			clearCookies = {
+				viewModel.clearCookies()
+				items.refresh()
+			}
+		)
+		if (categoriesDialogItem != null) {
+			CategoriesDialog(
+				onDismissRequest = { categoriesDialogItem = null },
+				categories = categories,
+				setCategories = {
+					viewModel.backgroundNovelAdd(
+						item = categoriesDialogItem ?: return@CategoriesDialog,
+						categories = it
+					)
+				},
+				novelCategories = remember { persistentListOf() }
+			)
 		}
 	}
 }
