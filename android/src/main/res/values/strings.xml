@@ -655,6 +655,13 @@
     <string name="settings_reader_track_long_reading_title">Track long reading</string>
     <string name="settings_reader_track_long_reading_desc">Track users reading time to ensure the user maintains their eye health by requiring the user to look at something 5-10 meters away for 20 seconds every 20 minutes.</string>
     <string name="global_search">Global Search\n</string>
+    <string name="settings_reader_voice_title">Text to Speech Voice</string>
+    <string name="settings_reader_voice_desc">Which voice to use for Text to Speech</string>
+    <string name="voice_very_high">Highest</string>
+    <string name="voice_high">High</string>
+    <string name="voice_normal">Normal</string>
+    <string name="voice_low">Low</string>
+    <string name="voice_very_low">Lowest</string>
     <plurals name="fragment_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>

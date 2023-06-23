@@ -102,6 +102,8 @@ abstract class AChapterReaderViewModel :
 	abstract val ttsSpeed: StateFlow<Float>
 	abstract val ttsPitch: StateFlow<Float>
 
+	abstract val ttsVoice: StateFlow<String>
+
 	/**
 	 * Is tap to scroll enabled
 	 */
