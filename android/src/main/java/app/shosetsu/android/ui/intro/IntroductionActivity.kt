@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +33,6 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.URL_KOFI
 import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.ext.readAsset
-import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ScrollStateBar
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -69,18 +69,13 @@ import org.kodein.di.android.closestDI
 class IntroductionActivity : AppCompatActivity(), DIAware {
 
 	override val di: DI by closestDI()
-	private val viewModel: AIntroViewModel by viewModel()
 
 	/***/
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 
 		setContent {
-			ShosetsuCompose {
-				IntroView(viewModel) {
-					finish()
-				}
-			}
+			IntroView(exit = ::finish)
 		}
 	}
 }
@@ -120,94 +115,110 @@ fun IntroView(
 		}
 	}
 
-	Scaffold(
-		bottomBar = {
-			BottomAppBar {
-				Row(
-					modifier = Modifier.fillMaxWidth(),
-					horizontalArrangement = Arrangement.SpaceBetween,
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					Box {
-						if (state.currentPage > 0) {
-							IconButton(
-								onClick = {
-									scope.launch {
-										state.scrollToPage(state.currentPage - 1)
-									}
-								}
-							) {
-								Icon(
-									Icons.Default.ArrowBack,
-									stringResource(androidx.navigation.ui.R.string.nav_app_bar_navigate_up_description)
-								)
-							}
-						}
-					}
-					Box {
-						if (
-							state.currentPage != IntroPages.Support.ordinal ||
-							shouldSupportShowNext
-						) {
-							IconButton(
-								onClick = {
-									nextPage()
-								}
-							) {
-								Icon(
-									if (state.currentPage != IntroPages.End.ordinal)
-										Icons.Default.ArrowForward
-									else Icons.Default.Close,
-									stringResource(
-										if (state.currentPage != IntroPages.End.ordinal)
-											R.string.intro_page_next else R.string.intro_close
-									)
-								)
-							}
-						}
+	ShosetsuCompose {
 
-					}
-				}
-			}
-		}
-	) {
-		HorizontalPager(
-			IntroPages.values().size,
-			state = state,
-			modifier = Modifier.padding(it),
-			userScrollEnabled = state.currentPage != IntroPages.Support.ordinal
-		) { page ->
-			when (page) {
-				IntroPages.Title.ordinal -> IntroTitlePage()
-				IntroPages.Explanation.ordinal -> IntroExplanationPage()
-				IntroPages.License.ordinal -> {
-					IntroLicensePage(isLicenseRead) {
-						viewModel.setLicenseRead()
-					}
-				}
-
-				IntroPages.ACRA.ordinal -> {
-					val isACRA by viewModel.isACRAEnabled.collectAsState()
-					IntroACRAPage(
-						isACRA
+		Scaffold(
+			bottomBar = {
+				BottomAppBar {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically
 					) {
-						viewModel.setACRAEnabled(it)
+						Box {
+							if (state.currentPage > 0) {
+								IconButton(
+									onClick = {
+										scope.launch {
+											state.scrollToPage(state.currentPage - 1)
+										}
+									}
+								) {
+									Icon(
+										Icons.Default.ArrowBack,
+										stringResource(androidx.navigation.ui.R.string.nav_app_bar_navigate_up_description)
+									)
+								}
+							}
+						}
+						Box {
+							if (
+								state.currentPage != IntroPages.Support.ordinal ||
+								shouldSupportShowNext
+							) {
+								IconButton(
+									onClick = {
+										nextPage()
+									}
+								) {
+									Icon(
+										if (state.currentPage != IntroPages.End.ordinal)
+											Icons.Default.ArrowForward
+										else Icons.Default.Close,
+										stringResource(
+											if (state.currentPage != IntroPages.End.ordinal)
+												R.string.intro_page_next else R.string.intro_close
+										)
+									)
+								}
+							}
+
+						}
 					}
 				}
-
-				IntroPages.Support.ordinal -> IntroSupportPage(
-					{
-						viewModel.supportShowNext()
-					},
-					::nextPage
-				)
-
-				IntroPages.Permissions.ordinal -> IntroPermissionPage()
-				IntroPages.End.ordinal -> IntroEndPage()
 			}
+		) {
+			IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
 		}
 	}
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun IntroContent(
+	viewModel: AIntroViewModel,
+	paddingValues: PaddingValues,
+	state: PagerState,
+	isLicenseRead: Boolean,
+	nextPage: () -> Unit
+) {
+	HorizontalPager(
+		IntroPages.values().size,
+		state = state,
+		modifier = Modifier.padding(paddingValues),
+		userScrollEnabled = state.currentPage != IntroPages.Support.ordinal
+	) { page ->
+		when (page) {
+			IntroPages.Title.ordinal -> IntroTitlePage()
+			IntroPages.Explanation.ordinal -> IntroExplanationPage()
+			IntroPages.License.ordinal -> {
+				IntroLicensePage(isLicenseRead) {
+					viewModel.setLicenseRead()
+				}
+			}
+
+			IntroPages.ACRA.ordinal -> {
+				val isACRA by viewModel.isACRAEnabled.collectAsState()
+				IntroACRAPage(
+					isACRA
+				) {
+					viewModel.setACRAEnabled(it)
+				}
+			}
+
+			IntroPages.Support.ordinal -> IntroSupportPage(
+				{
+					viewModel.supportShowNext()
+				},
+				nextPage
+			)
+
+			IntroPages.Permissions.ordinal -> IntroPermissionPage()
+			IntroPages.End.ordinal -> IntroEndPage()
+		}
+	}
+}
+
 
 enum class IntroPages {
 	Title,
