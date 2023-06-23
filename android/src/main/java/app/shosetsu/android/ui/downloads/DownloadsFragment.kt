@@ -44,6 +44,7 @@ import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.collectLA
 import app.shosetsu.android.common.ext.displayOfflineSnackBar
 import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.SelectableBox
@@ -79,23 +80,7 @@ class DownloadsFragment : ShosetsuFragment(),
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
 		return ComposeView {
-			ShosetsuCompose {
-				val items by viewModel.liveData.collectAsState()
-				val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
-				val hasSelected by viewModel.hasSelectedFlow.collectAsState()
-
-				DownloadsContent(
-					items = items,
-					selectedDownloadState = selectedDownloadState,
-					hasSelected = hasSelected,
-					pauseSelection = viewModel::pauseSelection,
-					startSelection = viewModel::startSelection,
-					startFailedSelection = viewModel::restartSelection,
-					deleteSelected = viewModel::deleteSelected,
-					toggleSelection = viewModel::toggleSelection,
-					fab
-				)
-			}
+			DownloadsView(viewModel, fab)
 		}
 	}
 
@@ -210,6 +195,30 @@ class DownloadsFragment : ShosetsuFragment(),
 			showFAB(fab!!)
 			viewModel.deselectAll()
 		}
+	}
+}
+
+@Composable
+fun DownloadsView(
+	viewModel: ADownloadsViewModel = viewModelDi(),
+	fab: EFabMaintainer?
+) {
+	ShosetsuCompose {
+		val items by viewModel.liveData.collectAsState()
+		val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
+		val hasSelected by viewModel.hasSelectedFlow.collectAsState()
+
+		DownloadsContent(
+			items = items,
+			selectedDownloadState = selectedDownloadState,
+			hasSelected = hasSelected,
+			pauseSelection = viewModel::pauseSelection,
+			startSelection = viewModel::startSelection,
+			startFailedSelection = viewModel::restartSelection,
+			deleteSelected = viewModel::deleteSelected,
+			toggleSelection = viewModel::toggleSelection,
+			fab
+		)
 	}
 }
 
