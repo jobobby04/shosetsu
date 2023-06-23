@@ -124,8 +124,11 @@ fun ChapterReaderView(
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
 			while (!isReadingTooLong) {
+				val startTime = System.currentTimeMillis()
 				delay(MAX_CONTINOUS_READING_TIME)
-				viewModel.userIsReadingTooLong()
+				val currentTime = System.currentTimeMillis()
+				if ((currentTime - startTime) < ((MAX_CONTINOUS_READING_TIME / .25)))
+					viewModel.userIsReadingTooLong()
 			}
 		}
 
