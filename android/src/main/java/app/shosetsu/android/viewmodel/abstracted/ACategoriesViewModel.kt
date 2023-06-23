@@ -22,29 +22,77 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 abstract class ACategoriesViewModel : SubscribeViewModel<ImmutableList<CategoryUI>>,
 	ShosetsuViewModel() {
+
+	/**
+	 * Is the add category dialog visible
+	 */
+	abstract val isAddDialogVisible: StateFlow<Boolean>
+
+	/**
+	 * State of adding a category
+	 */
+	abstract val addCategoryState: StateFlow<CategoryChangeState>
+
+	/**
+	 * State of removing a category
+	 */
+	abstract val removeCategoryState: StateFlow<CategoryChangeState>
+
+	/**
+	 * State of moving a category up
+	 */
+	abstract val moveUpCategoryState: StateFlow<CategoryChangeState>
+
+	/**
+	 * State of moving a category down
+	 */
+	abstract val moveDownCategoryState: StateFlow<CategoryChangeState>
+
 	/**
 	 * Adds a category via a string the user provides
 	 *
 	 * @param name The name of the category
 	 */
-	abstract fun addCategory(name: String): Flow<Unit>
+	abstract fun addCategory(name: String)
 
 	/**
 	 * Remove the category from the app
 	 */
-	abstract fun remove(categoryUI: CategoryUI): Flow<Unit>
+	abstract fun remove(categoryUI: CategoryUI)
 
 	/**
 	 * Move the category up one
 	 */
-	abstract fun moveUp(categoryUI: CategoryUI): Flow<Unit>
+	abstract fun moveUp(categoryUI: CategoryUI)
 
 	/**
 	 * Move the category down one
 	 */
-	abstract fun moveDown(categoryUI: CategoryUI): Flow<Unit>
+	abstract fun moveDown(categoryUI: CategoryUI)
+
+	/**
+	 * Show the add category dialog
+	 */
+	abstract fun showAddDialog()
+
+	/**
+	 * Hide the add category dialog
+	 */
+	abstract fun hideAddDialog()
+
+
+	/**
+	 * State of any given category change
+	 */
+	sealed class CategoryChangeState {
+		object Unknown : CategoryChangeState()
+
+		object Finished : CategoryChangeState()
+
+		class Failure(val category: CategoryUI, val exception: Exception) : CategoryChangeState()
+	}
 }
