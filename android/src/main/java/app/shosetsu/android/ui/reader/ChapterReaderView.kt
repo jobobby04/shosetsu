@@ -20,6 +20,7 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -46,7 +47,6 @@ import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.compose.TextButton
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
