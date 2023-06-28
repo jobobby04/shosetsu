@@ -1,0 +1,4 @@
+# v2.4.2
+
+## Fixes
+- Disable development mode (oops!)
