@@ -1,11 +1,59 @@
 package app.shosetsu.android.di
 
-import app.shosetsu.android.viewmodel.abstracted.*
-import app.shosetsu.android.viewmodel.abstracted.settings.*
-import app.shosetsu.android.viewmodel.impl.*
+import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
+import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
+import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
+import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
+import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
+import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
+import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
+import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
+import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
+import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
+import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
+import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
+import app.shosetsu.android.viewmodel.abstracted.AMigrationViewModel
+import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
+import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
+import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
+import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
+import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
+import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
+import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
+import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.AUpdateSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.AboutViewModel
+import app.shosetsu.android.viewmodel.impl.AddShareViewModel
+import app.shosetsu.android.viewmodel.impl.AnalyticsViewModelImpl
+import app.shosetsu.android.viewmodel.impl.CSSEditorViewModel
+import app.shosetsu.android.viewmodel.impl.CatalogViewModel
+import app.shosetsu.android.viewmodel.impl.CategoriesViewModel
+import app.shosetsu.android.viewmodel.impl.ChapterReaderViewModel
+import app.shosetsu.android.viewmodel.impl.DownloadsViewModel
+import app.shosetsu.android.viewmodel.impl.HistoryViewModelImpl
+import app.shosetsu.android.viewmodel.impl.IntroViewModel
+import app.shosetsu.android.viewmodel.impl.LibraryViewModel
+import app.shosetsu.android.viewmodel.impl.MainViewModel
+import app.shosetsu.android.viewmodel.impl.MigrationViewModel
+import app.shosetsu.android.viewmodel.impl.NovelViewModel
+import app.shosetsu.android.viewmodel.impl.RepositoryViewModel
+import app.shosetsu.android.viewmodel.impl.SearchViewModel
+import app.shosetsu.android.viewmodel.impl.TextAssetReaderViewModel
+import app.shosetsu.android.viewmodel.impl.UpdatesViewModel
 import app.shosetsu.android.viewmodel.impl.extension.ExtensionConfigureViewModel
 import app.shosetsu.android.viewmodel.impl.extension.ExtensionsViewModel
-import app.shosetsu.android.viewmodel.impl.settings.*
+import app.shosetsu.android.viewmodel.impl.extension.WebViewViewModelImpl
+import app.shosetsu.android.viewmodel.impl.settings.AdvancedSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.BackupSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.DownloadSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.ReaderSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.UpdateSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.ViewSettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -303,5 +351,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance()
 		)
+	}
+	bind<WebViewViewModel>() with provider {
+		WebViewViewModelImpl(instance())
 	}
 }
