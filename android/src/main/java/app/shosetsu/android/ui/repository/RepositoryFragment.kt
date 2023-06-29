@@ -1,12 +1,12 @@
 package app.shosetsu.android.ui.repository
 
-import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -14,19 +14,23 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
-import androidx.core.widget.addTextChangedListener
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.REPOSITORY_HELP_URL
 import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.databinding.RepositoryAddBinding
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -36,12 +40,15 @@ import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaint
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
-import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE
+import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel.AddRepoState
+import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel.RemoveRepoState
+import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel.ToggleRepoIsEnabledState
+import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel.UndoRepoRemoveState
+import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.acra.ACRA
-import androidx.appcompat.app.AlertDialog.Builder as AlertDialogBuilder
 
 /*
  * This file is part of Shosetsu.
@@ -66,10 +73,13 @@ import androidx.appcompat.app.AlertDialog.Builder as AlertDialogBuilder
  */
 class RepositoryFragment : ShosetsuFragment(),
 	ExtendedFABController, MenuProvider {
-	private val viewModel: ARepositoryViewModel by viewModel()
-
 	override val viewTitleRes: Int = R.string.repositories
 
+	private val viewModel: ARepositoryViewModel by viewModel()
+
+	private lateinit var fab: EFabMaintainer
+
+	/***/
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -78,200 +88,35 @@ class RepositoryFragment : ShosetsuFragment(),
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		setViewTitle()
 		return ComposeView {
-			ShosetsuCompose {
-				val items by viewModel.liveData.collectAsState()
-
-				RepositoriesContent(
-					items = items,
-					toggleEnabled = {
-						toggleIsEnabled(it)
-					},
-					onRemove = {
-						onRemove(it, requireContext())
-					},
-					addRepository = {
-						launchAddRepositoryDialog(requireView())
-					},
-					onRefresh = {
-						onRefresh()
-					},
-					fab
-				)
-			}
-		}
-	}
-
-	private fun onRemove(item: RepositoryUI, context: Context) {
-		AlertDialogBuilder(context)
-			.setTitle(R.string.alert_dialog_title_warn_repo_removal)
-			.setMessage(R.string.alert_dialog_message_warn_repo_removal)
-			.setPositiveButton(android.R.string.ok) { _, _ ->
-				removeRepository(item)
-			}.setNegativeButton(android.R.string.cancel) { _, _ ->
-			}.show()
-	}
-
-	private fun undoRemoveRepository(item: RepositoryUI) {
-		viewModel.undoRemove(item).observe(
-
-			catch = {
-				it.printStackTrace()
-				ACRA.errorReporter.handleSilentException(it)
-
-				// Warn the user that there was an error
-				makeSnackBar(R.string.fragment_repositories_snackbar_fail_undo_repo_removal)
-					// Ask if the user wants to retry
-					?.setAction(R.string.generic_question_retry) {
-						undoRemoveRepository(item)
-					}
-					// If the user doesn't want to retry, ask to refresh
-					?.setOnDismissedNotByAction { _, _ ->
-						showWarning()
-					}
-					?.show()
-			}
-		) {
-			// Success, ask to refresh
-			showWarning()
-		}
-	}
-
-	private fun removeRepository(item: RepositoryUI) {
-		// Pass item to viewModel to remove, observe result
-		viewModel.remove(item).observe(
-			catch = {
-				logE("Failed to remove repository $item", it)
-				makeSnackBar(R.string.toast_repository_remove_fail)
-					?.setAction(R.string.generic_question_retry) {
-						removeRepository(item)
-					}?.show()
-			}
-		) {
-			// Inform user of the repository being removed
-			makeSnackBar(
-				R.string.fragment_repositories_snackbar_repo_removed,
+			RepositoriesView(
+				viewModel,
+				::displayOfflineSnackBar,
+				makeSnackBar = {
+					makeSnackBar(it)
+				},
+				makeSnackBarT = { a, b ->
+					makeSnackBar(a, b)
+				},
+				fab
 			)
-				// Ask the user if they want to undo
-				?.setAction(R.string.generic_undo) {
-					undoRemoveRepository(item)
-				}
-				// If they don't, ask to refresh
-				?.setOnDismissedNotByAction { _, _ ->
-					showWarning()
-				}?.show()
 		}
 	}
 
-	private fun toggleIsEnabled(item: RepositoryUI) {
-		viewModel.toggleIsEnabled(item).observe(
-			catch = {
-				// Inform the user of an error
-				makeSnackBar(R.string.toast_error_repository_toggle_enabled_failed)
-					// Ask the user if they want to retry
-					?.setAction(R.string.generic_question_retry) {
-						toggleIsEnabled(item)
-					}?.show()
-			}
-		) { newState ->
-			// Inform the user of the new state
-			makeSnackBar(
-				if (newState)
-					R.string.toast_success_repository_toggled_enabled
-				else
-					R.string.toast_success_repository_toggled_disabled
-			)
-				// After, ask the user if they want to refresh
-				?.setOnDismissed { _, event ->
-					if (event != DISMISS_EVENT_CONSECUTIVE)
-						showWarning()
-				}?.show()
-		}
-	}
-
-	private fun addRepository(name: String, url: String) {
-		viewModel.addRepository(name, url).observe(
-			catch = {
-				// Inform the user the repository couldn't be added
-				makeSnackBar(R.string.toast_repository_add_fail)
-					// Ask the user if they want to retry
-					?.setAction(R.string.generic_question_retry) {
-						addRepository(name, url)
-					}?.show()
-			}
-		) {
-			// Inform the user that the repository was added
-			makeSnackBar(R.string.toast_repository_added)
-				// Ask if the user wants to refresh the UI
-				?.setOnDismissed { _, _ ->
-					showWarning()
-				}?.show()
-		}
-	}
-
-	private fun launchAddRepositoryDialog(view: View) {
-		val addBinding: RepositoryAddBinding =
-			RepositoryAddBinding.inflate(LayoutInflater.from(view.context))
-		var error = false
-
-		addBinding.urlInput.addTextChangedListener {
-			error = false
-			if (it.toString().toHttpUrlOrNull() == null) {
-				error = true
-				addBinding.urlInput.error = getString(R.string.fragment_repositories_add_error)
-			}
-		}
-
-		AlertDialogBuilder(view.context)
-			.setView(addBinding.root)
-			.setTitle(R.string.repository_add_title)
-			.setPositiveButton(android.R.string.ok) { _, _ ->
-				if (!error)
-					with(addBinding) {
-						// Pass data to view model, observe result
-						addRepository(
-							nameInput.text.toString(),
-							urlInput.text.toString()
-						)
-					}
-			}
-			.setNegativeButton(android.R.string.cancel) { _, _ -> }
-			.show()
-	}
-
-	/**
-	 * Warn the user that they need to refresh their extension list
-	 */
-	private fun showWarning() {
-		makeSnackBar(
-			R.string.fragment_repositories_snackbar_repo_changed,
-			length = Snackbar.LENGTH_LONG
-		)
-			// Ask the user if they want to refresh
-			?.setAction(R.string.fragment_repositories_action_repo_update) {
-				onRefresh()
-			}?.show()
-	}
-
-	private lateinit var fab: EFabMaintainer
 	override fun manipulateFAB(fab: EFabMaintainer) {
-		this.fab = fab
-		fab.setIconResource(R.drawable.add_circle_outline)
-		fab.setText(R.string.fragment_repositories_action_add)
-
-		// When the FAB is clicked, open a alert dialog to input a new repository
-		fab.setOnClickListener { launchAddRepositoryDialog(it) }
+		this.fab = fab.apply {
+			setIconResource(R.drawable.add_circle_outline)
+			setText(R.string.fragment_repositories_action_add)
+			// When the FAB is clicked, open a alert dialog to input a new repository
+			setOnClickListener { viewModel.showAddDialog() }
+		}
 	}
 
-	private fun onRefresh() {
-		if (viewModel.isOnline()) {
-			viewModel.updateRepositories()
-		} else displayOfflineSnackBar(R.string.fragment_repositories_snackbar_offline_no_update)
-	}
-
+	/***/
 	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
 		menuInflater.inflate(R.menu.repositories, menu)
 	}
 
+	/***/
 	override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
 		when (menuItem.itemId) {
 			R.id.help -> {
@@ -283,6 +128,312 @@ class RepositoryFragment : ShosetsuFragment(),
 		}
 }
 
+/**
+ * View of repositories
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RepositoriesView(
+	viewModel: ARepositoryViewModel = viewModelDi(),
+	displayOfflineSnackBar: (Int) -> Unit,
+	makeSnackBar: (Int) -> Snackbar?,
+	makeSnackBarT: (Int, Int) -> Snackbar?,
+	fab: EFabMaintainer
+) {
+	ShosetsuCompose {
+
+		fun onRefresh() {
+			if (viewModel.isOnline()) {
+				viewModel.updateRepositories()
+			} else displayOfflineSnackBar(R.string.fragment_repositories_snackbar_offline_no_update)
+		}
+
+		/**
+		 * Warn the user that they need to refresh their extension list
+		 */
+		fun showWarning() {
+			makeSnackBarT(
+				R.string.fragment_repositories_snackbar_repo_changed,
+				Snackbar.LENGTH_LONG
+			)
+				// Ask the user if they want to refresh
+				?.setAction(R.string.fragment_repositories_action_repo_update) {
+					onRefresh()
+				}?.show()
+		}
+
+		val items by viewModel.liveData.collectAsState()
+		var itemToRemove: RepositoryUI? by remember { mutableStateOf(null) }
+		val isAddDialogVisible by viewModel.isAddDialogVisible.collectAsState()
+
+		val removeState by viewModel.removeState.collectAsState()
+		val addRepoState by viewModel.addState.collectAsState()
+		val undoRemoveState by viewModel.undoRemoveState.collectAsState()
+		val toggleIsEnabledState by viewModel.toggleIsEnabledState.collectAsState()
+
+		LaunchedEffect(removeState) {
+			when (removeState) {
+				is RemoveRepoState.Failure -> {
+					val (exception, repo) = removeState as RemoveRepoState.Failure
+
+					logE(
+						"Failed to remove repository $repo",
+						exception
+					)
+					makeSnackBar(R.string.toast_repository_remove_fail)
+						?.setAction(R.string.generic_question_retry) {
+							viewModel.remove(repo)
+						}?.show()
+				}
+
+				is RemoveRepoState.Success -> {
+					val (repo) = removeState as RemoveRepoState.Success
+
+					// Inform user of the repository being removed
+					makeSnackBar(
+						R.string.fragment_repositories_snackbar_repo_removed,
+					)
+						// Ask the user if they want to undo
+						?.setAction(R.string.generic_undo) {
+							viewModel.undoRemove(repo)
+						}
+						// If they don't, ask to refresh
+						?.setOnDismissedNotByAction { _, _ ->
+							showWarning()
+						}?.show()
+				}
+
+				RemoveRepoState.Unknown -> {}
+			}
+		}
+
+		LaunchedEffect(addRepoState) {
+			when (addRepoState) {
+				is AddRepoState.Failure -> {
+					val (_, name, url) = addRepoState as AddRepoState.Failure
+					// Inform the user the repository couldn't be added
+					makeSnackBar(R.string.toast_repository_add_fail)
+						// Ask the user if they want to retry
+						?.setAction(R.string.generic_question_retry) {
+							viewModel.addRepository(name, url)
+						}?.show()
+				}
+
+				AddRepoState.Success -> {
+					// Inform the user that the repository was added
+					makeSnackBar(R.string.toast_repository_added)
+						// Ask if the user wants to refresh the UI
+						?.setOnDismissed { _, _ ->
+							showWarning()
+						}?.show()
+				}
+
+				AddRepoState.Unknown -> {
+				}
+			}
+		}
+
+		LaunchedEffect(undoRemoveState) {
+			when (undoRemoveState) {
+				is UndoRepoRemoveState.Failure -> {
+					val (repo, exception) =
+						undoRemoveState as UndoRepoRemoveState.Failure
+
+					exception.printStackTrace()
+					ACRA.errorReporter.handleSilentException(exception)
+
+					// Warn the user that there was an error
+					makeSnackBar(R.string.fragment_repositories_snackbar_fail_undo_repo_removal)
+						// Ask if the user wants to retry
+						?.setAction(R.string.generic_question_retry) {
+							viewModel.undoRemove(repo)
+						}
+						// If the user doesn't want to retry, ask to refresh
+						?.setOnDismissedNotByAction { _, _ ->
+							showWarning()
+						}
+						?.show()
+				}
+
+				UndoRepoRemoveState.Success -> {
+					// Success, ask to refresh
+					showWarning()
+				}
+
+				UndoRepoRemoveState.Unknown -> {
+				}
+			}
+		}
+
+		LaunchedEffect(toggleIsEnabledState) {
+			when (toggleIsEnabledState) {
+				is ToggleRepoIsEnabledState.Failure -> {
+					val (repo, _) = toggleIsEnabledState as ToggleRepoIsEnabledState.Failure
+
+					// Inform the user of an error
+					makeSnackBar(R.string.toast_error_repository_toggle_enabled_failed)
+						// Ask the user if they want to retry
+						?.setAction(R.string.generic_question_retry) {
+							viewModel.toggleIsEnabled(repo)
+						}?.show()
+				}
+
+				is ToggleRepoIsEnabledState.Success -> {
+					val (_, newState) = toggleIsEnabledState as ToggleRepoIsEnabledState.Success
+
+					// Inform the user of the new state
+					makeSnackBar(
+						if (newState)
+							R.string.toast_success_repository_toggled_enabled
+						else
+							R.string.toast_success_repository_toggled_disabled
+					)
+						// After, ask the user if they want to refresh
+						?.setOnDismissed { _, event ->
+							if (event != BaseCallback.DISMISS_EVENT_CONSECUTIVE)
+								showWarning()
+						}?.show()
+				}
+
+				ToggleRepoIsEnabledState.Unknown -> {
+				}
+			}
+		}
+
+		RepositoriesContent(
+			items = items,
+			toggleEnabled = {
+				viewModel.toggleIsEnabled(it)
+			},
+			onRemove = {
+				itemToRemove = it
+			},
+			addRepository = {
+				viewModel.showAddDialog()
+			},
+			onRefresh = ::onRefresh,
+			fab
+		)
+
+		if (isAddDialogVisible) {
+			RepositoriesAddDialog(viewModel)
+		}
+
+		if (itemToRemove != null) {
+			RepositoriesRemoveDialog(
+				repo = itemToRemove ?: return@ShosetsuCompose,
+				remove = viewModel::remove,
+				dismiss = {
+					itemToRemove = null
+				}
+			)
+		}
+	}
+}
+
+@Composable
+fun RepositoriesRemoveDialog(
+	repo: RepositoryUI,
+	remove: (RepositoryUI) -> Unit,
+	dismiss: () -> Unit
+) {
+	AlertDialog(
+		title = {
+			Text(stringResource(R.string.alert_dialog_title_warn_repo_removal))
+		},
+		text = {
+			Text(stringResource(R.string.alert_dialog_message_warn_repo_removal))
+		},
+		onDismissRequest = dismiss,
+		confirmButton = {
+			TextButton(
+				onClick = {
+					remove(repo)
+					dismiss()
+				}
+			) {
+				Text(stringResource(android.R.string.ok))
+			}
+		},
+		dismissButton = {
+			TextButton(
+				onClick = dismiss
+			) {
+				Text(stringResource(android.R.string.cancel))
+			}
+		}
+	)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RepositoriesAddDialog(
+	viewModel: ARepositoryViewModel
+) {
+	var name by remember { mutableStateOf("") }
+	var url by remember { mutableStateOf("") }
+	val isError by remember { derivedStateOf { url.toHttpUrlOrNull() == null } }
+
+	AlertDialog(
+		title = {
+			Text(stringResource(R.string.repository_add_title))
+		},
+		text = {
+			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(4.dp)
+			) {
+				OutlinedTextField(
+					name,
+					onValueChange = {
+						name = it
+					},
+					placeholder = {
+						Text(stringResource(R.string.repository_add_name_hint))
+					}
+				)
+				OutlinedTextField(
+					url,
+					onValueChange = {
+						url = it
+					},
+					isError = isError,
+					placeholder = {
+						Text(stringResource(R.string.repository_add_url_hint))
+					},
+					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Uri)
+				)
+			}
+		},
+		onDismissRequest = {
+			viewModel.hideAddDialog()
+		},
+		confirmButton = {
+			TextButton(
+				onClick = {
+					viewModel.addRepository(name, url)
+					viewModel.hideAddDialog()
+				},
+				enabled = !isError
+			) {
+				Text(stringResource(android.R.string.ok))
+			}
+		},
+		dismissButton = {
+			TextButton(
+				onClick = {
+					viewModel.hideAddDialog()
+				},
+			) {
+				Text(stringResource(android.R.string.cancel))
+			}
+		}
+	)
+}
+
+/**
+ * Repositories content
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RepositoriesContent(
@@ -330,6 +481,9 @@ fun RepositoriesContent(
 	}
 }
 
+/**
+ * Content of a repository item
+ */
 @Composable
 fun RepositoryContent(
 	item: RepositoryUI,
