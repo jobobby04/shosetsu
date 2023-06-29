@@ -31,17 +31,16 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.common.utils.CookieJarSync
-import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
-import com.google.accompanist.themeadapter.material.MdcTheme
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import com.google.accompanist.web.*
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
-import org.kodein.di.instance
 
 /*
  * This file is part of Shosetsu.
@@ -71,7 +70,6 @@ import org.kodein.di.instance
  */
 class WebViewApp : AppCompatActivity(), DIAware {
 	override val di: DI by closestDI()
-	private val getUserAgent: GetUserAgentUseCase by instance()
 
 	private fun shareWebpage(url: String) {
 		try {
@@ -95,20 +93,34 @@ class WebViewApp : AppCompatActivity(), DIAware {
 		}
 
 		setContent {
-			MdcTheme {
-				Mdc3Theme {
-					val userAgent by getUserAgent.flow().collectAsState("")
-
-					WebViewScreen(
-						onUp = ::finish,
-						url = url,
-						userAgent = userAgent,
-						onShare = ::shareWebpage,
-						onOpenInBrowser = ::openInBrowser
-					)
-				}
-			}
+			WebViewAppView(
+				url,
+				finish = ::finish,
+				shareWebpage = ::shareWebpage,
+				openInBrowser = ::openInBrowser
+			)
 		}
+	}
+}
+
+@Composable
+fun WebViewAppView(
+	url: String,
+	finish: () -> Unit,
+	shareWebpage: (String) -> Unit,
+	openInBrowser: (String) -> Unit,
+	viewModel: WebViewViewModel = viewModelDi(),
+) {
+	ShosetsuCompose {
+		val userAgent by viewModel.userAgent.collectAsState()
+
+		WebViewScreen(
+			onUp = finish,
+			url = url,
+			userAgent = userAgent,
+			onShare = shareWebpage,
+			onOpenInBrowser = openInBrowser
+		)
 	}
 }
 
