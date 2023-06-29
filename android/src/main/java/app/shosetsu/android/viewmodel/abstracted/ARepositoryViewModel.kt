@@ -5,7 +5,7 @@ import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -32,26 +32,53 @@ abstract class ARepositoryViewModel
 	: SubscribeViewModel<ImmutableList<RepositoryUI>>, ShosetsuViewModel(),
 	IsOnlineCheckViewModel {
 	/**
+	 * Show add dialog or not
+	 */
+	abstract val isAddDialogVisible: StateFlow<Boolean>
+
+	/**
+	 * Add repo state
+	 */
+	abstract val addState: StateFlow<AddRepoState>
+
+	/**
+	 * Remove repo state
+	 */
+	abstract val removeState: StateFlow<RemoveRepoState>
+
+	/**
+	 * Toggle repo is enabled state
+	 */
+	abstract val toggleIsEnabledState: StateFlow<ToggleRepoIsEnabledState>
+
+	/**
+	 * Undo repo remove state
+	 */
+	abstract val undoRemoveState: StateFlow<UndoRepoRemoveState>
+
+	/**
 	 * Adds a URL via a string the user provides
 	 *
 	 * @param url THe URL of the repository
 	 */
-	abstract fun addRepository(name: String, url: String): Flow<Unit>
+	abstract fun addRepository(name: String, url: String)
 
 	/**
 	 * Checks if the string provided is a valid URL
 	 */
 	abstract fun isURL(string: String): Boolean
 
+
 	/**
 	 * Remove the repo from the app
 	 */
-	abstract fun remove(repositoryInfoUI: RepositoryUI): Flow<Unit>
+	abstract fun remove(repo: RepositoryUI)
+
 
 	/**
 	 * Toggles the state of [RepositoryUI.isRepoEnabled], returns the new state
 	 */
-	abstract fun toggleIsEnabled(repositoryInfoUI: RepositoryUI): Flow<Boolean>
+	abstract fun toggleIsEnabled(repo: RepositoryUI)
 
 	/**
 	 * Start the repository updater
@@ -61,5 +88,59 @@ abstract class ARepositoryViewModel
 	/**
 	 * Try to restore a repository
 	 */
-	abstract fun undoRemove(item: RepositoryUI): Flow<Unit>
+	abstract fun undoRemove(repo: RepositoryUI)
+
+	/**
+	 * Show the add repo dialog
+	 */
+	abstract fun showAddDialog()
+
+	/**
+	 * Hide the add repo dialog
+	 */
+	abstract fun hideAddDialog()
+
+	sealed interface AddRepoState {
+		object Unknown : AddRepoState
+		data class Failure(
+			val exception: Exception,
+			val name: String,
+			val url: String
+		) : AddRepoState
+
+		object Success : AddRepoState
+	}
+
+	sealed interface UndoRepoRemoveState {
+		object Unknown : UndoRepoRemoveState
+		data class Failure(
+			val repo: RepositoryUI,
+			val exception: Exception
+		) : UndoRepoRemoveState
+
+		object Success : UndoRepoRemoveState
+	}
+
+	sealed interface ToggleRepoIsEnabledState {
+		object Unknown : ToggleRepoIsEnabledState
+		data class Failure(
+			val repo: RepositoryUI,
+			val exception: Exception
+		) : ToggleRepoIsEnabledState
+
+		data class Success(
+			val repo: RepositoryUI,
+			val newState: Boolean
+		) : ToggleRepoIsEnabledState
+	}
+
+	sealed interface RemoveRepoState {
+		object Unknown : RemoveRepoState
+		data class Failure(
+			val exception: Exception,
+			val repo: RepositoryUI
+		) : RemoveRepoState
+
+		data class Success(val repo: RepositoryUI) : RemoveRepoState
+	}
 }

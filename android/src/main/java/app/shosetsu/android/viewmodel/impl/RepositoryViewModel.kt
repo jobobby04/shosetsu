@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
+import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.usecases.AddRepositoryUseCase
 import app.shosetsu.android.domain.usecases.ForceInsertRepositoryUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
@@ -12,7 +13,12 @@ import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of Shosetsu.
@@ -49,33 +55,83 @@ class RepositoryViewModel(
 		loadRepositoriesUseCase().map { it.toImmutableList() }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
+	override val isAddDialogVisible = MutableStateFlow(false)
+	override val addState = MutableStateFlow<AddRepoState>(AddRepoState.Unknown)
+	override val removeState = MutableStateFlow<RemoveRepoState>(RemoveRepoState.Unknown)
+	override val toggleIsEnabledState =
+		MutableStateFlow<ToggleRepoIsEnabledState>(ToggleRepoIsEnabledState.Unknown)
+	override val undoRemoveState =
+		MutableStateFlow<UndoRepoRemoveState>(UndoRepoRemoveState.Unknown)
 
-	override fun addRepository(name: String, url: String) = flow {
-		addRepositoryUseCase(url = url, name = name)
-		emit(Unit)
+	override fun addRepository(name: String, url: String) {
+		launchIO {
+			try {
+				addRepositoryUseCase(url = url, name = name)
+				addState.value = AddRepoState.Success
+			} catch (e: Exception) {
+				addState.value = AddRepoState.Failure(e, name, url)
+			} finally {
+				delay(100)
+				addState.value = AddRepoState.Unknown
+			}
+		}
 	}
 
-	override fun undoRemove(item: RepositoryUI): Flow<Unit> = flow {
-		forceInsertRepositoryUseCase(item)
-		emit(Unit)
+	override fun undoRemove(repo: RepositoryUI) {
+		launchIO {
+			try {
+				forceInsertRepositoryUseCase(repo)
+				undoRemoveState.value = UndoRepoRemoveState.Success
+			} catch (e: Exception) {
+				undoRemoveState.value = UndoRepoRemoveState.Failure(repo, e)
+			} finally {
+				delay(100)
+				undoRemoveState.value = UndoRepoRemoveState.Unknown
+			}
+		}
+	}
+
+	override fun showAddDialog() {
+		isAddDialogVisible.value = true
+	}
+
+	override fun hideAddDialog() {
+		isAddDialogVisible.value = false
 	}
 
 	override fun isURL(string: String): Boolean {
 		return false
 	}
 
-	override fun remove(repositoryInfoUI: RepositoryUI) =
-		flow {
-			emit(deleteRepositoryUseCase(repositoryInfoUI))
-		}.onIO()
-
-	override fun toggleIsEnabled(repositoryInfoUI: RepositoryUI): Flow<Boolean> =
-		flow {
-			val newState = !repositoryInfoUI.isRepoEnabled
-			emit(updateRepositoryUseCase(repositoryInfoUI.copy(isRepoEnabled = newState)).let {
-				newState
-			})
+	override fun remove(repo: RepositoryUI) {
+		launchIO {
+			try {
+				deleteRepositoryUseCase(repo)
+				removeState.value = RemoveRepoState.Success(repo)
+			} catch (e: Exception) {
+				removeState.value = RemoveRepoState.Failure(e, repo)
+			} finally {
+				delay(100)
+				removeState.value = RemoveRepoState.Unknown
+			}
 		}
+	}
+
+	override fun toggleIsEnabled(repo: RepositoryUI) {
+		launchIO {
+			val newState = !repo.isRepoEnabled
+			try {
+				updateRepositoryUseCase(repo.copy(isRepoEnabled = newState))
+				toggleIsEnabledState.value =
+					ToggleRepoIsEnabledState.Success(repo, newState)
+			} catch (e: Exception) {
+				toggleIsEnabledState.value = ToggleRepoIsEnabledState.Failure(repo, e)
+			} finally {
+				delay(100)
+				toggleIsEnabledState.value = ToggleRepoIsEnabledState.Unknown
+			}
+		}
+	}
 
 	override fun updateRepositories() {
 		startRepositoryUpdateManagerUseCase()
