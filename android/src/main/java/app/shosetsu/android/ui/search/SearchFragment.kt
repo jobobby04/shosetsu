@@ -17,6 +17,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -54,7 +55,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.acra.ACRA
-import javax.security.auth.DestroyFailedException
 
 /*
  * This file is part of Shosetsu.
@@ -80,7 +80,9 @@ import javax.security.auth.DestroyFailedException
  * @author github.com/doomsdayrs
  */
 class SearchFragment : ShosetsuFragment(), MenuProvider {
+
 	override val viewTitleRes: Int = R.string.search
+
 	internal val viewModel: ASearchViewModel by viewModel()
 
 	override fun onCreateView(
@@ -90,43 +92,18 @@ class SearchFragment : ShosetsuFragment(), MenuProvider {
 	): View {
 		activity?.addMenuProvider(this, viewLifecycleOwner)
 		return ComposeView {
-			ShosetsuCompose {
-				val rows by viewModel.listings.collectAsState()
-				val isCozy by viewModel.isCozy.collectAsState()
-
-				SearchContent(
-					rows = rows,
-					isCozy = isCozy,
-					getChildren = {
-						if (it == -1)
-							viewModel.searchLibrary()
-						else
-							viewModel.searchExtension(it)
-					},
-					getException = viewModel::getException,
-					onClick = {
-						findNavController().navigateSafely(
-							R.id.action_searchController_to_novelController,
-							bundleOf(BundleKeys.BUNDLE_NOVEL_ID to it.id),
-							navOptions {
-								setShosetsuTransition()
-							}
-						)
-					},
-					onRefresh = viewModel::refresh,
-					onRefreshAll = viewModel::refresh
+			SearchView(
+				viewModel,
+				remember { requireArguments().getString(BundleKeys.BUNDLE_QUERY, null) }
+			) { novelId ->
+				findNavController().navigateSafely(
+					R.id.action_searchController_to_novelController,
+					bundleOf(BundleKeys.BUNDLE_NOVEL_ID to novelId),
+					navOptions {
+						setShosetsuTransition()
+					}
 				)
 			}
-		}
-	}
-
-	override fun onDestroy() {
-		super.onDestroy()
-		try {
-			viewModel.destroy()
-		} catch (e: DestroyFailedException) {
-			logE("Failed to destroy", e)
-			ACRA.errorReporter.handleSilentException(e)
 		}
 	}
 
@@ -152,10 +129,6 @@ class SearchFragment : ShosetsuFragment(), MenuProvider {
 
 	override fun onMenuItemSelected(item: MenuItem): Boolean = true
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.initQuery(requireArguments().getString(BundleKeys.BUNDLE_QUERY, null))
-	}
-
 	/** Class that handles querying */
 	inner class InternalQuery
 		: SearchView.OnQueryTextListener {
@@ -168,6 +141,40 @@ class SearchFragment : ShosetsuFragment(), MenuProvider {
 			viewModel.setQuery(newText ?: "")
 			return true
 		}
+	}
+}
+
+@Composable
+fun SearchView(
+	viewModel: ASearchViewModel,
+	query: String?,
+	openNovel: (novelId: Int) -> Unit
+) {
+	LaunchedEffect(query) {
+		viewModel.initQuery(query)
+	}
+
+	ShosetsuCompose {
+		val rows by viewModel.listings.collectAsState()
+		val isCozy by viewModel.isCozy.collectAsState()
+
+		SearchContent(
+			rows = rows,
+			isCozy = isCozy,
+			getChildren = {
+				if (it == -1)
+					viewModel.searchLibrary()
+				else
+					viewModel.searchExtension(it)
+			},
+			getException = viewModel::getException,
+			onClick = {
+				openNovel(it.id)
+
+			},
+			onRefresh = viewModel::refresh,
+			onRefreshAll = viewModel::refresh
+		)
 	}
 }
 

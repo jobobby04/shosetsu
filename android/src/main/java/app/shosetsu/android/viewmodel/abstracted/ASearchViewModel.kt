@@ -7,7 +7,6 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import javax.security.auth.Destroyable
 
 /*
  * This file is part of shosetsu.
@@ -33,7 +32,7 @@ import javax.security.auth.Destroyable
  * shosetsu
  * 01 / 05 / 2020
  */
-abstract class ASearchViewModel : ShosetsuViewModel(), Destroyable {
+abstract class ASearchViewModel : ShosetsuViewModel() {
 
 	abstract val query: StateFlow<String?>
 

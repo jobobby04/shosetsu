@@ -147,16 +147,6 @@ class SearchViewModel(
 		}
 	}
 
-	/**
-	 * Clears out all the data
-	 */
-	override fun destroy() {
-		logI("Clearing out all flows")
-		searchFlows.clear()
-		query.value = null
-		appliedQueryFlow.value = null
-	}
-
 	private fun getRefreshFlow(id: Int) =
 		refreshFlows.getOrPut(id) {
 			MutableStateFlow(0)
