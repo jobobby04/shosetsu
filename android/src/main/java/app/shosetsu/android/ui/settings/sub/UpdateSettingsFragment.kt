@@ -31,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
@@ -41,8 +40,9 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.StringSetKey
 import app.shosetsu.android.common.enums.TriStateState
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.HeaderSettingContent
@@ -79,24 +79,27 @@ import kotlinx.coroutines.flow.map
  */
 class UpdateSettingsFragment : ShosetsuFragment() {
 	override val viewTitleRes: Int = R.string.settings_update
-	val viewModel: AUpdateSettingsViewModel by viewModel()
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				UpdateSettingsContent(
-					viewModel,
-				)
-			}
+		return ComposeView {
+			UpdateSettingsView()
 		}
 	}
 }
 
+@Composable
+fun UpdateSettingsView(
+	viewModel: AUpdateSettingsViewModel = viewModelDi()
+) {
+	ShosetsuCompose {
+		UpdateSettingsContent(viewModel)
+	}
+}
 
 @Composable
 fun UpdateSettingsContent(viewModel: AUpdateSettingsViewModel) {
