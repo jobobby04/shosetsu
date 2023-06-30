@@ -19,15 +19,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.launchUI
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
@@ -62,26 +62,32 @@ import kotlinx.coroutines.flow.map
  * @author Doomsdayrs
  */
 class ViewSettingsFragment : ShosetsuFragment() {
-	private val viewModel: AViewSettingsViewModel by viewModel()
-
 	override val viewTitleRes: Int = R.string.settings_view
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				ViewSettingsContent(
-					viewModel,
-					finishActivity = {
-						activity?.finish()
-					}
-				)
+		return ComposeView {
+			ViewSettingsView {
+				requireActivity().finish()
 			}
 		}
+	}
+}
+
+@Composable
+fun ViewSettingsView(
+	viewModel: AViewSettingsViewModel = viewModelDi(),
+	exit: () -> Unit
+) {
+	ShosetsuCompose {
+		ViewSettingsContent(
+			viewModel,
+			finishActivity = exit
+		)
 	}
 }
 
