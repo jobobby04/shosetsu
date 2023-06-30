@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -42,14 +41,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.*
 import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.makeSnackBar
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
@@ -60,6 +61,7 @@ import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.*
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.toImmutableList
 import java.util.Locale
 
@@ -87,33 +89,43 @@ import java.util.Locale
  * @author Doomsdayrs
  */
 class ReaderSettingsFragment : ShosetsuFragment() {
-	private val viewModel: AReaderSettingsViewModel by viewModel()
-
 	override val viewTitleRes: Int = R.string.settings_reader
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				ReaderSettingsContent(
-					viewModel,
-					openHTMLEditor = {
-						startActivity(
-							Intent(activity, CSSEditorActivity::class.java).apply {
-								putExtra(CSSEditorActivity.CSS_ID, -1)
-							}
-						)
-					},
-					showStyleAddSnackBar = {
-						makeSnackBar(R.string.style_wait)?.show()
-					}
-				)
-			}
+		return ComposeView {
+			ReaderSettingsView(::makeSnackBar)
 		}
+	}
+}
+
+@Composable
+fun ReaderSettingsView(
+	makeSnackBar: (Int) -> Snackbar?,
+	viewModel: AReaderSettingsViewModel = viewModelDi(),
+) {
+	val context = LocalContext.current
+
+	ShosetsuCompose {
+		ReaderSettingsContent(
+			viewModel,
+			openHTMLEditor = {
+				startActivity(
+					context,
+					Intent(context, CSSEditorActivity::class.java).apply {
+						putExtra(CSSEditorActivity.CSS_ID, -1)
+					},
+					null
+				)
+			},
+			showStyleAddSnackBar = {
+				makeSnackBar(R.string.style_wait)?.show()
+			}
+		)
 	}
 }
 
