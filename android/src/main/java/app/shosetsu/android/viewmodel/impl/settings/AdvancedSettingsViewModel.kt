@@ -9,8 +9,8 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.PurgeNovelCacheUseCase
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /*
  * This file is part of shosetsu.
@@ -41,10 +41,22 @@ class AdvancedSettingsViewModel(
 	private val novelUpdateCycleManager: NovelUpdateCycleWorker.Manager,
 	private val repoManager: RepositoryUpdateWorker.Manager,
 ) : AAdvancedSettingsViewModel(iSettingsRepository) {
-	override fun purgeUselessData(): Flow<Unit> =
-		flow {
-			emit(purgeNovelCacheUseCase())
-		}.onIO()
+
+	override val purgeState = MutableStateFlow<PurgeState>(PurgeState.Default)
+
+	override fun purgeUselessData() {
+		launchIO {
+			try {
+				purgeNovelCacheUseCase()
+				purgeState.value = PurgeState.Success
+			} catch (e: Exception) {
+				purgeState.value = PurgeState.Failure(e)
+			} finally {
+				delay(100)
+				purgeState.value = PurgeState.Default
+			}
+		}
+	}
 
 	override fun killCycleWorkers() {
 		backupCycleManager.stop()

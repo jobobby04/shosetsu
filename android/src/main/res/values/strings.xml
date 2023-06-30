@@ -662,6 +662,7 @@
     <string name="voice_normal">Normal</string>
     <string name="voice_low">Low</string>
     <string name="voice_very_low">Lowest</string>
+    <string name="settings_advanced_clear_cookies_nada">No cookies cleared</string>
     <plurals name="fragment_novel_toggle_delete_chapters">
         <!-- Ignore zero-->
         <item quantity="one">Delete %d chapter?</item>
