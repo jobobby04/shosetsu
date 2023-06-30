@@ -1,6 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted.settings
 
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -25,6 +26,7 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
  */
 abstract class ADownloadSettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
-	abstract var downloadWorkerSettingsChanged: Boolean
+	abstract val notifyRestartWorker: StateFlow<Boolean>
 	abstract fun restartDownloadWorker()
+	abstract fun dismissNotifyRestartWorker()
 }

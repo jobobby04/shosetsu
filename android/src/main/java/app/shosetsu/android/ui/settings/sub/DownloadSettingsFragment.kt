@@ -1,30 +1,30 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.content.Intent
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.makeSnackBar
 import app.shosetsu.android.common.ext.setOnDismissed
-import app.shosetsu.android.common.ext.toast
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
@@ -56,79 +56,53 @@ import com.google.android.material.snackbar.Snackbar
  */
 class DownloadSettingsFragment : ShosetsuFragment() {
 	override val viewTitleRes: Int = R.string.settings_download
-	val viewModel: ADownloadSettingsViewModel by viewModel()
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
+	): View {
 		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				DownloadSettingsContent(
-					viewModel,
-					::performFileSearch
-				)
-			}
+		return ComposeView {
+			DownloadSettingsView(::makeSnackBar)
 		}
 	}
+}
 
-	private fun setDownloadDirectory(dir: String) {
-		//s.downloadDirectory = dir
-		// TODO ???????????
-	}
+@Composable
+fun DownloadSettingsView(
+	makeSnackBar: (msg: String, length: Int) -> Snackbar?,
+	viewModel: ADownloadSettingsViewModel = viewModelDi(),
+) {
+	val notifyRestartWorker by viewModel.notifyRestartWorker.collectAsState()
+	val resources = LocalContext.current.resources
 
-	private fun performFileSearch() {
-		context?.toast(
-			"Please make sure this is on the main storage, " +
-					"SD card storage is not functional yet", duration = Toast.LENGTH_LONG
-		)
-		val i = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-		i.addCategory(Intent.CATEGORY_DEFAULT)
-		//activity?.startActivityForResult(Intent.createChooser(i, "Choose directory"), 42)
-	}
-
-	/*
-	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, data)
-		if (requestCode == REQUEST_CODE_DIRECTORY && resultCode == Activity.RESULT_OK) {
-			if (data != null) {
-				val path = data.data?.path
-				Log.i("Selected Folder", "Uri: $path")
-				if (path != null)
-					setDownloadDirectory(path.substring(path.indexOf(":") + 1))
-				else context?.toast("Path is null")
-			}
-		}
-	}
-	 */
-
-	override fun onDestroy() {
-		super.onDestroy()
-		launchUI {
-			if (!viewModel.downloadWorkerSettingsChanged) return@launchUI
-
+	LaunchedEffect(notifyRestartWorker) {
+		if (notifyRestartWorker) {
 			makeSnackBar(
-				getString(
+				resources.getString(
 					R.string.fragment_settings_restart_worker,
-					getString(R.string.worker_title_download)
+					resources.getString(R.string.worker_title_download)
 				),
 				Snackbar.LENGTH_LONG
 			)?.setAction(R.string.restart) {
 				viewModel.restartDownloadWorker()
 			}?.setOnDismissed { _, _ ->
-				viewModel.downloadWorkerSettingsChanged = false
+				viewModel.dismissNotifyRestartWorker()
 			}?.show()
 		}
+	}
 
+	ShosetsuCompose {
+		DownloadSettingsContent(
+			viewModel,
+		)
 	}
 }
 
 @Composable
 fun DownloadSettingsContent(
 	viewModel: ADownloadSettingsViewModel,
-	performFileSearch: () -> Unit
 ) {
 	LazyColumn(
 		contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
