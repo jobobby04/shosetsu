@@ -16,13 +16,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -41,13 +41,13 @@ import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
 import app.shosetsu.android.common.SettingKey.VerifyCheckSum
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
+import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.makeSnackBar
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
@@ -86,45 +86,60 @@ import kotlinx.coroutines.runBlocking
  * 13 / 07 / 2019
  */
 class AdvancedSettingsFragment : ShosetsuFragment() {
-	val viewModel: AAdvancedSettingsViewModel by viewModel()
 	override val viewTitleRes: Int = R.string.settings_advanced
 
-	/**
-	 * Execute a purge from the view model, prompt to retry if failed
-	 */
-	private fun purgeNovelCache() {
-		viewModel.purgeUselessData().observe(
-			catch = {
+	/***/
+	override fun onCreateView(
+		inflater: LayoutInflater,
+		container: ViewGroup?,
+		savedViewState: Bundle?
+	): View {
+		setViewTitle()
+		return ComposeView {
+			AdvancedSettingsView(
+				makeSnackBar = ::makeSnackBar,
+				makeSnackBarT = ::makeSnackBar,
+				exit = requireActivity().onBackPressedDispatcher::onBackPressed
+			)
+		}
+	}
+}
+
+@Composable
+fun AdvancedSettingsView(
+	makeSnackBar: (id: Int) -> Snackbar?,
+	makeSnackBarT: (id: Int, length: Int) -> Snackbar?,
+	viewModel: AAdvancedSettingsViewModel = viewModelDi(),
+	exit: () -> Unit
+) {
+
+	val purgeState by viewModel.purgeState.collectAsState()
+
+	LaunchedEffect(purgeState) {
+		when (purgeState) {
+			AAdvancedSettingsViewModel.PurgeState.Default -> {}
+			is AAdvancedSettingsViewModel.PurgeState.Failure -> {
 				logE("Failed to purge")
-				makeSnackBar(
+				makeSnackBarT(
 					R.string.fragment_settings_advanced_snackbar_purge_failure,
 					LENGTH_LONG
 				)
-					?.setAction(R.string.retry) { purgeNovelCache() }
+					?.setAction(R.string.retry) { viewModel.purgeUselessData() }
 					?.show()
 			}
-		) {
 
-			makeSnackBar(R.string.fragment_settings_advanced_snackbar_purge_success)
-				?.show()
+			AAdvancedSettingsViewModel.PurgeState.Success -> {
+				makeSnackBar(R.string.fragment_settings_advanced_snackbar_purge_success)
+					?.show()
+			}
 		}
 	}
 
 
-	private fun clearWebCookies() {
-		logI("User wants to clear cookies")
-		logV("Clearing cookies")
-		CookieManager.getInstance().removeAllCookies {
-			logV("Cookies cleared")
-			makeSnackBar(R.string.settings_advanced_clear_cookies_complete)?.show()
-		}
-	}
-
-
-	private fun themeSelected(position: Int) {
+	fun themeSelected(position: Int) {
 		launchUI {
-			activity?.onBackPressedDispatcher?.onBackPressed()
-			makeSnackBar(
+			exit()
+			makeSnackBarT(
 				R.string.fragment_settings_advanced_snackbar_ui_change,
 				Snackbar.LENGTH_INDEFINITE
 			)?.setAction(R.string.apply) {
@@ -135,9 +150,9 @@ class AdvancedSettingsFragment : ShosetsuFragment() {
 		}
 	}
 
-	private fun killCycleWorkers() {
+	fun killCycleWorkers() {
 		viewModel.killCycleWorkers()
-		makeSnackBar(
+		makeSnackBarT(
 			R.string.settings_advanced_snackbar_cycle_kill_success,
 			LENGTH_LONG
 		)?.apply {
@@ -148,27 +163,30 @@ class AdvancedSettingsFragment : ShosetsuFragment() {
 		}?.show()
 	}
 
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
-		setViewTitle()
-		setContent {
-			ShosetsuCompose {
-				AdvancedSettingsContent(
-					viewModel,
-					onThemeSelected = ::themeSelected,
-					onPurgeNovelCache = ::purgeNovelCache,
-					onPurgeChapterCache = {},
-					onKillCycleWorkers = ::killCycleWorkers,
-					onClearCookies = ::clearWebCookies,
-					onForceRepoSync = {
-						viewModel.forceRepoSync()
-					}
-				)
+	ShosetsuCompose {
+		AdvancedSettingsContent(
+			viewModel,
+			onThemeSelected = ::themeSelected,
+			onPurgeNovelCache = viewModel::purgeUselessData,
+			onPurgeChapterCache = {},
+			onKillCycleWorkers = ::killCycleWorkers,
+			onClearCookies = {
+				viewModel.logV("Clearing cookies")
+				CookieManager.getInstance().removeAllCookies {
+					viewModel.logV("Cookies cleared")
+					makeSnackBar(
+						if (it) {
+							R.string.settings_advanced_clear_cookies_complete
+						} else {
+							R.string.settings_advanced_clear_cookies_nada
+						}
+					)?.show()
+				}
+			},
+			onForceRepoSync = {
+				viewModel.forceRepoSync()
 			}
-		}
+		)
 	}
 }
 

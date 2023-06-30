@@ -2,7 +2,7 @@ package app.shosetsu.android.viewmodel.abstracted.settings
 
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -28,10 +28,18 @@ import kotlinx.coroutines.flow.Flow
 abstract class AAdvancedSettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
 
+	sealed interface PurgeState {
+		object Default : PurgeState
+		object Success : PurgeState
+		data class Failure(val exception: Exception) : PurgeState
+	}
+
+	abstract val purgeState: StateFlow<PurgeState>
+
 	/**
 	 * Executes a purge async, provides a [LiveData] for result
 	 */
-	abstract fun purgeUselessData(): Flow<Unit>
+	abstract fun purgeUselessData()
 
 	abstract fun killCycleWorkers()
 	abstract fun startCycleWorkers()
