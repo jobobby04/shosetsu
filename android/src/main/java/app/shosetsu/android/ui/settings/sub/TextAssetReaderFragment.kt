@@ -11,14 +11,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import app.shosetsu.android.common.enums.TextAsset
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.ComposeView
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
@@ -47,40 +50,51 @@ import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
  */
 class TextAssetReaderFragment : ShosetsuFragment() {
 
-	private val viewModel: ATextAssetReaderViewModel by viewModel()
-
-
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
 		savedViewState: Bundle?
-	): View = ComposeView(requireContext()).apply {
-		setContent {
-			val content by viewModel.liveData.collectAsState()
-			ShosetsuCompose {
-				TextAssetReaderContent(content)
-			}
-		}
-	}
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.setTarget(
-			requireArguments().getInt(
-				BUNDLE_KEY,
-				TextAsset.LICENSE.bundle.getInt(BUNDLE_KEY)
-			)
+	): View = ComposeView {
+		TextAssetReaderView(
+			remember {
+				requireArguments().getInt(
+					BUNDLE_KEY,
+					TextAsset.LICENSE.bundle.getInt(BUNDLE_KEY)
+				)
+			},
+			::setViewTitle
 		)
-
-		viewModel.targetLiveData.observe(catch = {}) {
-			if (it != null)
-				setViewTitle(getString(it.titleRes))
-		}
 	}
 
 	companion object {
 		const val BUNDLE_KEY: String = "target"
 		val TextAsset.bundle: Bundle
 			get() = bundleOf(BUNDLE_KEY to ordinal)
+	}
+}
+
+@Composable
+fun TextAssetReaderView(
+	bundleKey: Int,
+	setViewTitle: (String) -> Unit,
+	viewModel: ATextAssetReaderViewModel = viewModelDi()
+) {
+	LaunchedEffect(bundleKey) {
+		viewModel.setTarget(bundleKey)
+	}
+
+	val target by viewModel.targetLiveData.collectAsState()
+	val resources = LocalContext.current.resources
+
+	LaunchedEffect(target) {
+		if (target != null)
+			setViewTitle(resources.getString((target ?: return@LaunchedEffect).titleRes))
+
+	}
+
+	val content by viewModel.liveData.collectAsState()
+	ShosetsuCompose {
+		TextAssetReaderContent(content)
 	}
 }
 
