@@ -2,10 +2,14 @@ package app.shosetsu.android.viewmodel.impl.settings
 
 import androidx.work.WorkInfo
 import app.shosetsu.android.backend.workers.onetime.DownloadWorker
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.DownloadOnLowBattery
+import app.shosetsu.android.common.SettingKey.DownloadOnLowStorage
+import app.shosetsu.android.common.SettingKey.DownloadOnMeteredConnection
+import app.shosetsu.android.common.SettingKey.DownloadOnlyWhenIdle
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 
 /*
@@ -35,23 +39,17 @@ class DownloadSettingsViewModel(
 ) : ADownloadSettingsViewModel(iSettingsRepository) {
 
 
-	override var downloadWorkerSettingsChanged: Boolean = false
+	override val notifyRestartWorker = MutableStateFlow<Boolean>(false)
 
 	init {
 		launchIO {
-			var ran = false
 			settingsRepo.getBooleanFlow(DownloadOnlyWhenIdle)
-				.combine(settingsRepo.getBooleanFlow(DownloadOnLowStorage)) { _, _ -> }
-				.combine(settingsRepo.getBooleanFlow(DownloadOnLowBattery)) { _, _ -> }
-				.combine(settingsRepo.getBooleanFlow(DownloadOnMeteredConnection)) { _, _ -> }
+				.combine(settingsRepo.getBooleanFlow(DownloadOnLowStorage)) { a, b -> a to b }
+				.combine(settingsRepo.getBooleanFlow(DownloadOnLowBattery)) { a, b -> a to b }
+				.combine(settingsRepo.getBooleanFlow(DownloadOnMeteredConnection)) { a, b -> a to b }
 				.collect {
-					if (!ran) {
-						ran = true
-						return@collect
-					}
-
 					if (manager.getCount() != 0 && manager.getWorkerState() == WorkInfo.State.ENQUEUED)
-						downloadWorkerSettingsChanged = true
+						notifyRestartWorker.value = true
 				}
 		}
 	}
@@ -59,5 +57,10 @@ class DownloadSettingsViewModel(
 	override fun restartDownloadWorker() {
 		manager.stop()
 		manager.start()
+		notifyRestartWorker.value = false
+	}
+
+	override fun dismissNotifyRestartWorker() {
+		notifyRestartWorker.value = false
 	}
 }
