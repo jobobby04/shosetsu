@@ -267,7 +267,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 * Setting to hold user agent, so users can have their own UA,
 	 * 	allowing diversity to avoid app bans.
 	 */
-	object UserAgent : StringKey("user_agent", DEFAULT_USER_AGENT)
+	object UserAgent : StringKey("user_agent_2", DEFAULT_USER_AGENT)
 
 	/**
 	 * Use a user agent that explicitly states Shosetsu
