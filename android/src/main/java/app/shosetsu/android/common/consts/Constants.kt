@@ -27,7 +27,7 @@ import app.shosetsu.android.BuildConfig
  * A default user agent string, should not be used
  */
 const val DEFAULT_USER_AGENT =
-	"Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101 Firefox/108.0"
+	"Mozilla/5.0 (Linux, Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36"
 
 /**
  * User agent for when we want to be soft and cuddly to sites.
