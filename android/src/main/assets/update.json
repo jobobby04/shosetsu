@@ -1,9 +1,9 @@
 {
-  "latestVersion": "2.4.2",
-  "versionCode": 43,
-  "url": "https://cdn.shosetsu.app/v2.4.2/shosetsu-v2.4.2.apk",
+  "latestVersion": "2.4.3",
+  "versionCode": 44,
+  "url": "https://cdn.shosetsu.app/v2.4.3/shosetsu-v2.4.3.apk",
   "releaseNotes": [
     "## Fixes",
-    "- Disable development mode (oops!)"
+    "- Use Google Chrome user agent"
   ]
 }

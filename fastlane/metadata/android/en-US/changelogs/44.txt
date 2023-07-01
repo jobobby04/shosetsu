@@ -1,0 +1,4 @@
+# v2.4.3
+
+## Fixes
+- Use Google Chrome user agent
