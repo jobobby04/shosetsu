@@ -240,8 +240,13 @@ class ShosetsuApplication :
 
 		// Set up the site protector
 		launchIO {
-			settingsRepo.getIntFlow(SettingKey.SiteProtectionDelay).collectLatest {
-				SiteProtector.requestDelay = it.toLong()
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionPermits).collectLatest {
+				SiteProtector.permits = it
+			}
+		}
+		launchIO {
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionPeriod).collectLatest {
+				SiteProtector.period = it.toLong()
 			}
 		}
 
@@ -312,6 +317,7 @@ class ShosetsuApplication :
 		okHttpClient(
 			okHttpClient.newBuilder()
 				.apply {
+					interceptors().remove(SiteProtector)
 					interceptors().removeIf { it is CloudflareInterceptor }
 				}
 				.build(),
