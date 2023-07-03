@@ -18,6 +18,7 @@ package app.shosetsu.android.common.utils
 
 import android.os.SystemClock
 import app.shosetsu.android.common.SettingKey
+import com.google.common.cache.CacheBuilder
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -60,9 +61,7 @@ object SiteProtector {
 	const val permits = 4
 	const val period = 1L
 	val unit = TimeUnit.SECONDS
-	private val requestQueue = ArrayDeque<Long>(permits)
-	private val rateLimitMillis = unit.toMillis(period)
-	private val fairLock = Semaphore(1, true)
+
 
 	/**
 	 * Check if we can continue operating.
@@ -72,6 +71,16 @@ object SiteProtector {
 	@Suppress("NOTHING_TO_INLINE")
 	private inline fun checkIfCan(host: String, lastUsedTime: Long): Boolean =
 		(lastUsedTime + getDelay(host)) > System.currentTimeMillis()
+
+	private val cache = CacheBuilder.newBuilder()
+		.expireAfterAccess(10, TimeUnit.MINUTES)
+		.build<String, CachedRateLimit>()
+
+	data class CachedRateLimit(
+		val requestQueue: ArrayDeque<Long> = ArrayDeque<Long>(permits),
+		val rateLimitMillis: Long = unit.toMillis(period),
+		val fairLock: Semaphore = Semaphore(1, true)
+	)
 
 	/**
 	 * Ask to use the site, once received
@@ -87,13 +96,14 @@ object SiteProtector {
 
 		val request = chain.request()
 
+		val (requestQueue, rateLimitMillis, fairLock) = cache.get(request.url.host) { CachedRateLimit() }
+
 		try {
 			fairLock.acquire()
 		} catch (e: InterruptedException) {
 			throw IOException(e)
 		}
 
-		val requestQueue = this.requestQueue
 		val timestamp: Long
 
 		try {
