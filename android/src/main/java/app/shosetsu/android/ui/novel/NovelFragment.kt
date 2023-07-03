@@ -1317,7 +1317,7 @@ fun NovelInfoHeaderContent(
 					horizontalArrangement = Arrangement.SpaceEvenly,
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					TextButton(
+					LongClickTextButton(
 						onClick = {
 							if (novelInfo.bookmarked || categories.isEmpty()) {
 								toggleBookmark()

@@ -18,12 +18,42 @@
 
 package app.shosetsu.android.view.compose
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.interaction.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.interaction.FocusInteraction
+import androidx.compose.foundation.interaction.HoverInteraction
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -33,7 +63,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TextButton(
+fun LongClickTextButton(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	onLongClick: (() -> Unit)? = null,
@@ -46,7 +76,7 @@ fun TextButton(
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 	content: @Composable RowScope.() -> Unit,
 ) =
-	Button(
+	LongClickButton(
 		onClick = onClick,
 		modifier = modifier,
 		onLongClick = onLongClick,
@@ -61,7 +91,7 @@ fun TextButton(
 	)
 
 @Composable
-fun Button(
+fun LongClickButton(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	onLongClick: (() -> Unit)? = null,
@@ -161,7 +191,7 @@ class ButtonColors internal constructor(
 /**
  * Represents the elevation for a button in different states.
  *
- * - See [ButtonDefaults.buttonElevation] for the default elevation used in a [Button].
+ * - See [ButtonDefaults.buttonElevation] for the default elevation used in a [LongClickButton].
  * - See [ButtonDefaults.elevatedButtonElevation] for the default elevation used in a
  * [ElevatedButton].
  */
@@ -378,12 +408,12 @@ private val HoveredOutgoingSpec = TweenSpec<Dp>(
 object ButtonDefaults2 {
 	/**
 	 * Creates a [ButtonColors] that represents the default container and content colors used in a
-	 * [Button].
+	 * [LongClickButton].
 	 *
-	 * @param containerColor the container color of this [Button] when enabled.
-	 * @param contentColor the content color of this [Button] when enabled.
-	 * @param disabledContainerColor the container color of this [Button] when not enabled.
-	 * @param disabledContentColor the content color of this [Button] when not enabled.
+	 * @param containerColor the container color of this [LongClickButton] when enabled.
+	 * @param contentColor the content color of this [LongClickButton] when enabled.
+	 * @param disabledContainerColor the container color of this [LongClickButton] when not enabled.
+	 * @param disabledContentColor the content color of this [LongClickButton] when not enabled.
 	 */
 	@Composable
 	fun buttonColors(
@@ -403,12 +433,12 @@ object ButtonDefaults2 {
 
 	/**
 	 * Creates a [ButtonColors] that represents the default container and content colors used in a
-	 * [TextButton].
+	 * [LongClickTextButton].
 	 *
-	 * @param containerColor the container color of this [TextButton] when enabled
-	 * @param contentColor the content color of this [TextButton] when enabled
-	 * @param disabledContainerColor the container color of this [TextButton] when not enabled
-	 * @param disabledContentColor the content color of this [TextButton] when not enabled
+	 * @param containerColor the container color of this [LongClickTextButton] when enabled
+	 * @param contentColor the content color of this [LongClickTextButton] when enabled
+	 * @param disabledContainerColor the container color of this [LongClickTextButton] when not enabled
+	 * @param disabledContentColor the content color of this [LongClickTextButton] when not enabled
 	 */
 	@Composable
 	fun textButtonColors(
@@ -426,14 +456,14 @@ object ButtonDefaults2 {
 
 	/**
 	 * Creates a [ButtonElevation] that will animate between the provided values according to the
-	 * Material specification for a [Button].
+	 * Material specification for a [LongClickButton].
 	 *
-	 * @param defaultElevation the elevation used when the [Button] is enabled, and has no other
+	 * @param defaultElevation the elevation used when the [LongClickButton] is enabled, and has no other
 	 * [Interaction]s.
-	 * @param pressedElevation the elevation used when this [Button] is enabled and pressed.
-	 * @param focusedElevation the elevation used when the [Button] is enabled and focused.
-	 * @param hoveredElevation the elevation used when the [Button] is enabled and hovered.
-	 * @param disabledElevation the elevation used when the [Button] is not enabled.
+	 * @param pressedElevation the elevation used when this [LongClickButton] is enabled and pressed.
+	 * @param focusedElevation the elevation used when the [LongClickButton] is enabled and focused.
+	 * @param hoveredElevation the elevation used when the [LongClickButton] is enabled and hovered.
+	 * @param disabledElevation the elevation used when the [LongClickButton] is not enabled.
 	 */
 	@Composable
 	fun buttonElevation(
