@@ -58,7 +58,7 @@ object SiteProtector {
 	private inline fun getDelay(host: String) =
 		retryAfter[host] ?: requestDelay
 
-	const val permits = 4
+	const val permits = 2
 	const val period = 1L
 	val unit = TimeUnit.SECONDS
 
