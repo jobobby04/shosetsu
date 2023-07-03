@@ -407,17 +407,6 @@ fun BackupSettingsContent(
 
 			item {
 				SwitchSettingContent(
-					stringResource(R.string.backup_only_modified_title),
-					stringResource(R.string.backup_only_modified_desc),
-					viewModel.settingsRepo,
-					SettingKey.BackupOnlyModifiedChapters,
-					modifier = Modifier
-						.fillMaxWidth()
-				)
-			}
-
-			item {
-				SwitchSettingContent(
 					stringResource(R.string.backup_restore_low_storage),
 					stringResource(R.string.backup_restore_low_storage_desc),
 					viewModel.settingsRepo,
