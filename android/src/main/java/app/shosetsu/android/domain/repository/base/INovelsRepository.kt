@@ -52,6 +52,11 @@ interface INovelsRepository {
 	suspend fun loadNovels(): List<NovelEntity>
 
 	/**
+	 * Finds the Novel ID for the given URL and Extension
+	 */
+	suspend fun loadNovelId(novelURL: String, extensionID: Int): Int?
+
+	/**
 	 * Searches the bookmarked novels and returns a live data of them
 	 */
 	@Throws(SQLiteException::class)

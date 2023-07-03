@@ -15,7 +15,6 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_WORK_ID
-import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
@@ -96,9 +95,6 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 	private suspend fun backupSettings() =
 		iSettingsRepository.getBoolean(ShouldBackupSettings)
 
-	private suspend fun backupOnlyModified() =
-		iSettingsRepository.getBoolean(BackupOnlyModifiedChapters)
-
 	@Throws(IOException::class)
 	fun gzip(content: String): ByteArray {
 		val bos = ByteArrayOutputStream()
@@ -111,11 +107,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 	private suspend fun getBackupChapters(novelID: Int): List<BackupChapterEntity> {
 		if (backupChapters())
 			chaptersRepository.getChapters(novelID).let { list ->
-				return list.filter { chapterEntity ->
-					if (backupOnlyModified()) {
-						chapterEntity.bookmarked || chapterEntity.readingStatus != ReadingStatus.UNREAD || chapterEntity.readingPosition != 0.0
-					} else true
-				}.map { chapterEntity ->
+				return list.map { chapterEntity ->
 					val chapterHistory = try {
 						chapterHistoryRepository.get(chapterEntity.id!!)
 					} catch (e: SQLiteException) {
@@ -123,13 +115,15 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					}
 
 					BackupChapterEntity(
-						chapterEntity.url,
-						chapterEntity.title,
-						chapterEntity.bookmarked,
-						chapterEntity.readingStatus,
-						chapterEntity.readingPosition,
+						url = chapterEntity.url,
+						name = chapterEntity.title,
+						bookmarked = chapterEntity.bookmarked,
+						rS = chapterEntity.readingStatus,
+						rP = chapterEntity.readingPosition,
 						startedReadingAt = chapterHistory?.startedReadingAt,
-						endedReadingAt = chapterHistory?.endedReadingAt
+						endedReadingAt = chapterHistory?.endedReadingAt,
+						releaseDate = chapterEntity.releaseDate,
+						order = chapterEntity.order
 					)
 				}
 			}
@@ -257,10 +251,19 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 												.map { categories[it.categoryID]!!.order }
 
 										BackupNovelEntity(
-											novel.url,
-											novel.title,
-											novel.imageURL,
-											chapters,
+											url = novel.url,
+											bookmarked = novel.bookmarked,
+											loaded = novel.loaded,
+											name = novel.title,
+											imageURL = novel.imageURL,
+											description = novel.description,
+											language = novel.language,
+											genres = novel.genres,
+											authors = novel.authors,
+											artists = novel.artists,
+											tags = novel.tags,
+											status = novel.status,
+											chapters = chapters,
 											settings = bSettings,
 											categories = novelCategories,
 											pinned = novelPinRepository.isPinned(novel.id!!)

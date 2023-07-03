@@ -3,7 +3,11 @@ package app.shosetsu.android.datasource.local.database.impl
 import androidx.paging.PagingSource
 import app.shosetsu.android.common.ext.toDB
 import app.shosetsu.android.datasource.local.database.base.IDBNovelsDataSource
-import app.shosetsu.android.domain.model.local.*
+import app.shosetsu.android.domain.model.local.AnalyticsNovelEntity
+import app.shosetsu.android.domain.model.local.LibraryNovelEntity
+import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
+import app.shosetsu.android.domain.model.local.StrippedNovelEntity
 import app.shosetsu.android.dto.convertList
 import app.shosetsu.android.providers.database.dao.NovelsDao
 import kotlinx.coroutines.flow.Flow
@@ -62,6 +66,9 @@ class DBNovelsDataSource(
 
 	override fun loadNovels(): List<NovelEntity> =
 		(novelsDao.loadNovels().convertList())
+
+	override fun loadNovelId(novelURL: String, extensionID: Int): Int? =
+		novelsDao.loadNovelID(novelURL, extensionID)
 
 	override fun searchBookmarked(query: String): PagingSource<Int, StrippedBookmarkedNovelEntity> =
 		novelsDao.searchBookmarked(query)

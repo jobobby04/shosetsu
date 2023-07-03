@@ -34,6 +34,9 @@ interface IDBNovelsDataSource {
 	@Throws(SQLiteException::class)
 	fun loadNovels(): List<NovelEntity>
 
+	@Throws(SQLiteException::class)
+	fun loadNovelId(novelURL: String, extensionID: Int): Int?
+
 	/** Load a [List] of [NovelEntity]s that are bookmarked */
 	@Throws(SQLiteException::class)
 	suspend fun loadBookmarkedNovels(): List<NovelEntity>

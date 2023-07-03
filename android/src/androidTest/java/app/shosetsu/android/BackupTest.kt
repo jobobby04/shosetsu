@@ -82,7 +82,9 @@ class BackupTest : DIAware {
 					randomString, randomString,
 					Random.nextBoolean(),
 					ReadingStatus.fromInt(Random.nextInt() % 3 + 1),
-					randomInt.toDouble()
+					randomInt.toDouble(),
+					releaseDate = null,
+					order = i.toDouble()
 				)
 			)
 		}
@@ -91,11 +93,15 @@ class BackupTest : DIAware {
 	private fun randomNovels() = ArrayList<BackupNovelEntity>().apply {
 		for (i in 0 until randomInt) {
 			add(
-				BackupNovelEntity(
+				/* element = */ BackupNovelEntity(
+					randomString,
+					true,
+					true,
 					randomString,
 					randomString,
 					randomString,
-					randomChapters()
+					"en",
+					chapters = randomChapters()
 				)
 			)
 		}

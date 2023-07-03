@@ -57,6 +57,10 @@ class NovelsRepository(
 		onIO { database.loadNovels() }
 
 	@Throws(SQLiteException::class)
+	override suspend fun loadNovelId(novelURL: String, extensionID: Int): Int? =
+		onIO { database.loadNovelId(novelURL, extensionID) }
+
+	@Throws(SQLiteException::class)
 	override suspend fun update(novelEntity: NovelEntity): Unit =
 		onIO { database.update(novelEntity) }
 
