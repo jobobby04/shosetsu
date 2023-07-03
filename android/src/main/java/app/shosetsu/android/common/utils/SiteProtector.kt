@@ -16,10 +16,15 @@
  */
 package app.shosetsu.android.common.utils
 
+import android.os.SystemClock
 import app.shosetsu.android.common.SettingKey
-import kotlinx.coroutines.delay
+import okhttp3.Interceptor
+import okhttp3.Response
+import java.io.IOException
+import java.util.ArrayDeque
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.random.Random
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
 
 /**
  * Class dedicated to protecting sites from what is essentially a ddos attack from shosetsu
@@ -52,6 +57,13 @@ object SiteProtector {
 	private inline fun getDelay(host: String) =
 		retryAfter[host] ?: requestDelay
 
+	const val permits = 4
+	const val period = 1L
+	val unit = TimeUnit.SECONDS
+	private val requestQueue = ArrayDeque<Long>(permits)
+	private val rateLimitMillis = unit.toMillis(period)
+	private val fairLock = Semaphore(1, true)
+
 	/**
 	 * Check if we can continue operating.
 	 *
@@ -68,36 +80,61 @@ object SiteProtector {
 	 * @param block code block to execute
 	 * @return whatever [block] returns
 	 */
-	suspend fun <R> await(host: String, block: () -> R): R {
-		// Query time
-		var time = lastUsed[host]
+	@Suppress("BlockingMethodInNonBlockingContext")
+	fun await(chain: Interceptor.Chain): Response {
+		val call = chain.call()
+		if (call.isCanceled()) throw IOException("Canceled")
 
-		return if (time == null) {
-			// Site has not been accessed, we can operate
-			lastUsed[host] = System.currentTimeMillis()
-			block()
-		} else {
-			// Site has been accessed, check if we can operate
-			if (checkIfCan(host, time)) {
-				// We can not operate rn, delay until we can
-				/** Represents the loop count, delaying the time increasingly until 10 loops */
-				var delayedCount = 0
-				do {
-					// Delay a random interval between (requestDelay / 1 - 10)
-					// + progressive delay
-					// This ensures that two awaits never occur at the same time
-					delay(
-						(getDelay(host) / Random.nextInt(1, 10)) +
-								delayedCount * 100
-					)
-					if (delayedCount < 10) delayedCount++
+		val request = chain.request()
 
-					time = lastUsed[host]
-				} while (time != null && checkIfCan(host, time))
-			}
-			lastUsed[host] = System.currentTimeMillis()
-			retryAfter.remove(host) // Clear out retry after, we respected it.
-			block()
+		try {
+			fairLock.acquire()
+		} catch (e: InterruptedException) {
+			throw IOException(e)
 		}
+
+		val requestQueue = this.requestQueue
+		val timestamp: Long
+
+		try {
+			synchronized(requestQueue) {
+				while (requestQueue.size >= permits) { // queue is full, remove expired entries
+					val periodStart = SystemClock.elapsedRealtime() - rateLimitMillis
+					var hasRemovedExpired = false
+					while (requestQueue.isEmpty().not() && requestQueue.first <= periodStart) {
+						requestQueue.removeFirst()
+						hasRemovedExpired = true
+					}
+					if (call.isCanceled()) {
+						throw IOException("Canceled")
+					} else if (hasRemovedExpired) {
+						break
+					} else {
+						try { // wait for the first entry to expire, or notified by cached response
+							(requestQueue as Object).wait(requestQueue.first - periodStart)
+						} catch (_: InterruptedException) {
+							continue
+						}
+					}
+				}
+
+				// add request to queue
+				timestamp = SystemClock.elapsedRealtime()
+				requestQueue.addLast(timestamp)
+			}
+		} finally {
+			fairLock.release()
+		}
+
+		val response = chain.proceed(request)
+		if (response.networkResponse == null) { // response is cached, remove it from queue
+			synchronized(requestQueue) {
+				if (requestQueue.isEmpty() || timestamp < requestQueue.first) return@synchronized
+				requestQueue.removeFirstOccurrence(timestamp)
+				(requestQueue as Object).notifyAll()
+			}
+		}
+
+		return response
 	}
 }
