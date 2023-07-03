@@ -37,6 +37,7 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import java.io.BufferedInputStream
 import java.io.IOException
+import java.io.InputStream
 import java.util.zip.GZIPInputStream
 
 /*
@@ -108,6 +109,18 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		return BackupEntity(bis.readBytes())
 	}
 
+	private fun isBase64Encoded(inputStream: InputStream): Boolean {
+		val buffer = ByteArray(4)
+		inputStream.mark(4)
+		val bytesRead = inputStream.read(buffer)
+		inputStream.reset()
+		if (bytesRead >= 4) {
+			val content = String(buffer)
+			return content.matches(Regex("[A-Za-z0-9+/=]+"))
+		}
+		return false
+	}
+
 	@OptIn(ExperimentalSerializationApi::class)
 	@Throws(IOException::class)
 	override suspend fun doWork(): Result {
@@ -152,7 +165,12 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 		// Decode encrypted string to bytes via Base64
 		notify(R.string.restore_notification_content_decoding_string)
-		val decodedBytes: ByteArray = Base64.decode(backupEntity.content, Base64.DEFAULT)
+		val decodedBytes: ByteArray = if (isBase64Encoded(backupEntity.content.inputStream())) {
+			Base64.decode(backupEntity.content, Base64.DEFAULT)
+		} else {
+			// assume gzipped
+			backupEntity.content
+		}
 
 		// Unzip bytes to a string via gzip
 		notify(R.string.restore_notification_content_unzipping_bytes)

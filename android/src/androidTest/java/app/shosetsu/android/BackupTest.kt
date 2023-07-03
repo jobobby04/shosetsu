@@ -1,7 +1,6 @@
 package app.shosetsu.android
 
 import android.content.Context
-import android.util.Base64
 import androidx.test.platform.app.InstrumentationRegistry
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.utils.backupJSON
@@ -176,16 +175,11 @@ class BackupTest : DIAware {
 				println("Zipped backup in ${it.duration.toDouble(DurationUnit.MILLISECONDS)}ms")
 			}.value
 
-			val base64Bytes =
-				measureTimedValue { Base64.encode(zippedBytes, Base64.DEFAULT) }.also {
-					println("Base64 backup in ${it.duration.toDouble(DurationUnit.MILLISECONDS)}ms")
-				}.value
-
 			measureTimeMillis {
 				requireNotNull(
 					backupRepository.saveBackup(
 						BackupEntity(
-							base64Bytes
+							zippedBytes
 						)
 					)
 				)
