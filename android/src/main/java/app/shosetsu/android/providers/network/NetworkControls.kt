@@ -3,10 +3,6 @@ package app.shosetsu.android.providers.network
 import android.annotation.SuppressLint
 import android.content.Context
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.logD
-import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.common.ext.logI
-import app.shosetsu.android.common.ext.logW
 import app.shosetsu.android.common.utils.CloudflareInterceptor
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
@@ -16,14 +12,12 @@ import java.net.Authenticator
 import java.net.InetSocketAddress
 import java.net.PasswordAuthentication
 import java.net.Proxy
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 
 /*
@@ -55,9 +49,7 @@ fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepositor
 
 	val builder = OkHttpClient.Builder()
 		.cookieJar(CookieJarSync)
-		.addInterceptor { chain ->
-			return@addInterceptor slowRequest(chain, chain.request())
-		}
+		.addInterceptor(SiteProtector)
 		.addInterceptor(
 			CloudflareInterceptor(
 				context = context,
@@ -133,7 +125,7 @@ val retryAfterDateRegex: Regex =
  *
  * @return time in milliseconds till the date
  */
-fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
+/*fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
 	val rightNow = System.currentTimeMillis()
 	val formattedTime = try {
 		retryAfterDateFormat.parse(retryAfter)?.time
@@ -143,20 +135,14 @@ fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
 		SiteProtector.requestDelay
 	}
 	return formattedTime - rightNow
-}
+}*/
 
-fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false): Response {
-	if (isRetry) {
+fun slowRequest(chain: Interceptor.Chain): Response {
+	/*if (isRetry) {
 		chain.logI("Retrying")
-	}
-	val response = runBlocking {
-		// Await for chance to access the site
-		SiteProtector.await(r.url.host) {
-			chain.logI("Sending Request: $r")
-			chain.proceed(r)
-		}
-	}
-	if (response.hasRetryAfter()) {
+	}*/
+	val response = SiteProtector.intercept(chain)
+	/*if (response.hasRetryAfter()) {
 		chain.logI("Received Retry-After from ${r.url}")
 		// This can be two things, either a date or a second
 		val retryAfter = response.header("Retry-After")
@@ -186,7 +172,7 @@ fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false):
 				slowRequest(chain, r, isRetry = true)
 			}
 		}
-	}
+	}*/
 	return response
 }
 
