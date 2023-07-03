@@ -211,8 +211,13 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			}
 		}
 		launchIO {
-			settingsRepo.getIntFlow(SettingKey.SiteProtectionDelay).collectLatest {
-				SiteProtector.requestDelay = it.toLong()
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionPermits).collectLatest {
+				SiteProtector.permits = it
+			}
+		}
+		launchIO {
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionPeriod).collectLatest {
+				SiteProtector.period = it.toLong()
 			}
 		}
 		super.onCreate()
@@ -273,7 +278,13 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	@OptIn(ExperimentalCoroutinesApi::class)
 	override fun newImageLoader(): ImageLoader =
 		ImageLoader.Builder(this).apply {
-			okHttpClient(okHttpClient)
+			okHttpClient(
+				okHttpClient.newBuilder()
+					.apply {
+						interceptors().remove(SiteProtector)
+					}
+					.build()
+			)
 			diskCache {
 				DiskCache.Builder().apply {
 					directory(cacheDir.resolve("image_cache"))
