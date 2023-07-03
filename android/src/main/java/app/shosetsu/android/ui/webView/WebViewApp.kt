@@ -143,7 +143,7 @@ fun WebViewScreen(
 	onOpenInBrowser: (String) -> Unit,
 	onClearCookies: (String) -> Unit
 ) {
-	val state = rememberWebViewState(url = url)
+	val state = rememberWebViewState(url = url, additionalHttpHeaders = mapOf("User-Agent" to userAgent))
 	val navigator = rememberWebViewNavigator()
 	var currentUrl by remember { mutableStateOf(url) }
 	Scaffold(
