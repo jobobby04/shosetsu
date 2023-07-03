@@ -3,7 +3,6 @@ package app.shosetsu.android.backend.workers.onetime
 import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.os.Build
-import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
@@ -24,7 +23,7 @@ import app.shosetsu.android.domain.model.local.backup.*
 import app.shosetsu.android.domain.repository.base.*
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import kotlinx.coroutines.delay
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.encodeToStream
 import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -96,9 +95,9 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		iSettingsRepository.getBoolean(ShouldBackupSettings)
 
 	@Throws(IOException::class)
-	fun gzip(content: String): ByteArray {
+	inline fun gzip(block: (GZIPOutputStream) -> Unit): ByteArray {
 		val bos = ByteArrayOutputStream()
-		GZIPOutputStream(bos).bufferedWriter().use { it.write(content) }
+		GZIPOutputStream(bos).use { block(it) }
 		return bos.toByteArray()
 	}
 
@@ -216,79 +215,65 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 						BackupRepositoryEntity(url, name)
 					}
 
-			val base64Bytes = run {
-				val zippedBytes = run {
-					val stringBackup = run {
-						logI("Creating backup entity")
-						notify("Creating backup entity")
-						val backup = FleshedBackupEntity(
-							repos = repositoriesRequired,
-							// Creates the trees
-							extensions = extensions.map { extensionEntity ->
-								BackupExtensionEntity(
-									extensionEntity.id,
-									novelsToChapters.filter { (novel, _) ->
-										novel.extensionID == extensionEntity.id
-									}.map { (novel, chapters) ->
-										val settings =
-											if (backupSettings)
-												novelSettingsRepository.get(novel.id!!)
-											else null
+			val zippedBytes = gzip { gzip ->
+				logI("Creating backup entity")
+				notify("Creating backup entity")
+				val backup = FleshedBackupEntity(
+					repos = repositoriesRequired,
+					// Creates the trees
+					extensions = extensions.map { extensionEntity ->
+						BackupExtensionEntity(
+							extensionEntity.id,
+							novelsToChapters.filter { (novel, _) ->
+								novel.extensionID == extensionEntity.id
+							}.map { (novel, chapters) ->
+								val settings =
+									if (backupSettings)
+										novelSettingsRepository.get(novel.id!!)
+									else null
 
-										val bSettings = settings?.let {
-											BackupNovelSettingEntity(
-												it.sortType,
-												it.showOnlyReadingStatusOf,
-												it.showOnlyBookmarked,
-												it.showOnlyDownloaded
-											)
-										} ?: BackupNovelSettingEntity()
+								val bSettings = settings?.let {
+									BackupNovelSettingEntity(
+										it.sortType,
+										it.showOnlyReadingStatusOf,
+										it.showOnlyBookmarked,
+										it.showOnlyDownloaded
+									)
+								} ?: BackupNovelSettingEntity()
 
-										val novelCategories =
-											novelCategoriesRepository.getNovelCategoriesFromNovel(
-												novel.id!!
-											)
-												.map { categories[it.categoryID]!!.order }
+								val novelCategories =
+									novelCategoriesRepository.getNovelCategoriesFromNovel(
+										novel.id!!
+									)
+										.map { categories[it.categoryID]!!.order }
 
-										BackupNovelEntity(
-											url = novel.url,
-											bookmarked = novel.bookmarked,
-											loaded = novel.loaded,
-											name = novel.title,
-											imageURL = novel.imageURL,
-											description = novel.description,
-											language = novel.language,
-											genres = novel.genres,
-											authors = novel.authors,
-											artists = novel.artists,
-											tags = novel.tags,
-											status = novel.status,
-											chapters = chapters,
-											settings = bSettings,
-											categories = novelCategories,
-											pinned = novelPinRepository.isPinned(novel.id!!)
-										)
-									}
+								BackupNovelEntity(
+									url = novel.url,
+									bookmarked = novel.bookmarked,
+									loaded = novel.loaded,
+									name = novel.title,
+									imageURL = novel.imageURL,
+									description = novel.description,
+									language = novel.language,
+									genres = novel.genres,
+									authors = novel.authors,
+									artists = novel.artists,
+									tags = novel.tags,
+									status = novel.status,
+									chapters = chapters,
+									settings = bSettings,
+									categories = novelCategories,
+									pinned = novelPinRepository.isPinned(novel.id!!)
 								)
-							},
-							categories = categories.values.toList()
+							}
 						)
+					},
+					categories = categories.values.toList()
+				)
 
-						logI("Encoding to json")
-						notify("Encoding to json")
-						backupJSON.encodeToString(backup)
-					}
-					System.gc() // please clean up
-
-					logI("Zipping bytes")
-					notify("Zipping bytes")
-					gzip(stringBackup)
-				}
-				System.gc() // please clean up
-
-				logI("Encoding via bas64")
-				notify("Encoding via bas64")
-				Base64.encode(zippedBytes, Base64.DEFAULT)
+				logI("Encoding to json")
+				notify("Encoding to json")
+				backupJSON.encodeToStream(backup, gzip)
 			}
 			System.gc() // please clean up
 
@@ -296,7 +281,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 			notify("Saving to file")
 			val pathResult = backupRepository.saveBackup(
 				BackupEntity(
-					base64Bytes
+					zippedBytes
 				)
 			)
 			pathResult.let {
