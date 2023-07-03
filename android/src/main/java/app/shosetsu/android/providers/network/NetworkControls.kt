@@ -2,10 +2,7 @@ package app.shosetsu.android.providers.network
 
 import android.annotation.SuppressLint
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.common.ext.logI
-import app.shosetsu.android.common.ext.logW
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -13,7 +10,6 @@ import app.shosetsu.lib.ShosetsuSharedLib
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.Response
 import java.net.Authenticator
 import java.net.InetSocketAddress
@@ -55,9 +51,8 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 
 	val builder = OkHttpClient.Builder()
 		.cookieJar(CookieJarSync)
-		.addInterceptor { chain ->
-			return@addInterceptor slowRequest(chain, chain.request())
-		}.addNetworkInterceptor {
+		.addInterceptor(::slowRequest)
+		.addNetworkInterceptor {
 			val request = it.request().newBuilder()
 			ShosetsuSharedLib.shosetsuHeaders.forEach { (name, value) ->
 				request.header(name, value)
@@ -134,18 +129,12 @@ fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
 	return formattedTime - rightNow
 }
 
-fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false): Response {
-	if (isRetry) {
+fun slowRequest(chain: Interceptor.Chain): Response {
+	/*if (isRetry) {
 		chain.logI("Retrying")
-	}
-	val response = runBlocking {
-		// Await for chance to access the site
-		SiteProtector.await(r.url.host) {
-			chain.logI("Sending Request: $r")
-			chain.proceed(r)
-		}
-	}
-	if (response.hasRetryAfter()) {
+	}*/
+	val response = SiteProtector.await(chain)
+	/*if (response.hasRetryAfter()) {
 		chain.logI("Received Retry-After from ${r.url}")
 		// This can be two things, either a date or a second
 		val retryAfter = response.header("Retry-After")
@@ -170,7 +159,7 @@ fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false):
 			// Do not infinitely repeat the request
 			return if (isRetry) response else slowRequest(chain, r, isRetry = true)
 		}
-	}
+	}*/
 	return response
 }
 
