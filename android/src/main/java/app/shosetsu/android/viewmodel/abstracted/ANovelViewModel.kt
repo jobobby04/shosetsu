@@ -87,7 +87,7 @@ abstract class ANovelViewModel
 	/**
 	 * Set the categories of the novel
 	 */
-	abstract fun setNovelCategories(categories: IntArray): Flow<Unit>
+	abstract fun setNovelCategories(categories: IntArray): Unit
 
 	/**
 	 * Toggles the bookmark of this ui
