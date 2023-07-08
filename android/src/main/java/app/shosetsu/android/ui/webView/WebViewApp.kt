@@ -257,19 +257,6 @@ fun WebViewScreen(
 	) { contentPadding ->
 		val webClient = remember {
 			object : AccompanistWebViewClient() {
-				override fun onPageFinished(view: WebView?, url: String?) {
-					super.onPageFinished(view, url)
-					logI(url)
-					if (view == null || url == null) return
-					view.evaluateJavascript("document.cookie") { cookies ->
-						val httpUrl = url.toHttpUrl()
-						CookieJarSync.saveFromResponse(
-							httpUrl,
-							cookies.split("; ").mapNotNull { Cookie.parse(httpUrl, it) }
-						)
-						logV("Cookies: $cookies")
-					}
-				}
 			}
 		}
 
