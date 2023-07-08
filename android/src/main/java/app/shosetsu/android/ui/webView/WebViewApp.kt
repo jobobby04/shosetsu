@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -274,7 +275,7 @@ fun WebViewScreen(
 
 		WebView(
 			state = state,
-			modifier = Modifier.padding(contentPadding),
+			modifier = Modifier.fillMaxSize().padding(contentPadding),
 			navigator = navigator,
 			onCreated = { webView ->
 				webView.settings.apply {
