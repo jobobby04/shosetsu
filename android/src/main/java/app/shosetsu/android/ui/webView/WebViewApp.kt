@@ -3,6 +3,7 @@ package app.shosetsu.android.ui.webView
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.webkit.CookieManager
 import android.webkit.WebView
@@ -149,6 +150,7 @@ fun WebViewScreen(
 ) {
 	val state = rememberWebViewState(url = url)
 	val navigator = rememberWebViewNavigator()
+	var currentUrl by remember { mutableStateOf(url) }
 	Scaffold(
 		topBar = {
 			Box {
@@ -206,21 +208,21 @@ fun WebViewScreen(
 								}
 							)
 							DropdownMenuItem(onClick = {
-								onShare(state.lastLoadedUrl!!); overflow = false
+								onShare(currentUrl); overflow = false
 							},
 								text = {
 									Text(text = stringResource(R.string.share))
 								}
 							)
 							DropdownMenuItem(onClick = {
-								onOpenInBrowser(state.lastLoadedUrl!!); overflow = false
+								onOpenInBrowser(currentUrl); overflow = false
 							},
 								text = {
 									Text(text = stringResource(R.string.open_in_browser))
 								}
 							)
 							DropdownMenuItem(onClick = {
-								onClearCookies(state.lastLoadedUrl!!); overflow = false
+								onClearCookies(currentUrl); overflow = false
 							},
 								text = {
 									Text(text = stringResource(R.string.action_webview_clear_cookies))
@@ -257,6 +259,23 @@ fun WebViewScreen(
 	) { contentPadding ->
 		val webClient = remember {
 			object : AccompanistWebViewClient() {
+				override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+					super.onPageStarted(view, url, favicon)
+					url?.let {
+						currentUrl = it
+					}
+				}
+
+				override fun doUpdateVisitedHistory(
+					view: WebView?,
+					url: String?,
+					isReload: Boolean,
+				) {
+					super.doUpdateVisitedHistory(view, url, isReload)
+					url?.let {
+						currentUrl = it
+					}
+				}
 			}
 		}
 
