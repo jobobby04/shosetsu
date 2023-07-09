@@ -28,7 +28,7 @@ import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
 
 @Composable
 fun CSSEditorBottomBarContent(
-	isCSSInvalid: Boolean,
+	isCSSValid: Boolean,
 	cssInvalidReason: String?,
 	onUndo: () -> Unit,
 	canUndo: Boolean,
@@ -40,7 +40,7 @@ fun CSSEditorBottomBarContent(
 	canRedo: Boolean
 ) {
 	Column {
-		if (!isCSSInvalid && cssInvalidReason != null)
+		if (!isCSSValid && cssInvalidReason != null)
 			Card(
 				border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
 				modifier = Modifier

@@ -27,7 +27,7 @@ fun CSSEditorView(
 	val cssContent by viewModel.cssContent.collectAsState()
 	val clipboardManager = LocalClipboardManager.current
 
-	val isCSSInvalid by viewModel.isCSSValid.collectAsState()
+	val isCSSValid by viewModel.isCSSValid.collectAsState()
 	val cssInvalidReason by viewModel.cssInvalidReason.collectAsState()
 
 	val canRedo by viewModel.canRedo.collectAsState()
@@ -38,7 +38,7 @@ fun CSSEditorView(
 		CSSEditorPagerContent(
 			cssTitle = cssTitle,
 			cssContent = cssContent,
-			isCSSInvalid = isCSSInvalid,
+			isCSSValid = isCSSValid,
 			cssInvalidReason = cssInvalidReason,
 			onUndo = { viewModel.undo() },
 			onRedo = { viewModel.redo() },

@@ -33,7 +33,7 @@ import okhttp3.internal.immutableListOf
 fun CSSEditorPagerContent(
 	cssTitle: String,
 	cssContent: String,
-	isCSSInvalid: Boolean,
+	isCSSValid: Boolean,
 	cssInvalidReason: String? = null,
 	onBack: () -> Unit,
 	onHelp: () -> Unit,
@@ -53,7 +53,7 @@ fun CSSEditorPagerContent(
 		},
 		bottomBar = {
 			CSSEditorBottomBarContent(
-				isCSSInvalid,
+				isCSSValid,
 				cssInvalidReason,
 				onUndo,
 				canUndo,
@@ -138,7 +138,7 @@ fun PreviewCSSEditorPagerContent() {
 		onNewText = {},
 		onUndo = {},
 		onRedo = {},
-		isCSSInvalid = false,
+		isCSSValid = false,
 		cssInvalidReason = "This is not CSS",
 		onPaste = {},
 		onExport = {},
