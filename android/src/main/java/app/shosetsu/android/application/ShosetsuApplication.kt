@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteException
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.getSystemService
@@ -281,7 +280,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				}.build()
 			}
 
-			crossfade((300 * Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)).toInt())
 			allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
 
 			// Coil spawns a new thread for every image load by default
