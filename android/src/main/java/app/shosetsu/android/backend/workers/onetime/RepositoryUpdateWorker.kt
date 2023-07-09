@@ -7,7 +7,16 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
+import androidx.work.await
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
@@ -19,7 +28,16 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_REPOSITORY_UPDATE
 import app.shosetsu.android.common.consts.Notifications.ID_REPOSITORY_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.REPOSITORY_UPDATE_TAG
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.getString
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.removeProgress
+import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setOngoing
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.domain.model.local.RepositoryEntity
@@ -285,7 +303,7 @@ class RepositoryUpdateWorker(
 						setContentTitle("${repo.name} failed to load")
 						setNotOngoing()
 					}
-					return@let
+					continue
 				} catch (e: IOException) {
 					notify(
 						"${e.message}",
@@ -295,7 +313,7 @@ class RepositoryUpdateWorker(
 						setContentTitle("${repo.name} failed to load")
 						setNotOngoing()
 					}
-					return@let
+					continue
 				} catch (e: HTTPException) {
 					notify(
 						"${e.code}",
@@ -305,7 +323,7 @@ class RepositoryUpdateWorker(
 						setContentTitle("${repo.name} failed to load")
 						setNotOngoing()
 					}
-					return@let
+					continue
 				} catch (e: Exception) {
 					notify(
 						"${e.message}",
@@ -328,7 +346,7 @@ class RepositoryUpdateWorker(
 						logI("Disabling repository: $repo")
 						extRepoRepo.update(repo.copy(isEnabled = false))
 					}
-					return@let
+					continue
 				}
 
 				updateLibraries(repoIndex.libraries, repo)
