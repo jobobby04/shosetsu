@@ -8,6 +8,7 @@ import app.shosetsu.android.common.ext.logW
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.lib.ShosetsuSharedLib
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -55,6 +56,12 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 		.cookieJar(CookieJarSync)
 		.addInterceptor { chain ->
 			return@addInterceptor slowRequest(chain, chain.request())
+		}.addNetworkInterceptor {
+			val request = it.request().newBuilder()
+			ShosetsuSharedLib.shosetsuHeaders.forEach { (name, value) ->
+				request.header(name, value)
+			}
+			it.proceed(request.build())
 		}.apply {
 			Logger.getLogger(OkHttpClient::class.java.name).level = Level.ALL
 		}
@@ -69,15 +76,19 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 			val (host, rawPort) = hostname.split(':')
 			val port = rawPort.toInt()
 
-			val proxy = Proxy(Proxy.Type.SOCKS,  InetSocketAddress(host, port))
+			val proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress(host, port))
 			builder.proxy(proxy)
 
 			if (auth.isNotEmpty()) {
 				val (user, pass) = auth.split(':')
 
-				Authenticator.setDefault(object: Authenticator() {
+				Authenticator.setDefault(object : Authenticator() {
 					override fun getPasswordAuthentication(): PasswordAuthentication? {
-						if (requestingHost.equals(host, ignoreCase = true) and (requestingPort == port)) {
+						if (requestingHost.equals(
+								host,
+								ignoreCase = true
+							) and (requestingPort == port)
+						) {
 							return PasswordAuthentication(user, pass.toCharArray())
 						}
 						return null;
