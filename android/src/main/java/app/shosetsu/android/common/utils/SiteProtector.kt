@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Class dedicated to protecting sites from what is essentially a ddos attack from shosetsu
  */
-object SiteProtector {
+object SiteProtector : Interceptor {
 	/**
 	 * The delay between each request to a site in milliseconds
 	 */
@@ -60,7 +60,7 @@ object SiteProtector {
 	 * @return whatever [block] returns
 	 */
 	@Suppress("BlockingMethodInNonBlockingContext")
-	fun await(chain: Interceptor.Chain): Response {
+	override fun intercept(chain: Interceptor.Chain): Response {
 		val call = chain.call()
 		if (call.isCanceled()) throw IOException("Canceled")
 

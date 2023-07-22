@@ -48,7 +48,7 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 
 	val builder = OkHttpClient.Builder()
 		.cookieJar(CookieJarSync)
-		.addInterceptor(::slowRequest)
+		.addInterceptor(SiteProtector)
 		.addNetworkInterceptor {
 			val request = it.request().newBuilder()
 			ShosetsuSharedLib.shosetsuHeaders.forEach { (name, value) ->
@@ -129,7 +129,7 @@ fun slowRequest(chain: Interceptor.Chain): Response {
 	/*if (isRetry) {
 		chain.logI("Retrying")
 	}*/
-	val response = SiteProtector.await(chain)
+	val response = SiteProtector.intercept(chain)
 	/*if (response.hasRetryAfter()) {
 		chain.logI("Received Retry-After from ${r.url}")
 		// This can be two things, either a date or a second
