@@ -46,7 +46,8 @@ import app.shosetsu.android.common.SettingKey.ExposeTrueChapterDelete
 import app.shosetsu.android.common.SettingKey.LogToFile
 import app.shosetsu.android.common.SettingKey.ProxyHost
 import app.shosetsu.android.common.SettingKey.RequireDoubleBackToExit
-import app.shosetsu.android.common.SettingKey.SiteProtectionDelay
+import app.shosetsu.android.common.SettingKey.SiteProtectionPeriod
+import app.shosetsu.android.common.SettingKey.SiteProtectionPermits
 import app.shosetsu.android.common.SettingKey.UseProxy
 import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
@@ -392,19 +393,33 @@ fun AdvancedSettingsContent(
 				)
 			}
 
-			item {
-				SliderSettingContent(
-					title = stringResource(R.string.settings_advanced_site_protection_title),
-					description = stringResource(R.string.settings_advanced_site_protection_desc),
-					valueRange = remember { StableHolder(300..5000) },
-					parseValue = {
-						"$it ms"
-					},
-					repo = viewModel.settingsRepo,
-					key = SiteProtectionDelay,
-					haveSteps = false,
-				)
-			}
+		item {
+			SliderSettingContent(
+				title = stringResource(R.string.settings_advanced_site_protection_period),
+				description = stringResource(R.string.settings_advanced_site_protection_period_desc),
+				valueRange = remember { StableHolder(300..60000) },
+				parseValue = {
+					"$it ms"
+				},
+				repo = viewModel.settingsRepo,
+				key = SiteProtectionPeriod,
+				haveSteps = false,
+			)
+		}
+
+		item {
+			SliderSettingContent(
+				title = stringResource(R.string.settings_advanced_site_protection_permits),
+				description = stringResource(R.string.settings_advanced_site_protection_permits_desc),
+				valueRange = remember { StableHolder(1..60) },
+				parseValue = {
+					"$it permits"
+				},
+				repo = viewModel.settingsRepo,
+				key = SiteProtectionPermits,
+				haveSteps = false,
+			)
+		}
 
 			item {
 				SwitchSettingContent(
