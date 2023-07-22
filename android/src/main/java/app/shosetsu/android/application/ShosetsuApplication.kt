@@ -210,8 +210,13 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			}
 		}
 		launchIO {
-			settingsRepo.getIntFlow(SettingKey.SiteProtectionDelay).collectLatest {
-				SiteProtector.requestDelay = it.toLong()
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionPermits).collectLatest {
+				SiteProtector.permits = it
+			}
+		}
+		launchIO {
+			settingsRepo.getIntFlow(SettingKey.SiteProtectionPeriod).collectLatest {
+				SiteProtector.period = it.toLong()
 			}
 		}
 		super.onCreate()

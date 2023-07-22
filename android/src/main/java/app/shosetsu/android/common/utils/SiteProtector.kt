@@ -23,7 +23,6 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 import java.util.ArrayDeque
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 
@@ -31,46 +30,17 @@ import java.util.concurrent.TimeUnit
  * Class dedicated to protecting sites from what is essentially a ddos attack from shosetsu
  */
 object SiteProtector {
-	private val lastUsed = ConcurrentHashMap<String, Long>()
-
 	/**
-	 * Filled with delays provided by HTTP 429s
-	 * If entry is found, then it should be removed afterwards.
+	 * The delay between each request to a site in milliseconds
 	 */
-	private val retryAfter = ConcurrentHashMap<String, Long>()
-
-	/**
-	 * @param after delay in ms
-	 */
-	fun setRetryAfter(host: String, after: Long) {
-		retryAfter[host] = after
-	}
+	var permits: Int = SettingKey.SiteProtectionPermits.default
 
 	/**
 	 * The delay between each request to a site in milliseconds
 	 */
-	var requestDelay: Long = SettingKey.SiteProtectionDelay.default.toLong()
+	var period: Long = SettingKey.SiteProtectionPeriod.default.toLong()
 
-	/**
-	 * Get delay, respects [retryAfter] defaults to [requestDelay]
-	 */
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun getDelay(host: String) =
-		retryAfter[host] ?: requestDelay
-
-	const val permits = 2
-	const val period = 1L
 	val unit = TimeUnit.SECONDS
-
-
-	/**
-	 * Check if we can continue operating.
-	 *
-	 * @return true if we can, false if delay must occur
-	 */
-	@Suppress("NOTHING_TO_INLINE")
-	private inline fun checkIfCan(host: String, lastUsedTime: Long): Boolean =
-		(lastUsedTime + getDelay(host)) > System.currentTimeMillis()
 
 	private val cache = CacheBuilder.newBuilder()
 		.expireAfterAccess(10, TimeUnit.MINUTES)
