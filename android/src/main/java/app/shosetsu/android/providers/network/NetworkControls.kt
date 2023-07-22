@@ -1,7 +1,6 @@
 package app.shosetsu.android.providers.network
 
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -14,7 +13,6 @@ import java.net.Authenticator
 import java.net.InetSocketAddress
 import java.net.PasswordAuthentication
 import java.net.Proxy
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -115,7 +113,7 @@ val retryAfterDateRegex: Regex =
  *
  * @return time in milliseconds till the date
  */
-fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
+/*fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
 	val rightNow = System.currentTimeMillis()
 	val formattedTime = try {
 		retryAfterDateFormat.parse(retryAfter)?.time
@@ -125,7 +123,7 @@ fun parseRetryAfterDate(chain: Interceptor.Chain, retryAfter: String): Long {
 		SiteProtector.requestDelay
 	}
 	return formattedTime - rightNow
-}
+}*/
 
 fun slowRequest(chain: Interceptor.Chain): Response {
 	/*if (isRetry) {

@@ -304,7 +304,12 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	/**
 	 * Delay between each request to a site
 	 */
-	object SiteProtectionDelay : IntKey("site_protection_delay", 300)
+	object SiteProtectionPermits : IntKey("site_protection_permits", 4)
+
+	/**
+	 * Delay between each request to a site
+	 */
+	object SiteProtectionPeriod : IntKey("site_protection_period", 300)
 
 	class CustomString(
 		name: String,
