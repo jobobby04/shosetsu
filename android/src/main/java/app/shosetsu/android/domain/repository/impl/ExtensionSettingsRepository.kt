@@ -1,10 +1,13 @@
 package app.shosetsu.android.domain.repository.impl
 
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.CustomBoolean
+import app.shosetsu.android.common.SettingKey.CustomFloat
+import app.shosetsu.android.common.SettingKey.CustomInt
+import app.shosetsu.android.common.SettingKey.CustomString
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.file.base.IFileSettingsDataSource
 import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -35,8 +38,8 @@ class ExtensionSettingsRepository(
 		iFileSettingSystem.getInt("$extensionID", selectedListingKey())
 	}
 
-	override suspend fun observeSelectedListing(extensionID: Int): Flow<Int> =
-		iFileSettingSystem.observeInt("$extensionID", selectedListingKey()).onIO()
+	override suspend fun observeSelectedListing(extensionID: Int): StateFlow<Int> =
+		iFileSettingSystem.observeInt("$extensionID", selectedListingKey())
 
 	override suspend fun setSelectedListing(extensionID: Int, selectedListing: Int) = onIO {
 		iFileSettingSystem.setInt("$extensionID", selectedListingKey(), selectedListing)
@@ -85,42 +88,41 @@ class ExtensionSettingsRepository(
 		extensionID: Int,
 		settingID: Int,
 		default: Int
-	): Flow<Int> =
+	): StateFlow<Int> =
 		iFileSettingSystem.observeInt(
 			"$extensionID",
 			CustomInt("$settingID", default)
-		).onIO()
+		)
 
 	override fun getStringFlow(
 		extensionID: Int,
 		settingID: Int,
 		default: String
-	): Flow<String> =
+	): StateFlow<String> =
 		iFileSettingSystem.observeString(
 			"$extensionID",
 			CustomString("$settingID", default)
-		).onIO()
+		)
 
 	override fun getBooleanFlow(
 		extensionID: Int,
 		settingID: Int,
 		default: Boolean
-	): Flow<Boolean> =
+	): StateFlow<Boolean> =
 		iFileSettingSystem.observeBoolean(
 			"$extensionID",
 			CustomBoolean("$settingID", default)
 		)
-			.onIO()
 
 	override fun getFloatFlow(
 		extensionID: Int,
 		settingID: Int,
 		default: Float
-	): Flow<Float> =
+	): StateFlow<Float> =
 		iFileSettingSystem.observeFloat(
 			"$extensionID",
 			CustomFloat("$settingID", default)
-		).onIO()
+		)
 
 
 	override suspend fun setInt(extensionID: Int, settingID: Int, value: Int) = onIO {

@@ -52,12 +52,14 @@ fun GenericRightSettingLayout(
 		) {
 			val alpha = if (enabled) 1F else 0.38f
 			Text(title, color = LocalContentColor.current.copy(alpha = alpha))
-			Text(
-				description,
-				style = SUB_TEXT_SIZE,
-				modifier = Modifier.alpha(0.7f),
-				color = LocalContentColor.current.copy(alpha = alpha)
-			)
+			if (description.isNotBlank()) {
+				Text(
+					description,
+					style = SUB_TEXT_SIZE,
+					modifier = Modifier.alpha(0.7f),
+					color = LocalContentColor.current.copy(alpha = alpha)
+				)
+			}
 		}
 		right()
 	}

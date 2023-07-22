@@ -1,6 +1,6 @@
 package app.shosetsu.android.domain.repository.base
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.Flow
  */
 interface IExtensionSettingsRepository {
 	suspend fun getSelectedListing(extensionID: Int): Int
-	suspend fun observeSelectedListing(extensionID: Int): Flow<Int>
+	suspend fun observeSelectedListing(extensionID: Int): StateFlow<Int>
 	suspend fun setSelectedListing(extensionID: Int, selectedListing: Int)
 
 	// -- suspended getters
@@ -39,10 +39,10 @@ interface IExtensionSettingsRepository {
 
 	// -- flow getters
 
-	fun getIntFlow(extensionID: Int, settingID: Int, default: Int): Flow<Int>
-	fun getStringFlow(extensionID: Int, settingID: Int, default: String): Flow<String>
-	fun getBooleanFlow(extensionID: Int, settingID: Int, default: Boolean): Flow<Boolean>
-	fun getFloatFlow(extensionID: Int, settingID: Int, default: Float): Flow<Float>
+	fun getIntFlow(extensionID: Int, settingID: Int, default: Int): StateFlow<Int>
+	fun getStringFlow(extensionID: Int, settingID: Int, default: String): StateFlow<String>
+	fun getBooleanFlow(extensionID: Int, settingID: Int, default: Boolean): StateFlow<Boolean>
+	fun getFloatFlow(extensionID: Int, settingID: Int, default: Float): StateFlow<Float>
 
 	// -- setters
 

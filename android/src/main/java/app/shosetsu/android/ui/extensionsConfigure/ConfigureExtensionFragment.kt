@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -166,9 +165,7 @@ fun SettingsItemAsCompose(
 			is FilterEntity.Header -> {
 				column.item(Random.nextInt() + 1000000) {
 					Row(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
+						modifier = Modifier.fillMaxWidth()
 					) {
 						Text(data.name)
 						Divider()
@@ -191,9 +188,7 @@ fun SettingsItemAsCompose(
 						onValueChanged = { value ->
 							viewModel.saveSetting(data.id, value)
 						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
+						modifier = Modifier.fillMaxWidth()
 					)
 				}
 			}
@@ -207,9 +202,7 @@ fun SettingsItemAsCompose(
 						onCheckChange = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
 						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
+						modifier = Modifier.fillMaxWidth()
 					)
 				}
 			}
@@ -217,9 +210,7 @@ fun SettingsItemAsCompose(
 			is FilterEntity.TriState -> {
 				column.item(data.id) {
 					Row(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp),
+						modifier = Modifier.fillMaxWidth(),
 						horizontalArrangement = Arrangement.SpaceBetween
 					) {
 						Text(text = data.name)
@@ -247,9 +238,7 @@ fun SettingsItemAsCompose(
 						onSelection = { index ->
 							viewModel.saveSetting(data.id, index)
 						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
+						modifier = Modifier.fillMaxWidth()
 					)
 				}
 			}
@@ -259,7 +248,6 @@ fun SettingsItemAsCompose(
 					Row(
 						modifier = Modifier
 							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
 					) {
 						Text(data.name)
 						Divider()
@@ -281,9 +269,7 @@ fun SettingsItemAsCompose(
 						onCheckChange = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
 						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
+						modifier = Modifier.fillMaxWidth()
 					)
 				}
 			}
@@ -298,9 +284,7 @@ fun SettingsItemAsCompose(
 						onSelection = { index ->
 							viewModel.saveSetting(data.id, index)
 						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 16.dp, end = 16.dp)
+						modifier = Modifier.fillMaxWidth()
 					)
 				}
 			}

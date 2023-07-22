@@ -343,4 +343,17 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 		fun valueOf(key: String): SettingKey<*>? = map[key]
 	}
+
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (other !is SettingKey<*>) return false
+
+		if (name != other.name) return false
+
+		return true
+	}
+
+	override fun hashCode(): Int {
+		return name.hashCode()
+	}
 }

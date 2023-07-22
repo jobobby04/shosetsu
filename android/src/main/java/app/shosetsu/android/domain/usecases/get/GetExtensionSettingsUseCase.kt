@@ -119,12 +119,8 @@ class GetExtensionSettingsUseCase(
 						filter.copy(filters = subList)
 					}
 				}
-				is FilterEntity.Header -> flow {
-					emit(filter)
-				}
-				is FilterEntity.Separator -> flow {
-					emit(filter)
-				}
+				is FilterEntity.Header -> flowOf(filter)
+				is FilterEntity.Separator -> flowOf(filter)
 			}
 		}
 
