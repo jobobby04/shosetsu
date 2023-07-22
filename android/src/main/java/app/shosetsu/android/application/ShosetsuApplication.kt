@@ -279,7 +279,13 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	@OptIn(ExperimentalCoroutinesApi::class)
 	override fun newImageLoader(): ImageLoader =
 		ImageLoader.Builder(this).apply {
-			okHttpClient(okHttpClient)
+			okHttpClient(
+				okHttpClient.newBuilder()
+					.apply {
+						interceptors().remove(SiteProtector)
+					}
+					.build()
+			)
 			diskCache {
 				DiskCache.Builder().apply {
 					directory(cacheDir.resolve("image_cache"))
