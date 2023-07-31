@@ -1,0 +1,65 @@
+# v2.4.4
+
+## Fixes
+- Fix extension link going to github doomsdayrs 7/31/23, 2:20 PM
+- Add headers to request properly Jobobby04* 7/11/23, 7:51 PM
+- Fix extension settings watching and updating Jobobby04* 7/21/23, 8:55 PM
+- Fix webview header bloating Jobobby04* 7/7/23, 8:55 PM
+- Fix webview for some websites Jobobby04* 7/7/23, 8:35 PM
+- Fix setCategories Jobobby04* 7/4/23, 9:27 AM
+- Fix library button having a background Jobobby04* 2/3/23, 1:36 PM
+- Replace return with continue in RepositoryUpdateWorker doomsdayrs 7/8/23, 8:11 PM
+- Fix reader timer triggering on activity resume doomsdayrs 6/23/23, 12:47 AM
+
+## Misc
+- Drop references to proxy doomsdayrs 7/29/23, 10:43 AM
+- Upgrade to AGP 8.1.0 doomsdayrs 7/29/23, 10:22 AM
+- Rename Button to LongClickButton Jobobby04* 7/3/23, 12:28 AM
+- Use currentUrl in webview actions Jobobby04* 7/7/23, 8:56 PM
+- Use Material 3 surface in shosetsu theme Jobobby04* 2/3/23, 11:22 PM
+- Use regular surface in catalogue filter menu Jobobby04* 2/3/23, 11:21 PM
+- Minor improvements for CSS Editor (lite) Jobobby04* 7/8/23, 8:54 PM
+- Improve missing icon in configure extension Jobobby04* 2/3/23, 11:21 PM
+- Add PreviewCSSEditorBottomBarContent doomsdayrs 7/8/23, 8:42 PM
+- Fix parameter naming in CSSEditorPagerContent doomsdayrs 7/8/23, 8:42 PM
+- Add surface to library filter sheet Jobobby04* 2/3/23, 11:19 PM
+- Use Material 3 chips for genre Jobobby04* 2/3/23, 11:18 PM
+- Use regular box for MoreItemContent Jobobby04* 2/3/23, 11:17 PM
+- Reader Scrollbar improvements Jobobby04* 2/3/23, 11:17 PM
+- Use regular box for SettingsMenuItem Jobobby04* 2/3/23, 11:16 PM
+- Re-add fake pull refresh Jobobby04* 2/3/23, 3:17 PM
+- Improve image error in browse Jobobby04* 2/3/23, 3:13 PM
+- Share options material 3 and improvements Jobobby04* 2/3/23, 2:42 PM
+- Material 3 surface Jobobby04* 2/3/23, 2:24 PM
+- Use Material3 Icon Jobobby04* 2/3/23, 2:07 PM
+- Take some coil configuration fromTachi Jobobby04* 2/3/23, 12:26 PM
+- Remove crossfade change from coil configuration doomsdayrs 7/8/23, 8:14 PM
+- Extract DownloadSettingsView out of DownloadSettingsFragment doomsdayrs 6/30/23, 10:04 AM
+- Extract WebViewAppView out of WebViewApp doomsdayrs 6/29/23, 7:32 PM
+- Extract SearchView out of SearchFragment doomsdayrs 6/29/23, 7:19 PM
+- Extract RepositoriesView out of RepositoryFragment doomsdayrs 6/29/23, 7:03 PM
+- Extract NovelInfoView out of NovelFragment doomsdayrs 6/23/23, 6:04 PM
+- Remember arguments in ConfigureExtensionFragment doomsdayrs 6/23/23, 1:47 PM
+- Extract MigrationView from MigrationFragment doomsdayrs 6/23/23, 1:45 PM
+- Extract IntroView from IntroductionActivity doomsdayrs 6/23/23, 1:36 PM
+- Extract HistoryView from HistoryFragment doomsdayrs 6/23/23, 1:29 PM
+- Extract ConfigureExtensionView from ConfigureExtensionFragment doomsdayrs 6/23/23, 12:27 PM
+- Extract DownloadsView out of DownloadsFragment doomsdayrs 6/23/23, 12:24 PM
+- Extract CategoriesView from CategoriesFragment doomsdayrs 6/23/23, 11:58 AM
+- Extract CatalogView from CatalogFragment doomsdayrs 6/23/23, 10:59 AM
+- State ChapterReader handles orientation and screenSize changes. doomsdayrs 6/23/23, 1:04 AM
+- Remove duplicated code from ChapterReaderView doomsdayrs 6/22/23, 11:53 AM
+- Upgrade guava to 32.0.1 doomsdayrs 6/17/23, 9:56 AM
+- Upgrade okhttp3 to 4.11.0 doomsdayrs 6/17/23, 9:54 AM
+- Upgrade androidx.window to 1.1.0 doomsdayrs 6/17/23, 9:54 AM
+- Use new ComposeView extension to simplify UI code doomsdayrs 6/16/23, 1:24 PM
+- Move SettingsView out of SettingsFragment doomsdayrs 6/16/23, 1:00 PM
+- Rename UpdatesController to UpdatesFragment doomsdayrs 6/16/23, 12:57 PM
+- Move UpdatesView out of ComposeUpdatesFragment doomsdayrs 6/16/23, 12:56 PM
+- Covert NovelFilterMenuBuilder.kt into idiomatic compose doomsdayrs 6/16/23, 7:36 AM
+- Covert LibraryFilterMenuBuilder.kt into idiomatic compose doomsdayrs 6/16/23, 7:35 AM
+- Update xml away from controller naming scheme doomsdayrs 6/15/23, 7:31 PM
+- Fix MoreFragment and SettingsFragment naming doomsdayrs 6/15/23, 7:18 PM
+- Rename Controller -> Fragment doomsdayrs 6/15/23, 7:17 PM
+- Separate BackupView out of BackupFragment doomsdayrs 6/15/23, 7:12 PM
+- Separate AddShareView out of AddShareController doomsdayrs 6/15/23, 4:56 PM
