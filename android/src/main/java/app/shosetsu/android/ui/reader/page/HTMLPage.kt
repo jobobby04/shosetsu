@@ -2,18 +2,26 @@ package app.shosetsu.android.ui.reader.page
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
+import android.net.Uri
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
+import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.utils.ProgressiveDelayer
 import app.shosetsu.android.view.compose.ScrollStateBar
@@ -55,6 +63,20 @@ fun HTMLPage(
 	val scrollState = rememberScrollState()
 	val state = rememberWebViewStateWithHTMLData(html)
 	val navigator = rememberWebViewNavigator(scope)
+	val uriHandler = LocalUriHandler.current
+	var uriToOpen: Uri? by remember { mutableStateOf(null) }
+
+	if (uriToOpen != null) {
+		HTMLPageUriDialog(
+			uriToOpen!!,
+			open = {
+				uriHandler.openUri(uriToOpen.toString())
+			},
+			reset = {
+				uriToOpen = null
+			}
+		)
+	}
 
 	/*
 	LaunchedEffect(navigator) {
@@ -114,7 +136,11 @@ fun HTMLPage(
 				.fillMaxWidth()
 				.heightIn(min = 1.dp)
 				.verticalScroll(scrollState),
-			client = ChapterReaderAccompanistWebViewClient(),
+			client = ChapterReaderAccompanistWebViewClient(
+				openURI = {
+					uriToOpen = it
+				}
+			),
 			chromeClient = ShosetsuAccompanistWebChromeClient(),
 			navigator = navigator,
 		)
@@ -139,6 +165,41 @@ fun HTMLPage(
 			}
 		}
 	}
+}
+
+@Composable
+fun HTMLPageUriDialog(uri: Uri, open: () -> Unit, reset: () -> Unit) {
+	AlertDialog(
+		confirmButton = {
+			TextButton(
+				onClick = {
+					open()
+					reset()
+				}
+			) {
+				Text(stringResource(android.R.string.ok))
+			}
+		},
+		dismissButton = {
+			TextButton(
+				onClick = {
+					reset()
+				}
+			) {
+				Text(stringResource(android.R.string.cancel))
+			}
+		},
+		onDismissRequest = reset,
+		title = {
+			Text(stringResource(R.string.reader_open_uri_title))
+		},
+		text = {
+			Column {
+				Text(stringResource(R.string.reader_open_uri_desc))
+				Text(uri.toString())
+			}
+		}
+	)
 }
 
 val WebViewState.sIsLoading: Boolean

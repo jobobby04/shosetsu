@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.reader.page
 
+import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.google.accompanist.web.AccompanistWebViewClient
@@ -27,7 +28,9 @@ import com.google.accompanist.web.AccompanistWebViewClient
  * @since 23 / 05 / 2023
  * @author Doomsdayrs
  */
-class ChapterReaderAccompanistWebViewClient : AccompanistWebViewClient() {
+class ChapterReaderAccompanistWebViewClient(
+	private val openURI: (Uri) -> Unit
+) : AccompanistWebViewClient() {
 	private var applied = false
 
 	/**
@@ -37,8 +40,11 @@ class ChapterReaderAccompanistWebViewClient : AccompanistWebViewClient() {
 	 */
 	override fun shouldOverrideUrlLoading(
 		view: WebView?,
-		request: WebResourceRequest?
-	): Boolean = true
+		request: WebResourceRequest
+	): Boolean {
+		openURI(request.url)
+		return true
+	}
 
 	/**
 	 * Apply event listeners after a page is loaded
