@@ -29,7 +29,6 @@ import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.decodeFromStream
 import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -159,7 +158,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 
 		unGZip(decodedBytes).use { stream ->
-			val metaInfo = backupJSON.decodeFromStream<MetaBackupEntity>(stream)
+			val metaInfo = backupJSON.decodeSafeFromStream<MetaBackupEntity>(stream)
 
 			// Reads the version line from the json, if it does not exist the process fails
 
@@ -182,7 +181,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		}
 
 		unGZip(decodedBytes).use { stream ->
-			val backup = backupJSON.decodeFromStream<FleshedBackupEntity>(stream)
+			val backup = backupJSON.decodeSafeFromStream<FleshedBackupEntity>(stream)
 
 			notify("Adding categories")
 			val currentCategories = categoriesRepo.getCategories()

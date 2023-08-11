@@ -295,6 +295,7 @@ class RepositoryUpdateWorker(
 				val repoIndex = try {
 					extRepoRepo.getRepoData(repo)
 				} catch (e: IllegalArgumentException) {
+					e.printStackTrace()
 					notify(
 						"${e.message}",
 						notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id
