@@ -302,6 +302,11 @@ class RepositoryUpdateWorker(
 						removeProgress()
 						setContentTitle("${repo.name} failed to load")
 						setNotOngoing()
+						addReportErrorAction(
+							applicationContext,
+							ID_REPOSITORY_UPDATE + 1 + repo.id,
+							e
+						)
 					}
 					continue
 				} catch (e: IOException) {
