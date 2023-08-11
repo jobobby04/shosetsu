@@ -101,7 +101,7 @@ class IsOnlineUseCase(
 			}
 		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			connectivityManager.registerDefaultNetworkCallbackCompat(callback)
 		} else {
 			// For Android 5
