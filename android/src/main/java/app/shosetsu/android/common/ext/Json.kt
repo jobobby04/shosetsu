@@ -38,7 +38,7 @@ import java.io.InputStream
  */
 @ExperimentalSerializationApi
 public inline fun <reified T> Json.decodeSafeFromStream(stream: InputStream): T {
-	return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+	return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 		decodeFromStream(serializersModule.serializer(), stream)
 	} else {
 		decodeFromString(stream.bufferedReader().readText())
