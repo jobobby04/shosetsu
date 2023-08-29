@@ -64,6 +64,9 @@
         <action
             android:id="@+id/action_browseController_to_configureExtension"
             app:destination="@id/configureExtension" />
+        <action
+            android:id="@+id/action_browseController_to_repositoryController"
+            app:destination="@id/repositoryController" />
     </fragment>
     <fragment
         android:id="@+id/catalogController"
@@ -174,6 +177,9 @@
         <action
             android:id="@+id/action_repositoryController_to_moreController"
             app:destination="@id/moreController" />
+        <action
+            android:id="@+id/action_repositoryController_to_browseController"
+            app:destination="@id/browseController" />
     </fragment>
     <fragment
         android:id="@+id/textAssetReader"

@@ -134,7 +134,16 @@ class BrowseFragment : ShosetsuFragment(),
 				installExtension = ::installExtension,
 				openCatalogue = ::openCatalogue,
 				openSettings = ::openSettings,
-				fab
+				openRepositories = {
+					findNavController().navigateSafely(
+						R.id.action_browseController_to_repositoryController,
+						navOptions = navOptions {
+							launchSingleTop = true
+							setShosetsuTransition()
+						}
+					)
+				},
+				fab = fab,
 			)
 		}
 	}
@@ -248,7 +257,8 @@ fun BrowseView(
 	installExtension: (BrowseExtensionUI, ExtensionInstallOptionEntity) -> Unit,
 	openCatalogue: (BrowseExtensionUI) -> Unit,
 	openSettings: (BrowseExtensionUI) -> Unit,
-	fab: EFabMaintainer?
+	fab: EFabMaintainer?,
+	openRepositories: () -> Unit
 ) {
 	ShosetsuCompose {
 		val entities by viewModel.liveData.collectAsState()
@@ -256,6 +266,9 @@ fun BrowseView(
 			entities,
 			refresh = {
 				onRefresh()
+			},
+			openRepositories = {
+				openRepositories()
 			},
 			installExtension = installExtension,
 			update = viewModel::updateExtension,
@@ -288,6 +301,7 @@ fun PreviewBrowseContent() {
 			)
 		}.toImmutableList(),
 		{},
+		{},
 		{ _, _ -> },
 		{},
 		{},
@@ -302,6 +316,7 @@ fun PreviewBrowseContent() {
 fun BrowseContent(
 	entities: ImmutableList<BrowseExtensionUI>?,
 	refresh: () -> Unit,
+	openRepositories: () -> Unit,
 	installExtension: (BrowseExtensionUI, ExtensionInstallOptionEntity) -> Unit,
 	update: (BrowseExtensionUI) -> Unit,
 	openCatalogue: (BrowseExtensionUI) -> Unit,
@@ -351,9 +366,14 @@ fun BrowseContent(
 		} else {
 			ErrorContent(
 				R.string.empty_browse_message,
-				ErrorAction(R.string.empty_browse_refresh_action) {
-					refresh()
-				}
+				actions = arrayOf(
+					ErrorAction(R.string.empty_browse_refresh_action) {
+						refresh()
+					},
+					ErrorAction(R.string.repositories) {
+						openRepositories()
+					}
+				)
 			)
 		}
 
