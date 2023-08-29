@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -349,7 +348,7 @@ fun BrowseContent(
 					)
 				}
 			}
-		} else if (entities != null && entities.isEmpty()) {
+		} else {
 			ErrorContent(
 				R.string.empty_browse_message,
 				ErrorAction(R.string.empty_browse_refresh_action) {
