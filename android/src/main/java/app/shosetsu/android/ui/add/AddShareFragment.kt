@@ -191,29 +191,26 @@ fun PreviewAboutContent() {
 	)
 
 
-	ShosetsuCompose {
-
-		AddShareContent(
-			showURLInput = true,
-			isProcessing = false,
-			novelLink = novelLink,
-			extensionLink = extLink,
-			repositoryLink = repoLink,
-			add = {
-			},
-			reject = {
-			},
-			isAdding = false,
-			isUrlValid = true,
-			retry = {
-			},
-			isNovelAlreadyPresent = false,
-			isStyleAlreadyPresent = true,
-			isExtAlreadyPresent = true,
-			isRepoAlreadyPresent = true,
-			openNovel = {}
-		)
-	}
+	AddShareContent(
+		showURLInput = true,
+		isProcessing = false,
+		novelLink = novelLink,
+		extensionLink = extLink,
+		repositoryLink = repoLink,
+		add = {
+		},
+		reject = {
+		},
+		isAdding = false,
+		isUrlValid = true,
+		retry = {
+		},
+		isNovelAlreadyPresent = false,
+		isStyleAlreadyPresent = true,
+		isExtAlreadyPresent = true,
+		isRepoAlreadyPresent = true,
+		openNovel = {}
+	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
