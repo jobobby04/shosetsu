@@ -222,12 +222,55 @@ class AddShareViewModel(
 								isProcessing.value = false
 								isURLValid.value = true
 							}
+
 							"repository" -> {
-								invalidate()
+								val names = http.queryParameterNames
+
+								if (!names.containsAll(
+										listOf(
+											"name",
+											"url",
+										)
+									)
+								) {
+									invalidate()
+									return@collectLatest
+								}
+
+								val repo = RepositoryLink(
+									http.queryParameter("name")!!,
+									http.queryParameter("url")!!.toHttpUrl().toUri().normalize()
+										.toString()
+								)
+
+								logI("Checking if repository is present")
+								repoEntity = try {
+									repoRepo.loadRepositories().find {
+										val entityUrl = it.url.toHttpUrl().toUri().normalize()
+										val repoLinkUrl = repo.url.toHttpUrl().toUri()
+
+										logV(entityUrl.toString())
+										logV(entityUrl.toString())
+
+										entityUrl == repoLinkUrl
+									}
+								} catch (e: SQLiteException) {
+									null
+								}
+
+								repoLink.value = repo
+
+								if (repoEntity != null)
+									isRepoAlreadyPresent.value = true
+
+								isProcessing.value = false
+								isURLValid.value = true
 							}
+
 							"extension" -> {
 								invalidate()
 							}
+
 							"style" -> {
 								invalidate()
 							}
@@ -263,7 +306,7 @@ class AddShareViewModel(
 			isAdding.value = true
 
 			// Add repository if not present
-			if (!isRepoAlreadyPresent.value) {
+			if (!isRepoAlreadyPresent.value && repoLink.value != null) {
 				val link = repoLink.value!!
 				try {
 					repoRepo.addRepository(link.url, link.name)
@@ -284,7 +327,7 @@ class AddShareViewModel(
 			}
 
 			// Add ext if not present
-			if (!isExtAlreadyPresent.value) {
+			if (!isExtAlreadyPresent.value && extLink.value != null) {
 				val link = extLink.value!!
 
 				if (repoEntity == null)
@@ -319,7 +362,7 @@ class AddShareViewModel(
 			}
 
 			// Add novel if not present
-			if (!isNovelAlreadyPresent.value) {
+			if (!isNovelAlreadyPresent.value && novelLink.value != null) {
 				val link = novelLink.value!!
 
 				if (novelEntity == null)
