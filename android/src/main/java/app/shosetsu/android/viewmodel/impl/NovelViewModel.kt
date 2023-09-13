@@ -22,7 +22,6 @@ import app.shosetsu.android.domain.usecases.settings.LoadChaptersResumeFirstUnre
 import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelSettingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelUseCase
-import app.shosetsu.android.view.AndroidQRCodeDrawable
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
@@ -32,7 +31,6 @@ import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
 import io.github.g0dkar.qrcode.QRCode
-import io.github.g0dkar.qrcode.render.QRCodeCanvasFactory
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -198,26 +196,12 @@ class NovelViewModel(
 									)
 								).toURL()
 								val code = QRCode(url)
-								val encoding = code.encode()
 
-								QRCodeCanvasFactory.AVAILABLE_IMPLEMENTATIONS["android.graphics.Bitmap"] =
-									{ width, height ->
-										AndroidQRCodeDrawable(
-											width, height
-										)
-									}
-
-								val size = code.computeImageSize(
-									QRCode.DEFAULT_CELL_SIZE,
-									QRCode.DEFAULT_MARGIN,
-								)
 								val bytes = code.render(
-									qrCodeCanvas = AndroidQRCodeDrawable(size, size),
-									rawData = encoding,
 									brightColor = Color.WHITE,
 									darkColor = Color.BLACK,
 									marginColor = Color.WHITE
-								).toByteArray()
+								).getBytes()
 
 								emit(
 									BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
