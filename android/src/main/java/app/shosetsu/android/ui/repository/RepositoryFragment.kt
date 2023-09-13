@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
@@ -316,7 +317,7 @@ fun RepositoriesView(
 		)
 
 		if (isAddDialogVisible) {
-			RepositoriesAddDialog(viewModel)
+			RepositoriesAddDialog(viewModel::addRepository, viewModel::hideAddDialog)
 		}
 
 		if (itemToRemove != null) {
@@ -329,6 +330,27 @@ fun RepositoriesView(
 			)
 		}
 	}
+}
+
+@Composable
+private inline fun createPreviewUI(id: Int = 1, enabled: Boolean = true) =
+	remember {
+		RepositoryUI(
+			id,
+			"shosetsu.app/$id",
+			"Example $id",
+			enabled
+		)
+	}
+
+@Preview
+@Composable
+fun PreviewRepositoriesRemoveDialog() {
+	RepositoriesRemoveDialog(
+		createPreviewUI(1),
+		remove = { },
+		dismiss = {}
+	)
 }
 
 @Composable
@@ -365,10 +387,20 @@ fun RepositoriesRemoveDialog(
 	)
 }
 
+@Preview
+@Composable
+fun PreviewRepositoriesAddDialog() {
+	RepositoriesAddDialog(
+		addRepository = { name, url -> },
+		hideAddDialog = {}
+	)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RepositoriesAddDialog(
-	viewModel: ARepositoryViewModel
+	addRepository: (name: String, url: String) -> Unit,
+	hideAddDialog: () -> Unit,
 ) {
 	var name by remember { mutableStateOf("") }
 	var url by remember { mutableStateOf("") }
@@ -406,13 +438,13 @@ fun RepositoriesAddDialog(
 			}
 		},
 		onDismissRequest = {
-			viewModel.hideAddDialog()
+			hideAddDialog()
 		},
 		confirmButton = {
 			TextButton(
 				onClick = {
-					viewModel.addRepository(name, url)
-					viewModel.hideAddDialog()
+					addRepository(name, url)
+					hideAddDialog()
 				},
 				enabled = !isError
 			) {
@@ -422,7 +454,7 @@ fun RepositoriesAddDialog(
 		dismissButton = {
 			TextButton(
 				onClick = {
-					viewModel.hideAddDialog()
+					hideAddDialog()
 				},
 			) {
 				Text(stringResource(android.R.string.cancel))
@@ -471,7 +503,11 @@ fun RepositoriesContent(
 				}
 			}
 
-			PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+			PullRefreshIndicator(
+				isRefreshing,
+				pullRefreshState,
+				Modifier.align(Alignment.TopCenter)
+			)
 		}
 	} else {
 		ErrorContent(
@@ -479,6 +515,17 @@ fun RepositoriesContent(
 			ErrorAction(R.string.empty_repositories_action) { addRepository() }
 		)
 	}
+}
+
+@Preview
+@Composable
+fun PreviewRepositoryContent() {
+	val enabled by remember { mutableStateOf(true) }
+	RepositoryContent(
+		createPreviewUI(enabled = enabled),
+		onCheckedChange = { enabled != enabled },
+		onRemove = {}
+	)
 }
 
 /**
