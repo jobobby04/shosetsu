@@ -49,12 +49,12 @@ import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
 import app.shosetsu.android.view.ComposeBottomSheetDialog
+import app.shosetsu.android.view.QRCodeShareDialog
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
-import app.shosetsu.android.view.openQRCodeShareDialog
 import app.shosetsu.android.view.openShareMenu
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
@@ -207,12 +207,7 @@ class NovelFragment : ShosetsuFragment(),
 				}
 			},
 			shareQRCode = {
-				openQRCodeShareDialog(
-					requireActivity(),
-					this,
-					activity as MainActivity,
-					viewModel.getQRCode()
-				)
+				viewModel.showQRCodeDialog()
 			}
 		)
 	}
@@ -566,6 +561,7 @@ fun NovelInfoView(
 	val toggleBookmarkResponse by viewModel.toggleBookmarkResponse.collectAsState()
 	val isChapterJumpDialogVisible by viewModel.isChapterJumpDialogVisible.collectAsState()
 	val jumpState by viewModel.jumpState.collectAsState()
+	val isQRCodeVisible by viewModel.isQRCodeVisible.collectAsState()
 
 
 	invalidateOptionsMenu()
@@ -647,6 +643,11 @@ fun NovelInfoView(
 					viewModel.jump(query, byTitle)
 				}
 			)
+		}
+
+		if (isQRCodeVisible) {
+			val qrCode by viewModel.qrCode.collectAsState(null)
+			QRCodeShareDialog(qrCode, viewModel::hideQRCodeDialog, novelInfo?.title)
 		}
 
 		val context = LocalContext.current

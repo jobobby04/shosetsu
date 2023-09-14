@@ -166,8 +166,6 @@ abstract class ANovelViewModel
 
 	abstract fun getIfAllowTrueDelete(): Flow<Boolean>
 
-	abstract fun getQRCode(): Flow<ImageBitmap?>
-
 	abstract fun bookmarkSelected()
 	abstract fun removeBookmarkFromSelected()
 
@@ -193,6 +191,26 @@ abstract class ANovelViewModel
 	 */
 	abstract fun deleteChapters()
 	abstract fun jump(query: String, byTitle: Boolean)
+
+	/**
+	 * Is the QR code currently visible or not
+	 */
+	abstract val isQRCodeVisible: StateFlow<Boolean>
+
+	/**
+	 * The QR code that the novel share is done by
+	 */
+	abstract val qrCode: Flow<ImageBitmap?>
+
+	/**
+	 * Show QR code dialog to share
+	 */
+	abstract fun showQRCodeDialog()
+
+	/**
+	 * Hide the QR code dialog
+	 */
+	abstract fun hideQRCodeDialog()
 
 	/**
 	 * @param showRemoveBookmark If any chapters are bookmarked, show the remove bookmark logo

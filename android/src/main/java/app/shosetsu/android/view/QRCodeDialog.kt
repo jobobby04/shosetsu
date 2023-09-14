@@ -1,31 +1,30 @@
 package app.shosetsu.android.view
 
-import android.content.Context
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
-import androidx.savedstate.SavedStateRegistryOwner
+import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
-import app.shosetsu.android.view.compose.ShosetsuCompose
-import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -51,59 +50,63 @@ import kotlinx.coroutines.flow.Flow
  * @author Doomsdayrs
  */
 
+@Preview
+@Composable
+fun PreviewQRCodeShareDialog() {
+	QRCodeShareDialog(
+		null,
+		hide = {},
+		title = "Test"
+	)
+}
 
+@Composable
 @OptIn(ExperimentalAnimationGraphicsApi::class)
-fun openQRCodeShareDialog(
-	context: Context,
-	owner: LifecycleOwner,
-	stateOwner: SavedStateRegistryOwner,
-	flow: Flow<ImageBitmap?>
+fun QRCodeShareDialog(
+	map: ImageBitmap?,
+	hide: () -> Unit,
+	title: String? = null
 ) {
-	ComposeDialog(context, owner, stateOwner).apply {
-		setContentView(ComposeView(context).apply {
+	Dialog(
+		onDismissRequest = hide
+	) {
+		Card {
+			Column(
+				modifier = Modifier
+					.padding(16.dp)
+					.fillMaxWidth(),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(8.dp)
+			) {
+				if (title != null)
+					Text(title, style = MaterialTheme.typography.titleLarge)
+				Box(
+					modifier = Modifier
+						.aspectRatio(1.0f)
+						.fillMaxWidth(),
+					contentAlignment = Alignment.Center
+				) {
+					if (map != null) {
+						Image(
+							map,
+							"",
+							modifier = Modifier
+								.background(androidx.compose.ui.graphics.Color.White)
+								.padding(16.dp)
+								.aspectRatio(1.0f)
+								.fillMaxSize()
+						)
+					} else {
+						val image =
+							AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
 
-
-			setViewCompositionStrategy(
-				ViewCompositionStrategy.DisposeOnLifecycleDestroyed(owner)
-			)
-
-
-			setContent {
-				ShosetsuCompose {
-					Card(
-						modifier = Modifier
-							.fillMaxWidth()
-							.fillMaxHeight(.4f)
-					) {
-						val map by flow.collectAsState(null)
-
-						Box(
-							modifier = Modifier.padding(16.dp),
-							contentAlignment = Alignment.Center
-						) {
-							if (map != null) {
-								Image(
-									map!!,
-									"",
-									modifier = Modifier
-										.background(androidx.compose.ui.graphics.Color.White)
-										.padding(16.dp)
-								)
-							} else {
-								val image =
-									AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
-
-								Image(
-									rememberAnimatedVectorPainter(image, false),
-									stringResource(R.string.loading),
-								)
-							}
-						}
-
+						Image(
+							rememberAnimatedVectorPainter(image, false),
+							stringResource(R.string.loading),
+						)
 					}
 				}
 			}
-		})
-
-	}.show()
+		}
+	}
 }

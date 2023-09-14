@@ -180,40 +180,42 @@ class NovelViewModel(
 		emit(getTrueDelete())
 	}.onIO()
 
-	override fun getQRCode(): Flow<ImageBitmap?> = novelLive.transformLatest { novel ->
-		if (novel != null) {
-			emitAll(novelURL.transformLatest { novelURL ->
-				if (novelURL != null) {
-					emitAll(getInstalledExtensionUseCase(novel.extID).transformLatest { ext ->
-						if (ext != null) {
-							val repo = getRepositoryUseCase(ext.repoID)
-							if (repo != null) {
-								val url = NovelLink(
-									novel.title, novel.imageURL, novelURL, ExtensionLink(
-										novel.extID, ext.name, ext.imageURL, RepositoryLink(
-											repo.name, repo.url
+	override val qrCode: Flow<ImageBitmap?> by lazy {
+		novelLive.transformLatest { novel ->
+			if (novel != null) {
+				emitAll(novelURL.transformLatest { novelURL ->
+					if (novelURL != null) {
+						emitAll(getInstalledExtensionUseCase(novel.extID).transformLatest { ext ->
+							if (ext != null) {
+								val repo = getRepositoryUseCase(ext.repoID)
+								if (repo != null) {
+									val url = NovelLink(
+										novel.title, novel.imageURL, novelURL, ExtensionLink(
+											novel.extID, ext.name, ext.imageURL, RepositoryLink(
+												repo.name, repo.url
+											)
 										)
+									).toURL()
+									val code = QRCode(url)
+
+									val bytes = code.render(
+										brightColor = Color.WHITE,
+										darkColor = Color.BLACK,
+										marginColor = Color.WHITE
+									).getBytes()
+
+									emit(
+										BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+											.asImageBitmap()
 									)
-								).toURL()
-								val code = QRCode(url)
-
-								val bytes = code.render(
-									brightColor = Color.WHITE,
-									darkColor = Color.BLACK,
-									marginColor = Color.WHITE
-								).getBytes()
-
-								emit(
-									BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-										.asImageBitmap()
-								)
+								} else emit(null)
 							} else emit(null)
-						} else emit(null)
-					})
-				} else emit(null)
-			})
-		} else emit(null)
-	}.onIO()
+						})
+					} else emit(null)
+				})
+			} else emit(null)
+		}.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1).onIO()
+	}
 
 	override val novelLive: StateFlow<NovelUI?> by lazy {
 		novelIDLive.flatMapLatest {
@@ -627,4 +629,12 @@ class NovelViewModel(
 		}
 	}
 
+	override val isQRCodeVisible = MutableStateFlow(false)
+	override fun showQRCodeDialog() {
+		isQRCodeVisible.value = true
+	}
+
+	override fun hideQRCodeDialog() {
+		isQRCodeVisible.value = false
+	}
 }
