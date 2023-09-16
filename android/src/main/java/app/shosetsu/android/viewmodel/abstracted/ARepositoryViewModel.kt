@@ -1,10 +1,12 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import androidx.compose.ui.graphics.ImageBitmap
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -99,6 +101,14 @@ abstract class ARepositoryViewModel
 	 * Hide the add repo dialog
 	 */
 	abstract fun hideAddDialog()
+
+	abstract val currentShare: StateFlow<RepositoryUI?>
+
+	abstract val qrCode: Flow<ImageBitmap?>
+
+	abstract fun showShare(repositoryUI: RepositoryUI)
+
+	abstract fun hideShare()
 
 	sealed interface AddRepoState {
 		object Unknown : AddRepoState

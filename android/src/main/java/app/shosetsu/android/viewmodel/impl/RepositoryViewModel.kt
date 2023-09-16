@@ -1,6 +1,13 @@
 package app.shosetsu.android.viewmodel.impl
 
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import app.shosetsu.android.common.ext.get
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.set
+import app.shosetsu.android.common.utils.share.toURL
 import app.shosetsu.android.domain.usecases.AddRepositoryUseCase
 import app.shosetsu.android.domain.usecases.ForceInsertRepositoryUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
@@ -10,15 +17,21 @@ import app.shosetsu.android.domain.usecases.load.LoadRepositoriesUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateRepositoryUseCase
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
+import app.shosetsu.lib.share.RepositoryLink
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import io.github.g0dkar.qrcode.QRCode
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import java.util.concurrent.TimeUnit
 
 /*
  * This file is part of Shosetsu.
@@ -97,6 +110,54 @@ class RepositoryViewModel(
 
 	override fun hideAddDialog() {
 		isAddDialogVisible.value = false
+	}
+
+	private val qrCodeMap: Cache<Int, ImageBitmap?> =
+		CacheBuilder
+			.newBuilder()
+			.expireAfterAccess(1, TimeUnit.MINUTES)
+			.build()
+
+	override val currentShare = MutableStateFlow<RepositoryUI?>(null)
+
+	override val qrCode: Flow<ImageBitmap?> =
+		currentShare.map { repo ->
+			if (repo != null) {
+				val value = qrCodeMap[repo.id]
+				if (value != null) {
+					value
+				} else {
+					val url = RepositoryLink(
+						repo.name,
+						repo.url
+					).toURL()
+
+					val code = QRCode(url)
+
+					val bytes = code.render(
+						brightColor = Color.WHITE,
+						darkColor = Color.BLACK,
+						marginColor = Color.WHITE
+					).getBytes()
+
+					val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+						.asImageBitmap()
+
+					qrCodeMap[repo.id] = bitmap
+
+					bitmap
+				}
+			} else {
+				null
+			}
+		}
+
+	override fun showShare(repositoryUI: RepositoryUI) {
+		currentShare.value = repositoryUI
+	}
+
+	override fun hideShare() {
+		currentShare.value = null
 	}
 
 	override fun isURL(string: String): Boolean {

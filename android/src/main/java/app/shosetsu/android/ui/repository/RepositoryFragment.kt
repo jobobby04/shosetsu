@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.*
@@ -22,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +32,7 @@ import androidx.core.view.MenuProvider
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.REPOSITORY_HELP_URL
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.view.QRCodeShareDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
@@ -171,6 +173,7 @@ fun RepositoriesView(
 		val addRepoState by viewModel.addState.collectAsState()
 		val undoRemoveState by viewModel.undoRemoveState.collectAsState()
 		val toggleIsEnabledState by viewModel.toggleIsEnabledState.collectAsState()
+		val currentShare by viewModel.currentShare.collectAsState()
 
 		LaunchedEffect(removeState) {
 			when (removeState) {
@@ -301,6 +304,7 @@ fun RepositoriesView(
 			}
 		}
 
+
 		RepositoriesContent(
 			items = items,
 			toggleEnabled = {
@@ -313,6 +317,8 @@ fun RepositoriesView(
 				viewModel.showAddDialog()
 			},
 			onRefresh = ::onRefresh,
+			onShowShare = viewModel::showShare,
+			onHideShare = viewModel::hideShare,
 			fab
 		)
 
@@ -327,6 +333,16 @@ fun RepositoriesView(
 				dismiss = {
 					itemToRemove = null
 				}
+			)
+		}
+
+		if (currentShare != null) {
+			val map by viewModel.qrCode.collectAsState(null)
+
+			QRCodeShareDialog(
+				map,
+				hide = viewModel::hideShare,
+				currentShare!!.name
 			)
 		}
 	}
@@ -474,6 +490,8 @@ fun RepositoriesContent(
 	onRemove: (RepositoryUI) -> Unit,
 	addRepository: () -> Unit,
 	onRefresh: () -> Unit,
+	onShowShare: (RepositoryUI) -> Unit,
+	onHideShare: () -> Unit,
 	fab: EFabMaintainer
 ) {
 	if (items.isNotEmpty()) {
@@ -498,6 +516,9 @@ fun RepositoriesContent(
 						},
 						onRemove = {
 							onRemove(item)
+						},
+						onShowShare = {
+							onShowShare(item)
 						}
 					)
 				}
@@ -524,7 +545,8 @@ fun PreviewRepositoryContent() {
 	RepositoryContent(
 		createPreviewUI(enabled = enabled),
 		onCheckedChange = { enabled != enabled },
-		onRemove = {}
+		onRemove = {},
+		onShowShare = {}
 	)
 }
 
@@ -535,7 +557,8 @@ fun PreviewRepositoryContent() {
 fun RepositoryContent(
 	item: RepositoryUI,
 	onCheckedChange: () -> Unit,
-	onRemove: () -> Unit
+	onRemove: () -> Unit,
+	onShowShare: () -> Unit
 ) {
 	Card(Modifier.padding(bottom = 8.dp)) {
 		Row(
@@ -571,11 +594,43 @@ fun RepositoryContent(
 			}
 
 			Row {
-				IconButton(onClick = onRemove) {
+				var visible by remember { mutableStateOf(false) }
+
+				DropdownMenu(
+					visible,
+					onDismissRequest = {
+						visible = false
+					}
+				) {
+					DropdownMenuItem(
+						text = {
+							Text(stringResource(R.string.remove))
+						},
+						onClick = {
+							visible = false
+							onRemove()
+						}
+					)
+
+					DropdownMenuItem(
+						text = {
+							Text(stringResource(R.string.share))
+						},
+						onClick = {
+							visible = false
+							onShowShare()
+						}
+					)
+				}
+
+				IconButton(
+					onClick = {
+						visible = true
+					}
+				) {
 					Icon(
-						painter = painterResource(R.drawable.close),
-						contentDescription =
-						stringResource(R.string.fragment_repositories_action_remove)
+						Icons.Default.MoreVert,
+						contentDescription = stringResource(R.string.more)
 					)
 				}
 

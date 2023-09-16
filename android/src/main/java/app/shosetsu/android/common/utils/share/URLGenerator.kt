@@ -1,6 +1,7 @@
 package app.shosetsu.android.common.utils.share
 
 import app.shosetsu.lib.share.NovelLink
+import app.shosetsu.lib.share.RepositoryLink
 import java.net.URLEncoder
 
 /*
@@ -39,3 +40,8 @@ fun NovelLink.toURL(): String =
 			"&extName=${extensionQRCode.name.urlEncode()}" +
 			"&repoName=${extensionQRCode.repo.name.urlEncode()}" +
 			"&repoURL=${extensionQRCode.repo.url.urlEncode()}"
+
+fun RepositoryLink.toURL(): String =
+	"$BASE_SHARE_URL/repository" +
+			"?name=${name.urlEncode()}" +
+			"&url=${url.urlEncode()}"
