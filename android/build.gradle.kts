@@ -297,7 +297,7 @@ dependencies {
 	 */
 
 	// Room
-	val roomVersion = "2.5.1"
+	val roomVersion = "2.5.2"
 	fun room(module: String, version: String = roomVersion) =
 		"androidx.room:$module:$version"
 
