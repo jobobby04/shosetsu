@@ -226,7 +226,7 @@ dependencies {
 	implementation("androidx.work:work-runtime-ktx:2.8.1")
 	implementation("androidx.appcompat:appcompat:1.6.1")
 	implementation("androidx.annotation:annotation:1.6.0")
-	implementation("androidx.core:core-ktx:1.10.1")
+	implementation("androidx.core:core-ktx:1.12.0")
 	implementation("androidx.collection:collection-ktx:1.2.0")
 	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
