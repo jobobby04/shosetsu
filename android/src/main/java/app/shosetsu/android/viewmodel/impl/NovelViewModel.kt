@@ -2,7 +2,6 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.common.enums.ChapterSortType
@@ -26,6 +25,7 @@ import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
+import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
@@ -180,7 +180,7 @@ class NovelViewModel(
 		emit(getTrueDelete())
 	}.onIO()
 
-	override val qrCode: Flow<ImageBitmap?> by lazy {
+	override val qrCode: Flow<QRCodeData?> by lazy {
 		novelLive.transformLatest { novel ->
 			if (novel != null) {
 				emitAll(novelURL.transformLatest { novelURL ->
@@ -204,10 +204,11 @@ class NovelViewModel(
 										marginColor = Color.WHITE
 									).getBytes()
 
-									emit(
-										BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-											.asImageBitmap()
-									)
+									val bitmap = BitmapFactory
+										.decodeByteArray(bytes, 0, bytes.size)
+										.asImageBitmap()
+
+									emit(QRCodeData(bitmap, url))
 								} else emit(null)
 							} else emit(null)
 						})

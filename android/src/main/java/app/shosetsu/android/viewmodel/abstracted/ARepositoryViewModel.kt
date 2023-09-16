@@ -1,6 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import androidx.compose.ui.graphics.ImageBitmap
+import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
@@ -104,7 +104,7 @@ abstract class ARepositoryViewModel
 
 	abstract val currentShare: StateFlow<RepositoryUI?>
 
-	abstract val qrCode: Flow<ImageBitmap?>
+	abstract val qrCode: Flow<QRCodeData?>
 
 	abstract fun showShare(repositoryUI: RepositoryUI)
 

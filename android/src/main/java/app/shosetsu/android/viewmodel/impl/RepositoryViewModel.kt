@@ -2,7 +2,6 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import app.shosetsu.android.common.ext.get
 import app.shosetsu.android.common.ext.launchIO
@@ -15,6 +14,7 @@ import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteRepositoryUseCase
 import app.shosetsu.android.domain.usecases.load.LoadRepositoriesUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateRepositoryUseCase
+import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
 import app.shosetsu.lib.share.RepositoryLink
@@ -112,7 +112,7 @@ class RepositoryViewModel(
 		isAddDialogVisible.value = false
 	}
 
-	private val qrCodeMap: Cache<Int, ImageBitmap?> =
+	private val qrCodeMap: Cache<Int, QRCodeData?> =
 		CacheBuilder
 			.newBuilder()
 			.expireAfterAccess(1, TimeUnit.MINUTES)
@@ -120,7 +120,7 @@ class RepositoryViewModel(
 
 	override val currentShare = MutableStateFlow<RepositoryUI?>(null)
 
-	override val qrCode: Flow<ImageBitmap?> =
+	override val qrCode: Flow<QRCodeData?> =
 		currentShare.map { repo ->
 			if (repo != null) {
 				val value = qrCodeMap[repo.id]
@@ -143,9 +143,8 @@ class RepositoryViewModel(
 					val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 						.asImageBitmap()
 
-					qrCodeMap[repo.id] = bitmap
-
-					bitmap
+					qrCodeMap[repo.id] = QRCodeData(bitmap, url)
+					qrCodeMap[repo.id]
 				}
 			} else {
 				null

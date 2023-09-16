@@ -1,12 +1,12 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.ImageBitmap
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
+import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -200,7 +200,7 @@ abstract class ANovelViewModel
 	/**
 	 * The QR code that the novel share is done by
 	 */
-	abstract val qrCode: Flow<ImageBitmap?>
+	abstract val qrCode: Flow<QRCodeData?>
 
 	/**
 	 * Show QR code dialog to share

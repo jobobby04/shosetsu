@@ -16,15 +16,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
+import app.shosetsu.android.view.uimodels.model.QRCodeData
 
 /*
  * This file is part of shosetsu.
@@ -52,9 +56,22 @@ import app.shosetsu.android.R
 
 @Preview
 @Composable
-fun PreviewQRCodeShareDialog() {
+fun PreviewLoadingQRCodeShareDialog() {
 	QRCodeShareDialog(
 		null,
+		hide = {},
+		title = "Test"
+	)
+}
+
+@Preview
+@Composable
+fun PreviewQRCodeShareDialog() {
+	QRCodeShareDialog(
+		QRCodeData(
+			ImageBitmap(50, 50),
+			"url"
+		),
 		hide = {},
 		title = "Test"
 	)
@@ -63,7 +80,7 @@ fun PreviewQRCodeShareDialog() {
 @Composable
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 fun QRCodeShareDialog(
-	map: ImageBitmap?,
+	qrCodeData: QRCodeData?,
 	hide: () -> Unit,
 	title: String? = null
 ) {
@@ -80,15 +97,17 @@ fun QRCodeShareDialog(
 			) {
 				if (title != null)
 					Text(title, style = MaterialTheme.typography.titleLarge)
+				val clipboard = LocalClipboardManager.current
+
 				Box(
 					modifier = Modifier
 						.aspectRatio(1.0f)
 						.fillMaxWidth(),
 					contentAlignment = Alignment.Center
 				) {
-					if (map != null) {
+					if (qrCodeData != null) {
 						Image(
-							map,
+							qrCodeData.imageBitmap,
 							"",
 							modifier = Modifier
 								.background(androidx.compose.ui.graphics.Color.White)
@@ -105,6 +124,15 @@ fun QRCodeShareDialog(
 							stringResource(R.string.loading),
 						)
 					}
+				}
+
+				TextButton(
+					onClick = {
+						clipboard.setText(AnnotatedString(qrCodeData!!.data))
+					},
+					enabled = qrCodeData != null
+				) {
+					Text(stringResource(android.R.string.copy))
 				}
 			}
 		}
