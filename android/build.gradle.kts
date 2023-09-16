@@ -234,7 +234,7 @@ dependencies {
 
 	// - Life Cycle
 
-	val lifecycleVersion = "2.6.1"
+	val lifecycleVersion = "2.6.2"
 	fun lifecycle(module: String, version: String = lifecycleVersion) =
 		"androidx.lifecycle:lifecycle-$module:$version"
 	implementation(lifecycle("viewmodel-ktx"))
