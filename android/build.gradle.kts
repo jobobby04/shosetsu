@@ -381,7 +381,7 @@ dependencies {
 	implementation(accompanist("accompanist-themeadapter-material"))
 	implementation(accompanist("accompanist-themeadapter-material3"))
 
-	val androidxActivity = "1.7.0"
+	val androidxActivity = "1.7.2"
 	fun androidxActivity(module: String, version: String = androidxActivity) =
 		"androidx.activity:$module:$version"
 	implementation(androidxActivity("activity"))
