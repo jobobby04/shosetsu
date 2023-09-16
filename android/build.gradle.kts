@@ -278,7 +278,7 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
 
 	// Error logging
-	val acraVersion = "5.9.7"
+	val acraVersion = "5.11.2"
 	fun acra(module: String, version: String = acraVersion) =
 		"ch.acra:$module:$version"
 
