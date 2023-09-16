@@ -863,7 +863,7 @@ fun NovelInfoContent(
 	onRefresh: () -> Unit,
 	openWebView: () -> Unit,
 	categories: ImmutableList<CategoryUI>,
-	setCategoriesDialogOpen: (Boolean) -> Unit,
+	setCategoriesDialogOpen: () -> Unit,
 	toggleBookmark: () -> Unit,
 	openFilter: () -> Unit,
 	openChapterJump: () -> Unit,
@@ -1183,7 +1183,7 @@ fun NovelInfoHeaderContent(
 	toggleBookmark: () -> Unit,
 	openFilter: () -> Unit,
 	openChapterJump: () -> Unit,
-	setCategoriesDialogOpen: (Boolean) -> Unit,
+	setCategoriesDialogOpen: () -> Unit,
 ) {
 	var isCoverClicked: Boolean by remember { mutableStateOf(false) }
 	if (isCoverClicked)
@@ -1323,11 +1323,11 @@ fun NovelInfoHeaderContent(
 							if (novelInfo.bookmarked || categories.isEmpty()) {
 								toggleBookmark()
 							} else {
-								setCategoriesDialogOpen(true)
+								setCategoriesDialogOpen()
 							}
 						},
 						onLongClick = {
-							setCategoriesDialogOpen(true)
+							setCategoriesDialogOpen()
 						},
 						modifier = Modifier
 							.padding(vertical = 8.dp, horizontal = 4.dp)
@@ -1368,6 +1368,34 @@ fun NovelInfoHeaderContent(
 							)
 						}
 					}
+
+					if (categories.isNotEmpty())
+						TextButton(
+							onClick = {
+								setCategoriesDialogOpen()
+							},
+							modifier = Modifier
+								.padding(vertical = 8.dp, horizontal = 4.dp)
+								.weight(1F)
+						) {
+							Column(
+								horizontalAlignment = Alignment.CenterHorizontally
+							) {
+								Icon(
+									painterResource(R.drawable.ic_baseline_label_24),
+									stringResource(R.string.categories),
+									modifier = Modifier.size(20.dp),
+									tint = MaterialTheme.colorScheme.onSurface
+								)
+								Spacer(Modifier.height(4.dp))
+								Text(
+									stringResource(R.string.set_categories),
+									color = MaterialTheme.colorScheme.onSurface,
+									fontSize = 12.sp,
+									textAlign = TextAlign.Center,
+								)
+							}
+						}
 					TextButton(
 						onClick = openWebview,
 						modifier = Modifier
