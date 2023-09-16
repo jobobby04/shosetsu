@@ -29,17 +29,12 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
-import app.shosetsu.android.common.ext.logI
-import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import com.google.accompanist.web.*
-import okhttp3.Cookie
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -259,7 +254,7 @@ fun WebViewScreen(
 	) { contentPadding ->
 		val webClient = remember {
 			object : AccompanistWebViewClient() {
-				override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+				override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
 					super.onPageStarted(view, url, favicon)
 					url?.let {
 						currentUrl = it
@@ -267,7 +262,7 @@ fun WebViewScreen(
 				}
 
 				override fun doUpdateVisitedHistory(
-					view: WebView?,
+					view: WebView,
 					url: String?,
 					isReload: Boolean,
 				) {
@@ -281,7 +276,9 @@ fun WebViewScreen(
 
 		WebView(
 			state = state,
-			modifier = Modifier.fillMaxSize().padding(contentPadding),
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(contentPadding),
 			navigator = navigator,
 			onCreated = { webView ->
 				webView.settings.apply {

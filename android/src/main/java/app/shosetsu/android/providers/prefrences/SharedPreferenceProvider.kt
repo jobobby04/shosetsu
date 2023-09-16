@@ -170,7 +170,8 @@ class SharedPreferenceProvider(
 					}
 				}
 
-			override fun onSharedPreferenceChanged(sp: SharedPreferences?, s: String) {
+			override fun onSharedPreferenceChanged(sp: SharedPreferences?, s: String?) {
+				if (s == null) return
 				// Evaluate what setting key [s] corresponds to
 				val key: SettingKey<*> =
 					SettingKey.valueOf(s) ?: when (s.substringBefore("_")) {

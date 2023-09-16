@@ -49,10 +49,10 @@ class ChapterReaderAccompanistWebViewClient(
 	/**
 	 * Apply event listeners after a page is loaded
 	 */
-	override fun onPageFinished(view: WebView?, url: String?) {
+	override fun onPageFinished(view: WebView, url: String?) {
 		super.onPageFinished(view, url)
 		if (!applied) {
-			view?.evaluateJavascript(
+			view.evaluateJavascript(
 				"""
 				window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
 				window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
