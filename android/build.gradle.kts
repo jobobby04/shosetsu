@@ -394,7 +394,7 @@ dependencies {
 	implementation("io.github.g0dkar:qrcode-kotlin-android:3.3.0")
 
 	// - paging
-	val pagingVersion = "3.1.1"
+	val pagingVersion = "3.2.1"
 	fun paging(module: String, version: String = pagingVersion) =
 		"androidx.paging:$module:$version"
 
