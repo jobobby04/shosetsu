@@ -53,11 +53,11 @@ fun loadSProperties(name: String): Properties {
 val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
-	compileSdk = 33
+	compileSdk = 34
 	defaultConfig {
 		applicationId = "app.shosetsu.android"
 		minSdk = 22
-		targetSdk = 33
+		targetSdk = 34
 		versionCode = 45
 		versionName = "2.4.4"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
