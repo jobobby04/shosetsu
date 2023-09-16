@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 
 		onBackPressedDispatcher.addCallback(this) {
 			logI("Back pressed")
-			val backStackSize = navController.backQueue.size
+			val backStackSize = navController.currentBackStack.value.size
 			logD("Back stack size: $backStackSize")
 			when {
 				binding.drawerLayout.isDrawerOpen(GravityCompat.START) ->
@@ -302,7 +302,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 	}
 
 	private fun shouldProtectBack(): Boolean =
-		navController.backQueue.size == 2 &&
+		navController.currentBackStack.value.size == 2 &&
 				viewModel.requireDoubleBackToExit.value &&
 				!inProtectingBack
 
@@ -312,7 +312,7 @@ class MainActivity : AppCompatActivity(), DIAware {
 
 		binding.toolbar.setNavigationOnClickListener {
 			logV("Navigation item clicked")
-			if (navController.backQueue.size == 2) {
+			if (navController.currentBackStack.value.size == 2) {
 				if (viewModel.navigationStyle.value == LEGACY) {
 					binding.drawerLayout.openDrawer(GravityCompat.START)
 				} else onBackPressedDispatcher.onBackPressed()
