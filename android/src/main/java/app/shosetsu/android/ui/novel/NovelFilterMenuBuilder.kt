@@ -69,9 +69,9 @@ import kotlinx.coroutines.launch
 fun NovelFilterMenuView(
 	viewModel: ANovelViewModel
 ) {
-	val pagerState = rememberPagerState()
 	val pages =
 		listOf(stringResource(R.string.filter), stringResource(R.string.sort))
+	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
 
 	val novelSetting by viewModel.novelSettingFlow.collectAsState(null)
@@ -100,7 +100,7 @@ fun NovelFilterMenuView(
 				)
 			}
 		}
-		HorizontalPager(pageCount = pages.size, state = pagerState) {
+		HorizontalPager(state = pagerState) {
 			when (it) {
 				0 -> NovelFilterMenuFilterContent(
 					novelSetting ?: NovelSettingUI(-1),

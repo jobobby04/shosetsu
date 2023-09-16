@@ -55,9 +55,9 @@ import kotlinx.coroutines.launch
 fun LibraryFilterMenuView(
 	viewModel: ALibraryViewModel
 ) {
-	val pagerState = rememberPagerState()
 	val pages =
 		listOf(stringResource(R.string.filter), stringResource(R.string.sort))
+	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
 
 	Column {
@@ -85,7 +85,7 @@ fun LibraryFilterMenuView(
 			}
 		}
 		Surface {
-			HorizontalPager(pageCount = pages.size, state = pagerState) {
+			HorizontalPager(state = pagerState) {
 				when (it) {
 					0 -> {
 						val genres by viewModel.genresFlow.collectAsState(persistentListOf())
@@ -103,8 +103,10 @@ fun LibraryFilterMenuView(
 						val artists by viewModel.artistsFlow.collectAsState(persistentListOf())
 						val artistsIsNotEmpty by derivedStateOf { artists.isNotEmpty() }
 						var artistsIsExpanded by remember { mutableStateOf(false) }
-						val unreadStatusFilterState by viewModel.getUnreadFilter().collectAsState(Off)
-						val downloadFilterState by viewModel.getDownloadedFilter().collectAsState(Off)
+						val unreadStatusFilterState by viewModel.getUnreadFilter()
+							.collectAsState(Off)
+						val downloadFilterState by viewModel.getDownloadedFilter()
+							.collectAsState(Off)
 
 						LibraryFilterMenuFilterContent(
 							genres,
@@ -149,7 +151,8 @@ fun LibraryFilterMenuView(
 					1 -> {
 						val sortType by viewModel.getSortType().collectAsState(BY_TITLE)
 						val isSortReversed by viewModel.isSortReversed().collectAsState(false)
-						val pinOnTopState: Boolean by viewModel.isPinnedOnTop().collectAsState(false)
+						val pinOnTopState: Boolean by viewModel.isPinnedOnTop()
+							.collectAsState(false)
 
 						LibraryFilterMenuSortContent(
 							sortType,

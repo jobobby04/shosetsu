@@ -46,7 +46,7 @@ fun CSSEditorPagerContent(
 		)
 	)
 
-	val pagerState = rememberPagerState()
+	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
 	Scaffold(
 		topBar = {
@@ -74,7 +74,6 @@ fun CSSEditorPagerContent(
 				.verticalScroll(rememberScrollState())
 		) {
 			HorizontalPager(
-				pages.size,
 				state = pagerState,
 				modifier = Modifier.fillMaxSize(),
 				userScrollEnabled = false

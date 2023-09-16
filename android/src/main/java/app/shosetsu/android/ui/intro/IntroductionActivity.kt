@@ -89,7 +89,7 @@ fun IntroView(
 	viewModel: AIntroViewModel = viewModelDi(),
 	exit: () -> Unit
 ) {
-	val state = rememberPagerState()
+	val state = rememberPagerState { IntroPages.values().size }
 	val scope = rememberCoroutineScope()
 	val isLicenseRead by viewModel.isLicenseRead.collectAsState()
 	val shouldSupportShowNext by viewModel.shouldSupportShowNext.collectAsState()
@@ -183,7 +183,6 @@ fun IntroContent(
 	nextPage: () -> Unit
 ) {
 	HorizontalPager(
-		IntroPages.values().size,
 		state = state,
 		modifier = Modifier.padding(paddingValues),
 		userScrollEnabled = state.currentPage != IntroPages.Support.ordinal

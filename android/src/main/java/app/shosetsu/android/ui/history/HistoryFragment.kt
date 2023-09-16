@@ -45,7 +45,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.ComposeView
@@ -213,15 +212,16 @@ fun HistoryContent(
 			contentPadding = PaddingValues(top = 8.dp, bottom = 112.dp),
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			items(items, key = { it.id }) {
-				if (it != null) {
+			items(items.itemCount) {
+				val historyItem = items[it]
+				if (historyItem != null) {
 					HistoryItemContent(
-						updateUI = it,
+						updateUI = historyItem,
 						openNovel = {
-							openNovel(it)
+							openNovel(historyItem)
 						},
 						onClick = {
-							openChapter(it)
+							openChapter(historyItem)
 						}
 					)
 				}

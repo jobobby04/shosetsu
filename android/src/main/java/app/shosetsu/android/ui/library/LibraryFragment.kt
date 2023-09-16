@@ -18,7 +18,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -470,18 +469,18 @@ fun LibraryPager(
 	fab: EFabMaintainer?
 ) {
 	val scope = rememberCoroutineScope()
-	val state = rememberPagerState()
-	LaunchedEffect(state.currentPage) {
-		setActiveCategory(library.categories[state.currentPage].id)
+	val categoryPagerState = rememberPagerState { library.categories.size }
+	LaunchedEffect(categoryPagerState.currentPage) {
+		setActiveCategory(library.categories[categoryPagerState.currentPage].id)
 	}
 
 	Column(Modifier.fillMaxWidth()) {
 		if (!(library.categories.size == 1 && library.categories.first().id == 0)) {
 			ScrollableTabRow(
-				selectedTabIndex = state.currentPage,
+				selectedTabIndex = categoryPagerState.currentPage,
 				indicator = { tabPositions ->
 					TabRowDefaults.Indicator(
-						Modifier.pagerTabIndicatorOffset(state, tabPositions)
+						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
 					)
 				},
 				containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1F),
@@ -490,10 +489,10 @@ fun LibraryPager(
 				library.categories.forEachIndexed { index, category ->
 					Tab(
 						text = { Text(category.name) },
-						selected = state.currentPage == index,
+						selected = categoryPagerState.currentPage == index,
 						onClick = {
 							scope.launch {
-								state.animateScrollToPage(index)
+								categoryPagerState.animateScrollToPage(index)
 							}
 						},
 					)
@@ -501,8 +500,7 @@ fun LibraryPager(
 			}
 		}
 		HorizontalPager(
-			pageCount = library.categories.size,
-			state = state,
+			state = categoryPagerState,
 			modifier = Modifier.fillMaxSize()
 		) {
 			val id by derivedStateOf {

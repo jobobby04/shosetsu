@@ -71,7 +71,7 @@ fun ChapterReaderPagerContent(
 		return
 	}
 
-	val pagerState = rememberPagerState(currentPage)
+	val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { items.size })
 
 	var curChapter: ReaderUIItem.ReaderChapterUI? by remember { mutableStateOf(null) }
 	if (items.isNotEmpty())
@@ -98,7 +98,6 @@ fun ChapterReaderPagerContent(
 
 	if (isHorizontal) {
 		HorizontalPager(
-			pageCount = items.size,
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
@@ -113,7 +112,6 @@ fun ChapterReaderPagerContent(
 		)
 	} else {
 		VerticalPager(
-			pageCount = items.size,
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()

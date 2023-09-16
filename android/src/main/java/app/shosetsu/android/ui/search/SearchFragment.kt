@@ -34,7 +34,6 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.*
@@ -232,9 +231,10 @@ fun SearchContent(
 							)
 					},
 					items = {
-						itemsIndexed(
-							children,
-							key = { index, item -> item.hashCode() + index }) { _, novelUI ->
+						items(
+							children.itemCount,
+						) { index ->
+							val novelUI = children[index]
 							Box(
 								modifier = Modifier.width(105.dp)
 							) {
