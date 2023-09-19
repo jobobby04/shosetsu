@@ -42,20 +42,19 @@ import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.NoSuchExtensionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
 import app.shosetsu.android.view.ComposeBottomSheetDialog
+import app.shosetsu.android.view.NovelShareMenu
 import app.shosetsu.android.view.QRCodeShareDialog
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
-import app.shosetsu.android.view.openShareMenu
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
@@ -183,35 +182,6 @@ class NovelFragment : ShosetsuFragment(),
 		)
 	}
 
-	private fun openShare() {
-		openShareMenu(
-			requireActivity(),
-			this,
-			activity as MainActivity,
-			shareBasicURL = {
-				viewModel.getShareInfo().observe(
-					catch = {
-						makeSnackBar(
-							getString(
-								R.string.fragment_novel_error_share,
-								it.message ?: "Unknown"
-							)
-						)
-							?.setAction(R.string.report) { _ ->
-								ACRA.errorReporter.handleSilentException(it)
-							}?.show()
-					}
-				) { info ->
-					if (info != null)
-						activity?.openShare(info.novelURL, info.novelTitle)
-				}
-			},
-			shareQRCode = {
-				viewModel.showQRCodeDialog()
-			}
-		)
-	}
-
 	override fun onMenuItemSelected(item: MenuItem): Boolean = when (item.itemId) {
 		R.id.source_migrate -> {
 			migrateOpen()
@@ -219,7 +189,7 @@ class NovelFragment : ShosetsuFragment(),
 		}
 
 		R.id.share -> {
-			openShare()
+			viewModel.openShareMenu()
 			true
 		}
 
@@ -562,7 +532,7 @@ fun NovelInfoView(
 	val isChapterJumpDialogVisible by viewModel.isChapterJumpDialogVisible.collectAsState()
 	val jumpState by viewModel.jumpState.collectAsState()
 	val isQRCodeVisible by viewModel.isQRCodeVisible.collectAsState()
-
+	val isShareMenuVisible by viewModel.isShareMenuVisible.collectAsState()
 
 	invalidateOptionsMenu()
 	// If the data is not present, loads it
@@ -681,6 +651,22 @@ fun NovelInfoView(
 						}?.show()
 				}
 			}
+		}
+
+		if (isShareMenuVisible) {
+			val shareInfo by viewModel.shareInfo.collectAsState(null)
+			NovelShareMenu(
+				shareBasicURL = {
+					if (shareInfo != null)
+						activity.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
+				},
+				shareQRCode = {
+					viewModel.showQRCodeDialog()
+				},
+				dismiss = {
+					viewModel.hideShareMenu()
+				}
+			)
 		}
 	}
 }

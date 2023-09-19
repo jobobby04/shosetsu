@@ -122,7 +122,7 @@ abstract class ANovelViewModel
 		val novelURL: String
 	)
 
-	abstract fun getShareInfo(): Flow<NovelShareInfo?>
+	abstract val shareInfo: StateFlow<NovelShareInfo?>
 
 	/**
 	 * Return the chapterURL to utilize in some way
@@ -211,6 +211,10 @@ abstract class ANovelViewModel
 	 * Hide the QR code dialog
 	 */
 	abstract fun hideQRCodeDialog()
+
+	abstract val isShareMenuVisible: StateFlow<Boolean>
+	abstract fun openShareMenu()
+	abstract fun hideShareMenu()
 
 	/**
 	 * @param showRemoveBookmark If any chapters are bookmarked, show the remove bookmark logo

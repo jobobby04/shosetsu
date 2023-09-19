@@ -340,13 +340,12 @@ class NovelViewModel(
 		})
 	}.onIO().stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-	override fun getShareInfo(): Flow<NovelShareInfo?> = flow {
-		emit(novelLive.first { it != null }!!.let {
-			getContentURL(it)?.let { url ->
+	override val shareInfo: StateFlow<NovelShareInfo?> =
+		novelLive.combine(novelURL) { it, url ->
+			if (it != null && url != null)
 				NovelShareInfo(it.title, url)
-			}
-		})
-	}.onIO()
+			else null
+		}.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 	override fun getChapterURL(chapterUI: ChapterUI): Flow<String?> = flow {
 		emit(getContentURL(chapterUI))
@@ -637,5 +636,15 @@ class NovelViewModel(
 
 	override fun hideQRCodeDialog() {
 		isQRCodeVisible.value = false
+	}
+
+	override val isShareMenuVisible = MutableStateFlow(false)
+
+	override fun openShareMenu() {
+		isShareMenuVisible.value = true
+	}
+
+	override fun hideShareMenu() {
+		isShareMenuVisible.value = false
 	}
 }
