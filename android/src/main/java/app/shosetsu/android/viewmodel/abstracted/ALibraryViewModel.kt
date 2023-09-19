@@ -133,4 +133,10 @@ abstract class ALibraryViewModel :
 	 */
 	abstract fun togglePinSelected()
 
+	abstract val isFilterMenuVisible: StateFlow<Boolean>
+
+	abstract fun showFilterMenu()
+
+	abstract fun hideFilterMenu()
+
 }

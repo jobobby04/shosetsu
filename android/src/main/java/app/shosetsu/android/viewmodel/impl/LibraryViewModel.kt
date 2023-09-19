@@ -354,6 +354,7 @@ class LibraryViewModel(
 								}.toImmutableList()
 							}.toImmutableMap()
 						)
+
 					EXCLUDE ->
 						result.copy(
 							novels = result.novels.mapValues {
@@ -445,15 +446,19 @@ class LibraryViewModel(
 					NovelSortType.BY_TITLE -> library.novels.mapValues {
 						it.value.sortedBy { it.title }.toImmutableList()
 					}
+
 					NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues {
 						it.value.sortedBy { it.unread }.toImmutableList()
 					}
+
 					NovelSortType.BY_ID -> library.novels.mapValues {
 						it.value.sortedBy { it.id }.toImmutableList()
 					}
+
 					NovelSortType.BY_UPDATED -> library.novels.mapValues {
 						it.value.sortedBy { it.lastUpdate }.toImmutableList()
 					}
+
 					NovelSortType.BY_READ_TIME -> library.novels.mapValues {
 						it.value.sortedBy { it -> it.readTime }.toImmutableList()
 					}
@@ -471,6 +476,7 @@ class LibraryViewModel(
 								it.value.filter { it.unread > 0 }.toImmutableList()
 							}.toImmutableMap()
 						)
+
 						EXCLUDE -> list.copy(
 							novels = list.novels.mapValues {
 								it.value.filterNot { it.unread > 0 }.toImmutableList()
@@ -491,6 +497,7 @@ class LibraryViewModel(
 								it.value.filter { it.downloaded > 0 }.toImmutableList()
 							}.toImmutableMap()
 						)
+
 						EXCLUDE -> list.copy(
 							novels = list.novels.mapValues {
 								it.value.filterNot { it.downloaded > 0 }.toImmutableList()
@@ -733,5 +740,15 @@ class LibraryViewModel(
 			clearSelected()
 			toggleNovelPin(selected)
 		}
+	}
+
+	override val isFilterMenuVisible = MutableStateFlow(false)
+
+	override fun showFilterMenu() {
+		isFilterMenuVisible.value = true
+	}
+
+	override fun hideFilterMenu() {
+		isFilterMenuVisible.value = false
 	}
 }

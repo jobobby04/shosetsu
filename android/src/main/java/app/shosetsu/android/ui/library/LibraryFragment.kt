@@ -22,7 +22,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,7 +31,6 @@ import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.*
@@ -40,7 +38,7 @@ import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.ui.library.listener.LibrarySearchQuery
 import app.shosetsu.android.ui.migration.MigrationFragment
 import app.shosetsu.android.ui.novel.CategoriesDialog
-import app.shosetsu.android.view.ComposeBottomSheetDialog
+import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
@@ -314,23 +312,7 @@ class LibraryFragment
 	override fun manipulateFAB(fab: EFabMaintainer) {
 		this.fab = fab
 		fab.setOnClickListener {
-			//bottomMenuRetriever.invoke()?.show()
-			if (bsg == null)
-				bsg =
-					ComposeBottomSheetDialog(requireView().context, this, activity as MainActivity)
-			if (bsg?.isShowing == false) {
-				bsg?.apply {
-					setContentView(
-						ComposeView(context).apply {
-							setContent {
-								ShosetsuCompose {
-									LibraryFilterMenuView(viewModel)
-								}
-							}
-						}
-					)
-				}?.show()
-			}
+			viewModel.showFilterMenu()
 		}
 		fab.setText(R.string.filter)
 		fab.setIconResource(R.drawable.filter)
@@ -365,6 +347,7 @@ fun LibraryView(
 		val columnsInV by viewModel.columnsInV.collectAsState()
 		val columnsInH by viewModel.columnsInH.collectAsState()
 		val isCategoriesDialogOpen by viewModel.isCategoryDialogOpen.collectAsState()
+		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
 
 		BackHandler(hasSelected) {
 			viewModel.deselectAll()
@@ -395,6 +378,12 @@ fun LibraryView(
 				novelCategories = remember { persistentListOf() },
 				setCategories = viewModel::setCategories
 			)
+		}
+
+		if (isFilterMenuVisible) {
+			BottomSheetDialog(viewModel::hideFilterMenu) {
+				LibraryFilterMenuView(viewModel)
+			}
 		}
 	}
 }
