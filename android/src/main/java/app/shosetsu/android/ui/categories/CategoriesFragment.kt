@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.ComposeView
@@ -218,47 +219,67 @@ fun CategoriesView(
 		val isAddDialogVisible by viewModel.isAddDialogVisible.collectAsState()
 
 		if (isAddDialogVisible) {
-			var text by remember { mutableStateOf("") }
-			AlertDialog(
-				onDismissRequest = {
-					viewModel.hideAddDialog()
-				},
-				confirmButton = {
-					TextButton(
-						onClick = {
-							viewModel.addCategory(text)
-							viewModel.hideAddDialog()
-						},
-						enabled = text.isNotBlank()
-					) {
-						Text(stringResource(android.R.string.ok))
-					}
-				},
-				dismissButton = {
-					TextButton(onClick = { viewModel.hideAddDialog() }) {
-						Text(stringResource(android.R.string.cancel))
-					}
-				},
-				title = {
-					Text(stringResource(R.string.categories_add_title))
-				},
-				text = {
-					OutlinedTextField(
-						text,
-						onValueChange = {
-							if (!it.contains('\n'))
-								text = it
-						},
-						label = {
-							Text(stringResource(R.string.categories_add_name_hint))
-						},
-						isError = text.isBlank(),
-						singleLine = true
-					)
-				}
+			CategoriesAddDialog(
+				viewModel::hideAddDialog,
+				viewModel::addCategory
 			)
 		}
 	}
+}
+
+@Preview
+@Composable
+fun PreviewCategoriesAddDialog() {
+	CategoriesAddDialog(
+		hideAddDialog = {},
+		addCategory = {}
+	)
+}
+
+@Composable
+fun CategoriesAddDialog(
+	hideAddDialog: () -> Unit,
+	addCategory: (String) -> Unit
+) {
+	var text by remember { mutableStateOf("") }
+	AlertDialog(
+		onDismissRequest = {
+			hideAddDialog()
+		},
+		confirmButton = {
+			TextButton(
+				onClick = {
+					addCategory(text)
+					hideAddDialog()
+				},
+				enabled = text.isNotBlank()
+			) {
+				Text(stringResource(android.R.string.ok))
+			}
+		},
+		dismissButton = {
+			TextButton(onClick = { hideAddDialog() }) {
+				Text(stringResource(android.R.string.cancel))
+			}
+		},
+		title = {
+			Text(stringResource(R.string.categories_add_title))
+		},
+		text = {
+			OutlinedTextField(
+				text,
+				onValueChange = {
+					if (!it.contains('\n'))
+						text = it
+				},
+				label = {
+					Text(stringResource(R.string.categories_add_name_hint))
+				},
+				isError = text.isBlank(),
+				singleLine = true
+			)
+		}
+	)
 }
 
 @Composable
