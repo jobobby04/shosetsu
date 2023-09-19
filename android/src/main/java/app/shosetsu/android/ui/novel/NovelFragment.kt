@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,7 +46,7 @@ import app.shosetsu.android.common.NoSuchExtensionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
-import app.shosetsu.android.view.ComposeBottomSheetDialog
+import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.NovelShareMenu
 import app.shosetsu.android.view.QRCodeShareDialog
 import app.shosetsu.android.view.compose.*
@@ -55,6 +54,7 @@ import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
+import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
@@ -299,7 +299,6 @@ class NovelFragment : ShosetsuFragment(),
 				makeSnackBar = {
 					makeSnackBar(it)
 				},
-				openFilterMenu = ::openFilterMenu
 			)
 		}
 	}
@@ -396,20 +395,6 @@ class NovelFragment : ShosetsuFragment(),
 				activity?.openInWebView(it)
 			}
 		}
-	}
-
-	private fun openFilterMenu() {
-		ComposeBottomSheetDialog(requireView().context, this, requireActivity()).apply {
-			setContentView(
-				ComposeView(context).apply {
-					setContent {
-						ShosetsuCompose {
-							NovelFilterMenuView(viewModel)
-						}
-					}
-				}
-			)
-		}.show()
 	}
 
 	override fun onDestroy() {
@@ -513,7 +498,6 @@ fun NovelInfoView(
 	displayOfflineSnackBar: (Int?) -> Unit,
 	refresh: () -> Unit,
 	makeSnackBar: (String) -> Snackbar?,
-	openFilterMenu: () -> Unit
 ) {
 	if (resume != null)
 		syncFABWithCompose(state, resume!!)
@@ -533,6 +517,7 @@ fun NovelInfoView(
 	val jumpState by viewModel.jumpState.collectAsState()
 	val isQRCodeVisible by viewModel.isQRCodeVisible.collectAsState()
 	val isShareMenuVisible by viewModel.isShareMenuVisible.collectAsState()
+	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
 
 	invalidateOptionsMenu()
 	// If the data is not present, loads it
@@ -543,7 +528,6 @@ fun NovelInfoView(
 			displayOfflineSnackBar(R.string.fragment_novel_snackbar_cannot_inital_load_offline)
 		}
 	}
-
 
 	ShosetsuCompose {
 		NovelInfoContent(
@@ -566,7 +550,7 @@ fun NovelInfoView(
 			toggleBookmark = {
 				viewModel.toggleNovelBookmark()
 			},
-			openFilter = openFilterMenu,
+			openFilter = viewModel::showFilterMenu,
 			openChapterJump = {
 				viewModel.showChapterJumpDialog()
 			},
@@ -668,6 +652,22 @@ fun NovelInfoView(
 				}
 			)
 		}
+
+		if (isFilterMenuVisible) {
+			val settings by viewModel.novelSettingFlow.collectAsState()
+			NovelFilterMenu(settings, viewModel::updateNovelSetting, viewModel::hideFilterMenu)
+		}
+	}
+}
+
+@Composable
+fun NovelFilterMenu(
+	settings: NovelSettingUI?,
+	updateSettings: (NovelSettingUI) -> Unit,
+	onDismiss: () -> Unit
+) {
+	BottomSheetDialog(onDismiss) {
+		NovelFilterMenuView(settings, updateSettings)
 	}
 }
 

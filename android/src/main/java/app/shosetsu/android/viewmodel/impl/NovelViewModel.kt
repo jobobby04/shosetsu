@@ -136,9 +136,9 @@ class NovelViewModel(
 		selectedChapters.value = emptyMap()
 	}
 
-	override val novelSettingFlow: SharedFlow<NovelSettingUI?> by lazy {
+	override val novelSettingFlow: StateFlow<NovelSettingUI?> by lazy {
 		novelIDLive.flatMapLatest { getNovelSettingFlowUseCase(it) }.onIO()
-			.shareIn(viewModelScopeIO, SharingStarted.Eagerly, 1)
+			.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
 	}
 
 	override val categories: StateFlow<ImmutableList<CategoryUI>> by lazy {
@@ -646,5 +646,15 @@ class NovelViewModel(
 
 	override fun hideShareMenu() {
 		isShareMenuVisible.value = false
+	}
+
+	override val isFilterMenuVisible = MutableStateFlow(false)
+
+	override fun showFilterMenu() {
+		isFilterMenuVisible.value = true
+	}
+
+	override fun hideFilterMenu() {
+		isFilterMenuVisible.value = false
 	}
 }

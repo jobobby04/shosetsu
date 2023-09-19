@@ -11,7 +11,6 @@ import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
 
@@ -58,7 +57,7 @@ abstract class ANovelViewModel
 	abstract val novelException: StateFlow<Throwable?>
 	abstract val chaptersException: StateFlow<Throwable?>
 
-	abstract val novelSettingFlow: SharedFlow<NovelSettingUI?>
+	abstract val novelSettingFlow: StateFlow<NovelSettingUI?>
 
 	abstract val categories: StateFlow<ImmutableList<CategoryUI>>
 	abstract val novelCategories: StateFlow<ImmutableList<Int>>
@@ -215,6 +214,11 @@ abstract class ANovelViewModel
 	abstract val isShareMenuVisible: StateFlow<Boolean>
 	abstract fun openShareMenu()
 	abstract fun hideShareMenu()
+
+	abstract val isFilterMenuVisible: StateFlow<Boolean>
+	abstract fun showFilterMenu()
+
+	abstract fun hideFilterMenu()
 
 	/**
 	 * @param showRemoveBookmark If any chapters are bookmarked, show the remove bookmark logo

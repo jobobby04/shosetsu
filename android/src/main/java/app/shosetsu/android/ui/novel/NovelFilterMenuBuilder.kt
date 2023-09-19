@@ -22,13 +22,16 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.ChapterSortType
@@ -38,7 +41,6 @@ import app.shosetsu.android.common.enums.ReadingStatus.READ
 import app.shosetsu.android.common.enums.ReadingStatus.UNREAD
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.view.uimodels.NovelSettingUI
-import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
 import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.coroutines.launch
 
@@ -64,17 +66,26 @@ import kotlinx.coroutines.launch
  * 22 / 11 / 2020
  */
 
+@Preview
+@Composable
+fun PreviewNovelFilterMenuView() {
+	var setting by remember { mutableStateOf(NovelSettingUI(1)) }
+	NovelFilterMenuView(
+		novelSetting = setting,
+		updateNovelSetting = { setting = it }
+	)
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NovelFilterMenuView(
-	viewModel: ANovelViewModel
+	novelSetting: NovelSettingUI?,
+	updateNovelSetting: (NovelSettingUI) -> Unit,
 ) {
 	val pages =
 		listOf(stringResource(R.string.filter), stringResource(R.string.sort))
 	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
-
-	val novelSetting by viewModel.novelSettingFlow.collectAsState(null)
 
 	Column {
 		TabRow(
@@ -105,7 +116,7 @@ fun NovelFilterMenuView(
 				0 -> NovelFilterMenuFilterContent(
 					novelSetting ?: NovelSettingUI(-1),
 					novelSetting == null,
-					updateNovelSetting = viewModel::updateNovelSetting
+					updateNovelSetting = updateNovelSetting
 				)
 
 				1 -> NovelFilterMenuSortContent(
@@ -113,7 +124,7 @@ fun NovelFilterMenuView(
 					(novelSetting ?: NovelSettingUI(-1)).reverseOrder,
 					novelSetting == null,
 					update = { a, b ->
-						viewModel.updateNovelSetting(
+						updateNovelSetting(
 							(novelSetting ?: NovelSettingUI(-1)).copy(
 								sortType = a,
 								reverseOrder = b
@@ -124,6 +135,19 @@ fun NovelFilterMenuView(
 			}
 		}
 	}
+}
+
+@Preview
+@Composable
+fun PreviewNovelFilterMenuFilterContent() {
+	var setting by remember { mutableStateOf(NovelSettingUI(1)) }
+	NovelFilterMenuFilterContent(
+		settings = setting,
+		isLoading = false,
+		updateNovelSetting = {
+			setting = it
+		}
+	)
 }
 
 @Composable
@@ -206,6 +230,20 @@ fun NovelFilterMenuFilterContent(
 	}
 }
 
+@Preview
+@Composable
+fun PreviewNovelFilterMenuFilterRadioButtonItem() {
+	var selected by remember { mutableStateOf(false) }
+	NovelFilterMenuFilterRadioButtonItem(
+		title = "Test",
+		selected = selected,
+		isLoading = false,
+		onClick = {
+			selected = !selected
+		}
+	)
+}
+
 @Composable
 fun NovelFilterMenuFilterRadioButtonItem(
 	title: String,
@@ -231,6 +269,21 @@ fun NovelFilterMenuFilterRadioButtonItem(
 		)
 		Text(title)
 	}
+}
+
+@Preview
+@Composable
+fun PreviewNovelFilterMenuFilterCheckboxItem() {
+	var checked by remember { mutableStateOf(false) }
+
+	NovelFilterMenuFilterCheckboxItem(
+		title = "Test",
+		isChecked = checked,
+		isLoading = false,
+		onCheckedChange = {
+			checked = it
+		}
+	)
 }
 
 @Composable
@@ -260,6 +313,22 @@ fun NovelFilterMenuFilterCheckboxItem(
 		)
 		Text(title)
 	}
+}
+
+@Preview
+@Composable
+fun PreviewNovelFilterMenuSortContent() {
+	var type by remember { mutableStateOf(SOURCE) }
+	var reversed by remember { mutableStateOf(false) }
+	NovelFilterMenuSortContent(
+		chapterSortType = SOURCE,
+		isReversed = reversed,
+		isLoading = false,
+		update = { newType, newReversed ->
+			type = newType
+			reversed = newReversed
+		}
+	)
 }
 
 @Composable
@@ -305,6 +374,21 @@ fun NovelFilterMenuSortContent(
 	}
 }
 
+@Preview
+@Composable
+fun PreviewNovelFilterMenuSortItemContent() {
+	var type by remember { mutableStateOf(SOURCE) }
+	var reversed by remember { mutableStateOf(false) }
+	NovelFilterMenuSortItemContent(
+		name = "Test",
+		state = type,
+		expectedState = SOURCE,
+		reversed = false,
+		isPlaceholder = false,
+		setIsSortReversed = { reversed = it },
+		setSortType = { type = it }
+	)
+}
 
 @Composable
 fun NovelFilterMenuSortItemContent(
