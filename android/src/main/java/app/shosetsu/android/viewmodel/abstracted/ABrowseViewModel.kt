@@ -9,7 +9,7 @@ import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.StateFlow
-import java.util.*
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -100,4 +100,10 @@ abstract class ABrowseViewModel :
 	 * Reset the term set by [setSearch]
 	 */
 	abstract fun resetSearch()
+
+	abstract val isFilterMenuVisible: StateFlow<Boolean>
+
+	abstract fun showFilterMenu()
+
+	abstract fun hideFilterMenu()
 }

@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -54,13 +53,12 @@ import androidx.core.view.MenuProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.consts.BROWSE_HELP_URL
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
-import app.shosetsu.android.view.ComposeBottomSheetDialog
+import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
@@ -73,7 +71,6 @@ import app.shosetsu.lib.Version
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -86,8 +83,6 @@ import kotlinx.collections.immutable.toImmutableList
 class BrowseFragment : ShosetsuFragment(),
 	ExtendedFABController, HomeFragment, MenuProvider {
 	override val viewTitleRes: Int = R.string.browse
-
-	private var bsg: BottomSheetDialog? = null
 
 	/***/
 	val viewModel: ABrowseViewModel by viewModel()
@@ -223,27 +218,7 @@ class BrowseFragment : ShosetsuFragment(),
 	override fun manipulateFAB(fab: EFabMaintainer) {
 		this.fab = fab
 		fab.setOnClickListener {
-			//bottomMenuRetriever.invoke()?.show()
-			if (bsg == null)
-				bsg = ComposeBottomSheetDialog(
-					this.requireView().context,
-					this,
-					activity as MainActivity
-				)
-			if (bsg?.isShowing == false) {
-				bsg?.apply {
-					setContentView(
-						ComposeView(requireView().context).apply {
-							setContent {
-								ShosetsuCompose {
-									BrowseControllerFilterMenu(viewModel)
-								}
-							}
-						}
-					)
-
-				}?.show()
-			}
+			viewModel.showFilterMenu()
 		}
 		fab.setText(R.string.filter)
 		fab.setIconResource(R.drawable.filter)
@@ -262,6 +237,8 @@ fun BrowseView(
 ) {
 	ShosetsuCompose {
 		val entities by viewModel.liveData.collectAsState()
+		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+
 		BrowseContent(
 			entities,
 			refresh = {
@@ -277,6 +254,12 @@ fun BrowseView(
 			cancelInstall = viewModel::cancelInstall,
 			fab
 		)
+
+		if (isFilterMenuVisible) {
+			BottomSheetDialog(viewModel::hideFilterMenu) {
+				BrowseControllerFilterMenu(viewModel)
+			}
+		}
 	}
 }
 

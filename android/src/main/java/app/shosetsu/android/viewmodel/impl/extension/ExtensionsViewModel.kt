@@ -158,6 +158,15 @@ class ExtensionsViewModel(
 		searchTermLive.value = ""
 	}
 
+	override val isFilterMenuVisible = MutableStateFlow(false)
+	override fun showFilterMenu() {
+		isFilterMenuVisible.value = true
+	}
+
+	override fun hideFilterMenu() {
+		isFilterMenuVisible.value = false
+	}
+
 	override val searchTermLive: MutableStateFlow<String> by lazy {
 		MutableStateFlow("")
 	}
