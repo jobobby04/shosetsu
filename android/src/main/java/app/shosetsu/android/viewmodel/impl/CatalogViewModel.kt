@@ -35,6 +35,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
+import java.util.concurrent.ConcurrentHashMap
 
 /*
  * This file is part of shosetsu.
@@ -75,7 +76,7 @@ class CatalogViewModel(
 	/**
 	 * Map of filter id to the state to pass into the extension
 	 */
-	private var filterDataState: HashMap<Int, MutableStateFlow<Any>> = hashMapOf()
+	private var filterDataState: ConcurrentHashMap<Int, MutableStateFlow<Any>> = ConcurrentHashMap()
 
 	private val filterDataFlow = MutableStateFlow<Map<Int, Any>>(hashMapOf())
 
@@ -387,16 +388,19 @@ class CatalogViewModel(
 	 * @param [V] Value type of the hash map
 	 * @param [O] Expected value type
 	 */
-	private inline fun <reified O, V> HashMap<Int, V>.specialGetOrPut(
+	private inline fun <reified O, V> ConcurrentHashMap<Int, V>.specialGetOrPut(
 		key: Int,
 		getDefaultValue: () -> O
 	): O {
 		// Do not use computeIfAbsent on JVM8 as it would change locking behavior
-		return this[key].takeIf { value -> value is O }?.let { value -> value as O }
-			?: getDefaultValue().also { defaultValue ->
-				@Suppress("UNCHECKED_CAST")
-				put(key, defaultValue as V)
-			}
+		val value = this[key]
+		return if (value is O) {
+			value
+		} else {
+			val default = getDefaultValue()
+			this[key] = default as V
+			default
+		}
 	}
 
 	override fun clearCookies() {
@@ -404,6 +408,16 @@ class CatalogViewModel(
 			logV("Cookies cleared")
 			resetView()
 		}
+	}
+
+	override val isFilterMenuVisible = MutableStateFlow(false)
+
+	override fun showFilterMenu() {
+		isFilterMenuVisible.value = true
+	}
+
+	override fun hideFilterMenu() {
+		isFilterMenuVisible.value = false
 	}
 }
 

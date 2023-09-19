@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,7 +35,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
-import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.enums.NovelCardType
@@ -44,7 +42,7 @@ import app.shosetsu.android.common.enums.NovelCardType.*
 import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.ui.catalogue.listeners.CatalogueSearchQuery
 import app.shosetsu.android.ui.novel.CategoriesDialog
-import app.shosetsu.android.view.ComposeBottomSheetDialog
+import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.*
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
@@ -281,38 +279,7 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 		fab.setIconResource(R.drawable.filter)
 		fab.setText(R.string.filter)
 		fab.setOnClickListener {
-			//bottomMenuRetriever.invoke()?.show()
-			if (bsg == null)
-				bsg = ComposeBottomSheetDialog(
-					(this.view ?: return@setOnClickListener).context,
-					this,
-					activity as MainActivity
-				)
-			if (bsg?.isShowing == false) {
-				bsg?.apply {
-					setContentView(
-						ComposeView((view ?: return@apply).context).apply {
-							setContent {
-								ShosetsuCompose((view ?: return@setContent).context) {
-									val items by viewModel.filterItemsLive.collectAsState()
-									CatalogFilterMenu(
-										items = items,
-										getBoolean = viewModel::getFilterBooleanState,
-										setBoolean = viewModel::setFilterBooleanState,
-										getInt = viewModel::getFilterIntState,
-										setInt = viewModel::setFilterIntState,
-										getString = viewModel::getFilterStringState,
-										setString = viewModel::setFilterStringState,
-										applyFilter = viewModel::applyFilter,
-										resetFilter = viewModel::resetFilter
-									)
-								}
-							}
-						}
-					)
-
-				}?.show()
-			}
+			viewModel.showFilterMenu()
 		}
 		viewModel.hasFilters.collectLatestLA(this, catch = {}) {
 			if (it)
@@ -348,6 +315,7 @@ fun CatalogueView(
 		var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
 
 		val backgroundAddState by viewModel.backgroundAddState.collectAsState()
+		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
 
 		LaunchedEffect(backgroundAddState) {
 			when (backgroundAddState) {
@@ -441,6 +409,23 @@ fun CatalogueView(
 				},
 				novelCategories = remember { persistentListOf() }
 			)
+		}
+
+		if (isFilterMenuVisible) {
+			val items by viewModel.filterItemsLive.collectAsState()
+			BottomSheetDialog(viewModel::hideFilterMenu) {
+				CatalogFilterMenu(
+					items = items,
+					getBoolean = viewModel::getFilterBooleanState,
+					setBoolean = viewModel::setFilterBooleanState,
+					getInt = viewModel::getFilterIntState,
+					setInt = viewModel::setFilterIntState,
+					getString = viewModel::getFilterStringState,
+					setString = viewModel::setFilterStringState,
+					applyFilter = viewModel::applyFilter,
+					resetFilter = viewModel::resetFilter
+				)
+			}
 		}
 	}
 }

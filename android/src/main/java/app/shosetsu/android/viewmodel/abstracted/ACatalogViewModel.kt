@@ -142,4 +142,10 @@ abstract class ACatalogViewModel :
 	 * Clear the cookies
 	 */
 	abstract fun clearCookies()
+
+	abstract val isFilterMenuVisible: StateFlow<Boolean>
+
+	abstract fun showFilterMenu()
+
+	abstract fun hideFilterMenu()
 }
