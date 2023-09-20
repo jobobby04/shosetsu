@@ -130,7 +130,7 @@ interface INovelsRepository {
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>
-	): List<Novel.Listing>
+	): List<Novel.Info>
 
 	/**
 	 * Loads catalogue data of an [IExtension]
@@ -140,7 +140,7 @@ interface INovelsRepository {
 		ext: IExtension,
 		listing: Int,
 		data: Map<Int, Any>,
-	): List<Novel.Listing>
+	): List<Novel.Info>
 
 	/**
 	 * Get analytic entities

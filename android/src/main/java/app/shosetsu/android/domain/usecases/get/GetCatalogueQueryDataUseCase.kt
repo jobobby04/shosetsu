@@ -74,7 +74,7 @@ class GetCatalogueQueryDataUseCase(
 							query,
 							HashMap(data).also { it[PAGE_INDEX] = pageNumber }
 						).let {
-							val data: List<Novel.Listing> = it
+							val data: List<Novel.Info> = it
 							(data.map { novelListing ->
 								novelListing.convertTo(iExtension)
 							}.mapNotNull { ne ->
