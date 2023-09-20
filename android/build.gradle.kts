@@ -273,7 +273,7 @@ dependencies {
 
 	// Core libraries
 	implementation("org.luaj:luaj-jse:3.0.1")
-	implementation("com.gitlab.shosetsuorg:kotlin-lib:v1.3.0")
+	implementation("com.gitlab.shosetsuorg:kotlin-lib:3c204042a96efd691478820042b61625c0bc0f32")
 	implementation("org.jsoup:jsoup:1.17.2")
 
 	// Image loading
