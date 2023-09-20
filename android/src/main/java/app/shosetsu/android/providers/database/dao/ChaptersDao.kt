@@ -84,33 +84,50 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 
 	//# Transactions
 
-	/**
-	 * Handle new data. Update's chapters that already exist, and insert any new chapters.
-	 *
-	 * @param novelId Id of the novel to work on
-	 * @param extensionId Id of the extension to work with
-	 * @param list List of new data to work on
-	 */
-	@Transaction
-	@Throws(SQLiteException::class)
-	suspend fun handleNewData(
+	private suspend inline fun <R> internalHandleNewData(
 		novelId: Int,
-		extensionId: Int,
-		list: List<Novel.Chapter>
+		newData: List<Novel.Chapter>,
+		inserter: (novelChapter: Novel.Chapter) -> R,
+		withResult: (R) -> Unit = {}
 	) {
-		val databaseChapterEntities: List<DBChapterEntity> = getChapters(novelId)
-		list.forEach { novelChapter ->
-			databaseChapterEntities.find { it.url == novelChapter.link }?.let { dbChapterEntity ->
+		val dbChapters: List<DBChapterEntity> = getChapters(novelId)
+
+		newData.forEach { newChapter ->
+			val matchingChapter = dbChapters.find { it.url == newChapter.link }
+
+			if (matchingChapter != null) {
 				update(
-					chapterEntity = dbChapterEntity,
-					newData = novelChapter
+					chapterEntity = matchingChapter,
+					newData = newChapter
 				)
-			} ?: insertAbort(
-				novelChapter = novelChapter,
-				novelID = novelId,
-				extensionID = extensionId
-			)
+			} else {
+				withResult(inserter(newChapter))
+			}
 		}
+
+		deleteMissing(getChapters(novelId), newData)
+	}
+
+	/**
+	 * Delete [dbChapters] that are not in [newData]
+	 */
+	private suspend inline fun deleteMissing(
+		dbChapters: List<DBChapterEntity>,
+		newData: List<Novel.Chapter>
+	) {
+		// Remove deleted chapters
+		val removedChapters = dbChapters
+			// Filter out any dbChapters that have a url matching a new chapters link
+			// What remains will be chapters that are not present on the site anymore
+			.filterNot { dbChapter ->
+				newData.any { newChapter -> newChapter.link == dbChapter.url }
+			}
+			// Filter out any dbChapters that have been saved or bookmarked
+			// User choice!
+			.filterNot { it.isSaved || it.bookmarked }
+
+		// Delete the given chapters
+		delete(removedChapters)
 	}
 
 	/**
@@ -118,7 +135,28 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	 *
 	 * @param novelId Id of the novel to work on
 	 * @param extensionId Id of the extension to work with
-	 * @param list List of new data to work on
+	 * @param newData List of new data to work on
+	 */
+	@Transaction
+	@Throws(SQLiteException::class)
+	suspend fun handleNewData(
+		novelId: Int,
+		extensionId: Int,
+		newData: List<Novel.Chapter>
+	) {
+		internalHandleNewData(
+			novelId = novelId,
+			newData = newData,
+			inserter = { insertAbort(it, novelId, extensionId) }
+		)
+	}
+
+	/**
+	 * Handle new data. Update's chapters that already exist, and insert any new chapters.
+	 *
+	 * @param novelId Id of the novel to work on
+	 * @param extensionId Id of the extension to work with
+	 * @param newData List of new data to work on
 	 *
 	 * @return list of chapters that were newly inserted
 	 */
@@ -127,26 +165,17 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	suspend fun handleNewDataReturn(
 		novelId: Int,
 		extensionId: Int,
-		list: List<Novel.Chapter>,
+		newData: List<Novel.Chapter>,
 	): List<DBChapterEntity> {
 		val newChapters = ArrayList<DBChapterEntity>()
-		val databaseChapterEntities: List<DBChapterEntity> = getChapters(novelId)
-		list.forEach { novelChapter ->
-			databaseChapterEntities.find { it.url == novelChapter.link }?.let { dbChapterEntity ->
-				update(
-					chapterEntity = dbChapterEntity,
-					newData = novelChapter
-				)
-			} ?: run {
-				insertReturn(
-					novelID = novelId,
-					extensionID = extensionId,
-					novelChapter = novelChapter
-				)?.let {
-					newChapters.add(it)
-				}
-			}
-		}
+
+		internalHandleNewData(
+			novelId = novelId,
+			newData = newData,
+			inserter = { insertReturn(novelId, extensionId, it) },
+			withResult = { if (it != null) newChapters.add(it) }
+		)
+
 		return newChapters
 	}
 
