@@ -93,7 +93,10 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 		val dbChapters: List<DBChapterEntity> = getChapters(novelId)
 
 		newData.forEach { newChapter ->
+			// Try to find a matching chapter
+			// This can be done via the chapter order or url
 			val matchingChapter = dbChapters.find { it.url == newChapter.link }
+				?: dbChapters.find { it.order == newChapter.order }
 
 			if (matchingChapter != null) {
 				update(
@@ -234,6 +237,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	) {
 		update(
 			chapterEntity.copy(
+				url = newData.link,
 				title = newData.title,
 				releaseDate = newData.release,
 				order = newData.order
