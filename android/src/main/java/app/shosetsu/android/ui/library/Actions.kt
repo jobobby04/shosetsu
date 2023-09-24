@@ -293,6 +293,7 @@ fun ViewTypeItem(
 fun ViewTypeButton(
 	selectedType: NovelCardType,
 	onSetType: (NovelCardType) -> Unit,
+	showExtended: Boolean = false,
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 	SimpleIconButton(
@@ -322,12 +323,22 @@ fun ViewTypeButton(
 			onSetType
 		)
 
-		ViewTypeItem(
-			stringResource(R.string.cozy),
-			NovelCardType.COZY,
-			selectedType,
-			onSetType
-		)
+			ViewTypeItem(
+				stringResource(R.string.cozy),
+				NovelCardType.COZY,
+				selectedType,
+				onSetType
+			)
+
+			if (showExtended) {
+				ViewTypeItem(
+					stringResource(R.string.extended),
+					NovelCardType.EXTENDED,
+					selectedType,
+					onSetType
+				)
+			}
+		}
 	}
 }
 

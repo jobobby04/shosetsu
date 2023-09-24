@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -28,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -53,6 +56,7 @@ import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
 import app.shosetsu.android.common.enums.NovelCardType.COZY
+import app.shosetsu.android.common.enums.NovelCardType.EXTENDED
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
@@ -66,6 +70,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
+import app.shosetsu.android.view.compose.NovelCardExtendedContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
@@ -476,7 +481,8 @@ fun CatalogTopBar(
 			}
 			ViewTypeButton(
 				cardType,
-				onSetCardType
+				onSetCardType,
+				showExtended = true,
 			)
 
 			SimpleIconButton(
@@ -514,35 +520,66 @@ fun CatalogGrid(
 			else -> columnsInV
 		}).dp - 8.dp
 
-	val state = rememberLazyGridState()
+	if (cardType == EXTENDED) {
+		LazyColumn(
+			verticalArrangement = Arrangement.spacedBy(4.dp)
+		) {
+			catalogListingSelection(listingSelectionData, setListing)
 
-	LazyVerticalGrid(
-		modifier = Modifier.fillMaxSize(),
-		columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
-		contentPadding = PaddingValues(
-			bottom = 200.dp,
-			start = 8.dp,
-			end = 8.dp,
-			top = 4.dp
-		),
-		state = state,
-		horizontalArrangement = Arrangement.spacedBy(4.dp),
-		verticalArrangement = Arrangement.spacedBy(4.dp)
-	) {
-		catalogListingSelection(listingSelectionData, setListing)
+			itemsIndexed(
+				items,
+				key = { index, item -> item.hashCode() + index }
+			) { _, item ->
+				if (item != null)
+					Surface(tonalElevation = 2.dp) {
+						NovelCardExtendedContent(
+							item,
+							onClick = {
+								onClick(item)
+							},
+							onLongClick = {
+								onLongClick(item)
+							},
+						)
+					}
 
-		itemsIndexed(
-			items,
-			key = { index, item -> item.hashCode() + index }
-		) { _, item ->
-			when (cardType) {
-				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
-				COMPRESSED -> CatalogCompressedCard(item, onClick, onLongClick)
-				COZY -> CatalogCozyCard(item, onClick, onLongClick)
 			}
+
+			appendBar(items)
+			noMoreBar(items)
 		}
-		appendBar(items)
-		noMoreBar(items)
+	} else {
+		val state = rememberLazyGridState()
+
+		LazyVerticalGrid(
+			modifier = Modifier.fillMaxSize(),
+			columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
+			contentPadding = PaddingValues(
+				bottom = 200.dp,
+				start = 8.dp,
+				end = 8.dp,
+				top = 4.dp
+			),
+			state = state,
+			horizontalArrangement = Arrangement.spacedBy(4.dp),
+			verticalArrangement = Arrangement.spacedBy(4.dp)
+		) {
+			catalogListingSelection(listingSelectionData, setListing)
+
+			itemsIndexed(
+				items,
+				key = { index, item -> item.hashCode() + index }
+			) { _, item ->
+				when (cardType) {
+					NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
+					COMPRESSED -> CatalogCompressedCard(item, onClick, onLongClick)
+					COZY -> CatalogCozyCard(item, onClick, onLongClick)
+					EXTENDED -> Unit
+				}
+			}
+			appendBar(items)
+			noMoreBar(items)
+		}
 	}
 }
 
@@ -557,6 +594,27 @@ fun LazyGridScope.catalogListingSelection(
 	setListing: (selection: Int) -> Unit
 ) {
 	item(span = { GridItemSpan(maxLineSpan) }) {
+		AnimatedVisibility(listingSelectionData?.choices?.isNotEmpty() ?: false) {
+			if (listingSelectionData != null)
+				ListPreferenceWidget(
+					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
+					subtitle = listingSelectionData.choices[listingSelectionData.selection],
+					icon = null,
+					value = listingSelectionData.selection,
+					entries = listingSelectionData.choices.withIndex()
+						.associate { it.index to it.value },
+					onValueChange = setListing,
+					isSubtitleTheValue = true
+				)
+		}
+	}
+}
+
+fun LazyListScope.catalogListingSelection(
+	listingSelectionData: ListingSelectionData?,
+	setListing: (selection: Int) -> Unit
+) {
+	item {
 		AnimatedVisibility(listingSelectionData?.choices?.isNotEmpty() ?: false) {
 			if (listingSelectionData != null)
 				ListPreferenceWidget(
@@ -682,6 +740,31 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
 		items.loadState.append.endOfPaginationReached
 	) {
 		item(span = { GridItemSpan(maxLineSpan) }) {
+			CatalogContentNoMore()
+		}
+	}
+}
+
+
+/**
+ * Loading bar appended to the bottom of [CatalogGrid]
+ */
+fun LazyListScope.appendBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	if (items.loadState.append == LoadState.Loading) {
+		item {
+			LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+		}
+	}
+}
+
+/**
+ * No more message appended to the bottom of [CatalogGrid]
+ */
+fun LazyListScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	if (items.loadState.refresh.endOfPaginationReached ||
+		items.loadState.append.endOfPaginationReached
+	) {
+		item {
 			CatalogContentNoMore()
 		}
 	}
