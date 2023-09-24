@@ -25,6 +25,9 @@
                 <item
                     android:id="@+id/view_type_cozy"
                     android:title="@string/cozy" />
+                <item
+                    android:id="@+id/view_type_extended"
+                    android:title="@string/extended" />
             </group>
         </menu>
     </item>

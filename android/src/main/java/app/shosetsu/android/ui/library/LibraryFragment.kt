@@ -199,7 +199,7 @@ class LibraryFragment
 					menu.findItem(R.id.view_type_comp)?.isChecked = true
 				}
 
-				COZY -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
+				COZY, EXTENDED -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
 			}
 		}
 	}
@@ -664,7 +664,7 @@ fun LibraryCategory(
 						)
 					}
 
-					COZY -> {
+					COZY, EXTENDED -> {
 						NovelCardCozyContent(
 							item.title,
 							item.imageURL,

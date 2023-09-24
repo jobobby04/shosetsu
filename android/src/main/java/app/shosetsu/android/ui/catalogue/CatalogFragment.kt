@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,6 +14,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -173,6 +175,8 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 					}
 
 					COZY -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
+
+					EXTENDED -> menu.findItem(R.id.view_type_extended)?.isChecked = true
 				}
 			}
 
@@ -215,6 +219,12 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 			R.id.view_type_cozy -> {
 				item.isChecked = true
 				viewModel.setViewType(COZY)
+				true
+			}
+
+			R.id.view_type_extended -> {
+				item.isChecked = true
+				viewModel.setViewType(EXTENDED)
 				true
 			}
 
@@ -465,98 +475,156 @@ fun CatalogContent(
 			val state = rememberLazyGridState()
 			if (hasFilters)
 				syncFABWithCompose(state, fab)
-			LazyVerticalGrid(
-				modifier = Modifier.fillMaxSize(),
-				columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
-				contentPadding = PaddingValues(
-					bottom = 200.dp,
-					start = 8.dp,
-					end = 8.dp,
-					top = 4.dp
-				),
-				state = state,
-				horizontalArrangement = Arrangement.spacedBy(4.dp),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				itemsIndexed(
-					items,
-					key = { index, item -> item.hashCode() + index }
-				) { _, item ->
-					when (cardType) {
-						NORMAL -> {
-							if (item != null)
-								NovelCardNormalContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
 
-						COMPRESSED -> {
-							if (item != null)
-								NovelCardCompressedContent(
-									item.title,
-									item.imageURL,
+			if (cardType == EXTENDED) {
+				LazyColumn(
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					itemsIndexed(
+						items,
+						key = { index, item -> item.hashCode() + index }
+					) { _, item ->
+						if (item != null)
+							Surface(tonalElevation = 2.dp) {
+								NovelCardExtendedContent(
+									item,
 									onClick = {
 										onClick(item)
 									},
 									onLongClick = {
 										onLongClick(item)
 									},
-									isBookmarked = item.bookmarked
 								)
-						}
+							}
 
-						COZY -> {
-							if (item != null)
-								NovelCardCozyContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
+					}
+
+					if (items.loadState.append == LoadState.Loading) {
+						item {
+							LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+						}
+					}
+					if (items.loadState.refresh.endOfPaginationReached && items.loadState.append.endOfPaginationReached) {
+						item {
+							CatalogContentNoMore()
+						}
+					}
+					val errorState = items.loadState.refresh
+					if (errorState is LoadState.Error) {
+						item {
+							ErrorContent(
+								errorState.error.message ?: "Unknown",
+								actions = arrayOf(
+									ErrorAction(R.string.retry) {
+										items.refresh()
 									},
-									onLongClick = {
-										onLongClick(item)
+									ErrorAction(R.string.action_open_in_webview) {
+										openWebView()
 									},
-									isBookmarked = item.bookmarked
-								)
+									ErrorAction(R.string.settings_advanced_clear_cookies_title) {
+										clearCookies()
+									},
+								),
+								stackTrace = errorState.error.stackTraceToString()
+							)
 						}
 					}
 				}
-				if (items.loadState.append == LoadState.Loading) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+			} else {
+				LazyVerticalGrid(
+					modifier = Modifier.fillMaxSize(),
+					columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
+					contentPadding = PaddingValues(
+						bottom = 200.dp,
+						start = 8.dp,
+						end = 8.dp,
+						top = 4.dp
+					),
+					state = state,
+					horizontalArrangement = Arrangement.spacedBy(4.dp),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					itemsIndexed(
+						items,
+						key = { index, item -> item.hashCode() + index }
+					) { _, item ->
+						when (cardType) {
+							NORMAL -> {
+								if (item != null)
+									NovelCardNormalContent(
+										item.title,
+										item.imageURL,
+										onClick = {
+											onClick(item)
+										},
+										onLongClick = {
+											onLongClick(item)
+										},
+										isBookmarked = item.bookmarked
+									)
+							}
+
+							COMPRESSED -> {
+								if (item != null)
+									NovelCardCompressedContent(
+										item.title,
+										item.imageURL,
+										onClick = {
+											onClick(item)
+										},
+										onLongClick = {
+											onLongClick(item)
+										},
+										isBookmarked = item.bookmarked
+									)
+							}
+
+							COZY -> {
+								if (item != null)
+									NovelCardCozyContent(
+										item.title,
+										item.imageURL,
+										onClick = {
+											onClick(item)
+										},
+										onLongClick = {
+											onLongClick(item)
+										},
+										isBookmarked = item.bookmarked
+									)
+							}
+							EXTENDED -> Unit
+						}
 					}
-				}
-				if (items.loadState.refresh.endOfPaginationReached && items.loadState.append.endOfPaginationReached) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						CatalogContentNoMore()
+					if (items.loadState.append == LoadState.Loading) {
+						item(span = { GridItemSpan(maxLineSpan) }) {
+							LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+						}
 					}
-				}
-				val errorState = items.loadState.refresh
-				if (errorState is LoadState.Error) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						ErrorContent(
-							errorState.error.message ?: "Unknown",
-							actions = arrayOf(
-								ErrorAction(R.string.retry) {
-									items.refresh()
-								},
-								ErrorAction(R.string.action_open_in_webview) {
-									openWebView()
-								},
-								ErrorAction(R.string.settings_advanced_clear_cookies_title) {
-									clearCookies()
-								},
-							),
-							stackTrace = errorState.error.stackTraceToString()
-						)
+					if (items.loadState.refresh.endOfPaginationReached && items.loadState.append.endOfPaginationReached) {
+						item(span = { GridItemSpan(maxLineSpan) }) {
+							CatalogContentNoMore()
+						}
+					}
+					val errorState = items.loadState.refresh
+					if (errorState is LoadState.Error) {
+						item(span = { GridItemSpan(maxLineSpan) }) {
+							ErrorContent(
+								errorState.error.message ?: "Unknown",
+								actions = arrayOf(
+									ErrorAction(R.string.retry) {
+										items.refresh()
+									},
+									ErrorAction(R.string.action_open_in_webview) {
+										openWebView()
+									},
+									ErrorAction(R.string.settings_advanced_clear_cookies_title) {
+										clearCookies()
+									},
+								),
+								stackTrace = errorState.error.stackTraceToString()
+							)
+						}
 					}
 				}
 			}
