@@ -67,6 +67,7 @@ import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
 import app.shosetsu.android.common.enums.NovelCardType.COZY
+import app.shosetsu.android.common.enums.NovelCardType.EXTENDED
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.viewModelDi
@@ -603,7 +604,7 @@ fun LibraryCategory(
 						)
 					}
 
-					COZY -> {
+					COZY, EXTENDED -> {
 						NovelCardCozyContent(
 							item.title,
 							item.imageURL,
