@@ -19,6 +19,7 @@ import app.shosetsu.android.domain.usecases.load.LoadSearchRowUIUseCase
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
+import app.shosetsu.lib.Novel
 import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.mapify
 import kotlinx.collections.immutable.ImmutableList
@@ -202,7 +203,25 @@ class SearchViewModel(
 									true
 								}
 							}.map { (id, title, imageURL) ->
-								ACatalogNovelUI(id, title, imageURL, false)
+								ACatalogNovelUI(
+									id = id,
+									title = title,
+									imageURL = imageURL,
+									bookmarked = false,
+									language = "",
+									description = "",
+									status = Novel.Status.UNKNOWN,
+									tags = persistentListOf(),
+									genres = persistentListOf(),
+									authors = persistentListOf(),
+									artists = persistentListOf(),
+									chapters = persistentListOf(),
+									chapterCount = null,
+									wordCount = null,
+									commentCount = null,
+									viewCount = null,
+									favoriteCount = null
+								)
 							}
 						}
 					)

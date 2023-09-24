@@ -262,6 +262,7 @@ fun ViewTypeItem(
 fun ViewTypeButton(
 	selectedType: NovelCardType,
 	onSetType: (NovelCardType) -> Unit,
+	showExtended: Boolean = false,
 ) {
 	Box {
 		var showDropDown by remember { mutableStateOf(false) }
@@ -301,6 +302,15 @@ fun ViewTypeButton(
 				selectedType,
 				onSetType
 			)
+
+			if (showExtended) {
+				ViewTypeItem(
+					stringResource(R.string.extended),
+					NovelCardType.EXTENDED,
+					selectedType,
+					onSetType
+				)
+			}
 		}
 	}
 }

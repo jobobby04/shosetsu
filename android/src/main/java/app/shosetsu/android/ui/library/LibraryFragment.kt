@@ -29,6 +29,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
@@ -64,6 +65,7 @@ import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
 import app.shosetsu.android.common.enums.NovelCardType.COZY
+import app.shosetsu.android.common.enums.NovelCardType.EXTENDED
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.viewModelDi
@@ -450,7 +452,7 @@ fun LibraryPager(
 					)
 				}
 			}
-			Divider()
+			HorizontalDivider()
 		}
 		HorizontalPager(
 			state = categoryPagerState,
@@ -621,7 +623,7 @@ fun LibraryCategory(
 						)
 					}
 
-					COZY -> {
+					COZY, EXTENDED -> {
 						NovelCardCozyContent(
 							item.title,
 							item.imageURL,

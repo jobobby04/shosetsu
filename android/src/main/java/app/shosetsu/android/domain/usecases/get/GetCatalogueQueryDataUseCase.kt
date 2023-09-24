@@ -14,6 +14,7 @@ import app.shosetsu.lib.Novel
 import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.luaj.vm2.LuaError
@@ -75,13 +76,30 @@ class GetCatalogueQueryDataUseCase(
 							HashMap(data).also { it[PAGE_INDEX] = pageNumber }
 						).let {
 							val data: List<Novel.Info> = it
-							(data.map { novelListing ->
-								novelListing.convertTo(iExtension)
-							}.mapNotNull { ne ->
+							(data.mapNotNull { novelListing ->
+								val ne = novelListing.convertTo(iExtension)
 								try {
 									novelsRepository.insertReturnStripped(ne)
 										?.let { (id, title, imageURL, bookmarked) ->
-											ACatalogNovelUI(id, title, imageURL, bookmarked)
+											ACatalogNovelUI(
+												id = id,
+												title = title,
+												imageURL = imageURL,
+												bookmarked = bookmarked,
+												language = novelListing.language,
+												description = novelListing.description,
+												status = novelListing.status,
+												tags = novelListing.tags.asList().toImmutableList(),
+												genres = novelListing.genres.asList().toImmutableList(),
+												authors = novelListing.authors.asList().toImmutableList(),
+												artists = novelListing.artists.asList().toImmutableList(),
+												chapters = novelListing.chapters.asList().toImmutableList(),
+												chapterCount = novelListing.chapterCount,
+												wordCount = novelListing.wordCount,
+												commentCount = novelListing.commentCount,
+												viewCount = novelListing.viewCount,
+												favoriteCount = novelListing.favoriteCount
+											)
 										}
 								} catch (e: SQLiteException) {
 									logE("Failed to load parse novel", e)
