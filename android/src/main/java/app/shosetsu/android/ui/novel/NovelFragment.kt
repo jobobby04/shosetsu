@@ -18,6 +18,10 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
@@ -32,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -273,6 +278,7 @@ class NovelFragment : ShosetsuFragment(),
 
 	private var state = LazyListState(0)
 
+	@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
@@ -299,6 +305,7 @@ class NovelFragment : ShosetsuFragment(),
 				makeSnackBar = {
 					makeSnackBar(it)
 				},
+				windowSize = calculateWindowSizeClass(context as Activity)
 			)
 		}
 	}
@@ -498,6 +505,7 @@ fun NovelInfoView(
 	displayOfflineSnackBar: (Int?) -> Unit,
 	refresh: () -> Unit,
 	makeSnackBar: (String) -> Snackbar?,
+	windowSize: WindowSizeClass
 ) {
 	if (resume != null)
 		syncFABWithCompose(state, resume!!)
@@ -577,7 +585,8 @@ fun NovelInfoView(
 			bookmarkSelected = viewModel::bookmarkSelected,
 			unbookmarkSelected = viewModel::removeBookmarkFromSelected,
 			hasSelected = hasSelected,
-			state = state
+			state = state,
+			windowSize = windowSize
 		)
 
 		if (isCategoriesDialogVisible)
@@ -756,6 +765,7 @@ fun JumpDialog(
 	)
 }
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Preview
 @Composable
 fun PreviewNovelInfoContent() {
@@ -803,7 +813,10 @@ fun PreviewNovelInfoContent() {
 
 	}.toImmutableList()
 
-	Surface {
+	val width = 900.dp
+	val height = 300.dp
+
+	Surface(Modifier.size(width = width, height = height)) {
 		NovelInfoContent(
 			novelInfo = info,
 			chapters = chapters,
@@ -833,12 +846,13 @@ fun PreviewNovelInfoContent() {
 			bookmarkSelected = {},
 			unbookmarkSelected = {},
 			hasSelected = false,
-			state = rememberLazyListState(0)
+			state = rememberLazyListState(0),
+			windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height))
 		)
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun NovelInfoContent(
 	novelInfo: NovelUI?,
@@ -861,136 +875,214 @@ fun NovelInfoContent(
 	bookmarkSelected: () -> Unit,
 	unbookmarkSelected: () -> Unit,
 	hasSelected: Boolean,
-	state: LazyListState
+	state: LazyListState,
+	windowSize: WindowSizeClass
 ) {
-	Box(
-		modifier = Modifier.fillMaxSize()
+	val splitColumn = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
+
+	@Composable
+	fun header(
+		novelInfo: NovelUI
 	) {
-		val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
-		Box(Modifier.pullRefresh(pullRefreshState)) {
-			LazyColumnScrollbar(
-				listState = state,
-				thumbColor = MaterialTheme.colorScheme.primary,
-				thumbSelectedColor = Color.Gray,
-			) {
-				LazyColumn(
-					modifier = Modifier.fillMaxSize(),
-					state = state,
-					contentPadding = PaddingValues(bottom = 256.dp)
+		NovelInfoHeaderContent(
+			novelInfo = novelInfo,
+			openWebview = openWebView,
+			categories = categories,
+			setCategoriesDialogOpen = setCategoriesDialogOpen,
+			toggleBookmark = toggleBookmark
+		)
+	}
+
+	val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+	) {
+		Row(
+			Modifier
+				.fillMaxSize()
+				.pullRefresh(pullRefreshState)
+		) {
+			if (splitColumn) {
+				Box(
+					Modifier
+						.fillMaxWidth(0.5f)
+						.fillMaxHeight()
+						.verticalScroll(rememberScrollState())
 				) {
 					if (novelInfo != null)
-						item {
-							NovelInfoHeaderContent(
-								novelInfo = novelInfo,
-								openWebview = openWebView,
-								categories = categories,
-								setCategoriesDialogOpen = setCategoriesDialogOpen,
-								toggleBookmark = toggleBookmark,
-								openChapterJump = openChapterJump,
-								openFilter = openFilter,
-								chapterCount = chapters?.size ?: 0
-							)
-						}
-					else {
-						item {
-							LinearProgressIndicator(
-								modifier = Modifier.fillMaxWidth()
-							)
-						}
-					}
-
-					if (chapters != null)
-						NovelInfoChaptersContent(
-							chapters,
-							chapterContent
-						)
+						header(novelInfo)
 				}
 			}
 
-			// Do not save progress when there is nothing being displayed
-			if (novelInfo != null && chapters != null) {
-				LaunchedEffect(itemAt) {
-					launch {
-						if (!state.isScrollInProgress)
-							state.scrollToItem(itemAt)
+			Box(Modifier.fillMaxSize()) {
+				LazyColumnScrollbar(
+					listState = state,
+					thumbColor = MaterialTheme.colorScheme.primary,
+					thumbSelectedColor = Color.Gray,
+				) {
+					LazyColumn(
+						modifier = Modifier.fillMaxSize(),
+						state = state,
+						contentPadding = PaddingValues(bottom = 256.dp)
+					) {
+						if (novelInfo != null) {
+							if (!splitColumn)
+								item {
+									header(novelInfo)
+								}
+						} else {
+							item {
+								LinearProgressIndicator(
+									modifier = Modifier.fillMaxWidth()
+								)
+							}
+						}
+
+						stickyHeader {
+							Surface(tonalElevation = 1.dp) {
+								NovelChapterBar(
+									chapters?.size ?: 0,
+									openChapterJump,
+									openFilter
+								)
+							}
+						}
+
+						if (chapters != null)
+							NovelInfoChaptersContent(
+								chapters,
+								chapterContent
+							)
+					}
+				}
+
+				// Do not save progress when there is nothing being displayed
+				if (novelInfo != null && chapters != null) {
+					LaunchedEffect(itemAt) {
+						launch {
+							if (!state.isScrollInProgress)
+								state.scrollToItem(itemAt)
+						}
 					}
 				}
 			}
+		}
 
-			PullRefreshIndicator(
-				isRefreshing,
-				pullRefreshState,
-				Modifier.align(Alignment.TopCenter)
+		PullRefreshIndicator(
+			isRefreshing,
+			pullRefreshState,
+			Modifier.align(Alignment.TopCenter)
+		)
+
+		// Chapter Selection Bar
+		if (chapters != null && hasSelected) {
+			ChapterSelectionBar(
+				selectedChaptersState,
+				downloadSelected,
+				deleteSelected,
+				markSelectedAsRead,
+				markSelectedAsUnread,
+				bookmarkSelected,
+				unbookmarkSelected
 			)
 		}
 
-		if (chapters != null && hasSelected) {
-			Card(
-				modifier = Modifier
-					.align(BiasAlignment(0f, 0.7f))
-			) {
-				Row {
-					IconButton(
-						onClick = downloadSelected,
-						enabled = selectedChaptersState.showDownload
-					) {
-						Icon(
-							painterResource(R.drawable.download),
-							stringResource(R.string.fragment_novel_selected_download)
-						)
-					}
-					IconButton(
-						onClick = deleteSelected,
-						enabled = selectedChaptersState.showDelete
-					) {
-						Icon(
-							painterResource(R.drawable.trash),
-							stringResource(R.string.fragment_novel_selected_delete)
-						)
-					}
-					IconButton(
-						onClick = markSelectedAsRead,
-						enabled = selectedChaptersState.showMarkAsRead
-					) {
-						Icon(
-							painterResource(R.drawable.read_mark),
-							stringResource(R.string.fragment_novel_selected_read)
-						)
-					}
-					IconButton(
-						onClick = markSelectedAsUnread,
-						enabled = selectedChaptersState.showMarkAsUnread
-					) {
-						Icon(
-							painterResource(R.drawable.unread_mark),
-							stringResource(R.string.fragment_novel_selected_unread)
-						)
-					}
-					IconButton(
-						onClick = bookmarkSelected,
-						enabled = selectedChaptersState.showBookmark
-					) {
-						Icon(
-							painterResource(R.drawable.ic_outline_bookmark_add_24),
-							stringResource(R.string.fragment_novel_selected_bookmark)
-						)
-					}
-					IconButton(
-						onClick = unbookmarkSelected,
-						enabled = selectedChaptersState.showRemoveBookmark
-					) {
-						Icon(
-							painterResource(R.drawable.ic_baseline_bookmark_remove_24),
-							stringResource(R.string.fragment_novel_selected_unbookmark)
-						)
-					}
-				}
-			}
-		}
+		// Loading indicator
 		if (isRefreshing)
 			LinearProgressIndicator(
 				modifier = Modifier.fillMaxWidth()
 			)
+	}
+}
+
+@Preview
+@Composable
+fun PreviewChapterSelectionBar() {
+	Box {
+		ChapterSelectionBar(
+			SelectedChaptersState(),
+			{},
+			{},
+			{},
+			{},
+			{},
+			{},
+		)
+	}
+}
+
+@Composable
+fun BoxScope.ChapterSelectionBar(
+	selectedChaptersState: SelectedChaptersState,
+	downloadSelected: () -> Unit,
+	deleteSelected: () -> Unit,
+	markSelectedAsRead: () -> Unit,
+	markSelectedAsUnread: () -> Unit,
+	bookmarkSelected: () -> Unit,
+	unbookmarkSelected: () -> Unit,
+) {
+	Card(
+		modifier = Modifier
+			.align(BiasAlignment(0f, 0.7f))
+	) {
+		Row {
+			IconButton(
+				onClick = downloadSelected,
+				enabled = selectedChaptersState.showDownload
+			) {
+				Icon(
+					painterResource(R.drawable.download),
+					stringResource(R.string.fragment_novel_selected_download)
+				)
+			}
+			IconButton(
+				onClick = deleteSelected,
+				enabled = selectedChaptersState.showDelete
+			) {
+				Icon(
+					painterResource(R.drawable.trash),
+					stringResource(R.string.fragment_novel_selected_delete)
+				)
+			}
+			IconButton(
+				onClick = markSelectedAsRead,
+				enabled = selectedChaptersState.showMarkAsRead
+			) {
+				Icon(
+					painterResource(R.drawable.read_mark),
+					stringResource(R.string.fragment_novel_selected_read)
+				)
+			}
+			IconButton(
+				onClick = markSelectedAsUnread,
+				enabled = selectedChaptersState.showMarkAsUnread
+			) {
+				Icon(
+					painterResource(R.drawable.unread_mark),
+					stringResource(R.string.fragment_novel_selected_unread)
+				)
+			}
+			IconButton(
+				onClick = bookmarkSelected,
+				enabled = selectedChaptersState.showBookmark
+			) {
+				Icon(
+					painterResource(R.drawable.ic_outline_bookmark_add_24),
+					stringResource(R.string.fragment_novel_selected_bookmark)
+				)
+			}
+			IconButton(
+				onClick = unbookmarkSelected,
+				enabled = selectedChaptersState.showRemoveBookmark
+			) {
+				Icon(
+					painterResource(R.drawable.ic_baseline_bookmark_remove_24),
+					stringResource(R.string.fragment_novel_selected_unbookmark)
+				)
+			}
+		}
 	}
 }
 
@@ -1050,7 +1142,8 @@ fun NovelChapterContent(
 					openChapter
 				else onToggleSelection,
 				onLongClick = onToggleSelection
-			),
+			)
+			.fillMaxWidth(),
 	) {
 		Column(
 			modifier = Modifier.padding(16.dp)
@@ -1123,11 +1216,8 @@ fun PreviewHeaderContent() {
 	Surface {
 		NovelInfoHeaderContent(
 			info,
-			chapterCount = 0,
 			{},
 			persistentListOf(),
-			{},
-			{},
 			{},
 			{}
 		)
@@ -1163,12 +1253,9 @@ fun NovelInfoCoverContent(
 @Composable
 fun NovelInfoHeaderContent(
 	novelInfo: NovelUI,
-	chapterCount: Int,
 	openWebview: () -> Unit,
 	categories: ImmutableList<CategoryUI>,
 	toggleBookmark: () -> Unit,
-	openFilter: () -> Unit,
-	openChapterJump: () -> Unit,
 	setCategoriesDialogOpen: () -> Unit,
 ) {
 	var isCoverClicked: Boolean by remember { mutableStateOf(false) }
@@ -1420,66 +1507,79 @@ fun NovelInfoHeaderContent(
 				genre = novelInfo.displayGenre
 			)
 		}
-		Divider()
+	}
+}
 
-		// Chapters header bar
+@Preview
+@Composable
+fun PreviewNovelChapterBar() {
+	Surface {
+		NovelChapterBar(100, {}, {})
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NovelChapterBar(
+	chapterCount: Int,
+	openChapterJump: () -> Unit,
+	openFilter: () -> Unit
+) {
+	// Chapters header bar
+	Row(
+		horizontalArrangement = Arrangement.SpaceBetween,
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp),
+		verticalAlignment = Alignment.CenterVertically
+	) {
+		Row {
+			Text(stringResource(R.string.chapters))
+			Text("$chapterCount", modifier = Modifier.padding(start = 8.dp))
+		}
+
 		Row(
-			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp),
-			verticalAlignment = Alignment.CenterVertically
+				.padding(8.dp)
+				.height(34.dp)
 		) {
-			Row {
-				Text(stringResource(R.string.chapters))
-				Text("$chapterCount", modifier = Modifier.padding(start = 8.dp))
+			Card(
+				onClick = openChapterJump,
+				modifier = Modifier.height(32.dp),
+			) {
+				Box(
+					modifier = Modifier
+						.fillMaxHeight()
+						.padding(horizontal = 4.dp),
+					contentAlignment = Alignment.Center
+				) {
+					Text(
+						stringResource(R.string.jump_to_chapter_short),
+					)
+				}
 			}
 
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
+			Card(
+				onClick = openFilter,
 				modifier = Modifier
-					.padding(8.dp)
-					.height(34.dp)
+					.padding(start = 8.dp)
+					.height(32.dp)
 			) {
-				Card(
-					onClick = openChapterJump,
-					modifier = Modifier.height(32.dp),
+				Row(
+					Modifier
+						.fillMaxHeight()
+						.padding(horizontal = 4.dp),
+					verticalAlignment = Alignment.CenterVertically,
 				) {
-					Box(
-						modifier = Modifier
-							.fillMaxHeight()
-							.padding(horizontal = 4.dp),
-						contentAlignment = Alignment.Center
-					) {
-						Text(
-							stringResource(R.string.jump_to_chapter_short),
-						)
-					}
-				}
-
-				Card(
-					onClick = openFilter,
-					modifier = Modifier
-						.padding(start = 8.dp)
-						.height(32.dp)
-				) {
-					Row(
-						Modifier
-							.fillMaxHeight()
-							.padding(horizontal = 4.dp),
-						verticalAlignment = Alignment.CenterVertically,
-					) {
-						Icon(
-							painterResource(R.drawable.filter),
-							null,
-						)
-						Text(stringResource(R.string.filter))
-					}
+					Icon(
+						painterResource(R.drawable.filter),
+						null,
+					)
+					Text(stringResource(R.string.filter))
 				}
 			}
 		}
-
-		Divider()
 	}
 }
 

@@ -231,6 +231,7 @@ dependencies {
 	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 	implementation("androidx.window:window:1.1.0")
+	implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
 
 	// - Life Cycle
 
@@ -412,4 +413,5 @@ dependencies {
 	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
 	implementation("com.holix.android:bottomsheetdialog-compose:1.3.1")
+	implementation("androidx.window:window:1.0.0")
 }
