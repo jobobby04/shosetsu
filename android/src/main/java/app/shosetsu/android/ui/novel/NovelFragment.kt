@@ -803,7 +803,7 @@ fun PreviewNovelInfoContent() {
 
 	}.toImmutableList()
 
-	ShosetsuCompose {
+	Surface {
 		NovelInfoContent(
 			novelInfo = info,
 			chapters = chapters,
@@ -1011,7 +1011,7 @@ fun PreviewChapterContent() {
 		isSaved = true
 	)
 
-	ShosetsuCompose {
+	Surface {
 		NovelChapterContent(
 			chapter,
 			openChapter = {},
@@ -1120,7 +1120,7 @@ fun PreviewHeaderContent() {
 		status = Novel.Status.COMPLETED
 	)
 
-	ShosetsuCompose {
+	Surface {
 		NovelInfoHeaderContent(
 			info,
 			chapterCount = 0,
