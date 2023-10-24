@@ -506,7 +506,7 @@ fun NovelInfoView(
 	windowSize: WindowSizeClass
 ) {
 	if (resume != null)
-		syncFABWithCompose(state, resume!!)
+		syncFABWithCompose(state, resume)
 	val novelInfo by viewModel.novelLive.collectAsState()
 	val chapters by viewModel.chaptersLive.collectAsState()
 	val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -564,7 +564,7 @@ fun NovelInfoView(
 				NovelChapterContent(
 					chapter = it,
 					openChapter = {
-						activity?.openChapter(it)
+						activity.openChapter(it)
 					},
 					onToggleSelection = {
 						viewModel.toggleSelection(it)
