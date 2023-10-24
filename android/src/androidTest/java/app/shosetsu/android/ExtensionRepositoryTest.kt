@@ -64,11 +64,10 @@ class ExtensionRepositoryTest : DIAware {
 
 
 			// Add the temp entity
-			val result = repo.addRepository(
+			repo.addRepository(
 				url = "Build test",
 				name = "Temporary test",
 			)
-			result
 			logD<ExtensionRepositoryTest>("Added successfully")
 			print()
 
