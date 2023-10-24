@@ -69,13 +69,15 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 					)
 				)
 			} else {
-				val time = System.currentTimeMillis()
+				// If no history was made for a given chapter.
+				// We just use a placeholder value of 1 second.
+				val currentTime = System.currentTimeMillis()
 
 				insert(
 					novelId,
 					chapterId,
-					time - 1000,
-					time
+					currentTime - 1000,
+					currentTime
 				)
 			}
 		}
