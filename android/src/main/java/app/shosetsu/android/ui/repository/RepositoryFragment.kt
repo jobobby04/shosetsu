@@ -349,7 +349,7 @@ fun RepositoriesView(
 }
 
 @Composable
-private inline fun createPreviewUI(id: Int = 1, enabled: Boolean = true) =
+private fun createPreviewUI(id: Int = 1, enabled: Boolean = true) =
 	remember {
 		RepositoryUI(
 			id,
