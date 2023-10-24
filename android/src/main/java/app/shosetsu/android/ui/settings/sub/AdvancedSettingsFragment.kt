@@ -168,7 +168,6 @@ fun AdvancedSettingsView(
 			viewModel,
 			onThemeSelected = ::themeSelected,
 			onPurgeNovelCache = viewModel::purgeUselessData,
-			onPurgeChapterCache = {},
 			onKillCycleWorkers = ::killCycleWorkers,
 			onClearCookies = {
 				viewModel.logV("Clearing cookies")
@@ -196,7 +195,6 @@ fun AdvancedSettingsContent(
 	viewModel: AAdvancedSettingsViewModel,
 	onThemeSelected: (Int) -> Unit,
 	onPurgeNovelCache: () -> Unit,
-	onPurgeChapterCache: () -> Unit,
 	onKillCycleWorkers: () -> Unit,
 	onForceRepoSync: () -> Unit,
 	onClearCookies: () -> Unit
