@@ -318,7 +318,6 @@ fun RepositoriesView(
 			},
 			onRefresh = ::onRefresh,
 			onShowShare = viewModel::showShare,
-			onHideShare = viewModel::hideShare,
 			fab
 		)
 
@@ -491,7 +490,6 @@ fun RepositoriesContent(
 	addRepository: () -> Unit,
 	onRefresh: () -> Unit,
 	onShowShare: (RepositoryUI) -> Unit,
-	onHideShare: () -> Unit,
 	fab: EFabMaintainer
 ) {
 	if (items.isNotEmpty()) {
