@@ -19,7 +19,7 @@
 package app.shosetsu.android.view.compose
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalMinimumTouchTargetEnforcement
+import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.LayoutModifier
@@ -41,7 +41,7 @@ fun Modifier.minimumTouchTargetSize(): Modifier = composed(
 				"size to disambiguate touch interactions if the element would measure smaller"
 	},
 ) {
-	if (LocalMinimumTouchTargetEnforcement.current) {
+	if (LocalMinimumInteractiveComponentEnforcement.current) {
 		val size = LocalViewConfiguration.current.minimumTouchTargetSize
 		MinimumTouchTargetModifier(size)
 	} else {
