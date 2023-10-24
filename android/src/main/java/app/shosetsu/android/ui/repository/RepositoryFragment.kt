@@ -406,7 +406,7 @@ fun RepositoriesRemoveDialog(
 @Composable
 fun PreviewRepositoriesAddDialog() {
 	RepositoriesAddDialog(
-		addRepository = { name, url -> },
+		addRepository = { _, _ -> },
 		hideAddDialog = {}
 	)
 }
