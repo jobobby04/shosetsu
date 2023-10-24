@@ -3,6 +3,7 @@ package app.shosetsu.android.backend.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
 import app.shosetsu.android.backend.workers.onetime.DownloadWorker
@@ -60,6 +61,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 					)
 				)
 			}
+
 			DownloadWorker.ACTION_CANCEL_CHAPTER_DOWNLOAD -> {
 				val manager by di.instance<DownloadWorker.Manager>()
 				manager.stop()
@@ -70,6 +72,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 					)
 				)
 			}
+
 			ACTION_UPDATE_EXTENSION -> {
 				val manager by di.instance<RequestInstallExtensionUseCase>()
 				val extensionId = intent.getIntExtra(
@@ -89,8 +92,13 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 			}
 
 			ACTION_REPORT_ERROR -> {
-				ACRA.errorReporter
-					.handleSilentException(intent.extras?.get(EXTRA_EXCEPTION) as? Throwable)
+				val exception = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+					intent.extras?.getSerializable(EXTRA_EXCEPTION, Throwable::class.java)!!
+				} else {
+					@Suppress("DEPRECATION")
+					intent.extras?.get(EXTRA_EXCEPTION) as Throwable
+				}
+				ACRA.errorReporter.handleSilentException(exception)
 				notificationManager.cancel(
 					intent.getIntExtra(
 						EXTRA_NOTIFICATION_ID,
