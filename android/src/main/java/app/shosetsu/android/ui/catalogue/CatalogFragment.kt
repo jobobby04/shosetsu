@@ -412,10 +412,10 @@ fun CatalogueView(
 		}
 
 		if (isFilterMenuVisible) {
-			val items by viewModel.filterItemsLive.collectAsState()
+			val filterItems by viewModel.filterItemsLive.collectAsState()
 			BottomSheetDialog(viewModel::hideFilterMenu) {
 				CatalogFilterMenu(
-					items = items,
+					items = filterItems,
 					getBoolean = viewModel::getFilterBooleanState,
 					setBoolean = viewModel::setFilterBooleanState,
 					getInt = viewModel::getFilterIntState,
