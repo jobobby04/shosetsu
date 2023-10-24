@@ -443,24 +443,24 @@ class LibraryViewModel(
 		combine(novelSortTypeFlow) { library, sortType ->
 			library.copy(
 				novels = when (sortType) {
-					NovelSortType.BY_TITLE -> library.novels.mapValues {
-						it.value.sortedBy { it.title }.toImmutableList()
+					NovelSortType.BY_TITLE -> library.novels.mapValues { (_, value) ->
+						value.sortedBy { it.title }.toImmutableList()
 					}
 
-					NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues {
-						it.value.sortedBy { it.unread }.toImmutableList()
+					NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues { (_, value) ->
+						value.sortedBy { it.unread }.toImmutableList()
 					}
 
-					NovelSortType.BY_ID -> library.novels.mapValues {
-						it.value.sortedBy { it.id }.toImmutableList()
+					NovelSortType.BY_ID -> library.novels.mapValues { (_, value) ->
+						value.sortedBy { it.id }.toImmutableList()
 					}
 
-					NovelSortType.BY_UPDATED -> library.novels.mapValues {
-						it.value.sortedBy { it.lastUpdate }.toImmutableList()
+					NovelSortType.BY_UPDATED -> library.novels.mapValues { (_, value) ->
+						value.sortedBy { it.lastUpdate }.toImmutableList()
 					}
 
-					NovelSortType.BY_READ_TIME -> library.novels.mapValues {
-						it.value.sortedBy { it -> it.readTime }.toImmutableList()
+					NovelSortType.BY_READ_TIME -> library.novels.mapValues { (_, value) ->
+						value.sortedBy { it.readTime }.toImmutableList()
 					}
 				}.toImmutableMap()
 			)
