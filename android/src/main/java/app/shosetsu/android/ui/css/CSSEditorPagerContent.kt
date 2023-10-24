@@ -11,7 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,7 +46,7 @@ fun CSSEditorPagerContent(
 	)
 
 	val pagerState = rememberPagerState { pages.size }
-	val scope = rememberCoroutineScope()
+
 	Scaffold(
 		topBar = {
 			CSSEditorTopBarContent(pagerState, pages, cssTitle, onBack, onHelp)
