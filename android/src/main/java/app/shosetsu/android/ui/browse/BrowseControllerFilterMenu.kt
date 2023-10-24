@@ -71,8 +71,6 @@ fun BrowseControllerFilterMenu(viewModel: ABrowseViewModel) {
 
 	var hideLanguageFilter by remember { mutableStateOf(false) }
 
-	val searchTerm by viewModel.searchTermLive.collectAsState()
-
 	Column(
 		modifier = Modifier
 			.fillMaxSize()

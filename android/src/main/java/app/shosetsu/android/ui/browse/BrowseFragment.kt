@@ -98,6 +98,8 @@ class BrowseFragment : ShosetsuFragment(),
 			//setOnQueryTextListener(BrowseSearchQuery(findNavController()))
 			isSubmitButtonEnabled = false
 
+			setQuery(viewModel.searchTermLive.value, false)
+			isIconified = viewModel.searchTermLive.value.isEmpty()
 			setOnQueryTextListener(BrowseFilterExtensions(viewModel))
 		}
 	}
