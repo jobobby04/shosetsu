@@ -398,6 +398,7 @@ class CatalogViewModel(
 			value
 		} else {
 			val default = getDefaultValue()
+			@Suppress("UNCHECKED_CAST") // Good luck to whoever reads this
 			this[key] = default as V
 			default
 		}
