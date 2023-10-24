@@ -372,7 +372,6 @@ dependencies {
 	implementation(accompanist("accompanist-placeholder-material"))
 	implementation(accompanist("accompanist-pager-indicators"))
 	implementation(accompanist("accompanist-permissions"))
-	implementation(accompanist("accompanist-flowlayout"))
 	implementation(accompanist("accompanist-systemuicontroller"))
 
 	//- Integration with observables

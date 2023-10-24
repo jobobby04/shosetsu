@@ -70,8 +70,6 @@ import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.ToggleBookmarkR
 import app.shosetsu.lib.Novel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
@@ -1583,6 +1581,7 @@ fun NovelChapterBar(
 	}
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ExpandedText(
 	modifier: Modifier = Modifier,
@@ -1630,9 +1629,8 @@ fun ExpandedText(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(vertical = 8.dp),
-				mainAxisSpacing = 8.dp,
-				crossAxisSpacing = 4.dp,
-				mainAxisAlignment = FlowMainAxisAlignment.Center,
+				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+				verticalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				genre.forEach {
 					NovelGenre(it)
