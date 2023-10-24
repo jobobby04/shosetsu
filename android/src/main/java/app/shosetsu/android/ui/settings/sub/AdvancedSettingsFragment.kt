@@ -202,9 +202,6 @@ fun AdvancedSettingsContent(
 	val useShosetsuAgent by viewModel.settingsRepo.getBooleanFlow(UseShosetsuAgent)
 		.collectAsState()
 
-	val useProxy by viewModel.settingsRepo.getBooleanFlow(UseProxy)
-		.collectAsState()
-
 	LazyColumn(
 		contentPadding = PaddingValues(
 			top = 16.dp,
