@@ -3,6 +3,7 @@ package app.shosetsu.android
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import app.shosetsu.android.domain.repository.base.IBackupRepository
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
 import org.junit.Test
@@ -41,6 +42,7 @@ class RestoreTest : DIAware {
 
 	private val backupRepository by instance<IBackupRepository>()
 
+	@OptIn(DelicateCoroutinesApi::class)
 	@Test
 	fun test() {
 		GlobalScope.future {

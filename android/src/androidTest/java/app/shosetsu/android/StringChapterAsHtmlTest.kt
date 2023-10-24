@@ -6,6 +6,7 @@ import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryUseCase
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.future.future
@@ -48,6 +49,7 @@ class StringChapterAsHtmlTest : DIAware {
 	private val getBookMarkedNovelsUseCase: LoadLibraryUseCase by instance()
 	private val getChapterPassageUseCase: GetChapterPassageUseCase by instance()
 
+	@OptIn(DelicateCoroutinesApi::class)
 	@Test
 	fun main() {
 		GlobalScope.future {

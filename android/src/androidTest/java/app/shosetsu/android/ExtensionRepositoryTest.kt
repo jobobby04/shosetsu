@@ -5,6 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
 import org.junit.Test
@@ -50,6 +51,7 @@ class ExtensionRepositoryTest : DIAware {
 		logD("========================")
 	}
 
+	@OptIn(DelicateCoroutinesApi::class)
 	@Test
 	fun test() {
 		GlobalScope.future {

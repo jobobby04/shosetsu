@@ -8,6 +8,7 @@ import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.model.local.backup.*
 import app.shosetsu.android.domain.repository.base.IBackupRepository
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.future
 import kotlinx.serialization.encodeToString
@@ -137,6 +138,7 @@ class BackupTest : DIAware {
 	fun ungzip(content: ByteArray): String =
 		GZIPInputStream(content.inputStream()).bufferedReader().use { it.readText() }
 
+	@OptIn(DelicateCoroutinesApi::class)
 	@ExperimentalTime
 	@Test
 	fun test() {
