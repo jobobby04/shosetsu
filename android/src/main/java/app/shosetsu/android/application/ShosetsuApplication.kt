@@ -44,6 +44,7 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import com.google.android.material.color.DynamicColors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -270,6 +271,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		Configuration.Builder().apply {
 		}.build()
 
+	@OptIn(ExperimentalCoroutinesApi::class)
 	override fun newImageLoader(): ImageLoader =
 		ImageLoader.Builder(this).apply {
 			okHttpClient(okHttpClient)
