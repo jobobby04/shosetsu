@@ -509,6 +509,8 @@
 	<string name="categories_empty">Здесь нет категорий, добавьте одну!</string>
 	<string name="settings_reader_table_hack_title">Включить взлом таблицы</string>
 	<string name="settings_reader_table_hack_desc">Принудительное включение полосы прокрутки для таблиц с переполнениями. Включение этой функции может нарушить функциональность доступности.</string>
+	<string name="fragment_more_dest_analytics">Статистика</string>
+	<string name="fragment_more_dest_history">История</string>
 	<string-array name="marking_names">
 		<item>При просмотре страницы</item>
 		<item>При прокрутке страницы</item>
