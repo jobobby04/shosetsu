@@ -142,7 +142,7 @@
     <string name="repositories">Репозитории</string>
     <string name="settings_reader_volume_scroll_title">Прокрутка громкости</string>
     <string name="all">Все</string>
-    <string name="about">Информация</string>
+    <string name="about">О приложении</string>
     <string name="check_for_app_update">Проверка обновления приложения</string>
     <string name="source_licenses">Лицензия open-source</string>
     <string name="inverse_selection">Обратный выбор</string>
