@@ -510,7 +510,13 @@
 	<string name="settings_reader_table_hack_title">Включить взлом таблицы</string>
 	<string name="settings_reader_table_hack_desc">Принудительное включение полосы прокрутки для таблиц с переполнениями. Включение этой функции может нарушить функциональность доступности.</string>
 	<string name="fragment_more_dest_analytics">Статистика</string>
-	<string name="fragment_more_dest_history">История</string>
+	<string name="fragment_history">История</string>
+	<string name="fragment_history_error_empty">История пуста, начните чтение прямо сейчас!</string>
+	<string name="fragment_more_dest_history">@string/fragment_history</string>
+	<string name="fragment_history_menu_clear">Очистить историю</string>
+	<string name="fragment_history_picker_date">Выберите дату, до которой надо очистить</string>
+	<string name="clear">Очистить</string>
+	<string name="before">До</string>
 	<string-array name="marking_names">
 		<item>При просмотре страницы</item>
 		<item>При прокрутке страницы</item>
