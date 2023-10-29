@@ -27,7 +27,7 @@
 	<string name="paragraph_spacing">Расстояние между абзацами</string>
 	<string name="paragraph_indent">Отступ абзаца</string>
 	<string name="novel_author">Автор(ы):</string>
-	<string name="download">Скачать</string>
+	<string name="download">Загрузки</string>
     <string name="fragment_novel_chapter_position">Позиция:</string>
 	<string name="backup_now">Резервное копирование сейчас</string>
 	<string name="pending">В ожидании</string>
@@ -60,7 +60,7 @@
 	<string name="settings_reader_tap_to_scroll_title">Нажмите для прокрутки</string>
 	<string name="open_in_browser">Открыть в браузере</string>
 	<string name="open_in">Открыто в</string>
-	<string name="reader">Читатель</string>
+	<string name="reader">Читалка</string>
 	<string name="default_reader">По умолчанию</string>
 	<string name="remove_novel_cache">Удалить кэш новелл</string>
 	<string name="action_webview_back">Назад</string>
@@ -93,8 +93,8 @@
 	<string name="chapters">Главы</string>
 	<string name="today">Сегодня</string>
 	<string name="yesterday">Вчера</string>
-	<string name="view">Посмотреть</string>
-	<string name="advanced">Расширенный</string>
+	<string name="view">Просмотр</string>
+	<string name="advanced">Расширенные</string>
 	<string name="backup">Резервное копирование</string>
 	<string name="loading">Загрузка…</string>
 	<string name="amoled">Amoled</string>
