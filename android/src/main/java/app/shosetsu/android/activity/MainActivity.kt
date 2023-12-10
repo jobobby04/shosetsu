@@ -19,6 +19,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
@@ -191,16 +192,21 @@ class MainActivity : AppCompatActivity(), DIAware {
 			finish()
 			return
 		}
-		registerReceiver(broadcastReceiver, IntentFilter().apply {
-			addAction(ACTION_OPEN_UPDATES)
-			addAction(ACTION_OPEN_LIBRARY)
-			addAction(ACTION_OPEN_CATALOGUE)
-			addAction(ACTION_OPEN_SEARCH)
-			addAction(ACTION_OPEN_APP_UPDATE)
-			addAction(ACTION_DOWNLOAD_COMPLETE)
-			addAction(ACTION_VIEW)
-			addCategory(CATEGORY_BROWSABLE)
-		})
+		ContextCompat.registerReceiver(
+			this,
+			broadcastReceiver,
+			IntentFilter().apply {
+				addAction(ACTION_OPEN_UPDATES)
+				addAction(ACTION_OPEN_LIBRARY)
+				addAction(ACTION_OPEN_CATALOGUE)
+				addAction(ACTION_OPEN_SEARCH)
+				addAction(ACTION_OPEN_APP_UPDATE)
+				addAction(ACTION_DOWNLOAD_COMPLETE)
+				addAction(ACTION_VIEW)
+				addCategory(CATEGORY_BROWSABLE)
+			},
+			ContextCompat.RECEIVER_NOT_EXPORTED
+		)
 		registered = true
 
 		runBlocking {
