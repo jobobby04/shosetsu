@@ -276,7 +276,7 @@ dependencies {
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
 	// Error logging
 	val acraVersion = "5.11.2"
