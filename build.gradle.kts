@@ -4,11 +4,11 @@ import java.io.BufferedReader
 import java.io.IOException
 
 plugins {
-	id("com.google.devtools.ksp") version "1.8.20-1.0.10"
+	id("com.google.devtools.ksp") version "1.9.21-1.0.16"
 }
 
 buildscript {
-	val kotlinVersion: String by extra("1.8.0")
+	val kotlinVersion: String by extra("1.9.21")
 
 	repositories {
 		google()
