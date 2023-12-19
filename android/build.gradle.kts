@@ -84,7 +84,7 @@ android {
 	}
 
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.4.5"
+		kotlinCompilerExtensionVersion = "1.5.6"
 	}
 
 	/*
@@ -340,7 +340,7 @@ dependencies {
 	}*/
 
 	// Compose
-	val androidxCompose = "1.5.1"
+	val androidxCompose = "1.5.6"
 	fun androidxCompose(
 		module: String,
 		submodule: String = module,
