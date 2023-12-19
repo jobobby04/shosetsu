@@ -309,7 +309,7 @@ dependencies {
 	implementation(room("room-paging"))
 
 	// Guava cache
-	implementation("com.google.guava:guava:32.1.2-android")
+	implementation("com.google.guava:guava:33.0.0-android")
 
 	// kode-in
 	val kodeinVersion = "7.20.2"
