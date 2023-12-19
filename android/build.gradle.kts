@@ -250,8 +250,6 @@ dependencies {
 	androidTestImplementation("androidx.test:runner:1.5.2")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-	// Annotations
-	implementation("org.jetbrains:annotations:24.0.1")
 
 	// Core libraries
 	implementation("org.luaj:luaj-jse:3.0.1")
