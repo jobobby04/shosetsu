@@ -409,7 +409,7 @@ dependencies {
 	implementation(navigation("fragment-ktx"))
 	implementation(navigation("ui-ktx"))
 
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
 	implementation("com.holix.android:bottomsheetdialog-compose:1.3.1")
 	implementation("androidx.window:window:1.0.0")
