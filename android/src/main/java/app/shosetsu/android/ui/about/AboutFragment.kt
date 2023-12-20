@@ -8,11 +8,19 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -32,7 +40,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.*
+import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.common.consts.URL_DISCLAIMER
+import app.shosetsu.android.common.consts.URL_DISCORD
+import app.shosetsu.android.common.consts.URL_GITHUB_APP
+import app.shosetsu.android.common.consts.URL_GITHUB_EXTENSIONS
+import app.shosetsu.android.common.consts.URL_KOFI
+import app.shosetsu.android.common.consts.URL_MATRIX
+import app.shosetsu.android.common.consts.URL_PATREON
+import app.shosetsu.android.common.consts.URL_PRIVACY
+import app.shosetsu.android.common.consts.URL_WEBSITE
 import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.navigateSafely
@@ -232,106 +249,110 @@ fun AboutContent(
 	onOpenMatrix: () -> Unit,
 	onOpenPrivacy: () -> Unit
 ) {
-	LazyColumn(
-		modifier = Modifier.fillMaxSize(),
-		contentPadding = PaddingValues(bottom = 128.dp)
-	) {
-		item {
-			AboutItem(
-				R.string.version,
-				description = currentVersion
-			)
-		}
-		item {
-			AboutItem(
-				R.string.check_for_app_update,
-				onClick = onCheckForAppUpdate
-			)
-		}
-		item {
-			val context = LocalContext.current
-			val clipboard = LocalClipboardManager.current
+	Scaffold { paddingValues ->
+		LazyColumn(
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(paddingValues),
+			contentPadding = PaddingValues(bottom = 128.dp)
+		) {
+			item {
+				AboutItem(
+					R.string.version,
+					description = currentVersion
+				)
+			}
+			item {
+				AboutItem(
+					R.string.check_for_app_update,
+					onClick = onCheckForAppUpdate
+				)
+			}
+			item {
+				val context = LocalContext.current
+				val clipboard = LocalClipboardManager.current
 
-			val id = remember { Installation.id(context) }
+				val id = remember { Installation.id(context) }
 
-			AboutItem(
-				R.string.fragment_about_acra_id,
-				description = id,
-				onClick = {
-					clipboard.setText(AnnotatedString(id))
-				}
-			)
-		}
-		item {
-			Divider()
-		}
-		item {
-			AboutItem(
-				R.string.website,
-				URL_WEBSITE,
-				onClick = onOpenWebsite
-			)
-		}
-		item {
-			AboutItem(
-				R.string.github,
-				URL_GITHUB_APP,
-				onClick = onOpenSource
-			)
-		}
-		item {
-			AboutItem(
-				R.string.extensions,
-				URL_GITHUB_EXTENSIONS,
-				onClick = onOpenExtensions
-			)
-		}
-		item {
-			AboutItem(
-				R.string.matrix,
-				URL_MATRIX,
-				onClick = onOpenMatrix
-			)
-		}
-		item {
-			AboutItem(
-				R.string.discord,
-				URL_DISCORD,
-				onClick = onOpenDiscord
-			)
-		}
-		item {
-			AboutItem(
-				R.string.patreon_support,
-				URL_PATREON,
-				onClick = onOpenPatreon
-			)
-		}
-		item {
-			AboutItem(
-				R.string.kofi_support,
-				URL_KOFI,
-				onClick = onOpenKofi
-			)
-		}
-		item {
-			AboutItem(
-				R.string.source_licenses,
-				onClick = onOpenLicense
-			)
-		}
-		item {
-			AboutItem(
-				R.string.disclaimer,
-				URL_DISCLAIMER,
-				onClick = onOpenDisclaimer
-			)
-		}
-		item {
-			AboutItem(
-				R.string.privacy_policy,
-				onClick = onOpenPrivacy
-			)
+				AboutItem(
+					R.string.fragment_about_acra_id,
+					description = id,
+					onClick = {
+						clipboard.setText(AnnotatedString(id))
+					}
+				)
+			}
+			item {
+				Divider()
+			}
+			item {
+				AboutItem(
+					R.string.website,
+					URL_WEBSITE,
+					onClick = onOpenWebsite
+				)
+			}
+			item {
+				AboutItem(
+					R.string.github,
+					URL_GITHUB_APP,
+					onClick = onOpenSource
+				)
+			}
+			item {
+				AboutItem(
+					R.string.extensions,
+					URL_GITHUB_EXTENSIONS,
+					onClick = onOpenExtensions
+				)
+			}
+			item {
+				AboutItem(
+					R.string.matrix,
+					URL_MATRIX,
+					onClick = onOpenMatrix
+				)
+			}
+			item {
+				AboutItem(
+					R.string.discord,
+					URL_DISCORD,
+					onClick = onOpenDiscord
+				)
+			}
+			item {
+				AboutItem(
+					R.string.patreon_support,
+					URL_PATREON,
+					onClick = onOpenPatreon
+				)
+			}
+			item {
+				AboutItem(
+					R.string.kofi_support,
+					URL_KOFI,
+					onClick = onOpenKofi
+				)
+			}
+			item {
+				AboutItem(
+					R.string.source_licenses,
+					onClick = onOpenLicense
+				)
+			}
+			item {
+				AboutItem(
+					R.string.disclaimer,
+					URL_DISCLAIMER,
+					onClick = onOpenDisclaimer
+				)
+			}
+			item {
+				AboutItem(
+					R.string.privacy_policy,
+					onClick = onOpenPrivacy
+				)
+			}
 		}
 	}
 }

@@ -43,6 +43,8 @@ abstract class ALibraryViewModel :
 	IsOnlineCheckViewModel,
 	StartUpdateManagerViewModel {
 
+	abstract val error: Flow<Throwable>
+
 	/**
 	 * View state of if the category dialog is open or not.
 	 *
@@ -115,7 +117,7 @@ abstract class ALibraryViewModel :
 
 	abstract fun removeSelectedFromLibrary()
 
-	abstract fun getSelectedIds(): Flow<IntArray>
+	abstract val selectedIds: StateFlow<List<Int>>
 	abstract fun deselectAll()
 	abstract fun selectAll()
 	abstract fun invertSelection()

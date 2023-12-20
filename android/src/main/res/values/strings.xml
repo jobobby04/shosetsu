@@ -698,6 +698,7 @@
         <item>@string/compressed</item>
         <item>@string/comfy</item>
     </array>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>
 

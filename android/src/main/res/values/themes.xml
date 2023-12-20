@@ -1,30 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="windowActionModeOverlay">true</item>
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar" />
 
-
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimary</item>
-
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-
-        <item name="colorOnPrimary">#FFFFFF</item>
-
-        <!-- Some ROMs make black navbars white (e.g. OxygenOS) -->
-        <item name="android:navigationBarColor">@color/black_trans</item>
-    </style>
-
-    <style name="AppTheme.Main" parent="AppTheme">
-        <item name="android:statusBarColor">?colorPrimary</item>
-        <item name="colorPrimaryDark">@color/black_trans</item>
-        <item name="appBarLayoutStyle">@style/AppTheme.Widget.AppBarLayout</item>
-        <item name="floatingActionButtonStyle">@style/AppTheme.Widget.FAB</item>
-        <item name="extendedFloatingActionButtonStyle">@style/AppTheme.Widget.ExtendedFAB</item>
-        <item name="strokeColor">?colorPrimary</item>
-    </style>
+    <style name="AppTheme.Main" parent="AppTheme" />
 
 
     <style name="AppTheme.CrashReport" parent="Theme.Material3.DayNight.Dialog" />
@@ -35,4 +14,6 @@
         <item name="windowSplashScreenBackground">?colorPrimary</item>
         <item name="postSplashScreenTheme">@style/AppTheme.Main</item>
     </style>
+
+    <style name="Theme.MaterialComponents" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

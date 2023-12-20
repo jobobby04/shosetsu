@@ -2,9 +2,19 @@ package app.shosetsu.android.ui.catalogue
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,6 +23,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,16 +49,35 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.enums.NovelCardType
-import app.shosetsu.android.common.enums.NovelCardType.*
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
+import app.shosetsu.android.common.enums.NovelCardType.COZY
+import app.shosetsu.android.common.enums.NovelCardType.NORMAL
+import app.shosetsu.android.common.ext.ComposeView
+import app.shosetsu.android.common.ext.collectLA
+import app.shosetsu.android.common.ext.collectLatestLA
+import app.shosetsu.android.common.ext.firstLa
+import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.makeSnackBar
+import app.shosetsu.android.common.ext.navigateSafely
+import app.shosetsu.android.common.ext.openInWebView
+import app.shosetsu.android.common.ext.setShosetsuTransition
+import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.catalogue.listeners.CatalogueSearchQuery
 import app.shosetsu.android.ui.novel.CategoriesDialog
 import app.shosetsu.android.view.BottomSheetDialog
-import app.shosetsu.android.view.compose.*
+import app.shosetsu.android.view.compose.ErrorAction
+import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.NovelCardCompressedContent
+import app.shosetsu.android.view.compose.NovelCardCozyContent
+import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.itemsIndexed
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
-import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
@@ -100,7 +130,6 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 		return ComposeView {
 			CatalogueView(
 				viewModel = viewModel,
-				fab,
 				onOpenNovel = {
 					try {
 						findNavController().navigateSafely(
@@ -294,7 +323,6 @@ class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider 
 @Composable
 fun CatalogueView(
 	viewModel: ACatalogViewModel = viewModelDi(),
-	fab: EFabMaintainer,
 	onOpenNovel: (ACatalogNovelUI) -> Unit,
 	errorMessage: (String, () -> Unit) -> Unit,
 	openInWebView: () -> Unit,
@@ -390,7 +418,6 @@ fun CatalogueView(
 				}
 			},
 			hasFilters = hasFilters,
-			fab,
 			openWebView = openInWebView,
 			clearCookies = {
 				viewModel.clearCookies()
@@ -440,19 +467,22 @@ fun CatalogContent(
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
 	hasFilters: Boolean,
-	fab: EFabMaintainer,
 	clearCookies: () -> Unit,
 	openWebView: () -> Unit
 ) {
-	Box(
+	Scaffold(
 		modifier = Modifier.fillMaxSize(),
-	) {
+	) { padding ->
 		val pullRefreshState = rememberPullRefreshState(
 			items.loadState.refresh == LoadState.Loading,
 			onRefresh = { items.refresh() }
 		)
 
-		Box(Modifier.pullRefresh(pullRefreshState)) {
+		Box(
+			Modifier
+				.pullRefresh(pullRefreshState)
+				.padding(padding)
+		) {
 			val w = LocalConfiguration.current.screenWidthDp
 			val o = LocalConfiguration.current.orientation
 
@@ -463,8 +493,6 @@ fun CatalogContent(
 				}).dp - 8.dp
 
 			val state = rememberLazyGridState()
-			if (hasFilters)
-				syncFABWithCompose(state, fab)
 			LazyVerticalGrid(
 				modifier = Modifier.fillMaxSize(),
 				columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),

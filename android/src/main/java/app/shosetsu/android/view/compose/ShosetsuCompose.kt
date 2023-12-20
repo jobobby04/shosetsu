@@ -8,8 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import com.google.accompanist.themeadapter.material.MdcTheme
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
 /*
  * This file is part of shosetsu.
@@ -39,13 +37,9 @@ fun ShosetsuCompose(
 	context: Context = LocalContext.current,
 	content: @Composable () -> Unit
 ) {
-	MdcTheme(context = context) {
-		Mdc3Theme(context = context) {
-			Surface(
-				modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-				color = MaterialTheme.colorScheme.background,
-				content = content
-			)
-		}
-	}
+	Surface(
+		modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+		color = MaterialTheme.colorScheme.background,
+		content = content
+	)
 }
