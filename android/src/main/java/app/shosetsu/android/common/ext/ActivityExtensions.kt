@@ -40,7 +40,7 @@ import java.io.IOException
  * 06 / 05 / 2020
  */
 
-fun Activity.openInBrowser(url: Uri, pkg: String? = null) {
+fun Context.openInBrowser(url: Uri, pkg: String? = null) {
 	try {
 		startActivity(
 			Intent(Intent.ACTION_VIEW, url).apply {
@@ -53,10 +53,10 @@ fun Activity.openInBrowser(url: Uri, pkg: String? = null) {
 	}
 }
 
-fun Activity.openInBrowser(url: String, pkg: String? = null): Unit =
+fun Context.openInBrowser(url: String, pkg: String? = null): Unit =
 	openInBrowser(Uri.parse(url), pkg)
 
-fun Activity.openInWebView(url: String) {
+fun Context.openInWebView(url: String) {
 	logI("Opening in web view: $url")
 	startActivity(intent(this, WebViewApp::class.java) {
 		bundleOf(

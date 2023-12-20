@@ -1,10 +1,31 @@
 package app.shosetsu.android.ui.add
 
 import android.os.Bundle
-import android.view.*
-import androidx.compose.foundation.layout.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,17 +36,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import androidx.core.view.MenuProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.BundleKeys
-import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
 import app.shosetsu.android.common.consts.SHARE_HELP_URL
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.ComposeView
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.NovelEntity
-import app.shosetsu.android.view.compose.*
+import app.shosetsu.android.view.compose.ErrorAction
+import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.HelpButton
+import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.CollapsedToolBarController
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
@@ -64,7 +86,8 @@ import com.google.accompanist.placeholder.material.placeholder
  * @since 07 / 03 / 2022
  * @author Doomsdayrs
  */
-class AddShareFragment : ShosetsuFragment(), CollapsedToolBarController, MenuProvider {
+@Deprecated("Composed")
+class AddShareFragment : ShosetsuFragment(), CollapsedToolBarController {
 
 	override val viewTitleRes: Int = R.string.qr_code_scan
 
@@ -73,53 +96,19 @@ class AddShareFragment : ShosetsuFragment(), CollapsedToolBarController, MenuPro
 		container: ViewGroup?,
 		savedViewState: Bundle?
 	): View {
-		activity?.addMenuProvider(this, viewLifecycleOwner)
-		setViewTitle()
 		return ComposeView {
-			AddShareView(
-				arguments?.getString(BUNDLE_URL),
-				onBackPressed = {
-					requireActivity().onBackPressedDispatcher.onBackPressed()
-				},
-				openNovel = { entity ->
-					activity?.onBackPressedDispatcher?.onBackPressed()
-
-					if (entity != null) {
-						findNavController().navigateSafely(
-							R.id.action_moreController_to_novelController,
-							bundleOf(BundleKeys.BUNDLE_NOVEL_ID to entity.id),
-							navOptions {
-								setShosetsuTransition()
-							}
-						)
-					}
-				}
-			)
 		}
 	}
-
-	override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-		menuInflater.inflate(R.menu.toolbar_share, menu)
-	}
-
-	override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
-		when (menuItem.itemId) {
-			R.id.help -> {
-				requireActivity().openInWebView(SHARE_HELP_URL)
-				true
-			}
-
-			else -> false
-		}
 }
 
 @Composable
 fun AddShareView(
 	shareURL: String?,
-	viewModel: AAddShareViewModel = viewModelDi(),
 	onBackPressed: () -> Unit,
 	openNovel: (NovelEntity?) -> Unit
 ) {
+	val viewModel: AAddShareViewModel = viewModelDi()
+
 	LaunchedEffect(shareURL) {
 		if (shareURL != null)
 			viewModel.setURL(shareURL)
@@ -167,7 +156,8 @@ fun AddShareView(
 
 				openNovel(entity)
 			},
-			isNovelOpenable = isNovelOpenable
+			isNovelOpenable = isNovelOpenable,
+			onBack = onBackPressed
 		)
 	}
 }
@@ -238,155 +228,240 @@ fun AddShareContent(
 	isRepoAlreadyPresent: Boolean = false,
 	isComplete: Boolean = false,
 	isNovelOpenable: Boolean = false,
+	onBack: () -> Unit = {}
 ) {
-	if (isComplete) {
-		Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-			Column(horizontalAlignment = Alignment.CenterHorizontally) {
-				Text(stringResource(R.string.completed), style = MaterialTheme.typography.bodyLarge)
-				TextButton(onClick = reject) {
-					Text(stringResource(android.R.string.ok))
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.qr_code_scan))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				},
+				actions = {
+					HelpButton(SHARE_HELP_URL)
 				}
-
-				if (isNovelOpenable)
-					TextButton(onClick = openNovel) {
-						Text(stringResource(R.string.fragment_add_open_novel))
-					}
-			}
+			)
 		}
-	} else if (isProcessing) {
-		Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-			CircularProgressIndicator()
-		}
-	} else if (showURLInput) {
-		Column(
-			modifier = Modifier.fillMaxSize(),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.Center
-		) {
-			TextField(url, setURL, isError = isUrlValid)
-			TextButton(applyURL) {
-				Text(stringResource(R.string.apply))
-			}
-		}
-	} else if (!isUrlValid) {
-		ErrorContent(
-			R.string.fragment_add_invalid,
-			ErrorAction(
-				R.string.retry,
+	) { padding ->
+		if (isComplete) {
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(padding),
+				contentAlignment = Alignment.Center
 			) {
-				retry()
+				Column(horizontalAlignment = Alignment.CenterHorizontally) {
+					Text(
+						stringResource(R.string.completed),
+						style = MaterialTheme.typography.bodyLarge
+					)
+					TextButton(onClick = reject) {
+						Text(stringResource(android.R.string.ok))
+					}
+
+					if (isNovelOpenable)
+						TextButton(onClick = openNovel) {
+							Text(stringResource(R.string.fragment_add_open_novel))
+						}
+				}
 			}
-		)
-	} else if (isNovelAlreadyPresent && novelLink != null) {
-		ErrorContent(
-			stringResource(R.string.fragment_add_present_novel, novelLink.name),
-			actions = arrayOf(
+		} else if (isProcessing) {
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(padding),
+				contentAlignment = Alignment.Center
+			) {
+				CircularProgressIndicator()
+			}
+		} else if (showURLInput) {
+			Column(
+				modifier = Modifier
+					.fillMaxSize()
+					.padding(padding),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.Center
+			) {
+				TextField(url, setURL, isError = isUrlValid)
+				TextButton(applyURL) {
+					Text(stringResource(R.string.apply))
+				}
+			}
+		} else if (!isUrlValid) {
+			ErrorContent(
+				R.string.fragment_add_invalid,
+				ErrorAction(
+					R.string.retry,
+				) {
+					retry()
+				},
+				modifier = Modifier.padding(padding)
+			)
+		} else if (isNovelAlreadyPresent && novelLink != null) {
+			ErrorContent(
+				stringResource(R.string.fragment_add_present_novel, novelLink.name),
+				actions = arrayOf(
+					ErrorAction(
+						android.R.string.ok,
+					) {
+						reject()
+					},
+					ErrorAction(
+						R.string.fragment_add_open_novel,
+					) {
+						openNovel()
+					},
+				),
+				modifier = Modifier.padding(padding)
+			)
+		} else if (isStyleAlreadyPresent && styleLink != null) {
+			ErrorContent(
+				stringResource(R.string.fragment_add_present_style, styleLink.name),
 				ErrorAction(
 					android.R.string.ok,
 				) {
 					reject()
 				},
+				modifier = Modifier.padding(padding)
+			)
+		} else if (isExtAlreadyPresent && extensionLink != null && novelLink == null && styleLink == null) {
+			ErrorContent(
+				stringResource(R.string.fragment_add_present_ext, extensionLink.name),
 				ErrorAction(
-					R.string.fragment_add_open_novel,
+					android.R.string.ok,
 				) {
-					openNovel()
+					reject()
 				},
+				modifier = Modifier.padding(padding)
 			)
-		)
-	} else if (isStyleAlreadyPresent && styleLink != null) {
-		ErrorContent(
-			stringResource(R.string.fragment_add_present_style, styleLink.name),
-			ErrorAction(
-				android.R.string.ok,
-			) {
-				reject()
-			}
-		)
-	} else if (isExtAlreadyPresent && extensionLink != null && novelLink == null && styleLink == null) {
-		ErrorContent(
-			stringResource(R.string.fragment_add_present_ext, extensionLink.name),
-			ErrorAction(
-				android.R.string.ok,
-			) {
-				reject()
-			}
-		)
-	} else if (isRepoAlreadyPresent && repositoryLink != null && novelLink == null && styleLink == null && extensionLink == null) {
-		ErrorContent(
-			stringResource(R.string.fragment_add_present_repo, repositoryLink.name),
-			ErrorAction(
-				android.R.string.ok,
-			) {
-				reject()
-			}
-		)
-	} else {
-		Column(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(bottom = 56.dp),
-			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.SpaceBetween
-		) {
-			Text(
-				stringResource(R.string.fragment_add_following),
-				modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
-				style = MaterialTheme.typography.headlineSmall
+		} else if (isRepoAlreadyPresent && repositoryLink != null && novelLink == null && styleLink == null && extensionLink == null) {
+			ErrorContent(
+				stringResource(R.string.fragment_add_present_repo, repositoryLink.name),
+				ErrorAction(
+					android.R.string.ok,
+				) {
+					reject()
+				},
+				modifier = Modifier.padding(padding)
 			)
-
-			LazyColumn(
+		} else {
+			Column(
+				modifier = Modifier
+					.padding(padding)
+					.fillMaxSize()
+					.padding(bottom = 56.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				contentPadding = PaddingValues(16.dp),
-				modifier = Modifier.fillMaxHeight(.75f)
+				verticalArrangement = Arrangement.SpaceBetween
 			) {
-				if (novelLink != null) {
-					item {
-						Column {
-							Text(
-								stringResource(R.string.fragment_add_novel),
-								style = MaterialTheme.typography.titleLarge,
-								modifier = Modifier.padding(bottom = 8.dp)
-							)
+				Text(
+					stringResource(R.string.fragment_add_following),
+					modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
+					style = MaterialTheme.typography.headlineSmall
+				)
 
-							Card(
-								modifier = Modifier
-									.fillMaxWidth()
-									.padding(bottom = 16.dp)
-							) {
-								Column(
-									modifier = Modifier.padding(16.dp)
+				LazyColumn(
+					horizontalAlignment = Alignment.CenterHorizontally,
+					contentPadding = PaddingValues(16.dp),
+					modifier = Modifier.fillMaxHeight(.75f)
+				) {
+					if (novelLink != null) {
+						item {
+							Column {
+								Text(
+									stringResource(R.string.fragment_add_novel),
+									style = MaterialTheme.typography.titleLarge,
+									modifier = Modifier.padding(bottom = 8.dp)
+								)
+
+								Card(
+									modifier = Modifier
+										.fillMaxWidth()
+										.padding(bottom = 16.dp)
 								) {
-
-									Row(
-										verticalAlignment = Alignment.CenterVertically
+									Column(
+										modifier = Modifier.padding(16.dp)
 									) {
 
-										SubcomposeAsyncImage(
-											model = ImageRequest.Builder(LocalContext.current)
-												.data(novelLink.imageURL)
-												.crossfade(true)
-												.build(),
-											contentDescription = null,
-											modifier = Modifier
-												.heightIn(max = 128.dp)
-												.aspectRatio(coverRatio),
-											error = {
-												ImageLoadingError()
-											},
-											loading = {
-												Box(Modifier.placeholder(true))
-											}
-										)
-										Column(
-											modifier = Modifier.padding(start = 8.dp)
+										Row(
+											verticalAlignment = Alignment.CenterVertically
 										) {
-											Text(
-												novelLink.name,
-												style = MaterialTheme.typography.bodyLarge
+
+											SubcomposeAsyncImage(
+												model = ImageRequest.Builder(LocalContext.current)
+													.data(novelLink.imageURL)
+													.crossfade(true)
+													.build(),
+												contentDescription = null,
+												modifier = Modifier
+													.heightIn(max = 128.dp)
+													.aspectRatio(coverRatio),
+												error = {
+													ImageLoadingError()
+												},
+												loading = {
+													Box(Modifier.placeholder(true))
+												}
+											)
+											Column(
+												modifier = Modifier.padding(start = 8.dp)
+											) {
+												Text(
+													novelLink.name,
+													style = MaterialTheme.typography.bodyLarge
+												)
+												Text(
+													novelLink.url,
+													style = MaterialTheme.typography.bodySmall
+												)
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					//if (styleLink != null) {
+					//	// TODO Style
+					//}
+					if (extensionLink != null && !isExtAlreadyPresent) {
+						item {
+							Column {
+								Text(
+									stringResource(R.string.fragment_add_extension),
+									style = MaterialTheme.typography.titleLarge,
+									modifier = Modifier.padding(bottom = 8.dp)
+								)
+								Card(
+									modifier = Modifier
+										.padding(bottom = 16.dp)
+										.fillMaxWidth()
+								) {
+									Column(
+										modifier = Modifier.padding(16.dp),
+									) {
+
+										Row(
+											verticalAlignment = Alignment.CenterVertically
+										) {
+											SubcomposeAsyncImage(
+												ImageRequest.Builder(LocalContext.current)
+													.data(extensionLink.imageURL)
+													.crossfade(true)
+													.build(),
+												"",
+												modifier = Modifier.size(64.dp),
+												error = {
+													ImageLoadingError()
+												},
+												loading = {
+													Box(Modifier.placeholder(true))
+												}
 											)
 											Text(
-												novelLink.url,
-												style = MaterialTheme.typography.bodySmall
+												extensionLink.name,
+												style = MaterialTheme.typography.bodyLarge
 											)
 										}
 									}
@@ -394,107 +469,60 @@ fun AddShareContent(
 							}
 						}
 					}
-				}
-				//if (styleLink != null) {
-				//	// TODO Style
-				//}
-				if (extensionLink != null && !isExtAlreadyPresent) {
-					item {
-						Column {
-							Text(
-								stringResource(R.string.fragment_add_extension),
-								style = MaterialTheme.typography.titleLarge,
-								modifier = Modifier.padding(bottom = 8.dp)
-							)
-							Card(
-								modifier = Modifier
-									.padding(bottom = 16.dp)
-									.fillMaxWidth()
-							) {
-								Column(
-									modifier = Modifier.padding(16.dp),
+					if (repositoryLink != null && !isRepoAlreadyPresent) {
+						item {
+							Column {
+								Text(
+									stringResource(
+										R.string.fragment_add_repository,
+									),
+									style = MaterialTheme.typography.titleLarge,
+									modifier = Modifier.padding(bottom = 8.dp)
+								)
+								Card(
+									modifier = Modifier.fillMaxWidth()
 								) {
-
-									Row(
-										verticalAlignment = Alignment.CenterVertically
+									Column(
+										modifier = Modifier.padding(16.dp)
 									) {
-										SubcomposeAsyncImage(
-											ImageRequest.Builder(LocalContext.current)
-												.data(extensionLink.imageURL)
-												.crossfade(true)
-												.build(),
-											"",
-											modifier = Modifier.size(64.dp),
-											error = {
-												ImageLoadingError()
-											},
-											loading = {
-												Box(Modifier.placeholder(true))
-											}
-										)
+
 										Text(
-											extensionLink.name,
+											repositoryLink.name,
 											style = MaterialTheme.typography.bodyLarge
 										)
+										Text(
+											repositoryLink.url,
+											style = MaterialTheme.typography.bodySmall,
+
+											)
 									}
 								}
 							}
 						}
 					}
 				}
-				if (repositoryLink != null && !isRepoAlreadyPresent) {
-					item {
-						Column {
-							Text(
-								stringResource(
-									R.string.fragment_add_repository,
-								),
-								style = MaterialTheme.typography.titleLarge,
-								modifier = Modifier.padding(bottom = 8.dp)
-							)
-							Card(
-								modifier = Modifier.fillMaxWidth()
-							) {
-								Column(
-									modifier = Modifier.padding(16.dp)
-								) {
 
-									Text(
-										repositoryLink.name,
-										style = MaterialTheme.typography.bodyLarge
-									)
-									Text(
-										repositoryLink.url,
-										style = MaterialTheme.typography.bodySmall,
+				if (isAdding)
+					CircularProgressIndicator()
 
-										)
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if (isAdding)
-				CircularProgressIndicator()
-
-			Card(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(16.dp)
-			) {
-				Row(
-					horizontalArrangement = Arrangement.SpaceEvenly,
-					modifier = Modifier.fillMaxWidth()
+				Card(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(16.dp)
 				) {
-					TextButton(reject, contentPadding = PaddingValues(16.dp)) {
-						Text(stringResource(android.R.string.cancel))
-					}
-
-					if (!isAdding)
-						TextButton(add, contentPadding = PaddingValues(16.dp)) {
-							Text(stringResource(android.R.string.ok))
+					Row(
+						horizontalArrangement = Arrangement.SpaceEvenly,
+						modifier = Modifier.fillMaxWidth()
+					) {
+						TextButton(reject, contentPadding = PaddingValues(16.dp)) {
+							Text(stringResource(android.R.string.cancel))
 						}
+
+						if (!isAdding)
+							TextButton(add, contentPadding = PaddingValues(16.dp)) {
+								Text(stringResource(android.R.string.ok))
+							}
+					}
 				}
 			}
 		}

@@ -17,12 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -54,6 +50,7 @@ import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
@@ -247,9 +244,7 @@ fun AboutContent(
 					Text(stringResource(R.string.about))
 				},
 				navigationIcon = {
-					IconButton(onBack) {
-						Icon(Icons.Default.ArrowBack, stringResource(R.string.icon_desc_back))
-					}
+					NavigateBackButton(onBack)
 				}
 			)
 		}

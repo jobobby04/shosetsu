@@ -34,6 +34,7 @@ import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.getNovelID
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
+import app.shosetsu.android.ui.add.AddShareView
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
 import app.shosetsu.android.ui.library.LibraryView
@@ -255,9 +256,7 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 				onOpenLicense = {
 					TODO("Bind")
 				},
-				onBack = {
-					navController.popBackStack()
-				}
+				onBack = navController::popBackStack
 			)
 		}
 		composable(CATEGORIES.route) {
@@ -265,7 +264,16 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 		composable(DOWNLOADS.route) {
 		}
 
-		composable(ADD_SHARE.route) {
+		composable(ADD_SHARE.route) { entry ->
+			val shareURL = entry.arguments!!.getString(BundleKeys.BUNDLE_URL)
+			AddShareView(
+				shareURL,
+				onBackPressed = navController::popBackStack,
+				openNovel = {
+					if (it != null)
+						navController.navigate(NOVEL.routeWith(it.id ?: return@AddShareView))
+				}
+			)
 		}
 		composable(REPOSITORY.route) {
 		}
