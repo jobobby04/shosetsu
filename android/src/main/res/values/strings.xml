@@ -699,6 +699,7 @@
         <item>@string/comfy</item>
     </array>
     <string name="title_activity_main">MainActivity</string>
+    <string name="icon_desc_back">Arrow pointing to the left to navigate back.</string>
 
 </resources>
 

@@ -17,11 +17,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,9 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
@@ -50,12 +52,8 @@ import app.shosetsu.android.common.consts.URL_MATRIX
 import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
-import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.navigateSafely
-import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.settings.sub.TextAssetReaderFragment.Companion.bundle
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
@@ -84,6 +82,7 @@ import org.acra.util.Installation
  * @since 21 / 10 / 2021
  * @author Doomsdayrs
  */
+@Deprecated("Composed")
 class AboutFragment : ShosetsuFragment() {
 
 	override val viewTitleRes: Int = R.string.about
@@ -96,9 +95,8 @@ class AboutFragment : ShosetsuFragment() {
 		setViewTitle()
 		return ComposeView {
 			AboutView(
-				onNavigateSafely = { id, bundle, options ->
-					findNavController().navigateSafely(id, bundle, options)
-				}
+				onOpenLicense = {},
+				onBack = {}
 			)
 		}
 
@@ -107,21 +105,11 @@ class AboutFragment : ShosetsuFragment() {
 
 @Composable
 fun AboutView(
-	onNavigateSafely: (Int, Bundle, NavOptions) -> Unit
+	onOpenLicense: () -> Unit,
+	onBack: () -> Unit
 ) {
 	val viewModel: AAboutViewModel = viewModelDi()
 	val uriHandler = LocalUriHandler.current
-
-	fun onClickLicense() {
-		onNavigateSafely(
-			R.id.action_aboutController_to_textAssetReader,
-			TextAsset.LICENSE.bundle,
-			navOptions {
-				launchSingleTop = true
-				setShosetsuTransition()
-			}
-		)
-	}
 
 	fun onClickDisclaimer() {
 		uriHandler.openUri(URL_DISCLAIMER)
@@ -157,13 +145,14 @@ fun AboutView(
 			onOpenExtensions = ::openExtensions,
 			onOpenDiscord = ::openDiscord,
 			onOpenPatreon = ::openPatreon,
-			onOpenLicense = ::onClickLicense,
+			onOpenLicense = onOpenLicense,
 			onOpenDisclaimer = ::onClickDisclaimer,
 			onOpenMatrix = ::openMatrix,
 			onOpenPrivacy = ::openPrivacy,
 			onOpenKofi = {
 				uriHandler.openUri(URL_KOFI)
-			}
+			},
+			onBack = onBack
 		)
 	}
 }
@@ -186,7 +175,8 @@ fun PreviewAboutContent() {
 			onOpenMatrix = {},
 			onOpenPrivacy = {},
 			onOpenKofi = {
-			}
+			},
+			onBack = {}
 		)
 	}
 }
@@ -247,9 +237,23 @@ fun AboutContent(
 	onOpenLicense: () -> Unit,
 	onOpenDisclaimer: () -> Unit,
 	onOpenMatrix: () -> Unit,
-	onOpenPrivacy: () -> Unit
+	onOpenPrivacy: () -> Unit,
+	onBack: () -> Unit
 ) {
-	Scaffold { paddingValues ->
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.about))
+				},
+				navigationIcon = {
+					IconButton(onBack) {
+						Icon(Icons.Default.ArrowBack, stringResource(R.string.icon_desc_back))
+					}
+				}
+			)
+		}
+	) { paddingValues ->
 		LazyColumn(
 			modifier = Modifier
 				.fillMaxSize()

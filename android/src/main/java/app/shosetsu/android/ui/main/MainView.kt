@@ -21,6 +21,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,6 +33,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.getNovelID
 import app.shosetsu.android.common.ext.openChapter
+import app.shosetsu.android.ui.about.AboutView
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
 import app.shosetsu.android.ui.library.LibraryView
@@ -128,7 +130,7 @@ fun MainView() {
 					)
 				}
 				browseGraph()
-				moreGraph()
+				moreGraph(navController)
 				composable(TEXT_READER.route) {
 					TextAssetReaderView(
 						0,
@@ -240,7 +242,7 @@ fun NavGraphBuilder.browseGraph() {
 	}
 }
 
-fun NavGraphBuilder.moreGraph() {
+fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 	navigation(startDestination = "main", MORE.route) {
 		composable("main") {
 			MoreView(
@@ -249,6 +251,14 @@ fun NavGraphBuilder.moreGraph() {
 			)
 		}
 		composable(ABOUT.route) {
+			AboutView(
+				onOpenLicense = {
+					TODO("Bind")
+				},
+				onBack = {
+					navController.popBackStack()
+				}
+			)
 		}
 		composable(CATEGORIES.route) {
 		}
