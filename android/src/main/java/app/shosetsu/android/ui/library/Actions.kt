@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.RadioButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -205,7 +206,7 @@ fun SearchAction(
 	}
 ) {
 	var expanded by remember { mutableStateOf(false) }
-
+	var searchQuery by remember { mutableStateOf(query) }
 	LaunchedEffect(query) {
 		if (query.isNotEmpty() && !expanded)
 			expanded = true
@@ -224,10 +225,14 @@ fun SearchAction(
 
 		if (expanded) {
 			TextField(
-				query,
-				onValueChange = onSearch,
+				searchQuery,
+				onValueChange = { searchQuery = it },
 				modifier = Modifier
-					.fillMaxWidth()
+					.fillMaxWidth(),
+				keyboardActions = KeyboardActions {
+					onSearch(searchQuery)
+				},
+				singleLine = true
 			)
 		}
 	}
