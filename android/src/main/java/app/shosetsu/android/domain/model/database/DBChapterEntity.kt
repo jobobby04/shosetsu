@@ -47,28 +47,28 @@ import app.shosetsu.android.dto.Convertible
 )
 data class DBChapterEntity(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int? = null,
+	val id: Int = 0,
 
-	var url: String,
+	val url: String,
 
 	val novelID: Int,
 
 	@ColumnInfo(name = "formatterID")
 	val extensionID: Int,
 
-	var title: String,
+	val title: String,
 
-	var releaseDate: String,
+	val releaseDate: String,
 
-	var order: Double,
+	val order: Double,
 
-	var readingPosition: Double = 0.0,
+	val readingPosition: Double = 0.0,
 
-	var readingStatus: ReadingStatus = ReadingStatus.UNREAD,
+	val readingStatus: ReadingStatus = ReadingStatus.UNREAD,
 
-	var bookmarked: Boolean = false,
+	val bookmarked: Boolean = false,
 
-	var isSaved: Boolean = false,
+	val isSaved: Boolean = false,
 ) : Convertible<ChapterEntity> {
 	override fun convertTo(): ChapterEntity = ChapterEntity(
 		id,

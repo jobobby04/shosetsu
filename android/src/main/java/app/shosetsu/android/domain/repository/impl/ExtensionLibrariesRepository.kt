@@ -65,10 +65,12 @@ class ExtensionLibrariesRepository(
 		val data = remoteSource.downloadLibrary(repoURL, extLibEntity)
 		val json =
 			Json.parseToJsonElement(data.substring(0, data.indexOf("\n")).replace("--", "").trim())
-		extLibEntity.version = Version(json.jsonObject[J_VERSION]!!.jsonPrimitive.content)
-		databaseSource.updateOrInsert(extLibEntity)
-		memSource.setLibrary(extLibEntity.scriptName, data)
-		fileSource.writeExtLib(extLibEntity.scriptName, data)
+		val updatedLib = extLibEntity.copy(
+			version = Version(json.jsonObject[J_VERSION]!!.jsonPrimitive.content)
+		)
+		databaseSource.updateOrInsert(updatedLib)
+		memSource.setLibrary(updatedLib.scriptName, data)
+		fileSource.writeExtLib(updatedLib.scriptName, data)
 	}
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)

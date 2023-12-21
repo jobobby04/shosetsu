@@ -28,7 +28,7 @@ data class DBStrippedNovelEntity(
 	val id: Int,
 	val title: String,
 	val imageURL: String,
-	var bookmarked: Boolean,
+	val bookmarked: Boolean,
 ) : Convertible<StrippedNovelEntity> {
 	override fun convertTo() = StrippedNovelEntity(id, title, imageURL, bookmarked)
 }

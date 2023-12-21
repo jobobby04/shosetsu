@@ -27,9 +27,9 @@ data class NovelSettingEntity(
 	val novelID: Int,
 
 	// how chapters are sorted
-	var sortType: ChapterSortType = ChapterSortType.SOURCE,
-	var showOnlyReadingStatusOf: ReadingStatus? = null,
-	var showOnlyBookmarked: Boolean = false,
-	var showOnlyDownloaded: Boolean = false,
-	var reverseOrder: Boolean = false,
+	val sortType: ChapterSortType = ChapterSortType.SOURCE,
+	val showOnlyReadingStatusOf: ReadingStatus? = null,
+	val showOnlyBookmarked: Boolean = false,
+	val showOnlyDownloaded: Boolean = false,
+	val reverseOrder: Boolean = false,
 )

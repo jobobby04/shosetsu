@@ -47,15 +47,15 @@ data class DBNovelSettingsEntity(
 	val novelID: Int,
 
 	// how chapters are sorted
-	var sortType: ChapterSortType,
+	val sortType: ChapterSortType,
 
-	var showOnlyReadingStatusOf: ReadingStatus?,
+	val showOnlyReadingStatusOf: ReadingStatus?,
 
-	var showOnlyBookmarked: Boolean = false,
+	val showOnlyBookmarked: Boolean = false,
 
-	var showOnlyDownloaded: Boolean = false,
+	val showOnlyDownloaded: Boolean = false,
 
-	var reverseOrder: Boolean = false,
+	val reverseOrder: Boolean = false,
 
 
 	) : Convertible<NovelSettingEntity> {

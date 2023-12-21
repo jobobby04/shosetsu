@@ -60,7 +60,7 @@ data class DBDownloadEntity(
 	val novelName: String,
 	@ColumnInfo(name = "formatterID")
 	val extensionID: Int,
-	var status: DownloadStatus = DownloadStatus.PENDING,
+	val status: DownloadStatus = DownloadStatus.PENDING,
 ) : Convertible<DownloadEntity> {
 	override fun convertTo(): DownloadEntity =
 		DownloadEntity(

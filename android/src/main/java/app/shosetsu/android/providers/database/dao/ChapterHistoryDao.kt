@@ -92,11 +92,10 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 	) {
 		insertAbort(
 			DBChapterHistoryEntity(
-				null,
-				novelId,
-				chapterId,
-				startedReadingAt,
-				endedReadingAt
+				novelId = novelId,
+				chapterId = chapterId,
+				startedReadingAt = startedReadingAt,
+				endedReadingAt = endedReadingAt
 			)
 		)
 	}

@@ -328,7 +328,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			}
 
 			val siteNovel = NovelEntity(
-				id = null,
 				url = backupNovelEntity.url,
 				extensionID = extensionID,
 				bookmarked = backupNovelEntity.bookmarked,

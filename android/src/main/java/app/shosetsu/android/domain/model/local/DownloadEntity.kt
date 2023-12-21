@@ -34,5 +34,5 @@ data class DownloadEntity(
 	val chapterName: String,
 	val novelName: String,
 	val extensionID: Int,
-	var status: DownloadStatus = DownloadStatus.PENDING,
+	val status: DownloadStatus = DownloadStatus.PENDING,
 )

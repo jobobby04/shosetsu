@@ -25,5 +25,5 @@ data class StrippedNovelEntity(
 	val id: Int,
 	val title: String,
 	val imageURL: String,
-	var bookmarked: Boolean,
+	val bookmarked: Boolean,
 )

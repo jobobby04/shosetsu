@@ -30,6 +30,6 @@ import app.shosetsu.lib.Version
 
 data class ExtLibEntity(
 	val scriptName: String,
-	var version: Version,
-	var repoID: Int,
+	val version: Version,
+	val repoID: Int,
 )
