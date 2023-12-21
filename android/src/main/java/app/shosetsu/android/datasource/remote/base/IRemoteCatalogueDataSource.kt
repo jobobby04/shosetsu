@@ -46,7 +46,7 @@ interface IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, LuaError::class, IOException::class)
 	suspend fun loadListing(
 		ext: IExtension,
-		listingIndex: Int,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
 	): List<Novel.Info>
 }

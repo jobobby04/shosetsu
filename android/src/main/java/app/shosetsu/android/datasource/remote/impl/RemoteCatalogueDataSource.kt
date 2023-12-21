@@ -42,7 +42,7 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	): List<Novel.Info> {
 		return if (ext.hasSearch) {
 			try {
-				ext.search(HashMap(data).apply {
+				ext.list(HashMap(data).apply {
 					this[QUERY_INDEX] = query
 				}).toList()
 			} catch (e: LuaError) {
@@ -56,17 +56,20 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, LuaError::class, IOException::class)
 	override suspend fun loadListing(
 		ext: IExtension,
-		listingIndex: Int,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
 	): List<Novel.Info> {
-		val listing = ext.listings[listingIndex]
-
 		logD(data.toString())
 
 		return if (!listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
 			emptyList()
 		} else try {
-			listing.getListing(data).toList()
+			@Suppress("DEPRECATION") // todo remove getListing
+			if (listing.getListing != null) {
+				listing.getListing!!(data).toList()
+			} else {
+				ext.list(data).toList()
+			}
 		} catch (e: LuaError) {
 			if (e.cause != null)
 				throw e.cause!!

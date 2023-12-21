@@ -87,6 +87,8 @@ class CatalogViewModel(
 
 	override val exceptionFlow: MutableStateFlow<Throwable?> = MutableStateFlow(null)
 
+	override val selectedListing: MutableStateFlow<IExtension.Listing?> = MutableStateFlow<IExtension.Listing?>(null)
+
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
 			val ext = getExtensionUseCase(extensionID)
@@ -94,9 +96,20 @@ class CatalogViewModel(
 			// Ensure filter is initialized
 			ext?.searchFiltersModel?.toList()?.init()
 			applyFilter()
+			// Ensure listings are initialized
+			selectedListing.value = ext?.listings()
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
+
+	override val listingOptions = selectedListing.mapLatest {
+		when (it) {
+			is IExtension.Listing.List -> it.getListings().toList().toImmutableList()
+			else -> persistentListOf()
+		}
+	}.catch {
+		exceptionFlow.value = it
+	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
 	private fun List<Filter<*>>.init() {
 		forEach { filter ->
@@ -126,8 +139,10 @@ class CatalogViewModel(
 	}
 
 	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy {
-		iExtensionFlow.transformLatest { ext ->
-			if (ext == null) {
+		iExtensionFlow.combine(selectedListing) { ext, listing ->
+			ext to listing
+		}.transformLatest { (ext, listing) ->
+			if (ext == null || listing !is IExtension.Listing.Item) {
 				emit(null)
 			} else {
 				emitAll(
@@ -136,13 +151,16 @@ class CatalogViewModel(
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query == null)
-									getCatalogueListingData(ext, data)
-								else loadCatalogueQueryDataUseCase(
-									ext,
-									query,
-									data
-								)
+								if (query == null) {
+									getCatalogueListingData(ext, data, listing)
+								} else {
+									loadCatalogueQueryDataUseCase(
+										ext,
+										query,
+										data,
+										listing
+									)
+								}
 							}
 						}
 					}
@@ -208,6 +226,10 @@ class CatalogViewModel(
 			}
 		}
 		extensionIDFlow.value = extensionID
+	}
+
+	override fun setSelectedListing(listing: IExtension.Listing) {
+		selectedListing.value = listing
 	}
 
 	override fun applyQuery(newQuery: String) {

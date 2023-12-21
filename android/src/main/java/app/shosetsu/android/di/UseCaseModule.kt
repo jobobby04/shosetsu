@@ -88,7 +88,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	}
 
 	bind<GetCatalogueListingDataUseCase>() with provider {
-		GetCatalogueListingDataUseCase(instance(), instance())
+		GetCatalogueListingDataUseCase(instance())
 	}
 
 	bind<GetChapterUIsUseCase>() with provider { GetChapterUIsUseCase(instance()) }
@@ -261,23 +261,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<UpdateLibraryFilterStateUseCase>() with provider {
 		UpdateLibraryFilterStateUseCase(instance())
 	}
-
-	bind<GetExtListingNamesUseCase>() with provider {
-		GetExtListingNamesUseCase(instance())
-	}
-
-	bind<UpdateExtSelectedListing>() with provider {
-		UpdateExtSelectedListing(instance())
-	}
-
-	bind<GetExtSelectedListingUseCase>() with provider {
-		GetExtSelectedListingUseCase(instance())
-	}
-
-	bind<GetExtSelectedListingFlowUseCase>() with provider {
-		GetExtSelectedListingFlowUseCase(instance())
-	}
-
 
 	bind<UpdateExtensionSettingUseCase>() with provider {
 		UpdateExtensionSettingUseCase(instance(), instance(), instance())

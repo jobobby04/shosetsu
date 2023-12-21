@@ -4,25 +4,24 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -55,8 +54,10 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
+import app.shosetsu.lib.IExtension
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Job
 import org.acra.ACRA
@@ -321,6 +322,9 @@ fun CatalogueView(
 		val exception by viewModel.exceptionFlow.collectAsState()
 		val hasFilters by viewModel.hasFilters.collectAsState()
 
+		val selectedListing by viewModel.selectedListing.collectAsState()
+		val listingOptions by viewModel.listingOptions.collectAsState()
+
 		val categories by viewModel.categories.collectAsState()
 		var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
 
@@ -386,6 +390,15 @@ fun CatalogueView(
 			}
 		}
 
+		if (selectedListing !is IExtension.Listing.Item) {
+			ListingsContent(
+				listingOptions,
+				viewModel::setSelectedListing
+			)
+
+			return@ShosetsuCompose
+		}
+
 		CatalogContent(
 			items,
 			type,
@@ -438,6 +451,54 @@ fun CatalogueView(
 			}
 		}
 	}
+}
+
+@Composable
+fun ListingsContent(
+	items: ImmutableList<IExtension.Listing>,
+	onSelectListing: (IExtension.Listing) -> Unit
+) {
+	Crossfade(items, label = "listing_items") {
+		key(it) {
+			val listState = rememberLazyListState()
+			LazyColumnScrollbar(listState = listState) {
+				LazyColumn(
+					state = listState,
+					modifier = Modifier.fillMaxSize()
+				) {
+					items(items) {
+						Row(
+							Modifier
+								.fillMaxWidth()
+								.clickable { onSelectListing(it) }
+								.padding(horizontal = 8.dp, vertical = 16.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							when (it) {
+								is IExtension.Listing.Item -> {
+									Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "list")
+									Spacer(modifier = Modifier.width(16.dp))
+									Text(
+										text = it.name,
+										style = MaterialTheme.typography.bodyLarge
+									)
+								}
+								is IExtension.Listing.List -> {
+									Icon(imageVector = Icons.Default.List, contentDescription = "list")
+									Spacer(modifier = Modifier.width(16.dp))
+									Text(
+										text = it.name,
+										style = MaterialTheme.typography.bodyLarge
+									)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
 
 @OptIn(ExperimentalMaterialApi::class)

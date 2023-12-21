@@ -146,7 +146,7 @@ class NovelsRepository(
 	@Throws(SSLException::class, LuaError::class)
 	override suspend fun getCatalogueData(
 		ext: IExtension,
-		listing: Int,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
 	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data) }
 
