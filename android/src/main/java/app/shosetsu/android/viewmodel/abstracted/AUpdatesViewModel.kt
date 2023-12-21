@@ -52,4 +52,6 @@ abstract class AUpdatesViewModel
 	abstract fun clearBefore(date: Long)
 
 	abstract val isOnlineFlow: StateFlow<Boolean>
+
+	abstract val displayDateAsMDYFlow: StateFlow<Boolean>
 }

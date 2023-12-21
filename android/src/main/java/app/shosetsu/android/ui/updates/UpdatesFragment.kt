@@ -175,6 +175,7 @@ fun UpdatesView(
 	ShosetsuCompose {
 		val items by viewModel.liveData.collectAsState()
 		val isOnline by viewModel.isOnlineFlow.collectAsState()
+		val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
 
 		Scaffold {
 			UpdatesContent(
@@ -186,7 +187,8 @@ fun UpdatesView(
 				},
 				openNovel = openNovel,
 				openChapter = openChapter,
-				modifier = Modifier.padding(it)
+				modifier = Modifier.padding(it),
+				displayDateAsMDY = displayDateAsMDY
 			)
 		}
 
@@ -200,7 +202,8 @@ fun UpdatesContent(
 	onRefresh: () -> Unit,
 	openNovel: (UpdatesUI) -> Unit,
 	openChapter: (UpdatesUI) -> Unit,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	displayDateAsMDY: Boolean
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Box(modifier.pullRefresh(pullRefreshState)) {
@@ -220,7 +223,7 @@ fun UpdatesContent(
 			) {
 				items.forEach { (header, updateItems) ->
 					stickyHeader {
-						UpdateHeaderItemContent(remember(header) { StableHolder(header) })
+						UpdateHeaderItemContent(remember(header) { StableHolder(header) }, displayDateAsMDY)
 					}
 
 					items(updateItems, key = { it.chapterID }) {
@@ -241,7 +244,7 @@ fun UpdatesContent(
 @Preview
 @Composable
 fun PreviewUpdateHeaderItemContent() {
-	UpdateHeaderItemContent(StableHolder(DateTime().trimDate()))
+	UpdateHeaderItemContent(StableHolder(DateTime().trimDate()), false)
 }
 
 @ExperimentalMaterial3Api
@@ -332,7 +335,7 @@ fun UpdateItemContent(
 }
 
 @Composable
-fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
+fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: Boolean) {
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
 		shadowElevation = 2.dp,
@@ -347,7 +350,7 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
 				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 					context.getString(R.string.yesterday)
 
-				else -> "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
+				else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 			}
 		}
 		Text(

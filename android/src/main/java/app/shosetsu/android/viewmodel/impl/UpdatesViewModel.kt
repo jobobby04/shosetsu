@@ -2,8 +2,10 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.trimDate
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.repository.base.IUpdatesRepository
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
@@ -44,6 +46,7 @@ import org.joda.time.DateTime
 @OptIn(ExperimentalCoroutinesApi::class)
 class UpdatesViewModel(
 	private val updatesRepository: IUpdatesRepository,
+	private val settingsRepository: ISettingsRepository,
 	private val startUpdateWorkerUseCase: StartUpdateWorkerUseCase,
 	private val isOnlineUseCase: IsOnlineUseCase,
 ) : AUpdatesViewModel() {
@@ -73,6 +76,8 @@ class UpdatesViewModel(
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, false)
 
 	override fun isOnline(): Boolean = isOnlineFlow.value
+
+	override val displayDateAsMDYFlow = settingsRepository.getBooleanFlow(SettingKey.NovelUpdateDateMDY)
 
 	@SuppressLint("StopShip")
 	override suspend fun updateChapter(

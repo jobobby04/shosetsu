@@ -140,7 +140,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		UpdatesViewModel(
 			startUpdateWorkerUseCase = instance(),
 			isOnlineUseCase = instance(),
-			updatesRepository = instance()
+			updatesRepository = instance(),
+			settingsRepository = instance()
 		)
 	}
 

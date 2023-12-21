@@ -266,6 +266,17 @@ fun UpdateSettingsContent(viewModel: AUpdateSettingsViewModel) {
 					.fillMaxWidth()
 			)
 		}
+
+		item {
+			SwitchSettingContent(
+				stringResource(R.string.date_format_mdy),
+				stringResource(R.string.date_format_mdy_desc),
+				viewModel.settingsRepo,
+				SettingKey.NovelUpdateDateMDY,
+				modifier = Modifier
+					.fillMaxWidth()
+			)
+		}
 		item {
 			HeaderSettingContent(
 				stringResource(R.string.settings_update_header_repositories)

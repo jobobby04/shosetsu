@@ -605,13 +605,15 @@
     <string name="settings_advanced_site_protection_title">Site Protection Delayer</string>
     <string name="settings_advanced_site_protection_desc">Determines the delay between each request to a site. Helping prevent site bans.</string>
     <string name="settings_reader_text_sel_title">Disable reader text selection</string>
-    <string name="settings_reader_text_sel_desc">If you have issues with accidently selecting text, this can help you.</string>
+    <string name="settings_reader_text_sel_desc">If you have issues with accidentally selecting text, this can help you.</string>
     <string name="editor">Editor</string>
     <string name="preview">Preview</string>
     <string name="fragment_library_menu_tri_by_updated">By last updated</string>
     <string name="clear">Clear</string>
     <string name="before">Before</string>
     <string name="fragment_updates_clear">Select date to clear updates before</string>
+    <string name="date_format_mdy">Display dates M/D/Y</string>
+    <string name="date_format_mdy_desc">If toggled on, dates on the Updates page will be shown month-first</string>
     <string name="intro_support_title">Support the Developer</string>
     <string name="intro_support_desc">
         Hi I am Doomsdayrs the developer.\n
@@ -700,5 +702,3 @@
     </array>
 
 </resources>
-
-
