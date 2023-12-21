@@ -32,19 +32,6 @@ import kotlinx.coroutines.flow.StateFlow
 class ExtensionSettingsRepository(
 	private val iFileSettingSystem: IFileSettingsDataSource
 ) : IExtensionSettingsRepository {
-	private fun selectedListingKey() = CustomInt("selectedListing", 0)
-
-	override suspend fun getSelectedListing(extensionID: Int): Int = onIO {
-		iFileSettingSystem.getInt("$extensionID", selectedListingKey())
-	}
-
-	override suspend fun observeSelectedListing(extensionID: Int): StateFlow<Int> =
-		iFileSettingSystem.observeInt("$extensionID", selectedListingKey())
-
-	override suspend fun setSelectedListing(extensionID: Int, selectedListing: Int) = onIO {
-		iFileSettingSystem.setInt("$extensionID", selectedListingKey(), selectedListing)
-	}
-
 
 	override suspend fun getInt(extensionID: Int, settingID: Int, default: Int): Int = onIO {
 		iFileSettingSystem.getInt("$extensionID", CustomInt("$settingID", default))

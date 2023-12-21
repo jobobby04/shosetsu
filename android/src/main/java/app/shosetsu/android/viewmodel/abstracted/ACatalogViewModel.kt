@@ -46,6 +46,13 @@ abstract class ACatalogViewModel :
 	abstract val exceptionFlow: Flow<Throwable>
 
 	/**
+	 * Displayed listings from the extension
+	 */
+	abstract val selectedListing: StateFlow<IExtension.Listing?>
+
+	abstract val listingOptions: StateFlow<ImmutableList<IExtension.Listing>>
+
+	/**
 	 * The list of items that will be presented as the filter menu
 	 */
 	abstract val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>>
@@ -77,6 +84,11 @@ abstract class ACatalogViewModel :
 	 * This will reset the view completely
 	 */
 	abstract fun setExtensionID(extensionID: Int)
+
+	/**
+	 * Sets the [IExtension.Listing] currently displayed
+	 */
+	abstract fun setSelectedListing(listing: IExtension.Listing)
 
 	/**
 	 * Apply a query
