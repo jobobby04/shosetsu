@@ -257,7 +257,8 @@ class SearchViewModel(
 										HashMap<Int, Any>().apply {
 											putAll(ext.searchFiltersModel.toList().mapify())
 											this[PAGE_INDEX] = ext.startIndex
-										}
+										},
+										null
 									)
 								}
 							}.flow

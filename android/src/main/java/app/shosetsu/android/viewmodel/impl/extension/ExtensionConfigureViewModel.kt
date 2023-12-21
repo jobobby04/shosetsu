@@ -22,11 +22,8 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
@@ -47,9 +44,6 @@ class ExtensionConfigureViewModel(
 	private val loadInstalledExtension: GetInstalledExtensionUseCase,
 	private val uninstallExtensionUI: UninstallExtensionUseCase,
 	private val getExtensionSettings: GetExtensionSettingsUseCase,
-	private val getExtListNames: GetExtListingNamesUseCase,
-	private val updateExtSelectedListing: UpdateExtSelectedListing,
-	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
 	private val updateSetting: UpdateExtensionSettingUseCase,
 ) : AExtensionConfigureViewModel() {
 	private val extensionIdFlow: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
@@ -58,16 +52,6 @@ class ExtensionConfigureViewModel(
 		extensionIdFlow.flatMapLatest { id ->
 			loadInstalledExtension(id)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
-	}
-
-	private val extListNamesFlow: Flow<ListingSelectionData> by lazy {
-		extensionIdFlow.flatMapLatest { extensionID ->
-			val listingNames = getExtListNames(extensionID).toImmutableList()
-
-			getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
-				ListingSelectionData(listingNames, selectedListing)
-			}
-		}
 	}
 
 	private val extensionSettingsFlow: Flow<ImmutableList<FilterEntity>> by lazy {
@@ -79,11 +63,6 @@ class ExtensionConfigureViewModel(
 	override val extensionSettings: StateFlow<ImmutableList<FilterEntity>> by lazy {
 		extensionSettingsFlow.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
-	}
-
-	override val extensionListing: StateFlow<ListingSelectionData?> by lazy {
-		extListNamesFlow.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	override fun setExtensionID(id: Int) {
@@ -131,12 +110,6 @@ class ExtensionConfigureViewModel(
 	override fun saveSetting(id: Int, value: Int) {
 		launchIO {
 			updateSetting(extensionIdFlow.value, id, value)
-		}
-	}
-
-	override fun setSelectedListing(value: Int) {
-		launchIO {
-			updateExtSelectedListing(extensionIdFlow.value, value)
 		}
 	}
 }

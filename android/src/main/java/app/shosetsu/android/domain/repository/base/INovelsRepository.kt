@@ -138,7 +138,7 @@ interface INovelsRepository {
 	@Throws(SSLException::class, LuaError::class)
 	suspend fun getCatalogueData(
 		ext: IExtension,
-		listing: Int,
+		listing: IExtension.Listing.Item?,
 		data: Map<Int, Any>,
 	): List<Novel.Info>
 

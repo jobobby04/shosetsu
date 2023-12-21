@@ -30,9 +30,6 @@ import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
@@ -74,7 +71,6 @@ import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateChapterUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateLibraryFilterStateUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelSettingUseCase
@@ -156,7 +152,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	}
 
 	bind<GetCatalogueListingDataUseCase>() with provider {
-		GetCatalogueListingDataUseCase(instance(), instance())
+		GetCatalogueListingDataUseCase(instance())
 	}
 
 	bind<GetChapterUIsUseCase>() with provider { GetChapterUIsUseCase(instance()) }
@@ -319,23 +315,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<UpdateLibraryFilterStateUseCase>() with provider {
 		UpdateLibraryFilterStateUseCase(instance())
 	}
-
-	bind<GetExtListingNamesUseCase>() with provider {
-		GetExtListingNamesUseCase(instance())
-	}
-
-	bind<UpdateExtSelectedListing>() with provider {
-		UpdateExtSelectedListing(instance())
-	}
-
-	bind<GetExtSelectedListingUseCase>() with provider {
-		GetExtSelectedListingUseCase(instance())
-	}
-
-	bind<GetExtSelectedListingFlowUseCase>() with provider {
-		GetExtSelectedListingFlowUseCase(instance())
-	}
-
 
 	bind<UpdateExtensionSettingUseCase>() with provider {
 		UpdateExtensionSettingUseCase(instance(), instance(), instance())

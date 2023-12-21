@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -98,6 +99,8 @@ class CatalogViewModel(
 
 	override val exceptionFlow = MutableSharedFlow<Throwable>()
 
+	override val selectedListing: MutableStateFlow<IExtension.Listing?> = MutableStateFlow<IExtension.Listing?>(null)
+
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
 			val ext = getExtensionUseCase(extensionID)
@@ -105,9 +108,20 @@ class CatalogViewModel(
 			// Ensure filter is initialized
 			ext?.searchFiltersModel?.toList()?.init()
 			applyFilter()
+			// Ensure listings are initialized
+			selectedListing.value = ext?.listings()
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
+
+	override val listingOptions = selectedListing.mapLatest {
+		when (it) {
+			is IExtension.Listing.List -> it.getListings().toList().toImmutableList()
+			else -> persistentListOf()
+		}
+	}.catch {
+		exceptionFlow.emit(it)
+	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
 	private fun List<Filter<*>>.init() {
 		forEach { filter ->
@@ -137,7 +151,9 @@ class CatalogViewModel(
 	}
 
 	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy {
-		iExtensionFlow.transformLatest { ext ->
+		iExtensionFlow.combine(selectedListing) { ext, listing ->
+			ext to listing
+		}.transformLatest { (ext, listing) ->
 			if (ext == null) {
 				emit(null)
 			} else {
@@ -147,13 +163,16 @@ class CatalogViewModel(
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query.isNotEmpty())
-									getCatalogueListingData(ext, data)
-								else loadCatalogueQueryDataUseCase(
-									ext,
-									query,
-									data
-								)
+								if (query.isEmpty()) {
+									getCatalogueListingData(ext, data, listing as? IExtension.Listing.Item)
+								} else {
+									loadCatalogueQueryDataUseCase(
+										ext,
+										query,
+										data,
+										listing as? IExtension.Listing.Item
+									)
+								}
 							}
 						}
 					}
@@ -217,6 +236,10 @@ class CatalogViewModel(
 			}
 		}
 		extensionIDFlow.value = extensionID
+	}
+
+	override fun setSelectedListing(listing: IExtension.Listing) {
+		selectedListing.value = listing
 	}
 
 	override fun applyQuery(newQuery: String) {

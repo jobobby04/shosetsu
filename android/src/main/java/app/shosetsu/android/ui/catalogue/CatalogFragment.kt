@@ -2,13 +2,18 @@ package app.shosetsu.android.ui.catalogue
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -16,7 +21,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +34,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,6 +76,7 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
@@ -75,6 +88,8 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
+import app.shosetsu.lib.IExtension
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.acra.ACRA
 
@@ -133,6 +148,9 @@ fun CatalogueView(
 
 		val exception by viewModel.exceptionFlow.collectAsState(null)
 		val hasFilters by viewModel.hasFilters.collectAsState()
+
+		val selectedListing by viewModel.selectedListing.collectAsState()
+		val listingOptions by viewModel.listingOptions.collectAsState()
 
 		val categories by viewModel.categories.collectAsState()
 
@@ -253,7 +271,10 @@ fun CatalogueView(
 			onSetCardType = viewModel::setViewType,
 			onBack = onBack,
 			hasSearch = hasSearch,
-			hostState = hostState
+			hostState = hostState,
+			selectedListing = selectedListing,
+			listingOptions = listingOptions,
+			setSelectedListing = viewModel::setSelectedListing
 		)
 		if (categoriesDialogItem != null) {
 			CategoriesDialog(
@@ -288,6 +309,54 @@ fun CatalogueView(
 	}
 }
 
+@Composable
+fun ListingsContent(
+	items: ImmutableList<IExtension.Listing>,
+	onSelectListing: (IExtension.Listing) -> Unit
+) {
+	Crossfade(items, label = "listing_items") {
+		key(it) {
+			val listState = rememberLazyListState()
+			LazyColumnScrollbar(listState = listState) {
+				LazyColumn(
+					state = listState,
+					modifier = Modifier.fillMaxSize()
+				) {
+					items(items) {
+						Row(
+							Modifier
+								.fillMaxWidth()
+								.clickable { onSelectListing(it) }
+								.padding(horizontal = 8.dp, vertical = 16.dp),
+							verticalAlignment = Alignment.CenterVertically
+						) {
+							when (it) {
+								is IExtension.Listing.Item -> {
+									Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
+									Spacer(modifier = Modifier.width(16.dp))
+									Text(
+										text = it.name,
+										style = MaterialTheme.typography.bodyLarge
+									)
+								}
+								is IExtension.Listing.List -> {
+									Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "list")
+									Spacer(modifier = Modifier.width(16.dp))
+									Text(
+										text = it.name,
+										style = MaterialTheme.typography.bodyLarge
+									)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+}
+
 /**
  * Content of [CatalogueView]
  */
@@ -310,7 +379,10 @@ fun CatalogContent(
 	onShowFilterMenu: () -> Unit,
 	onBack: () -> Unit,
 	hasSearch: Boolean,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
+	selectedListing: IExtension.Listing?,
+	listingOptions: ImmutableList<IExtension.Listing>,
+	setSelectedListing: (IExtension.Listing) -> Unit,
 ) {
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -355,7 +427,18 @@ fun CatalogContent(
 						.pullRefresh(pullRefreshState)
 						.padding(padding)
 				) {
-					CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
+					if (
+						items.itemCount == 0 &&
+						selectedListing != null &&
+						selectedListing !is IExtension.Listing.Item
+					) {
+						ListingsContent(
+							listingOptions,
+							setSelectedListing
+						)
+					} else {
+						CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
+					}
 				}
 			}
 		}

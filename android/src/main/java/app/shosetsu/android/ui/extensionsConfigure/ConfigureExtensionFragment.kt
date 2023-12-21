@@ -107,7 +107,6 @@ fun ConfigureExtensionContent(
 	onBack: () -> Unit
 ) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
-	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
 
 	Scaffold(
@@ -135,23 +134,6 @@ fun ConfigureExtensionContent(
 						viewModel.uninstall(extensionUIResult!!)
 						onBack()
 					}
-				}
-			}
-
-			if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
-				item {
-					DropdownSettingContent(
-						title = stringResource(R.string.listings),
-						description = stringResource(R.string.fragment_configure_extension_listing_desc),
-						choices = extensionListingResult!!.choices,
-						selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
-						onSelection = { index ->
-							viewModel.setSelectedListing(index)
-						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(top = 8.dp, start = 16.dp, end = 16.dp)
-					)
 				}
 			}
 
