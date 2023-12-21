@@ -37,7 +37,7 @@ interface IRemoteCatalogueDataSource {
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>,
-	): List<Novel.Listing>
+	): List<Novel.Info>
 
 
 	/**
@@ -46,7 +46,7 @@ interface IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, LuaError::class, IOException::class)
 	suspend fun loadListing(
 		ext: IExtension,
-		listingIndex: Int,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
-	): List<Novel.Listing>
+	): List<Novel.Info>
 }

@@ -130,7 +130,7 @@ interface INovelsRepository {
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>
-	): List<Novel.Listing>
+	): List<Novel.Info>
 
 	/**
 	 * Loads catalogue data of an [IExtension]
@@ -138,9 +138,9 @@ interface INovelsRepository {
 	@Throws(SSLException::class, LuaError::class)
 	suspend fun getCatalogueData(
 		ext: IExtension,
-		listing: Int,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
-	): List<Novel.Listing>
+	): List<Novel.Info>
 
 	/**
 	 * Get analytic entities

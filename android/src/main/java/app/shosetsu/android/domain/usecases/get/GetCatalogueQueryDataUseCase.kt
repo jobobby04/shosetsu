@@ -10,10 +10,12 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.LISTING_INDEX
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.luaj.vm2.LuaError
@@ -48,6 +50,7 @@ class GetCatalogueQueryDataUseCase(
 		val iExtension: IExtension,
 		val query: String,
 		val data: Map<Int, Any>,
+		val listing: IExtension.Listing.Item?
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? {
 			return state.anchorPosition?.let {
@@ -72,16 +75,38 @@ class GetCatalogueQueryDataUseCase(
 						novelsRepository.getCatalogueSearch(
 							iExtension,
 							query,
-							HashMap(data).also { it[PAGE_INDEX] = pageNumber }
+							HashMap(data).also {
+								it[PAGE_INDEX] = pageNumber
+								if (listing != null) {
+									it[LISTING_INDEX] = listing.link
+								}
+							}
 						).let {
-							val data: List<Novel.Listing> = it
-							(data.map { novelListing ->
-								novelListing.convertTo(iExtension)
-							}.mapNotNull { ne ->
+							val data: List<Novel.Info> = it
+							(data.mapNotNull { novelListing ->
+								val ne = novelListing.convertTo(iExtension)
 								try {
 									novelsRepository.insertReturnStripped(ne)
 										?.let { (id, title, imageURL, bookmarked) ->
-											ACatalogNovelUI(id, title, imageURL, bookmarked)
+											ACatalogNovelUI(
+												id = id,
+												title = title,
+												imageURL = imageURL,
+												bookmarked = bookmarked,
+												language = novelListing.language,
+												description = novelListing.description,
+												status = novelListing.status,
+												tags = novelListing.tags.asList().toImmutableList(),
+												genres = novelListing.genres.asList().toImmutableList(),
+												authors = novelListing.authors.asList().toImmutableList(),
+												artists = novelListing.artists.asList().toImmutableList(),
+												chapters = novelListing.chapters.asList().toImmutableList(),
+												chapterCount = novelListing.chapterCount,
+												wordCount = novelListing.wordCount,
+												commentCount = novelListing.commentCount,
+												viewCount = novelListing.viewCount,
+												favoriteCount = novelListing.favoriteCount
+											)
 										}
 								} catch (e: SQLiteException) {
 									logE("Failed to load parse novel", e)
@@ -131,16 +156,18 @@ class GetCatalogueQueryDataUseCase(
 	suspend operator fun invoke(
 		extID: Int,
 		query: String,
-		filters: Map<Int, Any>
+		filters: Map<Int, Any>,
+		listing: IExtension.Listing.Item?
 	): MyPagingSource = getExt(extID)?.let {
-		invoke(it, query, filters)
+		invoke(it, query, filters, listing)
 	} ?: throw MissingExtensionException(extID)
 
 	@Throws(LuaError::class)
 	operator fun invoke(
 		ext: IExtension,
 		query: String,
-		filters: Map<Int, Any>
-	): MyPagingSource = MyPagingSource(ext, query, filters)
+		filters: Map<Int, Any>,
+		listing: IExtension.Listing.Item?
+	): MyPagingSource = MyPagingSource(ext, query, filters, listing)
 
 }

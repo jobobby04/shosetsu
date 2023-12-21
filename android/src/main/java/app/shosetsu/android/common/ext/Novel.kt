@@ -53,7 +53,7 @@ fun Novel.Chapter.entity(
 		order = this.order
 	)
 
-fun Novel.Listing.convertTo(extension: IExtension): NovelEntity = NovelEntity(
+fun Novel.Info.convertTo(extension: IExtension): NovelEntity = NovelEntity(
 	url = this.link,
 	imageURL = this.imageURL,
 	title = this.title,

@@ -10,11 +10,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -115,7 +111,6 @@ fun ConfigureExtensionContent(
 	onExit: () -> Unit
 ) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
-	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
 
 
@@ -130,23 +125,6 @@ fun ConfigureExtensionContent(
 					viewModel.uninstall(extensionUIResult!!)
 					onExit()
 				}
-			}
-		}
-
-		if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
-			item {
-				DropdownSettingContent(
-					title = stringResource(R.string.listings),
-					description = stringResource(R.string.fragment_configure_extension_listing_desc),
-					choices = extensionListingResult!!.choices,
-					selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
-					onSelection = { index ->
-						viewModel.setSelectedListing(index)
-					},
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(top = 8.dp, start = 16.dp, end = 16.dp)
-				)
 			}
 		}
 
