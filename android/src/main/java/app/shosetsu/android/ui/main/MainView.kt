@@ -52,7 +52,7 @@ import app.shosetsu.android.ui.main.Destination.LIBRARY
 import app.shosetsu.android.ui.main.Destination.MIGRATION
 import app.shosetsu.android.ui.main.Destination.MORE
 import app.shosetsu.android.ui.main.Destination.NOVEL
-import app.shosetsu.android.ui.main.Destination.REPOSITORY
+import app.shosetsu.android.ui.main.Destination.REPOSITORIES
 import app.shosetsu.android.ui.main.Destination.SEARCH
 import app.shosetsu.android.ui.main.Destination.SETTINGS
 import app.shosetsu.android.ui.main.Destination.SETTINGS_ADVANCED
@@ -248,8 +248,35 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 	navigation(startDestination = "main", MORE.route) {
 		composable("main") {
 			MoreView(
-				makeSnackBar = {},
-				navigateSafely = { _, _ -> }
+				onNavToAbout = {
+					navController.navigate(ABOUT.route)
+				},
+				onNavToDownloads = {
+					navController.navigate(DOWNLOADS.route)
+				},
+				onNavToBackup = {
+					navController.navigate(SETTINGS_BACKUP.route)
+				},
+				onNavToRepositories = {
+					navController.navigate(REPOSITORIES.route)
+				},
+				onNavToCategories = {
+					navController.navigate(CATEGORIES.route)
+				},
+				onNavToStyles = {
+				},
+				onNavToAddShare = {
+					navController.navigate(ADD_SHARE.route)
+				},
+				onNavToAnalytics = {
+					navController.navigate(ANALYTICS.route)
+				},
+				onNavToHistory = {
+					navController.navigate(HISTORY.route)
+				},
+				onNavToSettings = {
+					navController.navigate(SETTINGS.route)
+				}
 			)
 		}
 		composable(ABOUT.route) {
@@ -276,7 +303,7 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 				}
 			)
 		}
-		composable(REPOSITORY.route) {
+		composable(REPOSITORIES.route) {
 		}
 
 		composable(HISTORY.route) {
@@ -355,7 +382,7 @@ sealed class Destination {
 	}
 
 	data object SEARCH : Destination()
-	data object REPOSITORY : Destination()
+	data object REPOSITORIES : Destination()
 	data object MIGRATION : Destination()
 	data object CATALOG : Destination() {
 		override val route: String = "catalog/{extId}"
