@@ -2,10 +2,7 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.webkit.CookieManager
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
@@ -71,7 +68,8 @@ class CatalogViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ACatalogViewModel() {
-	private val queryFlow: MutableStateFlow<String?> by lazy { MutableStateFlow(null) }
+	private val queryFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+	private val filtersApplied: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	/**
 	 * Map of filter id to the state to pass into the extension
@@ -87,7 +85,7 @@ class CatalogViewModel(
 
 	override val exceptionFlow: MutableStateFlow<Throwable?> = MutableStateFlow(null)
 
-	override val selectedListing: MutableStateFlow<IExtension.Listing?> = MutableStateFlow<IExtension.Listing?>(null)
+	override val selectedListing: MutableStateFlow<IExtension.Listing?> = MutableStateFlow(null)
 
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
@@ -95,7 +93,7 @@ class CatalogViewModel(
 
 			// Ensure filter is initialized
 			ext?.searchFiltersModel?.toList()?.init()
-			applyFilter()
+			applyFilters()
 			// Ensure listings are initialized
 			selectedListing.value = ext?.listings()
 			ext
@@ -142,23 +140,28 @@ class CatalogViewModel(
 		iExtensionFlow.combine(selectedListing) { ext, listing ->
 			ext to listing
 		}.transformLatest { (ext, listing) ->
-			if (ext == null || listing !is IExtension.Listing.Item) {
+			if (ext == null) {
 				emit(null)
 			} else {
 				emitAll(
-					queryFlow.flatMapLatest { query ->
+					queryFlow.combine(filtersApplied) { query, filtersApplied ->
+						query to filtersApplied
+					}.flatMapLatest { (query, filtersApplied) ->
+						if (query == null && !filtersApplied && listing !is IExtension.Listing.Item) {
+							return@flatMapLatest flowOf(null)
+						}
 						filterDataFlow.mapLatest { data ->
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query == null) {
-									getCatalogueListingData(ext, data, listing)
+								if (query == null && !filtersApplied) {
+									getCatalogueListingData(ext, data, listing as IExtension.Listing.Item)
 								} else {
 									loadCatalogueQueryDataUseCase(
 										ext,
 										query,
 										data,
-										listing
+										listing as? IExtension.Listing.Item
 									)
 								}
 							}
@@ -170,10 +173,24 @@ class CatalogViewModel(
 	}
 
 	override val itemsLive: Flow<PagingData<ACatalogNovelUI>> by lazy {
-		pagerFlow.transformLatest {
-			if (it != null)
-				emitAll(it.flow)
-			else emit(PagingData.empty())
+		pagerFlow.combine(selectedListing) { pager, listing ->
+			pager to listing
+		}.transformLatest {(pager, listing) ->
+			if (pager != null)
+				emitAll(pager.flow)
+			else if (listing !is IExtension.Listing.Item) {
+				emit(
+					PagingData.empty(
+						sourceLoadStates = LoadStates(
+							LoadState.NotLoading(false),
+							LoadState.NotLoading(false),
+							LoadState.NotLoading(false)
+						)
+					)
+				)
+			} else {
+				emit(PagingData.empty())
+			}
 		}.catch {
 			exceptionFlow.value = it
 		}.cachedIn(viewModelScope)
@@ -241,7 +258,7 @@ class CatalogViewModel(
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = null
-			applyFilter()
+			applyFilters()
 		}
 	}
 
@@ -303,12 +320,17 @@ class CatalogViewModel(
 	private val filterMutex = Mutex()
 	override fun applyFilter() {
 		launchIO {
-			if (filterMutex.tryLock()) {
-				try {
-					filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
-				} finally {
-					filterMutex.unlock()
-				}
+			applyFilters()
+			filtersApplied.value = true
+		}
+	}
+
+	private fun applyFilters() {
+		if (filterMutex.tryLock()) {
+			try {
+				filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
+			} finally {
+				filterMutex.unlock()
 			}
 		}
 	}
@@ -362,7 +384,8 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-			applyFilter()
+			applyFilters()
+			filtersApplied.value = false
 		}
 	}
 

@@ -139,7 +139,7 @@ class NovelsRepository(
 	@Throws(LuaError::class)
 	override suspend fun getCatalogueSearch(
 		ext: IExtension,
-		query: String,
+		query: String?,
 		data: Map<Int, Any>
 	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, query, data) }
 

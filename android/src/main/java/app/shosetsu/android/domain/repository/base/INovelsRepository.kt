@@ -128,7 +128,7 @@ interface INovelsRepository {
 	@Throws(LuaError::class)
 	suspend fun getCatalogueSearch(
 		ext: IExtension,
-		query: String,
+		query: String?,
 		data: Map<Int, Any>
 	): List<Novel.Info>
 

@@ -382,36 +382,39 @@ fun CatalogueView(
 			}
 		}
 
-		if (selectedListing !is IExtension.Listing.Item) {
+		if (
+			items.loadState.refresh is LoadState.NotLoading &&
+			items.itemCount == 0 &&
+			selectedListing !is IExtension.Listing.Item
+		) {
 			ListingsContent(
 				listingOptions,
 				viewModel::setSelectedListing
 			)
-
-			return@ShosetsuCompose
+		} else {
+			CatalogContent(
+				items,
+				type,
+				columnsInV,
+				columnsInH,
+				onClick = onOpenNovel,
+				onLongClick = {
+					if (categories.isNotEmpty() && !it.bookmarked) {
+						categoriesDialogItem = it
+					} else {
+						viewModel.backgroundNovelAdd(it)
+					}
+				},
+				hasFilters = hasFilters,
+				fab,
+				openWebView = openInWebView,
+				clearCookies = {
+					viewModel.clearCookies()
+					items.refresh()
+				}
+			)
 		}
 
-		CatalogContent(
-			items,
-			type,
-			columnsInV,
-			columnsInH,
-			onClick = onOpenNovel,
-			onLongClick = {
-				if (categories.isNotEmpty() && !it.bookmarked) {
-					categoriesDialogItem = it
-				} else {
-					viewModel.backgroundNovelAdd(it)
-				}
-			},
-			hasFilters = hasFilters,
-			fab,
-			openWebView = openInWebView,
-			clearCookies = {
-				viewModel.clearCookies()
-				items.refresh()
-			}
-		)
 		if (categoriesDialogItem != null) {
 			CategoriesDialog(
 				onDismissRequest = { categoriesDialogItem = null },

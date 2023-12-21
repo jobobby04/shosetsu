@@ -35,7 +35,7 @@ interface IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	suspend fun search(
 		ext: IExtension,
-		query: String,
+		query: String?,
 		data: Map<Int, Any>,
 	): List<Novel.Info>
 
