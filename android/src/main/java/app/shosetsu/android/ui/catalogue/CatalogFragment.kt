@@ -86,8 +86,7 @@ import app.shosetsu.android.view.compose.NovelCardExtendedContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
-import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
-import app.shosetsu.android.view.uimodels.ListingSelectionData
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
@@ -279,7 +278,7 @@ fun CatalogueView(
 		onBack = onBack,
 		hasSearch = hasSearch,
 		hostState = hostState,
-		selectedListing = selectedListing,
+		selectedListing = selectedListing?.let { StableHolder(it) },
 		listingOptions = listingOptions,
 		setSelectedListing = viewModel::setSelectedListing
 	)
@@ -426,7 +425,7 @@ fun CatalogContent(
 	onBack: () -> Unit,
 	hasSearch: Boolean,
 	hostState: SnackbarHostState,
-	selectedListing: IExtension.Listing?,
+	selectedListing: StableHolder<IExtension.Listing>?,
 	listingOptions: ImmutableList<IExtension.Listing>,
 	setSelectedListing: (IExtension.Listing) -> Unit,
 ) {
@@ -476,7 +475,7 @@ fun CatalogContent(
 					if (
 						items.loadState.refresh is LoadState.NotLoading &&
 						items.itemCount == 0 &&
-						selectedListing !is IExtension.Listing.Item
+						selectedListing?.item !is IExtension.Listing.Item
 					) {
 						ListingsContent(
 							listingOptions,
