@@ -54,6 +54,8 @@ abstract class AUpdatesViewModel
 	abstract fun showClearBefore()
 	abstract fun hideClearBefore()
 
+	abstract val displayDateAsMDYFlow: StateFlow<Boolean>
+
 	abstract val error: Flow<Throwable>
 
 	abstract val isClearBeforeVisible: StateFlow<Boolean>

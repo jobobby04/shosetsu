@@ -111,6 +111,7 @@ fun UpdatesView(
 		val items by viewModel.liveData.collectAsState()
 		val error by viewModel.error.collectAsState(null)
 		val isClearBeforeVisible by viewModel.isClearBeforeVisible.collectAsState()
+		val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
 
 		val context = LocalContext.current
 		val hostState = remember { SnackbarHostState() }
@@ -144,7 +145,8 @@ fun UpdatesView(
 			onClearAll = viewModel::clearAll,
 			onClearBefore = viewModel::showClearBefore,
 			hostState = hostState,
-			drawerIcon = drawerIcon
+			drawerIcon = drawerIcon,
+			displayDateAsMDY = displayDateAsMDY
 		)
 
 		if (isClearBeforeVisible) {
@@ -256,7 +258,8 @@ fun UpdatesContent(
 	onClearAll: () -> Unit,
 	onClearBefore: () -> Unit,
 	hostState: SnackbarHostState,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
+	displayDateAsMDY: Boolean
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Scaffold(
@@ -286,7 +289,10 @@ fun UpdatesContent(
 				) {
 					items.forEach { (header, updateItems) ->
 						stickyHeader {
-							UpdateHeaderItemContent(remember(header) { StableHolder(header) })
+							UpdateHeaderItemContent(
+								remember(header) { StableHolder(header) },
+								displayDateAsMDY
+							)
 						}
 
 						items(updateItems, key = { it.chapterID }) {
@@ -312,7 +318,7 @@ fun UpdatesContent(
 @Preview
 @Composable
 fun PreviewUpdateHeaderItemContent() {
-	UpdateHeaderItemContent(StableHolder(DateTime().trimDate()))
+	UpdateHeaderItemContent(StableHolder(DateTime().trimDate()), false)
 }
 
 @ExperimentalMaterial3Api
@@ -404,7 +410,7 @@ fun UpdateItemContent(
 }
 
 @Composable
-fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
+fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: Boolean) {
 	Surface(
 		modifier = Modifier.fillMaxWidth(),
 		shadowElevation = 2.dp,
@@ -419,7 +425,7 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>) {
 				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 					context.getString(R.string.yesterday)
 
-				else -> "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
+				else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 			}
 		}
 		Text(
