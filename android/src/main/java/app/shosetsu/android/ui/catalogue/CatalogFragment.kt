@@ -426,8 +426,8 @@ fun CatalogContent(
 						.padding(padding)
 				) {
 					if (
+						items.loadState.refresh is LoadState.NotLoading &&
 						items.itemCount == 0 &&
-						selectedListing != null &&
 						selectedListing !is IExtension.Listing.Item
 					) {
 						ListingsContent(
