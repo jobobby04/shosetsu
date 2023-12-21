@@ -35,6 +35,7 @@ import app.shosetsu.android.common.ext.getNovelID
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
 import app.shosetsu.android.ui.add.AddShareView
+import app.shosetsu.android.ui.analytics.AnalyticsView
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
 import app.shosetsu.android.ui.library.LibraryView
@@ -281,6 +282,7 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 		composable(HISTORY.route) {
 		}
 		composable(ANALYTICS.route) {
+			AnalyticsView(navController::popBackStack)
 		}
 
 		settingsGraph()

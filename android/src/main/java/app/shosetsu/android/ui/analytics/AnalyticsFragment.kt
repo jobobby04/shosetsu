@@ -1,24 +1,41 @@
 package app.shosetsu.android.ui.analytics
 
 import android.os.Bundle
-import android.view.*
-import androidx.compose.foundation.layout.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.controller.ShosetsuFragment
@@ -48,6 +65,7 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * @since 27 / 03 / 2023
  * @author Doomsdayrs
  */
+@Deprecated("Composed")
 class AnalyticsFragment : ShosetsuFragment() {
 	override val viewTitleRes: Int = R.string.analytics
 
@@ -56,9 +74,6 @@ class AnalyticsFragment : ShosetsuFragment() {
 	): View {
 		setViewTitle()
 		return ComposeView {
-			ShosetsuCompose {
-				AnalyticsView()
-			}
 		}
 	}
 }
@@ -67,7 +82,9 @@ class AnalyticsFragment : ShosetsuFragment() {
  * UI of [AnalyticsFragment]
  */
 @Composable
-fun AnalyticsView() {
+fun AnalyticsView(
+	onBack: () -> Unit
+) {
 	val viewModel = viewModelDi<AnalyticsViewModel>()
 
 	val novels by viewModel.novels.collectAsState(emptyList())
@@ -88,25 +105,28 @@ fun AnalyticsView() {
 	val topGenres by viewModel.topGenres.collectAsState(emptyList())
 	val topExtensions by viewModel.topExtensions.collectAsState(emptyList())
 
-	AnalyticsContent(
-		days,
-		hours,
-		minutes,
+	ShosetsuCompose {
+		AnalyticsContent(
+			days,
+			hours,
+			minutes,
 
-		totalLibraryNovelCount,
-		totalUnreadNovelCount,
-		totalReadingNovelCount,
-		totalReadNovelCount,
+			totalLibraryNovelCount,
+			totalUnreadNovelCount,
+			totalReadingNovelCount,
+			totalReadNovelCount,
 
-		totalChapterCount,
-		totalUnreadChapterCount,
-		totalReadingChapterCount,
-		totalReadChapterCount,
+			totalChapterCount,
+			totalUnreadChapterCount,
+			totalReadingChapterCount,
+			totalReadChapterCount,
 
-		topGenres,
-		topExtensions,
-		novels
-	)
+			topGenres,
+			topExtensions,
+			novels,
+			onBack
+		)
+	}
 }
 
 /**
@@ -151,6 +171,7 @@ fun PreviewAnalyticsContent() {
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsContent(
 	days: Int,
@@ -170,134 +191,149 @@ fun AnalyticsContent(
 	topGenres: List<String>,
 	topExtensions: List<String>,
 
-	novels: List<AnalyticsNovelUI>
+	novels: List<AnalyticsNovelUI>,
+	onBack: () -> Unit = {}
 ) {
-	Column(
-		modifier = Modifier
-			.fillMaxSize()
-			.verticalScroll(rememberScrollState()),
-		horizontalAlignment = Alignment.CenterHorizontally,
-		verticalArrangement = Arrangement.spacedBy(4.dp)
-	) {
-		// Overview
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.analytics))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
+			)
+		},
+	) { padding ->
 		Column(
-			modifier = Modifier.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp)
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(padding)
+				.verticalScroll(rememberScrollState()),
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			Text("Overview", style = MaterialTheme.typography.titleLarge)
-
-			Text("Total reading time", style = MaterialTheme.typography.titleMedium)
-			Row(
-				horizontalArrangement = Arrangement.SpaceEvenly,
-				modifier = Modifier.fillMaxWidth()
-			) {
-				AnalyticsUnitCard(
-					"Day(s)",
-					days
-				)
-				AnalyticsUnitCard(
-					"Hours(s)",
-					hours
-				)
-				AnalyticsUnitCard(
-					"Minutes(s)",
-					minutes
-				)
-			}
-
-			Text("Library", style = MaterialTheme.typography.titleMedium)
-
-			Row(
-				horizontalArrangement = Arrangement.SpaceEvenly,
-				modifier = Modifier.fillMaxWidth()
-			) {
-				AnalyticsUnitCard(
-					"Novel(s)",
-					totalLibraryNovelCount
-				)
-				AnalyticsUnitCard(
-					"Unread",
-					totalUnreadNovelCount
-				)
-				AnalyticsUnitCard(
-					"Reading",
-					totalReadingNovelCount
-				)
-				AnalyticsUnitCard(
-					"Read",
-					totalReadNovelCount
-				)
-			}
-
-			Text("Chapters", style = MaterialTheme.typography.titleMedium)
-
-			Row(
-				horizontalArrangement = Arrangement.SpaceEvenly,
-				modifier = Modifier.fillMaxWidth()
-			) {
-				AnalyticsUnitCard(
-					"Chapter(s)",
-					totalChapterCount
-				)
-				AnalyticsUnitCard(
-					"Unread",
-					totalUnreadChapterCount
-				)
-				AnalyticsUnitCard(
-					"Reading",
-					totalReadingChapterCount
-				)
-				AnalyticsUnitCard(
-					"Read",
-					totalReadChapterCount
-				)
-			}
-			Text("Top Genre(s)", style = MaterialTheme.typography.titleMedium)
-
+			// Overview
 			Column(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(4.dp)
+				modifier = Modifier.padding(16.dp),
+				verticalArrangement = Arrangement.spacedBy(8.dp)
 			) {
-				for (genre in topGenres) {
-					Card(modifier = Modifier.fillMaxWidth()) {
-						Text(
-							genre, modifier = Modifier
-								.padding(8.dp)
-								.fillMaxWidth(),
-							textAlign = TextAlign.Center
-						)
+				Text("Overview", style = MaterialTheme.typography.titleLarge)
+
+				Text("Total reading time", style = MaterialTheme.typography.titleMedium)
+				Row(
+					horizontalArrangement = Arrangement.SpaceEvenly,
+					modifier = Modifier.fillMaxWidth()
+				) {
+					AnalyticsUnitCard(
+						"Day(s)",
+						days
+					)
+					AnalyticsUnitCard(
+						"Hours(s)",
+						hours
+					)
+					AnalyticsUnitCard(
+						"Minutes(s)",
+						minutes
+					)
+				}
+
+				Text("Library", style = MaterialTheme.typography.titleMedium)
+
+				Row(
+					horizontalArrangement = Arrangement.SpaceEvenly,
+					modifier = Modifier.fillMaxWidth()
+				) {
+					AnalyticsUnitCard(
+						"Novel(s)",
+						totalLibraryNovelCount
+					)
+					AnalyticsUnitCard(
+						"Unread",
+						totalUnreadNovelCount
+					)
+					AnalyticsUnitCard(
+						"Reading",
+						totalReadingNovelCount
+					)
+					AnalyticsUnitCard(
+						"Read",
+						totalReadNovelCount
+					)
+				}
+
+				Text("Chapters", style = MaterialTheme.typography.titleMedium)
+
+				Row(
+					horizontalArrangement = Arrangement.SpaceEvenly,
+					modifier = Modifier.fillMaxWidth()
+				) {
+					AnalyticsUnitCard(
+						"Chapter(s)",
+						totalChapterCount
+					)
+					AnalyticsUnitCard(
+						"Unread",
+						totalUnreadChapterCount
+					)
+					AnalyticsUnitCard(
+						"Reading",
+						totalReadingChapterCount
+					)
+					AnalyticsUnitCard(
+						"Read",
+						totalReadChapterCount
+					)
+				}
+				Text("Top Genre(s)", style = MaterialTheme.typography.titleMedium)
+
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					for (genre in topGenres) {
+						Card(modifier = Modifier.fillMaxWidth()) {
+							Text(
+								genre, modifier = Modifier
+									.padding(8.dp)
+									.fillMaxWidth(),
+								textAlign = TextAlign.Center
+							)
+						}
+					}
+				}
+
+				Text("Top Extension(s)", style = MaterialTheme.typography.titleMedium)
+
+				Column(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					for (extension in topExtensions) {
+						Card(modifier = Modifier.fillMaxWidth()) {
+							Text(
+								extension, modifier = Modifier
+									.padding(8.dp)
+									.fillMaxWidth(),
+								textAlign = TextAlign.Center
+							)
+						}
 					}
 				}
 			}
+			// Per novel
 
-			Text("Top Extension(s)", style = MaterialTheme.typography.titleMedium)
-
-			Column(
-				modifier = Modifier.fillMaxWidth(),
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(4.dp)
+			LazyRow(
+				horizontalArrangement = Arrangement.spacedBy(4.dp),
+				contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
 			) {
-				for (extension in topExtensions) {
-					Card(modifier = Modifier.fillMaxWidth()) {
-						Text(
-							extension, modifier = Modifier
-								.padding(8.dp)
-								.fillMaxWidth(),
-							textAlign = TextAlign.Center
-						)
-					}
+				items(novels, key = { it.id }) {
+					AnalyticsNovelCard(it)
 				}
-			}
-		}
-		// Per novel
-
-		LazyRow(
-			horizontalArrangement = Arrangement.spacedBy(4.dp),
-			contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
-		) {
-			items(novels, key = { it.id }) {
-				AnalyticsNovelCard(it)
 			}
 		}
 	}
