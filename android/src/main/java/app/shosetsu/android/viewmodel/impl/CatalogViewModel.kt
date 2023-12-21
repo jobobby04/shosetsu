@@ -85,7 +85,7 @@ class CatalogViewModel(
 
 	override val exceptionFlow: MutableStateFlow<Throwable?> = MutableStateFlow(null)
 
-	override val selectedListing: MutableStateFlow<IExtension.Listing?> = MutableStateFlow(null)
+	override val selectedListing: MutableStateFlow<StableHolder<IExtension.Listing>?> = MutableStateFlow(null)
 
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
@@ -95,14 +95,17 @@ class CatalogViewModel(
 			ext?.searchFiltersModel?.toList()?.init()
 			applyFilters()
 			// Ensure listings are initialized
-			selectedListing.value = ext?.listings()
+			selectedListing.value = ext?.let { StableHolder(it.listings()) }
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	override val listingOptions = selectedListing.mapLatest {
-		when (it) {
-			is IExtension.Listing.List -> it.getListings().toList().toImmutableList()
+	override val listingOptions = selectedListing.mapLatest { listing ->
+		when (listing?.item) {
+			is IExtension.Listing.List -> (listing.item as IExtension.Listing.List)
+				.getListings()
+				.map { StableHolder(it) }
+				.toImmutableList()
 			else -> persistentListOf()
 		}
 	}.catch {
@@ -147,7 +150,7 @@ class CatalogViewModel(
 					queryFlow.combine(filtersApplied) { query, filtersApplied ->
 						query to filtersApplied
 					}.flatMapLatest { (query, filtersApplied) ->
-						if (query == null && !filtersApplied && listing !is IExtension.Listing.Item) {
+						if (query == null && !filtersApplied && listing?.item !is IExtension.Listing.Item) {
 							return@flatMapLatest flowOf(null)
 						}
 						filterDataFlow.mapLatest { data ->
@@ -155,13 +158,13 @@ class CatalogViewModel(
 								PagingConfig(10)
 							) {
 								if (query == null && !filtersApplied) {
-									getCatalogueListingData(ext, data, listing as IExtension.Listing.Item)
+									getCatalogueListingData(ext, data, listing!!.item as IExtension.Listing.Item)
 								} else {
 									loadCatalogueQueryDataUseCase(
 										ext,
 										query,
 										data,
-										listing as? IExtension.Listing.Item
+										listing?.item as? IExtension.Listing.Item
 									)
 								}
 							}
@@ -178,7 +181,7 @@ class CatalogViewModel(
 		}.transformLatest {(pager, listing) ->
 			if (pager != null)
 				emitAll(pager.flow)
-			else if (listing !is IExtension.Listing.Item) {
+			else if (listing?.item !is IExtension.Listing.Item) {
 				emit(
 					PagingData.empty(
 						sourceLoadStates = LoadStates(
@@ -246,7 +249,7 @@ class CatalogViewModel(
 	}
 
 	override fun setSelectedListing(listing: IExtension.Listing) {
-		selectedListing.value = listing
+		selectedListing.value = StableHolder(listing)
 	}
 
 	override fun applyQuery(newQuery: String) {

@@ -49,6 +49,7 @@ import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.ExtendedFABController
 import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
 import app.shosetsu.android.view.controller.base.syncFABWithCompose
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
@@ -385,7 +386,7 @@ fun CatalogueView(
 		if (
 			items.loadState.refresh is LoadState.NotLoading &&
 			items.itemCount == 0 &&
-			selectedListing !is IExtension.Listing.Item
+			selectedListing?.item !is IExtension.Listing.Item
 		) {
 			ListingsContent(
 				listingOptions,
@@ -450,7 +451,7 @@ fun CatalogueView(
 
 @Composable
 fun ListingsContent(
-	items: ImmutableList<IExtension.Listing>,
+	items: ImmutableList<StableHolder<IExtension.Listing>>,
 	onSelectListing: (IExtension.Listing) -> Unit
 ) {
 	Crossfade(items, label = "listing_items") {
@@ -465,16 +466,16 @@ fun ListingsContent(
 						Row(
 							Modifier
 								.fillMaxWidth()
-								.clickable { onSelectListing(it) }
+								.clickable { onSelectListing(it.item) }
 								.padding(horizontal = 8.dp, vertical = 16.dp),
 							verticalAlignment = Alignment.CenterVertically
 						) {
-							when (it) {
+							when (it.item) {
 								is IExtension.Listing.Item -> {
 									Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "list")
 									Spacer(modifier = Modifier.width(16.dp))
 									Text(
-										text = it.name,
+										text = it.item.name,
 										style = MaterialTheme.typography.bodyLarge
 									)
 								}
@@ -482,7 +483,7 @@ fun ListingsContent(
 									Icon(imageVector = Icons.Default.List, contentDescription = "list")
 									Spacer(modifier = Modifier.width(16.dp))
 									Text(
-										text = it.name,
+										text = it.item.name,
 										style = MaterialTheme.typography.bodyLarge
 									)
 								}

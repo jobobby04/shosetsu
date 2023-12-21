@@ -48,9 +48,9 @@ abstract class ACatalogViewModel :
 	/**
 	 * Displayed listings from the extension
 	 */
-	abstract val selectedListing: StateFlow<IExtension.Listing?>
+	abstract val selectedListing: StateFlow<StableHolder<IExtension.Listing>?>
 
-	abstract val listingOptions: StateFlow<ImmutableList<IExtension.Listing>>
+	abstract val listingOptions: StateFlow<ImmutableList<StableHolder<IExtension.Listing>>>
 
 	/**
 	 * The list of items that will be presented as the filter menu
