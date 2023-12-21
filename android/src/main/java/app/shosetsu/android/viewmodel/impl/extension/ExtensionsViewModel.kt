@@ -17,6 +17,9 @@ package app.shosetsu.android.viewmodel.impl.extension
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.R
+import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.BrowseFilteredLanguages
 import app.shosetsu.android.common.ext.launchIO
@@ -33,9 +36,20 @@ import app.shosetsu.android.domain.usecases.load.LoadBrowseExtensionsUseCase
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
-import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * shosetsu
@@ -49,10 +63,14 @@ class ExtensionsViewModel(
 	private val startRepositoryUpdateManager: StartRepositoryUpdateManagerUseCase,
 	private val installExtensionUI: RequestInstallExtensionUseCase,
 	private val cancelExtensionInstall: CancelExtensionInstallUseCase,
-	private var isOnlineUseCase: IsOnlineUseCase,
-	override val settingsRepo: ISettingsRepository
+	private val isOnlineUseCase: IsOnlineUseCase,
+	override val settingsRepo: ISettingsRepository,
 ) : ABrowseViewModel(), ExposedSettingsRepoViewModel {
 
+	override val isOnline =
+		isOnlineUseCase.getFlow().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+	override val error = MutableSharedFlow<Throwable>()
 
 	override fun refresh() {
 		startRepositoryUpdateManager()
@@ -63,13 +81,21 @@ class ExtensionsViewModel(
 		option: ExtensionInstallOptionEntity
 	) {
 		launchIO {
-			installExtensionUI(extension, option)
+			if (isOnline.value) {
+				installExtensionUI(extension, option)
+			} else {
+				error.tryEmit(OfflineException(R.string.fragment_browse_snackbar_offline_no_install_extension))
+			}
 		}
 	}
 
 	override fun updateExtension(ext: BrowseExtensionUI) {
 		launchIO {
-			installExtensionUI(ext)
+			if (isOnline.value) {
+				installExtensionUI(ext)
+			} else {
+				error.tryEmit(OfflineException(R.string.fragment_browse_snackbar_offline_no_update_extension))
+			}
 		}
 	}
 
@@ -195,7 +221,5 @@ class ExtensionsViewModel(
 			}
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
-
-	override fun isOnline(): Boolean = isOnlineUseCase()
 
 }

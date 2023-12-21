@@ -140,7 +140,7 @@ fun UpdatesView(
 			when (error) {
 				is OfflineException -> {
 					val result = hostState.showSnackbar(
-						context.getString(R.string.generic_error_cannot_update_library_offline),
+						context.getString((error as OfflineException).messageRes),
 						duration = SnackbarDuration.Long,
 						actionLabel = context.getString(R.string.generic_wifi_settings)
 					)

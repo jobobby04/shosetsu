@@ -184,7 +184,7 @@ fun PreviewLibrarySearchAction() {
 		var query by remember { mutableStateOf("") }
 
 		Row {
-			LibrarySearchAction(
+			SearchAction(
 				query,
 				onSearch = {
 					query = it
@@ -197,9 +197,12 @@ fun PreviewLibrarySearchAction() {
 // Normal View
 
 @Composable
-fun LibrarySearchAction(
+fun SearchAction(
 	query: String,
-	onSearch: (String) -> Unit
+	onSearch: (String) -> Unit,
+	icon: @Composable () -> Unit = {
+		Icon(Icons.Default.Search, stringResource(R.string.search))
+	}
 ) {
 	var expanded by remember { mutableStateOf(false) }
 
@@ -216,7 +219,7 @@ fun LibrarySearchAction(
 				expanded = !expanded
 			}
 		) {
-			Icon(Icons.Default.Search, stringResource(R.string.search))
+			icon()
 		}
 
 		if (expanded) {

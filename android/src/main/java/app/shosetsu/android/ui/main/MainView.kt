@@ -31,6 +31,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
+import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
+import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_QUERY
 import app.shosetsu.android.common.ext.getNovelID
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
@@ -38,6 +41,7 @@ import app.shosetsu.android.ui.add.AddShareView
 import app.shosetsu.android.ui.analytics.AnalyticsView
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
+import app.shosetsu.android.ui.extensionsConfigure.ConfigureExtensionView
 import app.shosetsu.android.ui.library.LibraryView
 import app.shosetsu.android.ui.main.Destination.ABOUT
 import app.shosetsu.android.ui.main.Destination.ADD_SHARE
@@ -66,6 +70,7 @@ import app.shosetsu.android.ui.main.Destination.UPDATES
 import app.shosetsu.android.ui.migration.MigrationView
 import app.shosetsu.android.ui.more.MoreView
 import app.shosetsu.android.ui.novel.NovelInfoView
+import app.shosetsu.android.ui.search.SearchView
 import app.shosetsu.android.ui.settings.SettingsView
 import app.shosetsu.android.ui.settings.sub.TextAssetReaderView
 import app.shosetsu.android.ui.theme.ShosetsuTheme
@@ -131,7 +136,7 @@ fun MainView() {
 						}
 					)
 				}
-				browseGraph()
+				browseGraph(navController)
 				moreGraph(navController)
 				composable(TEXT_READER.route) {
 					TextAssetReaderView(
@@ -215,20 +220,26 @@ fun <T> BottomNavigationBar(
 	}
 }
 
-fun NavGraphBuilder.browseGraph() {
+fun NavGraphBuilder.browseGraph(navController: NavHostController) {
 	navigation("main", BROWSE.route) {
 		composable("main") {
 			BrowseView(
-				onRefresh = {},
-				installExtension = { _, _ -> },
-				openCatalogue = {},
-				openSettings = {},
-				fab = null,
-				openRepositories = {}
+				openCatalogue = {
+					navController.navigate(CATALOG.routeWith(it))
+				},
+				openSettings = {
+					navController.navigate(CONFIGURE_EXTENSION.routeWith(it))
+				},
+				openRepositories = {
+					navController.navigate(REPOSITORIES.route)
+				},
+				openSearch = {
+					navController.navigate(SEARCH.route)
+				}
 			)
 		}
-		composable(CATALOG.route) { entry ->
-			val novelId = entry.arguments!!.getInt(BundleKeys.BUNDLE_EXTENSION)
+		composable(CATALOG.route, CATALOG.arguments) { entry ->
+			val extensionId = entry.arguments!!.getInt(BUNDLE_EXTENSION)
 			CatalogueView(
 				onOpenNovel = {},
 				errorMessage = { _, _ -> },
@@ -236,10 +247,22 @@ fun NavGraphBuilder.browseGraph() {
 				makeSnackBar = { _, _ -> null }
 			)
 		}
-		composable(CONFIGURE_EXTENSION.route) {
+		composable(CONFIGURE_EXTENSION.route, CONFIGURE_EXTENSION.arguments) { entry ->
+			val extensionId = entry.arguments!!.getInt(BUNDLE_EXTENSION)
+			ConfigureExtensionView(
+				extensionId,
+				onExit = navController::popBackStack
+			)
 		}
 
-		composable(SEARCH.route) {
+		composable(SEARCH.route) { entry ->
+			val query = entry.arguments?.getString(BUNDLE_QUERY)
+			SearchView(
+				query = query,
+				openNovel = {
+					navController.navigate(NOVEL.routeWith(it))
+				}
+			)
 		}
 	}
 }
@@ -371,10 +394,10 @@ sealed class Destination {
 	}
 
 	data object NOVEL : Destination() {
-		override val route: String = "novel/{novelId}"
+		override val route: String = "novel/{$BUNDLE_NOVEL_ID}"
 		override val arguments: List<NamedNavArgument> =
 			listOf(
-				navArgument("novelId") { type = NavType.IntType }
+				navArgument(BUNDLE_NOVEL_ID) { type = NavType.IntType }
 			)
 
 		fun routeWith(novelId: Int): String =
@@ -385,19 +408,33 @@ sealed class Destination {
 	data object REPOSITORIES : Destination()
 	data object MIGRATION : Destination()
 	data object CATALOG : Destination() {
-		override val route: String = "catalog/{extId}"
+		override val route: String = "catalog/{$BUNDLE_EXTENSION}"
+
 		override val arguments: List<NamedNavArgument> =
 			listOf(
-				navArgument("extId") { type = NavType.IntType }
+				navArgument(BUNDLE_EXTENSION) { type = NavType.IntType }
 			)
+
+		fun routeWith(extensionId: Int): String =
+			"catalog/$extensionId"
 	}
 
 	data object BROWSE : Destination(), Root {
 		override val icon: Int = R.drawable.navigation_arrow
 	}
 
-	object CONFIGURE_EXTENSION : Destination()
-	object LIBRARY : Destination(), Root {
+	data object CONFIGURE_EXTENSION : Destination() {
+		override val route: String = "configure/{$BUNDLE_EXTENSION}"
+		override val arguments: List<NamedNavArgument> =
+			listOf(
+				navArgument(BUNDLE_EXTENSION) { type = NavType.IntType }
+			)
+
+		fun routeWith(extensionId: Int): String =
+			"configure/$extensionId"
+	}
+
+	data object LIBRARY : Destination(), Root {
 		override val icon: Int = R.drawable.library
 	}
 }

@@ -18,6 +18,7 @@ package app.shosetsu.android.viewmodel.impl
  */
 
 import androidx.compose.ui.state.ToggleableState
+import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.InclusionState
@@ -532,7 +533,7 @@ class LibraryViewModel(
 		if (isOnline()) {
 			startUpdateWorkerUseCase(categoryID, true)
 		} else {
-			error.tryEmit(OfflineException())
+			error.tryEmit(OfflineException(R.string.generic_error_cannot_update_library_offline))
 		}
 	}
 

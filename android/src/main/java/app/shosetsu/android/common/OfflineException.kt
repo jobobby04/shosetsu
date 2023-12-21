@@ -1,5 +1,6 @@
 package app.shosetsu.android.common
 
+import androidx.annotation.StringRes
 import java.io.Serial
 
 /*
@@ -24,8 +25,12 @@ import java.io.Serial
  *
  * @since 20 / 12 / 2023
  * @author Doomsdayrs
+ * @param messageRes given message
  */
-class OfflineException : Exception() {
+class OfflineException(
+	@StringRes
+	val messageRes: Int
+) : Exception() {
 	companion object {
 		@Serial
 		private const val serialVersionUID: Long = -2240930689548518502L

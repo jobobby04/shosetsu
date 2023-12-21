@@ -2,6 +2,7 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.trimDate
@@ -72,7 +73,7 @@ class UpdatesViewModel(
 		if (isOnlineFlow.value) {
 			startUpdateWorkerUseCase(categoryID)
 		} else {
-			error.tryEmit(OfflineException())
+			error.tryEmit(OfflineException(R.string.generic_error_cannot_update_library_offline))
 		}
 	}
 
