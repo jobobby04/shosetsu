@@ -88,7 +88,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	}
 
 	bind<GetCatalogueListingDataUseCase>() with provider {
-		GetCatalogueListingDataUseCase(instance())
+		GetCatalogueListingDataUseCase(instance(), instance())
 	}
 
 	bind<GetChapterUIsUseCase>() with provider { GetChapterUIsUseCase(instance()) }
@@ -143,9 +143,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 
 	bind<LoadAppUpdateFlowLiveUseCase>() with provider { LoadAppUpdateFlowLiveUseCase(instance()) }
 
-	bind<GetCatalogueQueryDataUseCase>() with provider {
-		GetCatalogueQueryDataUseCase(instance(), instance())
-	}
 	bind<LoadSearchRowUIUseCase>() with provider {
 		LoadSearchRowUIUseCase(
 			instance(),

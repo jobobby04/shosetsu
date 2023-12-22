@@ -12,7 +12,6 @@ import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
-import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
@@ -60,7 +59,6 @@ class CatalogViewModel(
 	private val getExtensionUseCase: GetExtensionUseCase,
 	private val backgroundAddUseCase: NovelBackgroundAddUseCase,
 	private val getCatalogueListingData: GetCatalogueListingDataUseCase,
-	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
 	private val loadNovelUITypeUseCase: LoadNovelUITypeUseCase,
 	private val loadNovelUIColumnsHUseCase: LoadNovelUIColumnsHUseCase,
 	private val loadNovelUIColumnsPUseCase: LoadNovelUIColumnsPUseCase,
@@ -68,7 +66,7 @@ class CatalogViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ACatalogViewModel() {
-	private val queryFlow: MutableStateFlow<String?> = MutableStateFlow(null)
+	private val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 	private val filtersApplied: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	/**
@@ -150,23 +148,14 @@ class CatalogViewModel(
 					queryFlow.combine(filtersApplied) { query, filtersApplied ->
 						query to filtersApplied
 					}.flatMapLatest { (query, filtersApplied) ->
-						if (query == null && !filtersApplied && listing?.item !is IExtension.Listing.Item) {
+						if (query.isEmpty() && !filtersApplied && listing?.item !is IExtension.Listing.Item) {
 							return@flatMapLatest flowOf(null)
 						}
 						filterDataFlow.mapLatest { data ->
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query == null && !filtersApplied) {
-									getCatalogueListingData(ext, data, listing!!.item as IExtension.Listing.Item)
-								} else {
-									loadCatalogueQueryDataUseCase(
-										ext,
-										query,
-										data,
-										listing?.item as? IExtension.Listing.Item
-									)
-								}
+								getCatalogueListingData(ext, query, data, listing?.item as? IExtension.Listing.Item)
 							}
 						}
 					}
@@ -260,7 +249,7 @@ class CatalogViewModel(
 	override fun resetView() {
 		launchIO {
 			resetFilterDataState()
-			queryFlow.value = null
+			queryFlow.value = ""
 			applyFilters()
 		}
 	}

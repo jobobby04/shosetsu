@@ -7,7 +7,7 @@ import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.usecases.SearchBookMarkedNovelsUseCase
-import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
+import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.load.LoadSearchRowUIUseCase
@@ -49,7 +49,7 @@ class SearchViewModel(
 	private val searchBookMarkedNovelsUseCase: SearchBookMarkedNovelsUseCase,
 	private val loadNovelUITypeUseCase: LoadNovelUITypeUseCase,
 	private val loadSearchRowUIUseCase: LoadSearchRowUIUseCase,
-	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
+	private val loadCatalogueListingDataUseCase: GetCatalogueListingDataUseCase,
 	private val getExtensionUseCase: GetExtensionUseCase
 ) : ASearchViewModel() {
 
@@ -234,7 +234,7 @@ class SearchViewModel(
 								PagingConfig(10)
 							) {
 								runBlocking {
-									loadCatalogueQueryDataUseCase(
+									loadCatalogueListingDataUseCase(
 										extensionID,
 										query,
 										HashMap<Int, Any>().apply {
