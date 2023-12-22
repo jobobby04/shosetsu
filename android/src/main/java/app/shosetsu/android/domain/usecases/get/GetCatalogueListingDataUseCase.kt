@@ -3,14 +3,14 @@ package app.shosetsu.android.domain.usecases.get
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.LISTING_INDEX
 import app.shosetsu.lib.PAGE_INDEX
-import app.shosetsu.lib.QUERY_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
 import kotlinx.collections.immutable.toImmutableList
@@ -42,10 +42,12 @@ import javax.net.ssl.SSLException
  * 15 / 05 / 2020
  */
 class GetCatalogueListingDataUseCase(
+	private val getExt: GetExtensionUseCase,
 	private val novelsRepository: INovelsRepository,
 ) {
 	inner class MyPagingSource(
 		private val iExtension: IExtension,
+		val query: String,
 		val data: Map<Int, Any>,
 		private val listing: IExtension.Listing.Item?,
 	) : PagingSource<Int, ACatalogNovelUI>() {
@@ -71,10 +73,9 @@ class GetCatalogueListingDataUseCase(
 					val response =
 						search(
 							iExtension,
+							query,
 							HashMap(data).also {
 								it[PAGE_INDEX] = pageNumber
-								it[QUERY_INDEX] = ""
-								it[LISTING_INDEX] = listing?.link
 							},
 							listing // todo remove
 						)
@@ -111,23 +112,46 @@ class GetCatalogueListingDataUseCase(
 		}
 	}
 
+	@Throws(
+		SQLiteException::class,
+		IncompatibleExtensionException::class,
+		LuaError::class,
+		MissingExtensionException::class
+	)
+	suspend operator fun invoke(
+		extID: Int,
+		query: String,
+		filters: Map<Int, Any>,
+		listing: IExtension.Listing.Item?
+	): MyPagingSource = getExt(extID)?.let {
+		invoke(it, query, filters, listing)
+	} ?: throw MissingExtensionException(extID)
+
 	@Throws(SSLException::class, LuaError::class)
 	operator fun invoke(
 		iExtension: IExtension,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
-	) = MyPagingSource(iExtension, data, listing)
+	) = MyPagingSource(
+		iExtension,
+		query,
+		data,
+		listing
+	)
 
 	@Throws(SSLException::class, LuaError::class)
 	suspend fun search(
 		iExtension: IExtension,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
 	): List<ACatalogNovelUI> =
-		novelsRepository.getCatalogueData(
+		novelsRepository.listCatalogue(
 			iExtension,
+			query,
+			data,
 			listing,
-			data
 		).let { list ->
 			list.mapNotNull { novelListing ->
 				val ne = novelListing.convertTo(iExtension)
