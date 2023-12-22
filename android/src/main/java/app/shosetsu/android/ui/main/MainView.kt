@@ -47,6 +47,7 @@ import app.shosetsu.android.ui.add.AddShareView
 import app.shosetsu.android.ui.analytics.AnalyticsView
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
+import app.shosetsu.android.ui.categories.CategoriesView
 import app.shosetsu.android.ui.extensionsConfigure.ConfigureExtensionView
 import app.shosetsu.android.ui.library.LibraryView
 import app.shosetsu.android.ui.main.Destination.ABOUT
@@ -336,6 +337,9 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 			)
 		}
 		composable(CATEGORIES.route) {
+			CategoriesView(
+				onBack = navController::popBackStack
+			)
 		}
 		composable(DOWNLOADS.route) {
 		}
