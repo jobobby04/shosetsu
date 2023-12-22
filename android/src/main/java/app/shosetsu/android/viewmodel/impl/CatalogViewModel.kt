@@ -33,7 +33,18 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.sync.Mutex
 import java.util.concurrent.ConcurrentHashMap
 
@@ -71,7 +82,7 @@ class CatalogViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ACatalogViewModel() {
-	private val queryFlow: MutableStateFlow<String?> by lazy { MutableStateFlow(null) }
+	override val queryFlow: MutableStateFlow<String> by lazy { MutableStateFlow("") }
 
 	/**
 	 * Map of filter id to the state to pass into the extension
@@ -85,7 +96,7 @@ class CatalogViewModel(
 	 */
 	private val extensionIDFlow: MutableStateFlow<Int> = MutableStateFlow(-1)
 
-	override val exceptionFlow: MutableStateFlow<Throwable?> = MutableStateFlow(null)
+	override val exceptionFlow = MutableSharedFlow<Throwable>()
 
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
@@ -136,7 +147,7 @@ class CatalogViewModel(
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query == null)
+								if (query.isNotEmpty())
 									getCatalogueListingData(ext, data)
 								else loadCatalogueQueryDataUseCase(
 									ext,
@@ -157,7 +168,7 @@ class CatalogViewModel(
 				emitAll(it.flow)
 			else emit(PagingData.empty())
 		}.catch {
-			exceptionFlow.value = it
+			exceptionFlow.emit(it)
 		}.cachedIn(viewModelScope)
 	}
 
@@ -188,11 +199,9 @@ class CatalogViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, "")
 	}
 
-	override fun getBaseURL(): Flow<String> =
-		flow {
-			val ext = iExtensionFlow.value ?: return@flow
-			emit(ext.baseURL)
-		}.onIO()
+	override val baseURL: StateFlow<String?> =
+		iExtensionFlow.map { it?.baseURL }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 
 	override fun setExtensionID(extensionID: Int) {
 		when {
@@ -218,7 +227,7 @@ class CatalogViewModel(
 	override fun resetView() {
 		launchIO {
 			resetFilterDataState()
-			queryFlow.value = null
+			queryFlow.value = ""
 			applyFilter()
 		}
 	}

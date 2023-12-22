@@ -238,15 +238,18 @@ fun NavGraphBuilder.browseGraph(navController: NavHostController) {
 				}
 			)
 		}
+
 		composable(CATALOG.route, CATALOG.arguments) { entry ->
 			val extensionId = entry.arguments!!.getInt(BUNDLE_EXTENSION)
 			CatalogueView(
-				onOpenNovel = {},
-				errorMessage = { _, _ -> },
-				openInWebView = {},
-				makeSnackBar = { _, _ -> null }
+				extensionId,
+				onOpenNovel = {
+					navController.navigate(NOVEL.routeWith(it))
+				},
+				onBack = navController::popBackStack
 			)
 		}
+
 		composable(CONFIGURE_EXTENSION.route, CONFIGURE_EXTENSION.arguments) { entry ->
 			val extensionId = entry.arguments!!.getInt(BUNDLE_EXTENSION)
 			ConfigureExtensionView(
