@@ -17,7 +17,6 @@ import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
-import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase

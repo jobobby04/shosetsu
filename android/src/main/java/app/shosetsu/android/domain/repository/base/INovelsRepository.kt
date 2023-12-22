@@ -24,7 +24,6 @@ import app.shosetsu.lib.exceptions.HTTPException
 import kotlinx.coroutines.flow.Flow
 import org.luaj.vm2.LuaError
 import java.io.IOException
-import javax.net.ssl.SSLException
 
 
 /**
@@ -123,23 +122,14 @@ interface INovelsRepository {
 
 
 	/**
-	 * Queries the [IExtension] for a search result
+	 * Lists the [IExtension] for novels
 	 */
 	@Throws(LuaError::class)
-	suspend fun getCatalogueSearch(
+	suspend fun listCatalogue(
 		ext: IExtension,
 		query: String,
-		data: Map<Int, Any>
-	): List<Novel.Info>
-
-	/**
-	 * Loads catalogue data of an [IExtension]
-	 */
-	@Throws(SSLException::class, LuaError::class)
-	suspend fun getCatalogueData(
-		ext: IExtension,
-		listing: IExtension.Listing.Item?,
 		data: Map<Int, Any>,
+		listing: IExtension.Listing.Item?,
 	): List<Novel.Info>
 
 	/**

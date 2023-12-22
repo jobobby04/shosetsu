@@ -1,8 +1,8 @@
 package app.shosetsu.android.datasource.remote.impl
 
-import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.LISTING_INDEX
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.QUERY_INDEX
@@ -34,46 +34,37 @@ import java.io.IOException
  */
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 
+	@Suppress("DEPRECATION") // todo remove getListing
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
-	override suspend fun search(
+	override suspend fun list(
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>,
+		listing: IExtension.Listing.Item?,
 	): List<Novel.Info> {
-		return if (ext.hasSearch) {
-			try {
+		return if (query.isEmpty() && listing?.getListing != null) { // old extension, todo remove
+			if (!listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
+				emptyList()
+			} else try {
+				listing.getListing!!(data).toList()
+			} catch (e: LuaError) {
+				if (e.cause != null)
+					throw e.cause!!
+				else throw e
+			}
+		} else {
+			if (listing != null && !listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
+				emptyList()
+			} else try {
 				ext.list(HashMap(data).apply {
 					this[QUERY_INDEX] = query
+					this[LISTING_INDEX] = listing?.link
 				}).toList()
 			} catch (e: LuaError) {
 				if (e.cause != null)
 					throw e.cause!!
 				else throw e
 			}
-		} else emptyList()
-	}
-
-	@Throws(HTTPException::class, LuaError::class, IOException::class)
-	override suspend fun loadListing(
-		ext: IExtension,
-		listing: IExtension.Listing.Item?,
-		data: Map<Int, Any>,
-	): List<Novel.Info> {
-		logD(data.toString())
-
-		return if (listing?.isIncrementing == false && (data[PAGE_INDEX] as Int) > ext.startIndex) {
-			emptyList()
-		} else try {
-			@Suppress("DEPRECATION") // todo remove getListing
-			if (listing?.getListing != null) {
-				listing.getListing!!(data).toList()
-			} else {
-				ext.list(data).toList()
-			}
-		} catch (e: LuaError) {
-			if (e.cause != null)
-				throw e.cause!!
-			else throw e
 		}
 	}
 }

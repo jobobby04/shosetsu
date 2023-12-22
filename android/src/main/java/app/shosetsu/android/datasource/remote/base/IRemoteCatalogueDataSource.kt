@@ -30,23 +30,13 @@ import java.io.IOException
 interface IRemoteCatalogueDataSource {
 
 	/**
-	 * Runs a search on an extension
+	 * Lists the current catalog
 	 */
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
-	suspend fun search(
+	suspend fun list(
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>,
-	): List<Novel.Info>
-
-
-	/**
-	 * Loads a listings data from an extension
-	 */
-	@Throws(HTTPException::class, LuaError::class, IOException::class)
-	suspend fun loadListing(
-		ext: IExtension,
 		listing: IExtension.Listing.Item?,
-		data: Map<Int, Any>,
 	): List<Novel.Info>
 }
