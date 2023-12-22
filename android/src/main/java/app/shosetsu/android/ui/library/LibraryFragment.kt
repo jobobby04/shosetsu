@@ -335,6 +335,7 @@ fun LibraryContent(
 				}
 			} else {
 				LibraryPager(
+					paddingValues = paddingValues,
 					library = items,
 					setActiveCategory = setActiveCategory,
 					cardType = cardType,
@@ -417,6 +418,7 @@ fun LibraryAppBar(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryPager(
+	paddingValues: PaddingValues,
 	library: LibraryUI,
 	setActiveCategory: (Int) -> Unit,
 	cardType: NovelCardType,
@@ -434,7 +436,10 @@ fun LibraryPager(
 		setActiveCategory(library.categories[categoryPagerState.currentPage].id)
 	}
 
-	Column(Modifier.fillMaxWidth()) {
+	Column(
+		Modifier
+			.padding(paddingValues)
+			.fillMaxWidth()) {
 		if (!(library.categories.size == 1 && library.categories.first().id == 0)) {
 			ScrollableTabRow(
 				selectedTabIndex = categoryPagerState.currentPage,
