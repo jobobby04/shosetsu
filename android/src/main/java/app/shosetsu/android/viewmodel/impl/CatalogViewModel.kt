@@ -17,7 +17,6 @@ import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
-import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
@@ -78,7 +77,6 @@ class CatalogViewModel(
 	private val getExtensionUseCase: GetExtensionUseCase,
 	private val backgroundAddUseCase: NovelBackgroundAddUseCase,
 	private val getCatalogueListingData: GetCatalogueListingDataUseCase,
-	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
 	private val loadNovelUITypeUseCase: LoadNovelUITypeUseCase,
 	private val loadNovelUIColumnsHUseCase: LoadNovelUIColumnsHUseCase,
 	private val loadNovelUIColumnsPUseCase: LoadNovelUIColumnsPUseCase,
@@ -172,16 +170,7 @@ class CatalogViewModel(
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query.isEmpty() && !filtersApplied) {
-									getCatalogueListingData(ext, data, listing as? IExtension.Listing.Item)
-								} else {
-									loadCatalogueQueryDataUseCase(
-										ext,
-										query,
-										data,
-										listing as? IExtension.Listing.Item
-									)
-								}
+								getCatalogueListingData(ext, query, data, listing as? IExtension.Listing.Item)
 							}
 						}
 					}

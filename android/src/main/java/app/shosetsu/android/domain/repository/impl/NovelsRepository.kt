@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.luaj.vm2.LuaError
 import java.io.IOException
-import javax.net.ssl.SSLException
 
 /*
  * This file is part of shosetsu.
@@ -137,18 +136,12 @@ class NovelsRepository(
 	}
 
 	@Throws(LuaError::class)
-	override suspend fun getCatalogueSearch(
+	override suspend fun listCatalogue(
 		ext: IExtension,
 		query: String,
-		data: Map<Int, Any>
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, query, data) }
-
-	@Throws(SSLException::class, LuaError::class)
-	override suspend fun getCatalogueData(
-		ext: IExtension,
-		listing: IExtension.Listing.Item?,
 		data: Map<Int, Any>,
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data) }
+		listing: IExtension.Listing.Item?,
+	): List<Novel.Info> = onIO { remoteCatalogueDataSource.list(ext, query, data, listing) }
 
 	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> =
 		database.getAnalytics()
