@@ -90,9 +90,9 @@ fun Activity.openShare(url: String, title: String) {
  * @param cUI novel chapter
  */
 
-fun Activity.openChapter(cUI: ChapterUI): Unit = openChapter(cUI.id, cUI.novelID)
+fun Context.openChapter(cUI: ChapterUI): Unit = openChapter(cUI.id, cUI.novelID)
 
-fun Activity.openChapter(chapterID: Int, novelID: Int) {
+fun Context.openChapter(chapterID: Int, novelID: Int) {
 	startActivity(intent(this, ChapterReader::class.java) {
 		bundleOf(
 			BUNDLE_CHAPTER_ID to chapterID,
