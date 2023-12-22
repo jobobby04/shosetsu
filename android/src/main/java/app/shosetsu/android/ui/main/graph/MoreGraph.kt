@@ -1,15 +1,18 @@
 package app.shosetsu.android.ui.main.graph
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
 import app.shosetsu.android.ui.add.AddShareView
 import app.shosetsu.android.ui.analytics.AnalyticsView
 import app.shosetsu.android.ui.categories.CategoriesView
 import app.shosetsu.android.ui.downloads.DownloadsView
+import app.shosetsu.android.ui.history.HistoryView
 import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.more.MoreView
 
@@ -75,9 +78,7 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 				openNovel = {
 					if (it != null)
 						navController.navigate(
-							Destination.NOVEL.routeWith(
-								it.id ?: return@AddShareView
-							)
+							Destination.NOVEL.routeWith(it.id)
 						)
 				}
 			)
@@ -86,6 +87,16 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 		}
 
 		composable(Destination.HISTORY.route) {
+			val context = LocalContext.current
+			HistoryView(
+				openNovel = {
+					navController.navigate(Destination.NOVEL.routeWith(it))
+				},
+				openChapter = { nId, cId ->
+					context.openChapter(nId, cId)
+				},
+				onBack = navController::popBackStack
+			)
 		}
 		composable(Destination.ANALYTICS.route) {
 			AnalyticsView(navController::popBackStack)
