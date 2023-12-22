@@ -402,9 +402,11 @@ fun LibraryAppBar(
 			scrollBehavior = behavior,
 			actions = {
 				AnimatedVisibility(!isEmpty) {
-					SearchAction(query, onSearch)
-					ViewTypeButton(selectedType, onSetType)
-					RefreshButton(onRefresh)
+					Row {
+						SearchAction(query, onSearch)
+						ViewTypeButton(selectedType, onSetType)
+						RefreshButton(onRefresh)
+					}
 				}
 			},
 		)
@@ -439,7 +441,8 @@ fun LibraryPager(
 	Column(
 		Modifier
 			.padding(paddingValues)
-			.fillMaxWidth()) {
+			.fillMaxWidth()
+	) {
 		if (!(library.categories.size == 1 && library.categories.first().id == 0)) {
 			ScrollableTabRow(
 				selectedTabIndex = categoryPagerState.currentPage,
