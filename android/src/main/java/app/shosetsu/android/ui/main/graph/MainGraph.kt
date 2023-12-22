@@ -68,6 +68,6 @@ fun NavGraphBuilder.mainGraph(
 		)
 	}
 	composable(Destination.MIGRATION.route) {
-		MigrationView(intArrayOf())
+		MigrationView(emptyList())
 	}
 }

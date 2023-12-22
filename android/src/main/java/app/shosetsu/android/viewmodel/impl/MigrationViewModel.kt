@@ -45,7 +45,7 @@ class MigrationViewModel(
 	private val loadBrowseExtensionsFlow: LoadBrowseExtensionsUseCase,
 	private val novelRepo: INovelsRepository
 ) : AMigrationViewModel() {
-	private val novelIds: MutableStateFlow<IntArray> = MutableStateFlow(intArrayOf())
+	private val novelIds: MutableStateFlow<List<Int>> = MutableStateFlow(emptyList())
 
 	/**
 	 * Map of novel id to which extension is selected
@@ -151,7 +151,7 @@ class MigrationViewModel(
 		which.value = novelId
 	}
 
-	override fun setNovels(array: IntArray) {
+	override fun setNovels(array: List<Int>) {
 		novelIds.value = array
 	}
 
