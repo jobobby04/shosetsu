@@ -1,9 +1,6 @@
-package app.shosetsu.android.view.compose
+package app.shosetsu.android.common
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import app.shosetsu.android.ui.theme.ShosetsuTheme
+import java.io.Serial
 
 /*
  * This file is part of shosetsu.
@@ -23,22 +20,14 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
  */
 
 /**
- * To provide unified connection
+ * Shosetsu
  *
- * @since 28 / 06 / 2022
+ * @since 23 / 12 / 2023
  * @author Doomsdayrs
  */
-@Deprecated(
-	"Replace with ShosetsuTheme",
-	replaceWith = ReplaceWith(
-		"ShosetsuTheme(content = content)",
-		"app.shosetsu.android.ui.theme.ShosetsuTheme"
-	)
-)
-@Composable
-fun ShosetsuCompose(
-	context: Context = LocalContext.current,
-	content: @Composable () -> Unit
-) {
-	ShosetsuTheme(content = content)
+class ChapterLoadException(cause: Throwable?) : Exception(cause) {
+	companion object {
+		@Serial
+		private const val serialVersionUID: Long = 9082101955214910766L
+	}
 }

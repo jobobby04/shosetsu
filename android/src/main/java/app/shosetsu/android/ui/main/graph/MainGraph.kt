@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import app.shosetsu.android.common.ext.getNovelID
 import app.shosetsu.android.common.ext.openChapter
+import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.ui.library.LibraryView
 import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.migration.MigrationView
@@ -48,23 +49,24 @@ fun NavGraphBuilder.mainGraph(
 			openNovel = { novelId ->
 				navController.navigate(Destination.NOVEL.routeWith(novelId))
 			},
-			openChapter = { novelId, chapterId ->
-				context.openChapter(novelId, chapterId)
-			},
+			openChapter = context::openChapter,
 		)
 	}
 	composable(
 		Destination.NOVEL.route, arguments = Destination.NOVEL.arguments
 	) { entry ->
 		val novelId = entry.arguments!!.getNovelID();
+		val context = LocalContext.current
 
 		NovelInfoView(
-			resume = null,
-			invalidateOptionsMenu = {},
-			displayOfflineSnackBar = {},
-			makeSnackBar = { null },
-			refresh = {},
-			windowSize = sizeClass
+			novelId,
+			windowSize = sizeClass,
+			onMigrate = {
+				TODO("Bind")
+			},
+			openInWebView = context::openInWebView,
+			openChapter = context::openChapter,
+			onBack = navController::popBackStack
 		)
 	}
 	composable(Destination.MIGRATION.route) {
