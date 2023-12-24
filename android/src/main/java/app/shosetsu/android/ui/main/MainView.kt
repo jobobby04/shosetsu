@@ -1,9 +1,6 @@
 package app.shosetsu.android.ui.main
 
 import android.app.Activity
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material3.Icon
@@ -13,7 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -98,22 +94,12 @@ fun <T> BottomNavigationBar(
 ) where T : Destination, T : Root {
 	var isVisible by remember { mutableStateOf(true) }
 
-	LaunchedEffect(currentDestination) {
-		isVisible = destinations.any { destination ->
-			currentDestination?.destination?.route == destination.route ||
-					currentDestination?.destination?.route == "main"
-		}
+	isVisible = destinations.any { destination ->
+		currentDestination?.destination?.route == destination.route ||
+				currentDestination?.destination?.route == "main"
 	}
 
-	AnimatedVisibility(
-		isVisible,
-		enter = slideInVertically {
-			it * 2
-		},
-		exit = slideOutVertically {
-			it * 2
-		}
-	) {
+	if (isVisible) {
 		NavigationBar {
 			destinations.forEach { destination ->
 				NavigationBarItem(
