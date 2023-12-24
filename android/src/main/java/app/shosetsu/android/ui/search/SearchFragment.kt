@@ -2,12 +2,8 @@ package app.shosetsu.android.ui.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +19,19 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,28 +43,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import androidx.core.view.MenuProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.makeSnackBar
-import app.shosetsu.android.common.ext.navigateSafely
-import app.shosetsu.android.common.ext.setShosetsuTransition
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.PlaceholderNovelCardCozyContent
 import app.shosetsu.android.view.compose.PlaceholderNovelCardNormalContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -74,10 +69,7 @@ import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
-import org.acra.ACRA
 
 /*
  * This file is part of Shosetsu.
@@ -102,7 +94,8 @@ import org.acra.ACRA
  *
  * @author github.com/doomsdayrs
  */
-class SearchFragment : ShosetsuFragment(), MenuProvider {
+@Deprecated("Composed")
+class SearchFragment : ShosetsuFragment() {
 
 	override val viewTitleRes: Int = R.string.search
 
@@ -113,92 +106,47 @@ class SearchFragment : ShosetsuFragment(), MenuProvider {
 		container: ViewGroup?,
 		savedViewState: Bundle?
 	): View {
-		activity?.addMenuProvider(this, viewLifecycleOwner)
 		return ComposeView {
-			SearchView(
-				viewModel,
-				remember { requireArguments().getString(BundleKeys.BUNDLE_QUERY, null) }
-			) { novelId ->
-				findNavController().navigateSafely(
-					R.id.action_searchController_to_novelController,
-					bundleOf(BundleKeys.BUNDLE_NOVEL_ID to novelId),
-					navOptions {
-						setShosetsuTransition()
-					}
-				)
-			}
-		}
-	}
-
-	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-		inflater.inflate(R.menu.toolbar_search, menu)
-	}
-
-	override fun onPrepareMenu(menu: Menu) {
-		val searchView = menu.findItem(R.id.search).actionView as SearchView
-		searchView.setOnQueryTextListener(InternalQuery())
-		searchView.setIconifiedByDefault(false)
-		runBlocking {
-			try {
-				searchView.setQuery(viewModel.query.first(), false)
-			} catch (e: Exception) {
-				makeSnackBar(e.message ?: "Failed to restore search query")
-					?.setAction(R.string.report) { _ ->
-						ACRA.errorReporter.handleSilentException(e)
-					}?.show()
-			}
-		}
-	}
-
-	override fun onMenuItemSelected(item: MenuItem): Boolean = true
-
-	/** Class that handles querying */
-	inner class InternalQuery
-		: SearchView.OnQueryTextListener {
-		override fun onQueryTextSubmit(query: String): Boolean {
-			viewModel.applyQuery(query)
-			return true
-		}
-
-		override fun onQueryTextChange(newText: String?): Boolean {
-			viewModel.setQuery(newText ?: "")
-			return true
 		}
 	}
 }
 
 @Composable
 fun SearchView(
-	viewModel: ASearchViewModel = viewModelDi(),
-	query: String?,
-	openNovel: (novelId: Int) -> Unit
+	initalQuery: String?,
+	openNovel: (novelId: Int) -> Unit,
+	onBack: () -> Unit
 ) {
-	LaunchedEffect(query) {
-		viewModel.initQuery(query)
+	val viewModel: ASearchViewModel = viewModelDi()
+
+	LaunchedEffect(initalQuery) {
+		viewModel.initQuery(initalQuery)
 	}
 
-	ShosetsuCompose {
-		val rows by viewModel.listings.collectAsState()
-		val isCozy by viewModel.isCozy.collectAsState()
+	val query by viewModel.query.collectAsState()
+	val rows by viewModel.listings.collectAsState()
+	val isCozy by viewModel.isCozy.collectAsState()
 
-		SearchContent(
-			rows = rows,
-			isCozy = isCozy,
-			getChildren = {
-				if (it == -1)
-					viewModel.searchLibrary()
-				else
-					viewModel.searchExtension(it)
-			},
-			getException = viewModel::getException,
-			onClick = {
-				openNovel(it.id)
-
-			},
-			onRefresh = viewModel::refresh,
-			onRefreshAll = viewModel::refresh
-		)
-	}
+	SearchContent(
+		rows = rows,
+		isCozy = isCozy,
+		getChildren = {
+			if (it == -1)
+				viewModel.searchLibrary()
+			else
+				viewModel.searchExtension(it)
+		},
+		getException = viewModel::getException,
+		onClick = {
+			openNovel(it.id)
+		},
+		onRefresh = viewModel::refresh,
+		onRefreshAll = viewModel::refresh,
+		query = query,
+		onBack = onBack,
+		onSetQuery = viewModel::setQuery,
+		onApply = viewModel::applyQuery
+	)
 }
 
 @Preview
@@ -222,11 +170,15 @@ fun PreviewSearchContent() {
 		onRefreshAll = {},
 		getChildren = {
 			flow { }
-		}
+		},
+		query = "",
+		onBack = {},
+		onSetQuery = {},
+		onApply = {},
 	)
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchContent(
 	rows: ImmutableList<SearchRowUI>,
@@ -235,89 +187,136 @@ fun SearchContent(
 	getException: (id: Int) -> Flow<Throwable?>,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onRefresh: (id: Int) -> Unit,
-	onRefreshAll: () -> Unit
+	onRefreshAll: () -> Unit,
+
+	onBack: () -> Unit,
+
+	query: String,
+	onSetQuery: (String) -> Unit,
+	onApply: (String) -> Unit
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefreshAll)
-	Box(Modifier.pullRefresh(pullRefreshState)) {
-		LazyColumn(
-			modifier = Modifier.fillMaxSize(),
-			contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
-		) {
-			items(rows, key = { row -> row.extensionID }) { row ->
-				val children: LazyPagingItems<ACatalogNovelUI> =
-					getChildren(row.extensionID).collectAsLazyPagingItems()
-
-				SearchRowContent(
-					row = row,
-					loadingBar = {
-						if (children.loadState.refresh == LoadState.Loading)
-							LinearProgressIndicator(
-								modifier = Modifier.fillMaxWidth()
-							)
-					},
-					items = {
-						items(
-							children.itemCount,
-						) { index ->
-							val novelUI = children[index]
-							Box(
-								modifier = Modifier.width(105.dp)
-							) {
-								if (novelUI != null)
-									if (!isCozy)
-										NovelCardNormalContent(
-											novelUI.title,
-											novelUI.imageURL,
-											onClick = {
-												onClick(novelUI)
-											},
-											onLongClick = {},
-											isBookmarked = novelUI.bookmarked
-										)
-									else NovelCardCozyContent(
-										novelUI.title,
-										novelUI.imageURL,
-										onClick = {
-											onClick(novelUI)
-										},
-										onLongClick = {},
-										isBookmarked = novelUI.bookmarked
-									)
-								else if (!isCozy) PlaceholderNovelCardNormalContent() else PlaceholderNovelCardCozyContent()
-							}
-						}
-					},
-					exception = {
-						val exception by getException(row.extensionID).collectAsState(null)
-						if (exception != null)
-							ExceptionBar(
-								remember(exception) {
-									StableHolder(exception!!)
-								},
-								onRefresh = {
-									onRefresh(row.extensionID)
-								}
-							)
-						else {
-							val refreshState = children.loadState.refresh
-							if (refreshState is LoadState.Error) {
-								ExceptionBar(
-									remember(refreshState.error) {
-										StableHolder(refreshState.error)
-									},
-									onRefresh = {
-										children.refresh()
-									}
-								)
-							}
-						}
-					}
-				)
-			}
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.global_search))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
+			)
 		}
+	) { paddingValue ->
+		Box(
+			Modifier
+				.pullRefresh(pullRefreshState)
+				.padding(paddingValue)
+				.fillMaxSize()
+		) {
+			Column {
+				SearchBar(
+					query,
+					onSetQuery,
+					onApply,
+					false,
+					onActiveChange = {},
+					modifier = Modifier.fillMaxWidth(),
+					leadingIcon = {
+						Icon(Icons.Default.Search, stringResource(R.string.search))
+					},
+					placeholder = {
+						Text(stringResource(R.string.search))
+					}
+				) {
+				}
 
-		PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+				LazyColumn(
+					modifier = Modifier.fillMaxSize(),
+					contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+				) {
+					items(rows, key = { row -> row.extensionID }) { row ->
+						val children: LazyPagingItems<ACatalogNovelUI> =
+							getChildren(row.extensionID).collectAsLazyPagingItems()
+
+						SearchRowContent(
+							row = row,
+							loadingBar = {
+								if (children.loadState.refresh == LoadState.Loading)
+									LinearProgressIndicator(
+										modifier = Modifier.fillMaxWidth()
+									)
+							},
+							items = {
+								items(
+									children.itemCount,
+								) { index ->
+									val novelUI = children[index]
+									Box(
+										modifier = Modifier.width(105.dp)
+									) {
+										if (novelUI != null)
+											if (!isCozy)
+												NovelCardNormalContent(
+													novelUI.title,
+													novelUI.imageURL,
+													onClick = {
+														onClick(novelUI)
+													},
+													onLongClick = {},
+													isBookmarked = novelUI.bookmarked
+												)
+											else NovelCardCozyContent(
+												novelUI.title,
+												novelUI.imageURL,
+												onClick = {
+													onClick(novelUI)
+												},
+												onLongClick = {},
+												isBookmarked = novelUI.bookmarked
+											)
+										else if (!isCozy) PlaceholderNovelCardNormalContent() else PlaceholderNovelCardCozyContent()
+									}
+								}
+							},
+							exception = {
+								val exception by getException(row.extensionID).collectAsState(null)
+								if (exception != null)
+									ExceptionBar(
+										remember(exception) {
+											StableHolder(exception!!)
+										},
+										onRefresh = {
+											onRefresh(row.extensionID)
+										}
+									)
+								else {
+									val refreshState = children.loadState.refresh
+									if (refreshState is LoadState.Error) {
+										ExceptionBar(
+											remember(refreshState.error) {
+												StableHolder(refreshState.error)
+											},
+											onRefresh = {
+												children.refresh()
+											}
+										)
+									}
+								}
+							}
+						)
+					}
+				}
+			}
+
+			PullRefreshIndicator(
+				isRefreshing,
+				pullRefreshState,
+				Modifier.align(Alignment.TopCenter)
+			)
+		}
 	}
+
 }
 
 @Composable

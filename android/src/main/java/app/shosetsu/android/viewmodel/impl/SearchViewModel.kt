@@ -2,7 +2,12 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.database.sqlite.SQLiteException
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
@@ -20,7 +25,19 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.runBlocking
 
 /*
@@ -64,7 +81,7 @@ class SearchViewModel(
 	 *
 	 * Used to save user input
 	 */
-	override val query: MutableStateFlow<String?> = MutableStateFlow(null)
+	override val query: MutableStateFlow<String> = MutableStateFlow("")
 
 	private val searchFlows =
 		HashMap<Int, Flow<PagingData<ACatalogNovelUI>>>()
@@ -103,7 +120,7 @@ class SearchViewModel(
 
 	override fun initQuery(string: String?) {
 		launchIO {
-			if (string != null && query.value == null) {
+			if (string != null && query.value.isEmpty()) {
 				query.value = string
 				appliedQueryFlow.value = string
 			}

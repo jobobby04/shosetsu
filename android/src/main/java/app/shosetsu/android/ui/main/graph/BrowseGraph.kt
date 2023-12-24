@@ -55,10 +55,11 @@ fun NavGraphBuilder.browseGraph(navController: NavHostController) {
 		composable(Destination.SEARCH.route) { entry ->
 			val query = entry.arguments?.getString(BundleKeys.BUNDLE_QUERY)
 			SearchView(
-				query = query,
+				initalQuery = query,
 				openNovel = {
 					navController.navigate(Destination.NOVEL.routeWith(it))
-				}
+				},
+				onBack = navController::popBackStack
 			)
 		}
 	}

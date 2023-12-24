@@ -653,7 +653,7 @@
     <string name="reader_long_reading_desc">Please look at something at least 5–10 meters away for 20 seconds to avoid eye damage.</string>
     <string name="settings_reader_track_long_reading_title">Track long reading</string>
     <string name="settings_reader_track_long_reading_desc">Track users reading time to ensure the user maintains their eye health by requiring the user to look at something 5-10 meters away for 20 seconds every 20 minutes.</string>
-    <string name="global_search">Global Search\n</string>
+    <string name="global_search">Global Search</string>
     <string name="settings_reader_voice_title">Text to Speech Voice</string>
     <string name="settings_reader_voice_desc">Which voice to use for Text to Speech</string>
     <string name="voice_very_high">Highest</string>
