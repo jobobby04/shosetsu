@@ -50,7 +50,7 @@ fun loadSProperties(name: String): Properties {
 	return properties
 }
 
-val CI_MODE = System.getenv("CI_MODE") == "true" || true
+val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
 	compileSdk = 34
@@ -228,7 +228,7 @@ dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
 	// Google view things
-	implementation("com.google.android.material:material:1.11.0")
+	implementation("com.google.android.material:material:1.10.0")
 
 	// Androidx
 	implementation("androidx.work:work-runtime:2.9.0")
