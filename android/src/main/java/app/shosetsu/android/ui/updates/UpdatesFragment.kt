@@ -1,11 +1,7 @@
 package app.shosetsu.android.ui.updates
 
 import android.content.Intent
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -64,7 +60,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorAction
@@ -73,8 +68,6 @@ import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
 import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
@@ -107,21 +100,6 @@ import org.joda.time.DateTime
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-@Deprecated("Composed")
-class UpdatesFragment : ShosetsuFragment(), HomeFragment {
-	override val viewTitleRes: Int = R.string.updates
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
-
 @Composable
 fun UpdatesView(
 	openNovel: (Int) -> Unit,

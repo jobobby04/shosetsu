@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.settings
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
@@ -26,9 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.controller.ShosetsuFragment
 
 /*
  * This file is part of shosetsu.
@@ -53,21 +47,6 @@ import app.shosetsu.android.view.controller.ShosetsuFragment
  * @since 06 / 10 / 2021
  * @author Doomsdayrs
  */
-@Deprecated("Composed")
-class SettingsFragment : ShosetsuFragment() {
-
-	override val viewTitleRes: Int = R.string.settings
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
-
 @Composable
 fun SettingsView(
 	navToView: () -> Unit,

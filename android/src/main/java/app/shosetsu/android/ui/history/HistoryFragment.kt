@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.history
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,13 +46,11 @@ import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.coverRatio
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import coil.compose.SubcomposeAsyncImage
@@ -86,17 +80,6 @@ import com.google.accompanist.placeholder.material.placeholder
  * @since 09 / 10 / 2021
  * @author Doomsdayrs
  */
-@Deprecated("Compose")
-class HistoryFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.fragment_history
-
-	override fun onCreateView(
-		inflater: LayoutInflater, container: ViewGroup?, savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun HistoryView(

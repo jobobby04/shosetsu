@@ -1,11 +1,7 @@
 package app.shosetsu.android.ui.repository
 
 import android.content.Intent
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,7 +58,6 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.consts.REPOSITORY_HELP_URL
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.QRCodeShareDialog
@@ -71,7 +66,6 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel.AddRepoState
@@ -103,23 +97,7 @@ import org.acra.ACRA
 /**
  * shosetsu
  * 16 / 09 / 2020
- */
-@Deprecated("Compose")
-class RepositoryFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.repositories
 
-	/***/
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
-
-/**
  * View of repositories
  */
 @OptIn(ExperimentalMaterial3Api::class)

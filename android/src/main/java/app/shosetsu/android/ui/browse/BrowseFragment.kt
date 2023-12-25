@@ -18,11 +18,7 @@ package app.shosetsu.android.ui.browse
  */
 
 import android.content.Intent
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -87,7 +83,6 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.consts.BROWSE_HELP_URL
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
@@ -98,8 +93,6 @@ import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.lib.Version
@@ -116,19 +109,6 @@ import kotlinx.coroutines.launch
  *
  * @author github.com/doomsdayrs
  */
-@Deprecated("Compose")
-class BrowseFragment : ShosetsuFragment(), HomeFragment {
-	override val viewTitleRes: Int = R.string.browse
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun BrowseView(

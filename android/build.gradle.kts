@@ -422,8 +422,6 @@ dependencies {
 	fun navigation(module: String, version: String = navVersion) =
 		"androidx.navigation:navigation-$module:$version"
 
-	implementation(navigation("fragment-ktx"))
-	implementation(navigation("ui-ktx"))
 	implementation(navigation("compose"))
 
 	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

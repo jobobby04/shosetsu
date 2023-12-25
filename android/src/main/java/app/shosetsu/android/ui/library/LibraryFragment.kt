@@ -2,11 +2,7 @@ package app.shosetsu.android.ui.library
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -69,7 +65,6 @@ import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
 import app.shosetsu.android.common.enums.NovelCardType.COZY
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.novel.CategoriesDialog
@@ -81,8 +76,6 @@ import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.HomeFragment
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
@@ -113,25 +106,7 @@ import kotlinx.coroutines.launch
  * 9 / June / 2019
  *
  * @author github.com/doomsdayrs
- */
-@Deprecated("Composed")
-class LibraryFragment
-	: ShosetsuFragment(), HomeFragment {
-
-	override val viewTitleRes: Int = R.string.library
-
-	/***/
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {}
-	}
-}
-
-/**
+ *
  * Main view of the users saved novels.
  */
 @Suppress("IncompleteDestructuring")

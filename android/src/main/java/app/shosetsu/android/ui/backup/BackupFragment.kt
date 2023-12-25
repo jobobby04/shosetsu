@@ -2,10 +2,6 @@ package app.shosetsu.android.ui.backup
 
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
@@ -47,14 +43,12 @@ import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
 import kotlinx.coroutines.launch
@@ -80,19 +74,6 @@ import kotlinx.coroutines.launch
  * Shosetsu
  * 13 / 07 / 2019
  */
-class BackupFragment : ShosetsuFragment() {
-
-	override val viewTitleRes: Int = R.string.fragment_backup_title
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun BackupView(

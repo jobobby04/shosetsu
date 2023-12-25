@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.analytics
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,12 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.AnalyticsNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
 
@@ -65,18 +59,6 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * @since 27 / 03 / 2023
  * @author Doomsdayrs
  */
-@Deprecated("Composed")
-class AnalyticsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.analytics
-
-	override fun onCreateView(
-		inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
 
 /**
  * UI of [AnalyticsFragment]

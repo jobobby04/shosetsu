@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.about
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -48,11 +44,9 @@ import app.shosetsu.android.common.consts.URL_MATRIX
 import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
 import org.acra.util.Installation
 
@@ -79,26 +73,6 @@ import org.acra.util.Installation
  * @since 21 / 10 / 2021
  * @author Doomsdayrs
  */
-@Deprecated("Composed")
-class AboutFragment : ShosetsuFragment() {
-
-	override val viewTitleRes: Int = R.string.about
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-			AboutView(
-				onOpenLicense = {},
-				onBack = {}
-			)
-		}
-
-	}
-}
 
 @Composable
 fun AboutView(

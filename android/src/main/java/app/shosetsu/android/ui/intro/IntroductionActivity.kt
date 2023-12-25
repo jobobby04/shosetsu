@@ -21,7 +21,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
@@ -60,6 +59,7 @@ import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.ext.readAsset
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ScrollStateBar
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -151,17 +151,10 @@ fun IntroView(
 					) {
 						Box {
 							if (state.currentPage > 0) {
-								IconButton(
-									onClick = {
-										scope.launch {
-											state.scrollToPage(state.currentPage - 1)
-										}
+								NavigateBackButton {
+									scope.launch {
+										state.scrollToPage(state.currentPage - 1)
 									}
-								) {
-									Icon(
-										Icons.Default.ArrowBack,
-										stringResource(androidx.navigation.ui.R.string.nav_app_bar_navigate_up_description)
-									)
 								}
 							}
 						}

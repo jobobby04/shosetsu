@@ -18,11 +18,7 @@ package app.shosetsu.android.ui.downloads
  */
 
 import android.content.Intent
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -81,7 +77,6 @@ import app.shosetsu.android.common.enums.DownloadStatus.ERROR
 import app.shosetsu.android.common.enums.DownloadStatus.PAUSED
 import app.shosetsu.android.common.enums.DownloadStatus.PENDING
 import app.shosetsu.android.common.enums.DownloadStatus.WAITING
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.library.DeselectAllButton
 import app.shosetsu.android.ui.library.InverseSelectionButton
@@ -92,7 +87,6 @@ import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SelectableBox
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDownloadsState
@@ -104,21 +98,6 @@ import kotlinx.collections.immutable.ImmutableList
  *
  * @author github.com/doomsdayrs
  */
-@Deprecated("Composed")
-class DownloadsFragment : ShosetsuFragment() {
-
-	override val viewTitleRes: Int = R.string.downloads
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
-
 /**
  * View that displays downloads the app is working on
  */

@@ -3,11 +3,7 @@ package app.shosetsu.android.ui.novel
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Resources
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -99,9 +95,7 @@ import app.shosetsu.android.common.NovelLoadException
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.RefreshException
 import app.shosetsu.android.common.enums.ReadingStatus
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.openShare
-import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.NovelShareMenu
@@ -111,7 +105,6 @@ import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.LongClickTextButton
 import app.shosetsu.android.view.compose.SelectableBox
 import app.shosetsu.android.view.compose.coverRatio
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
@@ -152,25 +145,6 @@ import kotlinx.coroutines.launch
  *
  * The page you see when you select a novel
  */
-@Deprecated("Compose")
-class NovelFragment : ShosetsuFragment() {
-
-	internal val viewModel: ANovelViewModel by viewModel()
-
-	override val viewTitle: String
-		get() = ""
-
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-
-		}
-	}
-}
 
 @Composable
 fun NovelInfoView(
