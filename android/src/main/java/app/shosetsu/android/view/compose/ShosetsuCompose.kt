@@ -28,8 +28,7 @@ import androidx.compose.runtime.Composable
 @Deprecated(
 	"Replace with ShosetsuTheme",
 	replaceWith = ReplaceWith(
-		"ShosetsuTheme(content = content)",
-		"app.shosetsu.android.ui.theme.ShosetsuTheme"
+		"run(content)",
 	)
 )
 @Composable
