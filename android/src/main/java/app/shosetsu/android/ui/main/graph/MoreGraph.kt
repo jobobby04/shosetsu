@@ -16,6 +16,7 @@ import app.shosetsu.android.ui.downloads.DownloadsView
 import app.shosetsu.android.ui.history.HistoryView
 import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.more.MoreView
+import app.shosetsu.android.ui.repository.RepositoriesView
 
 fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 	navigation(startDestination = "main", Destination.MORE.route) {
@@ -90,6 +91,9 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 			)
 		}
 		composable(Destination.REPOSITORIES.route) {
+			RepositoriesView(
+				onBack = navController::popBackStack
+			)
 		}
 
 		composable(Destination.HISTORY.route) {
