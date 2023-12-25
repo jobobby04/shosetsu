@@ -24,8 +24,7 @@ package app.shosetsu.android.common.enums
 enum class AppThemes(val key: Int) {
 	FOLLOW_SYSTEM(0),
 	LIGHT(1),
-	DARK(2),
-	AMOLED(3);
+	DARK(2);
 
 	companion object {
 		fun fromKey(key: Int): AppThemes = values().find { it.key == key } ?: FOLLOW_SYSTEM

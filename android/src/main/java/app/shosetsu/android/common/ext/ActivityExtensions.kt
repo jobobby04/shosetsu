@@ -124,14 +124,12 @@ fun AppCompatActivity.setTheme(theme: AppThemes) {
 		AppThemes.FOLLOW_SYSTEM -> {
 			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 		}
+
 		AppThemes.LIGHT -> {
 			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
 		}
+
 		AppThemes.DARK -> {
-			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-		}
-		AppThemes.AMOLED -> {
-			// TODO Implement amoled mode
 			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
 		}
 	}

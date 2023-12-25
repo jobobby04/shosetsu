@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material3.Icon
@@ -27,6 +28,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import app.shosetsu.android.ui.main.Destination.BROWSE
@@ -65,6 +67,7 @@ import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
 fun MainView() {
 	val viewModel = viewModelDi<AMainViewModel>()
 	val backupProgressState by viewModel.backupProgressState.collectAsState()
+	val theme by viewModel.appTheme.collectAsState()
 
 	val context = LocalContext.current
 	val navController = rememberNavController()
@@ -79,7 +82,13 @@ fun MainView() {
 
 	val sizeClass = calculateWindowSizeClass(context as Activity)
 
-	ShosetsuTheme {
+	ShosetsuTheme(
+		darkTheme = when (theme) {
+			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+			AppThemes.LIGHT -> false
+			AppThemes.DARK -> true
+		}
+	) {
 		Scaffold(
 			bottomBar = {
 				BottomNavigationBar(destinations, navBackStackEntry, navController)

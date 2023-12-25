@@ -19,7 +19,12 @@ import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCase
 import app.shosetsu.android.domain.usecases.start.StartAppUpdateInstallWorkerUseCase
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of shosetsu.
@@ -70,11 +75,10 @@ class MainViewModel(
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
-	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
+	override val appTheme: StateFlow<AppThemes> =
 		loadLiveAppThemeUseCase()
 			.onIO()
-			.shareIn(viewModelScopeIO, SharingStarted.Lazily, replay = 1)
-	}
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
 
 	override fun handleAppUpdate(): Flow<AppUpdateAction?> =
 		flow {
