@@ -6,12 +6,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.shosetsu.android.ui.main.Destination.SETTINGS
 import app.shosetsu.android.ui.main.Destination.SETTINGS_ADVANCED
-import app.shosetsu.android.ui.main.Destination.SETTINGS_BACKUP
 import app.shosetsu.android.ui.main.Destination.SETTINGS_DOWNLOAD
 import app.shosetsu.android.ui.main.Destination.SETTINGS_READER
 import app.shosetsu.android.ui.main.Destination.SETTINGS_UPDATE
 import app.shosetsu.android.ui.main.Destination.SETTINGS_VIEW
 import app.shosetsu.android.ui.settings.SettingsView
+import app.shosetsu.android.ui.settings.sub.AdvancedSettingsView
+import app.shosetsu.android.ui.settings.sub.DownloadSettingsView
+import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
+import app.shosetsu.android.ui.settings.sub.UpdateSettingsView
+import app.shosetsu.android.ui.settings.sub.ViewSettingsView
 
 /*
  * This file is part of shosetsu.
@@ -53,16 +57,33 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 			)
 		}
 		composable(SETTINGS_VIEW.route) {
+			ViewSettingsView(
+				exit = {
+					TODO("REBIND")
+				}
+			)
 		}
 		composable(SETTINGS_UPDATE.route) {
+			UpdateSettingsView()
 		}
 		composable(SETTINGS_ADVANCED.route) {
+			AdvancedSettingsView(
+				makeSnackBar = { null },
+				makeSnackBarT = { _, _ -> null },
+				exit = {
+					TODO("REBIND")
+				}
+			)
 		}
 		composable(SETTINGS_DOWNLOAD.route) {
-		}
-		composable(SETTINGS_BACKUP.route) {
+			DownloadSettingsView(
+				makeSnackBar = { _, _ -> null }
+			)
 		}
 		composable(SETTINGS_READER.route) {
+			ReaderSettingsView(
+				makeSnackBar = { null }
+			)
 		}
 	}
 }
