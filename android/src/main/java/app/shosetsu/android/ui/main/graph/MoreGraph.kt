@@ -102,6 +102,6 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 			AnalyticsView(navController::popBackStack)
 		}
 
-		settingsGraph()
+		settingsGraph(navController)
 	}
 }

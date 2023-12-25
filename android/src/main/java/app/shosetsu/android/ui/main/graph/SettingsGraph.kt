@@ -1,9 +1,16 @@
 package app.shosetsu.android.ui.main.graph
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import app.shosetsu.android.ui.main.Destination
+import app.shosetsu.android.ui.main.Destination.SETTINGS
+import app.shosetsu.android.ui.main.Destination.SETTINGS_ADVANCED
+import app.shosetsu.android.ui.main.Destination.SETTINGS_BACKUP
+import app.shosetsu.android.ui.main.Destination.SETTINGS_DOWNLOAD
+import app.shosetsu.android.ui.main.Destination.SETTINGS_READER
+import app.shosetsu.android.ui.main.Destination.SETTINGS_UPDATE
+import app.shosetsu.android.ui.main.Destination.SETTINGS_VIEW
 import app.shosetsu.android.ui.settings.SettingsView
 
 /*
@@ -23,23 +30,39 @@ import app.shosetsu.android.ui.settings.SettingsView
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-fun NavGraphBuilder.settingsGraph() {
-	navigation(startDestination = "main", Destination.SETTINGS.route) {
+fun NavGraphBuilder.settingsGraph(navController: NavController) {
+	navigation(startDestination = "main", SETTINGS.route) {
 		composable("main") {
-			SettingsView {
-			}
+			SettingsView(
+				onBack = navController::popBackStack,
+				navToAdvanced = {
+					navController.navigate(SETTINGS_ADVANCED.route)
+				},
+				navToView = {
+					navController.navigate(SETTINGS_VIEW.route)
+				},
+				navToDownload = {
+					navController.navigate(SETTINGS_DOWNLOAD.route)
+				},
+				navToReader = {
+					navController.navigate(SETTINGS_READER.route)
+				},
+				navToUpdate = {
+					navController.navigate(SETTINGS_UPDATE.route)
+				}
+			)
 		}
-		composable(Destination.SETTINGS_VIEW.route) {
+		composable(SETTINGS_VIEW.route) {
 		}
-		composable(Destination.SETTINGS_UPDATE.route) {
+		composable(SETTINGS_UPDATE.route) {
 		}
-		composable(Destination.SETTINGS_ADVANCED.route) {
+		composable(SETTINGS_ADVANCED.route) {
 		}
-		composable(Destination.SETTINGS_DOWNLOAD.route) {
+		composable(SETTINGS_DOWNLOAD.route) {
 		}
-		composable(Destination.SETTINGS_BACKUP.route) {
+		composable(SETTINGS_BACKUP.route) {
 		}
-		composable(Destination.SETTINGS_READER.route) {
+		composable(SETTINGS_READER.route) {
 		}
 	}
 }
