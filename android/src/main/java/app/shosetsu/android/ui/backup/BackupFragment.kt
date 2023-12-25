@@ -29,15 +29,18 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -46,15 +49,15 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of Shosetsu.
@@ -86,23 +89,21 @@ class BackupFragment : ShosetsuFragment() {
 		container: ViewGroup?,
 		savedViewState: Bundle?
 	): View {
-		setViewTitle()
-
 		return ComposeView {
-			BackupView(
-				toast = {
-					requireContext().toast(it)
-				}
-			)
 		}
 	}
 }
 
 @Composable
 fun BackupView(
-	toast: (String) -> Unit,
-	viewModel: ABackupSettingsViewModel = viewModelDi(),
+	onBack: () -> Unit
 ) {
+	val viewModel: ABackupSettingsViewModel = viewModelDi()
+
+	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
+	val hostState = remember { SnackbarHostState() }
+
 	val selectBackupToRestoreLauncher = rememberLauncherForActivityResult(
 		ActivityResultContracts.OpenDocument()
 	) { uri ->
@@ -113,8 +114,11 @@ fun BackupView(
 
 		// TODO Possibly add popup verification to make sure that an invalid file ext is oki
 
-		toast("Restoring now...")
 		viewModel.restore(uri)
+
+		scope.launch {
+			hostState.showSnackbar(context.getString(R.string.view_backup_restore_start))
+		}
 	}
 
 	val selectLocationToExportLauncher = rememberLauncherForActivityResult(
@@ -126,8 +130,11 @@ fun BackupView(
 			return@rememberLauncherForActivityResult
 		}
 
-		toast("Exporting now")
 		viewModel.exportBackup(uri)
+
+		scope.launch {
+			hostState.showSnackbar(context.getString(R.string.view_backup_exporting_start))
+		}
 	}
 
 	var hasNoBackupSelectedForExport by remember { mutableStateOf(false) }
@@ -143,23 +150,22 @@ fun BackupView(
 		selectLocationToExportLauncher.launch(backupFileName)
 	}
 
-	ShosetsuCompose {
-		BackupSettingsContent(
-			viewModel,
-			// Stops novel updates while backup is taking place
-			// Starts backing up data
-			backupNow = viewModel::startBackup,
-			restore = viewModel::restore,
-			export = {
-				viewModel.holdBackupToExport(it)
-				performExportSelection()
-			},
-			performFileSelection = {
-				selectBackupToRestoreLauncher.launch(arrayOf("application/octet-stream"))
-			},
-			hasNoBackupSelectedForExport = hasNoBackupSelectedForExport
-		)
-	}
+	BackupSettingsContent(
+		viewModel,
+		// Stops novel updates while backup is taking place
+		// Starts backing up data
+		backupNow = viewModel::startBackup,
+		restore = viewModel::restore,
+		export = {
+			viewModel.holdBackupToExport(it)
+			performExportSelection()
+		},
+		performFileSelection = {
+			selectBackupToRestoreLauncher.launch(arrayOf("application/octet-stream"))
+		},
+		hasNoBackupSelectedForExport = hasNoBackupSelectedForExport,
+		onBack = onBack
+	)
 }
 
 @Composable
@@ -224,6 +230,7 @@ fun BackupSettingsContent(
 	restore: (String) -> Unit,
 	export: (String) -> Unit,
 	hasNoBackupSelectedForExport: Boolean,
+	onBack: () -> Unit
 ) {
 	val snackbarHostState = remember { SnackbarHostState() }
 	val message = stringResource(R.string.fragment_backup_error_unselected)
@@ -236,6 +243,16 @@ fun BackupSettingsContent(
 	Scaffold(
 		snackbarHost = {
 			SnackbarHost(snackbarHostState)
+		},
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.backup))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
+			)
 		}
 	) {
 		LazyColumn(

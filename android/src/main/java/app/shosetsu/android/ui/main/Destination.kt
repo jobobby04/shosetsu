@@ -23,7 +23,7 @@ sealed class Destination {
 	data object SETTINGS_UPDATE : Destination()
 	data object SETTINGS_ADVANCED : Destination()
 	data object SETTINGS_DOWNLOAD : Destination()
-	data object SETTINGS_BACKUP : Destination()
+	data object BACKUP : Destination()
 	data object SETTINGS_READER : Destination()
 	data object CATEGORIES : Destination()
 	data object MORE : Destination(), Root {

@@ -702,6 +702,8 @@
     <string name="icon_desc_back">Arrow pointing to the left to navigate back.</string>
     <string name="view_title_configure">Configure</string>
     <string name="view_novel_refresh_failed">Failed to refresh novel: %s</string>
+    <string name="view_backup_restore_start">Restoring now...</string>
+    <string name="view_backup_exporting_start">Exporting now...</string>
 
 </resources>
 
