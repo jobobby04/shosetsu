@@ -34,6 +34,7 @@ fun NavGraphBuilder.mainGraph(
 				navController.navigate(NOVEL.routeWith(novelId))
 			},
 			onMigrate = {
+				navController.navigate(MIGRATION.routeWith(it))
 			}
 		)
 	}
@@ -58,7 +59,7 @@ fun NavGraphBuilder.mainGraph(
 			novelId,
 			windowSize = sizeClass,
 			onMigrate = {
-				TODO("Bind")
+				navController.navigate(MIGRATION.routeWith(listOf(it)))
 			},
 			openInWebView = context::openInWebView,
 			openChapter = context::openChapter,

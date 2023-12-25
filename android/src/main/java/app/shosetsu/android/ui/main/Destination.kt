@@ -64,7 +64,18 @@ sealed class Destination {
 
 	data object SEARCH : Destination()
 	data object REPOSITORIES : Destination()
-	data object MIGRATION : Destination()
+	data object MIGRATION : Destination() {
+		override val route: String = "migrate/{${BundleKeys.BUNDLE_NOVEL_ID}}"
+
+		override val arguments: List<NamedNavArgument> =
+			listOf(
+				navArgument(BundleKeys.BUNDLE_NOVEL_ID) { type = NavType.IntArrayType }
+			)
+
+		fun routeWith(novelId: List<Int>): String =
+			"migrate/$novelId"
+	}
+
 	data object CATALOG : Destination() {
 		override val route: String = "catalog/{${BundleKeys.BUNDLE_EXTENSION}}"
 
