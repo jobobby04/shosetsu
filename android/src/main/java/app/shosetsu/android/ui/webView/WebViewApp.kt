@@ -32,7 +32,7 @@ import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import com.google.accompanist.web.*
 import org.kodein.di.DI
@@ -118,7 +118,7 @@ fun WebViewAppView(
 	onClearCookies: (String) -> Unit,
 	viewModel: WebViewViewModel = viewModelDi(),
 ) {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val userAgent by viewModel.userAgent.collectAsState()
 
 		WebViewScreen(

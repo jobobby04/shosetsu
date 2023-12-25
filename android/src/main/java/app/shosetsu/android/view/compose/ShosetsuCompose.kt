@@ -1,9 +1,6 @@
 package app.shosetsu.android.view.compose
 
-import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /*
  * This file is part of shosetsu.
@@ -37,8 +34,7 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 )
 @Composable
 fun ShosetsuCompose(
-	context: Context = LocalContext.current,
 	content: @Composable () -> Unit
 ) {
-	ShosetsuTheme(content = content)
+	content()
 }

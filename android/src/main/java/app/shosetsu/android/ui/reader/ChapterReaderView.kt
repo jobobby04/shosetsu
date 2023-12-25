@@ -46,7 +46,7 @@ import app.shosetsu.android.ui.reader.content.ChapterReaderHTMLContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
 import app.shosetsu.android.ui.reader.page.DividierPageContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
@@ -133,7 +133,7 @@ fun ChapterReaderView(
 		}
 
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
-	ShosetsuCompose {
+	ShosetsuTheme {
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
 			isFocused = isFocused,
