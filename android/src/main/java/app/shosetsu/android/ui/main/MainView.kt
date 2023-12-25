@@ -1,6 +1,9 @@
 package app.shosetsu.android.ui.main
 
 import android.app.Activity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material3.Icon
@@ -10,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,12 +27,15 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import app.shosetsu.android.ui.main.Destination.BROWSE
 import app.shosetsu.android.ui.main.Destination.LIBRARY
 import app.shosetsu.android.ui.main.Destination.MORE
 import app.shosetsu.android.ui.main.Destination.UPDATES
 import app.shosetsu.android.ui.main.graph.mainGraph
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
 
 /*
  * This file is part of shosetsu.
@@ -56,6 +63,9 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun MainView() {
+	val viewModel = viewModelDi<AMainViewModel>()
+	val backupProgressState by viewModel.backupProgressState.collectAsState()
+
 	val context = LocalContext.current
 	val navController = rememberNavController()
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -74,6 +84,15 @@ fun MainView() {
 			bottomBar = {
 				BottomNavigationBar(destinations, navBackStackEntry, navController)
 			},
+			topBar = {
+				AnimatedVisibility(
+					backupProgressState == BackupProgress.IN_PROGRESS,
+					enter = slideInVertically(),
+					exit = slideOutVertically()
+				) {
+					BackupProgressIndicator()
+				}
+			}
 		) { paddingValues ->
 			NavHost(
 				navController,
@@ -85,6 +104,7 @@ fun MainView() {
 		}
 	}
 }
+
 
 @Composable
 fun <T> BottomNavigationBar(
