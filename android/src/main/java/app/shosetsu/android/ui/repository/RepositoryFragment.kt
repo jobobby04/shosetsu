@@ -542,7 +542,7 @@ fun RepositoriesContent(
 					Text(stringResource(R.string.repositories))
 				},
 				navigationIcon = {
-					NavigateBackButton(onRefresh)
+					NavigateBackButton(onBack)
 				},
 				actions = {
 					HelpButton(REPOSITORY_HELP_URL)
