@@ -31,8 +31,8 @@ import app.shosetsu.android.ui.settings.SettingsView
  */
 
 fun NavGraphBuilder.settingsGraph(navController: NavController) {
-	navigation(startDestination = "main", SETTINGS.route) {
-		composable("main") {
+	navigation(startDestination = "overview", SETTINGS.route) {
+		composable("overview") {
 			SettingsView(
 				onBack = navController::popBackStack,
 				navToAdvanced = {
