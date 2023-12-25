@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.Voice
@@ -12,7 +11,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,13 +29,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,18 +53,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.ChaptersResumeFirstUnread
+import app.shosetsu.android.common.SettingKey.ReaderKeepScreenOn
+import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
+import app.shosetsu.android.common.SettingKey.ReaderTextAlignment
+import app.shosetsu.android.common.SettingKey.ReaderTheme
+import app.shosetsu.android.common.SettingKey.ReaderVoice
+import app.shosetsu.android.common.SettingKey.ReadingMarkingType
 import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.makeSnackBar
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.css.CSSEditorActivity
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
@@ -60,9 +75,23 @@ import app.shosetsu.android.view.compose.setting.GenericRightSettingLayout
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
-import app.shosetsu.android.viewmodel.impl.settings.*
-import com.google.android.material.snackbar.Snackbar
+import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
+import app.shosetsu.android.viewmodel.impl.settings.doubleTapSystem
+import app.shosetsu.android.viewmodel.impl.settings.enableFullscreen
+import app.shosetsu.android.viewmodel.impl.settings.invertChapterSwipeOption
+import app.shosetsu.android.viewmodel.impl.settings.matchFullscreenToFocus
+import app.shosetsu.android.viewmodel.impl.settings.paragraphIndentOption
+import app.shosetsu.android.viewmodel.impl.settings.paragraphSpacingOption
+import app.shosetsu.android.viewmodel.impl.settings.readerPitchOption
+import app.shosetsu.android.viewmodel.impl.settings.readerSpeedOption
+import app.shosetsu.android.viewmodel.impl.settings.readerTableHackOption
+import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
+import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
+import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
+import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
+import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /*
@@ -88,6 +117,7 @@ import java.util.Locale
  * @since 04 / 10 / 2021
  * @author Doomsdayrs
  */
+@Deprecated("Composed")
 class ReaderSettingsFragment : ShosetsuFragment() {
 	override val viewTitleRes: Int = R.string.settings_reader
 
@@ -98,35 +128,33 @@ class ReaderSettingsFragment : ShosetsuFragment() {
 	): View {
 		setViewTitle()
 		return ComposeView {
-			ReaderSettingsView(::makeSnackBar)
 		}
 	}
 }
 
 @Composable
 fun ReaderSettingsView(
-	makeSnackBar: (Int) -> Snackbar?,
-	viewModel: AReaderSettingsViewModel = viewModelDi(),
+	onBack: () -> Unit,
+	openCSS: () -> Unit
 ) {
+	val viewModel: AReaderSettingsViewModel = viewModelDi()
+
+	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 
-	ShosetsuCompose {
-		ReaderSettingsContent(
-			viewModel,
-			openHTMLEditor = {
-				startActivity(
-					context,
-					Intent(context, CSSEditorActivity::class.java).apply {
-						putExtra(CSSEditorActivity.CSS_ID, -1)
-					},
-					null
-				)
-			},
-			showStyleAddSnackBar = {
-				makeSnackBar(R.string.style_wait)?.show()
+	val hostState = remember { SnackbarHostState() }
+
+	ReaderSettingsContent(
+		viewModel = viewModel,
+		openHTMLEditor = openCSS,
+		showStyleAddSnackBar = {
+			scope.launch {
+				hostState.showSnackbar(context.getString(R.string.style_wait))
 			}
-		)
-	}
+		},
+		hostState = hostState,
+		onBack = onBack
+	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,240 +162,260 @@ fun ReaderSettingsView(
 fun ReaderSettingsContent(
 	viewModel: AReaderSettingsViewModel,
 	openHTMLEditor: () -> Unit,
-	showStyleAddSnackBar: () -> Unit
+	showStyleAddSnackBar: () -> Unit,
+	hostState: SnackbarHostState,
+	onBack: () -> Unit,
 ) {
-	LazyColumn(
-		contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-		verticalArrangement = Arrangement.spacedBy(8.dp)
-	) {
-		//TODO Text Preview at top
-
-		item {
-			viewModel.paragraphSpacingOption()
-		}
-
-		item {
-			DropdownSettingContent(
-				title = stringResource(R.string.settings_reader_text_alignment_title),
-				description = stringResource(R.string.settings_reader_text_alignment_desc),
-				choices = stringArrayResource(R.array.text_alignments).toList().toImmutableList(),
-				modifier = Modifier
-					.fillMaxWidth(),
-				repo = viewModel.settingsRepo,
-				ReaderTextAlignment
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.settings_reader))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
 			)
+		},
+		snackbarHost = {
+			SnackbarHost(hostState)
 		}
+	) { paddingValues ->
+		LazyColumn(
+			contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier.padding(paddingValues)
+		) {
+			//TODO Text Preview at top
 
-		item {
-			viewModel.textSizeOption()
-		}
+			item {
+				viewModel.paragraphSpacingOption()
+			}
 
-		item {
-			viewModel.paragraphIndentOption()
-		}
+			item {
+				DropdownSettingContent(
+					title = stringResource(R.string.settings_reader_text_alignment_title),
+					description = stringResource(R.string.settings_reader_text_alignment_desc),
+					choices = stringArrayResource(R.array.text_alignments).toList()
+						.toImmutableList(),
+					modifier = Modifier
+						.fillMaxWidth(),
+					repo = viewModel.settingsRepo,
+					ReaderTextAlignment
+				)
+			}
 
-		item {
-			GenericBottomSettingLayout(
-				stringResource(R.string.theme),
-				""
-			) {
-				val themes by viewModel.getReaderThemes().collectAsState(emptyList())
+			item {
+				viewModel.textSizeOption()
+			}
 
-				LazyRow(
-					contentPadding = PaddingValues(16.dp),
-					horizontalArrangement = Arrangement.spacedBy(8.dp)
+			item {
+				viewModel.paragraphIndentOption()
+			}
+
+			item {
+				GenericBottomSettingLayout(
+					stringResource(R.string.theme),
+					""
 				) {
-					items(themes, key = { it.id }) { themeItem ->
-						Card(
-							border = if (themeItem.isSelected) BorderStroke(
-								SELECTED_STROKE_WIDTH.dp,
-								MaterialTheme.colorScheme.tertiary
-							) else null,
-							onClick = {
-								launchIO {
-									viewModel.settingsRepo.setInt(
-										ReaderTheme,
-										themeItem.id.toInt()
+					val themes by viewModel.getReaderThemes().collectAsState(emptyList())
+
+					LazyRow(
+						contentPadding = PaddingValues(16.dp),
+						horizontalArrangement = Arrangement.spacedBy(8.dp)
+					) {
+						items(themes, key = { it.id }) { themeItem ->
+							Card(
+								border = if (themeItem.isSelected) BorderStroke(
+									SELECTED_STROKE_WIDTH.dp,
+									MaterialTheme.colorScheme.tertiary
+								) else null,
+								onClick = {
+									launchIO {
+										viewModel.settingsRepo.setInt(
+											ReaderTheme,
+											themeItem.id.toInt()
+										)
+									}
+								}
+							) {
+								Box(
+									modifier = Modifier.background(Color(themeItem.backgroundColor)),
+									contentAlignment = Alignment.Center
+								) {
+									Text(
+										"T",
+										color = Color(themeItem.textColor),
+										modifier = Modifier
+											.size(64.dp)
+											.padding(8.dp),
+										textAlign = TextAlign.Center,
+										fontSize = 32.sp
 									)
 								}
 							}
-						) {
-							Box(
-								modifier = Modifier.background(Color(themeItem.backgroundColor)),
-								contentAlignment = Alignment.Center
-							) {
-								Text(
-									"T",
-									color = Color(themeItem.textColor),
-									modifier = Modifier
-										.size(64.dp)
-										.padding(8.dp),
-									textAlign = TextAlign.Center,
-									fontSize = 32.sp
-								)
-							}
 						}
-					}
 
-					item {
-						Card(
-							onClick = {
-								showStyleAddSnackBar()
-							}
-						) {
-							Box(
-								contentAlignment = Alignment.Center
+						item {
+							Card(
+								onClick = {
+									showStyleAddSnackBar()
+								}
 							) {
-								Image(
-									painterResource(R.drawable.add_circle_outline),
-									stringResource(R.string.style_add),
-									modifier = Modifier
-										.size(64.dp)
-										.padding(8.dp)
-								)
-							}
+								Box(
+									contentAlignment = Alignment.Center
+								) {
+									Image(
+										painterResource(R.drawable.add_circle_outline),
+										stringResource(R.string.style_add),
+										modifier = Modifier
+											.size(64.dp)
+											.padding(8.dp)
+									)
+								}
 
+							}
 						}
 					}
 				}
 			}
-		}
 
 
-		item {
-			viewModel.invertChapterSwipeOption()
-		}
+			item {
+				viewModel.invertChapterSwipeOption()
+			}
 
-		//item { viewModel.tapToScrollOption() }
+			//item { viewModel.tapToScrollOption() }
 
-		//item { viewModel.volumeScrollingOption() }
+			//item { viewModel.volumeScrollingOption() }
 
-		item {
-			SwitchSettingContent(
-				stringResource(R.string.settings_reader_title_mark_read_as_reading),
-				stringResource(R.string.settings_reader_desc_mark_read_as_reading),
-				viewModel.settingsRepo,
-				ReaderMarkReadAsReading,
-				modifier = Modifier
-					.fillMaxWidth()
-			)
-		}
+			item {
+				SwitchSettingContent(
+					stringResource(R.string.settings_reader_title_mark_read_as_reading),
+					stringResource(R.string.settings_reader_desc_mark_read_as_reading),
+					viewModel.settingsRepo,
+					ReaderMarkReadAsReading,
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
 
-		//item { viewModel.horizontalSwitchOption() }
+			//item { viewModel.horizontalSwitchOption() }
 
-		item {
-			ButtonSettingContent(
-				stringResource(R.string.settings_reader_title_html_css),
-				stringResource(R.string.settings_reader_desc_html_css),
-				stringResource(R.string.open_in),
-				onClick = openHTMLEditor,
-				modifier = Modifier
-					.fillMaxWidth()
-			)
-		}
+			item {
+				ButtonSettingContent(
+					stringResource(R.string.settings_reader_title_html_css),
+					stringResource(R.string.settings_reader_desc_html_css),
+					stringResource(R.string.open_in),
+					onClick = openHTMLEditor,
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
 
-		item {
-			viewModel.stringAsHtmlOption()
-		}
+			item {
+				viewModel.stringAsHtmlOption()
+			}
 
-		item {
-			//viewModel.continuousScrollOption()
-		}
+			item {
+				//viewModel.continuousScrollOption()
+			}
 
-		item {
-			DropdownSettingContent(
-				stringResource(R.string.marking_mode),
-				stringResource(R.string.settings_reader_marking_mode_desc),
-				choices = stringArrayResource(R.array.marking_names)
-					.toList()
-					.toImmutableList(),
-				repo = viewModel.settingsRepo,
-				key = ReadingMarkingType,
-				stringToInt = {
-					when (MarkingType.valueOf(it)) {
-						MarkingType.ONSCROLL -> 1
-						MarkingType.ONVIEW -> 0
-					}
-				},
-				intToString = {
-					when (it) {
-						0 -> MarkingType.ONVIEW.name
-						1 -> MarkingType.ONSCROLL.name
-						else -> {
-							Log.e("MarkingMode", "UnknownType, defaulting")
-							MarkingType.ONVIEW.name
+			item {
+				DropdownSettingContent(
+					stringResource(R.string.marking_mode),
+					stringResource(R.string.settings_reader_marking_mode_desc),
+					choices = stringArrayResource(R.array.marking_names)
+						.toList()
+						.toImmutableList(),
+					repo = viewModel.settingsRepo,
+					key = ReadingMarkingType,
+					stringToInt = {
+						when (MarkingType.valueOf(it)) {
+							MarkingType.ONSCROLL -> 1
+							MarkingType.ONVIEW -> 0
 						}
+					},
+					intToString = {
+						when (it) {
+							0 -> MarkingType.ONVIEW.name
+							1 -> MarkingType.ONSCROLL.name
+							else -> {
+								Log.e("MarkingMode", "UnknownType, defaulting")
+								MarkingType.ONVIEW.name
+							}
+						}
+					},
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
+
+			item {
+				SwitchSettingContent(
+					stringResource(R.string.settings_reader_resume_behavior_title),
+					stringResource(R.string.settings_reader_resume_behavior_desc),
+					viewModel.settingsRepo,
+					ChaptersResumeFirstUnread,
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
+
+			item {
+				SwitchSettingContent(
+					stringResource(R.string.settings_reader_keep_screen_on),
+					stringResource(R.string.settings_reader_keep_screen_on_desc),
+					viewModel.settingsRepo,
+					ReaderKeepScreenOn,
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
+
+			item { viewModel.enableFullscreen() }
+
+			item { viewModel.readerTextSelectionToggle() }
+
+			item { viewModel.matchFullscreenToFocus() }
+
+			item {
+				viewModel.showReaderDivider()
+			}
+
+			item {
+				viewModel.readerTableHackOption()
+			}
+
+			item { viewModel.doubleTapFocus() }
+			item { viewModel.doubleTapSystem() }
+			item {
+				viewModel.trackLongReadingOption()
+			}
+			item { viewModel.readerPitchOption() }
+			item { viewModel.readerSpeedOption() }
+			item {
+				val context = LocalContext.current
+				val tts = remember {
+					TextToSpeech(
+						context
+					) {
 					}
-				},
-				modifier = Modifier
-					.fillMaxWidth()
-			)
-		}
-
-		item {
-			SwitchSettingContent(
-				stringResource(R.string.settings_reader_resume_behavior_title),
-				stringResource(R.string.settings_reader_resume_behavior_desc),
-				viewModel.settingsRepo,
-				ChaptersResumeFirstUnread,
-				modifier = Modifier
-					.fillMaxWidth()
-			)
-		}
-
-		item {
-			SwitchSettingContent(
-				stringResource(R.string.settings_reader_keep_screen_on),
-				stringResource(R.string.settings_reader_keep_screen_on_desc),
-				viewModel.settingsRepo,
-				ReaderKeepScreenOn,
-				modifier = Modifier
-					.fillMaxWidth()
-			)
-		}
-
-		item { viewModel.enableFullscreen() }
-
-		item { viewModel.readerTextSelectionToggle() }
-
-		item { viewModel.matchFullscreenToFocus() }
-
-		item {
-			viewModel.showReaderDivider()
-		}
-
-		item {
-			viewModel.readerTableHackOption()
-		}
-
-		item { viewModel.doubleTapFocus() }
-		item { viewModel.doubleTapSystem() }
-		item {
-			viewModel.trackLongReadingOption()
-		}
-		item { viewModel.readerPitchOption() }
-		item { viewModel.readerSpeedOption() }
-		item {
-			val context = LocalContext.current
-			val tts = remember {
-				TextToSpeech(
-					context
+				}
+				val selectedVoice by
+				viewModel.settingsRepo.getStringFlow(SettingKey.ReaderVoice).collectAsState()
+				val voices by remember {
+					derivedStateOf {
+						tts.voices?.toImmutableList() ?: emptyList()
+					}
+				}
+				ReaderSettingsVoiceOption(
+					selectedVoice,
+					voices
 				) {
-				}
-			}
-			val selectedVoice by
-			viewModel.settingsRepo.getStringFlow(SettingKey.ReaderVoice).collectAsState()
-			val voices by remember {
-				derivedStateOf {
-					tts.voices?.toImmutableList() ?: emptyList()
-				}
-			}
-			ReaderSettingsVoiceOption(
-				selectedVoice,
-				voices
-			) {
-				launchIO {
-					viewModel.settingsRepo.setString(ReaderVoice, it)
+					launchIO {
+						viewModel.settingsRepo.setString(ReaderVoice, it)
+					}
 				}
 			}
 		}

@@ -33,4 +33,6 @@ object BundleKeys {
 	const val BUNDLE_CHAPTER_ID: String = "chapterId"
 
 	const val BUNDLE_QUERY: String = "query"
+
+	const val BUNDLE_ID: String = "asset_id"
 }

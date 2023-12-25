@@ -9,10 +9,12 @@ import app.shosetsu.android.common.ext.getNovelID
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.ui.library.LibraryView
-import app.shosetsu.android.ui.main.Destination
+import app.shosetsu.android.ui.main.Destination.LIBRARY
+import app.shosetsu.android.ui.main.Destination.MIGRATION
+import app.shosetsu.android.ui.main.Destination.NOVEL
+import app.shosetsu.android.ui.main.Destination.UPDATES
 import app.shosetsu.android.ui.migration.MigrationView
 import app.shosetsu.android.ui.novel.NovelInfoView
-import app.shosetsu.android.ui.settings.sub.TextAssetReaderView
 import app.shosetsu.android.ui.updates.UpdatesView
 
 /**
@@ -26,10 +28,10 @@ fun NavGraphBuilder.mainGraph(
 	navController: NavHostController,
 	sizeClass: WindowSizeClass
 ) {
-	composable(Destination.LIBRARY.route) {
+	composable(LIBRARY.route) {
 		LibraryView(
 			onOpenNovel = { novelId ->
-				navController.navigate(Destination.NOVEL.routeWith(novelId))
+				navController.navigate(NOVEL.routeWith(novelId))
 			},
 			onMigrate = {
 			}
@@ -37,23 +39,17 @@ fun NavGraphBuilder.mainGraph(
 	}
 	browseGraph(navController)
 	moreGraph(navController)
-	composable(Destination.TEXT_READER.route) {
-		TextAssetReaderView(
-			0,
-			setViewTitle = {},
-		)
-	}
-	composable(Destination.UPDATES.route) {
+	composable(UPDATES.route) {
 		val context = LocalContext.current
 		UpdatesView(
 			openNovel = { novelId ->
-				navController.navigate(Destination.NOVEL.routeWith(novelId))
+				navController.navigate(NOVEL.routeWith(novelId))
 			},
 			openChapter = context::openChapter,
 		)
 	}
 	composable(
-		Destination.NOVEL.route, arguments = Destination.NOVEL.arguments
+		NOVEL.route, arguments = NOVEL.arguments
 	) { entry ->
 		val novelId = entry.arguments!!.getNovelID();
 		val context = LocalContext.current
@@ -69,7 +65,7 @@ fun NavGraphBuilder.mainGraph(
 			onBack = navController::popBackStack
 		)
 	}
-	composable(Destination.MIGRATION.route) {
+	composable(MIGRATION.route) {
 		MigrationView(emptyList())
 	}
 }

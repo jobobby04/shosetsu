@@ -1,9 +1,14 @@
 package app.shosetsu.android.ui.main.graph
 
+import android.app.Activity
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.main.Destination.SETTINGS
 import app.shosetsu.android.ui.main.Destination.SETTINGS_ADVANCED
 import app.shosetsu.android.ui.main.Destination.SETTINGS_DOWNLOAD
@@ -56,33 +61,42 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				}
 			)
 		}
+
 		composable(SETTINGS_VIEW.route) {
+			val activity = LocalContext.current as Activity
 			ViewSettingsView(
-				exit = {
-					TODO("REBIND")
-				}
+				onExit = activity::finish,
+				onBack = navController::popBackStack
 			)
 		}
 		composable(SETTINGS_UPDATE.route) {
-			UpdateSettingsView()
+			UpdateSettingsView(
+				onBack = navController::popBackStack
+			)
 		}
 		composable(SETTINGS_ADVANCED.route) {
 			AdvancedSettingsView(
-				makeSnackBar = { null },
-				makeSnackBarT = { _, _ -> null },
-				exit = {
-					TODO("REBIND")
-				}
+				onBack = navController::popBackStack
 			)
 		}
 		composable(SETTINGS_DOWNLOAD.route) {
 			DownloadSettingsView(
-				makeSnackBar = { _, _ -> null }
+				onBack = navController::popBackStack
 			)
 		}
 		composable(SETTINGS_READER.route) {
+			val context = LocalContext.current
 			ReaderSettingsView(
-				makeSnackBar = { null }
+				onBack = navController::popBackStack,
+				openCSS = {
+					ContextCompat.startActivity(
+						context,
+						Intent(context, CSSEditorActivity::class.java).apply {
+							putExtra(CSSEditorActivity.CSS_ID, -1)
+						},
+						null
+					)
+				}
 			)
 		}
 	}

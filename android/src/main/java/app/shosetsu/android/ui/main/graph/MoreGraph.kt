@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
 import app.shosetsu.android.ui.add.AddShareView
@@ -51,10 +52,15 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 				}
 			)
 		}
+
+		assetReader(navController)
+
 		composable(Destination.ABOUT.route) {
 			AboutView(
 				onOpenLicense = {
-					TODO("Bind")
+					navController.navigate(
+						Destination.TEXT_READER.routeWith(TextAsset.LICENSE.ordinal)
+					)
 				},
 				onBack = navController::popBackStack
 			)

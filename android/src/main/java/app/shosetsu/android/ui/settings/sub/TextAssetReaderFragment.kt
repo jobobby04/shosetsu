@@ -4,25 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import app.shosetsu.android.common.enums.TextAsset
+import androidx.compose.ui.res.stringResource
+import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
 
@@ -48,6 +46,7 @@ import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
  * Shosetsu
  * 9 / June / 2019
  */
+@Deprecated("Composed")
 class TextAssetReaderFragment : ShosetsuFragment() {
 
 	override fun onCreateView(
@@ -55,60 +54,53 @@ class TextAssetReaderFragment : ShosetsuFragment() {
 		container: ViewGroup?,
 		savedViewState: Bundle?
 	): View = ComposeView {
-		TextAssetReaderView(
-			remember {
-				requireArguments().getInt(
-					BUNDLE_KEY,
-					TextAsset.LICENSE.bundle.getInt(BUNDLE_KEY)
-				)
-			},
-			::setViewTitle
-		)
-	}
-
-	companion object {
-		const val BUNDLE_KEY: String = "target"
-		val TextAsset.bundle: Bundle
-			get() = bundleOf(BUNDLE_KEY to ordinal)
 	}
 }
 
 @Composable
 fun TextAssetReaderView(
 	bundleKey: Int,
-	setViewTitle: (String) -> Unit,
-	viewModel: ATextAssetReaderViewModel = viewModelDi()
+	onBack: () -> Unit,
 ) {
+	val viewModel: ATextAssetReaderViewModel = viewModelDi()
+
 	LaunchedEffect(bundleKey) {
 		viewModel.setTarget(bundleKey)
 	}
 
 	val target by viewModel.targetLiveData.collectAsState()
-	val resources = LocalContext.current.resources
-
-	LaunchedEffect(target) {
-		if (target != null)
-			setViewTitle(resources.getString((target ?: return@LaunchedEffect).titleRes))
-
-	}
-
 	val content by viewModel.liveData.collectAsState()
-	ShosetsuCompose {
-		TextAssetReaderContent(content)
-	}
+
+	TextAssetReaderContent(
+		text = content,
+		title = stringResource(
+			target?.titleRes ?: R.string.loading
+		),
+		onBack = onBack
+	)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextAssetReaderContent(text: String?) {
-	if (text != null) {
-		Box(
-			modifier = Modifier
+fun TextAssetReaderContent(text: String, title: String, onBack: () -> Unit) {
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(title)
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
+			)
+		}
+	) { paddingValues ->
+		Text(
+			text = text, modifier = Modifier
+				.padding(paddingValues)
 				.verticalScroll(
 					state = rememberScrollState(),
 				)
-				.fillMaxSize()
-		) {
-			Text(text = text, modifier = Modifier.padding(16.dp))
-		}
+		)
 	}
 }

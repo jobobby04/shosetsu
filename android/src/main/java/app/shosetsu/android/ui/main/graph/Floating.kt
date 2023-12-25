@@ -1,10 +1,11 @@
-package app.shosetsu.android.viewmodel.abstracted
+package app.shosetsu.android.ui.main.graph
 
-import androidx.lifecycle.LiveData
-import app.shosetsu.android.common.enums.TextAsset
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
-import app.shosetsu.android.viewmodel.base.SubscribeViewModel
-import kotlinx.coroutines.flow.StateFlow
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.ui.main.Destination
+import app.shosetsu.android.ui.settings.sub.TextAssetReaderView
 
 /*
  * This file is part of shosetsu.
@@ -26,24 +27,16 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Shosetsu
  *
- * @since 29 / 06 / 2021
+ * @since 25 / 12 / 2023
  * @author Doomsdayrs
  */
-abstract class ATextAssetReaderViewModel : ShosetsuViewModel(), SubscribeViewModel<String?> {
+fun NavGraphBuilder.assetReader(navController: NavController) {
+	composable(Destination.TEXT_READER.route, Destination.TEXT_READER.arguments) { entry ->
+		val assetId = entry.arguments!!.getInt(BundleKeys.BUNDLE_ID)
 
-	/**
-	 * [LiveData] of text to display
-	 */
-	abstract override val liveData: StateFlow<String>
-
-	/**
-	 * [LiveData] of the current [TextAsset]
-	 */
-	abstract val targetLiveData: StateFlow<TextAsset?>
-
-	/**
-	 * Set the target asset to read
-	 */
-	abstract fun setTarget(targetOrdinal: Int)
-
+		TextAssetReaderView(
+			assetId,
+			onBack = navController::popBackStack
+		)
+	}
 }

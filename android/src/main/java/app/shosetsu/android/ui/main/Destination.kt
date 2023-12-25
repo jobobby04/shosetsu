@@ -31,7 +31,18 @@ sealed class Destination {
 	}
 
 	data object ABOUT : Destination()
-	data object TEXT_READER : Destination()
+	data object TEXT_READER : Destination() {
+		override val route: String = "text/{${BundleKeys.BUNDLE_ID}}"
+
+		override val arguments: List<NamedNavArgument> =
+			listOf(
+				navArgument(BundleKeys.BUNDLE_ID) { type = NavType.IntType }
+			)
+
+		fun routeWith(assetId: Int): String =
+			"text/$assetId"
+	}
+
 	data object DOWNLOADS : Destination()
 	data object ANALYTICS : Destination()
 	data object ADD_SHARE : Destination()
