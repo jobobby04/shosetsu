@@ -115,7 +115,8 @@ fun BrowseView(
 	openCatalogue: (extensionId: Int) -> Unit,
 	openSettings: (extensionId: Int) -> Unit,
 	openRepositories: () -> Unit,
-	openSearch: () -> Unit
+	openSearch: () -> Unit,
+	drawerIcon: @Composable () -> Unit
 ) {
 	val viewModel: ABrowseViewModel = viewModelDi()
 
@@ -192,7 +193,8 @@ fun BrowseView(
 			onOpenFilter = viewModel::showFilterMenu,
 			onOpenSearch = openSearch,
 			query = query,
-			onSetQuery = viewModel::setSearch
+			onSetQuery = viewModel::setSearch,
+			drawerIcon = drawerIcon
 		)
 
 		if (isFilterMenuVisible) {
@@ -234,7 +236,8 @@ fun PreviewBrowseContent() {
 		{},
 		hostState = remember { SnackbarHostState() },
 		onOpenFilter = {},
-		onOpenSearch = {}
+		onOpenSearch = {},
+		drawerIcon = {}
 	)
 }
 
@@ -253,7 +256,8 @@ fun BrowseContent(
 	cancelInstall: (BrowseExtensionUI) -> Unit,
 	hostState: SnackbarHostState,
 	onOpenFilter: () -> Unit,
-	onOpenSearch: () -> Unit
+	onOpenSearch: () -> Unit,
+	drawerIcon: @Composable () -> Unit
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(refresh)
 
@@ -279,7 +283,8 @@ fun BrowseContent(
 						Icon(Icons.Default.Search, stringResource(R.string.global_search))
 					}
 					HelpButton(BROWSE_HELP_URL)
-				}
+				},
+				navigationIcon = drawerIcon
 			)
 		},
 		snackbarHost = {

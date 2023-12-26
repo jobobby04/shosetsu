@@ -153,7 +153,8 @@ fun NovelInfoView(
 	onMigrate: (novelId: Int) -> Unit,
 	openInWebView: (String) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
+	drawerIcon: @Composable () -> Unit
 ) {
 	val viewModel: ANovelViewModel = viewModelDi()
 

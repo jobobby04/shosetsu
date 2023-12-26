@@ -114,6 +114,7 @@ import kotlinx.coroutines.launch
 fun LibraryView(
 	onOpenNovel: (novelId: Int) -> Unit,
 	onMigrate: (ids: List<Int>) -> Unit,
+	drawerIcon: @Composable () -> Unit,
 ) {
 	ShosetsuCompose {
 		val viewModel = viewModelDi<ALibraryViewModel>()
@@ -203,7 +204,8 @@ fun LibraryView(
 			selectedType = type,
 			onSetType = viewModel::setViewType,
 			hostState = hostState,
-			onShowFilterMenu = viewModel::showFilterMenu
+			onShowFilterMenu = viewModel::showFilterMenu,
+			drawerIcon = drawerIcon
 		)
 		if (isCategoriesDialogOpen) {
 			CategoriesDialog(
@@ -253,7 +255,8 @@ fun LibraryContent(
 	selectedType: NovelCardType,
 	onSetType: (NovelCardType) -> Unit,
 	hostState: SnackbarHostState,
-	onShowFilterMenu: () -> Unit
+	onShowFilterMenu: () -> Unit,
+	drawerIcon: @Composable () -> Unit
 ) {
 	Scaffold(
 		topBar = {
@@ -274,7 +277,8 @@ fun LibraryContent(
 				onRefresh = {
 					onRefresh(-1) // default, TODO maybe make better?
 				},
-				isEmpty = isEmpty
+				isEmpty = isEmpty,
+				drawerIcon = drawerIcon
 			)
 		},
 		snackbarHost = {
@@ -349,7 +353,8 @@ fun LibraryAppBar(
 	selectedType: NovelCardType,
 	onSetType: (NovelCardType) -> Unit,
 	onRefresh: () -> Unit,
-	isEmpty: Boolean
+	isEmpty: Boolean,
+	drawerIcon: @Composable () -> Unit
 ) {
 	@Composable
 	fun title() {
@@ -370,6 +375,7 @@ fun LibraryAppBar(
 				RemoveAllButton(onRemove)
 				LibrarySelectedMoreButton(onMigrate, onTogglePin, onSetCategories)
 			},
+			navigationIcon = drawerIcon
 		)
 	} else {
 		TopAppBar(
@@ -384,6 +390,7 @@ fun LibraryAppBar(
 					}
 				}
 			},
+			navigationIcon = drawerIcon
 		)
 	}
 }

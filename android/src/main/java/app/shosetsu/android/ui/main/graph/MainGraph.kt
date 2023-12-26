@@ -1,6 +1,7 @@
 package app.shosetsu.android.ui.main.graph
 
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -26,7 +27,8 @@ import app.shosetsu.android.ui.updates.UpdatesView
 
 fun NavGraphBuilder.mainGraph(
 	navController: NavHostController,
-	sizeClass: WindowSizeClass
+	sizeClass: WindowSizeClass,
+	drawerIcon: @Composable () -> Unit
 ) {
 	composable(LIBRARY.route) {
 		LibraryView(
@@ -35,11 +37,18 @@ fun NavGraphBuilder.mainGraph(
 			},
 			onMigrate = {
 				navController.navigate(MIGRATION.routeWith(it))
-			}
+			},
+			drawerIcon = drawerIcon
 		)
 	}
-	browseGraph(navController)
-	moreGraph(navController)
+	browseGraph(
+		navController,
+		drawerIcon = drawerIcon
+	)
+	moreGraph(
+		navController,
+		drawerIcon = drawerIcon
+	)
 	composable(UPDATES.route) {
 		val context = LocalContext.current
 		UpdatesView(
@@ -47,6 +56,7 @@ fun NavGraphBuilder.mainGraph(
 				navController.navigate(NOVEL.routeWith(novelId))
 			},
 			openChapter = context::openChapter,
+			drawerIcon = drawerIcon
 		)
 	}
 	composable(
@@ -63,9 +73,11 @@ fun NavGraphBuilder.mainGraph(
 			},
 			openInWebView = context::openInWebView,
 			openChapter = context::openChapter,
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
+			drawerIcon = drawerIcon
 		)
 	}
+
 	composable(MIGRATION.route) {
 		MigrationView(emptyList())
 	}

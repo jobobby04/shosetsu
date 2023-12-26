@@ -68,7 +68,13 @@ class MainViewModel(
 		loadAppUpdateFlowLiveUseCase()
 
 	override val navigationStyle =
-		loadNavigationStyleUseCase().map { NavigationStyle.values()[it] }
+		loadNavigationStyleUseCase().map {
+			if (it) {
+				NavigationStyle.LEGACY
+			} else {
+				NavigationStyle.MATERIAL
+			}
+		}
 			.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Eagerly, NavigationStyle.MATERIAL)
 

@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.main.graph
 
-import android.app.Activity
 import android.content.Intent
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
@@ -63,9 +62,7 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 		}
 
 		composable(SETTINGS_VIEW.route) {
-			val activity = LocalContext.current as Activity
 			ViewSettingsView(
-				onExit = activity::finish,
 				onBack = navController::popBackStack
 			)
 		}

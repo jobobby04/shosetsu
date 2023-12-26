@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.main.graph
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -11,7 +12,10 @@ import app.shosetsu.android.ui.extensionsConfigure.ConfigureExtensionView
 import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.search.SearchView
 
-fun NavGraphBuilder.browseGraph(navController: NavHostController) {
+fun NavGraphBuilder.browseGraph(
+	navController: NavHostController,
+	drawerIcon: @Composable () -> Unit
+) {
 	navigation("main", Destination.BROWSE.route) {
 		composable("main") {
 			BrowseView(
@@ -26,7 +30,8 @@ fun NavGraphBuilder.browseGraph(navController: NavHostController) {
 				},
 				openSearch = {
 					navController.navigate(Destination.SEARCH.route)
-				}
+				},
+				drawerIcon = drawerIcon
 			)
 		}
 

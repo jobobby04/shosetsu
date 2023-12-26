@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.main.graph
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -19,7 +20,10 @@ import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.more.MoreView
 import app.shosetsu.android.ui.repository.RepositoriesView
 
-fun NavGraphBuilder.moreGraph(navController: NavHostController) {
+fun NavGraphBuilder.moreGraph(
+	navController: NavHostController,
+	drawerIcon: @Composable () -> Unit
+) {
 	navigation(startDestination = "main", Destination.MORE.route) {
 		composable("main") {
 			MoreView(
@@ -51,7 +55,8 @@ fun NavGraphBuilder.moreGraph(navController: NavHostController) {
 				},
 				onNavToSettings = {
 					navController.navigate(Destination.SETTINGS.route)
-				}
+				},
+				drawerIcon = drawerIcon
 			)
 		}
 

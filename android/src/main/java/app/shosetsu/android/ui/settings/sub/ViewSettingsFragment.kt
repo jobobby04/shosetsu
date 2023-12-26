@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,27 +9,23 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.ChapterColumnsInLandscape
+import app.shosetsu.android.common.SettingKey.ChapterColumnsInPortait
+import app.shosetsu.android.common.SettingKey.NavStyle
+import app.shosetsu.android.common.SettingKey.NovelBadgeToast
+import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
 import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
@@ -40,7 +35,6 @@ import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.map
 
 /*
  * This file is part of shosetsu.
@@ -82,14 +76,12 @@ class ViewSettingsFragment : ShosetsuFragment() {
 
 @Composable
 fun ViewSettingsView(
-	onExit: () -> Unit,
 	onBack: () -> Unit
 ) {
 	val viewModel: AViewSettingsViewModel = viewModelDi()
 
 	ViewSettingsContent(
 		viewModel,
-		finishActivity = onExit,
 		onBack = onBack
 	)
 }
@@ -98,15 +90,8 @@ fun ViewSettingsView(
 @Composable
 fun ViewSettingsContent(
 	viewModel: AViewSettingsViewModel,
-	finishActivity: () -> Unit,
 	onBack: () -> Unit
 ) {
-	var showUIAlert by remember { mutableStateOf(false) }
-
-	@SuppressLint("FlowOperatorInvokedInComposition")
-	val navStyle by viewModel.settingsRepo.getIntFlow(NavStyle).map { it == 1 }
-		.collectAsState(NavStyle.default == 1)
-
 	Scaffold(
 		topBar = {
 			TopAppBar(
@@ -181,48 +166,13 @@ fun ViewSettingsContent(
 				SwitchSettingContent(
 					title = stringResource(R.string.settings_view_legacy_nav_title),
 					description = stringResource(R.string.settings_view_legacy_nav_desc),
-					isChecked = navStyle,
-					modifier = Modifier.fillMaxWidth()
-				) {
-					showUIAlert = true
-				}
+					modifier = Modifier.fillMaxWidth(),
+					repo = viewModel.settingsRepo,
+					key = NavStyle
+				)
 			}
 		}
 	}
-
-	if (showUIAlert)
-		AlertDialog(
-			onDismissRequest = {
-				showUIAlert = false
-			},
-			confirmButton = {
-				TextButton(
-					onClick = {
-						launchIO {
-							viewModel.settingsRepo.setInt(NavStyle, if (navStyle) 0 else 1)
-							launchUI {
-								showUIAlert = false
-								finishActivity()
-							}
-						}
-					}
-				) {
-					Text(stringResource(R.string.restart))
-				}
-			},
-			dismissButton = {
-				TextButton(
-					onClick = {
-						showUIAlert = false
-					}
-				) {
-					Text(stringResource(R.string.never_mind))
-				}
-			},
-			title = {
-				Text(stringResource(R.string.need_restart))
-			}
-		)
 }
 
 

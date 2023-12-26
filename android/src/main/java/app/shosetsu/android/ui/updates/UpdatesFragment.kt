@@ -104,6 +104,7 @@ import org.joda.time.DateTime
 fun UpdatesView(
 	openNovel: (Int) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
+	drawerIcon: @Composable () -> Unit,
 ) {
 	ShosetsuCompose {
 		val viewModel = viewModelDi<AUpdatesViewModel>()
@@ -142,7 +143,8 @@ fun UpdatesView(
 			},
 			onClearAll = viewModel::clearAll,
 			onClearBefore = viewModel::showClearBefore,
-			hostState = hostState
+			hostState = hostState,
+			drawerIcon = drawerIcon
 		)
 
 		if (isClearBeforeVisible) {
@@ -198,7 +200,8 @@ fun ClearBeforeDialog(
 fun UpdatesAppBar(
 	onClearAll: () -> Unit,
 	onClearBefore: () -> Unit,
-	isEmpty: Boolean
+	isEmpty: Boolean,
+	drawerIcon: @Composable () -> Unit
 ) {
 	TopAppBar(
 		title = {
@@ -238,7 +241,8 @@ fun UpdatesAppBar(
 				}
 			}
 		},
-		scrollBehavior = enterAlwaysScrollBehavior()
+		scrollBehavior = enterAlwaysScrollBehavior(),
+		navigationIcon = drawerIcon
 	)
 }
 
@@ -251,12 +255,13 @@ fun UpdatesContent(
 	openChapter: (UpdatesUI) -> Unit,
 	onClearAll: () -> Unit,
 	onClearBefore: () -> Unit,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
+	drawerIcon: @Composable () -> Unit
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Scaffold(
 		topBar = {
-			UpdatesAppBar(onClearAll, onClearBefore, items.isEmpty())
+			UpdatesAppBar(onClearAll, onClearBefore, items.isEmpty(), drawerIcon)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)

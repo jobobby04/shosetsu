@@ -95,7 +95,8 @@ fun MoreView(
 	onNavToAnalytics: () -> Unit = {},
 	onNavToHistory: () -> Unit = {},
 	onNavToSettings: () -> Unit = {},
-	onNavToAbout: () -> Unit = {}
+	onNavToAbout: () -> Unit = {},
+	drawerIcon: @Composable () -> Unit
 ) {
 	ShosetsuCompose {
 		val hostState = remember { SnackbarHostState() }
@@ -118,7 +119,8 @@ fun MoreView(
 			onNavToAnalytics,
 			onNavToHistory,
 			onNavToSettings,
-			onNavToAbout
+			onNavToAbout,
+			drawerIcon = drawerIcon
 		)
 	}
 }
@@ -154,7 +156,8 @@ fun MoreItemContent(
 @Composable
 fun PreviewMoreContent() {
 	MoreContent(
-		hostState = remember { SnackbarHostState() }
+		hostState = remember { SnackbarHostState() },
+		drawerIcon = { }
 	)
 }
 
@@ -172,7 +175,8 @@ fun MoreContent(
 	onNavToAnalytics: () -> Unit = {},
 	onNavToHistory: () -> Unit = {},
 	onNavToSettings: () -> Unit = {},
-	onNavToAbout: () -> Unit = {}
+	onNavToAbout: () -> Unit = {},
+	drawerIcon: @Composable () -> Unit
 ) {
 	Scaffold(
 		topBar = {
@@ -180,12 +184,13 @@ fun MoreContent(
 				title = {
 					Text(stringResource(R.string.more))
 				},
-				scrollBehavior = enterAlwaysScrollBehavior()
+				scrollBehavior = enterAlwaysScrollBehavior(),
+				navigationIcon = drawerIcon
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { padding ->
 		LazyColumn(
 			modifier = Modifier
