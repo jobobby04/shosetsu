@@ -31,7 +31,11 @@ import kotlinx.coroutines.flow.StateFlow
  * 20 / 06 / 2020
  */
 abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
-	abstract fun startAppUpdateCheck(): Flow<AppUpdateEntity?>
+
+	/**
+	 * App update, if any
+	 */
+	abstract val appUpdate: Flow<AppUpdateEntity?>
 
 	/**
 	 * If 0, Bottom
@@ -39,9 +43,20 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	 */
 	abstract val navigationStyle: StateFlow<NavigationStyle>
 
+	/**
+	 * Theme to use
+	 */
 	abstract val appTheme: StateFlow<AppThemes>
 
+	/**
+	 * The app needs two presses to exit
+	 */
 	abstract val requireDoubleBackToExit: StateFlow<Boolean>
+
+	/**
+	 * Action to take for an update
+	 */
+	abstract val updateAction: Flow<AppUpdateAction>
 
 	/**
 	 * The user requests to update the app
@@ -52,27 +67,34 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	 * If stable-utd, will open up up-to-down
 	 * If stable-fdr, will open up f-droid
 	 */
-	abstract fun handleAppUpdate(): Flow<AppUpdateAction?>
+	abstract fun handleAppUpdate()
 
-	sealed class AppUpdateAction {
+	/**
+	 * An action the user is prompted with to handle an update
+	 */
+	sealed interface AppUpdateAction {
 
 		/**
 		 * Shosetsu is downloading the update itself
 		 */
-		object SelfUpdate : AppUpdateAction()
+		data object SelfUpdate : AppUpdateAction
 
 		/**
 		 * The user has to handle the update
 		 *
 		 * @param pkg preferred application to open with
+		 * @param updateURL url to open with
 		 */
 		data class UserUpdate(
 			val updateURL: String,
 			val pkg: String?
-		) : AppUpdateAction()
+		) : AppUpdateAction
 
 	}
 
+	/**
+	 *
+	 */
 	abstract val backupProgressState: StateFlow<IBackupRepository.BackupProgress>
 
 	/** If the application should show the show splash screen */

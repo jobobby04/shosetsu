@@ -6,9 +6,16 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
@@ -20,10 +27,16 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.ID_APP_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.APP_UPDATE_WORK_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import app.shosetsu.android.domain.usecases.load.LoadRemoteAppUpdateUseCase
 import app.shosetsu.lib.exceptions.HTTPException
+import kotlinx.coroutines.flow.first
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -66,7 +79,7 @@ class AppUpdateCheckWorker(
 		}
 	override val defaultNotificationID: Int = ID_APP_UPDATE
 
-	private val loadRemoteAppUpdateUseCase by instance<LoadRemoteAppUpdateUseCase>()
+	private val updateRepo by instance<IAppUpdatesRepository>()
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
@@ -83,7 +96,7 @@ class AppUpdateCheckWorker(
 	override suspend fun doWork(): Result {
 		notify("Starting")
 		val entity = try {
-			loadRemoteAppUpdateUseCase()
+			updateRepo.fetch()
 		} catch (e: HTTPException) {
 			logE("Error!", e)
 			notify("${e.code}") {
@@ -159,7 +172,7 @@ class AppUpdateCheckWorker(
 			getWorkerInfoList()[index].state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
-			workerManager.getWorkInfosForUniqueWork(APP_UPDATE_WORK_ID).await()
+			workerManager.getWorkInfosForUniqueWorkFlow(APP_UPDATE_WORK_ID).first()
 
 		override suspend fun getCount(): Int =
 			getWorkerInfoList().size
@@ -203,7 +216,8 @@ class AppUpdateCheckWorker(
 				)
 				logI(
 					"Worker State ${
-						workerManager.getWorkInfosForUniqueWork(APP_UPDATE_WORK_ID).await()[0].state
+						workerManager.getWorkInfosForUniqueWorkFlow(APP_UPDATE_WORK_ID)
+							.first()[0].state
 					}"
 				)
 			}

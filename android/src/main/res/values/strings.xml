@@ -704,6 +704,7 @@
     <string name="view_novel_refresh_failed">Failed to refresh novel: %s</string>
     <string name="view_backup_restore_start">Restoring now...</string>
     <string name="view_backup_exporting_start">Exporting now...</string>
+    <string name="worker_update_install_missing">No update to install</string>
 
 </resources>
 
