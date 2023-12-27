@@ -1,6 +1,7 @@
 package app.shosetsu.android.ui.main
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -43,6 +44,7 @@ import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
+import app.shosetsu.android.ui.intro.IntroductionActivity
 import app.shosetsu.android.ui.main.Destination.BROWSE
 import app.shosetsu.android.ui.main.Destination.LIBRARY
 import app.shosetsu.android.ui.main.Destination.MORE
@@ -78,7 +80,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun MainView() {
+	val context = LocalContext.current
+
 	val viewModel = viewModelDi<AMainViewModel>()
+	val showIntro by viewModel.showIntro.collectAsState()
+
+	// Has to happen as soon as possible
+	LaunchedEffect(showIntro) {
+		if (showIntro)
+			context.startActivity(Intent(context, IntroductionActivity::class.java))
+	}
+
 	val backupProgressState by viewModel.backupProgressState.collectAsState()
 	val theme by viewModel.appTheme.collectAsState()
 	val navStyle by viewModel.navigationStyle.collectAsState()
@@ -88,7 +100,6 @@ fun MainView() {
 	val isMaterial = navStyle == NavigationStyle.MATERIAL
 	val isLegacy = navStyle == NavigationStyle.LEGACY
 
-	val context = LocalContext.current
 	val navController = rememberNavController()
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
 	val drawerState = rememberDrawerState(DrawerValue.Closed)

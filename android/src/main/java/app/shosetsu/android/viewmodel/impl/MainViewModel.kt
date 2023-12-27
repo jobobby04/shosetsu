@@ -109,17 +109,8 @@ class MainViewModel(
 	override val backupProgressState: StateFlow<IBackupRepository.BackupProgress> =
 		backupRepo.backupProgress
 
-	private val showIntro by lazy {
+	override val showIntro: StateFlow<Boolean> by lazy {
 		settingsRepository.getBooleanFlow(SettingKey.FirstTime)
-	}
-
-	override suspend fun showIntro(): Boolean =
-		settingsRepository.getBoolean(SettingKey.FirstTime)
-
-	override fun toggleShowIntro() {
-		launchIO {
-			settingsRepository.setBoolean(SettingKey.FirstTime, !showIntro.value)
-		}
 	}
 
 	override fun dismissUpdateDialog() {
