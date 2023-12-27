@@ -1,6 +1,7 @@
 package app.shosetsu.android.ui.main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import app.shosetsu.android.R
+import app.shosetsu.android.ui.theme.Primary
 
 /*
  * This file is part of shosetsu.
@@ -54,8 +56,9 @@ fun <T> NavigationDrawerContent(
 			verticalAlignment = Alignment.Bottom
 		) {
 			Image(
-				painterResource(R.mipmap.ic_launcher_round),
-				stringResource(R.string.logo_desc)
+				painterResource(R.drawable.shou_icon),
+				stringResource(R.string.logo_desc),
+				modifier = Modifier.background(Primary)
 			)
 			Column(
 				verticalArrangement = Arrangement.Bottom,
