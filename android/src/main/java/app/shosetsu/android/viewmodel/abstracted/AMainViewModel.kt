@@ -35,7 +35,7 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	/**
 	 * App update, if any
 	 */
-	abstract val appUpdate: Flow<AppUpdateEntity?>
+	abstract val appUpdate: StateFlow<AppUpdateEntity?>
 
 	/**
 	 * If 0, Bottom
@@ -67,7 +67,7 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	 * If stable-utd, will open up up-to-down
 	 * If stable-fdr, will open up f-droid
 	 */
-	abstract fun handleAppUpdate()
+	abstract fun update()
 
 	/**
 	 * An action the user is prompted with to handle an update
@@ -102,4 +102,9 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 
 	/** Toggle the state if show intro or not*/
 	abstract fun toggleShowIntro()
+
+	/**
+	 * Dismiss the update dialog
+	 */
+	abstract fun dismissUpdateDialog()
 }

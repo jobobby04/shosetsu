@@ -18,11 +18,11 @@ import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCas
 import app.shosetsu.android.domain.usecases.start.StartAppUpdateInstallWorkerUseCase
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 
 /*
@@ -63,8 +63,7 @@ class MainViewModel(
 
 	override val updateAction: MutableSharedFlow<AppUpdateAction> = MutableSharedFlow()
 
-	override val appUpdate: SharedFlow<AppUpdateEntity?> =
-		appUpdateRepo.appUpdate.shareIn(viewModelScopeIO, SharingStarted.Lazily, 0)
+	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
 
 	override val navigationStyle: StateFlow<NavigationStyle> =
 		loadNavigationStyleUseCase().map {
@@ -83,13 +82,13 @@ class MainViewModel(
 		loadLiveAppThemeUseCase()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
 
-	override fun handleAppUpdate() {
+	override fun update() {
 		launchIO {
 			if (appUpdateRepo.canSelfUpdate) {
 				startInstallWorker()
 				updateAction.emit(AppUpdateAction.SelfUpdate)
 			} else {
-				val update = appUpdateRepo.appUpdate.value
+				val update = appUpdateRepo.appUpdate.first()
 
 				if (update != null) {
 					updateAction.emit(
@@ -120,6 +119,19 @@ class MainViewModel(
 	override fun toggleShowIntro() {
 		launchIO {
 			settingsRepository.setBoolean(SettingKey.FirstTime, !showIntro.value)
+		}
+	}
+
+	override fun dismissUpdateDialog() {
+		appUpdate.value = null
+	}
+
+	init {
+		launchIO {
+			// Pass updates to UI
+			appUpdateRepo.appUpdate.collect { it ->
+				appUpdate.emit(it)
+			}
 		}
 	}
 }

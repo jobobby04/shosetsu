@@ -6,7 +6,7 @@ import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.MissingFeatureException
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.net.UnknownHostException
 
@@ -37,7 +37,7 @@ interface IAppUpdatesRepository {
 	/**
 	 * Flow of app updates
 	 */
-	val appUpdate: StateFlow<AppUpdateEntity?>
+	val appUpdate: Flow<AppUpdateEntity?>
 
 	/**
 	 * Checks for a new update

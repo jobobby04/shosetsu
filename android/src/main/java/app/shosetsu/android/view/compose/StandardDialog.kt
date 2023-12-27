@@ -50,13 +50,13 @@ fun StandardDialog(
 	dialogProperties: DialogProperties = DialogProperties(),
 	title: @Composable () -> Unit = {},
 	onConfirm: () -> Unit = onDismissRequest,
-	confirmButton: @Composable () -> Unit = {
+	confirmButton: @Composable (onConfirm: (() -> Unit)) -> Unit = {
 		TextButton(onConfirm) {
 			Text(stringResource(android.R.string.ok))
 		}
 	},
 	onCancel: () -> Unit = onDismissRequest,
-	cancelButton: @Composable () -> Unit = {
+	cancelButton: @Composable (onCancel: () -> Unit) -> Unit = {
 		TextButton(onCancel) {
 			Text(stringResource(android.R.string.cancel))
 		}
@@ -79,8 +79,8 @@ fun StandardDialog(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier.align(Alignment.End)
 				) {
-					cancelButton()
-					confirmButton()
+					cancelButton(onCancel)
+					confirmButton(onConfirm)
 				}
 			}
 		}

@@ -17,7 +17,8 @@ import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
 
 /*
@@ -46,11 +47,20 @@ class AppUpdatesRepository(
 	private val iFileAppUpdateDataSource: IFileCachedAppUpdateDataSource,
 ) : IAppUpdatesRepository {
 
-	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
+	/**
+	 * SharedFlow so that the UI can always get whatever is last pushed.
+	 *
+	 * A StateFlow would not update the UI if the user clicks the update button twice
+	 */
+	override val appUpdate: MutableSharedFlow<AppUpdateEntity> = MutableSharedFlow(1)
 
 	init {
 		launchIO {
-			appUpdate.emit(iFileAppUpdateDataSource.load())
+			try {
+				appUpdate.emit(iFileAppUpdateDataSource.load())
+			} catch (ignore: Exception) {
+				// If it doesn't work, meh!
+			}
 		}
 	}
 
@@ -135,7 +145,8 @@ class AppUpdatesRepository(
 	)
 	override suspend fun downloadAppUpdate(): String = onIO {
 		if (iRemoteAppUpdateDataSource is IRemoteAppUpdateDataSource.Downloadable) {
-			val update = appUpdate.value
+			val update = appUpdate.firstOrNull()
+
 			if (update != null) {
 				// Download
 				val response = iRemoteAppUpdateDataSource.downloadAppUpdate(update)

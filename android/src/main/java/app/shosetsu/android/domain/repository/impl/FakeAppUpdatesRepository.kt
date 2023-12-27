@@ -1,11 +1,9 @@
 package app.shosetsu.android.domain.repository.impl
 
 import app.shosetsu.android.common.ext.onIO
-import app.shosetsu.android.datasource.local.file.base.IFileCachedAppUpdateDataSource
-import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 /*
  * This file is part of shosetsu.
@@ -28,19 +26,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * shosetsu
  * 07 / 09 / 2020
  */
-class FakeAppUpdatesRepository(
-	private val iFileAppUpdateDataSource: IFileCachedAppUpdateDataSource,
-	private val iRemoteAppUpdateDataSource: IRemoteAppUpdateDataSource,
-) : IAppUpdatesRepository {
+class FakeAppUpdatesRepository : IAppUpdatesRepository {
 
-	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
+	override val appUpdate = MutableSharedFlow<AppUpdateEntity>(1)
 
 	override suspend fun fetch(): AppUpdateEntity = onIO {
 		val entity = AppUpdateEntity(
-			"v3.0.0",
+			"v9.9.9",
 			999,
 			9999,
-			"https://github.com/shosetsuorg/shosetsu-preview/releases/download/r1136/shosetsu-r1136.apk",
+			"https://gitlab.com/shosetsuorg/shosetsu-preview/releases/download/r1136/shosetsu-r1136.apk",
 			notes = listOf("This is a fake update")
 		)
 
@@ -49,7 +44,7 @@ class FakeAppUpdatesRepository(
 		entity
 	}
 
-	override val canSelfUpdate: Boolean = false
+	override val canSelfUpdate: Boolean = true
 
 	override suspend fun downloadAppUpdate(): String = throw Exception("Stub")
 }

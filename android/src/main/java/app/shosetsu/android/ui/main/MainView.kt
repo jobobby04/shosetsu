@@ -21,6 +21,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NavigationStyle
+import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import app.shosetsu.android.ui.main.Destination.BROWSE
@@ -80,6 +82,9 @@ fun MainView() {
 	val backupProgressState by viewModel.backupProgressState.collectAsState()
 	val theme by viewModel.appTheme.collectAsState()
 	val navStyle by viewModel.navigationStyle.collectAsState()
+	val update by viewModel.appUpdate.collectAsState()
+	val updateAction by viewModel.updateAction.collectAsState(null)
+
 	val isMaterial = navStyle == NavigationStyle.MATERIAL
 	val isLegacy = navStyle == NavigationStyle.LEGACY
 
@@ -190,6 +195,28 @@ fun MainView() {
 					)
 				}
 			}
+		}
+	}
+
+	if (update != null) {
+		AppUpdateDialog(
+			update ?: return,
+			onDismissRequest = viewModel::dismissUpdateDialog,
+			onUpdate = viewModel::update
+		)
+	}
+
+	LaunchedEffect(updateAction) {
+		when (val action = updateAction) {
+			AMainViewModel.AppUpdateAction.SelfUpdate -> {
+				// TODO how to notify the user?
+			}
+
+			is AMainViewModel.AppUpdateAction.UserUpdate -> {
+				context.openInBrowser(action.updateURL, action.pkg)
+			}
+
+			null -> {}
 		}
 	}
 }
