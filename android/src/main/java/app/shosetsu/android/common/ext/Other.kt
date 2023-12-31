@@ -17,10 +17,8 @@ package app.shosetsu.android.common.ext
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -32,27 +30,18 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.direct
 import org.kodein.di.instance
 
+/*
+ * KODEIN EXT
+ */
+
 /**
  * shosetsu
  * 24 / 04 / 2020
  *
  * @author github.com/doomsdayrs
  */
-
-/**
- * KODEIN EXT
- **/
 inline fun <reified VM : ViewModel, T> T.viewModel()
-		: Lazy<VM> where T : DIAware, T : Fragment =
-	lazy(LazyThreadSafetyMode.NONE) {
-		ViewModelProvider(
-			this.viewModelStore,
-			direct.instance()
-		)[VM::class.java]
-	}
-
-inline fun <reified VM : ViewModel, T> T.viewModel()
-		: Lazy<VM> where T : DIAware, T : AppCompatActivity =
+		: Lazy<VM> where T : DIAware, T : ViewModelStoreOwner =
 	lazy(LazyThreadSafetyMode.NONE) {
 		ViewModelProvider(
 			this,

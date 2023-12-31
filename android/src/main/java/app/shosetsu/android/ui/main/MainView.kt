@@ -79,10 +79,11 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun MainView() {
+fun MainView(
+	viewModel: AMainViewModel = viewModelDi()
+) {
 	val context = LocalContext.current
 
-	val viewModel = viewModelDi<AMainViewModel>()
 	val showIntro by viewModel.showIntro.collectAsState()
 
 	// Has to happen as soon as possible
@@ -120,8 +121,8 @@ fun MainView() {
 		}
 	}
 
-	fun navigate(destination: Destination) {
-		navController.navigate(destination.route) {
+	fun navigate(route: String) {
+		navController.navigate(route) {
 			// Pop up to the start destination of the graph to
 			// avoid building up a large stack of destinations
 			// on the back stack as users select items
@@ -135,6 +136,15 @@ fun MainView() {
 			restoreState = true
 		}
 	}
+
+	fun navigate(destination: Destination) {
+		navigate(destination.route)
+	}
+
+	IntentHandler(
+		onNavigate = ::navigate,
+		onUpdate = viewModel::update
+	)
 
 	ShosetsuTheme(
 		darkTheme = when (theme) {
@@ -271,3 +281,5 @@ fun <T> BottomNavigationBar(
 		}
 	}
 }
+
+

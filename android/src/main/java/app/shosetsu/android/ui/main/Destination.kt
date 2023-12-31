@@ -45,7 +45,17 @@ sealed class Destination {
 
 	data object DOWNLOADS : Destination()
 	data object ANALYTICS : Destination()
-	data object ADD_SHARE : Destination()
+	data object ADD_SHARE : Destination() {
+		override val route: String = "add_share/{${BundleKeys.BUNDLE_URL}}"
+		override val arguments: List<NamedNavArgument> =
+			listOf(
+				navArgument(BundleKeys.BUNDLE_URL) { type = NavType.StringType }
+			)
+
+		fun routeWith(url: String): String =
+			"add_share/$url"
+	}
+
 	data object HISTORY : Destination()
 	data object UPDATES : Destination(), Root {
 		override val icon: Int = R.drawable.update
@@ -62,7 +72,17 @@ sealed class Destination {
 			"novel/$novelId"
 	}
 
-	data object SEARCH : Destination()
+	data object SEARCH : Destination() {
+		override val route: String = "search/{${BundleKeys.BUNDLE_QUERY}}"
+		override val arguments: List<NamedNavArgument> =
+			listOf(
+				navArgument(BundleKeys.BUNDLE_QUERY) { type = NavType.StringType }
+			)
+
+		fun routeWith(query: String?): String =
+			"search/$query"
+	}
+
 	data object REPOSITORIES : Destination()
 	data object MIGRATION : Destination() {
 		override val route: String = "migrate/{${BundleKeys.BUNDLE_NOVEL_ID}}"

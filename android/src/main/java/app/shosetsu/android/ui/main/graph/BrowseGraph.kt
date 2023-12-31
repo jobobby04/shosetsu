@@ -9,46 +9,51 @@ import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
 import app.shosetsu.android.ui.extensionsConfigure.ConfigureExtensionView
-import app.shosetsu.android.ui.main.Destination
+import app.shosetsu.android.ui.main.Destination.BROWSE
+import app.shosetsu.android.ui.main.Destination.CATALOG
+import app.shosetsu.android.ui.main.Destination.CONFIGURE_EXTENSION
+import app.shosetsu.android.ui.main.Destination.NOVEL
+import app.shosetsu.android.ui.main.Destination.REPOSITORIES
+import app.shosetsu.android.ui.main.Destination.SEARCH
 import app.shosetsu.android.ui.search.SearchView
 
 fun NavGraphBuilder.browseGraph(
 	navController: NavHostController,
 	drawerIcon: @Composable () -> Unit
 ) {
-	navigation("main", Destination.BROWSE.route) {
+	navigation("main", BROWSE.route) {
 		composable("main") {
 			BrowseView(
 				openCatalogue = {
-					navController.navigate(Destination.CATALOG.routeWith(it))
+					navController.navigate(CATALOG.routeWith(it))
 				},
 				openSettings = {
-					navController.navigate(Destination.CONFIGURE_EXTENSION.routeWith(it))
+					navController.navigate(CONFIGURE_EXTENSION.routeWith(it))
 				},
 				openRepositories = {
-					navController.navigate(Destination.REPOSITORIES.route)
+					navController.navigate(REPOSITORIES.route)
 				},
 				openSearch = {
-					navController.navigate(Destination.SEARCH.route)
+					navController.navigate(SEARCH.route)
 				},
 				drawerIcon = drawerIcon
 			)
 		}
 
-		composable(Destination.CATALOG.route, Destination.CATALOG.arguments) { entry ->
+		composable(CATALOG.route, CATALOG.arguments) { entry ->
 			val extensionId = entry.arguments!!.getInt(BundleKeys.BUNDLE_EXTENSION)
 			CatalogueView(
 				extensionId,
 				onOpenNovel = {
-					navController.navigate(Destination.NOVEL.routeWith(it))
+					navController.navigate(NOVEL.routeWith(it))
 				},
 				onBack = navController::popBackStack
 			)
 		}
 
 		composable(
-			Destination.CONFIGURE_EXTENSION.route,
-			Destination.CONFIGURE_EXTENSION.arguments
+			CONFIGURE_EXTENSION.route,
+			CONFIGURE_EXTENSION.arguments
 		) { entry ->
 			val extensionId = entry.arguments!!.getInt(BundleKeys.BUNDLE_EXTENSION)
 			ConfigureExtensionView(
@@ -57,12 +62,13 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable(Destination.SEARCH.route) { entry ->
+		composable(SEARCH.route, SEARCH.arguments) { entry ->
+			// TODO fix crash here
 			val query = entry.arguments?.getString(BundleKeys.BUNDLE_QUERY)
 			SearchView(
 				initalQuery = query,
 				openNovel = {
-					navController.navigate(Destination.NOVEL.routeWith(it))
+					navController.navigate(NOVEL.routeWith(it))
 				},
 				onBack = navController::popBackStack
 			)
