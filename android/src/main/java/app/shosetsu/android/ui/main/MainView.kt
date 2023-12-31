@@ -7,6 +7,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -20,6 +22,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -114,6 +117,8 @@ fun MainView(
 	)
 
 	val sizeClass = calculateWindowSizeClass(context as Activity)
+	val isCompact = sizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+	val isBig = sizeClass.widthSizeClass != WindowWidthSizeClass.Compact
 
 	BackHandler(drawerState.isOpen) {
 		scope.launch {
@@ -169,51 +174,61 @@ fun MainView(
 			drawerState = drawerState,
 			gesturesEnabled = isLegacy
 		) {
-			Scaffold(
-				bottomBar = {
-					AnimatedVisibility(isMaterial) {
-						BottomNavigationBar(
-							destinations,
-							navBackStackEntry,
-							::navigate
-						)
-					}
-				},
-				topBar = {
-					AnimatedVisibility(
-						backupProgressState == BackupProgress.IN_PROGRESS,
-						enter = slideInVertically(),
-						exit = slideOutVertically()
-					) {
-						BackupProgressIndicator()
-					}
+			Row(Modifier.fillMaxSize()) {
+				AnimatedVisibility(isBig && isMaterial) {
+					NavigationRail(
+						destinations,
+						navBackStackEntry,
+						onNavigate = ::navigate
+					)
 				}
-			) { paddingValues ->
-				NavHost(
-					navController,
-					startDestination = LIBRARY.route,
-					modifier = Modifier.padding(paddingValues)
-				) {
-					mainGraph(
+
+				Scaffold(
+					bottomBar = {
+						AnimatedVisibility(isCompact && isMaterial) {
+							BottomNavigationBar(
+								destinations,
+								navBackStackEntry,
+								::navigate
+							)
+						}
+					},
+					topBar = {
+						AnimatedVisibility(
+							backupProgressState == BackupProgress.IN_PROGRESS,
+							enter = slideInVertically(),
+							exit = slideOutVertically()
+						) {
+							BackupProgressIndicator()
+						}
+					},
+				) { paddingValues ->
+					NavHost(
 						navController,
-						sizeClass,
-						drawerIcon = {
-							AnimatedVisibility(isLegacy) {
-								IconButton(
-									onClick = {
-										scope.launch {
-											drawerState.open()
+						startDestination = LIBRARY.route,
+						modifier = Modifier.padding(paddingValues)
+					) {
+						mainGraph(
+							navController,
+							sizeClass,
+							drawerIcon = {
+								AnimatedVisibility(isLegacy) {
+									IconButton(
+										onClick = {
+											scope.launch {
+												drawerState.open()
+											}
 										}
+									) {
+										Icon(
+											Icons.Default.Menu,
+											stringResource(R.string.navigation_drawer_open)
+										)
 									}
-								) {
-									Icon(
-										Icons.Default.Menu,
-										stringResource(R.string.navigation_drawer_open)
-									)
 								}
 							}
-						}
-					)
+						)
+					}
 				}
 			}
 		}
