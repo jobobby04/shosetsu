@@ -68,13 +68,13 @@ import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.compose.setting.GenericRightSettingLayout
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.EditCSS
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapSystem
 import app.shosetsu.android.viewmodel.impl.settings.enableFullscreen
@@ -303,14 +303,7 @@ fun ReaderSettingsContent(
 			//item { viewModel.horizontalSwitchOption() }
 
 			item {
-				ButtonSettingContent(
-					stringResource(R.string.settings_reader_title_html_css),
-					stringResource(R.string.settings_reader_desc_html_css),
-					stringResource(R.string.open_in),
-					onClick = openHTMLEditor,
-					modifier = Modifier
-						.fillMaxWidth()
-				)
+				viewModel.EditCSS(openHTMLEditor)
 			}
 
 			item {

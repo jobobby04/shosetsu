@@ -8,11 +8,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.*
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.load.LoadReaderThemes
+import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.FloatSliderSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
@@ -324,6 +326,19 @@ fun ExposedSettingsRepoViewModel.readerSpeedOption() {
 		settingsRepo,
 		ReaderSpeed,
 		flip = true,
+		modifier = Modifier
+			.fillMaxWidth()
+	)
+}
+
+@Composable
+fun ExposedSettingsRepoViewModel.EditCSS(openCSS: () -> Unit) {
+	val context = LocalContext.current
+	ButtonSettingContent(
+		stringResource(R.string.settings_reader_title_html_css),
+		stringResource(R.string.settings_reader_desc_html_css),
+		stringResource(R.string.open_in),
+		onClick = openCSS,
 		modifier = Modifier
 			.fillMaxWidth()
 	)
