@@ -41,13 +41,13 @@ data class DBInstalledExtensionEntity(
 	val repoID: Int,
 
 	/** Name of the extension, can be changed */
-	val name: String = "",
+	var name: String = "",
 
 	/** FileName of the extension */
 	val fileName: String = "",
 
 	/** Image URL of the extension*/
-	val imageURL: String,
+	var imageURL: String,
 
 	/** The language of the extension */
 	val lang: String = "",
@@ -55,20 +55,20 @@ data class DBInstalledExtensionEntity(
 	/**
 	 * Version currently installed
 	 */
-	val version: Version,
+	var version: Version,
 
 	/** MD5 to check against */
-	val md5: String = "",
+	var md5: String = "",
 
 	val type: ExtensionType,
 
 	/** If extension is enabled */
-	val enabled: Boolean = false,
+	var enabled: Boolean = false,
 
 	/**
 	 * The reader type of this extension
 	 */
-	val chapterType: Novel.ChapterType,
+	var chapterType: Novel.ChapterType,
 ) : Convertible<InstalledExtensionEntity> {
 	override fun convertTo(): InstalledExtensionEntity = InstalledExtensionEntity(
 		id = id,

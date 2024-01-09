@@ -33,8 +33,8 @@ import app.shosetsu.lib.Version
 data class DBExtLibEntity(
 	@PrimaryKey
 	val scriptName: String,
-	val version: Version,
-	val repoID: Int,
+	var version: Version,
+	var repoID: Int,
 ) : Convertible<ExtLibEntity> {
 	override fun convertTo(): ExtLibEntity = ExtLibEntity(scriptName, version, repoID)
 }
