@@ -2,7 +2,6 @@ package app.shosetsu.android.ui.main
 
 import android.app.Activity
 import android.content.Intent
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -92,6 +91,7 @@ fun MainView(
 	val navStyle by viewModel.navigationStyle.collectAsState()
 	val update by viewModel.appUpdate.collectAsState()
 	val updateToOpen by viewModel.openUpdate.collectAsState(null)
+	val protectBack by viewModel.requireDoubleBackToExit.collectAsState(false)
 
 	val isMaterial = navStyle == NavigationStyle.MATERIAL
 	val isLegacy = navStyle == NavigationStyle.LEGACY
@@ -112,11 +112,12 @@ fun MainView(
 	val isCompact = sizeClass.widthSizeClass == WindowWidthSizeClass.Compact
 	val isBig = sizeClass.widthSizeClass != WindowWidthSizeClass.Compact
 
-	BackHandler(drawerState.isOpen) {
-		scope.launch {
-			drawerState.close()
-		}
-	}
+	ShosetsuBackHandler(
+		navController = navController,
+		protectBack = protectBack,
+		isDrawerOpen = drawerState.isOpen,
+		onCloseDrawer = drawerState::close
+	)
 
 	fun navigate(route: String) {
 		navController.navigate(route) {
