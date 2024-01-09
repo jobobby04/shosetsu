@@ -38,50 +38,50 @@ import app.shosetsu.lib.Novel
 data class DBNovelEntity(
 	@PrimaryKey(autoGenerate = true)
 	/** ID of this novel */
-	var id: Int? = 0,
+	val id: Int = 0,
 
 	/** URL of the novel */
-	var url: String,
+	val url: String,
 
 	/** Source this novel is from */
 	@ColumnInfo(name = "formatterID")
 	val extensionID: Int,
 
 	/** If this novel is in the user's library */
-	var bookmarked: Boolean = false,
+	val bookmarked: Boolean = false,
 
 	/** Says if the data is loaded or now, if it is not it needs to be loaded */
-	var loaded: Boolean = false,
+	val loaded: Boolean = false,
 
 	/** The title of the novel */
-	var title: String,
+	val title: String,
 
 	/** Image URL of the novel */
-	var imageURL: String = "",
+	val imageURL: String = "",
 
 	/** Description */
-	var description: String = "",
+	val description: String = "",
 
 	/** Language of the novel */
-	var language: String = "",
+	val language: String = "",
 
 	/** Genres this novel matches too */
-	var genres: List<String> = emptyList(),
+	val genres: List<String> = emptyList(),
 
 	/** Authors of this novel */
-	var authors: List<String> = emptyList(),
+	val authors: List<String> = emptyList(),
 
 	/** Artists who helped with the novel illustration */
-	var artists: List<String> = emptyList(),
+	val artists: List<String> = emptyList(),
 
 	/** Tags this novel matches, in case genres were not enough*/
-	var tags: List<String> = emptyList(),
+	val tags: List<String> = emptyList(),
 
 	/** The publishing status of this novel */
-	var status: Novel.Status = Novel.Status.UNKNOWN,
+	val status: Novel.Status = Novel.Status.UNKNOWN,
 ) : Convertible<NovelEntity> {
 	override fun convertTo(): NovelEntity = NovelEntity(
-		id ?: 0,
+		id,
 		url,
 		extensionID,
 		bookmarked,

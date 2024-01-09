@@ -32,7 +32,7 @@ import app.shosetsu.android.dto.Convertible
 data class DBCategoryEntity(
 	@PrimaryKey(autoGenerate = true)
 	/** ID of this category */
-	val id: Int? = 0,
+	val id: Int = 0,
 
 	/** Name of this category */
 	val name: String,
@@ -41,7 +41,7 @@ data class DBCategoryEntity(
 	val order: Int,
 ) : Convertible<CategoryEntity> {
 	override fun convertTo(): CategoryEntity = CategoryEntity(
-		id ?: 0,
+		id,
 		name,
 		order
 	)

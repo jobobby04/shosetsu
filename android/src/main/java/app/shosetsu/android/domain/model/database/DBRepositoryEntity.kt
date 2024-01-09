@@ -40,17 +40,17 @@ import app.shosetsu.android.dto.Convertible
 )
 data class DBRepositoryEntity(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int? = 0,
+	val id: Int = 0,
 
 	@ColumnInfo
 	val url: String,
 
-	var name: String,
+	val name: String,
 
-	var isEnabled: Boolean
+	val isEnabled: Boolean
 ) : Convertible<RepositoryEntity> {
 	override fun convertTo(): RepositoryEntity = RepositoryEntity(
-		id ?: 0,
+		id,
 		url,
 		name,
 		isEnabled

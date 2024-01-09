@@ -49,7 +49,7 @@ import app.shosetsu.android.dto.Convertible
 data class DBNovelCategoryEntity(
 	/** Extension ID */
 	@PrimaryKey(autoGenerate = true)
-	val id: Int? = 0,
+	val id: Int = 0,
 	val novelID: Int,
 	val categoryID: Int,
 ) : Convertible<NovelCategoryEntity> {

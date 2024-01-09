@@ -43,9 +43,9 @@ data class DBNovelReaderSettingEntity(
 	@PrimaryKey
 	val novelID: Int,
 
-	var paragraphIndentSize: Int,
+	val paragraphIndentSize: Int,
 
-	var paragraphSpacingSize: Float,
+	val paragraphSpacingSize: Float,
 ) : Convertible<NovelReaderSettingEntity> {
 	override fun convertTo(): NovelReaderSettingEntity =
 		NovelReaderSettingEntity(novelID, paragraphIndentSize, paragraphSpacingSize)
