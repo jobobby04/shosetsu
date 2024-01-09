@@ -1,26 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Main" parent="AppTheme">
-
-
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="colorOnBackground">#FFFFFF</item>
-
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:textColorPrimary">#FFFFFF</item>
-
-        <item name="android:windowBackground">@color/grey_B_10</item>
-        <item name="android:colorBackground">@color/grey_B_10</item>
-
-        <item name="floatingActionButtonStyle">@style/AppTheme.Widget.FAB</item>
-        <item name="extendedFloatingActionButtonStyle">@style/AppTheme.Widget.ExtendedFAB</item>
-        <item name="appBarLayoutStyle">@style/AppTheme.Widget.AppBarLayout</item>
-        <item name="buttonStyle">@style/AppTheme.Widget.Button</item>
-        <item name="android:statusBarColor">@color/grey_B_15</item>
-
-    </style>
+    <style name="AppTheme.Main" parent="AppTheme" />
 
     <style name="SplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@android:color/black</item>

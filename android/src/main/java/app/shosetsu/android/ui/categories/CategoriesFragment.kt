@@ -18,10 +18,6 @@
 
 package app.shosetsu.android.ui.categories
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -31,15 +27,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -50,81 +53,46 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.common.ext.makeSnackBar
-import app.shosetsu.android.common.ext.viewModel
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.ExtendedFABController
-import app.shosetsu.android.view.controller.base.syncFABWithCompose
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel.CategoryChangeState
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
 
-class CategoriesFragment : ShosetsuFragment(), ExtendedFABController {
-
-	private lateinit var fab: ExtendedFABController.EFabMaintainer
-
-	private val viewModel: ACategoriesViewModel by viewModel()
-
-	override val viewTitleRes: Int = R.string.categories
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-			CategoriesView(
-				viewModel,
-				fab,
-				makeSnackBar = { makeSnackBar(it) }
-			)
-		}
-	}
-
-	override fun manipulateFAB(fab: ExtendedFABController.EFabMaintainer) {
-		this.fab = fab
-		fab.setIconResource(R.drawable.add_circle_outline)
-		fab.setText(R.string.fragment_categories_action_add)
-
-		// When the FAB is clicked, open a alert dialog to input a new category
-		fab.setOnClickListener {
-			viewModel.showAddDialog()
-		}
-	}
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Allow user to configure categories
+ */
 @Composable
 fun CategoriesView(
-	viewModel: ACategoriesViewModel,
-	fab: ExtendedFABController.EFabMaintainer,
-	makeSnackBar: (
-		stringRes: Int,
-	) -> Snackbar?
+	onBack: () -> Unit,
 ) {
 	ShosetsuCompose {
+		val viewModel: ACategoriesViewModel = viewModelDi()
+
 		val items by viewModel.liveData.collectAsState()
 
 		val addCategoryState by viewModel.addCategoryState.collectAsState()
+
+		val hostState = remember { SnackbarHostState() }
+		val context = LocalContext.current
+
 		LaunchedEffect(addCategoryState) {
 			when (addCategoryState) {
 				CategoryChangeState.Finished ->
-					makeSnackBar(R.string.toast_categories_added)?.show()
+					hostState.showSnackbar(context.getString(R.string.toast_categories_added))
 
 				is CategoryChangeState.Failure ->
-					makeSnackBar(R.string.toast_categories_add_fail)?.show()
+					hostState.showSnackbar(context.getString(R.string.toast_categories_add_fail))
 
 				CategoryChangeState.Unknown -> {}
 			}
@@ -134,15 +102,19 @@ fun CategoriesView(
 		LaunchedEffect(removeCategoryState) {
 			when (addCategoryState) {
 				CategoryChangeState.Finished ->
-					makeSnackBar(R.string.fragment_categories_snackbar_repo_removed)?.show()
+					hostState.showSnackbar(context.getString(R.string.fragment_categories_snackbar_repo_removed))
 
 				is CategoryChangeState.Failure -> {
 					val state = removeCategoryState as CategoryChangeState.Failure
 					logE("Failed to remove category ${state.category}", state.exception)
-					makeSnackBar(R.string.toast_categories_remove_fail)
-						?.setAction(R.string.generic_question_retry) {
-							viewModel.remove(state.category)
-						}?.show()
+					val result =
+						hostState.showSnackbar(
+							context.getString(R.string.toast_categories_remove_fail),
+							actionLabel = context.getString(R.string.retry)
+						)
+
+					if (result == SnackbarResult.ActionPerformed)
+						viewModel.remove(state.category)
 				}
 
 				CategoryChangeState.Unknown -> {}
@@ -154,7 +126,7 @@ fun CategoriesView(
 			when (addCategoryState) {
 				CategoryChangeState.Finished -> {}
 				is CategoryChangeState.Failure ->
-					makeSnackBar(R.string.toast_categories_move_fail)?.show()
+					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
 
 				CategoryChangeState.Unknown -> {}
 			}
@@ -165,7 +137,7 @@ fun CategoriesView(
 			when (addCategoryState) {
 				CategoryChangeState.Finished -> {}
 				is CategoryChangeState.Failure ->
-					makeSnackBar(R.string.toast_categories_move_fail)?.show()
+					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
 
 				CategoryChangeState.Unknown -> {}
 			}
@@ -184,7 +156,8 @@ fun CategoriesView(
 			onMoveDown = {
 				viewModel.moveDown(it)
 			},
-			fab = fab
+			showAddDialog = viewModel::showAddDialog,
+			onBack = onBack
 		)
 
 		if (itemToRemove != null) {
@@ -282,68 +255,107 @@ fun CategoriesAddDialog(
 	)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesContent(
 	items: ImmutableList<CategoryUI>,
 	onRemove: (CategoryUI) -> Unit,
 	onMoveUp: (CategoryUI) -> Unit,
 	onMoveDown: (CategoryUI) -> Unit,
-	fab: ExtendedFABController.EFabMaintainer
+	showAddDialog: () -> Unit,
+	onBack: () -> Unit
 ) {
 	val state = rememberLazyListState()
-	syncFABWithCompose(state, fab)
 
-	if (items.isNotEmpty())
-		LazyColumn(
-			Modifier.fillMaxSize(),
-			state,
-			contentPadding = PaddingValues(bottom = 64.dp, top = 16.dp, start = 8.dp, end = 8.dp),
-			verticalArrangement = Arrangement.spacedBy(4.dp)
-		) {
-			val isNotSingluar by derivedStateOf { items.size > 1 }
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.categories))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
+			)
+		},
+		floatingActionButton = {
+			ExtendedFloatingActionButton(
+				text = {
+					Text(stringResource(R.string.fragment_categories_action_add))
+				},
+				icon = {
+					Icon(
+						Icons.Default.AddCircle,
+						stringResource(R.string.fragment_categories_action_add)
+					)
+				},
+				onClick = showAddDialog
+			)
+		}
+	) { padding ->
+		if (items.isNotEmpty())
+			LazyColumn(
+				Modifier
+					.padding(padding)
+					.fillMaxSize(),
+				state,
+				contentPadding = PaddingValues(
+					bottom = 64.dp,
+					top = 16.dp,
+					start = 8.dp,
+					end = 8.dp
+				),
+				verticalArrangement = Arrangement.spacedBy(4.dp)
+			) {
+				val isNotSingluar by derivedStateOf { items.size > 1 }
 
-			itemsIndexed(items) { index, item ->
-				Card {
-					Row(
-						Modifier
-							.padding(horizontal = 8.dp, vertical = 4.dp)
-							.fillMaxWidth(),
-						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.SpaceBetween
-					) {
-						Text(item.name, style = MaterialTheme.typography.titleLarge)
+				itemsIndexed(items) { index, item ->
+					Card {
 						Row(
+							Modifier
+								.padding(horizontal = 8.dp, vertical = 4.dp)
+								.fillMaxWidth(),
 							verticalAlignment = Alignment.CenterVertically,
 							horizontalArrangement = Arrangement.SpaceBetween
 						) {
-							if (isNotSingluar) {
-								if (index != 0)
-									IconButton(onClick = { onMoveDown(item) }) {
-										Icon(
-											painterResource(R.drawable.expand_less),
-											contentDescription = null
-										)
-									}
+							Text(item.name, style = MaterialTheme.typography.titleLarge)
+							Row(
+								verticalAlignment = Alignment.CenterVertically,
+								horizontalArrangement = Arrangement.SpaceBetween
+							) {
+								if (isNotSingluar) {
+									if (index != 0)
+										IconButton(onClick = { onMoveDown(item) }) {
+											Icon(
+												painterResource(R.drawable.expand_less),
+												contentDescription = null
+											)
+										}
 
-								if (index != items.lastIndex)
-									IconButton(onClick = { onMoveUp(item) }) {
-										Icon(
-											painterResource(R.drawable.expand_more),
-											contentDescription = null
-										)
-									}
-							}
-							IconButton(onClick = { onRemove(item) }) {
-								Icon(painterResource(R.drawable.trash), contentDescription = null)
+									if (index != items.lastIndex)
+										IconButton(onClick = { onMoveUp(item) }) {
+											Icon(
+												painterResource(R.drawable.expand_more),
+												contentDescription = null
+											)
+										}
+								}
+								IconButton(onClick = { onRemove(item) }) {
+									Icon(
+										painterResource(R.drawable.trash),
+										contentDescription = null
+									)
+								}
 							}
 						}
 					}
 				}
 			}
+		else {
+			ErrorContent(
+				R.string.categories_empty,
+				modifier = Modifier.padding(padding)
+			)
 		}
-	else {
-		ErrorContent(
-			R.string.categories_empty
-		)
 	}
 }

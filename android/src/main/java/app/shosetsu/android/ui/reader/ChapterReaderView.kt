@@ -16,6 +16,7 @@
  */
 package app.shosetsu.android.ui.reader
 
+import android.content.Intent
 import android.speech.tts.TextToSpeech
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
@@ -40,15 +42,17 @@ import app.shosetsu.android.common.ext.collectLA
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.reader.content.ChapterReaderBottomSheetContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderHTMLContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
 import app.shosetsu.android.ui.reader.page.DividierPageContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
+import app.shosetsu.android.viewmodel.impl.settings.EditCSS
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapSystem
 import app.shosetsu.android.viewmodel.impl.settings.enableFullscreen
@@ -133,7 +137,7 @@ fun ChapterReaderView(
 		}
 
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
-	ShosetsuCompose {
+	ShosetsuTheme {
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
 			isFocused = isFocused,
@@ -232,6 +236,19 @@ fun ChapterReaderView(
 						item { viewModel.doubleTapFocus() }
 						item { viewModel.doubleTapSystem() }
 						item { viewModel.readerTableHackOption() }
+						item {
+							viewModel.EditCSS(
+								openCSS = {
+									ContextCompat.startActivity(
+										context,
+										Intent(context, CSSEditorActivity::class.java).apply {
+											putExtra(CSSEditorActivity.CSS_ID, -1)
+										},
+										null
+									)
+								}
+							)
+						}
 						item { viewModel.readerTextSelectionToggle() }
 						item { viewModel.trackLongReadingOption() }
 						item { viewModel.readerPitchOption() }

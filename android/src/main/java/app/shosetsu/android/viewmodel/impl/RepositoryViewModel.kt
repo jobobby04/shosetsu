@@ -3,6 +3,9 @@ package app.shosetsu.android.viewmodel.impl
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.R
+import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.ext.get
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.set
@@ -24,13 +27,14 @@ import io.github.g0dkar.qrcode.QRCode
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 /*
@@ -68,24 +72,22 @@ class RepositoryViewModel(
 		loadRepositoriesUseCase().map { it.toImmutableList() }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
+	override val error = MutableSharedFlow<Throwable>()
 	override val isAddDialogVisible = MutableStateFlow(false)
-	override val addState = MutableStateFlow<AddRepoState>(AddRepoState.Unknown)
-	override val removeState = MutableStateFlow<RemoveRepoState>(RemoveRepoState.Unknown)
+	override val addState = MutableSharedFlow<AddRepoState>()
+	override val removeState = MutableSharedFlow<RemoveRepoState>()
 	override val toggleIsEnabledState =
-		MutableStateFlow<ToggleRepoIsEnabledState>(ToggleRepoIsEnabledState.Unknown)
+		MutableSharedFlow<ToggleRepoIsEnabledState>()
 	override val undoRemoveState =
-		MutableStateFlow<UndoRepoRemoveState>(UndoRepoRemoveState.Unknown)
+		MutableSharedFlow<UndoRepoRemoveState>()
 
 	override fun addRepository(name: String, url: String) {
 		launchIO {
 			try {
 				addRepositoryUseCase(url = url, name = name)
-				addState.value = AddRepoState.Success
+				addState.emit(AddRepoState.Success)
 			} catch (e: Exception) {
-				addState.value = AddRepoState.Failure(e, name, url)
-			} finally {
-				delay(100)
-				addState.value = AddRepoState.Unknown
+				addState.emit(AddRepoState.Failure(e, name, url))
 			}
 		}
 	}
@@ -94,12 +96,9 @@ class RepositoryViewModel(
 		launchIO {
 			try {
 				forceInsertRepositoryUseCase(repo)
-				undoRemoveState.value = UndoRepoRemoveState.Success
+				undoRemoveState.emit(UndoRepoRemoveState.Success)
 			} catch (e: Exception) {
-				undoRemoveState.value = UndoRepoRemoveState.Failure(repo, e)
-			} finally {
-				delay(100)
-				undoRemoveState.value = UndoRepoRemoveState.Unknown
+				undoRemoveState.emit(UndoRepoRemoveState.Failure(repo, e))
 			}
 		}
 	}
@@ -167,12 +166,9 @@ class RepositoryViewModel(
 		launchIO {
 			try {
 				deleteRepositoryUseCase(repo)
-				removeState.value = RemoveRepoState.Success(repo)
+				removeState.emit(RemoveRepoState.Success(repo))
 			} catch (e: Exception) {
-				removeState.value = RemoveRepoState.Failure(e, repo)
-			} finally {
-				delay(100)
-				removeState.value = RemoveRepoState.Unknown
+				removeState.emit(RemoveRepoState.Failure(e, repo))
 			}
 		}
 	}
@@ -182,20 +178,23 @@ class RepositoryViewModel(
 			val newState = !repo.isRepoEnabled
 			try {
 				updateRepositoryUseCase(repo.copy(isRepoEnabled = newState))
-				toggleIsEnabledState.value =
-					ToggleRepoIsEnabledState.Success(repo, newState)
+				toggleIsEnabledState.emit(ToggleRepoIsEnabledState.Success(repo, newState))
 			} catch (e: Exception) {
-				toggleIsEnabledState.value = ToggleRepoIsEnabledState.Failure(repo, e)
-			} finally {
-				delay(100)
-				toggleIsEnabledState.value = ToggleRepoIsEnabledState.Unknown
+				toggleIsEnabledState.emit(ToggleRepoIsEnabledState.Failure(repo, e))
 			}
 		}
 	}
 
 	override fun updateRepositories() {
-		startRepositoryUpdateManagerUseCase()
+		viewModelScope.launch {
+			if (isOnline.value) {
+				startRepositoryUpdateManagerUseCase()
+			} else {
+				error.emit(OfflineException(R.string.fragment_repositories_snackbar_offline_no_update))
+			}
+		}
 	}
 
-	override fun isOnline(): Boolean = isOnlineUseCase()
+	private val isOnline: StateFlow<Boolean> = isOnlineUseCase.getFlow()
+		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, false)
 }

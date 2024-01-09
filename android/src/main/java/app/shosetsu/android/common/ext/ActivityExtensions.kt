@@ -40,7 +40,7 @@ import java.io.IOException
  * 06 / 05 / 2020
  */
 
-fun Activity.openInBrowser(url: Uri, pkg: String? = null) {
+fun Context.openInBrowser(url: Uri, pkg: String? = null) {
 	try {
 		startActivity(
 			Intent(Intent.ACTION_VIEW, url).apply {
@@ -53,10 +53,10 @@ fun Activity.openInBrowser(url: Uri, pkg: String? = null) {
 	}
 }
 
-fun Activity.openInBrowser(url: String, pkg: String? = null): Unit =
+fun Context.openInBrowser(url: String, pkg: String? = null): Unit =
 	openInBrowser(Uri.parse(url), pkg)
 
-fun Activity.openInWebView(url: String) {
+fun Context.openInWebView(url: String) {
 	logI("Opening in web view: $url")
 	startActivity(intent(this, WebViewApp::class.java) {
 		bundleOf(
@@ -90,9 +90,9 @@ fun Activity.openShare(url: String, title: String) {
  * @param cUI novel chapter
  */
 
-fun Activity.openChapter(cUI: ChapterUI): Unit = openChapter(cUI.id, cUI.novelID)
+fun Context.openChapter(cUI: ChapterUI): Unit = openChapter(cUI.id, cUI.novelID)
 
-fun Activity.openChapter(chapterID: Int, novelID: Int) {
+fun Context.openChapter(chapterID: Int, novelID: Int) {
 	startActivity(intent(this, ChapterReader::class.java) {
 		bundleOf(
 			BUNDLE_CHAPTER_ID to chapterID,
@@ -124,14 +124,12 @@ fun AppCompatActivity.setTheme(theme: AppThemes) {
 		AppThemes.FOLLOW_SYSTEM -> {
 			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 		}
+
 		AppThemes.LIGHT -> {
 			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
 		}
+
 		AppThemes.DARK -> {
-			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-		}
-		AppThemes.AMOLED -> {
-			// TODO Implement amoled mode
 			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
 		}
 	}

@@ -223,7 +223,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ChapterColumnsInLandscape : IntKey("columnsInNovelsViewH", 6)
 	object NovelBadgeToast : BooleanKey("novelBadge", true)
 	object SelectedNovelCardType : IntKey("novelCardType", 0)
-	object NavStyle : IntKey("navigationStyle", 0)
+	object NavStyle : BooleanKey("legacy_navigation", false)
 
 	// Backup Options
 	object ShouldBackupChapters : BooleanKey("backupChapters", true)

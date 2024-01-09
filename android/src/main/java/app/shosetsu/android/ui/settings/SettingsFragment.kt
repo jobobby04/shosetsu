@@ -1,28 +1,28 @@
 package app.shosetsu.android.ui.settings
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.navigateSafely
-import app.shosetsu.android.common.ext.setShosetsuTransition
-import app.shosetsu.android.view.compose.ShosetsuCompose
-import app.shosetsu.android.view.controller.ShosetsuFragment
+import app.shosetsu.android.view.compose.NavigateBackButton
 
 /*
  * This file is part of shosetsu.
@@ -47,34 +47,23 @@ import app.shosetsu.android.view.controller.ShosetsuFragment
  * @since 06 / 10 / 2021
  * @author Doomsdayrs
  */
-class SettingsFragment : ShosetsuFragment() {
-
-	override val viewTitleRes: Int = R.string.settings
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-			SettingsView {
-				findNavController().navigateSafely(
-					it,
-					null,
-					navOptions { setShosetsuTransition() })
-			}
-		}
-	}
-}
-
 @Composable
 fun SettingsView(
-	navigate: (Int) -> Unit
+	navToView: () -> Unit,
+	navToReader: () -> Unit,
+	navToDownload: () -> Unit,
+	navToUpdate: () -> Unit,
+	navToAdvanced: () -> Unit,
+	onBack: () -> Unit
 ) {
-	ShosetsuCompose {
-		SettingsContent(navigate)
-	}
+	SettingsContent(
+		navToView,
+		navToReader,
+		navToDownload,
+		navToUpdate,
+		navToAdvanced,
+		onBack
+	)
 }
 
 @Composable
@@ -100,27 +89,40 @@ fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClic
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsContent(navigate: (Int) -> Unit) {
-	Column {
-		SettingMenuItem(R.string.view, R.drawable.view_module) {
-			navigate(R.id.action_settingsController_to_viewSettings)
+fun SettingsContent(
+	navToView: () -> Unit,
+	navToReader: () -> Unit,
+	navToDownload: () -> Unit,
+	navToUpdate: () -> Unit,
+	navToAdvanced: () -> Unit,
+	onBack: () -> Unit
+) {
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.settings))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				}
+			)
 		}
+	) { paddingValues ->
+		Column(
+			Modifier.padding(paddingValues)
+		) {
+			SettingMenuItem(R.string.view, R.drawable.view_module, navToView)
 
-		SettingMenuItem(R.string.reader, R.drawable.book) {
-			navigate(R.id.action_settingsController_to_readerSettings)
-		}
+			SettingMenuItem(R.string.reader, R.drawable.book, navToReader)
 
-		SettingMenuItem(R.string.download, R.drawable.download) {
-			navigate(R.id.action_settingsController_to_downloadSettings)
-		}
+			SettingMenuItem(R.string.download, R.drawable.download, navToDownload)
 
-		SettingMenuItem(R.string.update, R.drawable.update) {
-			navigate(R.id.action_settingsController_to_updateSettings)
-		}
+			SettingMenuItem(R.string.update, R.drawable.update, navToUpdate)
 
-		SettingMenuItem(R.string.advanced, R.drawable.settings) {
-			navigate(R.id.action_settingsController_to_advancedSettings)
+			SettingMenuItem(R.string.advanced, R.drawable.settings, navToAdvanced)
 		}
 	}
 }

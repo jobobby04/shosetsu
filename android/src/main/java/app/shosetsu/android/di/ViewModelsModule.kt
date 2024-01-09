@@ -85,16 +85,14 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	// Main
 	bind<AMainViewModel>() with provider {
 		MainViewModel(
-			loadAppUpdateFlowLiveUseCase = instance(),
 			isOnlineUseCase = instance(),
 			loadNavigationStyleUseCase = instance(),
 			loadLiveAppThemeUseCase = instance(),
 			startInstallWorker = instance(),
-			canAppSelfUpdateUseCase = instance(),
-			loadAppUpdateUseCase = instance(),
 			loadRequireDoubleBackUseCase = instance(),
-			loadBackupProgress = instance(),
-			settingsRepository = instance()
+			settingsRepository = instance(),
+			appUpdateRepo = instance(),
+			backupRepo = instance()
 		)
 	}
 
@@ -233,7 +231,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			startDownloadWorkerUseCase = instance(),
 			startDownloadWorkerAfterUpdateUseCase = instance(),
 			getContentURL = instance(),
-			getTrueDelete = instance(),
+			settingsRepo = instance(),
 			trueDeleteChapter = instance(),
 			getInstalledExtensionUseCase = instance(),
 			getRepositoryUseCase = instance(),

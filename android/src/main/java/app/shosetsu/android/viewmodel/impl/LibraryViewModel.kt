@@ -18,6 +18,8 @@ package app.shosetsu.android.viewmodel.impl
  */
 
 import androidx.compose.ui.state.ToggleableState
+import app.shosetsu.android.R
+import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.InclusionState
 import app.shosetsu.android.common.enums.InclusionState.EXCLUDE
@@ -31,7 +33,12 @@ import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
 import app.shosetsu.android.domain.usecases.ToggleNovelPinUseCase
-import app.shosetsu.android.domain.usecases.load.*
+import app.shosetsu.android.domain.usecases.load.LoadLibraryFilterSettingsUseCase
+import app.shosetsu.android.domain.usecases.load.LoadLibraryUseCase
+import app.shosetsu.android.domain.usecases.load.LoadNovelUIBadgeToastUseCase
+import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
+import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsPUseCase
+import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
@@ -44,7 +51,16 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 import java.util.Locale.getDefault as LGD
 
 /**
@@ -158,6 +174,8 @@ class LibraryViewModel(
 	}
 
 	private val librarySourceFlow: Flow<LibraryUI> by lazy { loadLibrary() }
+	override val error = MutableSharedFlow<Throwable>()
+
 	override val isCategoryDialogOpen: MutableStateFlow<Boolean> = MutableStateFlow(false)
 	override fun showCategoryDialog() {
 		isCategoryDialogOpen.value = true
@@ -512,7 +530,11 @@ class LibraryViewModel(
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
 	override fun startUpdateManager(categoryID: Int) {
-		startUpdateWorkerUseCase(categoryID, true)
+		if (isOnline()) {
+			startUpdateWorkerUseCase(categoryID, true)
+		} else {
+			error.tryEmit(OfflineException(R.string.generic_error_cannot_update_library_offline))
+		}
 	}
 
 	override fun removeSelectedFromLibrary() {
@@ -530,17 +552,13 @@ class LibraryViewModel(
 		}
 	}
 
-	override fun getSelectedIds(): Flow<IntArray> = flow {
-		val ints = selectedNovels.value
-			.flatMap { (_, map) ->
+	override val selectedIds: StateFlow<List<Int>> =
+		selectedNovels.map { it ->
+			it.flatMap { (_, map) ->
 				map.entries.filter { it.value }
 					.map { it.key }
 			}
-			.toIntArray()
-		if (ints.isEmpty()) return@flow
-		clearSelected()
-		emit(ints)
-	}
+		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 
 	override fun deselectAll() {
 		launchIO {
@@ -670,7 +688,7 @@ class LibraryViewModel(
 
 	override fun setCategories(categories: IntArray) {
 		launchIO {
-			val selected = getSelectedIds().first()
+			val selected = selectedIds.first()
 			setNovelsCategoriesUseCase(selected, categories)
 		}
 	}

@@ -7,6 +7,7 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.StartUpdateManagerViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import org.joda.time.DateTime
 
@@ -50,8 +51,12 @@ abstract class AUpdatesViewModel
 	 * Clear all updates before provided date
 	 */
 	abstract fun clearBefore(date: Long)
-
-	abstract val isOnlineFlow: StateFlow<Boolean>
+	abstract fun showClearBefore()
+	abstract fun hideClearBefore()
 
 	abstract val displayDateAsMDYFlow: StateFlow<Boolean>
+
+	abstract val error: Flow<Throwable>
+
+	abstract val isClearBeforeVisible: StateFlow<Boolean>
 }

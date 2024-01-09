@@ -1,14 +1,22 @@
 package app.shosetsu.android.ui.library
 
+import android.content.Intent
 import android.content.res.Configuration
-import android.content.res.Resources
-import android.os.Bundle
-import android.view.*
+import android.provider.Settings
 import androidx.activity.compose.BackHandler
-import androidx.appcompat.widget.SearchView
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -18,42 +26,62 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult.ActionPerformed
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import androidx.core.view.MenuProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.BundleKeys
+import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.enums.NovelCardType
-import app.shosetsu.android.common.enums.NovelCardType.*
-import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.ui.library.listener.LibrarySearchQuery
-import app.shosetsu.android.ui.migration.MigrationFragment
+import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
+import app.shosetsu.android.common.enums.NovelCardType.COZY
+import app.shosetsu.android.common.enums.NovelCardType.NORMAL
+import app.shosetsu.android.common.ext.onIO
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.novel.CategoriesDialog
 import app.shosetsu.android.view.BottomSheetDialog
-import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.ExtendedFABController
-import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
-import app.shosetsu.android.view.controller.base.HomeFragment
-import app.shosetsu.android.view.controller.base.syncFABWithCompose
+import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.NovelCardCompressedContent
+import app.shosetsu.android.view.compose.NovelCardCozyContent
+import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
+import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 /*
  * This file is part of Shosetsu.
@@ -78,266 +106,19 @@ import kotlinx.coroutines.runBlocking
  * 9 / June / 2019
  *
  * @author github.com/doomsdayrs
- */
-class LibraryFragment
-	: ShosetsuFragment(), ExtendedFABController, HomeFragment, MenuProvider {
-
-	private var fab: EFabMaintainer? = null
-	private var bsg: BottomSheetDialog? = null
-
-	override val viewTitleRes: Int = R.string.library
-
-	private val viewModel: ALibraryViewModel by viewModel()
-
-	/***/
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		activity?.addMenuProvider(this, viewLifecycleOwner)
-		setViewTitle()
-		return ComposeView {
-			LibraryView(
-				viewModel = viewModel,
-				onRefresh = ::onRefresh,
-				onOpenNovel = ::onOpenNovel,
-				onToastNovel = ::onToastNovel,
-				fab
-			)
-		}
-	}
-
-	private fun onToastNovel(item: LibraryNovelUI) {
-		try {
-			makeSnackBar(
-				resources.getQuantityString(
-					R.plurals.toast_unread_count,
-					item.unread,
-					item.unread
-				)
-			)?.show()
-		} catch (ignored: Resources.NotFoundException) {
-			// oops!
-		}
-	}
-
-	private fun onOpenNovel(novelId: Int) {
-		try {
-			findNavController().navigateSafely(
-				R.id.action_libraryController_to_novelController,
-				bundleOf(BundleKeys.BUNDLE_NOVEL_ID to novelId),
-				navOptions = navOptions {
-					launchSingleTop = true
-					setShosetsuTransition()
-				}
-			)
-		} catch (ignored: Exception) {
-			// ignore dup
-		}
-	}
-
-	/***/
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		startObservation()
-	}
-
-	private fun startObservation() {
-		viewModel.isEmptyFlow.collectLA(this, catch = {}) {
-			if (it)
-				fab?.hide()
-			else fab?.show()
-		}
-
-		viewModel.hasSelection.collectLatestLA(this, catch = {}) {
-			activity?.invalidateOptionsMenu()
-		}
-	}
-
-	/***/
-	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-		if (!viewModel.hasSelection.value) {
-			inflater.inflate(R.menu.toolbar_library, menu)
-		} else {
-			inflater.inflate(R.menu.toolbar_library_selected, menu)
-		}
-	}
-
-	private var searchView: SearchView? = null
-
-	/***/
-	override fun onPrepareMenu(menu: Menu) {
-		logI("Preparing options menu")
-		searchView = (menu.findItem(R.id.library_search)?.actionView as? SearchView)
-		searchView?.apply {
-			setOnQueryTextListener(LibrarySearchQuery(viewModel))
-		}
-		runBlocking {
-			val string = viewModel.queryFlow.first()
-			searchView?.setQuery(string, false)
-			if (string.isNotEmpty()) {
-				searchView?.isIconified = false
-			}
-		}
-
-		viewModel.isEmptyFlow.collectLA(this, catch = {
-			// IGNORE, Main observer will handle
-		}) { visible ->
-
-			menu.findItem(R.id.library_search)?.isVisible = !visible
-			menu.findItem(R.id.view_type)?.isVisible = !visible
-			menu.findItem(R.id.updater_now)?.isVisible = !visible
-		}
-
-		viewModel.novelCardTypeFlow.collectLA(this, catch = {}) {
-			when (it) {
-				NORMAL -> {
-					menu.findItem(R.id.view_type_normal)?.isChecked = true
-				}
-
-				COMPRESSED -> {
-					menu.findItem(R.id.view_type_comp)?.isChecked = true
-				}
-
-				COZY -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
-			}
-		}
-	}
-
-	/*&
-	TODO BACK
-	override fun handleBack(): Boolean =
-		if (searchView != null && searchView!!.isIconified) {
-			searchView!!.onActionViewCollapsed()
-			true
-		} else super.handleBack()
-	 */
-
-	/***/
-	override fun onMenuItemSelected(item: MenuItem): Boolean =
-		when (item.itemId) {
-			R.id.updater_now -> {
-				if (viewModel.isOnline())
-					viewModel.startUpdateManager(-1)
-				else displayOfflineSnackBar()
-				true
-			}
-
-			R.id.library_select_all -> {
-				selectAll()
-				true
-			}
-
-			R.id.library_deselect_all -> {
-				deselectAll()
-				true
-			}
-
-			R.id.library_inverse_selection -> {
-				invertSelection()
-				true
-			}
-
-			R.id.library_select_between -> {
-				selectBetween()
-				true
-			}
-
-			R.id.remove_from_library -> {
-				viewModel.removeSelectedFromLibrary()
-				true
-			}
-
-			R.id.source_migrate -> {
-				viewModel.getSelectedIds().firstLa(this, catch = {}) {
-					findNavController().navigateSafely(
-						R.id.action_libraryController_to_migrationController,
-						bundleOf(MigrationFragment.TARGETS_BUNDLE_KEY to it),
-						navOptions {
-							setShosetsuTransition()
-						}
-					)
-				}
-
-				true
-			}
-
-			R.id.set_categories -> {
-				viewModel.showCategoryDialog()
-				true
-			}
-
-			R.id.view_type_normal -> {
-				item.isChecked = !item.isChecked
-				viewModel.setViewType(NORMAL)
-				true
-			}
-
-			R.id.view_type_comp -> {
-				item.isChecked = !item.isChecked
-				viewModel.setViewType(COMPRESSED)
-				true
-			}
-
-			R.id.view_type_cozy -> {
-				item.isChecked = !item.isChecked
-				viewModel.setViewType(COZY)
-				true
-			}
-
-			R.id.pin -> {
-				viewModel.togglePinSelected()
-				true
-			}
-
-			else -> false
-		}
-
-	private fun deselectAll() {
-		viewModel.deselectAll()
-	}
-
-	private fun selectAll() {
-		viewModel.selectAll()
-	}
-
-	private fun invertSelection() {
-		viewModel.invertSelection()
-	}
-
-	private fun selectBetween() {
-		viewModel.selectBetween()
-	}
-
-	override fun manipulateFAB(fab: EFabMaintainer) {
-		this.fab = fab
-		fab.setOnClickListener {
-			viewModel.showFilterMenu()
-		}
-		fab.setText(R.string.filter)
-		fab.setIconResource(R.drawable.filter)
-	}
-
-	private fun onRefresh(categoryID: Int) {
-		if (viewModel.isOnline())
-			viewModel.startUpdateManager(categoryID)
-		else displayOfflineSnackBar(R.string.generic_error_cannot_update_library_offline)
-	}
-}
-
-/**
+ *
  * Main view of the users saved novels.
  */
 @Suppress("IncompleteDestructuring")
 @Composable
 fun LibraryView(
-	viewModel: ALibraryViewModel = viewModelDi(),
-	onRefresh: (categoryId: Int) -> Unit,
 	onOpenNovel: (novelId: Int) -> Unit,
-	onToastNovel: (LibraryNovelUI) -> Unit,
-	fab: EFabMaintainer?
+	onMigrate: (ids: List<Int>) -> Unit,
+	drawerIcon: @Composable () -> Unit,
 ) {
 	ShosetsuCompose {
+		val viewModel = viewModelDi<ALibraryViewModel>()
+
 		val items by viewModel.liveData.collectAsState()
 		val isEmpty by viewModel.isEmptyFlow.collectAsState()
 		val hasSelected by viewModel.hasSelection.collectAsState()
@@ -348,9 +129,39 @@ fun LibraryView(
 		val columnsInH by viewModel.columnsInH.collectAsState()
 		val isCategoriesDialogOpen by viewModel.isCategoryDialogOpen.collectAsState()
 		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+		val query by viewModel.queryFlow.collectAsState()
+		val error by viewModel.error.collectAsState(null)
+		val selectedIds by viewModel.selectedIds.collectAsState()
 
 		BackHandler(hasSelected) {
 			viewModel.deselectAll()
+		}
+
+		val context = LocalContext.current
+		val scope = rememberCoroutineScope()
+		val hostState = remember { SnackbarHostState() }
+
+		LaunchedEffect(error) {
+			if (error != null) {
+				when (error) {
+					is OfflineException -> {
+						val result = hostState.showSnackbar(
+							context.getString((error as OfflineException).messageRes),
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.generic_wifi_settings)
+						)
+						if (result == ActionPerformed) {
+							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+						}
+					}
+
+					else -> {
+						hostState.showSnackbar(
+							error?.message ?: context.getString(R.string.error)
+						)
+					}
+				}
+			}
 		}
 
 		LibraryContent(
@@ -361,13 +172,40 @@ fun LibraryView(
 			columnsInV = columnsInV,
 			columnsInH = columnsInH,
 			hasSelected = hasSelected,
-			onRefresh = onRefresh,
+			onRefresh = viewModel::startUpdateManager,
 			onOpen = { (id) -> onOpenNovel(id) },
 			toggleSelection = viewModel::toggleSelection,
 			toastNovel = if (badgeToast) {
-				onToastNovel
+				{ item ->
+					scope.launch {
+						hostState.showSnackbar(
+							context.resources.getQuantityString(
+								R.plurals.toast_unread_count,
+								item.unread,
+								item.unread
+							)
+						)
+					}
+				}
 			} else null,
-			fab = fab
+			onInverseSelection = viewModel::invertSelection,
+			onSelectAll = viewModel::selectAll,
+			onRemove = viewModel::removeSelectedFromLibrary,
+			onMigrate = {
+				viewModel.deselectAll()
+				onMigrate(selectedIds)
+			},
+			onTogglePin = viewModel::togglePinSelected,
+			onSetCategories = viewModel::showCategoryDialog,
+			onDeselectAll = viewModel::deselectAll,
+			onSelectBetween = viewModel::selectBetween,
+			query = query,
+			onSearch = viewModel::setQuery,
+			selectedType = type,
+			onSetType = viewModel::setViewType,
+			hostState = hostState,
+			onShowFilterMenu = viewModel::showFilterMenu,
+			drawerIcon = drawerIcon
 		)
 		if (isCategoriesDialogOpen) {
 			CategoriesDialog(
@@ -404,40 +242,159 @@ fun LibraryContent(
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
-	fab: EFabMaintainer?
+	onInverseSelection: () -> Unit,
+	onSelectAll: () -> Unit,
+	onRemove: () -> Unit,
+	onMigrate: () -> Unit,
+	onTogglePin: () -> Unit,
+	onSetCategories: () -> Unit,
+	onDeselectAll: () -> Unit,
+	onSelectBetween: () -> Unit,
+	query: String,
+	onSearch: (String) -> Unit,
+	selectedType: NovelCardType,
+	onSetType: (NovelCardType) -> Unit,
+	hostState: SnackbarHostState,
+	onShowFilterMenu: () -> Unit,
+	drawerIcon: @Composable () -> Unit
 ) {
-	if (!isEmpty) {
-		if (items == null) {
-			Box(
-				modifier = Modifier.fillMaxSize()
-			) {
-				LinearProgressIndicator(
-					Modifier
-						.fillMaxWidth()
-						.align(Alignment.TopCenter)
+	Scaffold(
+		topBar = {
+			LibraryAppBar(
+				hasSelected = hasSelected,
+				onInverseSelection = onInverseSelection,
+				onSelectAll = onSelectAll,
+				onRemove = onRemove,
+				onMigrate = onMigrate,
+				onTogglePin = onTogglePin,
+				onSetCategories = onSetCategories,
+				onDeselectAll = onDeselectAll,
+				onSelectBetween = onSelectBetween,
+				query = query,
+				onSearch = onSearch,
+				selectedType = selectedType,
+				onSetType = onSetType,
+				onRefresh = {
+					onRefresh(-1) // default, TODO maybe make better?
+				},
+				isEmpty = isEmpty,
+				drawerIcon = drawerIcon
+			)
+		},
+		snackbarHost = {
+			SnackbarHost(hostState)
+		},
+		floatingActionButton = {
+			// TODO Collapsible
+			AnimatedVisibility(!isEmpty) {
+				ExtendedFloatingActionButton(
+					text = {
+						Text(stringResource(R.string.filter))
+					},
+					icon = {
+						Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+					},
+					onClick = onShowFilterMenu
+				)
+			}
+		}
+	) { paddingValues ->
+		if (!isEmpty) {
+			if (items == null) {
+				Box(
+					modifier = Modifier
+						.fillMaxSize()
+						.padding(paddingValues)
+				) {
+					LinearProgressIndicator(
+						Modifier
+							.fillMaxWidth()
+							.align(Alignment.TopCenter)
+					)
+				}
+			} else {
+				LibraryPager(
+					paddingValues = paddingValues,
+					library = items,
+					setActiveCategory = setActiveCategory,
+					cardType = cardType,
+					columnsInV = columnsInV,
+					columnsInH = columnsInH,
+					hasSelected = hasSelected,
+					onRefresh = onRefresh,
+					onOpen = onOpen,
+					toggleSelection = toggleSelection,
+					toastNovel = toastNovel,
 				)
 			}
 		} else {
-			LibraryPager(
-				library = items,
-				setActiveCategory = setActiveCategory,
-				cardType = cardType,
-				columnsInV = columnsInV,
-				columnsInH = columnsInH,
-				hasSelected = hasSelected,
-				onRefresh = onRefresh,
-				onOpen = onOpen,
-				toggleSelection = toggleSelection,
-				toastNovel = toastNovel,
-				fab = fab
+			ErrorContent(
+				stringResource(R.string.empty_library_message),
+				modifier = Modifier.padding(paddingValues)
 			)
 		}
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LibraryAppBar(
+	hasSelected: Boolean,
+	onInverseSelection: () -> Unit,
+	onSelectAll: () -> Unit,
+	onRemove: () -> Unit,
+	onMigrate: () -> Unit,
+	onTogglePin: () -> Unit,
+	onSetCategories: () -> Unit,
+	onDeselectAll: () -> Unit,
+	onSelectBetween: () -> Unit,
+	query: String,
+	onSearch: (String) -> Unit,
+	selectedType: NovelCardType,
+	onSetType: (NovelCardType) -> Unit,
+	onRefresh: () -> Unit,
+	isEmpty: Boolean,
+	drawerIcon: @Composable () -> Unit
+) {
+	@Composable
+	fun title() {
+		Text(stringResource(R.string.library))
+	}
+
+	val behavior = enterAlwaysScrollBehavior()
+
+	if (hasSelected) {
+		LargeTopAppBar(
+			title = { title() },
+			scrollBehavior = behavior,
+			actions = {
+				InverseSelectionButton(onInverseSelection)
+				SelectAllButton(onSelectAll)
+				SelectBetweenButton(onSelectBetween)
+				DeselectAllButton(onDeselectAll)
+				RemoveAllButton(onRemove)
+				LibrarySelectedMoreButton(onMigrate, onTogglePin, onSetCategories)
+			},
+			navigationIcon = drawerIcon
+		)
 	} else {
-		ErrorContent(
-			stringResource(R.string.empty_library_message)
+		TopAppBar(
+			title = { title() },
+			scrollBehavior = behavior,
+			actions = {
+				AnimatedVisibility(!isEmpty) {
+					Row {
+						SearchAction(query, onSearch)
+						ViewTypeButton(selectedType, onSetType)
+						RefreshButton(onRefresh)
+					}
+				}
+			},
+			navigationIcon = drawerIcon
 		)
 	}
 }
+
 
 /**
  * Pager for categories
@@ -445,6 +402,7 @@ fun LibraryContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LibraryPager(
+	paddingValues: PaddingValues,
 	library: LibraryUI,
 	setActiveCategory: (Int) -> Unit,
 	cardType: NovelCardType,
@@ -454,8 +412,7 @@ fun LibraryPager(
 	onRefresh: (Int) -> Unit,
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
-	toastNovel: ((LibraryNovelUI) -> Unit)?,
-	fab: EFabMaintainer?
+	toastNovel: ((LibraryNovelUI) -> Unit)?
 ) {
 	val scope = rememberCoroutineScope()
 	val categoryPagerState = rememberPagerState { library.categories.size }
@@ -463,7 +420,11 @@ fun LibraryPager(
 		setActiveCategory(library.categories[categoryPagerState.currentPage].id)
 	}
 
-	Column(Modifier.fillMaxWidth()) {
+	Column(
+		Modifier
+			.padding(paddingValues)
+			.fillMaxWidth()
+	) {
 		if (!(library.categories.size == 1 && library.categories.first().id == 0)) {
 			ScrollableTabRow(
 				selectedTabIndex = categoryPagerState.currentPage,
@@ -510,7 +471,6 @@ fun LibraryPager(
 				onOpen = onOpen,
 				toggleSelection = toggleSelection,
 				toastNovel = toastNovel,
-				fab = fab
 			)
 		}
 	}
@@ -533,7 +493,6 @@ fun LibraryCategory(
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
-	fab: EFabMaintainer?
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Box(Modifier.pullRefresh(pullRefreshState)) {
@@ -548,8 +507,6 @@ fun LibraryCategory(
 
 
 		val state = rememberLazyGridState()
-		if (fab != null)
-			syncFABWithCompose(state, fab)
 
 		LazyVerticalGrid(
 			modifier = Modifier.fillMaxSize(),

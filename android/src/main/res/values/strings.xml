@@ -655,7 +655,7 @@
     <string name="reader_long_reading_desc">Please look at something at least 5–10 meters away for 20 seconds to avoid eye damage.</string>
     <string name="settings_reader_track_long_reading_title">Track long reading</string>
     <string name="settings_reader_track_long_reading_desc">Track users reading time to ensure the user maintains their eye health by requiring the user to look at something 5-10 meters away for 20 seconds every 20 minutes.</string>
-    <string name="global_search">Global Search\n</string>
+    <string name="global_search">Global Search</string>
     <string name="settings_reader_voice_title">Text to Speech Voice</string>
     <string name="settings_reader_voice_desc">Which voice to use for Text to Speech</string>
     <string name="voice_very_high">Highest</string>
@@ -700,5 +700,13 @@
         <item>@string/compressed</item>
         <item>@string/comfy</item>
     </array>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="icon_desc_back">Arrow pointing to the left to navigate back.</string>
+    <string name="view_title_configure">Configure</string>
+    <string name="view_novel_refresh_failed">Failed to refresh novel: %s</string>
+    <string name="view_backup_restore_start">Restoring now...</string>
+    <string name="view_backup_exporting_start">Exporting now...</string>
+    <string name="worker_update_install_missing">No update to install</string>
+    <string name="error_intent_handle">Failed to handle intent</string>
 
 </resources>

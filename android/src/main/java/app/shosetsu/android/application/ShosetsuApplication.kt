@@ -267,7 +267,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 	override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {}
 
-	override fun getWorkManagerConfiguration(): Configuration =
+	override val workManagerConfiguration: Configuration =
 		Configuration.Builder().apply {
 		}.build()
 

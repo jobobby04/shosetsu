@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
 
 @Composable
@@ -34,7 +34,7 @@ fun CSSEditorView(
 	val canUndo by viewModel.canUndo.collectAsState()
 	val activity = LocalContext.current as Activity
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		CSSEditorPagerContent(
 			cssTitle = cssTitle,
 			cssContent = cssContent,

@@ -1,20 +1,32 @@
 package app.shosetsu.android.ui.extensionsConfigure
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,18 +37,15 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.enums.TriStateState
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.CollapsedToolBarController
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.ExtensionType
@@ -71,23 +80,6 @@ import kotlin.random.Random
  *
  * Opens up detailed view of an extension, allows modifications
  */
-class ConfigureExtensionFragment : ShosetsuFragment(),
-	CollapsedToolBarController {
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-			ConfigureExtensionView(
-				remember { requireArguments().getInt(BUNDLE_EXTENSION) },
-				onExit = { activity?.onBackPressedDispatcher?.onBackPressed() }
-			)
-		}
-	}
-}
 
 @Composable
 fun ConfigureExtensionView(
@@ -108,49 +100,63 @@ fun ConfigureExtensionView(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ConfigureExtensionContent(
 	viewModel: AExtensionConfigureViewModel,
-	onExit: () -> Unit
+	onBack: () -> Unit
 ) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
 	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
 
-
-	LazyColumn(
-		verticalArrangement = Arrangement.spacedBy(8.dp),
-		state = rememberLazyListState(),
-		contentPadding = PaddingValues(bottom = 8.dp)
-	) {
-		stickyHeader(1000000) {
-			if (extensionUIResult != null) {
-				ConfigureExtensionHeaderContent(extensionUIResult!!) {
-					viewModel.uninstall(extensionUIResult!!)
-					onExit()
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = {
+					Text(stringResource(R.string.view_title_configure))
+				},
+				navigationIcon = {
+					NavigateBackButton(onBack)
+				},
+				scrollBehavior = enterAlwaysScrollBehavior()
+			)
+		}
+	) { paddingValues ->
+		LazyColumn(
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			state = rememberLazyListState(),
+			contentPadding = PaddingValues(bottom = 8.dp),
+			modifier = Modifier.padding(paddingValues)
+		) {
+			stickyHeader(1000000) {
+				if (extensionUIResult != null) {
+					ConfigureExtensionHeaderContent(extensionUIResult!!) {
+						viewModel.uninstall(extensionUIResult!!)
+						onBack()
+					}
 				}
 			}
-		}
 
-		if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
-			item {
-				DropdownSettingContent(
-					title = stringResource(R.string.listings),
-					description = stringResource(R.string.fragment_configure_extension_listing_desc),
-					choices = extensionListingResult!!.choices,
-					selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
-					onSelection = { index ->
-						viewModel.setSelectedListing(index)
-					},
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(top = 8.dp, start = 16.dp, end = 16.dp)
-				)
+			if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
+				item {
+					DropdownSettingContent(
+						title = stringResource(R.string.listings),
+						description = stringResource(R.string.fragment_configure_extension_listing_desc),
+						choices = extensionListingResult!!.choices,
+						selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
+						onSelection = { index ->
+							viewModel.setSelectedListing(index)
+						},
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(top = 8.dp, start = 16.dp, end = 16.dp)
+					)
+				}
 			}
-		}
 
-		SettingsItemAsCompose(this, viewModel, extensionSettingsResult)
+			SettingsItemAsCompose(this, viewModel, extensionSettingsResult)
+		}
 	}
 }
 
@@ -346,7 +352,8 @@ fun ConfigureExtensionHeaderContent(
 				} else {
 					Box(Modifier.size(100.dp), contentAlignment = Alignment.Center) {
 						ImageLoadingError(
-							Modifier.size(80.dp)
+							Modifier
+								.size(80.dp)
 								.clip(MaterialTheme.shapes.extraSmall)
 						)
 					}

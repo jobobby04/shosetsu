@@ -50,7 +50,7 @@ fun loadSProperties(name: String): Properties {
 	return properties
 }
 
-val CI_MODE = System.getenv("CI_MODE") == "true"
+val CI_MODE = System.getenv("CI_MODE") == "true" || true
 
 android {
 	compileSdk = 34
@@ -75,15 +75,19 @@ android {
 		)
 
 		setProperty("archivesBaseName", rootProject.name)
+		vectorDrawables {
+			useSupportLibrary = true
+		}
 	}
 
 	buildFeatures {
 		viewBinding = true
 		compose = true
+		buildConfig = true
 	}
 
 	composeOptions {
-		kotlinCompilerExtensionVersion = "1.4.5"
+		kotlinCompilerExtensionVersion = "1.5.7"
 	}
 
 	/*
@@ -186,6 +190,11 @@ android {
 		abortOnError = false
 	}
 	namespace = "app.shosetsu.android"
+	packaging {
+		resources {
+			excludes += "/META-INF/{AL2.0,LGPL2.1}"
+		}
+	}
 }
 
 ksp {
@@ -219,19 +228,30 @@ dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
 	// Google view things
-	implementation("com.google.android.material:material:1.9.0")
+	implementation("com.google.android.material:material:1.10.0")
 
 	// Androidx
-	implementation("androidx.work:work-runtime:2.8.1")
-	implementation("androidx.work:work-runtime-ktx:2.8.1")
+	implementation("androidx.work:work-runtime:2.9.0")
+	implementation("androidx.work:work-runtime-ktx:2.9.0")
 	implementation("androidx.appcompat:appcompat:1.6.1")
-	implementation("androidx.annotation:annotation:1.7.0")
+	implementation("androidx.annotation:annotation:1.7.1")
 	implementation("androidx.core:core-ktx:1.12.0")
-	implementation("androidx.collection:collection-ktx:1.2.0")
+	implementation("androidx.collection:collection-ktx:1.3.0")
 	implementation("androidx.core:core-splashscreen:1.0.1")
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-	implementation("androidx.window:window:1.1.0")
+	implementation("androidx.window:window:1.2.0")
 	implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+	implementation("androidx.activity:activity-compose:1.8.2")
+
+	implementation(platform("androidx.compose:compose-bom:2023.10.01"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
+
+	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+	androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.01"))
+
+	debugImplementation("androidx.compose.ui:ui-tooling")
+	debugImplementation("androidx.compose.ui:ui-test-manifest")
 
 	// - Life Cycle
 
@@ -250,16 +270,14 @@ dependencies {
 	androidTestImplementation("androidx.test:runner:1.5.2")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-	// Annotations
-	implementation("org.jetbrains:annotations:24.0.1")
 
 	// Core libraries
 	implementation("org.luaj:luaj-jse:3.0.1")
 	implementation("com.gitlab.shosetsuorg:kotlin-lib:v1.3.0")
-	implementation("org.jsoup:jsoup:1.16.1")
+	implementation("org.jsoup:jsoup:1.17.1")
 
 	// Image loading
-	implementation("io.coil-kt:coil-compose:2.4.0")
+	implementation("io.coil-kt:coil-compose:2.5.0")
 
 	// Time control
 	implementation("joda-time:joda-time:2.12.5")
@@ -268,7 +286,7 @@ dependencies {
 	//implementation("com.zhkrb.cloudflare-scrape-android:scrape-webview:0.0.3")
 
 	// Network
-	implementation("com.squareup.okhttp3:okhttp:4.11.0")
+	implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 	// Kotlin libraries
 	implementation(kotlin("stdlib-jdk8"))
@@ -276,7 +294,7 @@ dependencies {
 
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
 	// Error logging
 	val acraVersion = "5.11.2"
@@ -309,7 +327,7 @@ dependencies {
 	implementation(room("room-paging"))
 
 	// Guava cache
-	implementation("com.google.guava:guava:32.1.2-android")
+	implementation("com.google.guava:guava:33.0.0-android")
 
 	// kode-in
 	val kodeinVersion = "7.20.2"
@@ -329,7 +347,7 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.7.3")
 
 	// KTX - Serialization
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
 	// Roomigrant
 	/*val enableRoomigrant = false
@@ -341,26 +359,24 @@ dependencies {
 	}*/
 
 	// Compose
-	val androidxCompose = "1.5.1"
+	val androidxCompose = "1.5.4"
 	fun androidxCompose(
 		module: String,
 		submodule: String = module,
 		version: String = androidxCompose
 	) = "androidx.compose.$submodule:$module:$version"
 
-	implementation(androidxCompose("ui"))
-
-	//- Tooling support (Previews, etc.)
-	implementation(androidxCompose("ui-tooling", "ui"))
-
-	//- Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)
-	implementation(androidxCompose("foundation"))
-	implementation(androidxCompose("animation"))
-	implementation(androidxCompose("animation-graphics", "animation"))
-	implementation(androidxCompose("animation-core", "animation"))
-
-	// - Material
-	implementation(androidxCompose("material3", version = "1.1.1"))
+	implementation(platform("androidx.compose:compose-bom:2023.10.01"))
+	implementation("androidx.compose.runtime:runtime")
+	implementation("androidx.compose.ui:ui")
+	implementation("androidx.compose.ui:ui-tooling")
+	implementation("androidx.compose.ui:ui-graphics")
+	implementation("androidx.compose.ui:ui-tooling-preview")
+	implementation("androidx.compose.material3:material3")
+	implementation("androidx.compose.foundation:foundation")
+	implementation("androidx.compose.animation:animation")
+	implementation("androidx.compose.animation:animation-graphics")
+	implementation("androidx.compose.animation:animation-core")
 
 	// - accompanist
 	val accompanistVersion = "0.32.0"
@@ -399,18 +415,16 @@ dependencies {
 		"androidx.paging:$module:$version"
 
 	implementation(paging("paging-runtime"))
-	implementation(paging("paging-compose", "1.0.0-alpha14"))
+	implementation(paging("paging-compose"))
 	implementation(kotlin("reflect"))
 
 	val navVersion = "2.7.2"
 	fun navigation(module: String, version: String = navVersion) =
 		"androidx.navigation:navigation-$module:$version"
 
-	implementation(navigation("fragment-ktx"))
-	implementation(navigation("ui-ktx"))
+	implementation(navigation("compose"))
 
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
 	implementation("com.holix.android:bottomsheetdialog-compose:1.3.1")
-	implementation("androidx.window:window:1.0.0")
 }

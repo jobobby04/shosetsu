@@ -4,19 +4,38 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.R
+import app.shosetsu.android.common.ChapterLoadException
+import app.shosetsu.android.common.NovelLoadException
+import app.shosetsu.android.common.OfflineException
+import app.shosetsu.android.common.RefreshException
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.ChapterSortType
 import app.shosetsu.android.common.enums.ReadingStatus
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logD
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.common.utils.share.toURL
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.DownloadChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.StartDownloadWorkerAfterUpdateUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.delete.TrueDeleteChapterUseCase
-import app.shosetsu.android.domain.usecases.get.*
+import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
+import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
+import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
+import app.shosetsu.android.domain.usecases.get.GetNovelCategoriesUseCase
+import app.shosetsu.android.domain.usecases.get.GetNovelSettingFlowUseCase
+import app.shosetsu.android.domain.usecases.get.GetNovelUIUseCase
+import app.shosetsu.android.domain.usecases.get.GetRemoteNovelUseCase
+import app.shosetsu.android.domain.usecases.get.GetRepositoryUseCase
+import app.shosetsu.android.domain.usecases.get.GetURLUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadChaptersResumeFirstUnreadUseCase
 import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelSettingUseCase
@@ -36,7 +55,23 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.launch
 import kotlin.collections.set
 
 /*
@@ -78,7 +113,7 @@ class NovelViewModel(
 	private val updateNovelSettingUseCase: UpdateNovelSettingUseCase,
 	private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
 	private val startDownloadWorkerAfterUpdateUseCase: StartDownloadWorkerAfterUpdateUseCase,
-	private val getTrueDelete: GetTrueDeleteChapterUseCase,
+	private val settingsRepo: ISettingsRepository,
 	private val trueDeleteChapter: TrueDeleteChapterUseCase,
 	private val getInstalledExtensionUseCase: GetInstalledExtensionUseCase,
 	private val getRepositoryUseCase: GetRepositoryUseCase,
@@ -87,11 +122,7 @@ class NovelViewModel(
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ANovelViewModel() {
 
-	override val chaptersException: MutableStateFlow<Throwable?> = MutableStateFlow(null)
-
-	override val novelException: MutableStateFlow<Throwable?> = MutableStateFlow(null)
-
-	override val otherException: MutableStateFlow<Throwable?> = MutableStateFlow(null)
+	override val error = MutableSharedFlow<Throwable>()
 
 	override val isRefreshing = MutableStateFlow(false)
 
@@ -103,7 +134,7 @@ class NovelViewModel(
 				.combineBookmarked().combineDownloaded().combineStatus().combineSort()
 				.combineReverse().combineSelection().map { it.toImmutableList() }
 		}.catch {
-			chaptersException.value = it
+			error.emit(ChapterLoadException(it))
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
@@ -176,9 +207,8 @@ class NovelViewModel(
 		isCategoriesDialogVisible.value = false
 	}
 
-	override fun getIfAllowTrueDelete(): Flow<Boolean> = flow {
-		emit(getTrueDelete())
-	}.onIO()
+	override val showTrueDelete: StateFlow<Boolean> =
+		settingsRepo.getBooleanFlow(SettingKey.ExposeTrueChapterDelete)
 
 	override val qrCode: Flow<QRCodeData?> by lazy {
 		novelLive.transformLatest { novel ->
@@ -222,7 +252,7 @@ class NovelViewModel(
 		novelIDLive.flatMapLatest {
 			loadNovelUIUseCase(it)
 		}.catch {
-			novelException.emit(it)
+			error.emit(NovelLoadException(it))
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
@@ -294,17 +324,6 @@ class NovelViewModel(
 			}
 		}
 
-	override fun destroy() {
-		novelIDLive.value = -1 // Reset view to nothing
-		itemIndex.value = 0
-		isRefreshing.value = false
-
-		novelException.value = null
-		chaptersException.value = null
-		otherException.value = null
-		clearSelected()
-	}
-
 	private suspend fun downloadChapter(chapters: Array<ChapterUI>, startManager: Boolean = false) {
 		if (chapters.isEmpty()) return
 		downloadChapterPassageUseCase(chapters)
@@ -312,27 +331,30 @@ class NovelViewModel(
 		if (startManager) startDownloadWorkerUseCase()
 	}
 
-	override fun isOnline(): Boolean = isOnlineUseCase()
+	private val isOnline: StateFlow<Boolean> =
+		isOnlineUseCase.getFlow().stateIn(viewModelScopeIO, SharingStarted.Eagerly, false)
 
-	override fun openLastRead(): Flow<ChapterUI?> = flow {
-		val array = chaptersLive.value
+	override fun openLastRead() {
+		viewModelScopeIO.launch {
+			val array = chaptersLive.value
 
-		val sortedArray = array.sortedBy { it.order }
-		val result = isChaptersResumeFirstUnread()
+			val sortedArray = array.sortedBy { it.order }
+			val result = isChaptersResumeFirstUnread()
 
-		val item = if (!result) sortedArray.firstOrNull { it.readingStatus != ReadingStatus.READ }
-		else sortedArray.firstOrNull { it.readingStatus == ReadingStatus.UNREAD }
+			val item =
+				if (!result) sortedArray.firstOrNull { it.readingStatus != ReadingStatus.READ }
+				else sortedArray.firstOrNull { it.readingStatus == ReadingStatus.UNREAD }
 
 
-		emit(
+
 			if (item == null) {
-				null
+				openLastReadResult.emit(LastOpenResult.Complete)
 			} else {
 				itemIndex.emit(array.indexOf(item) + 1) // +1 to account for header
-				item
+				openLastReadResult.emit(LastOpenResult.Open(item))
 			}
-		)
-	}.onIO()
+		}
+	}
 
 	override val novelURL: StateFlow<String?> = flow {
 		emit(novelLive.first { it != null }?.let {
@@ -351,21 +373,29 @@ class NovelViewModel(
 		emit(getContentURL(chapterUI))
 	}.onIO()
 
-	override fun refresh(): Flow<Unit> = flow {
-		isRefreshing.value = true
-		var e: Throwable? = null
-		try {
-			loadRemoteNovel(novelIDLive.value, true)?.let {
-				startDownloadWorkerAfterUpdateUseCase(it.updatedChapters)
+	override fun refresh() {
+		viewModelScopeIO.launch {
+			if (isOnline.value) {
+				logI("Refreshing the novel data")
+				isRefreshing.emit(true)
+				try {
+					loadRemoteNovel(novelIDLive.value, true)?.let {
+						startDownloadWorkerAfterUpdateUseCase(it.updatedChapters)
+					}
+					logI("Successfully reloaded novel")
+				} catch (t: Throwable) {
+					logE("Failed refreshing the novel data", t)
+					error.emit(RefreshException(t))
+				} finally {
+					isRefreshing.emit(false)
+				}
+			} else {
+				error.emit(
+					OfflineException(R.string.fragment_novel_snackbar_cannot_inital_load_offline)
+				)
 			}
-		} catch (t: Throwable) {
-			e = t
-		} finally {
-			emit(Unit)
-			isRefreshing.value = false
 		}
-		if (e != null) throw e
-	}.onIO()
+	}
 
 	override fun setNovelID(novelID: Int) {
 		when {
@@ -470,6 +500,8 @@ class NovelViewModel(
 	override fun setItemAt(index: Int) {
 		itemIndex.value = index
 	}
+
+	override val openLastReadResult = MutableSharedFlow<LastOpenResult>()
 
 	override val hasSelected: StateFlow<Boolean> by lazy {
 		this.chaptersLive.mapLatest { chapters -> chapters.any { it.isSelected } }.onIO()
@@ -656,5 +688,15 @@ class NovelViewModel(
 
 	override fun hideFilterMenu() {
 		isFilterMenuVisible.value = false
+	}
+
+	override val isDownloadDialogVisible = MutableStateFlow(false)
+
+	override fun showDownloadDialog() {
+		isDownloadDialogVisible.value = true
+	}
+
+	override fun hideDownloadDialog() {
+		isDownloadDialogVisible.value = false
 	}
 }

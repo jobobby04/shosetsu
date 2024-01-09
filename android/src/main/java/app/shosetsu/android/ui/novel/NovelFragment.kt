@@ -1,28 +1,76 @@
 package app.shosetsu.android.ui.novel
 
 import android.app.Activity
+import android.content.Intent
 import android.content.res.Resources
-import android.database.sqlite.SQLiteException
-import android.os.Bundle
-import android.view.*
-import android.widget.NumberPicker
-import androidx.appcompat.app.AlertDialog
-import androidx.compose.foundation.*
+import android.provider.Settings
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ElevatedSuggestionChip
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
@@ -40,25 +88,23 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.os.bundleOf
 import androidx.core.text.isDigitsOnly
-import androidx.core.view.MenuProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import app.shosetsu.android.R
-import app.shosetsu.android.common.FilePermissionException
-import app.shosetsu.android.common.NoSuchExtensionException
+import app.shosetsu.android.common.ChapterLoadException
+import app.shosetsu.android.common.NovelLoadException
+import app.shosetsu.android.common.OfflineException
+import app.shosetsu.android.common.RefreshException
 import app.shosetsu.android.common.enums.ReadingStatus
-import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.ui.migration.MigrationFragment.Companion.TARGETS_BUNDLE_KEY
+import app.shosetsu.android.common.ext.openShare
+import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.NovelShareMenu
 import app.shosetsu.android.view.QRCodeShareDialog
-import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.ExtendedFABController
-import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
-import app.shosetsu.android.view.controller.base.syncFABWithCompose
+import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.LazyColumnScrollbar
+import app.shosetsu.android.view.compose.LongClickTextButton
+import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
@@ -71,16 +117,10 @@ import app.shosetsu.lib.Novel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.placeholder.material.placeholder
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.acra.ACRA
-import javax.security.auth.DestroyFailedException
 
 /*
  * This file is part of Shosetsu.
@@ -105,408 +145,23 @@ import javax.security.auth.DestroyFailedException
  *
  * The page you see when you select a novel
  */
-class NovelFragment : ShosetsuFragment(),
-	ExtendedFABController, MenuProvider {
-
-	/*
-	/** Fixes invalid adapter postion errors */
-	override fun createLayoutManager(): RecyclerView.LayoutManager =
-			object : LinearLayoutManager(context) {
-				override fun supportsPredictiveItemAnimations(): Boolean = false
-			}
-	*/
-
-	internal val viewModel: ANovelViewModel by viewModel()
-
-	override val viewTitle: String
-		get() = ""
-
-	private var resume: EFabMaintainer? = null
-
-	private var actionMode: ActionMode? = null
-
-	private fun startSelectionAction() {
-		if (actionMode != null) return
-		hideFAB(resume!!)
-		actionMode = activity?.startActionMode(SelectionActionMode())
-	}
-
-	private fun finishSelectionAction() {
-		actionMode?.finish()
-		//	recyclerView.postDelayed(400) { (activity as MainActivity?)?.supportActionBar?.show() }
-	}
-
-	/** Refreshes the novel */
-	private fun refresh() {
-		logI("Refreshing the novel data")
-		viewModel.refresh().observe(
-			catch = {
-				logE("Failed refreshing the novel data", it)
-				makeSnackBar(it.message ?: "Unknown exception")?.show()
-			}
-		) {
-			logI("Successfully reloaded novel")
-		}
-	}
-
-	override fun showFAB(fab: EFabMaintainer) {
-		if (actionMode == null) super.showFAB(fab)
-	}
-
-	override fun manipulateFAB(fab: EFabMaintainer) {
-		resume = fab
-		fab.setOnClickListener { openLastRead() }
-		fab.setIconResource(R.drawable.play_arrow)
-		fab.setText(R.string.resume)
-	}
-
-	private fun openLastRead() {
-		viewModel.openLastRead().firstLa(this, catch = {
-			logE("Loading last read hit an error")
-		}) { chapterUI ->
-			if (chapterUI != null) {
-				activity?.openChapter(chapterUI)
-			} else {
-				makeSnackBar(R.string.fragment_novel_snackbar_finished_reading)?.show()
-			}
-		}
-	}
-
-	@Suppress("unused")
-	fun migrateOpen() {
-		findNavController().navigateSafely(
-			R.id.action_novelController_to_migrationController,
-			bundleOf(
-				TARGETS_BUNDLE_KEY to arrayOf(requireArguments().getNovelID()).toIntArray()
-			),
-			navOptions {
-				setShosetsuTransition()
-			}
-		)
-	}
-
-	override fun onMenuItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-		R.id.source_migrate -> {
-			migrateOpen()
-			true
-		}
-
-		R.id.share -> {
-			viewModel.openShareMenu()
-			true
-		}
-
-		R.id.option_chapter_jump -> {
-			viewModel.showChapterJumpDialog()
-			true
-		}
-
-		R.id.download_next -> {
-			viewModel.downloadNextChapter()
-			true
-		}
-
-		R.id.download_next_5 -> {
-			viewModel.downloadNext5Chapters()
-			true
-		}
-
-		R.id.download_next_10 -> {
-			viewModel.downloadNext10Chapters()
-			true
-		}
-
-		R.id.download_custom -> {
-			downloadCustom()
-			true
-		}
-
-		R.id.download_unread -> {
-			viewModel.downloadAllUnreadChapters()
-			true
-		}
-
-		R.id.download_all -> {
-			viewModel.downloadAllChapters()
-			true
-		}
-
-		R.id.set_categories -> {
-			viewModel.showCategoriesDialog()
-			true
-		}
-
-		else -> false
-	}
-
-
-	/**
-	 * download a custom amount of chapters
-	 */
-	private fun downloadCustom() {
-		if (context == null) return
-		val max = viewModel.getChapterCount()
-
-		AlertDialog.Builder(requireActivity()).apply {
-			setTitle(R.string.download_custom_chapters)
-			val numberPicker = NumberPicker(requireActivity()).apply {
-				minValue = 0
-				maxValue = max
-			}
-			setView(numberPicker)
-
-			setPositiveButton(android.R.string.ok) { d, _ ->
-				viewModel.downloadNextCustomChapters(numberPicker.value)
-				d.dismiss()
-			}
-			setNegativeButton(android.R.string.cancel) { d, _ ->
-				d.cancel()
-			}
-		}.show()
-	}
-
-	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-		inflater.inflate(R.menu.toolbar_novel, menu)
-
-		runBlocking {
-			menu.findItem(R.id.source_migrate).isVisible = viewModel.isBookmarked().first()
-			menu.findItem(R.id.set_categories).isVisible = viewModel.categories.first().isNotEmpty()
-		}
-	}
-
-	private var state = LazyListState(0)
-
-	@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		activity?.addMenuProvider(this, viewLifecycleOwner)
-		setViewTitle()
-		return ComposeView {
-			NovelInfoView(
-				viewModel,
-				resume,
-				state,
-				invalidateOptionsMenu = {
-					activity?.invalidateOptionsMenu()
-				},
-				{
-					if (it != null) {
-						displayOfflineSnackBar(it)
-					} else {
-						displayOfflineSnackBar()
-					}
-				},
-				::refresh,
-				makeSnackBar = {
-					makeSnackBar(it)
-				},
-				windowSize = calculateWindowSizeClass(context as Activity)
-			)
-		}
-	}
-
-	private fun Flow<Boolean>.collectDeletePrevious() {
-		collectLA(this@NovelFragment, catch = {
-			when (it) {
-				is SQLiteException ->
-					makeSnackBar(
-						getString(
-							R.string.fragment_novel_delete_previous_fail,
-							it.message ?: ""
-						)
-					)?.show()
-
-				is FilePermissionException ->
-					makeSnackBar(
-						getString(
-							R.string.fragment_novel_delete_previous_fail,
-							it.message ?: ""
-						)
-					)?.show()
-
-				is NoSuchExtensionException ->
-					makeSnackBar(
-						getString(
-							R.string.missing_extension,
-							it.extensionId
-						)
-					)?.show()
-			}
-			emit(false)
-		}) {
-		}
-	}
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.setNovelID(requireArguments().getNovelID())
-
-		viewModel.hasSelected.collectLatestLA(this, catch = {}) { hasSelected ->
-			if (hasSelected) {
-				startSelectionAction()
-			} else {
-				finishSelectionAction()
-			}
-		}
-
-		viewModel.novelException.collectLatestLA(this, catch = {}) {
-			if (it != null)
-				makeSnackBar(
-					getString(
-						R.string.fragment_novel_error_load,
-						it.message ?: "Unknown"
-					)
-				)?.setAction(R.string.report) { _ ->
-					ACRA.errorReporter.handleSilentException(it)
-				}?.show()
-		}
-
-		viewModel.chaptersException.collectLatestLA(this, catch = {}) {
-			if (it != null)
-				makeSnackBar(
-					getString(
-						R.string.fragment_novel_error_load_chapters,
-						it.message ?: "Unknown"
-					)
-				)?.setAction(R.string.report) { _ ->
-					ACRA.errorReporter.handleSilentException(it)
-				}?.show()
-		}
-
-		viewModel.otherException.collectLatestLA(this, catch = {}) {
-			// TODO Figure out use of other exception
-		}
-
-	}
-
-	private fun openWebView() {
-		viewModel.novelURL.firstLa(
-			this,
-			catch = {
-				makeSnackBar(
-					getString(
-						R.string.fragment_novel_error_url,
-						it.message ?: "Unknown"
-					)
-				)
-					?.setAction(R.string.report) { _ ->
-						ACRA.errorReporter.handleSilentException(it)
-					}?.show()
-			}
-		) {
-			if (it != null) {
-				activity?.openInWebView(it)
-			}
-		}
-	}
-
-	override fun onDestroy() {
-		try {
-			viewModel.destroy()
-		} catch (e: DestroyFailedException) {
-			ACRA.errorReporter.handleException(e)
-		}
-		actionMode?.finish()
-		state = LazyListState(0)
-		super.onDestroy()
-	}
-
-	private fun selectAll() {
-		viewModel.selectAll()
-	}
-
-	private fun invertSelection() {
-		viewModel.invertSelection()
-	}
-
-	/**
-	 * Selects all chapters between the first and last selected chapter
-	 */
-	private fun selectBetween() {
-		viewModel.selectBetween()
-	}
-
-	private fun trueDeleteSelection() {
-		viewModel.trueDeleteSelected()
-	}
-
-	private inner class SelectionActionMode : ActionMode.Callback {
-		override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-			// Hides the original action bar
-			// (activity as MainActivity?)?.supportActionBar?.hide()
-
-			mode.menuInflater.inflate(R.menu.toolbar_novel_chapters_selected, menu)
-
-			viewModel.getIfAllowTrueDelete().observe(
-				catch = {
-					makeSnackBar(
-						getString(
-							R.string.fragment_novel_error_true_delete,
-							it.message ?: "Unknown"
-						)
-					)
-						?.setAction(R.string.report) { _ ->
-							ACRA.errorReporter.handleSilentException(it)
-						}?.show()
-				}
-			) {
-				menu.findItem(R.id.true_delete).isVisible = it
-			}
-
-			mode.setTitle(R.string.selection)
-			return true
-		}
-
-		override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean = false
-
-		override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean =
-			when (item.itemId) {
-				R.id.chapter_select_all -> {
-					selectAll()
-					true
-				}
-
-				R.id.chapter_select_between -> {
-					selectBetween()
-					true
-				}
-
-				R.id.chapter_inverse -> {
-					invertSelection()
-					true
-				}
-
-				R.id.true_delete -> {
-					trueDeleteSelection()
-					true
-				}
-
-				else -> false
-			}
-
-		override fun onDestroyActionMode(mode: ActionMode) {
-			actionMode = null
-			showFAB(resume!!)
-			viewModel.clearSelection()
-		}
-	}
-}
 
 @Composable
 fun NovelInfoView(
-	viewModel: ANovelViewModel = viewModelDi(),
-	resume: EFabMaintainer?,
-	state: LazyListState = LazyListState(0),
-	invalidateOptionsMenu: () -> Unit,
-	displayOfflineSnackBar: (Int?) -> Unit,
-	refresh: () -> Unit,
-	makeSnackBar: (String) -> Snackbar?,
-	windowSize: WindowSizeClass
+	novelId: Int,
+	windowSize: WindowSizeClass,
+	onMigrate: (novelId: Int) -> Unit,
+	openInWebView: (String) -> Unit,
+	openChapter: (novelId: Int, chapterId: Int) -> Unit,
+	onBack: () -> Unit,
+	drawerIcon: @Composable () -> Unit
 ) {
-	if (resume != null)
-		syncFABWithCompose(state, resume)
+	val viewModel: ANovelViewModel = viewModelDi()
+
+	LaunchedEffect(novelId) {
+		viewModel.setNovelID(novelId)
+	}
+
 	val novelInfo by viewModel.novelLive.collectAsState()
 	val chapters by viewModel.chaptersLive.collectAsState()
 	val isRefreshing by viewModel.isRefreshing.collectAsState()
@@ -524,146 +179,262 @@ fun NovelInfoView(
 	val isQRCodeVisible by viewModel.isQRCodeVisible.collectAsState()
 	val isShareMenuVisible by viewModel.isShareMenuVisible.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+	val error by viewModel.error.collectAsState(null)
+	val isDownloadDialogVisible by viewModel.isDownloadDialogVisible.collectAsState()
+	val showTrueDelete by viewModel.showTrueDelete.collectAsState()
+	val openLastReadResult by viewModel.openLastReadResult.collectAsState(null)
 
-	invalidateOptionsMenu()
-	// If the data is not present, loads it
-	if (novelInfo != null && !novelInfo!!.loaded) {
-		if (viewModel.isOnline()) {
-			refresh()
-		} else {
-			displayOfflineSnackBar(R.string.fragment_novel_snackbar_cannot_inital_load_offline)
+	val hostState = remember { SnackbarHostState() }
+	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
+
+	LaunchedEffect(error) {
+		if (error != null) {
+			when (error) {
+				is OfflineException -> {
+					scope.launch {
+						val result = hostState.showSnackbar(
+							context.getString((error as OfflineException).messageRes),
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.generic_wifi_settings)
+						)
+						if (result == SnackbarResult.ActionPerformed) {
+							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+						}
+					}
+				}
+
+				is RefreshException -> {
+					scope.launch {
+						val result = hostState.showSnackbar(
+							context.getString(
+								R.string.view_novel_refresh_failed,
+								error?.cause?.message ?: context.getString(R.string.unknown)
+							),
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.retry)
+						)
+						if (result == SnackbarResult.ActionPerformed) {
+							viewModel.refresh()
+						}
+					}
+				}
+
+				is NovelLoadException -> {
+					scope.launch {
+						hostState.showSnackbar(
+							context.getString(
+								R.string.fragment_novel_error_load,
+								error?.cause?.message ?: "Unknown"
+							)
+						)
+					}
+				}
+
+				is ChapterLoadException -> {
+					scope.launch {
+						hostState.showSnackbar(
+							context.getString(
+								R.string.fragment_novel_error_load_chapters,
+								error?.cause?.message ?: "Unknown"
+							)
+						)
+					}
+				}
+
+				else -> {
+					scope.launch {
+						hostState.showSnackbar(
+							error?.message ?: context.getString(R.string.error)
+						)
+					}
+				}
+			}
 		}
 	}
 
-	ShosetsuCompose {
-		NovelInfoContent(
-			novelInfo = novelInfo,
-			chapters = chapters,
-			selectedChaptersState = selectedChaptersState,
-			itemAt = itemAt,
-			isRefreshing = isRefreshing,
-			onRefresh = {
-				if (viewModel.isOnline())
-					refresh()
-				else displayOfflineSnackBar(null)
-			},
-			openWebView = {
-				if (novelURL != null)
-					activity.openInWebView(novelURL!!)
-			},
-			categories = categories,
-			setCategoriesDialogOpen = { viewModel.showCategoriesDialog() },
-			toggleBookmark = {
-				viewModel.toggleNovelBookmark()
-			},
-			openFilter = viewModel::showFilterMenu,
-			openChapterJump = {
-				viewModel.showChapterJumpDialog()
-			},
-			chapterContent = {
-				NovelChapterContent(
-					chapter = it,
-					openChapter = {
-						activity.openChapter(it)
-					},
-					onToggleSelection = {
-						viewModel.toggleSelection(it)
-					},
-					selectionMode = hasSelected
+	LaunchedEffect(openLastReadResult) {
+		when (val result = openLastReadResult) {
+			ANovelViewModel.LastOpenResult.Complete -> {
+				hostState.showSnackbar(
+					context.getString(R.string.fragment_novel_snackbar_finished_reading)
 				)
-			},
-			downloadSelected = viewModel::downloadSelected,
-			deleteSelected = viewModel::deleteSelected,
-			markSelectedAsRead = {
-				viewModel.markSelectedAs(ReadingStatus.READ)
-			},
-			markSelectedAsUnread = {
-				viewModel.markSelectedAs(ReadingStatus.UNREAD)
-			},
-			bookmarkSelected = viewModel::bookmarkSelected,
-			unbookmarkSelected = viewModel::removeBookmarkFromSelected,
-			hasSelected = hasSelected,
-			state = state,
-			windowSize = windowSize
+			}
+
+			is ANovelViewModel.LastOpenResult.Open -> {
+				openChapter(result.chapterUI.novelID, result.chapterUI.id)
+			}
+
+			null -> {}
+		}
+	}
+
+	val state = LazyListState(0)
+
+	// If the data is not present, loads it
+	if (novelInfo != null && !novelInfo!!.loaded) {
+		viewModel.refresh()
+	}
+
+	NovelInfoContent(
+		novelInfo = novelInfo,
+		chapters = chapters,
+		selectedChaptersState = selectedChaptersState,
+		itemAt = itemAt,
+		isRefreshing = isRefreshing,
+		onRefresh = {
+			//	if (viewModel.isOnline())
+			//refresh()
+			//else displayOfflineSnackBar(null)
+		},
+		openWebView = {
+			openInWebView(novelURL ?: return@NovelInfoContent)
+		},
+		categories = categories,
+		setCategoriesDialogOpen = { viewModel.showCategoriesDialog() },
+		toggleBookmark = {
+			viewModel.toggleNovelBookmark()
+		},
+		openFilter = viewModel::showFilterMenu,
+		openChapterJump = {
+			viewModel.showChapterJumpDialog()
+		},
+		chapterContent = {
+			NovelChapterContent(
+				chapter = it,
+				openChapter = {
+					openChapter(it.novelID, it.id)
+				},
+				onToggleSelection = {
+					viewModel.toggleSelection(it)
+				},
+				selectionMode = hasSelected
+			)
+		},
+		downloadSelected = viewModel::downloadSelected,
+		deleteSelected = viewModel::deleteSelected,
+		markSelectedAsRead = {
+			viewModel.markSelectedAs(ReadingStatus.READ)
+		},
+		markSelectedAsUnread = {
+			viewModel.markSelectedAs(ReadingStatus.UNREAD)
+		},
+		bookmarkSelected = viewModel::bookmarkSelected,
+		unbookmarkSelected = viewModel::removeBookmarkFromSelected,
+		hasSelected = hasSelected,
+		state = state,
+		windowSize = windowSize,
+		onSelectAll = viewModel::selectAll,
+		onSelectBetween = viewModel::selectBetween,
+		onInverseSelection = viewModel::invertSelection,
+		showTrueDelete = showTrueDelete,
+		onTrueDelete = viewModel::trueDeleteSelected,
+		onMigrate = {
+			onMigrate(novelId)
+		},
+		canMigrate = novelInfo?.bookmarked == true,
+		hasCategories = categories.isNotEmpty(),
+		onSetCategories = viewModel::showCategoriesDialog,
+		onDownloadAll = viewModel::downloadAllChapters,
+		onDownloadUnread = viewModel::downloadAllUnreadChapters,
+		onDownloadNext = viewModel::downloadNextChapter,
+		onDownloadNext5 = viewModel::downloadNext5Chapters,
+		onDownloadNext10 = viewModel::downloadNext10Chapters,
+		onDownloadCustom = viewModel::showDownloadDialog,
+		onResume = viewModel::openLastRead,
+		onBack = onBack
+	)
+
+	if (isCategoriesDialogVisible)
+		CategoriesDialog(
+			onDismissRequest = { viewModel.hideCategoriesDialog() },
+			categories = categories,
+			novelCategories = novelCategories,
+			setCategories = viewModel::setNovelCategories
 		)
 
-		if (isCategoriesDialogVisible)
-			CategoriesDialog(
-				onDismissRequest = { viewModel.hideCategoriesDialog() },
-				categories = categories,
-				novelCategories = novelCategories,
-				setCategories = viewModel::setNovelCategories
-			)
+	if (isChapterJumpDialogVisible) {
+		JumpDialog(
+			dismiss = {
+				viewModel.hideChapterJumpDialog()
+			},
+			confirm = { query, byTitle ->
+				viewModel.jump(query, byTitle)
+			}
+		)
+	}
 
-		if (isChapterJumpDialogVisible) {
-			JumpDialog(
-				dismiss = {
-					viewModel.hideChapterJumpDialog()
+	if (isQRCodeVisible) {
+		val qrCode by viewModel.qrCode.collectAsState(null)
+		QRCodeShareDialog(qrCode, viewModel::hideQRCodeDialog, novelInfo?.title)
+	}
+
+	LaunchedEffect(toggleBookmarkResponse) {
+		if (toggleBookmarkResponse is ToggleBookmarkResponse.DeleteChapters) {
+			val chaptersToDelete =
+				(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
+			val result = hostState.showSnackbar(
+				try {
+					context.resources.getQuantityString(
+						R.plurals.fragment_novel_toggle_delete_chapters,
+						chaptersToDelete,
+						chaptersToDelete
+					)
+				} catch (e: Resources.NotFoundException) {
+					"Delete $chaptersToDelete chapters?"
 				},
-				confirm = { query, byTitle ->
-					viewModel.jump(query, byTitle)
-				}
+				actionLabel = context.getString(R.string.delete)
 			)
-		}
 
-		if (isQRCodeVisible) {
-			val qrCode by viewModel.qrCode.collectAsState(null)
-			QRCodeShareDialog(qrCode, viewModel::hideQRCodeDialog, novelInfo?.title)
-		}
-
-		val context = LocalContext.current
-		LaunchedEffect(toggleBookmarkResponse) {
-			if (toggleBookmarkResponse is ToggleBookmarkResponse.DeleteChapters) {
-				val chaptersToDelete =
-					(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
-				makeSnackBar(
-					try {
-						context.resources.getQuantityString(
-							R.plurals.fragment_novel_toggle_delete_chapters,
-							chaptersToDelete,
-							chaptersToDelete
-						)
-					} catch (e: Resources.NotFoundException) {
-						"Delete $chaptersToDelete chapters?"
-					}
-				)?.setAction(R.string.delete) {
-					viewModel.deleteChapters()
-				}?.show()
+			if (result == SnackbarResult.ActionPerformed) {
+				viewModel.deleteChapters()
 			}
 		}
+	}
 
-		LaunchedEffect(jumpState) {
-			when (jumpState) {
-				JumpState.UNKNOWN -> {}
-				JumpState.FAILURE -> {
-					makeSnackBar(context.getString(R.string.toast_error_chapter_jump_invalid_target))
-						?.setAction(R.string.generic_question_retry) {
-							viewModel.showChapterJumpDialog()
-						}?.show()
+	LaunchedEffect(jumpState) {
+		when (jumpState) {
+			JumpState.UNKNOWN -> {}
+			JumpState.FAILURE -> {
+				val result = hostState.showSnackbar(
+					context.getString(R.string.toast_error_chapter_jump_invalid_target),
+					actionLabel = context.getString(R.string.generic_question_retry)
+				)
+
+				if (result == SnackbarResult.ActionPerformed) {
+					viewModel.showChapterJumpDialog()
 				}
 			}
 		}
+	}
 
-		if (isShareMenuVisible) {
-			val shareInfo by viewModel.shareInfo.collectAsState(null)
-			NovelShareMenu(
-				shareBasicURL = {
-					if (shareInfo != null)
-						activity.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
-				},
-				shareQRCode = {
-					viewModel.showQRCodeDialog()
-				},
-				dismiss = {
-					viewModel.hideShareMenu()
-				}
-			)
-		}
+	if (isShareMenuVisible) {
+		val shareInfo by viewModel.shareInfo.collectAsState(null)
+		NovelShareMenu(
+			shareBasicURL = {
+				if (shareInfo != null)
+					activity.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
+			},
+			shareQRCode = {
+				viewModel.showQRCodeDialog()
+			},
+			dismiss = {
+				viewModel.hideShareMenu()
+			}
+		)
+	}
 
-		if (isFilterMenuVisible) {
-			val settings by viewModel.novelSettingFlow.collectAsState()
-			NovelFilterMenu(settings, viewModel::updateNovelSetting, viewModel::hideFilterMenu)
-		}
+	if (isFilterMenuVisible) {
+		val settings by viewModel.novelSettingFlow.collectAsState()
+		NovelFilterMenu(settings, viewModel::updateNovelSetting, viewModel::hideFilterMenu)
+	}
+
+	if (isDownloadDialogVisible) {
+		NovelCustomDownloadDialog(
+			onDismissRequest = viewModel::hideDownloadDialog,
+			chapterCount = chapters.size,
+			onDownload = viewModel::downloadNextCustomChapters
+		)
 	}
 }
 
@@ -845,7 +616,24 @@ fun PreviewNovelInfoContent() {
 			unbookmarkSelected = {},
 			hasSelected = false,
 			state = rememberLazyListState(0),
-			windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height))
+			windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height)),
+			onSelectAll = {},
+			onSelectBetween = {},
+			onInverseSelection = {},
+			showTrueDelete = false,
+			onTrueDelete = {},
+			canMigrate = false,
+			onMigrate = {},
+			hasCategories = false,
+			onSetCategories = {},
+			onDownloadNext = {},
+			onDownloadNext5 = {},
+			onDownloadNext10 = {},
+			onDownloadCustom = {},
+			onDownloadAll = {},
+			onDownloadUnread = {},
+			onResume = {},
+			onBack = {}
 		)
 	}
 }
@@ -874,7 +662,24 @@ fun NovelInfoContent(
 	unbookmarkSelected: () -> Unit,
 	hasSelected: Boolean,
 	state: LazyListState,
-	windowSize: WindowSizeClass
+	windowSize: WindowSizeClass,
+	onSelectAll: () -> Unit,
+	onSelectBetween: () -> Unit,
+	onInverseSelection: () -> Unit,
+	showTrueDelete: Boolean,
+	onTrueDelete: () -> Unit,
+	canMigrate: Boolean,
+	onMigrate: () -> Unit,
+	hasCategories: Boolean,
+	onSetCategories: () -> Unit,
+	onDownloadNext: () -> Unit,
+	onDownloadNext5: () -> Unit,
+	onDownloadNext10: () -> Unit,
+	onDownloadCustom: () -> Unit,
+	onDownloadAll: () -> Unit,
+	onDownloadUnread: () -> Unit,
+	onResume: () -> Unit,
+	onBack: () -> Unit
 ) {
 	val splitColumn = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
 
@@ -893,105 +698,142 @@ fun NovelInfoContent(
 
 	val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
 
-	Box(
-		modifier = Modifier
-			.fillMaxSize()
-	) {
-		Row(
-			Modifier
+	Scaffold(
+		topBar = {
+			NovelAppBar(
+				onBack = onBack,
+				hasSelected = hasSelected,
+				onSelectAll = onSelectAll,
+				onSelectBetween = onSelectBetween,
+				onInverseSelection = onInverseSelection,
+				showTrueDelete = showTrueDelete,
+				onTrueDelete = onTrueDelete,
+				canMigrate = canMigrate,
+				onMigrate = onMigrate,
+				onJump = openChapterJump,
+				hasCategories = hasCategories,
+				onSetCategories = onSetCategories,
+				onDownloadNext = onDownloadNext,
+				onDownloadNext5 = onDownloadNext5,
+				onDownloadNext10 = onDownloadNext10,
+				onDownloadCustom = onDownloadCustom,
+				onDownloadUnread = onDownloadUnread,
+				onDownloadAll = onDownloadAll
+			)
+		},
+		floatingActionButton = {
+			ExtendedFloatingActionButton(
+				text = {
+					Text(stringResource(R.string.resume))
+				},
+				icon = {
+					Icon(Icons.Default.PlayArrow, stringResource(R.string.resume))
+				},
+				onClick = onResume
+			)
+		}
+	) { paddingValues ->
+		Box(
+			modifier = Modifier
 				.fillMaxSize()
-				.pullRefresh(pullRefreshState)
+				.padding(paddingValues)
 		) {
-			if (splitColumn) {
-				Box(
-					Modifier
-						.fillMaxWidth(0.5f)
-						.fillMaxHeight()
-						.verticalScroll(rememberScrollState())
-				) {
-					if (novelInfo != null)
-						header(novelInfo)
-				}
-			}
-
-			Box(Modifier.fillMaxSize()) {
-				LazyColumnScrollbar(
-					listState = state,
-					thumbColor = MaterialTheme.colorScheme.primary,
-					thumbSelectedColor = Color.Gray,
-				) {
-					LazyColumn(
-						modifier = Modifier.fillMaxSize(),
-						state = state,
-						contentPadding = PaddingValues(bottom = 256.dp)
+			Row(
+				Modifier
+					.fillMaxSize()
+					.pullRefresh(pullRefreshState)
+			) {
+				if (splitColumn) {
+					Box(
+						Modifier
+							.fillMaxWidth(0.5f)
+							.fillMaxHeight()
+							.verticalScroll(rememberScrollState())
 					) {
-						if (novelInfo != null) {
-							if (!splitColumn)
-								item {
-									header(novelInfo)
-								}
-						} else {
-							item {
-								LinearProgressIndicator(
-									modifier = Modifier.fillMaxWidth()
-								)
-							}
-						}
-
-						stickyHeader {
-							Surface(tonalElevation = 1.dp) {
-								NovelChapterBar(
-									chapters?.size ?: 0,
-									openChapterJump,
-									openFilter
-								)
-							}
-						}
-
-						if (chapters != null)
-							NovelInfoChaptersContent(
-								chapters,
-								chapterContent
-							)
+						if (novelInfo != null)
+							header(novelInfo)
 					}
 				}
 
-				// Do not save progress when there is nothing being displayed
-				if (novelInfo != null && chapters != null) {
-					LaunchedEffect(itemAt) {
-						launch {
-							if (!state.isScrollInProgress)
-								state.scrollToItem(itemAt)
+				Box(Modifier.fillMaxSize()) {
+					LazyColumnScrollbar(
+						listState = state,
+						thumbColor = MaterialTheme.colorScheme.primary,
+						thumbSelectedColor = Color.Gray,
+					) {
+						LazyColumn(
+							modifier = Modifier.fillMaxSize(),
+							state = state,
+							contentPadding = PaddingValues(bottom = 256.dp)
+						) {
+							if (novelInfo != null) {
+								if (!splitColumn)
+									item {
+										header(novelInfo)
+									}
+							} else {
+								item {
+									LinearProgressIndicator(
+										modifier = Modifier.fillMaxWidth()
+									)
+								}
+							}
+
+							stickyHeader {
+								Surface(tonalElevation = 1.dp) {
+									NovelChapterBar(
+										chapters?.size ?: 0,
+										openChapterJump,
+										openFilter
+									)
+								}
+							}
+
+							if (chapters != null)
+								NovelInfoChaptersContent(
+									chapters,
+									chapterContent
+								)
+						}
+					}
+
+					// Do not save progress when there is nothing being displayed
+					if (novelInfo != null && chapters != null) {
+						LaunchedEffect(itemAt) {
+							launch {
+								if (!state.isScrollInProgress)
+									state.scrollToItem(itemAt)
+							}
 						}
 					}
 				}
 			}
-		}
 
-		PullRefreshIndicator(
-			isRefreshing,
-			pullRefreshState,
-			Modifier.align(Alignment.TopCenter)
-		)
-
-		// Chapter Selection Bar
-		if (chapters != null && hasSelected) {
-			ChapterSelectionBar(
-				selectedChaptersState,
-				downloadSelected,
-				deleteSelected,
-				markSelectedAsRead,
-				markSelectedAsUnread,
-				bookmarkSelected,
-				unbookmarkSelected
+			PullRefreshIndicator(
+				isRefreshing,
+				pullRefreshState,
+				Modifier.align(Alignment.TopCenter)
 			)
-		}
 
-		// Loading indicator
-		if (isRefreshing)
-			LinearProgressIndicator(
-				modifier = Modifier.fillMaxWidth()
-			)
+			// Chapter Selection Bar
+			if (chapters != null && hasSelected) {
+				ChapterSelectionBar(
+					selectedChaptersState,
+					downloadSelected,
+					deleteSelected,
+					markSelectedAsRead,
+					markSelectedAsUnread,
+					bookmarkSelected,
+					unbookmarkSelected
+				)
+			}
+
+			// Loading indicator
+			if (isRefreshing)
+				LinearProgressIndicator(
+					modifier = Modifier.fillMaxWidth()
+				)
+		}
 	}
 }
 

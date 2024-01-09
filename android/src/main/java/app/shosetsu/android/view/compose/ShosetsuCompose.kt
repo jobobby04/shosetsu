@@ -1,15 +1,6 @@
 package app.shosetsu.android.view.compose
 
-import android.content.Context
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import com.google.accompanist.themeadapter.material.MdcTheme
-import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
 /*
  * This file is part of shosetsu.
@@ -34,18 +25,15 @@ import com.google.accompanist.themeadapter.material3.Mdc3Theme
  * @since 28 / 06 / 2022
  * @author Doomsdayrs
  */
+@Deprecated(
+	"Replace with ShosetsuTheme",
+	replaceWith = ReplaceWith(
+		"run(content)",
+	)
+)
 @Composable
 fun ShosetsuCompose(
-	context: Context = LocalContext.current,
 	content: @Composable () -> Unit
 ) {
-	MdcTheme(context = context) {
-		Mdc3Theme(context = context) {
-			Surface(
-				modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
-				color = MaterialTheme.colorScheme.background,
-				content = content
-			)
-		}
-	}
+	content()
 }

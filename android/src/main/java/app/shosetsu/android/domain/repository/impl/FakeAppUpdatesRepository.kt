@@ -1,18 +1,9 @@
 package app.shosetsu.android.domain.repository.impl
 
-import app.shosetsu.android.common.EmptyResponseBodyException
-import app.shosetsu.android.common.FileNotFoundException
-import app.shosetsu.android.common.FilePermissionException
-import app.shosetsu.android.common.MissingFeatureException
 import app.shosetsu.android.common.ext.onIO
-import app.shosetsu.android.datasource.local.file.base.IFileCachedAppUpdateDataSource
-import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
-import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import java.io.IOException
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 /*
  * This file is part of shosetsu.
@@ -35,51 +26,25 @@ import java.io.IOException
  * shosetsu
  * 07 / 09 / 2020
  */
-class FakeAppUpdatesRepository(
-	private val iFileAppUpdateDataSource: IFileCachedAppUpdateDataSource,
-	private val iRemoteAppUpdateDataSource: IRemoteAppUpdateDataSource,
-) : IAppUpdatesRepository {
-	private val _appUpdateFlow = MutableStateFlow<AppUpdateEntity?>(null)
+class FakeAppUpdatesRepository : IAppUpdatesRepository {
 
-	override fun loadAppUpdateFlow(): StateFlow<AppUpdateEntity?> =
-		_appUpdateFlow
+	override val appUpdate = MutableSharedFlow<AppUpdateEntity>(1)
 
-	override suspend fun loadRemoteUpdate(): AppUpdateEntity =
-		onIO { loadAppUpdate() }
-
-	override suspend fun loadAppUpdate(): AppUpdateEntity = onIO {
+	override suspend fun fetch(): AppUpdateEntity = onIO {
 		val entity = AppUpdateEntity(
-			"v3.0.0",
+			"v9.9.9",
 			999,
 			9999,
-			"https://github.com/shosetsuorg/shosetsu-preview/releases/download/r1136/shosetsu-r1136.apk",
+			"https://gitlab.com/shosetsuorg/shosetsu-preview/releases/download/r1136/shosetsu-r1136.apk",
 			notes = listOf("This is a fake update")
 		)
 
-		_appUpdateFlow.emit(entity)
+		appUpdate.emit(entity)
 
 		entity
 	}
 
-	override fun canSelfUpdate(): Boolean =
-		true
+	override val canSelfUpdate: Boolean = true
 
-	@Throws(
-		EmptyResponseBodyException::class,
-		HTTPException::class,
-		IOException::class,
-		FilePermissionException::class,
-		FileNotFoundException::class,
-		MissingFeatureException::class
-	)
-	override suspend fun downloadAppUpdate(appUpdateEntity: AppUpdateEntity): String = onIO {
-		if (iRemoteAppUpdateDataSource is IRemoteAppUpdateDataSource.Downloadable)
-			iRemoteAppUpdateDataSource.downloadAppUpdate(appUpdateEntity).let { response ->
-				iFileAppUpdateDataSource.saveAPK(appUpdateEntity, response).also {
-					// Call GC to clean up the chunky objects
-					System.gc()
-				}
-			}
-		else throw MissingFeatureException("self update")
-	}
+	override suspend fun downloadAppUpdate(): String = throw Exception("Stub")
 }

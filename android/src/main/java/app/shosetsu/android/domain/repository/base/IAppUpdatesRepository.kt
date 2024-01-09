@@ -6,7 +6,7 @@ import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.MissingFeatureException
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.net.UnknownHostException
 
@@ -37,10 +37,10 @@ interface IAppUpdatesRepository {
 	/**
 	 * Flow of app updates
 	 */
-	fun loadAppUpdateFlow(): StateFlow<AppUpdateEntity?>
+	val appUpdate: Flow<AppUpdateEntity?>
 
 	/**
-	 * Load an app update if present
+	 * Checks for a new update
 	 */
 	@Throws(
 		FilePermissionException::class,
@@ -48,25 +48,15 @@ interface IAppUpdatesRepository {
 		IOException::class,
 		HTTPException::class
 	)
-	suspend fun loadRemoteUpdate(): AppUpdateEntity?
-
-	/**
-	 * Load an app update if present
-	 */
-	@Throws(
-		FileNotFoundException::class,
-		UnknownHostException::class,
-		FilePermissionException::class
-	)
-	suspend fun loadAppUpdate(): AppUpdateEntity
+	suspend fun fetch(): AppUpdateEntity?
 
 	/**
 	 * Can the app self update itself
 	 */
-	fun canSelfUpdate(): Boolean
+	val canSelfUpdate: Boolean
 
 	/**
-	 * Downloads the app update specified by [appUpdateEntity]
+	 * Downloads the app update specified in [appUpdate]
 	 *
 	 * @return Path of the apk file, this is messy but it must be done so the intent can work
 	 */
@@ -77,6 +67,7 @@ interface IAppUpdatesRepository {
 		MissingFeatureException::class,
 		EmptyResponseBodyException::class,
 		HTTPException::class,
+		NoSuchElementException::class
 	)
-	suspend fun downloadAppUpdate(appUpdateEntity: AppUpdateEntity): String
+	suspend fun downloadAppUpdate(): String
 }

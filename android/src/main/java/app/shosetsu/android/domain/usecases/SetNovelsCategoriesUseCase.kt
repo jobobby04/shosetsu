@@ -28,7 +28,7 @@ class SetNovelsCategoriesUseCase(
 	private val repo: INovelCategoryRepository
 ) {
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(novelIDs: IntArray, categories: IntArray) {
+	suspend operator fun invoke(novelIDs: List<Int>, categories: IntArray) {
 		val entities = categories.filterNot { it == 0 }.distinct().flatMap { categoryID ->
 			novelIDs.distinct().map { novelID ->
 				NovelCategoryEntity(
