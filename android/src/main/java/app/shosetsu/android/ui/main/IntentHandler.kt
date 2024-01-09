@@ -2,11 +2,13 @@ package app.shosetsu.android.ui.main
 
 import android.app.SearchManager
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.util.Consumer
+import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.ACTION_OPEN_APP_UPDATE
 import app.shosetsu.android.common.consts.ACTION_OPEN_CATALOGUE
 import app.shosetsu.android.common.consts.ACTION_OPEN_LIBRARY
@@ -89,7 +91,8 @@ fun IntentHandler(
 			try {
 				handleIntentAction(it, onNavigate, onUpdate)
 			} catch (e: Exception) {
-
+				Toast.makeText(context, R.string.error_intent_handle, Toast.LENGTH_SHORT)
+					.show()
 			}
 		}
 	}

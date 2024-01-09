@@ -705,6 +705,7 @@
     <string name="view_backup_restore_start">Restoring now...</string>
     <string name="view_backup_exporting_start">Exporting now...</string>
     <string name="worker_update_install_missing">No update to install</string>
+    <string name="error_intent_handle">Failed to handle intent</string>
 
 </resources>
 
