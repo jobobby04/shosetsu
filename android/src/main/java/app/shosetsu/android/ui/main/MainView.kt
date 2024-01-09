@@ -73,9 +73,8 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun MainView(
-	viewModel: AMainViewModel = viewModelDi()
-) {
+fun MainView() {
+	val viewModel: AMainViewModel = viewModelDi()
 	val context = LocalContext.current
 
 	val showIntro by viewModel.showIntro.collectAsState()
