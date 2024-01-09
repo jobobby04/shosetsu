@@ -91,7 +91,7 @@ fun MainView(
 	val theme by viewModel.appTheme.collectAsState()
 	val navStyle by viewModel.navigationStyle.collectAsState()
 	val update by viewModel.appUpdate.collectAsState()
-	val updateAction by viewModel.updateAction.collectAsState(null)
+	val updateToOpen by viewModel.openUpdate.collectAsState(null)
 
 	val isMaterial = navStyle == NavigationStyle.MATERIAL
 	val isLegacy = navStyle == NavigationStyle.LEGACY
@@ -234,17 +234,8 @@ fun MainView(
 		)
 	}
 
-	LaunchedEffect(updateAction) {
-		when (val action = updateAction) {
-			AMainViewModel.AppUpdateAction.SelfUpdate -> {
-				// TODO how to notify the user?
-			}
-
-			is AMainViewModel.AppUpdateAction.UserUpdate -> {
-				context.openInBrowser(action.updateURL, action.pkg)
-			}
-
-			null -> {}
-		}
+	LaunchedEffect(updateToOpen) {
+		val userUpdate = updateToOpen ?: return@LaunchedEffect
+		context.openInBrowser(userUpdate.updateURL, userUpdate.pkg)
 	}
 }

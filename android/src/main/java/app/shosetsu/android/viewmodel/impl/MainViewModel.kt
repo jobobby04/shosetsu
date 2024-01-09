@@ -61,7 +61,7 @@ class MainViewModel(
 		loadRequireDoubleBackUseCase()
 	}
 
-	override val updateAction: MutableSharedFlow<AppUpdateAction> = MutableSharedFlow()
+	override val openUpdate: MutableSharedFlow<UserUpdate> = MutableSharedFlow()
 
 	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
 
@@ -86,13 +86,12 @@ class MainViewModel(
 		launchIO {
 			if (appUpdateRepo.canSelfUpdate) {
 				startInstallWorker()
-				updateAction.emit(AppUpdateAction.SelfUpdate)
 			} else {
 				val update = appUpdateRepo.appUpdate.first()
 
 				if (update != null) {
-					updateAction.emit(
-						AppUpdateAction.UserUpdate(
+					openUpdate.emit(
+						UserUpdate(
 							update.archURL(),
 							when (flavor()) {
 								ProductFlavors.PLAY_STORE -> "com.android.vending"

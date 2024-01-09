@@ -56,7 +56,7 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	/**
 	 * Action to take for an update
 	 */
-	abstract val updateAction: Flow<AppUpdateAction>
+	abstract val openUpdate: Flow<UserUpdate>
 
 	/**
 	 * The user requests to update the app
@@ -71,26 +71,15 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 
 	/**
 	 * An action the user is prompted with to handle an update
+	 * The user has to handle the update
+	 *
+	 * @param pkg preferred application to open with
+	 * @param updateURL url to open with
 	 */
-	sealed interface AppUpdateAction {
-
-		/**
-		 * Shosetsu is downloading the update itself
-		 */
-		data object SelfUpdate : AppUpdateAction
-
-		/**
-		 * The user has to handle the update
-		 *
-		 * @param pkg preferred application to open with
-		 * @param updateURL url to open with
-		 */
-		data class UserUpdate(
-			val updateURL: String,
-			val pkg: String?
-		) : AppUpdateAction
-
-	}
+	data class UserUpdate(
+		val updateURL: String,
+		val pkg: String?
+	)
 
 	/**
 	 *
