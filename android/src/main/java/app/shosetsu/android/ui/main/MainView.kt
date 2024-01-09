@@ -11,14 +11,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.IconButton
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -28,15 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -256,45 +248,3 @@ fun MainView(
 		}
 	}
 }
-
-
-@Composable
-fun <T> BottomNavigationBar(
-	destinations: List<T>,
-	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
-	var isVisible by remember { mutableStateOf(true) }
-
-	isVisible = destinations.any { destination ->
-		currentDestination?.destination?.route == destination.route ||
-				currentDestination?.destination?.route == "main"
-	}
-
-	if (isVisible) {
-		NavigationBar {
-			destinations.forEach { destination ->
-				NavigationBarItem(
-					selected =
-					currentDestination?.destination?.route == destination.route,
-					icon = {
-						Icon(
-							painterResource(
-								destination.icon
-							),
-							destination.route
-						)
-					},
-					label = {
-						Text(destination.route)
-					},
-					onClick = {
-						onNavigate(destination)
-					}
-				)
-			}
-		}
-	}
-}
-
-
