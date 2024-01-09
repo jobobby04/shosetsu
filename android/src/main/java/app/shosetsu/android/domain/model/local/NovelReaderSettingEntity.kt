@@ -25,7 +25,7 @@ package app.shosetsu.android.domain.model.local
 data class NovelReaderSettingEntity(
 	val novelID: Int,
 
-	val paragraphIndentSize: Int,
+	var paragraphIndentSize: Int,
 
-	val paragraphSpacingSize: Float,
+	var paragraphSpacingSize: Float,
 )

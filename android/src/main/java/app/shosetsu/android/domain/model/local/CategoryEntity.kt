@@ -23,9 +23,9 @@ package app.shosetsu.android.domain.model.local
  * 08 / 08 / 2022
  */
 data class CategoryEntity(
-	val id: Int = 0,
+	var id: Int? = null,
 
-	val name: String,
+	var name: String,
 
-	val order: Int
+	var order: Int
 )

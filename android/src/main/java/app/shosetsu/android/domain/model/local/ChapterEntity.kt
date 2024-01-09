@@ -28,25 +28,25 @@ import app.shosetsu.android.common.enums.ReadingStatus
  * @param readingPosition The progress through an chapter. Will be interpreted as 0 - 99%
  */
 data class ChapterEntity(
-	val id: Int = 0,
+	var id: Int? = null,
 
-	val url: String,
+	var url: String,
 
 	val novelID: Int,
 
 	val extensionID: Int,
 
-	val title: String,
+	var title: String,
 
-	val releaseDate: String,
+	var releaseDate: String,
 
-	val order: Double,
+	var order: Double,
 
-	val readingPosition: Double = 0.0,
+	var readingPosition: Double = 0.0,
 
-	val readingStatus: ReadingStatus = ReadingStatus.UNREAD,
+	var readingStatus: ReadingStatus = ReadingStatus.UNREAD,
 
-	val bookmarked: Boolean = false,
+	var bookmarked: Boolean = false,
 
-	val isSaved: Boolean = false,
+	var isSaved: Boolean = false,
 )

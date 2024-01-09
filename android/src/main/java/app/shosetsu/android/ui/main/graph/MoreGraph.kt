@@ -91,7 +91,7 @@ fun NavGraphBuilder.moreGraph(
 				openNovel = {
 					if (it != null)
 						navController.navigate(
-							Destination.NOVEL.routeWith(it.id)
+							Destination.NOVEL.routeWith(it.id!!)
 						)
 				}
 			)

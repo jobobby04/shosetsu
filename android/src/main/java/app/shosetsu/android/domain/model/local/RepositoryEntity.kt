@@ -34,6 +34,6 @@ package app.shosetsu.android.domain.model.local
 data class RepositoryEntity(
 	val id: Int,
 	val url: String,
-	val name: String,
-	val isEnabled: Boolean
+	var name: String,
+	var isEnabled: Boolean
 )

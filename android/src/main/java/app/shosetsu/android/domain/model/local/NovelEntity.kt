@@ -29,44 +29,44 @@ import app.shosetsu.lib.Novel
 
 data class NovelEntity(
 	/** ID of this novel */
-	val id: Int = 0,
+	var id: Int? = null,
 
 	/** URL of the novel */
-	val url: String,
+	var url: String,
 
 	/** Source this novel is from */
 	val extensionID: Int,
 
 	/** If this novel is in the user's library */
-	val bookmarked: Boolean = false,
+	var bookmarked: Boolean = false,
 
 	/** Says if the data is loaded or now, if it is not it needs to be loaded */
-	val loaded: Boolean = false,
+	var loaded: Boolean = false,
 
 	/** The title of the novel */
-	val title: String,
+	var title: String,
 
 	/** Image URL of the novel */
-	val imageURL: String = "",
+	var imageURL: String = "",
 
 	/** Description */
-	val description: String = "",
+	var description: String = "",
 
 	/** Language of the novel */
-	val language: String = "",
+	var language: String = "",
 
 	/** Genres this novel matches too */
-	val genres: List<String> = emptyList(),
+	var genres: List<String> = emptyList(),
 
 	/** Authors of this novel */
-	val authors: List<String> = emptyList(),
+	var authors: List<String> = emptyList(),
 
 	/** Artists who helped with the novel illustration */
-	val artists: List<String> = emptyList(),
+	var artists: List<String> = emptyList(),
 
 	/** Tags this novel matches, in case genres were not enough*/
-	val tags: List<String> = emptyList(),
+	var tags: List<String> = emptyList(),
 
 	/** The publishing status of this novel */
-	val status: Novel.Status = Novel.Status.UNKNOWN,
+	var status: Novel.Status = Novel.Status.UNKNOWN,
 )

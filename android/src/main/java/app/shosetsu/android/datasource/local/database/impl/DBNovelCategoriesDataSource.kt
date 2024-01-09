@@ -56,6 +56,7 @@ class DBNovelCategoriesDataSource(
 
 	fun NovelCategoryEntity.toDB() =
 		DBNovelCategoryEntity(
+			id = null,
 			novelID = novelID,
 			categoryID = categoryID
 		)

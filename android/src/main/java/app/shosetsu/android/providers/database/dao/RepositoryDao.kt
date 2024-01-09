@@ -108,6 +108,7 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 
 		createIfNotExist(
 			DBRepositoryEntity(
+				null,
 				url = repoMain.toString(),
 				name = "Main",
 				isEnabled = true
@@ -118,6 +119,7 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 		if (flavor() != ProductFlavors.PLAY_STORE)
 			createIfNotExist(
 				DBRepositoryEntity(
+					null,
 					url = repoUniv.toString(),
 					//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
 					name = "Universe",

@@ -189,7 +189,6 @@ class DownloadWorker(
 					DownloadStatus.DOWNLOADING -> {
 						setProgress(1, 0, true)
 					}
-
 					else -> {
 						removeProgress()
 					}
@@ -241,11 +240,8 @@ class DownloadWorker(
 				 */
 				if (activeExt(extID) <= getDownloadThreadsPerExtension()) {
 					// There is a connection available, starting this task
-					downloadsRepo.update(
-						downloadEntity.copy(
-							status = DownloadStatus.DOWNLOADING
-						)
-					)
+					downloadEntity.status = DownloadStatus.DOWNLOADING
+					downloadsRepo.update(downloadEntity)
 					// Break out of the while
 					break
 				} else {
@@ -255,11 +251,9 @@ class DownloadWorker(
 					 * for others to not overload the site.
 					 */
 					if (downloadEntity.status == DownloadStatus.PENDING) {
-						val newEntity = downloadEntity.copy(
-							status = DownloadStatus.WAITING
-						)
-						downloadsRepo.update(newEntity)
-						notify(newEntity)
+						downloadEntity.status = DownloadStatus.WAITING
+						downloadsRepo.update(downloadEntity)
+						notify(downloadEntity)
 					}
 					// Continues the loop, letting the check repeat
 				}

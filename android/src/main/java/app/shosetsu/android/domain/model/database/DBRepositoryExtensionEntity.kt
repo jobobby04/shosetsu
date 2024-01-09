@@ -62,13 +62,13 @@ data class DBRepositoryExtensionEntity(
 	val id: Int,
 
 	/** Name of the extension, can be changed */
-	val name: String,
+	var name: String,
 
 	/** FileName of the extension */
 	val fileName: String,
 
 	/** Image URL of the extension*/
-	val imageURL: String,
+	var imageURL: String,
 
 	/** The language of the extension */
 	val lang: String,
@@ -76,7 +76,7 @@ data class DBRepositoryExtensionEntity(
 	val version: Version,
 
 	/** MD5 to check against */
-	val md5: String,
+	var md5: String,
 
 	val type: ExtensionType
 ) : Convertible<GenericExtensionEntity> {

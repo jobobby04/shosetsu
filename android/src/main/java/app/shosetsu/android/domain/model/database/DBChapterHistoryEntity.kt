@@ -52,7 +52,7 @@ import androidx.room.PrimaryKey
 )
 data class DBChapterHistoryEntity(
 	@PrimaryKey(autoGenerate = true)
-	val id: Int = 0,
+	val id: Int?,
 	val novelId: Int,
 	val chapterId: Int,
 	val startedReadingAt: Long,

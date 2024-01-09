@@ -42,13 +42,7 @@ class DBExtRepoDataSource(
 		repositoryDao.loadRepositoryFromID(repoID)?.convertTo()
 
 	override suspend fun addRepository(url: String, name: String): Long =
-		(repositoryDao.insertAbort(
-			DBRepositoryEntity(
-				url = url,
-				name = name,
-				isEnabled = true
-			)
-		))
+		(repositoryDao.insertAbort(DBRepositoryEntity(null, url, name, true)))
 
 	override suspend fun remove(entity: RepositoryEntity): Unit =
 		(repositoryDao.delete(entity.toDB()))
