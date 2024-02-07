@@ -18,6 +18,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -339,6 +340,15 @@ fun CatalogContent(
 						cardType,
 						onSetCardType
 					)
+
+					IconButton(
+						onClick = openWebView
+					) {
+						Icon(
+							painterResource(R.drawable.open_in_browser),
+							stringResource(R.string.action_open_in_webview)
+						)
+					}
 				}
 			)
 		},
