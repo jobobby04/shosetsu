@@ -5,7 +5,32 @@ import android.graphics.Color
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
+import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
+import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
+import app.shosetsu.android.common.SettingKey.ReaderEnableFullscreen
+import app.shosetsu.android.common.SettingKey.ReaderHorizontalPageSwap
+import app.shosetsu.android.common.SettingKey.ReaderHtmlCss
+import app.shosetsu.android.common.SettingKey.ReaderIndentSize
+import app.shosetsu.android.common.SettingKey.ReaderIsFirstFocus
+import app.shosetsu.android.common.SettingKey.ReaderIsInvertedSwipe
+import app.shosetsu.android.common.SettingKey.ReaderIsTapToScroll
+import app.shosetsu.android.common.SettingKey.ReaderKeepScreenOn
+import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
+import app.shosetsu.android.common.SettingKey.ReaderMatchFullscreenToFocus
+import app.shosetsu.android.common.SettingKey.ReaderParagraphSpacing
+import app.shosetsu.android.common.SettingKey.ReaderPitch
+import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
+import app.shosetsu.android.common.SettingKey.ReaderSpeed
+import app.shosetsu.android.common.SettingKey.ReaderStringToHtml
+import app.shosetsu.android.common.SettingKey.ReaderTableHack
+import app.shosetsu.android.common.SettingKey.ReaderTextSize
+import app.shosetsu.android.common.SettingKey.ReaderTheme
+import app.shosetsu.android.common.SettingKey.ReaderTrackLongReading
+import app.shosetsu.android.common.SettingKey.ReaderUserThemes
+import app.shosetsu.android.common.SettingKey.ReaderVoice
+import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
+import app.shosetsu.android.common.SettingKey.ReadingMarkingType
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.common.enums.MarkingType.ONSCROLL
@@ -26,7 +51,11 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.RecordChapterIsReadUseCase
 import app.shosetsu.android.domain.usecases.RecordChapterIsReadingUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
-import app.shosetsu.android.domain.usecases.get.*
+import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
+import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
+import app.shosetsu.android.domain.usecases.get.GetLastReadChapterUseCase
+import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
+import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -40,7 +69,25 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
 import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -522,7 +569,7 @@ class ChapterReaderViewModel(
 	}
 
 	override fun setNovelID(novelID: Int) {
-		//logV("novelID=$novelID")
+		logV("novelID=$novelID")
 		when {
 			novelIDLive.value == -1 -> {
 				//logD("Setting NovelID")
