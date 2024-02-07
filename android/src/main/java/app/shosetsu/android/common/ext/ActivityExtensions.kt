@@ -15,7 +15,6 @@ import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.reader.ChapterReader
 import app.shosetsu.android.ui.webView.WebViewApp
-import app.shosetsu.android.view.uimodels.model.ChapterUI
 import java.io.IOException
 
 /*
@@ -90,9 +89,7 @@ fun Activity.openShare(url: String, title: String) {
  * @param cUI novel chapter
  */
 
-fun Context.openChapter(cUI: ChapterUI): Unit = openChapter(cUI.id, cUI.novelID)
-
-fun Context.openChapter(chapterID: Int, novelID: Int) {
+fun Context.openChapter(novelID: Int, chapterID: Int) {
 	startActivity(intent(this, ChapterReader::class.java) {
 		bundleOf(
 			BUNDLE_CHAPTER_ID to chapterID,
