@@ -280,7 +280,7 @@ dependencies {
 	implementation("io.coil-kt:coil-compose:2.6.0")
 
 	// Time control
-	implementation("joda-time:joda-time:2.12.5")
+	implementation("joda-time:joda-time:2.12.7")
 
 	// Cloud flare calculator
 	//implementation("com.zhkrb.cloudflare-scrape-android:scrape-webview:0.0.3")
