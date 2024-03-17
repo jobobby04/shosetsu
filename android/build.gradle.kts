@@ -407,7 +407,7 @@ dependencies {
 	implementation("com.chargemap.compose:numberpicker:1.0.3")
 
 	// QR Code
-	implementation("io.github.g0dkar:qrcode-kotlin-android:3.3.0")
+	implementation("io.github.g0dkar:qrcode-kotlin-android:4.1.1")
 
 	// - paging
 	val pagingVersion = "3.2.1"
