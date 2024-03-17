@@ -1,7 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.R
@@ -49,7 +48,6 @@ import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
-import io.github.g0dkar.qrcode.QRCode
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -72,6 +70,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import qrcode.QRCode
 import kotlin.collections.set
 
 /*
@@ -228,11 +227,7 @@ class NovelViewModel(
 									).toURL()
 									val code = QRCode(url)
 
-									val bytes = code.render(
-										brightColor = Color.WHITE,
-										darkColor = Color.BLACK,
-										marginColor = Color.WHITE
-									).getBytes()
+									val bytes = code.render().getBytes()
 
 									val bitmap = BitmapFactory
 										.decodeByteArray(bytes, 0, bytes.size)
