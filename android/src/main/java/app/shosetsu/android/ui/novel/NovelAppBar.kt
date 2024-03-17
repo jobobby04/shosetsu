@@ -59,7 +59,8 @@ fun NovelAppBar(
 	onDownloadNext10: () -> Unit,
 	onDownloadCustom: () -> Unit,
 	onDownloadUnread: () -> Unit,
-	onDownloadAll: () -> Unit
+	onDownloadAll: () -> Unit,
+	onOpenShareMenu: () -> Unit
 ) {
 
 	val behavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -84,6 +85,7 @@ fun NovelAppBar(
 					)
 				}
 			} else {
+				NovelShareButton(onOpenShareMenu)
 				NovelDownloadButton(
 					onDownloadNext = onDownloadNext,
 					onDownloadNext5 = onDownloadNext5,

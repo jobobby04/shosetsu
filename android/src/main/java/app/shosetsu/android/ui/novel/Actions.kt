@@ -3,6 +3,7 @@ package app.shosetsu.android.ui.novel
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -191,6 +192,23 @@ fun NovelMoreButton(
 					},
 					onClick = onSetCategories
 				)
+		}
+	}
+}
+
+
+@Composable
+fun NovelShareButton(
+	onShare: () -> Unit,
+) {
+	Box {
+		IconButton(
+			onClick = onShare
+		) {
+			Icon(
+				Icons.Default.Share,
+				stringResource(R.string.share)
+			)
 		}
 	}
 }

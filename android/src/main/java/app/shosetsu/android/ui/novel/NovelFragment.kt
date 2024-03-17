@@ -329,20 +329,21 @@ fun NovelInfoView(
 		onInverseSelection = viewModel::invertSelection,
 		showTrueDelete = showTrueDelete,
 		onTrueDelete = viewModel::trueDeleteSelected,
+		canMigrate = novelInfo?.bookmarked == true,
 		onMigrate = {
 			onMigrate(novelId)
 		},
-		canMigrate = novelInfo?.bookmarked == true,
 		hasCategories = categories.isNotEmpty(),
 		onSetCategories = viewModel::showCategoriesDialog,
-		onDownloadAll = viewModel::downloadAllChapters,
-		onDownloadUnread = viewModel::downloadAllUnreadChapters,
 		onDownloadNext = viewModel::downloadNextChapter,
 		onDownloadNext5 = viewModel::downloadNext5Chapters,
 		onDownloadNext10 = viewModel::downloadNext10Chapters,
 		onDownloadCustom = viewModel::showDownloadDialog,
+		onDownloadAll = viewModel::downloadAllChapters,
+		onDownloadUnread = viewModel::downloadAllUnreadChapters,
 		onResume = viewModel::openLastRead,
-		onBack = onBack
+		onBack = onBack,
+		onOpenShareMenu = viewModel::openShareMenu
 	)
 
 	if (isCategoriesDialogVisible)
@@ -633,7 +634,8 @@ fun PreviewNovelInfoContent() {
 			onDownloadAll = {},
 			onDownloadUnread = {},
 			onResume = {},
-			onBack = {}
+			onBack = {},
+			onOpenShareMenu = {}
 		)
 	}
 }
@@ -679,7 +681,8 @@ fun NovelInfoContent(
 	onDownloadAll: () -> Unit,
 	onDownloadUnread: () -> Unit,
 	onResume: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
+	onOpenShareMenu: () -> Unit
 ) {
 	val splitColumn = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
 
@@ -718,7 +721,8 @@ fun NovelInfoContent(
 				onDownloadNext10 = onDownloadNext10,
 				onDownloadCustom = onDownloadCustom,
 				onDownloadUnread = onDownloadUnread,
-				onDownloadAll = onDownloadAll
+				onDownloadAll = onDownloadAll,
+				onOpenShareMenu = onOpenShareMenu
 			)
 		},
 		floatingActionButton = {
