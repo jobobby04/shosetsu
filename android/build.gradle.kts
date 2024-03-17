@@ -292,7 +292,7 @@ dependencies {
 	implementation(kotlin("stdlib-jdk8"))
 	//implementation(kotlin("reflect"))
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
 
