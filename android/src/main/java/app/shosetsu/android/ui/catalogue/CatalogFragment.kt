@@ -4,12 +4,14 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -284,7 +286,7 @@ fun CatalogueView(
 /**
  * Content of [CatalogueView]
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CatalogContent(
 	extensionName: String,
@@ -308,48 +310,18 @@ fun CatalogContent(
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
 		floatingActionButton = {
-			// TODO Collapsible
-			AnimatedVisibility(hasFilters) {
-				ExtendedFloatingActionButton(
-					text = {
-						Text(stringResource(R.string.filter))
-					},
-					icon = {
-						Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
-					},
-					onClick = onShowFilterMenu
-				)
-			}
+			CatalogFloatingActionButton(hasFilters, onShowFilterMenu)
 		},
 		topBar = {
-			TopAppBar(
-				title = {
-					Text(extensionName)
-				},
-				navigationIcon = {
-					NavigateBackButton(onBack)
-				},
-				actions = {
-					AnimatedVisibility(hasSearch) {
-						SearchAction(
-							query,
-							onSetQuery
-						)
-					}
-					ViewTypeButton(
-						cardType,
-						onSetCardType
-					)
-
-					IconButton(
-						onClick = openWebView
-					) {
-						Icon(
-							painterResource(R.drawable.open_in_browser),
-							stringResource(R.string.action_open_in_webview)
-						)
-					}
-				}
+			CatalogTopBar(
+				extensionName,
+				onBack,
+				hasSearch,
+				query,
+				onSetQuery,
+				cardType,
+				onSetCardType,
+				openWebView
 			)
 		},
 		snackbarHost = {
@@ -361,122 +333,267 @@ fun CatalogContent(
 			onRefresh = { items.refresh() }
 		)
 
-		Box(
-			Modifier
-				.pullRefresh(pullRefreshState)
-				.padding(padding)
-		) {
-			val w = LocalConfiguration.current.screenWidthDp
-			val o = LocalConfiguration.current.orientation
+		Column {
+			CatalogRefreshBar(items)
 
-			val size =
-				(w / when (o) {
-					Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-					else -> columnsInV
-				}).dp - 8.dp
-
-			val state = rememberLazyGridState()
-			LazyVerticalGrid(
-				modifier = Modifier.fillMaxSize(),
-				columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
-				contentPadding = PaddingValues(
-					bottom = 200.dp,
-					start = 8.dp,
-					end = 8.dp,
-					top = 4.dp
-				),
-				state = state,
-				horizontalArrangement = Arrangement.spacedBy(4.dp),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				itemsIndexed(
+			val errorState = items.loadState.refresh
+			if (errorState is LoadState.Error) {
+				CatalogErrorContent(
+					errorState,
 					items,
-					key = { index, item -> item.hashCode() + index }
-				) { _, item ->
-					when (cardType) {
-						NORMAL -> {
-							if (item != null)
-								NovelCardNormalContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
-
-						COMPRESSED -> {
-							if (item != null)
-								NovelCardCompressedContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
-
-						COZY -> {
-							if (item != null)
-								NovelCardCozyContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
-					}
-				}
-				if (items.loadState.append == LoadState.Loading) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-					}
-				}
-				if (items.loadState.refresh.endOfPaginationReached &&
-					items.loadState.append.endOfPaginationReached
+					openWebView,
+					clearCookies
+				)
+			} else {
+				Box(
+					Modifier
+						.pullRefresh(pullRefreshState)
+						.padding(padding)
 				) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						CatalogContentNoMore()
-					}
-				}
-				val errorState = items.loadState.refresh
-				if (errorState is LoadState.Error) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						ErrorContent(
-							errorState.error.message ?: "Unknown",
-							actions = arrayOf(
-								ErrorAction(R.string.retry) {
-									items.refresh()
-								},
-								ErrorAction(R.string.action_open_in_webview) {
-									openWebView()
-								},
-								ErrorAction(R.string.settings_advanced_clear_cookies_title) {
-									clearCookies()
-								},
-							),
-							stackTrace = errorState.error.stackTraceToString()
-						)
-					}
+					CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
 				}
 			}
 		}
+	}
+}
 
-		if (items.loadState.refresh == LoadState.Loading)
+/**
+ * The refresh bar on top of the content
+ */
+@Composable
+fun CatalogRefreshBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	AnimatedVisibility(items.loadState.refresh == LoadState.Loading) {
+		LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+	}
+}
+
+/**
+ * The filter button
+ */
+@Composable
+fun CatalogFloatingActionButton(hasFilters: Boolean, onShowFilterMenu: () -> Unit) {
+	// TODO Collapsible
+	AnimatedVisibility(hasFilters) {
+		ExtendedFloatingActionButton(
+			text = {
+				Text(stringResource(R.string.filter))
+			},
+			icon = {
+				Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+			},
+			onClick = onShowFilterMenu
+		)
+	}
+}
+
+/**
+ * Catalogs top bar
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CatalogTopBar(
+	extensionName: String,
+	onBack: () -> Unit,
+	hasSearch: Boolean,
+	query: String,
+	onSetQuery: (String) -> Unit,
+	cardType: NovelCardType,
+	onSetCardType: (NovelCardType) -> Unit,
+	openWebView: () -> Unit
+) {
+	TopAppBar(
+		title = {
+			Text(extensionName)
+		},
+		navigationIcon = {
+			NavigateBackButton(onBack)
+		},
+		actions = {
+			AnimatedVisibility(hasSearch) {
+				SearchAction(
+					query,
+					onSetQuery
+				)
+			}
+			ViewTypeButton(
+				cardType,
+				onSetCardType
+			)
+
+			IconButton(
+				onClick = openWebView
+			) {
+				Icon(
+					painterResource(R.drawable.open_in_browser),
+					stringResource(R.string.action_open_in_webview)
+				)
+			}
+		}
+	)
+}
+
+/**
+ * Main content, the grid of items
+ */
+@Composable
+fun CatalogGrid(
+	items: LazyPagingItems<ACatalogNovelUI>,
+	columnsInH: Int,
+	columnsInV: Int,
+	cardType: NovelCardType,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	val w = LocalConfiguration.current.screenWidthDp
+	val o = LocalConfiguration.current.orientation
+
+	val size =
+		(w / when (o) {
+			Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+			else -> columnsInV
+		}).dp - 8.dp
+
+	val state = rememberLazyGridState()
+
+	LazyVerticalGrid(
+		modifier = Modifier.fillMaxSize(),
+		columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
+		contentPadding = PaddingValues(
+			bottom = 200.dp,
+			start = 8.dp,
+			end = 8.dp,
+			top = 4.dp
+		),
+		state = state,
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		verticalArrangement = Arrangement.spacedBy(4.dp)
+	) {
+		itemsIndexed(
+			items,
+			key = { index, item -> item.hashCode() + index }
+		) { _, item ->
+			when (cardType) {
+				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
+				COMPRESSED -> CatalogCompressedCard(item, onClick, onLongClick)
+				COZY -> CatalogCozyCard(item, onClick, onLongClick)
+			}
+		}
+		appendBar(items)
+		noMoreBar(items)
+	}
+}
+
+/**
+ * [NovelCardNormalContent] adapted for [CatalogueView]
+ */
+@Composable
+fun CatalogNormalCard(
+	item: ACatalogNovelUI?,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	if (item != null)
+		NovelCardNormalContent(
+			item.title,
+			item.imageURL,
+			onClick = {
+				onClick(item)
+			},
+			onLongClick = {
+				onLongClick(item)
+			},
+			isBookmarked = item.bookmarked
+		)
+}
+
+/**
+ * [NovelCardCompressedContent] adapted for [CatalogueView]
+ */
+@Composable
+fun CatalogCompressedCard(
+	item: ACatalogNovelUI?,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	if (item != null)
+		NovelCardCompressedContent(
+			item.title,
+			item.imageURL,
+			onClick = {
+				onClick(item)
+			},
+			onLongClick = {
+				onLongClick(item)
+			},
+			isBookmarked = item.bookmarked
+		)
+}
+
+/**
+ * [NovelCardCozyContent] adapted for [CatalogueView]
+ */
+@Composable
+fun CatalogCozyCard(
+	item: ACatalogNovelUI?,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	if (item != null)
+		NovelCardCozyContent(
+			item.title,
+			item.imageURL,
+			onClick = {
+				onClick(item)
+			},
+			onLongClick = {
+				onLongClick(item)
+			},
+			isBookmarked = item.bookmarked
+		)
+}
+
+/**
+ * Catalogs error view
+ */
+@Composable
+fun CatalogErrorContent(
+	errorState: LoadState.Error,
+	items: LazyPagingItems<ACatalogNovelUI>,
+	openWebView: () -> Unit,
+	clearCookies: () -> Unit
+) {
+	ErrorContent(
+		errorState.error.message ?: "Unknown",
+		actions = arrayOf(
+			ErrorAction(R.string.retry, items::refresh),
+			ErrorAction(R.string.action_open_in_webview, openWebView),
+			ErrorAction(R.string.settings_advanced_clear_cookies_title, clearCookies),
+		),
+		stackTrace = errorState.error.stackTraceToString()
+	)
+}
+
+/**
+ * Loading bar appended to the bottom of [CatalogGrid]
+ */
+fun LazyGridScope.appendBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	if (items.loadState.append == LoadState.Loading) {
+		item(span = { GridItemSpan(maxLineSpan) }) {
 			LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+		}
+	}
+}
+
+/**
+ * No more message appended to the bottom of [CatalogGrid]
+ */
+fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	if (items.loadState.refresh.endOfPaginationReached ||
+		items.loadState.append.endOfPaginationReached
+	) {
+		item(span = { GridItemSpan(maxLineSpan) }) {
+			CatalogContentNoMore()
+		}
 	}
 }
 
