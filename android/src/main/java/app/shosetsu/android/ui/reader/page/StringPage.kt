@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ScrollStateBar
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import kotlinx.coroutines.launch
 
 /*
@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 @Preview
 @Composable
 fun PreviewStringPageContent() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		StringPageContent(
 			content = "la\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\nla\n",
 			progress = 0.0,

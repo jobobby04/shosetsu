@@ -45,8 +45,8 @@ import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
 import org.acra.util.Installation
 
@@ -107,7 +107,7 @@ fun AboutView(
 	fun openPrivacy() =
 		uriHandler.openUri(URL_PRIVACY)
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		AboutContent(
 			currentVersion = BuildConfig.VERSION_NAME,
 			onCheckForAppUpdate = viewModel::appUpdateCheck,
@@ -132,7 +132,7 @@ fun AboutView(
 @Preview
 @Composable
 fun PreviewAboutContent() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		AboutContent(
 			currentVersion = BuildConfig.VERSION_NAME,
 			onCheckForAppUpdate = {},

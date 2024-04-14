@@ -82,11 +82,11 @@ import app.shosetsu.android.ui.library.DeselectAllButton
 import app.shosetsu.android.ui.library.InverseSelectionButton
 import app.shosetsu.android.ui.library.SelectAllButton
 import app.shosetsu.android.ui.library.SelectBetweenButton
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SelectableBox
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDownloadsState
@@ -105,7 +105,7 @@ import kotlinx.collections.immutable.ImmutableList
 fun DownloadsView(
 	onBack: () -> Unit
 ) {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val viewModel: ADownloadsViewModel = viewModelDi()
 
 		val items by viewModel.liveData.collectAsState()
@@ -452,7 +452,7 @@ fun DownloadsMoreOption(
 @Preview
 @Composable
 fun PreviewDownloadContent() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		DownloadContent(
 			DownloadUI(
 				0,

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /*
  * This file is part of shosetsu.
@@ -54,7 +54,7 @@ fun ButtonSettingContent(
 @Preview
 @Composable
 fun PreviewButtonSettingContent() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		ButtonSettingContent(
 			"This is a button",
 			"Press me now now now now now",

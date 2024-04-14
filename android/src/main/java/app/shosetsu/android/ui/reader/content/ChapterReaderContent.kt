@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 @Preview
 @Composable
 fun PreviewChapterReaderContent() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		ChapterReaderContent(
 			isFirstFocusProvider = { false },
 			onFirstFocus = {},

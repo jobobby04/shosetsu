@@ -10,12 +10,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 @Preview
 @Composable
 fun PreviewGenericBottomSetting() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		GenericBottomSettingLayout(
 			"Test",
 			"Description"

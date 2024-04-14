@@ -30,9 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardNormalContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.uimodels.model.AnalyticsNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
 
@@ -87,7 +87,7 @@ fun AnalyticsView(
 	val topGenres by viewModel.topGenres.collectAsState(emptyList())
 	val topExtensions by viewModel.topExtensions.collectAsState(emptyList())
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		AnalyticsContent(
 			days,
 			hours,

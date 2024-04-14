@@ -43,8 +43,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.uimodels.model.MigrationExtensionUI
 import app.shosetsu.android.view.uimodels.model.MigrationNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AMigrationViewModel
@@ -89,7 +89,7 @@ fun MigrationView(
 		viewModel.setNovels(novelIds)
 	}
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		MigrationContent(viewModel)
 	}
 }
@@ -188,7 +188,7 @@ fun PreviewMigrationExtensionItemContent() {
 			)
 		)
 	}
-	ShosetsuCompose {
+	ShosetsuTheme {
 		Box(modifier = Modifier.height(200.dp)) {
 			MigrationExtensionItemContent(item = item) {
 				println("Test")
@@ -278,7 +278,7 @@ fun PreviewMigrationNovelItemRowContent() {
 			)
 		)
 	}
-	ShosetsuCompose {
+	ShosetsuTheme {
 		Row(
 			modifier = Modifier
 				.height(200.dp)
@@ -308,7 +308,7 @@ fun PreviewMigrationNovelItemContent() {
 			)
 		)
 	}
-	ShosetsuCompose {
+	ShosetsuTheme {
 		Box(modifier = Modifier.height(200.dp)) {
 			MigrationNovelItemContent(item = item) {
 				println("Test")

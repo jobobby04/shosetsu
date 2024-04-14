@@ -56,6 +56,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.ui.library.ViewTypeButton
 import app.shosetsu.android.ui.novel.CategoriesDialog
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
@@ -63,7 +64,6 @@ import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.itemsIndexed
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
@@ -107,7 +107,7 @@ fun CatalogueView(
 	onOpenNovel: (novelId: Int) -> Unit,
 	onBack: () -> Unit
 ) {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val viewModel: ACatalogViewModel = viewModelDi()
 
 		LaunchedEffect(extensionId) {
@@ -604,7 +604,7 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
 @Preview
 @Composable
 fun PreviewCatalogContentNoMore() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		CatalogContentNoMore()
 	}
 }

@@ -86,12 +86,12 @@ import app.shosetsu.android.common.consts.BROWSE_HELP_URL
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
@@ -120,7 +120,7 @@ fun BrowseView(
 ) {
 	val viewModel: ABrowseViewModel = viewModelDi()
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val query by viewModel.searchTermLive.collectAsState()
 		val entities by viewModel.liveData.collectAsState()
 		val isOnline by viewModel.isOnline.collectAsState(false)

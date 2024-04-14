@@ -40,9 +40,9 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
@@ -91,7 +91,7 @@ fun ConfigureExtensionView(
 		viewModel.setExtensionID(extensionId)
 	}
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		ConfigureExtensionContent(
 			viewModel,
 			onExit

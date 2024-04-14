@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 @Preview
 @Composable
-fun CatalogFilterMenuPreview() = ShosetsuCompose {
+fun CatalogFilterMenuPreview() = ShosetsuTheme {
 	CatalogFilterMenu(
 		listOf(
 			Filter.Header("This is a header"),
@@ -355,7 +355,7 @@ fun CatalogFilterMenuFilterListContent(
 @Preview
 @Composable
 fun PreviewCatalogFilterMenuTextContent() =
-	ShosetsuCompose {
+	ShosetsuTheme {
 		CatalogFilterMenuTextContent(
 			filterHolder = StableHolder(Filter.Text(0, "This is a text input")),
 			{ MutableStateFlow("") },
@@ -389,7 +389,7 @@ fun CatalogFilterMenuTextContent(
 
 @Preview
 @Composable
-fun PreviewCatalogFilterMenuSwitchContent() = ShosetsuCompose {
+fun PreviewCatalogFilterMenuSwitchContent() = ShosetsuTheme {
 	CatalogFilterMenuSwitchContent(
 		filterHolder = StableHolder(Filter.Switch(0, "Switch")),
 		{ MutableStateFlow(false) },
@@ -426,7 +426,7 @@ fun CatalogFilterMenuSwitchContent(
 
 @Preview
 @Composable
-fun PreviewCatalogFilterMenuCheckboxContent() = ShosetsuCompose {
+fun PreviewCatalogFilterMenuCheckboxContent() = ShosetsuTheme {
 	CatalogFilterMenuCheckboxContent(filterHolder = StableHolder(Filter.Checkbox(0, "Checkbox")),
 		{ MutableStateFlow(false) },
 		{ _, _ -> })
@@ -461,7 +461,7 @@ fun CatalogFilterMenuCheckboxContent(
 
 @Preview
 @Composable
-fun PreviewCatalogFilterMenuTriStateContent() = ShosetsuCompose {
+fun PreviewCatalogFilterMenuTriStateContent() = ShosetsuTheme {
 	CatalogFilterMenuTriStateContent(filterHolder = StableHolder(Filter.TriState(0, "Tristate")),
 		{ MutableStateFlow(1) },
 		{ _, _ -> })
@@ -513,7 +513,7 @@ fun CatalogFilterMenuTriStateContent(
 
 @Preview
 @Composable
-fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuCompose {
+fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuTheme {
 	CatalogFilterMenuDropDownContent(
 		filterHolder = StableHolder(Filter.Dropdown(0, "Dropdown", listOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
@@ -586,7 +586,7 @@ fun CatalogFilterMenuDropDownContent(
 
 @Preview
 @Composable
-fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuCompose {
+fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuTheme {
 	CatalogFilterMenuRadioGroupContent(
 		filterHolder = StableHolder(Filter.RadioGroup(0, "Dropdown", listOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },

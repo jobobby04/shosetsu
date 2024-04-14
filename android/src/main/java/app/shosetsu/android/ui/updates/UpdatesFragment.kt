@@ -62,10 +62,10 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -106,7 +106,7 @@ fun UpdatesView(
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
 	drawerIcon: @Composable () -> Unit,
 ) {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val viewModel = viewModelDi<AUpdatesViewModel>()
 		val items by viewModel.liveData.collectAsState()
 		val error by viewModel.error.collectAsState(null)

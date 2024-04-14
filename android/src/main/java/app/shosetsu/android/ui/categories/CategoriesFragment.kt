@@ -61,9 +61,9 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel.CategoryChangeState
@@ -76,7 +76,7 @@ import kotlinx.collections.immutable.ImmutableList
 fun CategoriesView(
 	onBack: () -> Unit,
 ) {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val viewModel: ACategoriesViewModel = viewModelDi()
 
 		val items by viewModel.liveData.collectAsState()

@@ -36,12 +36,12 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SHARE_HELP_URL
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.ShosetsuCompose
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
 import app.shosetsu.lib.share.ExtensionLink
@@ -93,7 +93,7 @@ fun AddShareView(
 			viewModel.setURL(shareURL)
 	}
 
-	ShosetsuCompose {
+	ShosetsuTheme {
 		val url by viewModel.url.collectAsState()
 		val showURLInput by viewModel.showURLInput.collectAsState()
 		val isProcessing by viewModel.isProcessing.collectAsState()
