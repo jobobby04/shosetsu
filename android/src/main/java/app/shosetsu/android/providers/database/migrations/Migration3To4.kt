@@ -29,16 +29,16 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 object Migration3To4 : Migration(3, 4) {
 	@Throws(SQLException::class)
-	override fun migrate(database: SupportSQLiteDatabase) {
+	override fun migrate(db: SupportSQLiteDatabase) {
 		// Migrate extensions
 		run {
 			val tableName = "extensions"
 
 			// Create new table
-			database.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER NOT NULL, `repoID` INTEGER NOT NULL, `name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `imageURL` TEXT, `lang` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `installed` INTEGER NOT NULL, `installedVersion` TEXT, `repositoryVersion` TEXT NOT NULL, `chapterType` INTEGER NOT NULL, `md5` TEXT NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER NOT NULL, `repoID` INTEGER NOT NULL, `name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `imageURL` TEXT, `lang` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `installed` INTEGER NOT NULL, `installedVersion` TEXT, `repositoryVersion` TEXT NOT NULL, `chapterType` INTEGER NOT NULL, `md5` TEXT NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
 
 			// Migrate
-			database.execSQL(
+			db.execSQL(
 				"""
 INSERT INTO `${tableName}_new` 
 SELECT 
@@ -60,13 +60,13 @@ FROM `$tableName`;
 			)
 
 			// Drop
-			database.execSQL("DROP TABLE $tableName")
+			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			database.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
 
 			// Create indexes
-			database.execSQL("CREATE INDEX IF NOT EXISTS `index_extensions_repoID` ON `${tableName}` (`repoID`)")
+			db.execSQL("CREATE INDEX IF NOT EXISTS `index_extensions_repoID` ON `${tableName}` (`repoID`)")
 
 		}
 
@@ -75,19 +75,19 @@ FROM `$tableName`;
 			val tableName = "libs"
 
 			// Create new table
-			database.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`scriptName` TEXT NOT NULL, `version` TEXT NOT NULL, `repoID` INTEGER NOT NULL, PRIMARY KEY(`scriptName`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`scriptName` TEXT NOT NULL, `version` TEXT NOT NULL, `repoID` INTEGER NOT NULL, PRIMARY KEY(`scriptName`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
 
 			// Migrate
-			database.execSQL("INSERT INTO `${tableName}_new` SELECT * FROM `$tableName`")
+			db.execSQL("INSERT INTO `${tableName}_new` SELECT * FROM `$tableName`")
 
 			// Drop
-			database.execSQL("DROP TABLE $tableName")
+			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			database.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
 
 			// Create indexes
-			database.execSQL("CREATE INDEX IF NOT EXISTS `index_libs_repoID` ON `${tableName}` (`repoID`)")
+			db.execSQL("CREATE INDEX IF NOT EXISTS `index_libs_repoID` ON `${tableName}` (`repoID`)")
 		}
 	}
 }
