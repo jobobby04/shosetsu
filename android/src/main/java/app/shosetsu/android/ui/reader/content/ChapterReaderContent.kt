@@ -7,6 +7,7 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -110,9 +111,11 @@ fun ChapterReaderContent(
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
 
-	BackHandler(scaffoldState.bottomSheetState.isVisible) {
+	BackHandler(
+		scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
+	) {
 		scope.launch {
-			scaffoldState.bottomSheetState.hide()
+			scaffoldState.bottomSheetState.partialExpand()
 		}
 	}
 
@@ -126,7 +129,7 @@ fun ChapterReaderContent(
 			content(paddingValues)
 		},
 		sheetShape = RectangleShape,
-		sheetDragHandle = null
+		sheetDragHandle = null,
 	)
 
 	if (isFocused && isFirstFocusProvider()) {

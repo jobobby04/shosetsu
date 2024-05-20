@@ -13,6 +13,7 @@ import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -120,13 +121,15 @@ fun ChapterReaderBottomSheetContent(
 
 		IconButton(onClick = {
 			coroutineScope.launch {
-				if (!scaffoldState.bottomSheetState.isVisible)
+				if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
 					scaffoldState.bottomSheetState.expand()
-				else scaffoldState.bottomSheetState.hide()
+				} else {
+					scaffoldState.bottomSheetState.partialExpand()
+				}
 			}
 		}) {
 			Icon(
-				if (scaffoldState.bottomSheetState.isVisible) {
+				if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
 					painterResource(R.drawable.expand_more)
 				} else {
 					painterResource(R.drawable.expand_less)
