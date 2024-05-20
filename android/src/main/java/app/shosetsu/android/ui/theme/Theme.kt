@@ -42,6 +42,13 @@ val FallbackColorScheme = LightColorScheme
 
 @Composable
 fun ShosetsuTheme(
+	content: @Composable () -> Unit
+) {
+	content()
+}
+
+@Composable
+fun ShosetsuTheme(
 	theme: AppThemes,
 	content: @Composable () -> Unit
 ) {
