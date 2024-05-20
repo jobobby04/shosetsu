@@ -3,12 +3,12 @@ package app.shosetsu.android.ui.reader.content
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.BottomSheetScaffoldDefaults
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SnackbarResult
-import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
  * @since 26 / 05 / 2022
  * @author Doomsdayrs
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewChapterReaderContent() {
@@ -97,7 +97,7 @@ fun PreviewChapterReaderContent() {
 /**
  * Main reader content
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterReaderContent(
 	isFocused: Boolean,
@@ -110,9 +110,9 @@ fun ChapterReaderContent(
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
 
-	BackHandler(scaffoldState.bottomSheetState.isExpanded) {
+	BackHandler(scaffoldState.bottomSheetState.isVisible) {
 		scope.launch {
-			scaffoldState.bottomSheetState.collapse()
+			scaffoldState.bottomSheetState.hide()
 		}
 	}
 
@@ -121,11 +121,12 @@ fun ChapterReaderContent(
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocused) BottomSheetScaffoldDefaults.SheetPeekHeight else 0.dp,
+		sheetPeekHeight = if (!isFocused) BottomSheetDefaults.SheetPeekHeight else 0.dp,
 		content = { paddingValues ->
 			content(paddingValues)
 		},
-		sheetShape = RectangleShape
+		sheetShape = RectangleShape,
+		sheetDragHandle = null
 	)
 
 	if (isFocused && isFirstFocusProvider()) {

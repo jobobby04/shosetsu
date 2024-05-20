@@ -1,14 +1,18 @@
 package app.shosetsu.android.ui.reader.content
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,7 +29,7 @@ import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterReaderBottomSheetContent(
 	scaffoldState: BottomSheetScaffoldState,
@@ -116,13 +120,13 @@ fun ChapterReaderBottomSheetContent(
 
 		IconButton(onClick = {
 			coroutineScope.launch {
-				if (!scaffoldState.bottomSheetState.isExpanded)
+				if (!scaffoldState.bottomSheetState.isVisible)
 					scaffoldState.bottomSheetState.expand()
-				else scaffoldState.bottomSheetState.collapse()
+				else scaffoldState.bottomSheetState.hide()
 			}
 		}) {
 			Icon(
-				if (scaffoldState.bottomSheetState.isExpanded) {
+				if (scaffoldState.bottomSheetState.isVisible) {
 					painterResource(R.drawable.expand_more)
 				} else {
 					painterResource(R.drawable.expand_less)

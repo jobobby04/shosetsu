@@ -4,8 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,7 +78,7 @@ fun ChapterReaderHTMLContent(
 		AChapterReaderViewModel.ChapterPassage.Loading -> {
 			Box(
 				Modifier
-					.background(MaterialTheme.colors.background)
+					.background(MaterialTheme.colorScheme.background)
 					.fillMaxSize()
 			) {
 				LinearProgressIndicator(
