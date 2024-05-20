@@ -51,6 +51,7 @@ import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.PlaceholderNovelCardCozyContent
 import app.shosetsu.android.view.compose.PlaceholderNovelCardNormalContent
+import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
@@ -58,7 +59,6 @@ import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow

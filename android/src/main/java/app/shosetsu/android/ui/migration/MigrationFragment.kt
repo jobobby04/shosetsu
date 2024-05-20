@@ -45,12 +45,12 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.model.MigrationExtensionUI
 import app.shosetsu.android.view.uimodels.model.MigrationNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AMigrationViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.collections.immutable.ImmutableList
 
 /*

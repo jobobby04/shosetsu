@@ -47,7 +47,6 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.Novel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.collections.immutable.persistentListOf
 import java.text.NumberFormat
 import java.util.Locale

@@ -51,11 +51,11 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.coverRatio
+import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.material.placeholder
 
 /*
  * This file is part of shosetsu.
