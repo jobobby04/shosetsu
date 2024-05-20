@@ -128,184 +128,182 @@ fun CatalogueView(
 	onOpenNovel: (novelId: Int) -> Unit,
 	onBack: () -> Unit
 ) {
-	ShosetsuTheme {
-		val viewModel: ACatalogViewModel = viewModelDi()
+	val viewModel: ACatalogViewModel = viewModelDi()
 
-		LaunchedEffect(extensionId) {
-			viewModel.setExtensionID(extensionId)
-		}
+	LaunchedEffect(extensionId) {
+		viewModel.setExtensionID(extensionId)
+	}
 
-		val type by viewModel.novelCardTypeLive.collectAsState()
+	val type by viewModel.novelCardTypeLive.collectAsState()
 
-		val query by viewModel.queryFlow.collectAsState()
-		val baseURL by viewModel.baseURL.collectAsState()
-		val extensionName by viewModel.extensionName.collectAsState()
-		val hasSearch by viewModel.hasSearchLive.collectAsState()
+	val query by viewModel.queryFlow.collectAsState()
+	val baseURL by viewModel.baseURL.collectAsState()
+	val extensionName by viewModel.extensionName.collectAsState()
+	val hasSearch by viewModel.hasSearchLive.collectAsState()
 
-		val columnsInV by viewModel.columnsInV.collectAsState()
-		val columnsInH by viewModel.columnsInH.collectAsState()
+	val columnsInV by viewModel.columnsInV.collectAsState()
+	val columnsInH by viewModel.columnsInH.collectAsState()
 
-		val items = viewModel.itemsLive.collectAsLazyPagingItems()
+	val items = viewModel.itemsLive.collectAsLazyPagingItems()
 
-		val exception by viewModel.exceptionFlow.collectAsState(null)
-		val hasFilters by viewModel.hasFilters.collectAsState()
+	val exception by viewModel.exceptionFlow.collectAsState(null)
+	val hasFilters by viewModel.hasFilters.collectAsState()
 
-		val selectedListing by viewModel.selectedListing.collectAsState()
-		val listingOptions by viewModel.listingOptions.collectAsState()
+	val selectedListing by viewModel.selectedListing.collectAsState()
+	val listingOptions by viewModel.listingOptions.collectAsState()
 
-		val categories by viewModel.categories.collectAsState()
+	val categories by viewModel.categories.collectAsState()
 
-		val backgroundAddState by viewModel.backgroundAddState.collectAsState()
-		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
+	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
 
-		val context = LocalContext.current
-		val hostState = remember { SnackbarHostState() }
-		var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
+	val context = LocalContext.current
+	val hostState = remember { SnackbarHostState() }
+	var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
 
-		LaunchedEffect(backgroundAddState) {
-			when (backgroundAddState) {
-				is Added -> {
-					hostState.showSnackbar(
-						context.getString(
-							R.string.fragment_catalogue_toast_background_add_success,
-							(backgroundAddState as Added).title
-						)
+	LaunchedEffect(backgroundAddState) {
+		when (backgroundAddState) {
+			is Added -> {
+				hostState.showSnackbar(
+					context.getString(
+						R.string.fragment_catalogue_toast_background_add_success,
+						(backgroundAddState as Added).title
 					)
-				}
-
-				Adding -> {
-					hostState.showSnackbar(
-						context.getString(
-							R.string.fragment_catalogue_toast_background_add
-						)
-					)
-				}
-
-				is BackgroundNovelAddProgress.Failure -> {
-					val error = (backgroundAddState as BackgroundNovelAddProgress.Failure).error
-
-					val result = hostState.showSnackbar(
-						context.getString(
-							R.string.fragment_catalogue_toast_background_add_fail,
-							error.message
-								?: "Unknown exception"
-						),
-						actionLabel = context.getString(R.string.report)
-					)
-
-					if (result == SnackbarResult.ActionPerformed) {
-						ACRA.errorReporter.handleSilentException(error)
-					}
-				}
-
-				BackgroundNovelAddProgress.Unknown -> {
-				}
-			}
-		}
-
-		LaunchedEffect(exception) {
-			if (exception != null) {
-				val result = hostState.showSnackbar(
-					exception?.message ?: "Unknown error",
-					actionLabel = context.getString(R.string.reset)
 				)
-				if (result == SnackbarResult.ActionPerformed) {
-					viewModel.resetView()
-				}
 			}
-		}
 
-		val prepend = items.loadState.prepend
-
-		LaunchedEffect(prepend) {
-			if (prepend is LoadState.Error) {
-				val result = hostState.showSnackbar(
-					prepend.error.message ?: "Unknown error",
-					actionLabel = context.getString(R.string.retry)
-				)
-				if (result == SnackbarResult.ActionPerformed) {
-					items.retry()
-				}
-			}
-		}
-
-		val append = items.loadState.prepend
-		LaunchedEffect(append) {
-			if (append is LoadState.Error) {
-				val result = hostState.showSnackbar(
-					append.error.message ?: "Unknown error",
-					actionLabel = context.getString(R.string.retry)
-				)
-				if (result == SnackbarResult.ActionPerformed) {
-					items.retry()
-				}
-			}
-		}
-
-		CatalogContent(
-			items = items,
-			cardType = type,
-			columnsInV = columnsInV,
-			columnsInH = columnsInH,
-			onClick = {
-				onOpenNovel(it.id)
-			},
-			onLongClick = {
-				if (categories.isNotEmpty() && !it.bookmarked) {
-					categoriesDialogItem = it
-				} else {
-					viewModel.backgroundNovelAdd(it)
-				}
-			},
-			hasFilters = hasFilters,
-			openWebView = {
-				context.openInWebView(baseURL ?: return@CatalogContent)
-			},
-			clearCookies = {
-				viewModel.clearCookies()
-				items.refresh()
-			},
-			onShowFilterMenu = viewModel::showFilterMenu,
-			extensionName = extensionName,
-			query = query,
-			onSetQuery = viewModel::applyQuery,
-			onSetCardType = viewModel::setViewType,
-			onBack = onBack,
-			hasSearch = hasSearch,
-			hostState = hostState,
-			selectedListing = selectedListing?.let { StableHolder(it) },
-			listingOptions = listingOptions,
-			setSelectedListing = viewModel::setSelectedListing
-		)
-		if (categoriesDialogItem != null) {
-			CategoriesDialog(
-				onDismissRequest = { categoriesDialogItem = null },
-				categories = categories,
-				setCategories = {
-					viewModel.backgroundNovelAdd(
-						item = categoriesDialogItem ?: return@CategoriesDialog,
-						categories = it
+			Adding -> {
+				hostState.showSnackbar(
+					context.getString(
+						R.string.fragment_catalogue_toast_background_add
 					)
-				},
-				novelCategories = remember { persistentListOf() }
+				)
+			}
+
+			is BackgroundNovelAddProgress.Failure -> {
+				val error = (backgroundAddState as BackgroundNovelAddProgress.Failure).error
+
+				val result = hostState.showSnackbar(
+					context.getString(
+						R.string.fragment_catalogue_toast_background_add_fail,
+						error.message
+							?: "Unknown exception"
+					),
+					actionLabel = context.getString(R.string.report)
+				)
+
+				if (result == SnackbarResult.ActionPerformed) {
+					ACRA.errorReporter.handleSilentException(error)
+				}
+			}
+
+			BackgroundNovelAddProgress.Unknown -> {
+			}
+		}
+	}
+
+	LaunchedEffect(exception) {
+		if (exception != null) {
+			val result = hostState.showSnackbar(
+				exception?.message ?: "Unknown error",
+				actionLabel = context.getString(R.string.reset)
 			)
-		}
-
-		if (isFilterMenuVisible) {
-			val filterItems by viewModel.filterItemsLive.collectAsState()
-			BottomSheetDialog(viewModel::hideFilterMenu) {
-				CatalogFilterMenu(
-					items = filterItems,
-					getBoolean = viewModel::getFilterBooleanState,
-					setBoolean = viewModel::setFilterBooleanState,
-					getInt = viewModel::getFilterIntState,
-					setInt = viewModel::setFilterIntState,
-					getString = viewModel::getFilterStringState,
-					setString = viewModel::setFilterStringState,
-					applyFilter = viewModel::applyFilter,
-					resetFilter = viewModel::resetFilter
-				)
+			if (result == SnackbarResult.ActionPerformed) {
+				viewModel.resetView()
 			}
+		}
+	}
+
+	val prepend = items.loadState.prepend
+
+	LaunchedEffect(prepend) {
+		if (prepend is LoadState.Error) {
+			val result = hostState.showSnackbar(
+				prepend.error.message ?: "Unknown error",
+				actionLabel = context.getString(R.string.retry)
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				items.retry()
+			}
+		}
+	}
+
+	val append = items.loadState.prepend
+	LaunchedEffect(append) {
+		if (append is LoadState.Error) {
+			val result = hostState.showSnackbar(
+				append.error.message ?: "Unknown error",
+				actionLabel = context.getString(R.string.retry)
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				items.retry()
+			}
+		}
+	}
+
+	CatalogContent(
+		items = items,
+		cardType = type,
+		columnsInV = columnsInV,
+		columnsInH = columnsInH,
+		onClick = {
+			onOpenNovel(it.id)
+		},
+		onLongClick = {
+			if (categories.isNotEmpty() && !it.bookmarked) {
+				categoriesDialogItem = it
+			} else {
+				viewModel.backgroundNovelAdd(it)
+			}
+		},
+		hasFilters = hasFilters,
+		openWebView = {
+			context.openInWebView(baseURL ?: return@CatalogContent)
+		},
+		clearCookies = {
+			viewModel.clearCookies()
+			items.refresh()
+		},
+		onShowFilterMenu = viewModel::showFilterMenu,
+		extensionName = extensionName,
+		query = query,
+		onSetQuery = viewModel::applyQuery,
+		onSetCardType = viewModel::setViewType,
+		onBack = onBack,
+		hasSearch = hasSearch,
+		hostState = hostState,
+		selectedListing = selectedListing?.let { StableHolder(it) },
+		listingOptions = listingOptions,
+		setSelectedListing = viewModel::setSelectedListing
+	)
+	if (categoriesDialogItem != null) {
+		CategoriesDialog(
+			onDismissRequest = { categoriesDialogItem = null },
+			categories = categories,
+			setCategories = {
+				viewModel.backgroundNovelAdd(
+					item = categoriesDialogItem ?: return@CategoriesDialog,
+					categories = it
+				)
+			},
+			novelCategories = remember { persistentListOf() }
+		)
+	}
+
+	if (isFilterMenuVisible) {
+		val filterItems by viewModel.filterItemsLive.collectAsState()
+		BottomSheetDialog(viewModel::hideFilterMenu) {
+			CatalogFilterMenu(
+				items = filterItems,
+				getBoolean = viewModel::getFilterBooleanState,
+				setBoolean = viewModel::setFilterBooleanState,
+				getInt = viewModel::getFilterIntState,
+				setInt = viewModel::setFilterIntState,
+				getString = viewModel::getFilterStringState,
+				setString = viewModel::setFilterStringState,
+				applyFilter = viewModel::applyFilter,
+				resetFilter = viewModel::resetFilter
+			)
 		}
 	}
 }

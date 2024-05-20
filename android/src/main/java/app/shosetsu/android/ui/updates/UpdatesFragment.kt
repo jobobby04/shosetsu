@@ -62,7 +62,6 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
@@ -106,55 +105,53 @@ fun UpdatesView(
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
 	drawerIcon: @Composable () -> Unit,
 ) {
-	ShosetsuTheme {
-		val viewModel = viewModelDi<AUpdatesViewModel>()
-		val items by viewModel.liveData.collectAsState()
-		val error by viewModel.error.collectAsState(null)
-		val isClearBeforeVisible by viewModel.isClearBeforeVisible.collectAsState()
-		val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
+	val viewModel = viewModelDi<AUpdatesViewModel>()
+	val items by viewModel.liveData.collectAsState()
+	val error by viewModel.error.collectAsState(null)
+	val isClearBeforeVisible by viewModel.isClearBeforeVisible.collectAsState()
+	val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
 
-		val context = LocalContext.current
-		val hostState = remember { SnackbarHostState() }
+	val context = LocalContext.current
+	val hostState = remember { SnackbarHostState() }
 
-		LaunchedEffect(error) {
-			when (error) {
-				is OfflineException -> {
-					val result = hostState.showSnackbar(
-						context.getString((error as OfflineException).messageRes),
-						duration = SnackbarDuration.Long,
-						actionLabel = context.getString(R.string.generic_wifi_settings)
-					)
-					if (result == SnackbarResult.ActionPerformed) {
-						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-					}
+	LaunchedEffect(error) {
+		when (error) {
+			is OfflineException -> {
+				val result = hostState.showSnackbar(
+					context.getString((error as OfflineException).messageRes),
+					duration = SnackbarDuration.Long,
+					actionLabel = context.getString(R.string.generic_wifi_settings)
+				)
+				if (result == SnackbarResult.ActionPerformed) {
+					context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
 				}
 			}
 		}
+	}
 
-		UpdatesContent(
-			items = items,
-			onRefresh = {
-				viewModel.startUpdateManager(-1)
-			},
-			openNovel = {
-				openNovel(it.novelID)
-			},
-			openChapter = {
-				openChapter(it.novelID, it.chapterID)
-			},
-			onClearAll = viewModel::clearAll,
-			onClearBefore = viewModel::showClearBefore,
-			hostState = hostState,
-			drawerIcon = drawerIcon,
-			displayDateAsMDY = displayDateAsMDY
+	UpdatesContent(
+		items = items,
+		onRefresh = {
+			viewModel.startUpdateManager(-1)
+		},
+		openNovel = {
+			openNovel(it.novelID)
+		},
+		openChapter = {
+			openChapter(it.novelID, it.chapterID)
+		},
+		onClearAll = viewModel::clearAll,
+		onClearBefore = viewModel::showClearBefore,
+		hostState = hostState,
+		drawerIcon = drawerIcon,
+		displayDateAsMDY = displayDateAsMDY
+	)
+
+	if (isClearBeforeVisible) {
+		ClearBeforeDialog(
+			onHideClearBefore = viewModel::hideClearBefore,
+			onClearBefore = viewModel::clearBefore
 		)
-
-		if (isClearBeforeVisible) {
-			ClearBeforeDialog(
-				onHideClearBefore = viewModel::hideClearBefore,
-				onClearBefore = viewModel::clearBefore
-			)
-		}
 	}
 }
 

@@ -89,9 +89,7 @@ fun MigrationView(
 		viewModel.setNovels(novelIds)
 	}
 
-	ShosetsuTheme {
-		MigrationContent(viewModel)
-	}
+	MigrationContent(viewModel)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

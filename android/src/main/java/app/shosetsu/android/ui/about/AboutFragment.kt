@@ -107,25 +107,23 @@ fun AboutView(
 	fun openPrivacy() =
 		uriHandler.openUri(URL_PRIVACY)
 
-	ShosetsuTheme {
-		AboutContent(
-			currentVersion = BuildConfig.VERSION_NAME,
-			onCheckForAppUpdate = viewModel::appUpdateCheck,
-			onOpenWebsite = ::openWebsite,
-			onOpenSource = ::openGithub,
-			onOpenExtensions = ::openExtensions,
-			onOpenDiscord = ::openDiscord,
-			onOpenPatreon = ::openPatreon,
-			onOpenLicense = onOpenLicense,
-			onOpenDisclaimer = ::onClickDisclaimer,
-			onOpenMatrix = ::openMatrix,
-			onOpenPrivacy = ::openPrivacy,
-			onOpenKofi = {
-				uriHandler.openUri(URL_KOFI)
-			},
-			onBack = onBack
-		)
-	}
+	AboutContent(
+		currentVersion = BuildConfig.VERSION_NAME,
+		onCheckForAppUpdate = viewModel::appUpdateCheck,
+		onOpenWebsite = ::openWebsite,
+		onOpenSource = ::openGithub,
+		onOpenExtensions = ::openExtensions,
+		onOpenDiscord = ::openDiscord,
+		onOpenPatreon = ::openPatreon,
+		onOpenLicense = onOpenLicense,
+		onOpenDisclaimer = ::onClickDisclaimer,
+		onOpenMatrix = ::openMatrix,
+		onOpenPrivacy = ::openPrivacy,
+		onOpenKofi = {
+			uriHandler.openUri(URL_KOFI)
+		},
+		onBack = onBack
+	)
 }
 
 @ExperimentalMaterial3Api

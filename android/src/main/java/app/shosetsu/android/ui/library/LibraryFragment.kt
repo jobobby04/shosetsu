@@ -70,7 +70,6 @@ import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.novel.CategoriesDialog
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
@@ -118,112 +117,110 @@ fun LibraryView(
 	onMigrate: (ids: List<Int>) -> Unit,
 	drawerIcon: @Composable () -> Unit,
 ) {
-	ShosetsuTheme {
-		val viewModel = viewModelDi<ALibraryViewModel>()
+	val viewModel = viewModelDi<ALibraryViewModel>()
 
-		val items by viewModel.liveData.collectAsState()
-		val isEmpty by viewModel.isEmptyFlow.collectAsState()
-		val hasSelected by viewModel.hasSelection.collectAsState()
-		val type by viewModel.novelCardTypeFlow.collectAsState()
-		val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
+	val items by viewModel.liveData.collectAsState()
+	val isEmpty by viewModel.isEmptyFlow.collectAsState()
+	val hasSelected by viewModel.hasSelection.collectAsState()
+	val type by viewModel.novelCardTypeFlow.collectAsState()
+	val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
 
-		val columnsInV by viewModel.columnsInV.collectAsState()
-		val columnsInH by viewModel.columnsInH.collectAsState()
-		val isCategoriesDialogOpen by viewModel.isCategoryDialogOpen.collectAsState()
-		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
-		val query by viewModel.queryFlow.collectAsState()
-		val error by viewModel.error.collectAsState(null)
-		val selectedIds by viewModel.selectedIds.collectAsState()
+	val columnsInV by viewModel.columnsInV.collectAsState()
+	val columnsInH by viewModel.columnsInH.collectAsState()
+	val isCategoriesDialogOpen by viewModel.isCategoryDialogOpen.collectAsState()
+	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+	val query by viewModel.queryFlow.collectAsState()
+	val error by viewModel.error.collectAsState(null)
+	val selectedIds by viewModel.selectedIds.collectAsState()
 
-		BackHandler(hasSelected) {
+	BackHandler(hasSelected) {
+		viewModel.deselectAll()
+	}
+
+	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
+	val hostState = remember { SnackbarHostState() }
+
+	LaunchedEffect(error) {
+		if (error != null) {
+			when (error) {
+				is OfflineException -> {
+					val result = hostState.showSnackbar(
+						context.getString((error as OfflineException).messageRes),
+						duration = SnackbarDuration.Long,
+						actionLabel = context.getString(R.string.generic_wifi_settings)
+					)
+					if (result == ActionPerformed) {
+						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+					}
+				}
+
+				else -> {
+					hostState.showSnackbar(
+						error?.message ?: context.getString(R.string.error)
+					)
+				}
+			}
+		}
+	}
+
+	LibraryContent(
+		items = items,
+		isEmpty = isEmpty,
+		setActiveCategory = viewModel::setActiveCategory,
+		cardType = type,
+		columnsInV = columnsInV,
+		columnsInH = columnsInH,
+		hasSelected = hasSelected,
+		onRefresh = viewModel::startUpdateManager,
+		onOpen = { (id) -> onOpenNovel(id) },
+		toggleSelection = viewModel::toggleSelection,
+		toastNovel = if (badgeToast) {
+			{ item ->
+				scope.launch {
+					hostState.showSnackbar(
+						context.resources.getQuantityString(
+							R.plurals.toast_unread_count,
+							item.unread,
+							item.unread
+						)
+					)
+				}
+			}
+		} else null,
+		onInverseSelection = viewModel::invertSelection,
+		onSelectAll = viewModel::selectAll,
+		onRemove = viewModel::removeSelectedFromLibrary,
+		onMigrate = {
 			viewModel.deselectAll()
-		}
-
-		val context = LocalContext.current
-		val scope = rememberCoroutineScope()
-		val hostState = remember { SnackbarHostState() }
-
-		LaunchedEffect(error) {
-			if (error != null) {
-				when (error) {
-					is OfflineException -> {
-						val result = hostState.showSnackbar(
-							context.getString((error as OfflineException).messageRes),
-							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
-						)
-						if (result == ActionPerformed) {
-							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-						}
-					}
-
-					else -> {
-						hostState.showSnackbar(
-							error?.message ?: context.getString(R.string.error)
-						)
-					}
-				}
-			}
-		}
-
-		LibraryContent(
-			items = items,
-			isEmpty = isEmpty,
-			setActiveCategory = viewModel::setActiveCategory,
-			cardType = type,
-			columnsInV = columnsInV,
-			columnsInH = columnsInH,
-			hasSelected = hasSelected,
-			onRefresh = viewModel::startUpdateManager,
-			onOpen = { (id) -> onOpenNovel(id) },
-			toggleSelection = viewModel::toggleSelection,
-			toastNovel = if (badgeToast) {
-				{ item ->
-					scope.launch {
-						hostState.showSnackbar(
-							context.resources.getQuantityString(
-								R.plurals.toast_unread_count,
-								item.unread,
-								item.unread
-							)
-						)
-					}
-				}
-			} else null,
-			onInverseSelection = viewModel::invertSelection,
-			onSelectAll = viewModel::selectAll,
-			onRemove = viewModel::removeSelectedFromLibrary,
-			onMigrate = {
-				viewModel.deselectAll()
-				onMigrate(selectedIds)
+			onMigrate(selectedIds)
+		},
+		onTogglePin = viewModel::togglePinSelected,
+		onSetCategories = viewModel::showCategoryDialog,
+		onDeselectAll = viewModel::deselectAll,
+		onSelectBetween = viewModel::selectBetween,
+		query = query,
+		onSearch = viewModel::setQuery,
+		selectedType = type,
+		onSetType = viewModel::setViewType,
+		hostState = hostState,
+		onShowFilterMenu = viewModel::showFilterMenu,
+		drawerIcon = drawerIcon
+	)
+	if (isCategoriesDialogOpen) {
+		CategoriesDialog(
+			onDismissRequest = { viewModel.hideCategoryDialog() },
+			categories = remember(items?.categories) {
+				items?.categories ?: persistentListOf()
 			},
-			onTogglePin = viewModel::togglePinSelected,
-			onSetCategories = viewModel::showCategoryDialog,
-			onDeselectAll = viewModel::deselectAll,
-			onSelectBetween = viewModel::selectBetween,
-			query = query,
-			onSearch = viewModel::setQuery,
-			selectedType = type,
-			onSetType = viewModel::setViewType,
-			hostState = hostState,
-			onShowFilterMenu = viewModel::showFilterMenu,
-			drawerIcon = drawerIcon
+			novelCategories = remember { persistentListOf() },
+			setCategories = viewModel::setCategories
 		)
-		if (isCategoriesDialogOpen) {
-			CategoriesDialog(
-				onDismissRequest = { viewModel.hideCategoryDialog() },
-				categories = remember(items?.categories) {
-					items?.categories ?: persistentListOf()
-				},
-				novelCategories = remember { persistentListOf() },
-				setCategories = viewModel::setCategories
-			)
-		}
+	}
 
-		if (isFilterMenuVisible) {
-			BottomSheetDialog(viewModel::hideFilterMenu) {
-				LibraryFilterMenuView(viewModel)
-			}
+	if (isFilterMenuVisible) {
+		BottomSheetDialog(viewModel::hideFilterMenu) {
+			LibraryFilterMenuView(viewModel)
 		}
 	}
 }

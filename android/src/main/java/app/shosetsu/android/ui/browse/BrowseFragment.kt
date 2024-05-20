@@ -86,7 +86,6 @@ import app.shosetsu.android.common.consts.BROWSE_HELP_URL
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
@@ -120,87 +119,85 @@ fun BrowseView(
 ) {
 	val viewModel: ABrowseViewModel = viewModelDi()
 
-	ShosetsuTheme {
-		val query by viewModel.searchTermLive.collectAsState()
-		val entities by viewModel.liveData.collectAsState()
-		val isOnline by viewModel.isOnline.collectAsState(false)
-		val error by viewModel.error.collectAsState(null)
-		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+	val query by viewModel.searchTermLive.collectAsState()
+	val entities by viewModel.liveData.collectAsState()
+	val isOnline by viewModel.isOnline.collectAsState(false)
+	val error by viewModel.error.collectAsState(null)
+	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
 
-		val hostState = remember { SnackbarHostState() }
-		val context = LocalContext.current
-		val scope = rememberCoroutineScope()
+	val hostState = remember { SnackbarHostState() }
+	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
 
-		suspend fun offlineMessage(@StringRes message: Int) {
-			val result = hostState.showSnackbar(
-				context.getString(message),
-				duration = SnackbarDuration.Long,
-				actionLabel = context.getString(R.string.generic_wifi_settings)
-			)
-			if (result == SnackbarResult.ActionPerformed) {
-				context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+	suspend fun offlineMessage(@StringRes message: Int) {
+		val result = hostState.showSnackbar(
+			context.getString(message),
+			duration = SnackbarDuration.Long,
+			actionLabel = context.getString(R.string.generic_wifi_settings)
+		)
+		if (result == SnackbarResult.ActionPerformed) {
+			context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+		}
+	}
+
+	LaunchedEffect(error) {
+		if (error != null) {
+			when (error) {
+				is OfflineException -> {
+					offlineMessage((error as OfflineException).messageRes)
+				}
+
+				else -> {
+					hostState.showSnackbar(
+						error?.message ?: context.getString(R.string.error)
+					)
+				}
 			}
 		}
+	}
 
-		LaunchedEffect(error) {
-			if (error != null) {
-				when (error) {
-					is OfflineException -> {
-						offlineMessage((error as OfflineException).messageRes)
-					}
-
-					else -> {
+	BrowseContent(
+		entities = entities,
+		refresh = viewModel::refresh,
+		openRepositories = openRepositories,
+		installExtension = { extension, option ->
+			viewModel.installExtension(extension, option)
+		},
+		update = viewModel::updateExtension,
+		openCatalogue = {
+			if (isOnline) {
+				if (it.isInstalled) {
+					viewModel.resetSearch()
+					openCatalogue(it.id)
+				} else {
+					scope.launch {
 						hostState.showSnackbar(
-							error?.message ?: context.getString(R.string.error)
+							context.getString(R.string.fragment_browse_snackbar_not_installed)
 						)
 					}
 				}
-			}
-		}
-
-		BrowseContent(
-			entities = entities,
-			refresh = viewModel::refresh,
-			openRepositories = openRepositories,
-			installExtension = { extension, option ->
-				viewModel.installExtension(extension, option)
-			},
-			update = viewModel::updateExtension,
-			openCatalogue = {
-				if (isOnline) {
-					if (it.isInstalled) {
-						viewModel.resetSearch()
-						openCatalogue(it.id)
-					} else {
-						scope.launch {
-							hostState.showSnackbar(
-								context.getString(R.string.fragment_browse_snackbar_not_installed)
-							)
-						}
-					}
-				} else {
-					scope.launch {
-						offlineMessage(R.string.fragment_browse_snackbar_offline_no_extension)
-					}
+			} else {
+				scope.launch {
+					offlineMessage(R.string.fragment_browse_snackbar_offline_no_extension)
 				}
-			},
-			openSettings = {
-				viewModel.resetSearch()
-				openSettings(it.id)
-			},
-			cancelInstall = viewModel::cancelInstall,
-			hostState = hostState,
-			onOpenFilter = viewModel::showFilterMenu,
-			onOpenSearch = openSearch,
-			query = query,
-			onSetQuery = viewModel::setSearch,
-			drawerIcon = drawerIcon
-		)
-
-		if (isFilterMenuVisible) {
-			BottomSheetDialog(viewModel::hideFilterMenu) {
-				BrowseControllerFilterMenu(viewModel)
 			}
+		},
+		openSettings = {
+			viewModel.resetSearch()
+			openSettings(it.id)
+		},
+		cancelInstall = viewModel::cancelInstall,
+		hostState = hostState,
+		onOpenFilter = viewModel::showFilterMenu,
+		onOpenSearch = openSearch,
+		query = query,
+		onSetQuery = viewModel::setSearch,
+		drawerIcon = drawerIcon
+	)
+
+	if (isFilterMenuVisible) {
+		BottomSheetDialog(viewModel::hideFilterMenu) {
+			BrowseControllerFilterMenu(viewModel)
 		}
 	}
 }

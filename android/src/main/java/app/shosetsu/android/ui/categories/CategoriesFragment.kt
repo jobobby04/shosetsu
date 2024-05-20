@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.uimodels.model.CategoryUI
@@ -76,127 +75,125 @@ import kotlinx.collections.immutable.ImmutableList
 fun CategoriesView(
 	onBack: () -> Unit,
 ) {
-	ShosetsuTheme {
-		val viewModel: ACategoriesViewModel = viewModelDi()
+	val viewModel: ACategoriesViewModel = viewModelDi()
 
-		val items by viewModel.liveData.collectAsState()
+	val items by viewModel.liveData.collectAsState()
 
-		val addCategoryState by viewModel.addCategoryState.collectAsState()
+	val addCategoryState by viewModel.addCategoryState.collectAsState()
 
-		val hostState = remember { SnackbarHostState() }
-		val context = LocalContext.current
+	val hostState = remember { SnackbarHostState() }
+	val context = LocalContext.current
 
-		LaunchedEffect(addCategoryState) {
-			when (addCategoryState) {
-				CategoryChangeState.Finished ->
-					hostState.showSnackbar(context.getString(R.string.toast_categories_added))
+	LaunchedEffect(addCategoryState) {
+		when (addCategoryState) {
+			CategoryChangeState.Finished ->
+				hostState.showSnackbar(context.getString(R.string.toast_categories_added))
 
-				is CategoryChangeState.Failure ->
-					hostState.showSnackbar(context.getString(R.string.toast_categories_add_fail))
+			is CategoryChangeState.Failure ->
+				hostState.showSnackbar(context.getString(R.string.toast_categories_add_fail))
 
-				CategoryChangeState.Unknown -> {}
-			}
+			CategoryChangeState.Unknown -> {}
 		}
+	}
 
-		val removeCategoryState by viewModel.removeCategoryState.collectAsState()
-		LaunchedEffect(removeCategoryState) {
-			when (addCategoryState) {
-				CategoryChangeState.Finished ->
-					hostState.showSnackbar(context.getString(R.string.fragment_categories_snackbar_repo_removed))
+	val removeCategoryState by viewModel.removeCategoryState.collectAsState()
+	LaunchedEffect(removeCategoryState) {
+		when (addCategoryState) {
+			CategoryChangeState.Finished ->
+				hostState.showSnackbar(context.getString(R.string.fragment_categories_snackbar_repo_removed))
 
-				is CategoryChangeState.Failure -> {
-					val state = removeCategoryState as CategoryChangeState.Failure
-					logE("Failed to remove category ${state.category}", state.exception)
-					val result =
-						hostState.showSnackbar(
-							context.getString(R.string.toast_categories_remove_fail),
-							actionLabel = context.getString(R.string.retry)
-						)
+			is CategoryChangeState.Failure -> {
+				val state = removeCategoryState as CategoryChangeState.Failure
+				logE("Failed to remove category ${state.category}", state.exception)
+				val result =
+					hostState.showSnackbar(
+						context.getString(R.string.toast_categories_remove_fail),
+						actionLabel = context.getString(R.string.retry)
+					)
 
-					if (result == SnackbarResult.ActionPerformed)
-						viewModel.remove(state.category)
+				if (result == SnackbarResult.ActionPerformed)
+					viewModel.remove(state.category)
+			}
+
+			CategoryChangeState.Unknown -> {}
+		}
+	}
+
+	val moveUpCategoryState by viewModel.moveUpCategoryState.collectAsState()
+	LaunchedEffect(moveUpCategoryState) {
+		when (addCategoryState) {
+			CategoryChangeState.Finished -> {}
+			is CategoryChangeState.Failure ->
+				hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
+
+			CategoryChangeState.Unknown -> {}
+		}
+	}
+
+	val moveDownCategoryState by viewModel.moveDownCategoryState.collectAsState()
+	LaunchedEffect(moveDownCategoryState) {
+		when (addCategoryState) {
+			CategoryChangeState.Finished -> {}
+			is CategoryChangeState.Failure ->
+				hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
+
+			CategoryChangeState.Unknown -> {}
+		}
+	}
+
+	var itemToRemove: CategoryUI? by remember { mutableStateOf(null) }
+
+	CategoriesContent(
+		items = items,
+		onRemove = {
+			itemToRemove = it
+		},
+		onMoveUp = {
+			viewModel.moveUp(it)
+		},
+		onMoveDown = {
+			viewModel.moveDown(it)
+		},
+		showAddDialog = viewModel::showAddDialog,
+		onBack = onBack
+	)
+
+	if (itemToRemove != null) {
+		AlertDialog(
+			onDismissRequest = {
+				itemToRemove = null
+			},
+			confirmButton = {
+				TextButton(
+					onClick = {
+						viewModel.remove(itemToRemove!!)
+						itemToRemove = null
+					}
+				) {
+					Text(stringResource(android.R.string.ok))
 				}
-
-				CategoryChangeState.Unknown -> {}
-			}
-		}
-
-		val moveUpCategoryState by viewModel.moveUpCategoryState.collectAsState()
-		LaunchedEffect(moveUpCategoryState) {
-			when (addCategoryState) {
-				CategoryChangeState.Finished -> {}
-				is CategoryChangeState.Failure ->
-					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
-
-				CategoryChangeState.Unknown -> {}
-			}
-		}
-
-		val moveDownCategoryState by viewModel.moveDownCategoryState.collectAsState()
-		LaunchedEffect(moveDownCategoryState) {
-			when (addCategoryState) {
-				CategoryChangeState.Finished -> {}
-				is CategoryChangeState.Failure ->
-					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
-
-				CategoryChangeState.Unknown -> {}
-			}
-		}
-
-		var itemToRemove: CategoryUI? by remember { mutableStateOf(null) }
-
-		CategoriesContent(
-			items = items,
-			onRemove = {
-				itemToRemove = it
 			},
-			onMoveUp = {
-				viewModel.moveUp(it)
+			dismissButton = {
+				TextButton(onClick = { itemToRemove = null }) {
+					Text(stringResource(android.R.string.cancel))
+				}
 			},
-			onMoveDown = {
-				viewModel.moveDown(it)
+			title = {
+				Text(stringResource(R.string.alert_dialog_title_warn_categories_removal))
 			},
-			showAddDialog = viewModel::showAddDialog,
-			onBack = onBack
+			text = {
+				Text(stringResource(R.string.alert_dialog_message_warn_categories_removal))
+			}
 		)
+	}
 
-		if (itemToRemove != null) {
-			AlertDialog(
-				onDismissRequest = {
-					itemToRemove = null
-				},
-				confirmButton = {
-					TextButton(
-						onClick = {
-							viewModel.remove(itemToRemove!!)
-							itemToRemove = null
-						}
-					) {
-						Text(stringResource(android.R.string.ok))
-					}
-				},
-				dismissButton = {
-					TextButton(onClick = { itemToRemove = null }) {
-						Text(stringResource(android.R.string.cancel))
-					}
-				},
-				title = {
-					Text(stringResource(R.string.alert_dialog_title_warn_categories_removal))
-				},
-				text = {
-					Text(stringResource(R.string.alert_dialog_message_warn_categories_removal))
-				}
-			)
-		}
+	val isAddDialogVisible by viewModel.isAddDialogVisible.collectAsState()
 
-		val isAddDialogVisible by viewModel.isAddDialogVisible.collectAsState()
-
-		if (isAddDialogVisible) {
-			CategoriesAddDialog(
-				viewModel::hideAddDialog,
-				viewModel::addCategory
-			)
-		}
+	if (isAddDialogVisible) {
+		CategoriesAddDialog(
+			viewModel::hideAddDialog,
+			viewModel::addCategory
+		)
 	}
 }
 
