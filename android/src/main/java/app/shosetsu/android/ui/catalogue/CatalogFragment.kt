@@ -149,10 +149,10 @@ fun CatalogueView(
 	val exception by viewModel.exceptionFlow.collectAsState(null)
 	val hasFilters by viewModel.hasFilters.collectAsState()
 
-		val selectedListing by viewModel.selectedListing.collectAsState()
-		val listingOptions by viewModel.listingOptions.collectAsState()
+	val selectedListing by viewModel.selectedListing.collectAsState()
+	val listingOptions by viewModel.listingOptions.collectAsState()
 
-		val categories by viewModel.categories.collectAsState()
+	val categories by viewModel.categories.collectAsState()
 
 	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
