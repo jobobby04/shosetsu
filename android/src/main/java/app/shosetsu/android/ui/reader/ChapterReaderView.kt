@@ -18,6 +18,7 @@ package app.shosetsu.android.ui.reader
 
 import android.content.Intent
 import android.speech.tts.TextToSpeech
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -103,6 +104,10 @@ fun ChapterReaderView(
 	val isTTSPlaying by viewModel.isTTSPlaying.collectAsState()
 	val setting by viewModel.getSettings().collectAsState()
 	val currentPage by viewModel.currentPage.collectAsState()
+	val chapterHistory by viewModel.chapterHistory.collectAsState()
+	BackHandler(chapterHistory.size >= 2) {
+		viewModel.popHistory()
+	}
 
 	val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
 	val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
