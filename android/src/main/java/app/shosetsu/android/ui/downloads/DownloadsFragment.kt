@@ -105,61 +105,59 @@ import kotlinx.collections.immutable.ImmutableList
 fun DownloadsView(
 	onBack: () -> Unit
 ) {
-	ShosetsuTheme {
-		val viewModel: ADownloadsViewModel = viewModelDi()
+	val viewModel: ADownloadsViewModel = viewModelDi()
 
-		val items by viewModel.liveData.collectAsState()
-		val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
-		val hasSelected by viewModel.hasSelectedFlow.collectAsState()
-		val isPaused by viewModel.isDownloadPaused.collectAsState()
-		val error by viewModel.error.collectAsState(null)
+	val items by viewModel.liveData.collectAsState()
+	val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
+	val hasSelected by viewModel.hasSelectedFlow.collectAsState()
+	val isPaused by viewModel.isDownloadPaused.collectAsState()
+	val error by viewModel.error.collectAsState(null)
 
-		val context = LocalContext.current
-		val hostState = remember { SnackbarHostState() }
+	val context = LocalContext.current
+	val hostState = remember { SnackbarHostState() }
 
-		LaunchedEffect(error) {
-			if (error != null) {
-				when (error) {
-					is OfflineException -> {
-						val result = hostState.showSnackbar(
-							context.getString((error as OfflineException).messageRes),
-							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
-						)
-						if (result == SnackbarResult.ActionPerformed) {
-							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-						}
+	LaunchedEffect(error) {
+		if (error != null) {
+			when (error) {
+				is OfflineException -> {
+					val result = hostState.showSnackbar(
+						context.getString((error as OfflineException).messageRes),
+						duration = SnackbarDuration.Long,
+						actionLabel = context.getString(R.string.generic_wifi_settings)
+					)
+					if (result == SnackbarResult.ActionPerformed) {
+						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
 					}
+				}
 
-					else -> {
-						hostState.showSnackbar(
-							error?.message ?: context.getString(R.string.error)
-						)
-					}
+				else -> {
+					hostState.showSnackbar(
+						error?.message ?: context.getString(R.string.error)
+					)
 				}
 			}
 		}
-
-		DownloadsContent(
-			items = items,
-			selectedDownloadState = selectedDownloadState,
-			hasSelected = hasSelected,
-			pauseSelection = viewModel::pauseSelection,
-			startSelection = viewModel::startSelection,
-			startFailedSelection = viewModel::restartSelection,
-			deleteSelected = viewModel::deleteSelected,
-			toggleSelection = viewModel::toggleSelection,
-			onInverseSelection = viewModel::invertSelection,
-			onSetAllPending = viewModel::setAllPending,
-			onDeleteAll = viewModel::deleteAll,
-			onDeselectAll = viewModel::deselectAll,
-			onSelectAll = viewModel::selectAll,
-			onSelectBetween = viewModel::selectBetween,
-			isPaused = isPaused,
-			togglePause = viewModel::togglePause,
-			onBack = onBack
-		)
 	}
+
+	DownloadsContent(
+		items = items,
+		selectedDownloadState = selectedDownloadState,
+		hasSelected = hasSelected,
+		pauseSelection = viewModel::pauseSelection,
+		startSelection = viewModel::startSelection,
+		startFailedSelection = viewModel::restartSelection,
+		deleteSelected = viewModel::deleteSelected,
+		toggleSelection = viewModel::toggleSelection,
+		onInverseSelection = viewModel::invertSelection,
+		onSetAllPending = viewModel::setAllPending,
+		onDeleteAll = viewModel::deleteAll,
+		onDeselectAll = viewModel::deselectAll,
+		onSelectAll = viewModel::selectAll,
+		onSelectBetween = viewModel::selectBetween,
+		isPaused = isPaused,
+		togglePause = viewModel::togglePause,
+		onBack = onBack
+	)
 }
 
 /**

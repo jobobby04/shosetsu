@@ -39,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.controller.base.CollapsedToolBarController
 import app.shosetsu.android.view.controller.base.HomeFragment
@@ -98,31 +97,29 @@ fun MoreView(
 	onNavToAbout: () -> Unit = {},
 	drawerIcon: @Composable () -> Unit
 ) {
-	ShosetsuTheme {
-		val hostState = remember { SnackbarHostState() }
-		val scope = rememberCoroutineScope()
-		val context = LocalContext.current
+	val hostState = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
+	val context = LocalContext.current
 
-		MoreContent(
-			hostState,
-			showStyleBar = {
-				scope.launch {
-					hostState.showSnackbar(context.getString(R.string.style_wait))
-				}
-			},
-			onNavToDownloads,
-			onNavToBackup,
-			onNavToRepositories,
-			onNavToCategories,
-			onNavToStyles,
-			onNavToAddShare,
-			onNavToAnalytics,
-			onNavToHistory,
-			onNavToSettings,
-			onNavToAbout,
-			drawerIcon = drawerIcon
-		)
-	}
+	MoreContent(
+		hostState,
+		showStyleBar = {
+			scope.launch {
+				hostState.showSnackbar(context.getString(R.string.style_wait))
+			}
+		},
+		onNavToDownloads,
+		onNavToBackup,
+		onNavToRepositories,
+		onNavToCategories,
+		onNavToStyles,
+		onNavToAddShare,
+		onNavToAnalytics,
+		onNavToHistory,
+		onNavToSettings,
+		onNavToAbout,
+		drawerIcon = drawerIcon
+	)
 }
 
 @Composable

@@ -36,7 +36,6 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SHARE_HELP_URL
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.NovelEntity
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
@@ -93,52 +92,50 @@ fun AddShareView(
 			viewModel.setURL(shareURL)
 	}
 
-	ShosetsuTheme {
-		val url by viewModel.url.collectAsState()
-		val showURLInput by viewModel.showURLInput.collectAsState()
-		val isProcessing by viewModel.isProcessing.collectAsState()
-		val isQRCodeValid by viewModel.isURLValid.collectAsState()
-		val isAdding by viewModel.isAdding.collectAsState()
-		val isComplete by viewModel.isComplete.collectAsState()
-		val isNovelOpenable by viewModel.isNovelOpenable.collectAsState()
+	val url by viewModel.url.collectAsState()
+	val showURLInput by viewModel.showURLInput.collectAsState()
+	val isProcessing by viewModel.isProcessing.collectAsState()
+	val isQRCodeValid by viewModel.isURLValid.collectAsState()
+	val isAdding by viewModel.isAdding.collectAsState()
+	val isComplete by viewModel.isComplete.collectAsState()
+	val isNovelOpenable by viewModel.isNovelOpenable.collectAsState()
 
-		val isNovelAlreadyPresent by viewModel.isNovelAlreadyPresent.collectAsState()
-		val isStyleAlreadyPresent by viewModel.isStyleAlreadyPresent.collectAsState()
-		val isExtAlreadyPresent by viewModel.isExtAlreadyPresent.collectAsState()
-		val isRepoAlreadyPresent by viewModel.isRepoAlreadyPresent.collectAsState()
+	val isNovelAlreadyPresent by viewModel.isNovelAlreadyPresent.collectAsState()
+	val isStyleAlreadyPresent by viewModel.isStyleAlreadyPresent.collectAsState()
+	val isExtAlreadyPresent by viewModel.isExtAlreadyPresent.collectAsState()
+	val isRepoAlreadyPresent by viewModel.isRepoAlreadyPresent.collectAsState()
 
-		val novelLink by viewModel.novelLink.collectAsState()
-		val extLink by viewModel.extLink.collectAsState()
-		val repoLink by viewModel.repoLink.collectAsState()
-//
-		AddShareContent(
-			showURLInput = showURLInput,
-			url = url,
-			setURL = viewModel::setURL,
-			applyURL = viewModel::applyURL,
-			isProcessing = isProcessing,
-			isUrlValid = isQRCodeValid,
-			isAdding = isAdding,
-			add = viewModel::add,
-			reject = onBackPressed,
-			retry = viewModel::retry,
-			novelLink = novelLink,
-			extensionLink = extLink,
-			repositoryLink = repoLink,
-			isNovelAlreadyPresent = isNovelAlreadyPresent,
-			isStyleAlreadyPresent = isStyleAlreadyPresent,
-			isExtAlreadyPresent = isExtAlreadyPresent,
-			isRepoAlreadyPresent = isRepoAlreadyPresent,
-			isComplete = isComplete,
-			openNovel = {
-				val entity = viewModel.getNovel()
+	val novelLink by viewModel.novelLink.collectAsState()
+	val extLink by viewModel.extLink.collectAsState()
+	val repoLink by viewModel.repoLink.collectAsState()
 
-				openNovel(entity)
-			},
-			isNovelOpenable = isNovelOpenable,
-			onBack = onBackPressed
-		)
-	}
+	AddShareContent(
+		showURLInput = showURLInput,
+		url = url,
+		setURL = viewModel::setURL,
+		applyURL = viewModel::applyURL,
+		isProcessing = isProcessing,
+		isUrlValid = isQRCodeValid,
+		isAdding = isAdding,
+		add = viewModel::add,
+		reject = onBackPressed,
+		retry = viewModel::retry,
+		novelLink = novelLink,
+		extensionLink = extLink,
+		repositoryLink = repoLink,
+		isNovelAlreadyPresent = isNovelAlreadyPresent,
+		isStyleAlreadyPresent = isStyleAlreadyPresent,
+		isExtAlreadyPresent = isExtAlreadyPresent,
+		isRepoAlreadyPresent = isRepoAlreadyPresent,
+		isComplete = isComplete,
+		openNovel = {
+			val entity = viewModel.getNovel()
+
+			openNovel(entity)
+		},
+		isNovelOpenable = isNovelOpenable,
+		onBack = onBackPressed
+	)
 }
 
 @Preview

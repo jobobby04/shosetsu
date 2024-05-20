@@ -21,7 +21,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import app.shosetsu.android.ui.main.MainView
-import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /**
  * Shosetsu
@@ -44,9 +43,7 @@ class MainActivity : ComponentActivity() {
 		}
 
 		setContent {
-			ShosetsuTheme {
-				MainView()
-			}
+			MainView()
 		}
 	}
 }
