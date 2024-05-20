@@ -40,8 +40,8 @@ import app.shosetsu.android.common.enums.ChapterSortType.UPLOAD
 import app.shosetsu.android.common.enums.ReadingStatus.READ
 import app.shosetsu.android.common.enums.ReadingStatus.UNREAD
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
+import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.NovelSettingUI
-import com.google.accompanist.placeholder.material.placeholder
 import kotlinx.coroutines.launch
 
 /*

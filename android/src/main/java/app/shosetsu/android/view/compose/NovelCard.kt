@@ -36,7 +36,6 @@ import app.shosetsu.android.R
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.material.placeholder
 
 /*
  * This file is part of shosetsu.

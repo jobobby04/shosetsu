@@ -42,6 +42,7 @@ import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.coverRatio
+import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
@@ -49,7 +50,6 @@ import app.shosetsu.lib.share.RepositoryLink
 import app.shosetsu.lib.share.StyleLink
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.material.placeholder
 
 /*
  * This file is part of shosetsu.
