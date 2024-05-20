@@ -86,7 +86,7 @@ fun <T> NavigationDrawerContent(
 					)
 				},
 				label = {
-					androidx.compose.material.Text(destination.route)
+					Text(stringResource(destination.name))
 				},
 				onClick = {
 					onNavigate(destination)
