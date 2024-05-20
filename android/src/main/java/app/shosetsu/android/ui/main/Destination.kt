@@ -1,6 +1,7 @@
 package app.shosetsu.android.ui.main
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -10,6 +11,8 @@ import app.shosetsu.android.common.consts.BundleKeys
 interface Root {
 	@get:DrawableRes
 	val icon: Int
+	@get:StringRes
+	val name: Int
 }
 
 sealed class Destination {
@@ -28,6 +31,7 @@ sealed class Destination {
 	data object CATEGORIES : Destination()
 	data object MORE : Destination(), Root {
 		override val icon: Int = R.drawable.ic_baseline_more_horiz_24
+		override val name: Int = R.string.more
 	}
 
 	data object ABOUT : Destination()
@@ -59,6 +63,7 @@ sealed class Destination {
 	data object HISTORY : Destination()
 	data object UPDATES : Destination(), Root {
 		override val icon: Int = R.drawable.update
+		override val name: Int = R.string.updates
 	}
 
 	data object NOVEL : Destination() {
@@ -110,6 +115,7 @@ sealed class Destination {
 
 	data object BROWSE : Destination(), Root {
 		override val icon: Int = R.drawable.navigation_arrow
+		override val name: Int = R.string.browse
 	}
 
 	data object CONFIGURE_EXTENSION : Destination() {
@@ -125,5 +131,6 @@ sealed class Destination {
 
 	data object LIBRARY : Destination(), Root {
 		override val icon: Int = R.drawable.library
+		override val name: Int = R.string.library
 	}
 }

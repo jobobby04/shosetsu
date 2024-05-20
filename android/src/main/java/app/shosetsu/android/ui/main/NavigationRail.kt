@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
 
 /*
@@ -49,7 +50,7 @@ fun <T> NavigationRail(
 					)
 				},
 				label = {
-					Text(destination.route)
+					Text(stringResource(destination.name))
 				},
 				onClick = {
 					onNavigate(destination)
