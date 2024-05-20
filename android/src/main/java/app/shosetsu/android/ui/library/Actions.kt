@@ -1,12 +1,14 @@
 package app.shosetsu.android.ui.library
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -14,10 +16,12 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -202,15 +210,29 @@ fun SearchAction(
 	query: String,
 	onSearch: (String) -> Unit,
 	immediateSearch: Boolean = false,
+	onSetExpanded: (Boolean) -> Unit = {},
 	icon: @Composable () -> Unit = {
 		Icon(Icons.Default.Search, stringResource(R.string.search))
 	}
 ) {
-	var expanded by remember { mutableStateOf(false) }
+	var expanded by remember { mutableStateOf(query.isNotEmpty()) }
 	var searchQuery by remember { mutableStateOf(query) }
+	val focusManager = LocalFocusManager.current
+	val focusRequester = remember { FocusRequester() }
 	LaunchedEffect(query) {
 		if (query.isNotEmpty() && !expanded)
 			expanded = true
+	}
+
+	BackHandler(enabled = expanded) {
+		searchQuery = ""
+		onSearch("")
+		expanded = false
+	}
+
+	DisposableEffect(expanded) {
+		onSetExpanded(expanded)
+		onDispose { }
 	}
 
 	Row(
@@ -218,14 +240,25 @@ fun SearchAction(
 	) {
 		IconButton(
 			onClick = {
+				if (expanded) {
+					searchQuery = ""
+					onSearch("")
+				}
 				expanded = !expanded
 			}
 		) {
-			icon()
+			if (expanded) {
+				Icon(Icons.Default.ArrowBack, stringResource(android.R.string.cancel))
+			} else {
+				icon()
+			}
 		}
 
 		if (expanded) {
-			TextField(
+			LaunchedEffect(focusManager) {
+				focusRequester.requestFocus()
+			}
+			BasicTextField(
 				searchQuery,
 				onValueChange = {
 					searchQuery = it
@@ -234,11 +267,17 @@ fun SearchAction(
 					}
 				},
 				modifier = Modifier
-					.fillMaxWidth(),
+					.fillMaxWidth()
+					.focusRequester(focusRequester),
 				keyboardActions = KeyboardActions {
 					onSearch(searchQuery)
+					focusManager.clearFocus()
 				},
-				singleLine = true
+				singleLine = true,
+				textStyle = MaterialTheme.typography.bodyLarge.copy(
+					color = MaterialTheme.colorScheme.onSurface
+				),
+				cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
 			)
 		}
 	}

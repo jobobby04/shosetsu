@@ -490,18 +490,22 @@ fun CatalogTopBar(
 	onSetCardType: (NovelCardType) -> Unit,
 	openWebView: () -> Unit
 ) {
+	var isSearchExpanded by remember { mutableStateOf(false) }
 	TopAppBar(
 		title = {
 			Text(extensionName)
 		},
 		navigationIcon = {
-			NavigateBackButton(onBack)
+			if (!isSearchExpanded) {
+				NavigateBackButton(onBack)
+			}
 		},
 		actions = {
 			AnimatedVisibility(hasSearch) {
 				SearchAction(
 					query,
-					onSetQuery
+					onSetQuery,
+					onSetExpanded = { isSearchExpanded = it }
 				)
 			}
 			ViewTypeButton(
