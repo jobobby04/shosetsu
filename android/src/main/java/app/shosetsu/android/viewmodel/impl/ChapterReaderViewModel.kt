@@ -36,9 +36,11 @@ import app.shosetsu.android.common.enums.MarkingType.ONVIEW
 import app.shosetsu.android.common.enums.ReadingStatus.READ
 import app.shosetsu.android.common.enums.ReadingStatus.READING
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.common.utils.transformCatching
@@ -50,6 +52,7 @@ import app.shosetsu.android.domain.usecases.RecordChapterIsReadUseCase
 import app.shosetsu.android.domain.usecases.RecordChapterIsReadingUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
+import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
@@ -71,8 +74,10 @@ import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.IExtension.Companion.KEY_CHAPTER_URL
 import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -102,10 +107,11 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import org.acra.ACRA
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
@@ -145,6 +151,7 @@ class ChapterReaderViewModel(
 	private val getReaderSettingsUseCase: GetReaderSettingUseCase,
 	private val recordChapterIsReading: RecordChapterIsReadingUseCase,
 	private val recordChapterIsRead: RecordChapterIsReadUseCase,
+	private val getChapters: GetChapterUIsUseCase,
 	private val getExt: GetExtensionUseCase,
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
@@ -732,8 +739,12 @@ class ChapterReaderViewModel(
 		if (initial)
 			launchIO {
 				val items = liveData.first { it != null }!!
-				currentPage.value = items
-					.indexOfFirst { it is ReaderChapterUI && it.id == chapterId }
+				val selectedChapter =  items
+					.find { it is ReaderChapterUI && it.id == chapterId } as ReaderChapterUI
+				if (chapterHistory.value.isEmpty()) {
+					chapterHistory.value = persistentListOf(selectedChapter)
+				}
+				currentPage.value = items.indexOf(selectedChapter)
 			}
 	}
 
@@ -1151,6 +1162,48 @@ class ChapterReaderViewModel(
 	override fun onStopTts() {
 		ttsPlayback.value = TTSPlayback.Stopped
 		ttsProgress.value = null
+	}
+
+
+	override val chapterHistory: MutableStateFlow<ImmutableList<ReaderChapterUI>> =
+		MutableStateFlow(persistentListOf())
+
+	private val mutex = Mutex()
+	override fun popHistory() {
+		viewModelScopeIO.launch {
+			mutex.withLock {
+				this@ChapterReaderViewModel.logD(chapterHistory.value.toString())
+				val items = liveData.first { it != null } ?: return@launch
+				val history = chapterHistory.value
+				if (history.size >= 2) {
+					val chapter = history[history.lastIndex - 1]
+					this@ChapterReaderViewModel.logD(chapter.toString())
+					chapterHistory.value = chapterHistory.value.dropLast(1).toImmutableList()
+					pageJumper.emit(items.indexOf(chapter))
+				}
+			}
+		}
+	}
+
+	override suspend fun jumpToChapter(url: String): Boolean = onIO {
+		val chapters = getChapters(novelIDLive.value).first()
+			.map { it.copy(link = it.link.removeSuffix("/")) }
+		val ext = extFlow.first() ?: return@onIO false
+
+		val shrunkUrl = ext.shrinkURL(url, KEY_CHAPTER_URL).removeSuffix("/")
+		val noAnchorUrl = shrunkUrl.substringBefore('#')
+		val chapterId =  chapters.find {
+			it.link == shrunkUrl || it.link == noAnchorUrl
+		}?.id ?: return@onIO false
+
+		val items = liveData.first { it != null } ?: return@onIO false
+		val newChapter =  items
+			.find { it is ReaderChapterUI && it.id == chapterId } as? ReaderChapterUI
+			?: return@onIO false
+		chapterHistory.value = chapterHistory.value.plus(newChapter).toImmutableList()
+
+		pageJumper.emit(items.indexOf(newChapter))
+		true
 	}
 
 	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)

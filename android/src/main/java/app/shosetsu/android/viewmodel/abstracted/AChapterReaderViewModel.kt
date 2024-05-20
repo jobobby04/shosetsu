@@ -185,6 +185,10 @@ abstract class AChapterReaderViewModel :
 	abstract fun onPauseTts()
 	abstract fun onStopTts()
 
+	abstract val chapterHistory: StateFlow<ImmutableList<ReaderChapterUI>>
+	abstract fun popHistory()
+	abstract suspend fun jumpToChapter(url: String): Boolean
+
 	abstract val colorScheme: MutableStateFlow<ColorScheme>
 	abstract val paddingValues: MutableStateFlow<PaddingValues>
 }
