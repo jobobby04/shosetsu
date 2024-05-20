@@ -386,7 +386,7 @@ fun LibraryAppBar(
 			actions = {
 				AnimatedVisibility(!isEmpty) {
 					Row {
-						SearchAction(query, onSearch)
+						SearchAction(query, onSearch, immediateSearch = true)
 						ViewTypeButton(selectedType, onSetType)
 						RefreshButton(onRefresh)
 					}

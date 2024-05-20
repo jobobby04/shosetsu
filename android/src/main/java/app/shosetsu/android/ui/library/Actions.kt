@@ -201,6 +201,7 @@ fun PreviewLibrarySearchAction() {
 fun SearchAction(
 	query: String,
 	onSearch: (String) -> Unit,
+	immediateSearch: Boolean = false,
 	icon: @Composable () -> Unit = {
 		Icon(Icons.Default.Search, stringResource(R.string.search))
 	}
@@ -226,7 +227,12 @@ fun SearchAction(
 		if (expanded) {
 			TextField(
 				searchQuery,
-				onValueChange = { searchQuery = it },
+				onValueChange = {
+					searchQuery = it
+					if (immediateSearch) {
+						onSearch(it)
+					}
+				},
 				modifier = Modifier
 					.fillMaxWidth(),
 				keyboardActions = KeyboardActions {
