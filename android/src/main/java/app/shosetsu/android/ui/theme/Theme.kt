@@ -40,6 +40,13 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun ShosetsuTheme(
+	content: @Composable () -> Unit
+) {
+	content()
+}
+
+@Composable
+fun ShosetsuTheme(
 	darkTheme: Boolean = isSystemInDarkTheme(),
 	content: @Composable () -> Unit
 ) {
