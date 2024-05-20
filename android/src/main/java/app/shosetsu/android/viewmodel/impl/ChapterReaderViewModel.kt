@@ -39,6 +39,8 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.toast
+import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.common.utils.transformCatching
@@ -50,6 +52,7 @@ import app.shosetsu.android.domain.usecases.RecordChapterIsReadUseCase
 import app.shosetsu.android.domain.usecases.RecordChapterIsReadingUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
+import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
@@ -71,6 +74,7 @@ import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.IExtension.Companion.KEY_CHAPTER_URL
 import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -145,6 +149,7 @@ class ChapterReaderViewModel(
 	private val getReaderSettingsUseCase: GetReaderSettingUseCase,
 	private val recordChapterIsReading: RecordChapterIsReadingUseCase,
 	private val recordChapterIsRead: RecordChapterIsReadUseCase,
+	private val getChapters: GetChapterUIsUseCase,
 	private val getExt: GetExtensionUseCase,
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
@@ -648,6 +653,30 @@ class ChapterReaderViewModel(
 			}
 		}
 	}
+
+	override val pageJumper: MutableSharedFlow<Int> = MutableSharedFlow<Int>(replay = 0)
+	override suspend fun jumpToChapter(url: String): Boolean = onIO {
+		val chapters = getChapters(novelIDLive.value).first()
+			.map { it.copy(link = it.link.removeSuffix("/")) }
+		val ext = extFlow.first() ?: return@onIO false
+		val shrunkUrl = ext.shrinkURL(url, KEY_CHAPTER_URL).removeSuffix("/")
+		val noAnchorUrl = shrunkUrl.substringBefore('#')
+		val chapterId =  chapters.find {
+			it.link == shrunkUrl || it.link == noAnchorUrl
+		}?.id ?: return@onIO false
+		val items = liveData.first { it != null } ?: return@onIO false
+		val newChapterIndex =  items
+			.indexOfFirst { it is ReaderChapterUI && it.id == chapterId }
+		if (newChapterIndex >= 0) {
+			pageJumper.emit(newChapterIndex)
+			true
+		} else {
+			false
+		}
+	}
+
+	override fun loadChapterCss(): Flow<String> =
+		settingsRepo.getStringFlow(ReaderHtmlCss)
 
 	override fun updateSetting(novelReaderSettingEntity: NovelReaderSettingUI) {
 		launchIO {

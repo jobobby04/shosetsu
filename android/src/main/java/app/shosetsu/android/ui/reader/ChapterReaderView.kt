@@ -29,8 +29,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowInsetsControllerCompat
@@ -69,6 +72,8 @@ import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,6 +109,8 @@ fun ChapterReaderView(
 	val exception by viewModel.exceptions.collectAsState(null)
 
 	val context = LocalContext.current
+	val scope = rememberCoroutineScope()
+	val uriHandler = LocalUriHandler.current
 
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
@@ -218,6 +225,13 @@ fun ChapterReaderView(
 									},
 									ttsProgress = remember {
 										StableHolder(viewModel.ttsProgress)
+									},
+									openUri = {
+										scope.launch {
+											if (!viewModel.jumpToChapter(it)) {
+												uriHandler.openUri(it)
+											}
+										}
 									}
 								)
 							}

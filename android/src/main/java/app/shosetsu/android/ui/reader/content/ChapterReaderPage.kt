@@ -66,6 +66,7 @@ fun ChapterReaderPage(
 	onClick: (String?) -> Unit,
 	onDoubleClick: () -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
+	openUri: (String) -> Unit
 ) {
 	val html by remember(windowPadding, item) {
 		getHTMLContent(item)
@@ -127,6 +128,7 @@ fun ChapterReaderPage(
 					onDoubleClick = onDoubleClick,
 					ttsProgress = ttsProgress,
 					getChapterHTMLStyle = getChapterHTMLStyle,
+					openUri = openUri,
 				)
 			}
 		}

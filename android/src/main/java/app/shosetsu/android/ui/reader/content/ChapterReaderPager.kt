@@ -60,6 +60,7 @@ fun ChapterReaderPager(
 
 	pageJumper: StableHolder<SharedFlow<Int>>,
 	currentPage: Int?,
+	pageJumper: StableHolder<SharedFlow<Int>>,
 	onPageChanged: (Int) -> Unit,
 
 	markChapterAsCurrent: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
