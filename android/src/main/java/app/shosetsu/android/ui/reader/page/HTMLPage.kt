@@ -10,14 +10,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
@@ -31,7 +37,7 @@ import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 
-/*
+/**
  * This file is part of shosetsu.
  *
  * shosetsu is free software: you can redistribute it and/or modify
@@ -57,20 +63,20 @@ fun HTMLPage(
 	progress: Double,
 	onScroll: (perc: Double) -> Unit,
 	onClick: () -> Unit,
-	onDoubleClick: () -> Unit
+	onDoubleClick: () -> Unit,
+	openUri: (String) -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
 	val state = rememberWebViewStateWithHTMLData(html)
 	val navigator = rememberWebViewNavigator(scope)
-	val uriHandler = LocalUriHandler.current
 	var uriToOpen: Uri? by remember { mutableStateOf(null) }
 
 	if (uriToOpen != null) {
 		HTMLPageUriDialog(
 			uriToOpen!!,
 			open = {
-				uriHandler.openUri(uriToOpen.toString())
+				openUri(uriToOpen.toString())
 			},
 			reset = {
 				uriToOpen = null
@@ -99,7 +105,7 @@ fun HTMLPage(
 			}
 		}
 
-	val backgroundColor = MaterialTheme.colors.background
+	val backgroundColor = MaterialTheme.colorScheme.background
 	ScrollStateBar(scrollState) {
 		WebView(
 			state = state,

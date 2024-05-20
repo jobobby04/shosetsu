@@ -29,9 +29,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
@@ -50,6 +52,7 @@ import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.settings.EditCSS
@@ -71,6 +74,7 @@ import app.shosetsu.lib.Novel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -124,6 +128,8 @@ fun ChapterReaderView(
 				logE("Could not set utterance progress listener")
 		}
 	}
+	val scope = rememberCoroutineScope()
+	val uriHandler = LocalUriHandler.current
 
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
@@ -274,6 +280,7 @@ fun ChapterReaderView(
 					onStopTTS = {
 						tts.stop()
 					},
+					pageJumper = StableHolder(viewModel.pageJumper),
 					createPage = { page ->
 						when (val item = items.orEmpty()[page]) {
 							is ReaderUIItem.ReaderChapterUI -> {
@@ -306,6 +313,13 @@ fun ChapterReaderView(
 											onDoubleClick = viewModel::onReaderDoubleClicked,
 											progressFlow = {
 												viewModel.getChapterProgress(item)
+											},
+											openUri = {
+												scope.launch {
+													if (!viewModel.jumpToChapter(it)) {
+														uriHandler.openUri(it)
+													}
+												}
 											}
 										)
 									}

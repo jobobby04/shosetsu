@@ -3,7 +3,12 @@ package app.shosetsu.android.ui.reader.content
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.*
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetScaffoldDefaults
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SnackbarResult
+import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -13,8 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /*
@@ -60,6 +67,7 @@ fun PreviewChapterReaderContent() {
 					onPageChanged = {},
 					isSwipeInverted = false,
 					paddingValues = PaddingValues(),
+					pageJumper = StableHolder(MutableSharedFlow()),
 					createPage = {
 					}
 				)

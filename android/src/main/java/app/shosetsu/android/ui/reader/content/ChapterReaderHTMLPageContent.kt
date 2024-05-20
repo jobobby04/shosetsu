@@ -55,7 +55,8 @@ fun ChapterReaderHTMLContent(
 	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
 	onClick: () -> Unit,
-	onDoubleClick: () -> Unit
+	onDoubleClick: () -> Unit,
+	openUri: (String) -> Unit
 ) {
 	val html by remember(item) {
 		getHTMLContent(item)
@@ -97,7 +98,8 @@ fun ChapterReaderHTMLContent(
 					onScroll(item, it)
 				},
 				onClick = onClick,
-				onDoubleClick = onDoubleClick
+				onDoubleClick = onDoubleClick,
+				openUri = openUri
 			)
 		}
 	}

@@ -180,6 +180,9 @@ abstract class AChapterReaderViewModel :
 	 */
 	abstract fun onScroll(chapter: ReaderChapterUI, readingPosition: Double)
 
+	abstract val pageJumper: SharedFlow<Int>
+	abstract suspend fun jumpToChapter(url: String): Boolean
+
 	/**
 	 * Loads a [LiveData] reflection of the global custom css
 	 */

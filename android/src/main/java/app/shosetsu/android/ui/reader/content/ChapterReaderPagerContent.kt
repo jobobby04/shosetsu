@@ -9,13 +9,22 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /*
@@ -54,6 +63,7 @@ fun ChapterReaderPagerContent(
 	isSwipeInverted: Boolean,
 
 	currentPage: Int?,
+	pageJumper: StableHolder<SharedFlow<Int>>,
 	onPageChanged: (Int) -> Unit,
 
 	markChapterAsCurrent: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
@@ -72,6 +82,12 @@ fun ChapterReaderPagerContent(
 	}
 
 	val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { items.size })
+
+	LaunchedEffect(pageJumper) {
+		pageJumper.item.collectLatest {
+			pagerState.scrollToPage(it)
+		}
+	}
 
 	var curChapter: ReaderUIItem.ReaderChapterUI? by remember { mutableStateOf(null) }
 	if (items.isNotEmpty())
