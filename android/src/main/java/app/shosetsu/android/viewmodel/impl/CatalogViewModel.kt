@@ -163,7 +163,7 @@ class CatalogViewModel(
 					queryFlow.combine(filtersApplied) { query, filtersApplied ->
 						query to filtersApplied
 					}.flatMapLatest { (query, filtersApplied) ->
-						if (query.isEmpty() && !filtersApplied) {
+						if (query.isEmpty() && !filtersApplied && listing !is IExtension.Listing.Item) {
 							return@flatMapLatest flowOf(null)
 						}
 						filterDataFlow.mapLatest { data ->
