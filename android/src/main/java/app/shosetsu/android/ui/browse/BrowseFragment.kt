@@ -20,9 +20,11 @@ package app.shosetsu.android.ui.browse
 import android.content.Intent
 import android.provider.Settings
 import androidx.annotation.StringRes
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +45,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -387,12 +390,7 @@ fun PreviewBrowseExtensionContent() {
 	)
 }
 
-@OptIn(
-	ExperimentalMaterial3Api::class,
-	androidx.compose.foundation.ExperimentalFoundationApi::class,
-	androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi::class,
-	androidx.compose.ui.unit.ExperimentalUnitApi::class
-)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationGraphicsApi::class)
 @Composable
 fun BrowseExtensionContent(
 	item: BrowseExtensionUI,
