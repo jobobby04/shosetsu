@@ -685,7 +685,7 @@ fun NovelInfoContent(
 	onBack: () -> Unit,
 	onOpenShareMenu: () -> Unit
 ) {
-	val splitColumn = windowSize.widthSizeClass != WindowWidthSizeClass.Compact
+	val splitColumn = windowSize.widthSizeClass == WindowWidthSizeClass.Expanded
 
 	@Composable
 	fun header(
