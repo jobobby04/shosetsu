@@ -278,11 +278,7 @@ fun NovelInfoView(
 		selectedChaptersState = selectedChaptersState,
 		itemAt = itemAt,
 		isRefreshing = isRefreshing,
-		onRefresh = {
-			//	if (viewModel.isOnline())
-			//refresh()
-			//else displayOfflineSnackBar(null)
-		},
+		onRefresh = viewModel::refresh,
 		openWebView = {
 			openInWebView(novelURL ?: return@NovelInfoContent)
 		},
