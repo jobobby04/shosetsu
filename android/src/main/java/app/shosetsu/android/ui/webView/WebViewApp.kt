@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
@@ -224,7 +225,11 @@ fun WebViewScreen(
 								}
 							)
 						}
-					}
+					},
+					colors = TopAppBarDefaults.topAppBarColors(
+						containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+						titleContentColor = MaterialTheme.colorScheme.onSurface,
+					)
 				)
 				when (val loadingState = state.loadingState) {
 					is LoadingState.Initializing -> LinearProgressIndicator(
