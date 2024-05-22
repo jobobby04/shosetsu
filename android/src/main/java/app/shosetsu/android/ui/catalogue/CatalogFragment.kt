@@ -43,6 +43,8 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -563,7 +565,11 @@ fun CatalogTopBar(
 				stringResource(R.string.action_open_in_webview),
 				onClick = openWebView
 			)
-		}
+		},
+		colors = TopAppBarDefaults.topAppBarColors(
+			containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+			titleContentColor = MaterialTheme.colorScheme.onSurface,
+		)
 	)
 }
 
