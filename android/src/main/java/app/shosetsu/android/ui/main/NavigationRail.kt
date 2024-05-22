@@ -1,12 +1,15 @@
 package app.shosetsu.android.ui.main
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 
 /*
@@ -38,7 +41,10 @@ fun <T> NavigationRail(
 	currentDestination: NavBackStackEntry?,
 	onNavigate: (Destination) -> Unit
 ) where T : Destination, T : Root {
-	NavigationRail {
+	NavigationRail(
+		containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+		contentColor = MaterialTheme.colorScheme.onSurface,
+	) {
 		destinations.forEach { destination ->
 			NavigationRailItem(
 				selected =

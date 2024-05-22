@@ -22,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -217,7 +219,11 @@ fun AddShareContent(
 				},
 				actions = {
 					HelpButton(SHARE_HELP_URL)
-				}
+				},
+				colors = TopAppBarDefaults.topAppBarColors(
+					containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+					titleContentColor = MaterialTheme.colorScheme.onSurface,
+				)
 			)
 		}
 	) { padding ->
