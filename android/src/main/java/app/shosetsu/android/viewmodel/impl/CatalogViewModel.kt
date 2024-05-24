@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -114,9 +115,6 @@ class CatalogViewModel(
 		extensionIDFlow.mapLatest { extensionID ->
 			val ext = getExtensionUseCase(extensionID)
 
-			// Ensure filter is initialized
-			ext?.searchFiltersModel?.toList()?.init()
-			applyFilters()
 			// Ensure listings are initialized
 			selectedListing.value = ext?.listings()
 			ext
@@ -222,28 +220,21 @@ class CatalogViewModel(
 		}.cachedIn(viewModelScope)
 	}
 
-	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> by lazy {
-		iExtensionFlow.transformLatest { extension ->
-			// Once we get the extension, we want to reload the filters whenever the selected listing changes
-			if (extension != null) {
-				getExtSelectedListingFlow(extension.formatterID).collect {
-					emit(extension)
-				}
-			} else {
-				// Default when the extension has not loaded in yet
-				emit(null)
-			}
-		}.mapLatest {
-			it?.searchFiltersModel?.toList() ?: emptyList()
+	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> = iExtensionFlow.combine(
+		selectedListing.map { (it as? IExtension.Listing.Item)?.link }.distinctUntilChanged()
+	) { a, b -> a to b }
+		.mapLatest { (extension, listing) ->
+			extension?.getCatalogueFilters(listing)?.toList() ?: emptyList()
 		}.mapLatest { filterList ->
 			filterDataState.clear() // Reset filter state so no data conflicts occur
+			filterList.init()
 			filterList.map { StableHolder(it) }.toImmutableList()
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
-	}
+		}
+		.onIO()
+		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
 
 	override val hasFilters: StateFlow<Boolean> by lazy {
-		iExtensionFlow.mapLatest { it?.searchFiltersModel?.isNotEmpty() ?: false }
-			.onIO()
+		filterItemsLive.mapLatest { it.isNotEmpty() }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
