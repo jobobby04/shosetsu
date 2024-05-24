@@ -1,12 +1,14 @@
 package app.shosetsu.android.ui.css
 
 import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
@@ -34,7 +36,15 @@ fun CSSEditorView(
 	val canUndo by viewModel.canUndo.collectAsState()
 	val activity = LocalContext.current as Activity
 
-	ShosetsuTheme {
+	val theme by viewModel.appTheme.collectAsState()
+
+	ShosetsuTheme(
+		darkTheme = when (theme) {
+			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+			AppThemes.LIGHT -> false
+			AppThemes.DARK -> true
+		}
+	) {
 		CSSEditorPagerContent(
 			cssTitle = cssTitle,
 			cssContent = cssContent,

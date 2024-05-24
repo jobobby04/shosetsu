@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.StateFlow
 
@@ -30,4 +31,5 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class WebViewViewModel : ShosetsuViewModel() {
 	abstract val userAgent: StateFlow<String>
+	abstract val appTheme: StateFlow<AppThemes>
 }
