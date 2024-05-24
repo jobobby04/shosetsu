@@ -1,6 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.compose.material3.ColorScheme
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +30,8 @@ import kotlinx.coroutines.flow.StateFlow
  * @author Doomsdayrs
  */
 abstract class ACSSEditorViewModel : ShosetsuViewModel() {
+	abstract val appTheme: StateFlow<AppThemes>
+
 	abstract fun undo()
 	abstract fun redo()
 

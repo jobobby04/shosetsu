@@ -4,16 +4,22 @@ import android.app.Application
 import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.StyleEntity
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.ui.theme.FallbackColorScheme
+import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import java.util.Stack
 
 /*
  * This file is part of shosetsu.
@@ -40,8 +46,13 @@ import java.util.*
  */
 class CSSEditorViewModel(
 	private val app: Application,
-	private val settingsRepo: ISettingsRepository
+	private val settingsRepo: ISettingsRepository,
+	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : ACSSEditorViewModel() {
+	override val appTheme: StateFlow<AppThemes> =
+		loadLiveAppThemeUseCase()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
+
 
 	private val css = object : ShosetsuCssViewModelComponent() {
 		override val settingsRepo: ISettingsRepository

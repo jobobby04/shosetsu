@@ -333,7 +333,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 
 	bind<ACSSEditorViewModel>() with provider {
-		CSSEditorViewModel(instance(), instance())
+		CSSEditorViewModel(instance(), instance(), instance())
 	}
 
 	bind<AIntroViewModel>() with provider {
@@ -350,6 +350,6 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		)
 	}
 	bind<WebViewViewModel>() with provider {
-		WebViewViewModelImpl(instance())
+		WebViewViewModelImpl(instance(), instance())
 	}
 }
