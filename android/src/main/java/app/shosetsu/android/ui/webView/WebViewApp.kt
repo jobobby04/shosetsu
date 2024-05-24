@@ -10,6 +10,7 @@ import android.webkit.WebView
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,6 +49,7 @@ import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
@@ -143,7 +145,14 @@ fun WebViewAppView(
 	viewModel: WebViewViewModel = viewModelDi(),
 ) {
 	val theme by viewModel.appTheme.collectAsState()
-	ShosetsuTheme(theme) {
+
+	ShosetsuTheme(
+		darkTheme = when (theme) {
+			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+			AppThemes.LIGHT -> false
+			AppThemes.DARK -> true
+		}
+	) {
 		val userAgent by viewModel.userAgent.collectAsState()
 
 		WebViewScreen(

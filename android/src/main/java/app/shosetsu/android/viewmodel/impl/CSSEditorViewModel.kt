@@ -6,12 +6,14 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.StyleEntity
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.theme.FallbackColorScheme
+import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import kotlinx.coroutines.CoroutineScope
@@ -50,8 +52,12 @@ import java.util.Stack
 class CSSEditorViewModel(
 	private val app: Application,
 	private val settingsRepo: ISettingsRepository,
-	override var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
+	override val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : ACSSEditorViewModel() {
+	override val appTheme: StateFlow<AppThemes> =
+		loadLiveAppThemeUseCase()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
+
 
 	private val css = object : ShosetsuCssViewModelComponent() {
 		override val settingsRepo: ISettingsRepository
