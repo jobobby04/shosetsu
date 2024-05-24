@@ -56,7 +56,7 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 			if (listing != null && !listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
 				emptyList()
 			} else try {
-				ext.list(HashMap(data).apply {
+				ext.getCatalogue(HashMap(data).apply {
 					this[QUERY_INDEX] = query
 					this[LISTING_INDEX] = listing?.link
 				}).toList()

@@ -255,7 +255,7 @@ class SearchViewModel(
 										extensionID,
 										query,
 										HashMap<Int, Any>().apply {
-											putAll(ext.searchFiltersModel.toList().mapify())
+											putAll(ext.getCatalogueFilters(null).toList().mapify())
 											this[PAGE_INDEX] = ext.startIndex
 										},
 										null
