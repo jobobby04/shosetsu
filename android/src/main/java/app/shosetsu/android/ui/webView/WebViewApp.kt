@@ -23,6 +23,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,9 +33,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import app.shosetsu.android.BuildConfig
@@ -52,6 +57,8 @@ import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewState
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -283,6 +290,8 @@ fun WebViewScreen(
 			}
 		}
 
+		val background = rememberUpdatedState(MaterialTheme.colorScheme.background)
+		val scope = rememberCoroutineScope()
 		WebView(
 			state = state,
 			modifier = Modifier
@@ -303,6 +312,11 @@ fun WebViewScreen(
 				) {
 					WebView.setWebContentsDebuggingEnabled(true)
 				}
+
+				webView.setBackgroundColor(background.value.toArgb())
+				snapshotFlow { background.value }
+					.onEach { webView.setBackgroundColor(background.value.toArgb()) }
+					.launchIn(scope)
 			},
 			client = webClient,
 			chromeClient = ShosetsuAccompanistWebChromeClient()
