@@ -96,6 +96,8 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 
 			ACTION_REPORT_ERROR -> {
 				val exception = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+					// An exception MUST exist.
+					@Suppress("ReplaceNotNullAssertionWithElvisReturn")
 					intent.extras?.getSerializable(EXTRA_EXCEPTION, Throwable::class.java)!!
 				} else {
 					@Suppress("DEPRECATION")
