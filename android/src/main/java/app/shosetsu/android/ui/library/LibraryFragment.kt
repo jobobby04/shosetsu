@@ -333,6 +333,9 @@ fun LibraryContent(
 	}
 }
 
+/**
+ * Represents the top bar for the library
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryAppBar(
