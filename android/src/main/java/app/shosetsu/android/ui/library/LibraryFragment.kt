@@ -481,7 +481,7 @@ fun LibraryPager(
  *
  * Also is used for the default page.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LibraryCategory(
 	items: ImmutableList<LibraryNovelUI>,
