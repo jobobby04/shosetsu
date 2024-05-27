@@ -35,6 +35,9 @@ import org.kodein.di.android.closestDI
 abstract class CoroutineWorkerManager(
 	val context: Context
 ) : DIAware {
+	/**
+	 * Dependency injection
+	 */
 	override val di: DI by closestDI(context)
 
 	/**
@@ -47,14 +50,33 @@ abstract class CoroutineWorkerManager(
 	 */
 	abstract suspend fun getCount(): Int
 
+	/**
+	 * Get the state of a worker.
+	 *
+	 * @param index the index of the worker in [getWorkerInfoList]
+	 */
 	abstract suspend fun getWorkerState(index: Int = 0): WorkInfo.State
 
+	/**
+	 * Get worker information
+	 */
 	abstract suspend fun getWorkerInfoList(): List<WorkInfo>
 
+	/**
+	 * Is the given worker running or not.
+	 */
 	open suspend fun isRunning(): Boolean =
 		getWorkerState() == WorkInfo.State.RUNNING
 
+	/**
+	 * Start the given worker
+	 *
+	 * @param data to pass to the worker.
+	 */
 	abstract fun start(data: Data = Data.EMPTY)
 
+	/**
+	 * Stop the worker
+	 */
 	abstract fun stop(): Operation
 }
