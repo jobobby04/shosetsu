@@ -37,13 +37,16 @@ import org.kodein.di.instance
  */
 
 /**
- * Shosetsu
+ * Handle broadcasts sent by notifications.
  *
  * @since 23 / 07 / 2021
  * @author Doomsdayrs
  */
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
+	/**
+	 * Occurs when we receive a broadcast from a notification.
+	 */
 	override fun onReceive(context: Context?, intent: Intent?) {
 		if (context == null) return
 		if (intent == null) return
