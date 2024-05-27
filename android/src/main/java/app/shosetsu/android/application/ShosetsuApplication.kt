@@ -287,6 +287,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				}.build()
 			}
 
+			@Suppress("ReplaceNotNullAssertionWithElvisReturn")
 			allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
 
 			// Coil spawns a new thread for every image load by default
