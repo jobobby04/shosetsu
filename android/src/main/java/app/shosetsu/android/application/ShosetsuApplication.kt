@@ -98,6 +98,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	private val settingsRepo: ISettingsRepository by instance()
 	private val getUserAgent: GetUserAgentUseCase by instance()
 
+	/***/
 	override val di: DI by DI.lazy {
 		bind<ViewModelFactory>() with singleton { ViewModelFactory(applicationContext) }
 		import(othersModule)
@@ -111,6 +112,9 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		import(androidXModule(this@ShosetsuApplication))
 	}
 
+	/**
+	 * Perform setup as soon as context is available
+	 */
 	override fun attachBaseContext(base: Context?) {
 		super.attachBaseContext(base)
 		Notifications.createChannels(this)
@@ -191,6 +195,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		)
 	}
 
+	/***/
 	override fun onCreate() {
 
 		runBlocking {
