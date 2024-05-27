@@ -30,7 +30,7 @@ class BootReceiver : BroadcastReceiver() {
 			logE("Action did not match")
 			return
 		}
-		// Starts perodic workers
+		// Starts periodic workers
 		AutoStartUpdateWorker(context).invoke()
 		AutoStartAppUpdateWorker(context).invoke()
 	}
