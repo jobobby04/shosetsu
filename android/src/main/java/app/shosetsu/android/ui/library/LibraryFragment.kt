@@ -426,7 +426,7 @@ fun LibraryPager(
 			ScrollableTabRow(
 				selectedTabIndex = categoryPagerState.currentPage,
 				indicator = { tabPositions ->
-					TabRowDefaults.Indicator(
+					TabRowDefaults.SecondaryIndicator(
 						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
 					)
 				},
