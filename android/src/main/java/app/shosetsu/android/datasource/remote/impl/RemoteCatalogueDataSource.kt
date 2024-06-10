@@ -39,7 +39,7 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>,
-	): List<Novel.Listing> {
+	): List<Novel.Info> {
 		return if (ext.hasSearch) {
 			try {
 				ext.search(HashMap(data).apply {
@@ -58,7 +58,7 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 		ext: IExtension,
 		listingIndex: Int,
 		data: Map<Int, Any>,
-	): List<Novel.Listing> {
+	): List<Novel.Info> {
 		val listing = ext.listings[listingIndex]
 
 		logD(data.toString())
