@@ -1,14 +1,20 @@
 package app.shosetsu.android.viewmodel.impl
 
+import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.graphics.Color
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
+import app.shosetsu.android.R
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
 import app.shosetsu.android.common.SettingKey.ReaderEnableFullscreen
+import app.shosetsu.android.common.SettingKey.ReaderEngine
 import app.shosetsu.android.common.SettingKey.ReaderHorizontalPageSwap
 import app.shosetsu.android.common.SettingKey.ReaderHtmlCss
 import app.shosetsu.android.common.SettingKey.ReaderIndentSize
@@ -16,8 +22,10 @@ import app.shosetsu.android.common.SettingKey.ReaderIsFirstFocus
 import app.shosetsu.android.common.SettingKey.ReaderIsInvertedSwipe
 import app.shosetsu.android.common.SettingKey.ReaderIsTapToScroll
 import app.shosetsu.android.common.SettingKey.ReaderKeepScreenOn
+import app.shosetsu.android.common.SettingKey.ReaderLanguage
 import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
 import app.shosetsu.android.common.SettingKey.ReaderMatchFullscreenToFocus
+import app.shosetsu.android.common.SettingKey.ReaderNextChapter
 import app.shosetsu.android.common.SettingKey.ReaderParagraphSpacing
 import app.shosetsu.android.common.SettingKey.ReaderPitch
 import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
@@ -43,6 +51,7 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.onIO
+import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.model.local.ColorChoiceData
@@ -61,6 +70,7 @@ import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
+import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
@@ -72,8 +82,10 @@ import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,8 +93,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -94,12 +110,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.util.Locale
+import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 /*
  * This file is part of shosetsu.
@@ -142,18 +163,6 @@ class ChapterReaderViewModel(
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {
-
-	override val isTTSCapable = MutableStateFlow(false)
-
-	override fun setIsTTSCapable(newValue: Boolean) {
-		isTTSCapable.value = newValue
-	}
-
-	override val isTTSPlaying = MutableStateFlow(false)
-
-	override fun setIsTTSPlaying(newValue: Boolean) {
-		isTTSPlaying.value = newValue
-	}
 
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
@@ -233,12 +242,20 @@ class ChapterReaderViewModel(
 	override val ttsPitch by lazy {
 		settingsRepo.getFloatFlow(ReaderPitch)
 	}
+	override val ttsLanguage: StateFlow<String> by lazy {
+		settingsRepo.getStringFlow(ReaderLanguage)
+	}
+	override val ttsEngine: StateFlow<String> by lazy {
+		settingsRepo.getStringFlow(ReaderEngine)
+	}
 	override val ttsVoice: StateFlow<String> by lazy {
 		settingsRepo.getStringFlow(ReaderVoice)
 	}
-
 	override val ttsSpeed by lazy {
 		settingsRepo.getFloatFlow(ReaderSpeed)
+	}
+	val ttsNextChapter: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderNextChapter)
 	}
 
 	private val stringMap = HashMap<Int, Flow<ChapterPassage>>()
@@ -333,6 +350,12 @@ class ChapterReaderViewModel(
 								unformattedText.replace(
 									"\n".toRegex(),
 									replaceSpacing.toString()
+								),
+								listOf(
+									TTSText(
+										UUID.randomUUID().toString(),
+										unformattedText,
+									)
 								)
 							)
 						}
@@ -374,6 +397,27 @@ class ChapterReaderViewModel(
 
 					val document = Jsoup.parse(result)
 
+					val textElements = document.body().select("*:not(:has(*))")
+
+					val textItems = mutableListOf<TTSText>()
+					textElements.forEach { element ->
+						var actualElement = element
+						var parent = element.parent()
+						do {
+							if (!parent?.ownText().isNullOrEmpty()) {
+								actualElement = parent!!
+							}
+							parent = actualElement.parent()
+						} while (!parent?.ownText().isNullOrEmpty())
+
+						val text = actualElement.wholeText().trim()
+						if (text.isNotEmpty()) {
+							val uuid = UUID.randomUUID()
+							actualElement.attr("id", "textElement$uuid")
+							textItems.add(TTSText(uuid.toString(), text))
+						}
+					}
+
 					emitAll(
 						shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
 							fun update(id: String, css: String) {
@@ -396,7 +440,8 @@ class ChapterReaderViewModel(
 							update("user-style", useCSS)
 
 							ChapterPassage.Success(
-								document.toString()
+								document.toString(),
+								textItems.toList()
 							)
 						}
 					)
@@ -818,8 +863,11 @@ class ChapterReaderViewModel(
 		_isSystemVisible.value = !_isSystemVisible.value
 	}
 
-	override fun onReaderClicked() {
-		if (!doubleTapFocus.value) {
+	override fun onReaderClicked(item: String?) {
+		if (item != null && ttsPlayback.value == TtsPlayback.Paused) {
+			ttsProgress.value = item.substringAfter("textElement")
+			ttsPlayback.value = TtsPlayback.Playing
+		} else if (!doubleTapFocus.value) {
 			val newValue = !isFocused.value
 			isFocused.value = newValue
 			if (newValue || matchFullscreenToFocus.value)
@@ -907,6 +955,10 @@ class ChapterReaderViewModel(
 			setShosetsuStyle("img") {
 				this["max-width"] = "100%"
 				this["height"] = "initial !important"
+			}
+
+			setShosetsuStyle(".tts-border-style") {
+				this["border"] = "2px solid red"
 			}
 
 			if (it.tableHackEnabled)
@@ -1059,6 +1111,236 @@ class ChapterReaderViewModel(
 				)
 			}
 		}
+	}
+
+	override val ttsProgress = MutableStateFlow<String?>(null)
+	val ttsDone = MutableStateFlow<String?>(null)
+	override val ttsPlayback = MutableStateFlow<TtsPlayback>(TtsPlayback.Stopped)
+	data class TTSBuilder(
+		val context: Context,
+		val engine: String,
+		val language: String,
+		val voice: String,
+	)
+	private val context = MutableStateFlow<Context?>(null)
+	private val tts = ttsEngine.combine(context) { engine, context ->
+		context ?: return@combine null
+		TTSBuilder(context, engine, "", "")
+	}.filterNotNull().combine(ttsLanguage) { builder, language ->
+		builder.copy(language = language)
+	}.combine(ttsVoice) { builder, voice ->
+		builder.copy(voice = voice)
+	}.map { builder ->
+		val ttsResult = CompletableDeferred<Int>()
+		val tts = if (builder.engine.isEmpty()) {
+			TextToSpeech(builder.context) { ttsResult.complete(it) }
+		} else {
+			TextToSpeech(builder.context, { ttsResult.complete(it) }, builder.engine)
+		}
+		when (ttsResult.await()) {
+			TextToSpeech.SUCCESS -> tts to builder
+			else -> {
+				builder.context.toast(R.string.reader_test_invalid_engine)
+				null
+			}
+		}
+	}.filterNotNull()
+		.filter { (tts, builder) ->
+			val languageSuccess: Boolean
+			val locale: Locale
+			if (builder.language.isEmpty()) {
+				locale = Locale.getDefault()
+				val result = tts.setLanguage(Locale.getDefault())
+				languageSuccess = when (result) {
+					TextToSpeech.LANG_AVAILABLE -> true
+					TextToSpeech.LANG_COUNTRY_AVAILABLE -> true
+					TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE -> true
+					else -> false
+				}
+			} else {
+				val ttsLocale = tts.availableLanguages.find { it.toLanguageTag() == builder.language }
+				if (ttsLocale != null) {
+					locale = ttsLocale
+					val result = tts.setLanguage(locale)
+					languageSuccess = when (result) {
+						TextToSpeech.LANG_AVAILABLE -> true
+						TextToSpeech.LANG_COUNTRY_AVAILABLE -> true
+						TextToSpeech.LANG_COUNTRY_VAR_AVAILABLE -> true
+						else -> false
+					}
+				} else {
+					locale = Locale.getDefault()
+					languageSuccess = false
+				}
+			}
+			if (!languageSuccess) {
+				builder.context.toast(R.string.reader_test_invalid_language)
+				return@filter false
+			}
+			val voiceSuccess: Boolean
+			if (builder.voice.isNotEmpty()) {
+				val ttsVoice = tts.voices.filter { it.locale == locale }
+					.find { it.name == builder.voice }
+				if (ttsVoice != null) {
+					val result = tts.setVoice(ttsVoice)
+					voiceSuccess = when (result) {
+						TextToSpeech.SUCCESS -> true
+						else -> false
+					}
+				} else {
+					voiceSuccess = false
+				}
+			} else {
+				voiceSuccess = tts.defaultVoice != null
+			}
+			if (!voiceSuccess) {
+				builder.context.toast(R.string.reader_test_invalid_voice)
+				return@filter false
+			}
+			true
+		}
+		.combine(
+			ttsPitch.combine(ttsSpeed) { a, b -> a to b }
+				.distinctUntilChanged()
+		) { (tts, _), (pitch, speed) ->
+			tts.setPitch(pitch / 10)
+			tts.setSpeechRate(speed / 10)
+			tts
+		}
+		.distinctUntilChanged()
+		.onEach {
+			it.setOnUtteranceProgressListener(
+				object : UtteranceProgressListener() {
+					override fun onStart(utteranceId: String?) {
+						if (ttsPlayback.value != TtsPlayback.Stopped) {
+							ttsProgress.value = utteranceId?.substringBefore('|')
+						}
+					}
+
+					override fun onDone(utteranceId: String?) {
+						ttsDone.value = utteranceId
+					}
+					@Deprecated("Deprecated in Java")
+					override fun onError(utteranceId: String?) {}
+					override fun onError(utteranceId: String?, errorCode: Int) {
+						this@ChapterReaderViewModel.logE("TTS Error code: $errorCode")
+						ttsPlayback.value = TtsPlayback.Paused
+					}
+				}
+			)
+		}
+		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
+
+	init {
+		viewModelScopeIO.launch {
+			var oldTts: TextToSpeech? = null
+			currentChapterID.collectLatest { chapterId ->
+				coroutineScope {
+					oldTts?.stop()
+					oldTts = null
+					val chapters = liveData.first { it != null }
+					val item = chapters
+						?.find { (it as? ReaderChapterUI)?.id == chapterId }
+							as? ReaderChapterUI ?: return@coroutineScope
+
+					val passage = when (chapterType.first { it != null }) {
+						null -> return@coroutineScope
+						Novel.ChapterType.HTML -> getChapterHTMLPassage(item)
+						Novel.ChapterType.STRING -> getChapterStringPassage(item)
+					}.firstOrNull { it is ChapterPassage.Success } as? ChapterPassage.Success
+						?: return@coroutineScope
+
+					launch nextChapterTts@{
+						val lastTts = passage.ttsElements.lastOrNull() ?: return@nextChapterTts
+						ttsNextChapter.collectLatest nextChapterTts2@{
+							if (!it) {
+								return@nextChapterTts2
+							}
+							ttsDone.collectLatest nextChapterTts3@{ id ->
+								if (id != null && id == lastTts.id) {
+									val index = chapters.indexOfFirst {
+										(it as? ReaderChapterUI)?.id == chapterId
+									}
+									if (index > 0) {
+										val nextChapter = chapters.getOrNull(index + 2)
+											as? ReaderChapterUI
+											?: return@nextChapterTts3
+
+										pageJumper.emit(chapters.indexOf(nextChapter))
+										viewModelScopeIO.launch {
+											onViewed(nextChapter)
+											setCurrentChapterID(nextChapter.id)
+											withTimeoutOrNull(5.seconds) {
+												if (
+													ttsPlayback.firstOrNull { it == TtsPlayback.Stopped } != null
+												) {
+													onPlayTts(
+														context.value ?: return@withTimeoutOrNull
+													)
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					tts.collectLatest { tts ->
+						if (tts == null) {
+							oldTts?.stop()
+							oldTts = null
+							@Suppress("LABEL_NAME_CLASH")
+							return@collectLatest
+						}
+						oldTts?.stop()
+						oldTts = tts
+						ttsPlayback.collectLatest { playback ->
+							if (playback != TtsPlayback.Playing) {
+								tts.stop()
+								@Suppress("LABEL_NAME_CLASH")
+								return@collectLatest
+							}
+							coroutineScope {
+								var ttsElements = passage.ttsElements
+								val ttsState = ttsProgress.value
+								if (ttsState != null) {
+									val index = ttsElements.indexOfFirst { it.id == ttsState }
+									if (index >= 0) {
+										ttsElements = ttsElements.drop(index)
+									}
+								}
+								ttsElements.forEach {
+									customSpeak(
+										tts,
+										it.text,
+										it.id
+									)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	override fun onPlayTts(context: Context) {
+		this.context.value = context.applicationContext
+		ttsPlayback.value = TtsPlayback.Playing
+	}
+
+	override fun onPauseTts() {
+		ttsPlayback.value = TtsPlayback.Paused
+	}
+
+	override fun onStopTts() {
+		ttsPlayback.value = TtsPlayback.Stopped
+		ttsProgress.value = null
+	}
+
+	override fun onCleared() {
+		tts.value?.stop()
 	}
 
 	companion object {

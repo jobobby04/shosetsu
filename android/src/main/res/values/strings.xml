@@ -59,6 +59,15 @@
 
     <string name="reader_pitch">TTS Pitch</string>
     <string name="reader_speed">TTS Speed</string>
+    <string name="reader_engine">TTS Engine</string>
+    <string name="reader_voice">TTS Voice</string>
+    <string name="reader_language">TTS Language</string>
+    <string name="reader_test">Test TTS</string>
+    <string name="reader_test_invalid_engine">TTS engine failed to start</string>
+    <string name="reader_test_invalid_language">Invalid language selection</string>
+    <string name="reader_test_invalid_voice">Invalid voice selection</string>
+    <string name="reader_read_next_chapter_title">TTS Read Next Chapter</string>
+    <string name="reader_read_next_chapter_desc">Automatically start reading the next chapter when using TTS.</string>
 
     <!-- Migration View -->
 

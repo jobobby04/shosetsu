@@ -1,7 +1,6 @@
 package app.shosetsu.android.ui.settings.sub
 
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.speech.tts.Voice
 import android.util.Log
 import android.view.LayoutInflater
@@ -56,13 +55,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ChaptersResumeFirstUnread
 import app.shosetsu.android.common.SettingKey.ReaderKeepScreenOn
 import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
 import app.shosetsu.android.common.SettingKey.ReaderTextAlignment
 import app.shosetsu.android.common.SettingKey.ReaderTheme
-import app.shosetsu.android.common.SettingKey.ReaderVoice
 import app.shosetsu.android.common.SettingKey.ReadingMarkingType
 import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
@@ -84,10 +81,15 @@ import app.shosetsu.android.viewmodel.impl.settings.invertChapterSwipeOption
 import app.shosetsu.android.viewmodel.impl.settings.matchFullscreenToFocus
 import app.shosetsu.android.viewmodel.impl.settings.paragraphIndentOption
 import app.shosetsu.android.viewmodel.impl.settings.paragraphSpacingOption
+import app.shosetsu.android.viewmodel.impl.settings.readerEngineOption
+import app.shosetsu.android.viewmodel.impl.settings.readerLanguageOption
 import app.shosetsu.android.viewmodel.impl.settings.readerPitchOption
+import app.shosetsu.android.viewmodel.impl.settings.readerReadNextChapter
 import app.shosetsu.android.viewmodel.impl.settings.readerSpeedOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTableHackOption
+import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
+import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
 import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
@@ -393,30 +395,11 @@ fun ReaderSettingsContent(
 			}
 			item { viewModel.readerPitchOption() }
 			item { viewModel.readerSpeedOption() }
-			item {
-				val context = LocalContext.current
-				val tts = remember {
-					TextToSpeech(
-						context
-					) {
-					}
-				}
-				val selectedVoice by
-				viewModel.settingsRepo.getStringFlow(SettingKey.ReaderVoice).collectAsState()
-				val voices by remember {
-					derivedStateOf {
-						tts.voices?.toImmutableList() ?: emptyList()
-					}
-				}
-				ReaderSettingsVoiceOption(
-					selectedVoice,
-					voices
-				) {
-					launchIO {
-						viewModel.settingsRepo.setString(ReaderVoice, it)
-					}
-				}
-			}
+			item { viewModel.readerEngineOption() }
+			item { viewModel.readerLanguageOption() }
+			item { viewModel.readerVoiceOption() }
+			item { viewModel.readerTestOption() }
+			item { viewModel.readerReadNextChapter() }
 		}
 	}
 }

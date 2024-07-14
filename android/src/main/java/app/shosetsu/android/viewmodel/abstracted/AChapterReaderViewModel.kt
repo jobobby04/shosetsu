@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -40,14 +41,6 @@ abstract class AChapterReaderViewModel :
 	ShosetsuViewModel(),
 	ExposedSettingsRepoViewModel {
 
-	abstract val isTTSCapable: StateFlow<Boolean>
-
-	abstract fun setIsTTSCapable(newValue: Boolean)
-
-	abstract val isTTSPlaying: StateFlow<Boolean>
-
-	abstract fun setIsTTSPlaying(newValue: Boolean)
-
 	/**
 	 * Has the user been reading for too long?
 	 *
@@ -74,10 +67,11 @@ abstract class AChapterReaderViewModel :
 
 	abstract fun retryChapter(item: ReaderChapterUI)
 
+	class TTSText(val id: String, val text: String)
 	sealed class ChapterPassage {
-		object Loading : ChapterPassage()
+		data object Loading : ChapterPassage()
 		data class Error(val throwable: Throwable?) : ChapterPassage()
-		data class Success(val content: String) : ChapterPassage()
+		data class Success(val content: String, val ttsElements: List<TTSText>) : ChapterPassage()
 	}
 
 	abstract fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage>
@@ -102,6 +96,8 @@ abstract class AChapterReaderViewModel :
 	abstract val ttsSpeed: StateFlow<Float>
 	abstract val ttsPitch: StateFlow<Float>
 
+	abstract val ttsLanguage: StateFlow<String>
+	abstract val ttsEngine: StateFlow<String>
 	abstract val ttsVoice: StateFlow<String>
 
 	/**
@@ -125,7 +121,7 @@ abstract class AChapterReaderViewModel :
 	abstract fun toggleFocus()
 	abstract fun toggleSystemVisible()
 
-	abstract fun onReaderClicked()
+	abstract fun onReaderClicked(item: String?)
 	abstract fun onReaderDoubleClicked()
 
 	/**
@@ -208,4 +204,15 @@ abstract class AChapterReaderViewModel :
 	abstract fun depleteProgress()
 
 	abstract fun clearMemory()
+
+	sealed class TtsPlayback {
+		data object Playing : TtsPlayback()
+		data object Paused : TtsPlayback()
+		data object Stopped : TtsPlayback()
+	}
+	abstract val ttsProgress: StateFlow<String?>
+	abstract val ttsPlayback: StateFlow<TtsPlayback>
+	abstract fun onPlayTts(context: Context)
+	abstract fun onPauseTts()
+	abstract fun onStopTts()
 }

@@ -31,11 +31,13 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
 import app.shosetsu.android.common.utils.ProgressiveDelayer
 import app.shosetsu.android.view.compose.ScrollStateBar
+import app.shosetsu.android.view.uimodels.StableHolder
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * This file is part of shosetsu.
@@ -62,9 +64,10 @@ fun HTMLPage(
 	html: String,
 	progress: Double,
 	onScroll: (perc: Double) -> Unit,
-	onClick: () -> Unit,
+	onClick: (String?) -> Unit,
 	onDoubleClick: () -> Unit,
 	openUri: (String) -> Unit,
+	ttsProgress: StableHolder<StateFlow<String?>>,
 ) {
 	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
@@ -145,7 +148,9 @@ fun HTMLPage(
 			client = ChapterReaderAccompanistWebViewClient(
 				openURI = {
 					uriToOpen = it
-				}
+				},
+				scope,
+				ttsProgress.item
 			),
 			chromeClient = ShosetsuAccompanistWebChromeClient(),
 			navigator = navigator,
