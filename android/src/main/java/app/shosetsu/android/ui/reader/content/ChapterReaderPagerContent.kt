@@ -20,8 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /*
@@ -59,6 +62,7 @@ fun ChapterReaderPagerContent(
 
 	isSwipeInverted: Boolean,
 
+	pageJumper: StableHolder<SharedFlow<Int>>,
 	currentPage: Int?,
 	onPageChanged: (Int) -> Unit,
 
@@ -78,6 +82,12 @@ fun ChapterReaderPagerContent(
 	}
 
 	val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { items.size })
+
+	LaunchedEffect(pageJumper) {
+		pageJumper.item.collectLatest {
+			pagerState.scrollToPage(it)
+		}
+	}
 
 	var curChapter: ReaderUIItem.ReaderChapterUI? by remember { mutableStateOf(null) }
 	if (items.isNotEmpty())

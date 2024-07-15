@@ -16,9 +16,11 @@ import app.shosetsu.android.R
 import app.shosetsu.android.ui.reader.page.HTMLPage
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -54,8 +56,9 @@ fun ChapterReaderHTMLContent(
 	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<AChapterReaderViewModel.ChapterPassage>,
 	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
-	onClick: () -> Unit,
-	onDoubleClick: () -> Unit
+	onClick: (String?) -> Unit,
+	onDoubleClick: () -> Unit,
+	ttsProgress: StableHolder<StateFlow<String?>>,
 ) {
 	val html by remember(item) {
 		getHTMLContent(item)
@@ -97,7 +100,8 @@ fun ChapterReaderHTMLContent(
 					onScroll(item, it)
 				},
 				onClick = onClick,
-				onDoubleClick = onDoubleClick
+				onDoubleClick = onDoubleClick,
+				ttsProgress = ttsProgress,
 			)
 		}
 	}

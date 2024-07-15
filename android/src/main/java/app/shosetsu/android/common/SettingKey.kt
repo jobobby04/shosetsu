@@ -259,6 +259,12 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 	object ReaderVoice : StringKey("reader_voice", "")
 
+	object ReaderEngine : StringKey("reader_engine", "")
+
+	object ReaderLanguage : StringKey("reader_language", "")
+
+	object ReaderNextChapter : BooleanKey("reader_next_chapter", false)
+
 
 	// Advanced settings
 

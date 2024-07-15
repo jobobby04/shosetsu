@@ -1,10 +1,13 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
+import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
@@ -40,14 +43,6 @@ abstract class AChapterReaderViewModel :
 	ShosetsuViewModel(),
 	ExposedSettingsRepoViewModel {
 
-	abstract val isTTSCapable: StateFlow<Boolean>
-
-	abstract fun setIsTTSCapable(newValue: Boolean)
-
-	abstract val isTTSPlaying: StateFlow<Boolean>
-
-	abstract fun setIsTTSPlaying(newValue: Boolean)
-
 	/**
 	 * Has the user been reading for too long?
 	 *
@@ -75,9 +70,9 @@ abstract class AChapterReaderViewModel :
 	abstract fun retryChapter(item: ReaderChapterUI)
 
 	sealed class ChapterPassage {
-		object Loading : ChapterPassage()
+		data object Loading : ChapterPassage()
 		data class Error(val throwable: Throwable?) : ChapterPassage()
-		data class Success(val content: String) : ChapterPassage()
+		data class Success(val content: String, val ttsElements: List<TTSText>) : ChapterPassage()
 	}
 
 	abstract fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage>
@@ -102,6 +97,8 @@ abstract class AChapterReaderViewModel :
 	abstract val ttsSpeed: StateFlow<Float>
 	abstract val ttsPitch: StateFlow<Float>
 
+	abstract val ttsLanguage: StateFlow<String>
+	abstract val ttsEngine: StateFlow<String>
 	abstract val ttsVoice: StateFlow<String>
 
 	/**
@@ -125,7 +122,7 @@ abstract class AChapterReaderViewModel :
 	abstract fun toggleFocus()
 	abstract fun toggleSystemVisible()
 
-	abstract fun onReaderClicked()
+	abstract fun onReaderClicked(item: String?)
 	abstract fun onReaderDoubleClicked()
 
 	/**
@@ -202,4 +199,11 @@ abstract class AChapterReaderViewModel :
 	abstract fun depleteProgress()
 
 	abstract fun clearMemory()
+
+	abstract val pageJumper: SharedFlow<Int>
+	abstract val ttsProgress: StateFlow<String?>
+	abstract val ttsPlayback: StateFlow<TTSPlayback>
+	abstract fun onPlayTts(context: Context)
+	abstract fun onPauseTts()
+	abstract fun onStopTts()
 }

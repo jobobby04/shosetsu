@@ -27,6 +27,7 @@ import app.shosetsu.android.view.compose.DiscreteSlider
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -34,8 +35,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ChapterReaderBottomSheetContent(
 	scaffoldState: BottomSheetScaffoldState,
-	isTTSCapable: Boolean,
-	isTTSPlaying: Boolean,
+	ttsPlayback: TTSPlayback,
 	isBookmarked: Boolean,
 	isRotationLocked: Boolean,
 	setting: NovelReaderSettingUI,
@@ -44,6 +44,7 @@ fun ChapterReaderBottomSheetContent(
 	toggleBookmark: () -> Unit,
 	exit: () -> Unit,
 	onPlayTTS: () -> Unit,
+	onPauseTTS: () -> Unit,
 	onStopTTS: () -> Unit,
 	updateSetting: (NovelReaderSettingUI) -> Unit,
 	lowerSheet: LazyListScope.() -> Unit,
@@ -93,7 +94,7 @@ fun ChapterReaderBottomSheetContent(
 				)
 			}
 
-			if (isTTSCapable && !isTTSPlaying)
+			if (ttsPlayback != TTSPlayback.Playing)
 				IconButton(onClick = onPlayTTS) {
 					Icon(
 						painterResource(R.drawable.ic_baseline_audiotrack_24),
@@ -101,7 +102,15 @@ fun ChapterReaderBottomSheetContent(
 					)
 				}
 
-			if (isTTSPlaying)
+			if (ttsPlayback == TTSPlayback.Playing)
+				IconButton(onClick = onPauseTTS) {
+					Icon(
+						painterResource(R.drawable.ic_pause_circle_outline_24dp),
+						null
+					)
+				}
+
+			if (ttsPlayback != TTSPlayback.Stopped)
 				IconButton(onClick = onStopTTS) {
 					Icon(
 						painterResource(R.drawable.ic_baseline_stop_circle_24),
