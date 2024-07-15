@@ -1,6 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
-import android.content.Context
+import android.app.Application
 import android.database.sqlite.SQLiteException
 import android.graphics.Color
 import android.speech.tts.TextToSpeech
@@ -139,6 +139,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChapterReaderViewModel(
+	private val application: Application,
 	override val settingsRepo: ISettingsRepository,
 	private val chapterRepository: IChaptersRepository,
 	private val novelRepo: INovelsRepository,
@@ -1062,16 +1063,15 @@ class ChapterReaderViewModel(
 	override val ttsProgress = MutableStateFlow<String?>(null)
 	val ttsDone = MutableStateFlow<String?>(null)
 	override val ttsPlayback = MutableStateFlow<TTSPlayback>(TTSPlayback.Stopped)
+
 	data class TTSBuilder(
-		val context: Context,
 		val engine: String,
 		val language: String,
 		val voice: String,
 	)
-	private val context = MutableStateFlow<Context?>(null)
-	private val tts = ttsEngine.combine(context) { engine, context ->
-		context ?: return@combine null
-		TTSBuilder(context, engine, "", "")
+
+	private val tts = ttsEngine.map { engine ->
+		TTSBuilder(engine, "", "")
 	}.filterNotNull().combine(ttsLanguage) { builder, language ->
 		builder.copy(language = language)
 	}.combine(ttsVoice) { builder, voice ->
@@ -1079,14 +1079,14 @@ class ChapterReaderViewModel(
 	}.map { builder ->
 		val ttsResult = CompletableDeferred<Int>()
 		val tts = if (builder.engine.isEmpty()) {
-			TextToSpeech(builder.context) { ttsResult.complete(it) }
+			TextToSpeech(application) { ttsResult.complete(it) }
 		} else {
-			TextToSpeech(builder.context, { ttsResult.complete(it) }, builder.engine)
+			TextToSpeech(application, { ttsResult.complete(it) }, builder.engine)
 		}
 		when (ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
 			else -> {
-				builder.context.toast(R.string.reader_test_invalid_engine)
+				application.toast(R.string.reader_test_invalid_engine)
 				null
 			}
 		}
@@ -1104,7 +1104,8 @@ class ChapterReaderViewModel(
 					else -> false
 				}
 			} else {
-				val ttsLocale = tts.availableLanguages.find { it.toLanguageTag() == builder.language }
+				val ttsLocale =
+					tts.availableLanguages.find { it.toLanguageTag() == builder.language }
 				if (ttsLocale != null) {
 					locale = ttsLocale
 					val result = tts.setLanguage(locale)
@@ -1120,7 +1121,7 @@ class ChapterReaderViewModel(
 				}
 			}
 			if (!languageSuccess) {
-				builder.context.toast(R.string.reader_test_invalid_language)
+				application.toast(R.string.reader_test_invalid_language)
 				return@filter false
 			}
 			val voiceSuccess: Boolean
@@ -1140,7 +1141,7 @@ class ChapterReaderViewModel(
 				voiceSuccess = tts.defaultVoice != null
 			}
 			if (!voiceSuccess) {
-				builder.context.toast(R.string.reader_test_invalid_voice)
+				application.toast(R.string.reader_test_invalid_voice)
 				return@filter false
 			}
 			true
@@ -1166,8 +1167,11 @@ class ChapterReaderViewModel(
 					override fun onDone(utteranceId: String?) {
 						ttsDone.value = utteranceId
 					}
+
 					@Deprecated("Deprecated in Java")
-					override fun onError(utteranceId: String?) {}
+					override fun onError(utteranceId: String?) {
+					}
+
 					override fun onError(utteranceId: String?, errorCode: Int) {
 						this@ChapterReaderViewModel.logE("TTS Error code: $errorCode")
 						ttsPlayback.value = TTSPlayback.Paused
@@ -1209,7 +1213,7 @@ class ChapterReaderViewModel(
 									}
 									if (index > 0) {
 										val nextChapter = chapters.getOrNull(index + 2)
-											as? ReaderChapterUI
+												as? ReaderChapterUI
 											?: return@nextChapterTts3
 
 										pageJumper.emit(chapters.indexOf(nextChapter))
@@ -1220,9 +1224,7 @@ class ChapterReaderViewModel(
 												if (
 													ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
 												) {
-													onPlayTts(
-														context.value ?: return@withTimeoutOrNull
-													)
+													onPlayTts()
 												}
 											}
 										}
@@ -1271,8 +1273,7 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	override fun onPlayTts(context: Context) {
-		this.context.value = context.applicationContext
+	override fun onPlayTts() {
 		ttsPlayback.value = TTSPlayback.Playing
 	}
 

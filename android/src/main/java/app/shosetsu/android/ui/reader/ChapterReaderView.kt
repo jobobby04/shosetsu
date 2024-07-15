@@ -136,7 +136,7 @@ fun ChapterReaderView(
 					toggleBookmark = viewModel::toggleBookmark,
 					exit = onExit,
 					onPlayTTS = {
-						viewModel.onPlayTts(context)
+						viewModel.onPlayTts()
 					},
 					onPauseTTS = viewModel::onPauseTts,
 					onStopTTS = viewModel::onStopTts,

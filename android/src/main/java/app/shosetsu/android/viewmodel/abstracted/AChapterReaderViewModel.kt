@@ -1,6 +1,5 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -203,7 +202,7 @@ abstract class AChapterReaderViewModel :
 	abstract val pageJumper: SharedFlow<Int>
 	abstract val ttsProgress: StateFlow<String?>
 	abstract val ttsPlayback: StateFlow<TTSPlayback>
-	abstract fun onPlayTts(context: Context)
+	abstract fun onPlayTts()
 	abstract fun onPauseTts()
 	abstract fun onStopTts()
 }

@@ -245,6 +245,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	// Chapter
 	bind<AChapterReaderViewModel>() with provider {
 		ChapterReaderViewModel(
+			instance(),
 			settingsRepo = instance(),
 			instance(),
 			instance(),
