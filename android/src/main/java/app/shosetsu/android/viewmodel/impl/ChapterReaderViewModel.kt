@@ -1233,44 +1233,47 @@ class ChapterReaderViewModel(
 
 					launch nextChapterTts@{
 						val lastTts = passage.ttsElements.lastOrNull() ?: return@nextChapterTts
-						val ttsNextChapter = ttsNextChapter.value
 
-						// skip if disabled
-						if (!ttsNextChapter) {
-							return@nextChapterTts
-						}
+						// If the user enables the setting while in the reader, we can listen in
+						ttsNextChapter.collectLatest nextChapterTts2@{ ttsNextChapter ->
+							// skip if disabled
+							if (!ttsNextChapter) {
+								return@nextChapterTts2
+							}
 
-						// Wait for the last TTS line to be spoken to move to the next chapter
-						ttsDone.firstOrNull { it != null && it == lastTts.id }
-							?: return@nextChapterTts
+							// Wait for the last TTS line to be spoken to move to the next chapter
+							ttsDone.firstOrNull { it != null && it == lastTts.id }
+								?: return@nextChapterTts2
 
-						// Get current readerUIItems
-						val readerUIItems = liveData.first { it != null } ?: return@nextChapterTts
+							// Get current readerUIItems
+							val readerUIItems =
+								liveData.first { it != null } ?: return@nextChapterTts2
 
-						val chapterItems = readerUIItems.filterIsInstance<ReaderChapterUI>()
+							val chapterItems = readerUIItems.filterIsInstance<ReaderChapterUI>()
 
-						// Find index of the current chapter
-						val index = chapterItems.indexOfFirst { it.id == chapterId }
+							// Find index of the current chapter
+							val index = chapterItems.indexOfFirst { it.id == chapterId }
 
-						// ensure we got a valid index
-						if (index >= 0) {
-							// Find next chapter
-							val nextChapter = chapterItems
-								.getOrNull(index + 1) // Attempt to get next chapter
-								?: return@nextChapterTts
+							// ensure we got a valid index
+							if (index >= 0) {
+								// Find next chapter
+								val nextChapter = chapterItems
+									.getOrNull(index + 1) // Attempt to get next chapter
+									?: return@nextChapterTts2
 
-							// Jump to the next chapter
-							pageJumper.emit(readerUIItems.indexOf(nextChapter))
-							viewModelScopeIO.launch {
-								System.gc() // Clear out heavy operation (above)
-								onViewed(nextChapter)
-								setCurrentChapterID(nextChapter.id)
-								// Start the TTS again
-								withTimeoutOrNull(5.seconds) {
-									if (
-										ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
-									) {
-										onPlayTts()
+								// Jump to the next chapter
+								pageJumper.emit(readerUIItems.indexOf(nextChapter))
+								viewModelScopeIO.launch {
+									System.gc() // Clear out heavy operation (above)
+									onViewed(nextChapter)
+									setCurrentChapterID(nextChapter.id)
+									// Start the TTS again
+									withTimeoutOrNull(5.seconds) {
+										if (
+											ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
+										) {
+											onPlayTts()
+										}
 									}
 								}
 							}
