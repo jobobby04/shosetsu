@@ -1070,6 +1070,9 @@ class ChapterReaderViewModel(
 		val voice: String,
 	)
 
+	/**
+	 * Provides a TTS to use
+	 */
 	private val tts = ttsEngine.map { engine ->
 		TTSBuilder(engine, "", "")
 	}.filterNotNull().combine(ttsLanguage) { builder, language ->
@@ -1078,11 +1081,14 @@ class ChapterReaderViewModel(
 		builder.copy(voice = voice)
 	}.map { builder ->
 		val ttsResult = CompletableDeferred<Int>()
+
 		val tts = if (builder.engine.isEmpty()) {
-			TextToSpeech(application) { ttsResult.complete(it) }
+			TextToSpeech(application, ttsResult::complete)
 		} else {
-			TextToSpeech(application, { ttsResult.complete(it) }, builder.engine)
+			TextToSpeech(application, ttsResult::complete, builder.engine)
 		}
+
+		// Wait for the TTS to initialize
 		when (ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
 			else -> {
@@ -1092,11 +1098,14 @@ class ChapterReaderViewModel(
 		}
 	}.filterNotNull()
 		.filter { (tts, builder) ->
+			/** Has a language been set */
 			val languageSuccess: Boolean
 			val locale: Locale
+
 			if (builder.language.isEmpty()) {
+				// If language not set, assume the default language
 				locale = Locale.getDefault()
-				val result = tts.setLanguage(Locale.getDefault())
+				val result = tts.setLanguage(locale)
 				languageSuccess = when (result) {
 					TextToSpeech.LANG_AVAILABLE -> true
 					TextToSpeech.LANG_COUNTRY_AVAILABLE -> true
@@ -1104,6 +1113,7 @@ class ChapterReaderViewModel(
 					else -> false
 				}
 			} else {
+				// Find the local from languages
 				val ttsLocale =
 					tts.availableLanguages.find { it.toLanguageTag() == builder.language }
 				if (ttsLocale != null) {
@@ -1116,19 +1126,28 @@ class ChapterReaderViewModel(
 						else -> false
 					}
 				} else {
-					locale = Locale.getDefault()
+					// Failed to find the locale, strange
+					locale = Locale.getDefault() // need to set this, else warning
 					languageSuccess = false
 				}
 			}
+
+			// Do not continue if a language has not been set successfully
 			if (!languageSuccess) {
 				application.toast(R.string.reader_test_invalid_language)
 				return@filter false
 			}
+
+			/** Has the voice been set */
 			val voiceSuccess: Boolean
 			if (builder.voice.isNotEmpty()) {
-				val ttsVoice = tts.voices.filter { it.locale == locale }
+				// Find the voice from voices
+				val ttsVoice = tts.voices
+					.filter { it.locale == locale }
 					.find { it.name == builder.voice }
+
 				if (ttsVoice != null) {
+					// Attempt to set the voice if found
 					val result = tts.setVoice(ttsVoice)
 					voiceSuccess = when (result) {
 						TextToSpeech.SUCCESS -> true
@@ -1138,8 +1157,11 @@ class ChapterReaderViewModel(
 					voiceSuccess = false
 				}
 			} else {
+				// is fine if there is a default voice
 				voiceSuccess = tts.defaultVoice != null
 			}
+
+			// do not proceed if voice was not successful
 			if (!voiceSuccess) {
 				application.toast(R.string.reader_test_invalid_voice)
 				return@filter false
@@ -1147,18 +1169,21 @@ class ChapterReaderViewModel(
 			true
 		}
 		.combine(
-			ttsPitch.combine(ttsSpeed) { a, b -> a to b }
+			ttsPitch
+				.combine(ttsSpeed) { a, b -> a to b }
 				.distinctUntilChanged()
 		) { (tts, _), (pitch, speed) ->
-			tts.setPitch(pitch / 10)
-			tts.setSpeechRate(speed / 10)
-			tts
+			tts.apply {
+				setPitch(pitch / 10)
+				setSpeechRate(speed / 10)
+			}
 		}
 		.distinctUntilChanged()
 		.onEach {
 			it.setOnUtteranceProgressListener(
 				object : UtteranceProgressListener() {
 					override fun onStart(utteranceId: String?) {
+						// Only set progress if not stopped
 						if (ttsPlayback.value != TTSPlayback.Stopped) {
 							ttsProgress.value = utteranceId?.substringBefore('|')
 						}
@@ -1185,14 +1210,21 @@ class ChapterReaderViewModel(
 		viewModelScopeIO.launch {
 			var oldTts: TextToSpeech? = null
 			currentChapterID.collectLatest { chapterId ->
+				// Child scope is cancelled when the chapter is changed
 				coroutineScope {
+					// Clear out old TTS
 					oldTts?.stop()
 					oldTts = null
+
+					// Extract chapters
 					val chapters = liveData.first { it != null }
+
+					// Find the current chapter
 					val item = chapters
 						?.find { (it as? ReaderChapterUI)?.id == chapterId }
 							as? ReaderChapterUI ?: return@coroutineScope
 
+					// Get the text of the chapter
 					val passage = when (chapterType.first { it != null }) {
 						null -> return@coroutineScope
 						Novel.ChapterType.HTML -> getChapterHTMLPassage(item)
@@ -1203,23 +1235,30 @@ class ChapterReaderViewModel(
 					launch nextChapterTts@{
 						val lastTts = passage.ttsElements.lastOrNull() ?: return@nextChapterTts
 						ttsNextChapter.collectLatest nextChapterTts2@{
+							// skip if disabled
 							if (!it) {
 								return@nextChapterTts2
 							}
+							// Wait for the last TTS line to be spoken to move to the next chapter
 							ttsDone.collectLatest nextChapterTts3@{ id ->
 								if (id != null && id == lastTts.id) {
+									// Find index of the current chapter
 									val index = chapters.indexOfFirst {
 										(it as? ReaderChapterUI)?.id == chapterId
 									}
+
+									// ensure we got a valid index
 									if (index > 0) {
 										val nextChapter = chapters.getOrNull(index + 2)
 												as? ReaderChapterUI
 											?: return@nextChapterTts3
 
+										// Jump to the next chapter
 										pageJumper.emit(chapters.indexOf(nextChapter))
 										viewModelScopeIO.launch {
 											onViewed(nextChapter)
 											setCurrentChapterID(nextChapter.id)
+											// Start the TTS again
 											withTimeoutOrNull(5.seconds) {
 												if (
 													ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
@@ -1243,6 +1282,8 @@ class ChapterReaderViewModel(
 						}
 						oldTts?.stop()
 						oldTts = tts
+
+						// Are we playing TTS?
 						ttsPlayback.collectLatest { playback ->
 							if (playback != TTSPlayback.Playing) {
 								tts.stop()
@@ -1258,6 +1299,7 @@ class ChapterReaderViewModel(
 										ttsElements = ttsElements.drop(index)
 									}
 								}
+								// For each element, lets speak it out
 								ttsElements.forEach {
 									customSpeak(
 										tts,
