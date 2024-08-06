@@ -26,8 +26,10 @@ import app.shosetsu.android.dto.Convertible
  * @since 01 / 11 / 2022
  * @author Doomsdayrs
  *
- * @param novelId id of the novel
- * @param pinned if the novel specified by [novelId] is pinned or not
+ * @param novelId [DBNovelPinEntity.pinned]
+ * @param pinned [DBNovelPinEntity.pinned]
+ *
+ * @see DBNovelPinEntity
  */
 data class NovelPinEntity(val novelId: Int, val pinned: Boolean) : Convertible<DBNovelPinEntity> {
 	override fun convertTo(): DBNovelPinEntity = DBNovelPinEntity(novelId, pinned)

@@ -1,5 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBNovelCategoryEntity
+
 /*
  * This file is part of shosetsu.
  *
@@ -21,8 +23,10 @@ package app.shosetsu.android.domain.model.local
 /**
  * shosetsu
  * 08 / 08 / 2022
+ *
+ * @param novelID [DBNovelCategoryEntity.novelID]
+ * @param categoryID [DBNovelCategoryEntity.categoryID]
  */
-
 data class NovelCategoryEntity(
 	val novelID: Int,
 	val categoryID: Int,
