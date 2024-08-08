@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.Version
+import app.shosetsu.lib.json.RepoLibrary
 
 /*
  * This file is part of Shosetsu.
@@ -25,7 +26,11 @@ import app.shosetsu.lib.Version
 
 /**
  * shosetsu
- * 05 / 12 / 2020
+ * @since 05 / 12 / 2020
+ *
+ * @param scriptName name of the extension library. [RepoLibrary.name]
+ * @param version version of this library. [RepoLibrary.version]
+ * @param repoID repository this extension library is associated with.
  */
 @Entity(
 	tableName = "libs",

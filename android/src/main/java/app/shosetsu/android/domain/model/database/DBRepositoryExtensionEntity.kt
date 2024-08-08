@@ -7,6 +7,7 @@ import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.ExtensionType
 import app.shosetsu.lib.Version
+import app.shosetsu.lib.json.RepoExtension
 
 /*
  * This file is part of Shosetsu.
@@ -27,8 +28,16 @@ import app.shosetsu.lib.Version
 
 /**
  * shosetsu
- * 05 / 12 / 2020
+ * @since 05 / 12 / 2020
  *
+ * @param id [RepoExtension.id]
+ * @param name [RepoExtension.name]
+ * @param fileName [RepoExtension.fileName]
+ * @param imageURL [RepoExtension.imageURL]
+ * @param lang [RepoExtension.lang]
+ * @param version [RepoExtension.version]
+ * @param md5 [RepoExtension.md5]
+ * @param type [RepoExtension.type]
  */
 @Entity(
 	tableName = "repository_extension",
@@ -58,24 +67,18 @@ data class DBRepositoryExtensionEntity(
 	/** Repository extension belongs too*/
 	val repoId: Int,
 
-	/** Extension ID */
 	val id: Int,
 
-	/** Name of the extension, can be changed */
 	var name: String,
 
-	/** FileName of the extension */
 	val fileName: String,
 
-	/** Image URL of the extension*/
 	var imageURL: String,
 
-	/** The language of the extension */
 	val lang: String,
 
 	val version: Version,
 
-	/** MD5 to check against */
 	var md5: String,
 
 	val type: ExtensionType

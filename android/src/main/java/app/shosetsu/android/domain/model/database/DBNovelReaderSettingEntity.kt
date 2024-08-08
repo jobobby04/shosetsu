@@ -25,7 +25,11 @@ import app.shosetsu.android.dto.Convertible
  */
 
 /**
- * 03 / 01 / 2021
+ * @since 03 / 01 / 2021
+ *
+ * @param novelID id of the novel these settings are for
+ * @param paragraphIndentSize size of indent
+ * @param paragraphSpacingSize size of spacing
  */
 @Entity(
 	tableName = "novel_reader_settings",

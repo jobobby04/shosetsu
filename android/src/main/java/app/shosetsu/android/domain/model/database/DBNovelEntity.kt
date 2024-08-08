@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.Novel
+import app.shosetsu.lib.Novel.Info
 
 /*
  * This file is part of Shosetsu.
@@ -27,7 +28,18 @@ import app.shosetsu.lib.Novel
 
 /**
  * shosetsu
- * 05 / 12 / 2020
+ * @since 05 / 12 / 2020
+ *
+ * @param url [Info.link]
+ * @param title [Info.title]
+ * @param imageURL [Info.imageURL]
+ * @param description [Info.description]
+ * @param language [Info.language]
+ * @param genres [Info.genres]
+ * @param authors [Info.authors]
+ * @param artists [Info.artists]
+ * @param tags [Info.tags]
+ * @param status [Info.status]
  */
 @Entity(
 	tableName = "novels",
@@ -40,7 +52,6 @@ data class DBNovelEntity(
 	/** ID of this novel */
 	var id: Int? = null,
 
-	/** URL of the novel */
 	var url: String,
 
 	/** Source this novel is from */
@@ -53,31 +64,22 @@ data class DBNovelEntity(
 	/** Says if the data is loaded or now, if it is not it needs to be loaded */
 	var loaded: Boolean = false,
 
-	/** The title of the novel */
 	var title: String,
 
-	/** Image URL of the novel */
 	var imageURL: String = "",
 
-	/** Description */
 	var description: String = "",
 
-	/** Language of the novel */
 	var language: String = "",
 
-	/** Genres this novel matches too */
 	var genres: List<String> = emptyList(),
 
-	/** Authors of this novel */
 	var authors: List<String> = emptyList(),
 
-	/** Artists who helped with the novel illustration */
 	var artists: List<String> = emptyList(),
 
-	/** Tags this novel matches, in case genres were not enough*/
 	var tags: List<String> = emptyList(),
 
-	/** The publishing status of this novel */
 	var status: Novel.Status = Novel.Status.UNKNOWN,
 ) : Convertible<NovelEntity> {
 	override fun convertTo(): NovelEntity = NovelEntity(

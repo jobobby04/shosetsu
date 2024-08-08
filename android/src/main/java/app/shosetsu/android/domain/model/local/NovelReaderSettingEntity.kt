@@ -1,5 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBNovelReaderSettingEntity
+
 /*
  * This file is part of Shosetsu.
  *
@@ -21,6 +23,10 @@ package app.shosetsu.android.domain.model.local
  * 03 / 01 / 2021
  *
  * Defines the reader settings for a novel
+ *
+ * @param novelID [DBNovelReaderSettingEntity.novelID]
+ * @param paragraphIndentSize [DBNovelReaderSettingEntity.paragraphIndentSize]
+ * @param paragraphSpacingSize [DBNovelReaderSettingEntity.paragraphSpacingSize]
  */
 data class NovelReaderSettingEntity(
 	val novelID: Int,

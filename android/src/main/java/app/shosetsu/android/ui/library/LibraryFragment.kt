@@ -337,6 +337,9 @@ fun LibraryContent(
 	}
 }
 
+/**
+ * Represents the top bar for the library
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryAppBar(
@@ -438,7 +441,7 @@ fun LibraryPager(
 			ScrollableTabRow(
 				selectedTabIndex = categoryPagerState.currentPage,
 				indicator = { tabPositions ->
-					TabRowDefaults.Indicator(
+					TabRowDefaults.SecondaryIndicator(
 						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
 					)
 				},
@@ -493,7 +496,7 @@ fun LibraryPager(
  *
  * Also is used for the default page.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LibraryCategory(
 	items: ImmutableList<LibraryNovelUI>,

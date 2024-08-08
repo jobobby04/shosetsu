@@ -30,6 +30,7 @@ import app.shosetsu.android.ui.main.MainView
  */
 class MainActivity : ComponentActivity() {
 
+	/***/
 	override fun onCreate(savedInstanceState: Bundle?) {
 		@Suppress("UNUSED_VARIABLE") // We keep this value
 		val splashScreen = installSplashScreen()

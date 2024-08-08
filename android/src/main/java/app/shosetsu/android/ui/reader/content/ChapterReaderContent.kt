@@ -21,7 +21,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
-import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -77,7 +77,7 @@ fun PreviewChapterReaderContent() {
 			sheetContent = {
 				ChapterReaderBottomSheetContent(
 					scaffoldState = it,
-					ttsPlayback = AChapterReaderViewModel.TtsPlayback.Stopped,
+					ttsPlayback = TTSPlayback.Stopped,
 					isBookmarked = false,
 					isRotationLocked = false,
 					setting = NovelReaderSettingUI(-1, 0, 0f),

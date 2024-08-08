@@ -37,13 +37,16 @@ import org.kodein.di.instance
  */
 
 /**
- * Shosetsu
+ * Handle broadcasts sent by notifications.
  *
  * @since 23 / 07 / 2021
  * @author Doomsdayrs
  */
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
+	/**
+	 * Occurs when we receive a broadcast from a notification.
+	 */
 	override fun onReceive(context: Context?, intent: Intent?) {
 		if (context == null) return
 		if (intent == null) return
@@ -93,6 +96,8 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 
 			ACTION_REPORT_ERROR -> {
 				val exception = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+					// An exception MUST exist.
+					@Suppress("ReplaceNotNullAssertionWithElvisReturn")
 					intent.extras?.getSerializable(EXTRA_EXCEPTION, Throwable::class.java)!!
 				} else {
 					@Suppress("DEPRECATION")

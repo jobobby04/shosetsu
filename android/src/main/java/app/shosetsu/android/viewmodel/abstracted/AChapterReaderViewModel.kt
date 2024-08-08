@@ -6,6 +6,8 @@ import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
+import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
@@ -67,7 +69,6 @@ abstract class AChapterReaderViewModel :
 
 	abstract fun retryChapter(item: ReaderChapterUI)
 
-	class TTSText(val id: String, val text: String)
 	sealed class ChapterPassage {
 		data object Loading : ChapterPassage()
 		data class Error(val throwable: Throwable?) : ChapterPassage()
@@ -205,13 +206,8 @@ abstract class AChapterReaderViewModel :
 
 	abstract fun clearMemory()
 
-	sealed class TtsPlayback {
-		data object Playing : TtsPlayback()
-		data object Paused : TtsPlayback()
-		data object Stopped : TtsPlayback()
-	}
 	abstract val ttsProgress: StateFlow<String?>
-	abstract val ttsPlayback: StateFlow<TtsPlayback>
+	abstract val ttsPlayback: StateFlow<TTSPlayback>
 	abstract fun onPlayTts(context: Context)
 	abstract fun onPauseTts()
 	abstract fun onStopTts()

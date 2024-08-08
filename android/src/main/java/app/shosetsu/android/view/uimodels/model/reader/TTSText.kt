@@ -1,7 +1,3 @@
-package app.shosetsu.android.domain.model.local
-
-import app.shosetsu.android.domain.model.database.DBStrippedNovelEntity
-
 /*
  * This file is part of Shosetsu.
  *
@@ -17,20 +13,9 @@ import app.shosetsu.android.domain.model.database.DBStrippedNovelEntity
  *
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
 
-/**
- * shosetsu
- * 19 / 12 / 2020
- *
- * @param id [DBStrippedNovelEntity.id]
- * @param title [DBStrippedNovelEntity.title]
- * @param imageURL [DBStrippedNovelEntity.imageURL]
- * @param bookmarked [DBStrippedNovelEntity.bookmarked]
- */
-data class StrippedNovelEntity(
-	val id: Int,
-	val title: String,
-	val imageURL: String,
-	var bookmarked: Boolean,
-)
+package app.shosetsu.android.view.uimodels.model.reader
+
+data class TTSText(val id: String, val text: String)

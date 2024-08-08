@@ -27,7 +27,14 @@ import app.shosetsu.android.dto.Convertible
  */
 
 /**
- * 02 / 01 / 2021
+ * @since 02 / 01 / 2021
+ *
+ * @param novelID [DBNovelEntity.id]
+ * @param sortType How chapters should be sorted
+ * @param showOnlyReadingStatusOf Which chapters to show based on reading status
+ * @param showOnlyBookmarked If only bookmarked chapters should be shown
+ * @param showOnlyDownloaded If only downloaded chapters should be shown
+ * @param reverseOrder If the chapters should be displayed in reverse
  */
 @Entity(
 	tableName = "novel_settings",
@@ -55,10 +62,8 @@ data class DBNovelSettingsEntity(
 
 	var showOnlyDownloaded: Boolean = false,
 
-	var reverseOrder: Boolean = false,
-
-
-	) : Convertible<NovelSettingEntity> {
+	var reverseOrder: Boolean = false
+) : Convertible<NovelSettingEntity> {
 	override fun convertTo(): NovelSettingEntity = NovelSettingEntity(
 		novelID,
 		sortType,

@@ -75,6 +75,8 @@ import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
+import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.IExtension.Companion.KEY_CHAPTER_URL
@@ -864,9 +866,9 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onReaderClicked(item: String?) {
-		if (item != null && ttsPlayback.value == TtsPlayback.Paused) {
+		if (item != null && ttsPlayback.value == TTSPlayback.Paused) {
 			ttsProgress.value = item.substringAfter("textElement")
-			ttsPlayback.value = TtsPlayback.Playing
+			ttsPlayback.value = TTSPlayback.Playing
 		} else if (!doubleTapFocus.value) {
 			val newValue = !isFocused.value
 			isFocused.value = newValue
@@ -1115,16 +1117,21 @@ class ChapterReaderViewModel(
 
 	override val ttsProgress = MutableStateFlow<String?>(null)
 	val ttsDone = MutableStateFlow<String?>(null)
-	override val ttsPlayback = MutableStateFlow<TtsPlayback>(TtsPlayback.Stopped)
+	override val ttsPlayback = MutableStateFlow<TTSPlayback>(TTSPlayback.Stopped)
+
 	data class TTSBuilder(
-		val context: Context,
+        val context: Context,
 		val engine: String,
 		val language: String,
 		val voice: String,
 	)
-	private val context = MutableStateFlow<Context?>(null)
+
+    private val context = MutableStateFlow<Context?>(null)
+	/**
+	 * Provides a TTS to use
+	 */
 	private val tts = ttsEngine.combine(context) { engine, context ->
-		context ?: return@combine null
+        context ?: return@combine null
 		TTSBuilder(context, engine, "", "")
 	}.filterNotNull().combine(ttsLanguage) { builder, language ->
 		builder.copy(language = language)
@@ -1132,11 +1139,14 @@ class ChapterReaderViewModel(
 		builder.copy(voice = voice)
 	}.map { builder ->
 		val ttsResult = CompletableDeferred<Int>()
+
 		val tts = if (builder.engine.isEmpty()) {
-			TextToSpeech(builder.context) { ttsResult.complete(it) }
+			TextToSpeech(builder.context, ttsResult::complete)
 		} else {
-			TextToSpeech(builder.context, { ttsResult.complete(it) }, builder.engine)
+			TextToSpeech(builder.context, ttsResult::complete, builder.engine)
 		}
+
+		// Wait for the TTS to initialize
 		when (ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
 			else -> {
@@ -1146,11 +1156,14 @@ class ChapterReaderViewModel(
 		}
 	}.filterNotNull()
 		.filter { (tts, builder) ->
+			/** Has a language been set */
 			val languageSuccess: Boolean
 			val locale: Locale
+
 			if (builder.language.isEmpty()) {
+				// If language not set, assume the default language
 				locale = Locale.getDefault()
-				val result = tts.setLanguage(Locale.getDefault())
+				val result = tts.setLanguage(locale)
 				languageSuccess = when (result) {
 					TextToSpeech.LANG_AVAILABLE -> true
 					TextToSpeech.LANG_COUNTRY_AVAILABLE -> true
@@ -1158,7 +1171,9 @@ class ChapterReaderViewModel(
 					else -> false
 				}
 			} else {
-				val ttsLocale = tts.availableLanguages.find { it.toLanguageTag() == builder.language }
+				// Find the local from languages
+				val ttsLocale =
+					tts.availableLanguages.find { it.toLanguageTag() == builder.language }
 				if (ttsLocale != null) {
 					locale = ttsLocale
 					val result = tts.setLanguage(locale)
@@ -1169,19 +1184,28 @@ class ChapterReaderViewModel(
 						else -> false
 					}
 				} else {
-					locale = Locale.getDefault()
+					// Failed to find the locale, strange
+					locale = Locale.getDefault() // need to set this, else warning
 					languageSuccess = false
 				}
 			}
+
+			// Do not continue if a language has not been set successfully
 			if (!languageSuccess) {
 				builder.context.toast(R.string.reader_test_invalid_language)
 				return@filter false
 			}
+
+			/** Has the voice been set */
 			val voiceSuccess: Boolean
 			if (builder.voice.isNotEmpty()) {
-				val ttsVoice = tts.voices.filter { it.locale == locale }
+				// Find the voice from voices
+				val ttsVoice = tts.voices
+					.filter { it.locale == locale }
 					.find { it.name == builder.voice }
+
 				if (ttsVoice != null) {
+					// Attempt to set the voice if found
 					val result = tts.setVoice(ttsVoice)
 					voiceSuccess = when (result) {
 						TextToSpeech.SUCCESS -> true
@@ -1191,8 +1215,11 @@ class ChapterReaderViewModel(
 					voiceSuccess = false
 				}
 			} else {
+				// is fine if there is a default voice
 				voiceSuccess = tts.defaultVoice != null
 			}
+
+			// do not proceed if voice was not successful
 			if (!voiceSuccess) {
 				builder.context.toast(R.string.reader_test_invalid_voice)
 				return@filter false
@@ -1200,19 +1227,22 @@ class ChapterReaderViewModel(
 			true
 		}
 		.combine(
-			ttsPitch.combine(ttsSpeed) { a, b -> a to b }
+			ttsPitch
+				.combine(ttsSpeed) { a, b -> a to b }
 				.distinctUntilChanged()
 		) { (tts, _), (pitch, speed) ->
-			tts.setPitch(pitch / 10)
-			tts.setSpeechRate(speed / 10)
-			tts
+			tts.apply {
+				setPitch(pitch / 10)
+				setSpeechRate(speed / 10)
+			}
 		}
 		.distinctUntilChanged()
 		.onEach {
 			it.setOnUtteranceProgressListener(
 				object : UtteranceProgressListener() {
 					override fun onStart(utteranceId: String?) {
-						if (ttsPlayback.value != TtsPlayback.Stopped) {
+						// Only set progress if not stopped
+						if (ttsPlayback.value != TTSPlayback.Stopped) {
 							ttsProgress.value = utteranceId?.substringBefore('|')
 						}
 					}
@@ -1220,11 +1250,14 @@ class ChapterReaderViewModel(
 					override fun onDone(utteranceId: String?) {
 						ttsDone.value = utteranceId
 					}
+
 					@Deprecated("Deprecated in Java")
-					override fun onError(utteranceId: String?) {}
+					override fun onError(utteranceId: String?) {
+					}
+
 					override fun onError(utteranceId: String?, errorCode: Int) {
 						this@ChapterReaderViewModel.logE("TTS Error code: $errorCode")
-						ttsPlayback.value = TtsPlayback.Paused
+						ttsPlayback.value = TTSPlayback.Paused
 					}
 				}
 			)
@@ -1235,14 +1268,20 @@ class ChapterReaderViewModel(
 		viewModelScopeIO.launch {
 			var oldTts: TextToSpeech? = null
 			currentChapterID.collectLatest { chapterId ->
+				// Child scope is cancelled when the chapter is changed
 				coroutineScope {
+					// Clear out old TTS
 					oldTts?.stop()
 					oldTts = null
-					val chapters = liveData.first { it != null }
-					val item = chapters
+
+					// Find the current chapter
+					val item = liveData.first { it != null }
 						?.find { (it as? ReaderChapterUI)?.id == chapterId }
 							as? ReaderChapterUI ?: return@coroutineScope
 
+					System.gc()
+
+					// Get the text of the chapter
 					val passage = when (chapterType.first { it != null }) {
 						null -> return@coroutineScope
 						Novel.ChapterType.HTML -> getChapterHTMLPassage(item)
@@ -1252,33 +1291,46 @@ class ChapterReaderViewModel(
 
 					launch nextChapterTts@{
 						val lastTts = passage.ttsElements.lastOrNull() ?: return@nextChapterTts
-						ttsNextChapter.collectLatest nextChapterTts2@{
-							if (!it) {
+
+						// If the user enables the setting while in the reader, we can listen in
+						ttsNextChapter.collectLatest nextChapterTts2@{ ttsNextChapter ->
+							// skip if disabled
+							if (!ttsNextChapter) {
 								return@nextChapterTts2
 							}
-							ttsDone.collectLatest nextChapterTts3@{ id ->
-								if (id != null && id == lastTts.id) {
-									val index = chapters.indexOfFirst {
-										(it as? ReaderChapterUI)?.id == chapterId
-									}
-									if (index > 0) {
-										val nextChapter = chapters.getOrNull(index + 2)
-											as? ReaderChapterUI
-											?: return@nextChapterTts3
 
-										pageJumper.emit(chapters.indexOf(nextChapter))
-										viewModelScopeIO.launch {
-											onViewed(nextChapter)
-											setCurrentChapterID(nextChapter.id)
-											withTimeoutOrNull(5.seconds) {
-												if (
-													ttsPlayback.firstOrNull { it == TtsPlayback.Stopped } != null
-												) {
-													onPlayTts(
-														context.value ?: return@withTimeoutOrNull
-													)
-												}
-											}
+							// Wait for the last TTS line to be spoken to move to the next chapter
+							ttsDone.firstOrNull { it != null && it == lastTts.id }
+								?: return@nextChapterTts2
+
+							// Get current readerUIItems
+							val readerUIItems =
+								liveData.first { it != null } ?: return@nextChapterTts2
+
+							val chapterItems = readerUIItems.filterIsInstance<ReaderChapterUI>()
+
+							// Find index of the current chapter
+							val index = chapterItems.indexOfFirst { it.id == chapterId }
+
+							// ensure we got a valid index
+							if (index >= 0) {
+								// Find next chapter
+								val nextChapter = chapterItems
+									.getOrNull(index + 1) // Attempt to get next chapter
+									?: return@nextChapterTts2
+
+								// Jump to the next chapter
+								pageJumper.emit(readerUIItems.indexOf(nextChapter))
+								viewModelScopeIO.launch {
+									System.gc() // Clear out heavy operation (above)
+									onViewed(nextChapter)
+									setCurrentChapterID(nextChapter.id)
+									// Start the TTS again
+									withTimeoutOrNull(5.seconds) {
+										if (
+											ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
+										) {
+											onPlayTts(context.value ?: return@withTimeoutOrNull)
 										}
 									}
 								}
@@ -1295,8 +1347,10 @@ class ChapterReaderViewModel(
 						}
 						oldTts?.stop()
 						oldTts = tts
+
+						// Are we playing TTS?
 						ttsPlayback.collectLatest { playback ->
-							if (playback != TtsPlayback.Playing) {
+							if (playback != TTSPlayback.Playing) {
 								tts.stop()
 								@Suppress("LABEL_NAME_CLASH")
 								return@collectLatest
@@ -1310,6 +1364,7 @@ class ChapterReaderViewModel(
 										ttsElements = ttsElements.drop(index)
 									}
 								}
+								// For each element, lets speak it out
 								ttsElements.forEach {
 									customSpeak(
 										tts,
@@ -1326,16 +1381,16 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onPlayTts(context: Context) {
-		this.context.value = context.applicationContext
-		ttsPlayback.value = TtsPlayback.Playing
+        this.context.value = context.applicationContext
+		ttsPlayback.value = TTSPlayback.Playing
 	}
 
 	override fun onPauseTts() {
-		ttsPlayback.value = TtsPlayback.Paused
+		ttsPlayback.value = TTSPlayback.Paused
 	}
 
 	override fun onStopTts() {
-		ttsPlayback.value = TtsPlayback.Stopped
+		ttsPlayback.value = TTSPlayback.Stopped
 		ttsProgress.value = null
 	}
 
