@@ -37,9 +37,7 @@ cache:
 stages:
   - lint
   - standard
-  - fdroid
-  - uptodown
-  - playstore
+  - deploy
 
 # Setup
 packages:
