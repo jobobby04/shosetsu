@@ -88,7 +88,6 @@ fun MainView() {
 	val backupProgressState by viewModel.backupProgressState.collectAsState()
 	val theme by viewModel.appTheme.collectAsState()
 	val navStyle by viewModel.navigationStyle.collectAsState()
-	val update by viewModel.appUpdate.collectAsState()
 	val updateToOpen by viewModel.openUpdate.collectAsState(null)
 	val protectBack by viewModel.requireDoubleBackToExit.collectAsState(false)
 
@@ -139,8 +138,7 @@ fun MainView() {
 	}
 
 	IntentHandler(
-		onNavigate = ::navigate,
-		onUpdate = viewModel::update
+		onNavigate = ::navigate
 	)
 
 	ShosetsuTheme(
@@ -224,14 +222,6 @@ fun MainView() {
 				}
 			}
 		}
-	}
-
-	if (update != null) {
-		AppUpdateDialog(
-			update ?: return,
-			onDismissRequest = viewModel::dismissUpdateDialog,
-			onUpdate = viewModel::update
-		)
 	}
 
 	LaunchedEffect(updateToOpen) {

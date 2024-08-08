@@ -1,6 +1,4 @@
-import org.jetbrains.kotlin.konan.properties.Properties
 import java.io.BufferedReader
-import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 
@@ -118,12 +116,6 @@ android {
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
 			)
-		}
-	}
-	flavorDimensions += listOf("default")
-	productFlavors {
-		create("standard") {
-			isDefault = true
 		}
 	}
 	compileOptions {

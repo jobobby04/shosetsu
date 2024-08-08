@@ -62,7 +62,6 @@ import app.shosetsu.android.domain.usecases.settings.LoadChaptersResumeFirstUnre
 import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCase
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
-import app.shosetsu.android.domain.usecases.start.StartAppUpdateInstallWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartExportBackupWorkerUseCase
@@ -233,9 +232,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<LoadNovelUIColumnsHUseCase>() with provider { LoadNovelUIColumnsHUseCase(instance()) }
 	bind<LoadNovelUIBadgeToastUseCase>() with provider { LoadNovelUIBadgeToastUseCase(instance()) }
 	bind<LoadNovelUITypeUseCase>() with provider { LoadNovelUITypeUseCase(instance()) }
-	bind<StartAppUpdateInstallWorkerUseCase>() with provider {
-		StartAppUpdateInstallWorkerUseCase(instance())
-	}
 	bind<SetNovelUITypeUseCase>() with provider {
 		SetNovelUITypeUseCase(instance())
 	}

@@ -2,7 +2,6 @@ package app.shosetsu.android.viewmodel.impl.settings
 
 import androidx.work.await
 import app.shosetsu.android.backend.workers.onetime.RepositoryUpdateWorker
-import app.shosetsu.android.backend.workers.perodic.AppUpdateCheckCycleWorker
 import app.shosetsu.android.backend.workers.perodic.BackupCycleWorker
 import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import app.shosetsu.android.common.ext.launchIO
@@ -36,7 +35,6 @@ class AdvancedSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
 	private val purgeNovelCacheUseCase: PurgeNovelCacheUseCase,
 	private val backupCycleManager: BackupCycleWorker.Manager,
-	private val appUpdateCycleManager: AppUpdateCheckCycleWorker.Manager,
 	private val novelUpdateCycleManager: NovelUpdateCycleWorker.Manager,
 	private val repoManager: RepositoryUpdateWorker.Manager,
 ) : AAdvancedSettingsViewModel(iSettingsRepository) {
@@ -57,14 +55,12 @@ class AdvancedSettingsViewModel(
 
 	override fun killCycleWorkers() {
 		backupCycleManager.stop()
-		appUpdateCycleManager.stop()
 		novelUpdateCycleManager.stop()
 		workerState.tryEmit(RestartResult.KILLED)
 	}
 
 	override fun startCycleWorkers() {
 		backupCycleManager.start()
-		appUpdateCycleManager.start()
 		novelUpdateCycleManager.start()
 		workerState.tryEmit(RestartResult.RESTARTED)
 	}

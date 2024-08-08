@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.util.Consumer
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.ACTION_OPEN_APP_UPDATE
 import app.shosetsu.android.common.consts.ACTION_OPEN_CATALOGUE
 import app.shosetsu.android.common.consts.ACTION_OPEN_LIBRARY
 import app.shosetsu.android.common.consts.ACTION_OPEN_SEARCH
@@ -22,8 +21,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 fun handleIntentAction(
 	intent: Intent,
-	onNavigate: (String) -> Unit,
-	onUpdate: () -> Unit
+	onNavigate: (String) -> Unit
 ) {
 	intent.logD("Intent received was ${intent.action}")
 	when (intent.action) {
@@ -51,10 +49,6 @@ fun handleIntentAction(
 			)
 		}
 
-		ACTION_OPEN_APP_UPDATE -> {
-			onUpdate()
-		}
-
 		Intent.ACTION_VIEW -> {
 			if (intent.data != null) {
 				if (intent.data!!.scheme != null) {
@@ -74,8 +68,7 @@ fun handleIntentAction(
 
 @Composable
 fun IntentHandler(
-	onNavigate: (String) -> Unit,
-	onUpdate: () -> Unit
+	onNavigate: (String) -> Unit
 ) {
 	val context = LocalContext.current
 
@@ -89,7 +82,7 @@ fun IntentHandler(
 			awaitClose { activity.removeOnNewIntentListener(consumer) }
 		}.collectLatest {
 			try {
-				handleIntentAction(it, onNavigate, onUpdate)
+				handleIntentAction(it, onNavigate)
 			} catch (e: Exception) {
 				Toast.makeText(context, R.string.error_intent_handle, Toast.LENGTH_SHORT)
 					.show()

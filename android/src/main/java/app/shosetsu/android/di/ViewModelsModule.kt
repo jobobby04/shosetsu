@@ -88,10 +88,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			isOnlineUseCase = instance(),
 			loadNavigationStyleUseCase = instance(),
 			loadLiveAppThemeUseCase = instance(),
-			startInstallWorker = instance(),
 			loadRequireDoubleBackUseCase = instance(),
 			settingsRepository = instance(),
-			appUpdateRepo = instance(),
 			backupRepo = instance()
 		)
 	}
@@ -144,9 +142,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 
 	bind<AAboutViewModel>() with provider {
-		AboutViewModel(
-			manager = instance()
-		)
+		AboutViewModel()
 	}
 
 	bind<AAddShareViewModel>() with provider {
@@ -278,7 +274,6 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		AdvancedSettingsViewModel(
 			iSettingsRepository = instance(),
 			purgeNovelCacheUseCase = instance(),
-			instance(),
 			instance(),
 			instance(),
 			instance()

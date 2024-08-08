@@ -106,7 +106,6 @@ fun AboutView(
 
 	AboutContent(
 		currentVersion = BuildConfig.VERSION_NAME,
-		onCheckForAppUpdate = viewModel::appUpdateCheck,
 		onOpenWebsite = ::openWebsite,
 		onOpenSource = ::openGithub,
 		onOpenExtensions = ::openExtensions,
@@ -130,7 +129,6 @@ fun PreviewAboutContent() {
 	ShosetsuTheme {
 		AboutContent(
 			currentVersion = BuildConfig.VERSION_NAME,
-			onCheckForAppUpdate = {},
 			onOpenWebsite = {},
 			onOpenSource = {},
 			onOpenExtensions = {},
@@ -193,7 +191,6 @@ fun AboutItem(
 @Composable
 fun AboutContent(
 	currentVersion: String,
-	onCheckForAppUpdate: () -> Unit,
 	onOpenWebsite: () -> Unit,
 	onOpenSource: () -> Unit,
 	onOpenExtensions: () -> Unit,
@@ -232,12 +229,6 @@ fun AboutContent(
 				AboutItem(
 					R.string.version,
 					description = currentVersion
-				)
-			}
-			item {
-				AboutItem(
-					R.string.check_for_app_update,
-					onClick = onCheckForAppUpdate
 				)
 			}
 			item {

@@ -2,7 +2,6 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NavigationStyle
-import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
@@ -33,11 +32,6 @@ import kotlinx.coroutines.flow.StateFlow
 abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 
 	/**
-	 * App update, if any
-	 */
-	abstract val appUpdate: StateFlow<AppUpdateEntity?>
-
-	/**
 	 * If 0, Bottom
 	 * If 1, Drawer
 	 */
@@ -58,18 +52,7 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 	 */
 	abstract val openUpdate: Flow<UserUpdate>
 
-	/**
-	 * The user requests to update the app
-	 *
-	 * If preview, will use in-app update for preview
-	 * If stable-git, will use in-app update for stable
-	 * If stable-goo, will open up google play store
-	 * If stable-utd, will open up up-to-down
-	 * If stable-fdr, will open up f-droid
-	 */
-	abstract fun update()
-
-	/**
+    /**
 	 * An action the user is prompted with to handle an update
 	 * The user has to handle the update
 	 *
@@ -88,9 +71,4 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 
 	/** If the application should show the show splash screen */
 	abstract val showIntro: StateFlow<Boolean>
-
-	/**
-	 * Dismiss the update dialog
-	 */
-	abstract fun dismissUpdateDialog()
 }

@@ -1,7 +1,6 @@
 package app.shosetsu.android.di
 
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
-import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupUriRepository
 import app.shosetsu.android.domain.repository.base.ICategoryRepository
@@ -20,7 +19,6 @@ import app.shosetsu.android.domain.repository.base.INovelSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.repository.base.IUpdatesRepository
-import app.shosetsu.android.domain.repository.impl.AppUpdatesRepository
 import app.shosetsu.android.domain.repository.impl.BackupRepository
 import app.shosetsu.android.domain.repository.impl.BackupUriRepository
 import app.shosetsu.android.domain.repository.impl.CategoryRepository
@@ -105,11 +103,6 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 	bind<INovelPinsRepository>() with singleton { NovelPinsRepository(instance()) }
 
 	bind<IUpdatesRepository>() with singleton { UpdatesRepository(instance()) }
-
-	bind<IAppUpdatesRepository>() with singleton {
-		AppUpdatesRepository(instance(), instance())
-		//FakeAppUpdatesRepository()
-	}
 
 	bind<ISettingsRepository>() with singleton { SettingsRepository(instance()) }
 

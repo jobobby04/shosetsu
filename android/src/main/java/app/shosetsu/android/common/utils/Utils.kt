@@ -1,7 +1,5 @@
 package app.shosetsu.android.common.utils
 
-import app.shosetsu.android.BuildConfig
-import app.shosetsu.android.common.enums.ProductFlavors
 import kotlinx.serialization.json.Json
 
 
@@ -21,13 +19,6 @@ import kotlinx.serialization.json.Json
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-/**
- * shosetsu
- * 20 / 06 / 2020
- */
-
-fun flavor(): ProductFlavors = ProductFlavors.fromKey(BuildConfig.FLAVOR)
 
 val backupJSON
 	get() = Json {

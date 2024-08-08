@@ -498,11 +498,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		 */
 		override suspend fun isRunning(): Boolean = try {
 			// Is this running
-			val a = (getWorkerState() == WorkInfo.State.RUNNING)
-
-			// Don't run if update is being installed
-			val b = !AppUpdateInstallWorker.Manager(context).isRunning()
-			a && b
+			getWorkerState() == WorkInfo.State.RUNNING
 		} catch (e: Exception) {
 			false
 		}

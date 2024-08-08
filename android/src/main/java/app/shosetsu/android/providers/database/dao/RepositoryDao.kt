@@ -5,8 +5,6 @@ import androidx.room.Dao
 import androidx.room.Ignore
 import androidx.room.Query
 import androidx.room.Transaction
-import app.shosetsu.android.common.enums.ProductFlavors
-import app.shosetsu.android.common.utils.flavor
 import app.shosetsu.android.domain.model.database.DBRepositoryEntity
 import app.shosetsu.android.domain.model.local.CountIDTuple
 import app.shosetsu.android.providers.database.dao.base.BaseDao
@@ -116,16 +114,15 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 		)
 
 		// Create the Universe repository
-		if (flavor() != ProductFlavors.PLAY_STORE)
-			createIfNotExist(
-				DBRepositoryEntity(
-					null,
-					url = repoUniv.toString(),
-					//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
-					name = "Universe",
-					isEnabled = true
-				)
+		createIfNotExist(
+			DBRepositoryEntity(
+				null,
+				url = repoUniv.toString(),
+				//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
+				name = "Universe",
+				isEnabled = true
 			)
+		)
 	}
 
 	@Transaction

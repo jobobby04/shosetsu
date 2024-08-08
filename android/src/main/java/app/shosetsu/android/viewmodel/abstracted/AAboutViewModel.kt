@@ -23,7 +23,4 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
  * shosetsu
  * 01 / 10 / 2020
  */
-abstract class AAboutViewModel : ShosetsuViewModel() {
-	/** Run an app update check */
-	abstract fun appUpdateCheck()
-}
+abstract class AAboutViewModel : ShosetsuViewModel()
