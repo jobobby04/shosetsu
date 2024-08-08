@@ -77,7 +77,6 @@ import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel.UndoRepoRe
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import org.acra.ACRA
 
 /*
  * This file is part of Shosetsu.
@@ -258,7 +257,6 @@ fun RepositoriesView(
 					undoRemoveState as UndoRepoRemoveState.Failure
 
 				exception.printStackTrace()
-				ACRA.errorReporter.handleSilentException(exception)
 
 				// Warn the user that there was an error
 				scope.launch {

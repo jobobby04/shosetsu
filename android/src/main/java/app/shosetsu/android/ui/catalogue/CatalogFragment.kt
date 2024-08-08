@@ -94,7 +94,6 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.lib.IExtension
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import org.acra.ACRA
 
 /*
  * This file is part of Shosetsu.
@@ -185,18 +184,13 @@ fun CatalogueView(
 			is BackgroundNovelAddProgress.Failure -> {
 				val error = (backgroundAddState as BackgroundNovelAddProgress.Failure).error
 
-				val result = hostState.showSnackbar(
+				hostState.showSnackbar(
 					context.getString(
 						R.string.fragment_catalogue_toast_background_add_fail,
 						error.message
 							?: "Unknown exception"
-					),
-					actionLabel = context.getString(R.string.report)
+					)
 				)
-
-				if (result == SnackbarResult.ActionPerformed) {
-					ACRA.errorReporter.handleSilentException(error)
-				}
 			}
 
 			BackgroundNovelAddProgress.Unknown -> {

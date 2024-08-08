@@ -213,15 +213,6 @@ fun IntroContent(
 				}
 			}
 
-			IntroPages.ACRA.ordinal -> {
-				val isACRA by viewModel.isACRAEnabled.collectAsState()
-				IntroACRAPage(
-					isACRA
-				) {
-					viewModel.setACRAEnabled(it)
-				}
-			}
-
 			IntroPages.Support.ordinal -> IntroSupportPage(
 				{
 					viewModel.supportShowNext()
@@ -240,7 +231,6 @@ enum class IntroPages {
 	Title,
 	Explanation,
 	License,
-	ACRA,
 	Permissions,
 	Support,
 	End
@@ -362,41 +352,6 @@ fun IntroLicensePage(
 					.padding(16.dp)
 			)
 		}
-	}
-
-}
-
-@Preview
-@Composable
-fun PreviewIntroACRAPage() {
-	var isACRAEnabled by remember { mutableStateOf(false) }
-	IntroACRAPage(
-		isACRAEnabled
-	) {
-		isACRAEnabled = it
-	}
-}
-
-@Composable
-fun IntroACRAPage(
-	isACRAEnabled: Boolean,
-	setACRAEnabled: (Boolean) -> Unit
-) {
-
-	Column(
-		modifier = Modifier
-			.fillMaxSize()
-			.padding(16.dp),
-		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-		Text(stringResource(R.string.intro_acra), style = MaterialTheme.typography.headlineSmall)
-		Text(
-			stringResource(R.string.intro_acra_desc),
-			style = MaterialTheme.typography.bodyLarge,
-			textAlign = TextAlign.Center
-		)
-		Checkbox(isACRAEnabled, setACRAEnabled)
 	}
 
 }

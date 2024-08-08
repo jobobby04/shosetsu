@@ -1,14 +1,10 @@
 package app.shosetsu.android.viewmodel.impl
 
-import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of shosetsu.
@@ -46,16 +42,6 @@ class IntroViewModel(
 
 	override fun setLicenseRead() {
 		isLicenseRead.value = true
-	}
-
-	override val isACRAEnabled: StateFlow<Boolean> =
-		settingsRepo.getBooleanFlow(SettingKey.ACRAEnabled)
-			.stateIn(viewModelScope, SharingStarted.Lazily, false)
-
-	override fun setACRAEnabled(boolean: Boolean) {
-		launchIO {
-			settingsRepo.setBoolean(SettingKey.ACRAEnabled, boolean)
-		}
 	}
 
 	override var isFinished: Boolean = false

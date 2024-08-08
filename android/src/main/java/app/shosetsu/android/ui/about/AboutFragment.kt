@@ -22,16 +22,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
@@ -50,7 +46,6 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
-import org.acra.util.Installation
 
 /*
  * This file is part of shosetsu.
@@ -243,20 +238,6 @@ fun AboutContent(
 				AboutItem(
 					R.string.check_for_app_update,
 					onClick = onCheckForAppUpdate
-				)
-			}
-			item {
-				val context = LocalContext.current
-				val clipboard = LocalClipboardManager.current
-
-				val id = remember { Installation.id(context) }
-
-				AboutItem(
-					R.string.fragment_about_acra_id,
-					description = id,
-					onClick = {
-						clipboard.setText(AnnotatedString(id))
-					}
 				)
 			}
 			item {

@@ -29,7 +29,6 @@ import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
-import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -285,7 +284,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
 						notificationId = extensionID
 					)
-					ACRA.errorReporter.handleSilentException(e)
 					return
 				}
 			} else {
@@ -371,7 +369,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				)
 			} catch (e: Exception) {//TODO Specify
 				logE("Failed to handle chapters", e)
-				ACRA.errorReporter.handleSilentException(e)
 			}
 			logI("Inserted new chapters")
 		}
@@ -412,7 +409,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			novelsSettingsRepo.get(targetNovelID)
 		} catch (e: Exception) {// TODO specify
 			logE("Failed to load novel settings")
-			ACRA.errorReporter.handleSilentException(e)
 			return
 		}
 
@@ -447,7 +443,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			novelCategoriesRepo.getNovelCategoriesFromNovel(targetNovelID)
 		} catch (e: Exception) {// TODO specify
 			logE("Failed to load novel categories")
-			ACRA.errorReporter.handleSilentException(e)
 			return
 		}
 

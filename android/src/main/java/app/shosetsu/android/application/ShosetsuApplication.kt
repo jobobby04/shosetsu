@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
+import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.Notifications
@@ -20,6 +21,7 @@ import app.shosetsu.android.common.consts.ShortCuts
 import app.shosetsu.android.common.ext.fileOut
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.di.dataSourceModule
@@ -48,12 +50,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
-import org.acra.ACRA
-import org.acra.config.dialog
-import org.acra.config.httpSender
-import org.acra.data.StringFormat
-import org.acra.ktx.initAcra
-import org.acra.sender.HttpSender.Method
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.x.androidXModule
@@ -119,16 +115,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		super.attachBaseContext(base)
 		Notifications.createChannels(this)
 		ShortCuts.createShortcuts(this)
-
-		runBlocking {
-			// Enable ACRA if allowed or if it is the first run
-			// We want it enabled for first run to catch critical app errors
-			if (settingsRepo.getBoolean(SettingKey.ACRAEnabled) ||
-				settingsRepo.getBoolean(SettingKey.FirstTime)
-			) {
-				setupACRA()
-			}
-		}
 	}
 
 	private fun setupDualOutput() {
@@ -212,7 +198,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				if (extensionsRepo.loadRepositoryExtensions().isEmpty())
 					startRepositoryUpdateManagerUseCase()
 			} catch (e: SQLiteException) {
-				ACRA.errorReporter.handleException(e)
+				applicationContext.toast("Could not load extension repositories: $e")
 			}
 		}
 		launchIO {
@@ -255,24 +241,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
 			"User-Agent" to runBlocking { getUserAgent() }
 		)
-	}
-
-	private fun setupACRA() {
-		initAcra {
-			buildConfigClass = BuildConfig::class.java
-			reportFormat = StringFormat.JSON
-			dialog {
-				commentPrompt = getString(R.string.crashCommentPromt)
-				text = getString(R.string.crashDialogText)
-				resTheme = R.style.AppTheme_CrashReport
-			}
-			httpSender {
-				uri = "https://acra.shosetsu.app/report" /*best guess, you may need to adjust this*/
-				basicAuthLogin = BuildConfig.acraUsername
-				basicAuthPassword = BuildConfig.acraPassword
-				httpMethod = Method.POST
-			}
-		}
 	}
 
 	override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {}

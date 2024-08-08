@@ -41,7 +41,6 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey.ACRAEnabled
 import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.AutoBookmarkFromQR
 import app.shosetsu.android.common.SettingKey.ConcurrentMemoryExperiment
@@ -390,43 +389,32 @@ fun AdvancedSettingsContent(
 			}
 
 			item {
-				SwitchSettingContent(
-					title = stringResource(R.string.intro_acra),
-					description = stringResource(R.string.settings_advanced_enable_acra),
-					modifier = Modifier
-						.fillMaxWidth(),
+				SliderSettingContent(
+					title = stringResource(R.string.settings_advanced_site_protection_period),
+					description = stringResource(R.string.settings_advanced_site_protection_period_desc),
+					valueRange = remember { StableHolder(300..60000) },
+					parseValue = {
+						"$it ms"
+					},
 					repo = viewModel.settingsRepo,
-					key = ACRAEnabled
+					key = SiteProtectionPeriod,
+					haveSteps = false,
 				)
 			}
 
-		item {
-			SliderSettingContent(
-				title = stringResource(R.string.settings_advanced_site_protection_period),
-				description = stringResource(R.string.settings_advanced_site_protection_period_desc),
-				valueRange = remember { StableHolder(300..60000) },
-				parseValue = {
-					"$it ms"
-				},
-				repo = viewModel.settingsRepo,
-				key = SiteProtectionPeriod,
-				haveSteps = false,
-			)
-		}
-
-		item {
-			SliderSettingContent(
-				title = stringResource(R.string.settings_advanced_site_protection_permits),
-				description = stringResource(R.string.settings_advanced_site_protection_permits_desc),
-				valueRange = remember { StableHolder(1..60) },
-				parseValue = {
-					"$it permits"
-				},
-				repo = viewModel.settingsRepo,
-				key = SiteProtectionPermits,
-				haveSteps = false,
-			)
-		}
+			item {
+				SliderSettingContent(
+					title = stringResource(R.string.settings_advanced_site_protection_permits),
+					description = stringResource(R.string.settings_advanced_site_protection_permits_desc),
+					valueRange = remember { StableHolder(1..60) },
+					parseValue = {
+						"$it permits"
+					},
+					repo = viewModel.settingsRepo,
+					key = SiteProtectionPermits,
+					haveSteps = false,
+				)
+			}
 
 			item {
 				SwitchSettingContent(

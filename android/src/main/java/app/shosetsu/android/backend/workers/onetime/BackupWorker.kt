@@ -24,7 +24,6 @@ import app.shosetsu.android.domain.repository.base.*
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.encodeToStream
-import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -159,7 +158,6 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 			val novels = try {
 				novelRepository.loadBookmarkedNovelEntities()
 			} catch (e: SQLiteException) {
-				ACRA.errorReporter.handleSilentException(e)
 				e.printStackTrace()
 				return@run false
 			}
@@ -180,7 +178,6 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 				try {
 					extensionsRepository.getInstalledExtension(it.extensionID)
 				} catch (e: SQLiteException) {
-					ACRA.errorReporter.handleSilentException(e)
 					e.printStackTrace()
 					null
 				}
@@ -190,7 +187,6 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 			categories = try {
 				getBackupCategories()
 			} catch (e: SQLiteException) {
-				ACRA.errorReporter.handleSilentException(e)
 				e.printStackTrace()
 				emptyMap()
 			}

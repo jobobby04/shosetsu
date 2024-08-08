@@ -43,17 +43,6 @@ abstract class AIntroViewModel : ShosetsuViewModel() {
 	abstract fun setLicenseRead()
 
 	/**
-	 * Is ACRA enabled
-	 */
-	abstract val isACRAEnabled: StateFlow<Boolean>
-
-	/**
-	 * Set ACRA reporting enabled
-	 */
-	abstract fun setACRAEnabled(boolean: Boolean)
-
-
-	/**
 	 * If the user finished the entire introduction or not
 	 */
 	abstract val isFinished: Boolean

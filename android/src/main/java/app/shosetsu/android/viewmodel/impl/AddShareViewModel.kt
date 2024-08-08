@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import org.acra.ACRA
 
 /*
  * This file is part of shosetsu.
@@ -195,7 +194,6 @@ class AddShareViewModel(
 										} catch (e: IllegalArgumentException) {
 											// Something is wrong with the extension
 											// TODO how to report extension errors
-											ACRA.errorReporter.handleSilentException(e)
 											return@find false
 										}
 									val novelLinkUrl = novel.url.toHttpUrl().toUri().normalize()

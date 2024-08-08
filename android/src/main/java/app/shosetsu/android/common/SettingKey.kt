@@ -283,8 +283,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object UseShosetsuAgent : BooleanKey("use_shosetsu_agent", false)
 
-	object ACRAEnabled : BooleanKey("is_ACRA_enabled", false)
-
 	/**
 	 * Automatically bookmark a novel when scanned via a QR code
 	 */

@@ -29,27 +29,6 @@ fun Process.getText(): String =
 @Throws(IOException::class)
 fun getCommitCount(): String = "git rev-list --count HEAD".execute().getText().trim()
 
-fun loadSProperties(name: String): Properties {
-	var properties = try {
-		extra.get(name) as? Properties
-	} catch (e: ExtraPropertiesExtension.UnknownPropertyException) {
-		null
-	}
-
-	if (properties != null)
-		return properties
-
-	val acraPropertiesFile = rootProject.file("$name.properties")
-	properties = Properties()
-
-	if (acraPropertiesFile.exists())
-		properties.load(FileInputStream(acraPropertiesFile))
-
-	ext.set(name, properties)
-
-	return properties
-}
-
 val CI_MODE = System.getenv("CI_MODE") == "true" || true
 
 android {
@@ -62,17 +41,6 @@ android {
 		versionName = "2.4.4"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
-
-		buildConfigField(
-			"String",
-			"acraUsername",
-			loadSProperties("acra")["username"]?.toString() ?: "\"\""
-		)
-		buildConfigField(
-			"String",
-			"acraPassword",
-			loadSProperties("acra")["password"]?.toString() ?: "\"\""
-		)
 
 		setProperty("archivesBaseName", rootProject.name)
 		vectorDrawables {
@@ -122,55 +90,10 @@ android {
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
 			)
-			buildConfigField(
-				"String",
-				"acraUsername",
-				loadSProperties("acra-debug")["username"]?.toString() ?: "\"\""
-			)
-			buildConfigField(
-				"String",
-				"acraPassword",
-				loadSProperties("acra-debug")["password"]?.toString() ?: "\"\""
-			)
 		}
 	}
 	flavorDimensions += listOf("default")
 	productFlavors {
-		create("playstore") {
-			// play store will be in this
-			applicationId = "app.shosetsu.android"
-			applicationIdSuffix = ".play"
-			versionNameSuffix = "-play"
-		}
-		create("uptodown") {
-			applicationIdSuffix = ".uptodown"
-			versionNameSuffix = "-uptodown"
-			buildConfigField(
-				"String",
-				"acraUsername",
-				loadSProperties("acra-uptodown")["username"]?.toString() ?: "\"\""
-			)
-			buildConfigField(
-				"String",
-				"acraPassword",
-				loadSProperties("acra-uptodown")["password"]?.toString() ?: "\"\""
-			)
-		}
-		create("fdroid") {
-			applicationIdSuffix = ".fdroid"
-			versionNameSuffix = "-fdroid"
-			buildConfigField(
-				"String",
-				"acraUsername",
-				loadSProperties("acra-fdroid")["username"]?.toString() ?: "\"\""
-			)
-			buildConfigField(
-				"String",
-				"acraPassword",
-				loadSProperties("acra-fdroid")["password"]?.toString() ?: "\"\""
-			)
-
-		}
 		create("standard") {
 			isDefault = true
 		}
@@ -295,14 +218,6 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
 	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
-
-	// Error logging
-	val acraVersion = "5.11.2"
-	fun acra(module: String, version: String = acraVersion) =
-		"ch.acra:$module:$version"
-
-	implementation(acra("acra-http"))
-	implementation(acra("acra-dialog"))
 
 	// Conductor
 	/*

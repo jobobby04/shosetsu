@@ -9,7 +9,6 @@ import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
@@ -95,7 +94,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -112,12 +110,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
-import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.Locale
@@ -675,7 +671,6 @@ class ChapterReaderViewModel(
 				}
 			} catch (e: SQLiteException) {
 				logE("Failed to update chapter as read", e)
-				ACRA.errorReporter.handleSilentException(e)
 			}
 
 			deletePrevious(chapter)

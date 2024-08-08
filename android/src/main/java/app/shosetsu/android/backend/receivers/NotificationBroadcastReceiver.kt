@@ -15,7 +15,6 @@ import app.shosetsu.android.common.ext.ACTION_REPORT_ERROR
 import app.shosetsu.android.common.ext.EXTRA_EXCEPTION
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.usecases.RequestInstallExtensionUseCase
-import org.acra.ACRA
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
@@ -103,7 +102,6 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 					@Suppress("DEPRECATION")
 					intent.extras?.get(EXTRA_EXCEPTION) as Throwable
 				}
-				ACRA.errorReporter.handleSilentException(exception)
 				notificationManager.cancel(
 					intent.getIntExtra(
 						EXTRA_NOTIFICATION_ID,

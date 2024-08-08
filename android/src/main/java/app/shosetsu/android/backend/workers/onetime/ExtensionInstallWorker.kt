@@ -45,7 +45,6 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
-import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -169,8 +168,6 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 				),
 				e
 			)
-
-			ACRA.errorReporter.handleException(e)
 
 			return Result.failure()
 		}
@@ -342,8 +339,6 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 				chaptersRepository.getChaptersByExtension(extensionId)
 			} catch (e: Exception) {// TODO specify
 				logE("Failed to get chapters by extension", e)
-
-				ACRA.errorReporter.handleSilentException(e)
 
 				emptyList()
 			}
