@@ -89,28 +89,24 @@ lint:
   stage: standard
   timeout: 2 hours # We need extra time for building
   script:
-    - ./gradlew assembleStandard
+    - echo $KEYSTORE_FILE | base64 -d > shosetsu.keystore.jks
+    - ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$(pwd)/shosetsu.keystore.jks -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD -Pandroid.injected.signing.key.alias=$KEY_ALIAS -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+  artifacts:
+    paths:
+      - android/build/outputs/apk/release
 
-.assembleFdroid:
-  interruptible: true
-  stage: fdroid
-  timeout: 2 hours # We need extra time for building
+# Push the binary to pages for my fdroid scripts
+pages:
+  stage: deploy
   script:
-    - ./gradlew assembleFdroid
-
-.assembleUptodown:
-  interruptible: true
-  stage: uptodown
-  timeout: 2 hours # We need extra time for building
-  script:
-    - ./gradlew assembleUptodown
-
-.assemblePlaystore:
-  interruptible: true
-  stage: playstore
-  timeout: 2 hours # We need extra time for building
-  script:
-    - ./gradlew assemblePlaystore
+    - mkdir public
+    - mv android/build/outputs/apk/release/output-metadata.json public/version.json
+    - mv android/build/outputs/apk/release/*.apk public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - fork
 
 # Run all tests, if any fails, interrupt the pipeline(fail it)
 #debugTests:

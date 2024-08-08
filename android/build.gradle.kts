@@ -26,10 +26,38 @@ fun Process.getText(): String =
 		org.codehaus.groovy.runtime.ProcessGroovyMethods.closeStreams(this)
 	}
 
+val versionMajor = 2
+val versionMinor = 4
+val versionPatch = 4
+val versionBuild = System.getenv("CI_PIPELINE_IID")?.toIntOrNull() ?: 0
+
+
+val computedVersionName by lazy { String.format("%d.%d.%d+%d", versionMajor, versionMinor, versionPatch, versionBuild) }
+
+// Version code: S VVVVV MMMMMMM PPPPP IIIIIIIIIIIIII (32-bit integer)
+// S (x1):  Sign bit. Must always be 0 for an android version code
+// V (x5):  Major version. Up to 32, which should be enough (especially since we are still on 0)
+//          This might not work for apps that follow proper semantic versioning, but who does that?
+// M (x7):  Minor version. Up to 128, which should be enough
+// P (x5):  Patch version. Up to 32, which should be enough for these
+// I (x14): Pipeline ID bits. Allows a total of 16384 pipeline runs.
+//          I'm simply guessing that that'll be enough
+//
+// This implementation assumes that these maximum numbers will never be reached.
+// If they are reached, the version codes "bleed over" into the next range,
+// so this should technically still produce valid, higher versions, but the format will be broken.
+val computedVersionCode by lazy {
+	var bits = 0
+	bits = (bits shl 5) or versionMajor
+	bits = (bits shl 7) or versionMinor
+	bits = (bits shl 5) or versionPatch
+	bits = (bits shl 14) or versionBuild
+	bits
+}
+
+
 @Throws(IOException::class)
 fun getCommitCount(): String = "git rev-list --count HEAD".execute().getText().trim()
-
-val CI_MODE = System.getenv("CI_MODE") == "true" || true
 
 android {
 	compileSdk = 34
@@ -37,8 +65,8 @@ android {
 		applicationId = "app.shosetsu.android.sy"
 		minSdk = 22
 		targetSdk = 34
-		versionCode = 45
-		versionName = "2.4.4"
+		versionCode = computedVersionCode
+		versionName = computedVersionName
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 
@@ -71,8 +99,8 @@ android {
 
 	buildTypes {
 		named("release") {
-			isMinifyEnabled = !CI_MODE
-			isShrinkResources = !CI_MODE
+			isMinifyEnabled = true
+			isShrinkResources = true
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
