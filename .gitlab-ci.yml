@@ -1,4 +1,4 @@
-image: openjdk:17-jdk
+image: gradle:jdk17
 
 variables:
 
