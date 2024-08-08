@@ -82,10 +82,8 @@ lint:
     - ./gradlew -Pci --console=plain :android:lint -PbuildDir=lint
 
 # Make Project
-.assembleStandard:
-  interruptible: true
+assembleRelease:
   stage: standard
-  timeout: 2 hours # We need extra time for building
   script:
     - echo $KEYSTORE_FILE | base64 -d > shosetsu.keystore.jks
     - ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$(pwd)/shosetsu.keystore.jks -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD -Pandroid.injected.signing.key.alias=$KEY_ALIAS -Pandroid.injected.signing.key.password=$KEY_PASSWORD
