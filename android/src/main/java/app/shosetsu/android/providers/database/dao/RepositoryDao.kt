@@ -91,6 +91,10 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 			"https://raw.githubusercontent.com/shosetsuorg/extensions-main/main".toHttpUrl()
 		val oldUniv =
 			"https://raw.githubusercontent.com/shosetsuorg/extensions/dev".toHttpUrl()
+		val syer10 =
+			"https://raw.githubusercontent.com/jobobby04/ShosetsuExtensions/master/".toHttpUrl()
+		val noaione =
+			"https://raw.githubusercontent.com/noaione/shosetsu-extensions/master/".toHttpUrl()
 
 		// Migrate from github to gitlab
 		loadRepositories().forEach { repo ->
@@ -113,13 +117,29 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 			)
 		)
 
-		// Create the Universe repository
 		createIfNotExist(
 			DBRepositoryEntity(
 				null,
 				url = repoUniv.toString(),
-				//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
 				name = "Universe",
+				isEnabled = true
+			)
+		)
+
+		createIfNotExist(
+			DBRepositoryEntity(
+				null,
+				url = syer10.toString(),
+				name = "Syer10",
+				isEnabled = true
+			)
+		)
+
+		createIfNotExist(
+			DBRepositoryEntity(
+				null,
+				url = noaione.toString(),
+				name = "Noaione",
 				isEnabled = true
 			)
 		)
