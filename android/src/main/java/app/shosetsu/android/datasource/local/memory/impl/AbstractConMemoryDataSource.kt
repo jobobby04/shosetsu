@@ -1,7 +1,6 @@
 package app.shosetsu.android.datasource.local.memory.impl
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import java.util.concurrent.ConcurrentHashMap
 
 /*
  * This file is part of Shosetsu.
@@ -27,7 +26,7 @@ import kotlinx.coroutines.runBlocking
  *
  * This provides limitation features and expiration times, along with more thread safety then normally
  */
-abstract class AbstractMemoryDataSource<K : Any, V : Any> {
+abstract class AbstractConMemoryDataSource<K : Any, V : Any> {
 
 	/**
 	 * How long something can last in memory in MS
@@ -41,7 +40,7 @@ abstract class AbstractMemoryDataSource<K : Any, V : Any> {
 	 */
 	abstract val maxSize: Long
 
-	private val _hashMap: HashMap<K, Pair<Long, V>> = hashMapOf()
+	private val _hashMap = ConcurrentHashMap<K, Pair<Long, V>>()
 
 
 	/**
@@ -49,24 +48,10 @@ abstract class AbstractMemoryDataSource<K : Any, V : Any> {
 	 *
 	 * Data is considered stale if it's creation point is > [expireTime]
 	 */
-	@Throws(NoSuchElementException::class)
 	@Suppress("MemberVisibilityCanBePrivate")
 	fun recycle() {
 		// Reverses keys to go from back to front
-		val keys = try {
-			_hashMap.keys.reversed()
-		} catch (e: NoSuchElementException) {
-			println("AbstractMemoryDataSource: recycle: Failed to reverse keys, delaying 1ms")
-			runBlocking {
-				delay(1)
-			}
-			try {
-				_hashMap.keys.reversed()
-			} catch (e: NoSuchElementException) {
-				println("AbstractMemoryDataSource: recycle: Failed to reverse keys a second time")
-				throw e
-			}
-		}
+		val keys = _hashMap.keys.reversed()
 
 		// Saving value before hand saves 1ms~ per iteration
 		val compareTime = System.currentTimeMillis()
@@ -100,20 +85,7 @@ abstract class AbstractMemoryDataSource<K : Any, V : Any> {
 	fun contains(key: K): Boolean {
 		if (_hashMap.size <= 0) return false
 
-		val keys = try {
-			_hashMap.keys.reversed()
-		} catch (e: IllegalArgumentException) {
-			// Try this again in 10ms, maybe it will work then
-			runBlocking {
-				delay(10)
-			}
-			try {
-				_hashMap.keys.reversed()
-			} catch (e: IllegalArgumentException) {
-				// Forget about it, Ask for new data
-				return false
-			}
-		}
+		val keys = _hashMap.keys.reversed()
 		for (i in keys) {
 			if (i == key)
 				return true
@@ -121,7 +93,6 @@ abstract class AbstractMemoryDataSource<K : Any, V : Any> {
 		return false
 	}
 
-	@Throws(NoSuchElementException::class)
 	fun get(key: K): V? {
 		recycle()
 		return if (contains(key)) {

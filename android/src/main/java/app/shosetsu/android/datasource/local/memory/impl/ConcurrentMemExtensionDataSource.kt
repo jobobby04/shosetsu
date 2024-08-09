@@ -26,8 +26,8 @@ import app.shosetsu.lib.IExtension
  * shosetsu
  * 19 / 11 / 2020
  */
-class GenericMemExtensionDataSource : IMemExtensionsDataSource,
-	AbstractMemoryDataSource<Int, IExtension>() {
+class ConcurrentMemExtensionDataSource : IMemExtensionsDataSource,
+	AbstractConMemoryDataSource<Int, IExtension>() {
 
 	override val maxSize = MEMORY_MAX_EXTENSIONS
 	override val expireTime = MEMORY_EXPIRE_EXTENSION_TIME * 1000 * 60 * 60
