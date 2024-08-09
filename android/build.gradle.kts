@@ -29,8 +29,7 @@ val versionMinor = 4
 val versionPatch = 4
 val versionBuild = System.getenv("CI_PIPELINE_IID")?.toIntOrNull() ?: 0
 
-
-val computedVersionName by lazy { String.format("%d.%d.%d+%d", versionMajor, versionMinor, versionPatch, versionBuild) }
+val computedVersionName by lazy { "$versionMajor.$versionMinor.$versionPatch" + if (versionBuild > 0) "+$versionBuild" else "" }
 
 // Version code: S VVVVV MMMMMMM PPPPP IIIIIIIIIIIIII (32-bit integer)
 // S (x1):  Sign bit. Must always be 0 for an android version code
@@ -52,7 +51,6 @@ val computedVersionCode by lazy {
 	bits = (bits shl 14) or versionBuild
 	bits
 }
-
 
 @Throws(IOException::class)
 fun getCommitCount(): String = "git rev-list --count HEAD".execute().getText().trim()
