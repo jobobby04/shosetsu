@@ -45,7 +45,6 @@ import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.AutoBookmarkFromQR
 import app.shosetsu.android.common.SettingKey.ConcurrentMemoryExperiment
 import app.shosetsu.android.common.SettingKey.ExposeTrueChapterDelete
-import app.shosetsu.android.common.SettingKey.LogToFile
 import app.shosetsu.android.common.SettingKey.ProxyHost
 import app.shosetsu.android.common.SettingKey.RequireDoubleBackToExit
 import app.shosetsu.android.common.SettingKey.SiteProtectionPeriod
@@ -363,17 +362,6 @@ fun AdvancedSettingsContent(
 						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
 					key = ExposeTrueChapterDelete
-				)
-			}
-
-			item {
-				SwitchSettingContent(
-					title = stringResource(R.string.settings_advanced_log_title),
-					description = stringResource(R.string.settings_advanced_log_desc),
-					modifier = Modifier
-						.fillMaxWidth(),
-					repo = viewModel.settingsRepo,
-					key = LogToFile
 				)
 			}
 

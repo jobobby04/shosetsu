@@ -409,8 +409,6 @@
     <string name="fragment_backup_error_unselected">Для экспорта не выбрана резервная копия</string>
 	<string name="export_backup_notification_missing_uri">Не предоставлен URI для экспорта резервной копии</string>
 	<string name="export_backup_notification_invalid_backup">Такой резервной копии не существует</string>
-	<string name="settings_advanced_log_title">Запись в файл</string>
-	<string name="settings_advanced_log_desc">Включение записи журналов в файл, но может привести к замедлению работы.\nТребуется перезагрузка</string>
 	<string name="update_to">Обновление: %s</string>
     <string name="download_chapter_updates_desc">Скачать главы, которые были недавно добавлены в Обновления</string>
     <string name="input_int_range_desc">Пожалуйста, введите целое число в диапазоне от %1$d до %2$d (включительно)</string>

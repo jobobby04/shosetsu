@@ -505,8 +505,6 @@
     <string name="fragment_backup_error_unselected">No backup has been selected to export</string>
     <string name="export_backup_notification_missing_uri">URI not provided to export backup to</string>
     <string name="export_backup_notification_invalid_backup">No such backup exists</string>
-    <string name="settings_advanced_log_title">Log to file</string>
-    <string name="settings_advanced_log_desc">Enabling logs to a file, but may cause slow downs.\nRequires a restart</string>
     <string name="update_to">Update: %s</string>
     <string name="download_chapter_updates_desc">Download chapters that have been recently added to Updates</string>
     <string name="input_int">Input Integer</string>

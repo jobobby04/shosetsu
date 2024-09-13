@@ -236,8 +236,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 	object ExposeTrueChapterDelete : BooleanKey("expose_true_chapter_delete", false)
 
-	object LogToFile : BooleanKey("log_to_file", false)
-
 	// Download Options
 	object CustomExportDirectory : StringKey("downloadDirectory", "")
 

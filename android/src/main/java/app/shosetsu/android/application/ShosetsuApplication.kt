@@ -23,6 +23,7 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.toast
+import app.shosetsu.android.common.utils.LoggingPrintStream
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.di.dataSourceModule
 import app.shosetsu.android.di.databaseModule
@@ -117,76 +118,12 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		ShortCuts.createShortcuts(this)
 	}
 
-	private fun setupDualOutput() {
-		val dir = getExternalFilesDir(null)
-
-		// Ensure log file directory exists
-		val loggingDir = File(dir, "logs").also { loggingDir ->
-			// Ensure file "logs" exists and is a directory
-			if (loggingDir.exists()) {
-				if (!loggingDir.isDirectory) {
-					loggingDir.delete()
-					loggingDir.mkdirs()
-				} else {
-					// Launch to let app boot faster
-					launchIO {
-						// Ensure only that only 5 are kept to keep file usage down
-						loggingDir.listFiles { it: File -> it.isFile }
-							?.sortedBy { it.lastModified() }
-							?.takeIf { it.size > 5 }
-							?.let {
-								val length = it.size - 5
-								for (index in 0..length)
-									it[index].delete()
-							}
-					}
-				}
-			} else {
-				loggingDir.mkdirs()
-			}
-		}
-
-
-		val fileDate = SimpleDateFormat("yyyy-MM-dd-hh-mm-ss", Locale.ROOT).format(Date())
-		val logFile = File(loggingDir, "shosetsu-log-$fileDate.txt")
-
-		try {
-			logFile.createNewFile()
-		} catch (e: IOException) {
-			toast(R.string.toast_error_log_failed, Toast.LENGTH_LONG)
-			logE("Failed to create logfile", e)
-			return
-		}
-
-		val logOS = FileOutputStream(logFile)
-
-		fileOut = PrintStream(logOS)
-
-		System.setOut(
-			PrintStream(
-				MultipleOutputStream(
-					System.out,
-					logOS
-				)
-			)
-		)
-
-		System.setErr(
-			PrintStream(
-				MultipleOutputStream(
-					System.err,
-					logOS
-				)
-			)
-		)
-	}
-
-	/***/
+    /***/
 	override fun onCreate() {
 
 		runBlocking {
-			if (settingsRepo.getBoolean(SettingKey.LogToFile))
-				setupDualOutput()
+			System.setOut(LoggingPrintStream { Log.i("System,out", it) })
+			System.setErr(LoggingPrintStream { Log.e("System,err", it) })
 
 			FLAG_CONCURRENT_MEMORY = settingsRepo.getBoolean(SettingKey.ConcurrentMemoryExperiment)
 		}
@@ -230,7 +167,10 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			try {
 				val result = runBlocking { extLibRepository.loadExtLibrary(name) }
 				val l =
-					shosetsuGlobals().load(result, "lib($name)")
+					shosetsuGlobals().apply {
+						STDOUT = LoggingPrintStream { Log.i("lib($name)", it) }
+						STDERR = LoggingPrintStream { Log.e("lib($name)", it) }
+					}.load(result, "lib($name)")
 				l.call()
 			} catch (e: Throwable) {
 				logE("${e.message}", e)
