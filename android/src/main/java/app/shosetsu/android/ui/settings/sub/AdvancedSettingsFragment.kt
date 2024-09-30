@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.AutoBookmarkFromQR
-import app.shosetsu.android.common.SettingKey.ConcurrentMemoryExperiment
 import app.shosetsu.android.common.SettingKey.ExposeTrueChapterDelete
 import app.shosetsu.android.common.SettingKey.ProxyHost
 import app.shosetsu.android.common.SettingKey.RequireDoubleBackToExit
@@ -401,22 +400,6 @@ fun AdvancedSettingsContent(
 					repo = viewModel.settingsRepo,
 					key = SiteProtectionPermits,
 					haveSteps = false,
-				)
-			}
-
-			item {
-				SwitchSettingContent(
-					title = "Concurrent memory experiment",
-					description =
-					"""
-					Enable if you experience random crashes during reading, this might help.
-					Please tell developers you use this, as we are testing this.
-					Requires restart.
-				""".trimIndent(),
-					modifier = Modifier
-						.fillMaxWidth(),
-					repo = viewModel.settingsRepo,
-					key = ConcurrentMemoryExperiment
 				)
 			}
 

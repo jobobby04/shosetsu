@@ -25,8 +25,8 @@ import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
  * shosetsu
  * 19 / 11 / 2020
  */
-class GenericMemExtLibDataSource : IMemExtLibDataSource,
-	AbstractMemoryDataSource<String, String>() {
+class ConcurrentMemExtLibDataSource : IMemExtLibDataSource,
+	AbstractConMemoryDataSource<String, String>() {
 
 	override val maxSize = MEMORY_MAX_EXT_LIBS
 	override val expireTime = MEMORY_EXPIRE_EXT_LIB_TIME * 1000 * 60

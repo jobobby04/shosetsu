@@ -14,7 +14,6 @@ import androidx.work.Configuration
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.NotificationCapable
-import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
@@ -118,14 +117,12 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		ShortCuts.createShortcuts(this)
 	}
 
-    /***/
+	/***/
 	override fun onCreate() {
 
 		runBlocking {
 			System.setOut(LoggingPrintStream { Log.i("System,out", it) })
 			System.setErr(LoggingPrintStream { Log.e("System,err", it) })
-
-			FLAG_CONCURRENT_MEMORY = settingsRepo.getBoolean(SettingKey.ConcurrentMemoryExperiment)
 		}
 
 		setupCoreLib()

@@ -25,8 +25,8 @@ import app.shosetsu.android.datasource.local.memory.base.IMemChaptersDataSource
  * shosetsu
  * 19 / 11 / 2020
  */
-class GenericMemChaptersDataSource : IMemChaptersDataSource,
-	AbstractMemoryDataSource<Int, ByteArray>() {
+class ConcurrentMemChaptersDataSource : IMemChaptersDataSource,
+	AbstractConMemoryDataSource<Int, ByteArray>() {
 
 	override val expireTime = MEMORY_EXPIRE_CHAPTER_TIME * 1000 * 60
 	override val maxSize = MEMORY_MAX_CHAPTERS

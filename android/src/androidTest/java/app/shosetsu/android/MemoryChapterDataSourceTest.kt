@@ -2,7 +2,6 @@ package app.shosetsu.android
 
 import app.shosetsu.android.common.consts.MEMORY_EXPIRE_CHAPTER_TIME
 import app.shosetsu.android.common.consts.MEMORY_MAX_CHAPTERS
-import app.shosetsu.android.datasource.local.memory.impl.GenericMemChaptersDataSource
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
