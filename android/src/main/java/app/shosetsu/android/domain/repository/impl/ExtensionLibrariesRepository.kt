@@ -59,7 +59,7 @@ class ExtensionLibrariesRepository(
 		extLibEntity: ExtLibEntity,
 	) = onIO {
 		val data = LuaLibrary(remoteSource.downloadLibrary(repoURL, extLibEntity))
-		extLibEntity.version = data.exMetaData.version
+		extLibEntity.version = data.libMetaData.version
 		databaseSource.updateOrInsert(extLibEntity)
 		memSource.setLibrary(extLibEntity.scriptName, data.content)
 		fileSource.writeExtLib(extLibEntity.scriptName, data.content)
