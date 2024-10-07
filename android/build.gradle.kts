@@ -273,7 +273,7 @@ dependencies {
 
 	// Core libraries
 	implementation("org.luaj:luaj-jse:3.0.1")
-	implementation("com.gitlab.JFronny:kotlin-lib:index-generation-SNAPSHOT")
+	implementation("com.gitlab.shosetsuorg:kotlin-lib:d074263a57a94ebf6d5f6a0b51c0822aed3a3227")
 	implementation("org.jsoup:jsoup:1.17.2")
 
 	// Image loading
