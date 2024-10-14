@@ -1,6 +1,7 @@
 package app.shosetsu.android.ui.css
 
 import android.app.Activity
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,6 +28,8 @@ fun CSSEditorView(
 	val cssContent by viewModel.cssContent.collectAsState()
 	val clipboardManager = LocalClipboardManager.current
 
+	val shosetsuCss by viewModel.shosetsuCss.collectAsState()
+
 	val isCSSValid by viewModel.isCSSValid.collectAsState()
 	val cssInvalidReason by viewModel.cssInvalidReason.collectAsState()
 
@@ -35,9 +38,11 @@ fun CSSEditorView(
 	val activity = LocalContext.current as Activity
 
 	ShosetsuTheme {
+		viewModel.colorScheme.value = MaterialTheme.colorScheme
 		CSSEditorPagerContent(
 			cssTitle = cssTitle,
 			cssContent = cssContent,
+			shosetsuCss = shosetsuCss,
 			isCSSValid = isCSSValid,
 			cssInvalidReason = cssInvalidReason,
 			onUndo = { viewModel.undo() },

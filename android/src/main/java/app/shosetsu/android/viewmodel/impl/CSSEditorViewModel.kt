@@ -1,13 +1,17 @@
 package app.shosetsu.android.viewmodel.impl
 
 import android.app.Application
+import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.StyleEntity
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
+import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import java.util.*
 
@@ -38,6 +42,22 @@ class CSSEditorViewModel(
 	private val app: Application,
 	private val settingsRepo: ISettingsRepository
 ) : ACSSEditorViewModel() {
+
+	private val css = object : ShosetsuCssViewModelComponent() {
+		override val settingsRepo: ISettingsRepository
+			get() = this@CSSEditorViewModel.settingsRepo
+		override val viewModelScopeIO: CoroutineScope
+			get() = this@CSSEditorViewModel.viewModelScopeIO
+		override val indentSizeFlow: Flow<Int> by lazy {
+			settingsRepo.getIntFlow(SettingKey.ReaderIndentSize)
+		}
+		override val paragraphSpacingFlow: Flow<Float> by lazy {
+			settingsRepo.getFloatFlow(SettingKey.ReaderParagraphSpacing)
+		}
+		override val colorSchemeFlow: Flow<ColorScheme>
+			get() = this@CSSEditorViewModel.colorScheme
+	}
+
 	private val undoStack by lazy { Stack<String>() }
 	private val redoStack by lazy { Stack<String>() }
 	private val cssIDFlow = MutableStateFlow(-2)
@@ -51,6 +71,14 @@ class CSSEditorViewModel(
 			app.resources.getString(R.string.loading)
 		)
 	}
+	override val shosetsuCss: StateFlow<String> by lazy {
+		css.shosetsuCss.stateIn(
+			viewModelScopeIO,
+			SharingStarted.Lazily,
+			""
+		)
+	}
+	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)
 	override val isCSSValid: MutableStateFlow<Boolean> = MutableStateFlow(true)
 	override val cssInvalidReason: MutableStateFlow<String?> = MutableStateFlow(null)
 	override val canRedo: MutableStateFlow<Boolean> = MutableStateFlow(false)
