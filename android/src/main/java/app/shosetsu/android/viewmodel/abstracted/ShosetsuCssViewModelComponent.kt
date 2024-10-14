@@ -5,6 +5,8 @@ import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
+import app.shosetsu.android.common.SettingKey.ReaderIndentSize
+import app.shosetsu.android.common.SettingKey.ReaderParagraphSpacing
 import app.shosetsu.android.common.SettingKey.ReaderTableHack
 import app.shosetsu.android.common.SettingKey.ReaderTextSize
 import app.shosetsu.android.common.SettingKey.ReaderTheme
@@ -128,4 +130,14 @@ abstract class ShosetsuCssViewModelComponent {
             }.joinToString("")
         }.onIO()
     }
+
+    data class ShosetsuCSSBuilder(
+        val backgroundColor: Int = Color.WHITE,
+        val foregroundColor: Int = Color.BLACK,
+        val textSize: Float = ReaderTextSize.default,
+        val indentSize: Int = ReaderIndentSize.default,
+        val paragraphSpacing: Float = ReaderParagraphSpacing.default,
+        val tableHackEnabled: Boolean = ReaderTableHack.default,
+        val disableTextSelection: Boolean = ReaderDisableTextSelection.default
+    )
 }

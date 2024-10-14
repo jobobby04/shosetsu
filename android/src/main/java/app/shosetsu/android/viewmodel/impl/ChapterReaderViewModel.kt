@@ -2,18 +2,15 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.app.Application
 import android.database.sqlite.SQLiteException
-import android.graphics.Color
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
 import app.shosetsu.android.common.SettingKey.ReaderEnableFullscreen
 import app.shosetsu.android.common.SettingKey.ReaderEngine
 import app.shosetsu.android.common.SettingKey.ReaderHorizontalPageSwap
 import app.shosetsu.android.common.SettingKey.ReaderHtmlCss
-import app.shosetsu.android.common.SettingKey.ReaderIndentSize
 import app.shosetsu.android.common.SettingKey.ReaderIsFirstFocus
 import app.shosetsu.android.common.SettingKey.ReaderIsInvertedSwipe
 import app.shosetsu.android.common.SettingKey.ReaderIsTapToScroll
@@ -22,13 +19,10 @@ import app.shosetsu.android.common.SettingKey.ReaderLanguage
 import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
 import app.shosetsu.android.common.SettingKey.ReaderMatchFullscreenToFocus
 import app.shosetsu.android.common.SettingKey.ReaderNextChapter
-import app.shosetsu.android.common.SettingKey.ReaderParagraphSpacing
 import app.shosetsu.android.common.SettingKey.ReaderPitch
 import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
 import app.shosetsu.android.common.SettingKey.ReaderSpeed
 import app.shosetsu.android.common.SettingKey.ReaderStringToHtml
-import app.shosetsu.android.common.SettingKey.ReaderTableHack
-import app.shosetsu.android.common.SettingKey.ReaderTextSize
 import app.shosetsu.android.common.SettingKey.ReaderTrackLongReading
 import app.shosetsu.android.common.SettingKey.ReaderVoice
 import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
@@ -831,16 +825,6 @@ class ChapterReaderViewModel(
 	private val userCssFlow: StateFlow<String> by lazy {
 		settingsRepo.getStringFlow(ReaderHtmlCss)
 	}
-
-	data class ShosetsuCSSBuilder(
-		val backgroundColor: Int = Color.WHITE,
-		val foregroundColor: Int = Color.BLACK,
-		val textSize: Float = ReaderTextSize.default,
-		val indentSize: Int = ReaderIndentSize.default,
-		val paragraphSpacing: Float = ReaderParagraphSpacing.default,
-		val tableHackEnabled: Boolean = ReaderTableHack.default,
-		val disableTextSelection: Boolean = ReaderDisableTextSelection.default
-	)
 
 	override val liveIsScreenRotationLocked = MutableStateFlow(false)
 
