@@ -1,6 +1,8 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import android.graphics.Color
+import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -14,8 +16,8 @@ import app.shosetsu.android.common.SettingKey.ReaderUserThemes
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.domain.model.local.ColorChoiceData
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.viewmodel.impl.ChapterReaderViewModel.Companion.HTML_SIZE_DIVISION
-import app.shosetsu.android.viewmodel.impl.ChapterReaderViewModel.ShosetsuCSSBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +34,7 @@ abstract class ShosetsuCssViewModelComponent {
     abstract val viewModelScopeIO: CoroutineScope
     abstract val indentSizeFlow: Flow<Int>
     abstract val paragraphSpacingFlow: Flow<Float>
+    abstract val colorSchemeFlow: Flow<ColorScheme>
 
     val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
         settingsRepo.getIntFlow(ReaderTheme).mapLatest { id: Int ->
@@ -79,6 +82,10 @@ abstract class ShosetsuCssViewModelComponent {
             builder.copy(
                 disableTextSelection = enabled
             )
+        }.combine(colorSchemeFlow) { builder, colorScheme ->
+            builder.copy(
+                colorScheme = colorScheme
+            )
         }.map {
             val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
 
@@ -91,6 +98,64 @@ abstract class ShosetsuCssViewModelComponent {
                 setShosetsuStyle("*") {
                     this["-webkit-user-select"] = "none"
                     this["user-select"] = "none"
+                }
+            }
+
+            setShosetsuStyle(":root") {
+                // Naming is based on the Material Theme Builder's CSS output
+                fun color(name: String, color: androidx.compose.ui.graphics.Color) {
+                    this["--md-sys-color-$name"] = color.toArgb().cssColor()
+                }
+                it.colorScheme.run {
+                    color("primary", primary)
+                    color("surface-tint", surfaceTint)
+                    color("on-primary", onPrimary)
+                    color("primary-container", primaryContainer)
+                    color("on-primary-container", onPrimaryContainer)
+                    color("secondary", secondary)
+                    color("on-secondary", onSecondary)
+                    color("secondary-container", secondaryContainer)
+                    color("on-secondary-container", onSecondaryContainer)
+                    color("tertiary", tertiary)
+                    color("on-tertiary", onTertiary)
+                    color("tertiary-container", tertiaryContainer)
+                    color("on-tertiary-container", onTertiaryContainer)
+                    color("error", error)
+                    color("on-error", onError)
+                    color("error-container", errorContainer)
+                    color("on-error-container", onErrorContainer)
+                    color("background", background)
+                    color("on-background", onBackground)
+                    color("surface", surface)
+                    color("on-surface", onSurface)
+                    color("surface-variant", surfaceVariant)
+                    color("on-surface-variant", onSurfaceVariant)
+                    color("outline", outline)
+                    color("outline-variant", outlineVariant)
+                    color("shadow", scrim) // doesn't exist in ColorScheme
+                    color("scrim", scrim)
+                    color("inverse-surface", inverseSurface)
+                    color("inverse-on-surface", inverseOnSurface)
+                    color("inverse-primary", inversePrimary)
+                    color("primary-fixed", primary) // doesn't exist in ColorScheme
+                    color("on-primary-fixed", onPrimary) // doesn't exist in ColorScheme
+                    color("primary-fixed-dim", primary) // doesn't exist in ColorScheme
+                    color("on-primary-fixed-variant", onPrimary) // doesn't exist in ColorScheme
+                    color("secondary-fixed", secondary) // doesn't exist in ColorScheme
+                    color("on-secondary-fixed", onSecondary) // doesn't exist in ColorScheme
+                    color("secondary-fixed-dim", secondary) // doesn't exist in ColorScheme
+                    color("on-secondary-fixed-variant", onSecondary) // doesn't exist in ColorScheme
+                    color("tertiary-fixed", tertiary) // doesn't exist in ColorScheme
+                    color("on-tertiary-fixed", onTertiary) // doesn't exist in ColorScheme
+                    color("tertiary-fixed-dim", tertiary) // doesn't exist in ColorScheme
+                    color("on-tertiary-fixed-variant", onTertiary) // doesn't exist in ColorScheme
+                    color("surface-dim", surfaceDim)
+                    color("surface-bright", surfaceBright)
+                    color("surface-container-lowest", surfaceContainerLowest)
+                    color("surface-container-low", surfaceContainerLow)
+                    color("surface-container", surfaceContainer)
+                    color("surface-container-high", surfaceContainerHigh)
+                    color("surface-container-highest", surfaceContainerHighest)
                 }
             }
 
@@ -138,6 +203,7 @@ abstract class ShosetsuCssViewModelComponent {
         val indentSize: Int = ReaderIndentSize.default,
         val paragraphSpacing: Float = ReaderParagraphSpacing.default,
         val tableHackEnabled: Boolean = ReaderTableHack.default,
-        val disableTextSelection: Boolean = ReaderDisableTextSelection.default
+        val disableTextSelection: Boolean = ReaderDisableTextSelection.default,
+        val colorScheme: ColorScheme = FallbackColorScheme,
     )
 }

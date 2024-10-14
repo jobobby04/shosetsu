@@ -4,6 +4,7 @@ import android.app.Application
 import android.database.sqlite.SQLiteException
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
@@ -55,6 +56,7 @@ import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.reader.customSpeak
+import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
@@ -155,6 +157,8 @@ class ChapterReaderViewModel(
 			get() = this@ChapterReaderViewModel.indentSizeFlow
 		override val paragraphSpacingFlow: Flow<Float>
 			get() = this@ChapterReaderViewModel.paragraphSpacingFlow
+		override val colorSchemeFlow: Flow<ColorScheme>
+			get() = this@ChapterReaderViewModel.colorScheme
 	}
 
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
@@ -1235,6 +1239,8 @@ class ChapterReaderViewModel(
 		ttsPlayback.value = TTSPlayback.Stopped
 		ttsProgress.value = null
 	}
+
+	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)
 
 	override fun onCleared() {
 		tts.value?.stop()
