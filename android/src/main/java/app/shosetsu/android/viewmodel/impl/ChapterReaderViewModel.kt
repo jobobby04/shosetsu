@@ -2,21 +2,16 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.content.Context
 import android.database.sqlite.SQLiteException
-import android.graphics.Color
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import androidx.core.graphics.blue
-import androidx.core.graphics.green
-import androidx.core.graphics.red
+import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
 import app.shosetsu.android.common.SettingKey.ReaderEnableFullscreen
 import app.shosetsu.android.common.SettingKey.ReaderEngine
 import app.shosetsu.android.common.SettingKey.ReaderHorizontalPageSwap
 import app.shosetsu.android.common.SettingKey.ReaderHtmlCss
-import app.shosetsu.android.common.SettingKey.ReaderIndentSize
 import app.shosetsu.android.common.SettingKey.ReaderIsFirstFocus
 import app.shosetsu.android.common.SettingKey.ReaderIsInvertedSwipe
 import app.shosetsu.android.common.SettingKey.ReaderIsTapToScroll
@@ -25,16 +20,11 @@ import app.shosetsu.android.common.SettingKey.ReaderLanguage
 import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
 import app.shosetsu.android.common.SettingKey.ReaderMatchFullscreenToFocus
 import app.shosetsu.android.common.SettingKey.ReaderNextChapter
-import app.shosetsu.android.common.SettingKey.ReaderParagraphSpacing
 import app.shosetsu.android.common.SettingKey.ReaderPitch
 import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
 import app.shosetsu.android.common.SettingKey.ReaderSpeed
 import app.shosetsu.android.common.SettingKey.ReaderStringToHtml
-import app.shosetsu.android.common.SettingKey.ReaderTableHack
-import app.shosetsu.android.common.SettingKey.ReaderTextSize
-import app.shosetsu.android.common.SettingKey.ReaderTheme
 import app.shosetsu.android.common.SettingKey.ReaderTrackLongReading
-import app.shosetsu.android.common.SettingKey.ReaderUserThemes
 import app.shosetsu.android.common.SettingKey.ReaderVoice
 import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
 import app.shosetsu.android.common.SettingKey.ReadingMarkingType
@@ -53,7 +43,6 @@ import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
-import app.shosetsu.android.domain.model.local.ColorChoiceData
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.INovelReaderSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
@@ -70,6 +59,7 @@ import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.reader.customSpeak
+import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
@@ -77,6 +67,7 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDivide
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
+import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.IExtension.Companion.KEY_CHAPTER_URL
 import app.shosetsu.lib.Novel
@@ -84,6 +75,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -162,6 +154,19 @@ class ChapterReaderViewModel(
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {
 
+	private val css = object : ShosetsuCssViewModelComponent() {
+		override val settingsRepo: ISettingsRepository
+			get() = this@ChapterReaderViewModel.settingsRepo
+		override val viewModelScopeIO: CoroutineScope
+			get() = this@ChapterReaderViewModel.viewModelScopeIO
+		override val indentSizeFlow: Flow<Int>
+			get() = this@ChapterReaderViewModel.indentSizeFlow
+		override val paragraphSpacingFlow: Flow<Float>
+			get() = this@ChapterReaderViewModel.paragraphSpacingFlow
+		override val colorSchemeFlow: Flow<ColorScheme>
+			get() = this@ChapterReaderViewModel.colorScheme
+	}
+
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
 	}
@@ -197,10 +202,6 @@ class ChapterReaderViewModel(
 		readerSettingsFlow.mapLatest { result ->
 			result.paragraphSpacingSize
 		}
-	}
-
-	private val tableHackEnabledFlow: Flow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderTableHack)
 	}
 
 	private val doubleTapSystemFlow: StateFlow<Boolean> by lazy {
@@ -417,7 +418,7 @@ class ChapterReaderViewModel(
 					}
 
 					emitAll(
-						shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
+						css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
 							fun update(id: String, css: String) {
 								var style: Element? = document.getElementById(id)
 
@@ -575,30 +576,17 @@ class ChapterReaderViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingUI(-1))
 	}
 
-	private val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
-		settingsRepo.getIntFlow(ReaderTheme).mapLatest { id: Int ->
-			settingsRepo.getStringSet(ReaderUserThemes)
-				.map { ColorChoiceData.fromString(it) }
-				.find { it.identifier == id.toLong() }
-				?.let { (_, _, textColor, backgroundColor) ->
-					(textColor to backgroundColor)
-				} ?: (Color.BLACK to Color.WHITE)
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, Color.BLACK to Color.WHITE)
-	}
-
 	override val textColor: StateFlow<Int> by lazy {
-		themeFlow.map { it.first }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, themeFlow.value.first)
+		css.themeFlow.map { it.first }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.first)
 	}
 
 	override val backgroundColor: StateFlow<Int> by lazy {
-		themeFlow.map { it.second }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, themeFlow.value.second)
+		css.themeFlow.map { it.second }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.second)
 	}
 
-	override val liveTextSize: StateFlow<Float> by lazy {
-		settingsRepo.getFloatFlow(ReaderTextSize)
-	}
+	override val liveTextSize: StateFlow<Float> get() = css.liveTextSize
 
 	override val liveKeepScreenOn: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderKeepScreenOn)
@@ -825,9 +813,7 @@ class ChapterReaderViewModel(
 		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
 	}
 
-	override val disableTextSelection: StateFlow<Boolean> by lazy {
-		settingsRepo.getBooleanFlow(ReaderDisableTextSelection)
-	}
+	override val disableTextSelection: StateFlow<Boolean> get() = css.disableTextSelection
 
 	private val doubleTapFocus: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus)
@@ -885,91 +871,6 @@ class ChapterReaderViewModel(
 
 	private val userCssFlow: StateFlow<String> by lazy {
 		settingsRepo.getStringFlow(ReaderHtmlCss)
-	}
-
-	data class ShosetsuCSSBuilder(
-		val backgroundColor: Int = Color.WHITE,
-		val foregroundColor: Int = Color.BLACK,
-		val textSize: Float = ReaderTextSize.default,
-		val indentSize: Int = ReaderIndentSize.default,
-		val paragraphSpacing: Float = ReaderParagraphSpacing.default,
-		val tableHackEnabled: Boolean = ReaderTableHack.default,
-		val disableTextSelection: Boolean = ReaderDisableTextSelection.default
-	)
-
-	private val shosetsuCss: Flow<String> by lazy {
-		themeFlow.combine(liveTextSize) { (fore, back), textSize ->
-			ShosetsuCSSBuilder(
-				backgroundColor = back,
-				foregroundColor = fore,
-				textSize = textSize
-			)
-		}.combine(indentSizeFlow) { builder, indent ->
-			builder.copy(
-				indentSize = indent
-			)
-		}.combine(paragraphSpacingFlow) { builder, space ->
-			builder.copy(
-				paragraphSpacing = space
-			)
-		}.combine(tableHackEnabledFlow) { builder, enabled ->
-			builder.copy(
-				tableHackEnabled = enabled
-			)
-		}.combine(disableTextSelection) { builder, enabled ->
-			builder.copy(
-				disableTextSelection = enabled
-			)
-		}.map {
-			val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
-
-			fun setShosetsuStyle(elem: String, action: HashMap<String, String>.() -> Unit) =
-				shosetsuStyle.getOrPut(elem) { hashMapOf() }.apply(action)
-
-			fun Int.cssColor(): String = "rgb($red,$green,$blue)"
-
-			if (it.disableTextSelection) {
-				setShosetsuStyle("*") {
-					this["-webkit-user-select"] = "none"
-					this["user-select"] = "none"
-				}
-			}
-
-			setShosetsuStyle("body") {
-				this["background-color"] = it.backgroundColor.cssColor()
-				this["color"] = it.foregroundColor.cssColor()
-				this["font-size"] = "${it.textSize / HTML_SIZE_DIVISION}pt"
-				this["scroll-behavior"] = "smooth"
-				this["text-indent"] = "${it.indentSize}em"
-				this["overflow-wrap"] = "break-word"
-				this["padding"] = "0.5em" // ensure everything stays away from the edge
-			}
-
-			setShosetsuStyle("p") {
-				this["margin-top"] = "${it.paragraphSpacing}em"
-			}
-
-			setShosetsuStyle("img") {
-				this["max-width"] = "100%"
-				this["height"] = "initial !important"
-			}
-
-			setShosetsuStyle(".tts-border-style") {
-				this["border"] = "2px solid red"
-			}
-
-			if (it.tableHackEnabled)
-				setShosetsuStyle("table") {
-					this["overflow-x"] = "auto"
-					this["display"] = "block"
-					this["white-space"] = "nowrap"
-				}
-
-			shosetsuStyle.map { elem ->
-				"${elem.key} {" + elem.value.map { rule -> "${rule.key}:${rule.value}" }
-					.joinToString(";", postfix = ";") + "}"
-			}.joinToString("")
-		}.onIO()
 	}
 
 	override val liveIsScreenRotationLocked = MutableStateFlow(false)
@@ -1388,6 +1289,8 @@ class ChapterReaderViewModel(
 		ttsPlayback.value = TTSPlayback.Stopped
 		ttsProgress.value = null
 	}
+
+	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)
 
 	override fun onCleared() {
 		tts.value?.stop()

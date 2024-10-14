@@ -40,6 +40,8 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+val FallbackColorScheme = LightColorScheme
+
 @Composable
 fun ShosetsuTheme(
 	darkTheme: Boolean = isSystemInDarkTheme(),

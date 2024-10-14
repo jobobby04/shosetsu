@@ -1,6 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import android.content.Context
+import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -14,6 +15,7 @@ import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -211,4 +213,6 @@ abstract class AChapterReaderViewModel :
 	abstract fun onPlayTts(context: Context)
 	abstract fun onPauseTts()
 	abstract fun onStopTts()
+
+	abstract val colorScheme: MutableStateFlow<ColorScheme>
 }
