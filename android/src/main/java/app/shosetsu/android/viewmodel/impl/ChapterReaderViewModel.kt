@@ -198,8 +198,6 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	private val tableHackEnabledFlow: Flow<Boolean> get() = css.tableHackEnabledFlow
-
 	private val doubleTapSystemFlow: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapSystem)
 			.let {
@@ -572,16 +570,14 @@ class ChapterReaderViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingUI(-1))
 	}
 
-	private val themeFlow: StateFlow<Pair<Int, Int>> get() = css.themeFlow
-
 	override val textColor: StateFlow<Int> by lazy {
-		themeFlow.map { it.first }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, themeFlow.value.first)
+		css.themeFlow.map { it.first }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.first)
 	}
 
 	override val backgroundColor: StateFlow<Int> by lazy {
-		themeFlow.map { it.second }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, themeFlow.value.second)
+		css.themeFlow.map { it.second }.onIO()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.second)
 	}
 
 	override val liveTextSize: StateFlow<Float> get() = css.liveTextSize
