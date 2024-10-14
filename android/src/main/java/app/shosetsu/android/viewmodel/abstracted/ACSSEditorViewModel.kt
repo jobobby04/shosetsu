@@ -43,10 +43,11 @@ abstract class ACSSEditorViewModel : ShosetsuViewModel() {
 	abstract val cssContent: StateFlow<String>
 	abstract val cssTitle: StateFlow<String>
 
+	abstract val shosetsuCss: StateFlow<String>
+
 	abstract val isCSSValid: StateFlow<Boolean>
 	abstract val cssInvalidReason: StateFlow<String?>
 
 	abstract val canUndo: StateFlow<Boolean>
 	abstract val canRedo: StateFlow<Boolean>
-
 }

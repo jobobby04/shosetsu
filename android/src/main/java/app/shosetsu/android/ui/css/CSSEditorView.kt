@@ -27,6 +27,8 @@ fun CSSEditorView(
 	val cssContent by viewModel.cssContent.collectAsState()
 	val clipboardManager = LocalClipboardManager.current
 
+	val shosetsuCss by viewModel.shosetsuCss.collectAsState()
+
 	val isCSSValid by viewModel.isCSSValid.collectAsState()
 	val cssInvalidReason by viewModel.cssInvalidReason.collectAsState()
 
@@ -38,6 +40,7 @@ fun CSSEditorView(
 		CSSEditorPagerContent(
 			cssTitle = cssTitle,
 			cssContent = cssContent,
+			shosetsuCss = shosetsuCss,
 			isCSSValid = isCSSValid,
 			cssInvalidReason = cssInvalidReason,
 			onUndo = { viewModel.undo() },
