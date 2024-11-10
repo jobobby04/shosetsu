@@ -19,6 +19,7 @@ package app.shosetsu.android.ui.reader
 import android.content.Intent
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -121,6 +122,7 @@ fun ChapterReaderView(
 
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
 	ShosetsuTheme {
+		viewModel.colorScheme.value = MaterialTheme.colorScheme
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
 			isFocused = isFocused,

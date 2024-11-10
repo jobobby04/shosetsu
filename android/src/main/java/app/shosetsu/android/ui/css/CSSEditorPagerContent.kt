@@ -22,6 +22,7 @@ import kotlinx.collections.immutable.persistentListOf
 fun CSSEditorPagerContent(
 	cssTitle: String,
 	cssContent: String,
+	shosetsuCss: String,
 	isCSSValid: Boolean,
 	cssInvalidReason: String? = null,
 	onBack: () -> Unit,
@@ -83,7 +84,7 @@ fun CSSEditorPagerContent(
 					}
 
 					else -> {
-						CSSPreviewContent(cssContent)
+						CSSPreviewContent(cssContent, shosetsuCss)
 					}
 				}
 			}
@@ -96,6 +97,7 @@ fun CSSEditorPagerContent(
 fun PreviewCSSEditorPagerContent() {
 	CSSEditorPagerContent(
 		"TestCSS",
+		"",
 		"",
 		onBack = {},
 		onNewText = {},
