@@ -10,7 +10,6 @@ import androidx.work.Operation
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.BackupWorker
 import app.shosetsu.android.common.SettingKey.BackupCycle
@@ -21,6 +20,7 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
