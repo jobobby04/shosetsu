@@ -12,7 +12,6 @@ import androidx.work.NetworkType.UNMETERED
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
 import app.shosetsu.android.common.SettingKey.NovelUpdateCycle
@@ -25,6 +24,7 @@ import app.shosetsu.android.common.consts.WorkerTags.UPDATE_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit.HOURS
