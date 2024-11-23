@@ -168,8 +168,8 @@ class AppUpdateCheckWorker(
 		private suspend fun appUpdateOnlyIdle(): Boolean =
 			iSettingsRepository.getBoolean(SettingKey.AppUpdateOnlyWhenIdle)
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWorkFlow(APP_UPDATE_WORK_ID).first()
