@@ -387,8 +387,8 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(EXTENSION_INSTALL_WORK_ID).await()

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import app.shosetsu.android.backend.workers.perodic.BackupCycleWorker
 import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
@@ -31,6 +32,7 @@ class BootReceiver : BroadcastReceiver() {
 		}
 		// Starts periodic workers
 		AutoStartUpdateWorker(context).invoke()
+		AutoStartBackupWorker(context).invoke()
 	}
 
 	internal class AutoStartUpdateWorker(val context: Context) : DIAware {
@@ -47,4 +49,18 @@ class BootReceiver : BroadcastReceiver() {
 			}
 		}
 	}
+
+    internal class AutoStartBackupWorker(val context: Context) : DIAware {
+        override val di: DI by closestDI(context)
+        private val manager: BackupCycleWorker.Manager by instance()
+        private val iSettingsRepository: ISettingsRepository by instance()
+        operator fun invoke() {
+            launchIO {
+                if (!manager.isRunning()) {
+                    Log.i(logID(), "Starting backup worker on boot")
+                    manager.start()
+                }
+            }
+        }
+    }
 }
