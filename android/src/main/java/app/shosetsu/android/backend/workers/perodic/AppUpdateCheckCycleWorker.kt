@@ -77,6 +77,10 @@ class AppUpdateCheckCycleWorker(
 				logI("Previous AppUpdaterCheck was cancelled, starting again")
 				manager.start()
 			}
+			null -> {
+				logI("Previous AppUpdaterCheck is null, starting again")
+				manager.start()
+			}
 		}
 		return Result.success()
 	}
@@ -108,8 +112,8 @@ class AppUpdateCheckCycleWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(APP_UPDATE_CYCLE_WORK_ID).await()

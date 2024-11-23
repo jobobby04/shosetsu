@@ -55,7 +55,7 @@ abstract class CoroutineWorkerManager(
 	 *
 	 * @param index the index of the worker in [getWorkerInfoList]
 	 */
-	abstract suspend fun getWorkerState(index: Int = 0): WorkInfo.State
+	abstract suspend fun getWorkerState(index: Int = 0): WorkInfo.State?
 
 	/**
 	 * Get worker information
