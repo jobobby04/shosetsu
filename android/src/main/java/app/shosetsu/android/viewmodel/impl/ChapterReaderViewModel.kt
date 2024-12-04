@@ -59,6 +59,8 @@ import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
+import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
+import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
@@ -80,6 +82,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -90,6 +93,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -344,12 +348,12 @@ class ChapterReaderViewModel(
 									"\n".toRegex(),
 									replaceSpacing.toString()
 								),
-								listOf(
-									TTSText(
+								mutableListOf(
+									StaticTTSText(
 										UUID.randomUUID().toString(),
 										unformattedText,
 									)
-								)
+								).listIterator()
 							)
 						}
 					)
@@ -368,6 +372,23 @@ class ChapterReaderViewModel(
 		}
 
 		return mutableFlow
+	}
+
+	@Suppress("UNCHECKED_CAST")
+	class TTSIterator(
+		private val model: MutableListIterator<Element>
+	) : MutableListIterator<LazyTTSText> by model as MutableListIterator<LazyTTSText> {
+		override fun next(): LazyTTSText = LazyTTSText(model.next())
+
+		override fun previous(): LazyTTSText = LazyTTSText(model.previous())
+
+		override fun set(element: LazyTTSText) {
+			model.set(element.element!!)
+		}
+
+		override fun add(element: LazyTTSText) {
+			model.add(element.element!!)
+		}
 	}
 
 	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
@@ -390,26 +411,7 @@ class ChapterReaderViewModel(
 
 					val document = Jsoup.parse(result)
 
-					val textElements = document.body().select("*:not(:has(*))")
-
-					val textItems = mutableListOf<TTSText>()
-					textElements.forEach { element ->
-						var actualElement = element
-						var parent = element.parent()
-						do {
-							if (!parent?.ownText().isNullOrEmpty()) {
-								actualElement = parent!!
-							}
-							parent = actualElement.parent()
-						} while (!parent?.ownText().isNullOrEmpty())
-
-						val text = actualElement.wholeText().trim()
-						if (text.isNotEmpty()) {
-							val uuid = UUID.randomUUID()
-							actualElement.attr("id", "textElement$uuid")
-							textItems.add(TTSText(uuid.toString(), text))
-						}
-					}
+					val iter = TTSIterator(document.body().select("*:not(:has(*))").listIterator())
 
 					emitAll(
 						css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
@@ -434,7 +436,7 @@ class ChapterReaderViewModel(
 
 							ChapterPassage.Success(
 								document.toString(),
-								textItems.toList()
+								iter
 							)
 						}
 					)
@@ -1133,7 +1135,9 @@ class ChapterReaderViewModel(
 						?: return@coroutineScope
 
 					launch nextChapterTts@{
-						val lastTts = passage.ttsElements.lastOrNull() ?: return@nextChapterTts
+						val lastTts =
+							passage.ttsElements.asFlow().filter { !it.ignore }.lastOrNull()
+								?: return@nextChapterTts
 
 						// If the user enables the setting while in the reader, we can listen in
 						ttsNextChapter.collectLatest nextChapterTts2@{ ttsNextChapter ->
@@ -1193,32 +1197,58 @@ class ChapterReaderViewModel(
 
 						// Are we playing TTS?
 						ttsPlayback.collectLatest { playback ->
+							// if we are not playing, make sure the TTS is stopped
 							if (playback != TTSPlayback.Playing) {
 								tts.stop()
-								@Suppress("LABEL_NAME_CLASH")
+								@Suppress("LA   BEL_NAME_CLASH")
 								return@collectLatest
 							}
+
+							// child scope is killed off if the parent dies
 							coroutineScope {
-								var ttsElements = passage.ttsElements
-								val ttsState = ttsProgress.value
-								if (ttsState != null) {
-									val index = ttsElements.indexOfFirst { it.id == ttsState }
-									if (index >= 0) {
-										ttsElements = ttsElements.drop(index)
-									}
-								}
+								syncTTSIterator(passage.ttsElements)
 								// For each element, lets speak it out
-								ttsElements.forEach {
-									customSpeak(
-										tts,
-										it.text,
-										it.id
-									)
+								passage.ttsElements.forEachRemaining {
+									if (!it.ignore)
+										customSpeak(
+											tts,
+											it.text,
+											it.id
+										)
 								}
 							}
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private fun syncTTSIterator(ttsElements: ListIterator<TTSText>) {
+		val ttsState = ttsProgress.value
+
+		// rewind
+		while (ttsElements.hasPrevious())
+			ttsElements.previous()
+
+		// check if the tts was playing something
+		if (ttsState != null) {
+			logV("Attempting to sync TTS to $ttsState")
+			// we were in fact playing something
+			// we need to ensure we are at the right position
+			var found = false
+
+			while (ttsElements.hasNext()) {
+				if (ttsElements.next().id == ttsState) {
+					ttsElements.previous() // make current next
+					found = true
+					break
+				}
+			}
+
+			if (!found){
+				logE("Failed to syncc TTS to $ttsState")
+				onStopTts()
 			}
 		}
 	}

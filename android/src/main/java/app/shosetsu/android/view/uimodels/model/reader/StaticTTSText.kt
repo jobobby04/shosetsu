@@ -18,22 +18,8 @@
 package app.shosetsu.android.view.uimodels.model.reader
 
 /**
- * Represents text that TTS reads aloud to the user
+ * Used for when there is no other way to stream the text contents.
  */
-sealed interface TTSText {
-
-	/**
-	 * Unique identification of this specific text
-	 */
-	val id: String
-
-	/**
-	 * The actual content of the text
-	 */
-	val text: String
-
-	/**
-	 * If this text should be skipped from being read or not
-	 */
-	val ignore: Boolean
+data class StaticTTSText(override val id: String, override val text: String) : TTSText {
+	override val ignore: Boolean = false
 }
