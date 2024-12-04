@@ -12,7 +12,6 @@ import androidx.work.NetworkType.UNMETERED
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
 import app.shosetsu.android.common.SettingKey.NovelUpdateCycle
@@ -25,6 +24,7 @@ import app.shosetsu.android.common.consts.WorkerTags.UPDATE_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit.HOURS
@@ -85,6 +85,10 @@ class NovelUpdateCycleWorker(
 				logI("Previous NovelUpdater was cancelled, starting again")
 				manager.start()
 			}
+			null -> {
+				logI("Previous NovelUpdater is null, starting again")
+				manager.start()
+			}
 		}
 
 		return Result.success()
@@ -123,8 +127,8 @@ class NovelUpdateCycleWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()

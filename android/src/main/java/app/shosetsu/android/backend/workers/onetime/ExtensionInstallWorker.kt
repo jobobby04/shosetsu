@@ -13,7 +13,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import androidx.work.await
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
@@ -33,6 +32,7 @@ import app.shosetsu.android.common.ext.notificationBuilder
 import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IExtensionDownloadRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
@@ -392,8 +392,8 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(EXTENSION_INSTALL_WORK_ID).await()
