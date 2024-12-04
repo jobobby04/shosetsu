@@ -1,4 +1,4 @@
-image: openjdk:17-jdk
+image: eclipse-temurin:17-noble
 
 variables:
 
