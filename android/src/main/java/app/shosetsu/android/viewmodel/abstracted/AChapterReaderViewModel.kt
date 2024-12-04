@@ -73,7 +73,15 @@ abstract class AChapterReaderViewModel :
 	sealed class ChapterPassage {
 		data object Loading : ChapterPassage()
 		data class Error(val throwable: Throwable?) : ChapterPassage()
-		data class Success(val content: String, val ttsElements: List<TTSText>) : ChapterPassage()
+
+		/**
+		 * @param content content of this chapter
+		 * @param ttsElements text to speech elements of this chapter, if element is not present, skip
+		 */
+		data class Success(
+			val content: String,
+			val ttsElements: MutableListIterator<TTSText>
+		) : ChapterPassage()
 	}
 
 	abstract fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage>
