@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -284,7 +285,7 @@ fun ChapterReaderView(
 				},
 				confirmButton = {
 					var isEnabled by remember { mutableStateOf(false) }
-					var timeLeft by remember { mutableStateOf(20) }
+					var timeLeft by remember { mutableIntStateOf(20) }
 
 					LaunchedEffect(Unit) {
 						repeat(20) {

@@ -10,12 +10,8 @@ import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteExtLibDataSource
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
-import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
-import app.shosetsu.lib.json.J_VERSION
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
+import app.shosetsu.lib.lua.LuaLibrary
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -62,13 +58,11 @@ class ExtensionLibrariesRepository(
 		repoURL: String,
 		extLibEntity: ExtLibEntity,
 	) = onIO {
-		val data = remoteSource.downloadLibrary(repoURL, extLibEntity)
-		val json =
-			Json.parseToJsonElement(data.substring(0, data.indexOf("\n")).replace("--", "").trim())
-		extLibEntity.version = Version(json.jsonObject[J_VERSION]!!.jsonPrimitive.content)
+		val data = LuaLibrary(remoteSource.downloadLibrary(repoURL, extLibEntity))
+		extLibEntity.version = data.libMetaData.version
 		databaseSource.updateOrInsert(extLibEntity)
-		memSource.setLibrary(extLibEntity.scriptName, data)
-		fileSource.writeExtLib(extLibEntity.scriptName, data)
+		memSource.setLibrary(extLibEntity.scriptName, data.content)
+		fileSource.writeExtLib(extLibEntity.scriptName, data.content)
 	}
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)

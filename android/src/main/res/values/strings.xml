@@ -632,17 +632,12 @@
     <string name="date_format_mdy_desc">If toggled on, dates on the Updates page will be shown month-first</string>
     <string name="intro_support_title">Support the Developer</string>
     <string name="intro_support_desc">
-        Hi I am Doomsdayrs the developer.\n
-        Due to college, I am currently struggling financially,
-        and I am aware that there at least over 4000 users using Shosetsu.\n\n
+        Hoi, Am Clocks! The developer!\n
+        I am well off now, Thank you for helping me survive.
 
-        All I am asking is that you consider donating at least $1 (USD) via the services below.\n
-        - If 500 people donate once a month, I will be financially stable again.\n
-        - If 1000 donate once a month, I will be able to work on Shosetsu nearly full time.\n\n
+        You can still chose to donate to help show your support, but you do not need to anymore.\n
 
-        Please, do consider supporting.
-        Either by helping financially, programming new features / fixes, or spreading this message.\n
-        Thank you for your time.
+        To all those who helped support me before, thank you!!!!
     </string>
     <string name="support_agree_1">Support the developer.</string>
     <string name="support_agree_2">I love Shosetsu.</string>
@@ -724,5 +719,6 @@
     <string name="view_backup_exporting_start">Exporting now...</string>
     <string name="worker_update_install_missing">No update to install</string>
     <string name="error_intent_handle">Failed to handle intent</string>
+    <string name="support_ignore">Happy</string>
 
 </resources>
