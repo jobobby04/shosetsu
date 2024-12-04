@@ -16,6 +16,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,7 +36,7 @@ import kotlin.math.roundToInt
 @Preview
 @Composable
 fun PreviewSeekBar() {
-	var value by remember { mutableStateOf(1) }
+	var value by remember { mutableIntStateOf(1) }
 	ShosetsuTheme {
 		Box(
 			modifier = Modifier

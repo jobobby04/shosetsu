@@ -68,7 +68,7 @@ fun LazyColumnScrollbar(
 
 	var isSelected by remember { mutableStateOf(false) }
 
-	var dragOffset by remember { mutableStateOf(0f) }
+	var dragOffset by remember { mutableFloatStateOf(0f) }
 
 	fun normalizedThumbSize() = listState.layoutInfo.let {
 		if (it.totalItemsCount == 0) return@let 0f
