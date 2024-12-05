@@ -66,6 +66,7 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapte
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
 import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
+import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
@@ -395,28 +396,31 @@ class ChapterReaderViewModel(
 					val chapterType = extensionChapterTypeFlow.firstOrNull()
 
 					if (chapterType == Novel.ChapterType.STRING && convert) {
+						logI("Converting text to HTML")
 						result = asHtml(result, item.title)
 					}
 
 					val document = Jsoup.parse(result)
 
-					val ttsIterator =
-						ElementToTTSTextIterator(
-							document.body().select("*:not(:has(*))").listIterator()
-						)
+					val ttsElements = document.body().select("*:not(:has(*))")
 
 					// we need to generate the ids here
 					// as to ensure they stay here when the html is rendered
 					logV("Generating ids for views")
-					ttsIterator.forEachRemaining {
+					ttsElements.parallelStream().map(::LazyTTSText).forEach {
 						it.id
 					}
-					logV("Finished generating ids for views, rewinding")
-					ttsIterator.rewind()
-					logV("Finished rewinding")
+					logV("Finished generating ids for views")
+
 					// run GC as we just created a lot of objects
 					// TODO see how to optimize this by not creating so many objects
 					System.gc()
+
+					// keep a single backing store of the iterator,
+					//  as to prevent it from being recreated
+					val ttsIterator = ElementToTTSTextIterator(
+						ttsElements.listIterator()
+					)
 
 					emitAll(
 						css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
