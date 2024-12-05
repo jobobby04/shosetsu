@@ -39,6 +39,6 @@ sealed class ChapterPassage {
 	 */
 	data class Success(
 		val content: String,
-		val ttsElements: ListIterator<TTSText>
+		val ttsElements: RewindableMutableListIterator<TTSText>
 	) : ChapterPassage()
 }

@@ -60,10 +60,12 @@ import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
+import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
+import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
+import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
@@ -83,7 +85,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -94,7 +95,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -344,6 +344,7 @@ class ChapterReaderViewModel(
 								replaceSpacing.append("\t")
 
 							// Set new text formatted
+							@Suppress("UNCHECKED_CAST")
 							ChapterPassage.Success(
 								unformattedText.replace(
 									"\n".toRegex(),
@@ -355,6 +356,8 @@ class ChapterReaderViewModel(
 										unformattedText,
 									)
 								).listIterator()
+									// this can be cast, don't sweat it
+									.toRewindable() as RewindableMutableListIterator<TTSText>
 							)
 						}
 					)
@@ -373,31 +376,6 @@ class ChapterReaderViewModel(
 		}
 
 		return mutableFlow
-	}
-
-	@Suppress("UNCHECKED_CAST")
-	class TTSIterator(
-		private val model: MutableListIterator<Element>
-	) : MutableListIterator<LazyTTSText> by model as MutableListIterator<LazyTTSText> {
-		override fun next(): LazyTTSText = LazyTTSText(model.next())
-
-		override fun previous(): LazyTTSText = LazyTTSText(model.previous())
-
-		override fun set(element: LazyTTSText) {
-			model.set(element.element!!)
-		}
-
-		override fun add(element: LazyTTSText) {
-			model.add(element.element!!)
-		}
-	}
-
-	/**
-	 * Rewinds a given iterator back to start
-	 */
-	private fun <T> ListIterator<T>.rewind() {
-		while (hasPrevious())
-			previous()
 	}
 
 	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
@@ -420,7 +398,10 @@ class ChapterReaderViewModel(
 
 					val document = Jsoup.parse(result)
 
-					val ttsIterator = TTSIterator(document.body().select("*:not(:has(*))").listIterator())
+					val ttsIterator =
+						ElementToTTSTextIterator(
+							document.body().select("*:not(:has(*))").listIterator()
+						)
 
 					// we need to generate the ids here
 					// as to ensure they stay here when the html is rendered
@@ -456,9 +437,11 @@ class ChapterReaderViewModel(
 							update("shosetsu-style", shoCSS)
 							update("user-style", useCSS)
 
+							@Suppress("UNCHECKED_CAST")
 							ChapterPassage.Success(
 								document.toString(),
-								ttsIterator
+								// this is fine
+								ttsIterator as RewindableMutableListIterator<TTSText>
 							)
 						}
 					)
@@ -1158,7 +1141,7 @@ class ChapterReaderViewModel(
 
 					launch nextChapterTts@{
 						val lastTts =
-							passage.ttsElements.asFlow().filter { !it.ignore }.lastOrNull()
+							passage.ttsElements.lastOrNull()
 								?: return@nextChapterTts
 
 						// If the user enables the setting while in the reader, we can listen in
@@ -1246,7 +1229,7 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	private fun syncTTSIterator(ttsElements: ListIterator<TTSText>) {
+	private fun syncTTSIterator(ttsElements: RewindableMutableListIterator<TTSText>) {
 		val ttsState = ttsProgress.value
 
 		// rewind
@@ -1267,7 +1250,7 @@ class ChapterReaderViewModel(
 				}
 			}
 
-			if (!found){
+			if (!found) {
 				logE("Failed to syncc TTS to $ttsState")
 				onStopTts()
 			}

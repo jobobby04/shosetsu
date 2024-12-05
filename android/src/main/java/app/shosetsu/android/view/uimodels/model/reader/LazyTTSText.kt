@@ -26,13 +26,13 @@ import java.util.UUID
  * This lowers memory consumption by a great deal as the contents of the text are not persisted
  *  as a copy in memory.
  */
-class LazyTTSText(val element: Element?) : TTSText {
+class LazyTTSText(val element: Element) : TTSText {
 	/**
 	 * The "actual" element of this element
 	 */
 	private val actualElement by lazy {
 		// Finds the "actual" element
-		var actualElement = element!!
+		var actualElement = element
 		var parent = element.parent()
 		// traverse upwards to find our parent
 		do {
