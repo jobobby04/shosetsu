@@ -392,6 +392,14 @@ class ChapterReaderViewModel(
 		}
 	}
 
+	/**
+	 * Rewinds a given iterator back to start
+	 */
+	private fun <T> ListIterator<T>.rewind() {
+		while (hasPrevious())
+			previous()
+	}
+
 	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
 		val mutableFlow = stringMap.getOrPut(item.id) {
 			getRefreshFlow(item)
@@ -412,7 +420,20 @@ class ChapterReaderViewModel(
 
 					val document = Jsoup.parse(result)
 
-					val iter = TTSIterator(document.body().select("*:not(:has(*))").listIterator())
+					val ttsIterator = TTSIterator(document.body().select("*:not(:has(*))").listIterator())
+
+					// we need to generate the ids here
+					// as to ensure they stay here when the html is rendered
+					logV("Generating ids for views")
+					ttsIterator.forEachRemaining {
+						it.id
+					}
+					logV("Finished generating ids for views, rewinding")
+					ttsIterator.rewind()
+					logV("Finished rewinding")
+					// run GC as we just created a lot of objects
+					// TODO see how to optimize this by not creating so many objects
+					System.gc()
 
 					emitAll(
 						css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
@@ -437,7 +458,7 @@ class ChapterReaderViewModel(
 
 							ChapterPassage.Success(
 								document.toString(),
-								iter
+								ttsIterator
 							)
 						}
 					)
@@ -1229,8 +1250,7 @@ class ChapterReaderViewModel(
 		val ttsState = ttsProgress.value
 
 		// rewind
-		while (ttsElements.hasPrevious())
-			ttsElements.previous()
+		ttsElements.rewind()
 
 		// check if the tts was playing something
 		if (ttsState != null) {
