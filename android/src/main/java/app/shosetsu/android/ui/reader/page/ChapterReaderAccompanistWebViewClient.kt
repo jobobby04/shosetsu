@@ -3,6 +3,7 @@ package app.shosetsu.android.ui.reader.page
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import app.shosetsu.android.common.ext.logV
 import com.google.accompanist.web.AccompanistWebViewClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -74,11 +75,13 @@ class ChapterReaderAccompanistWebViewClient(
 				var oldTtsElement: String? = null
 				ttsState.collect { id ->
 					if (id != null) {
+						logV("Moving TTS highlight to $id")
 						view.evaluateJavascript(
 							"""
 							var element = document.getElementById("textElement$id");
 							element.classList.add("tts-border-style");
 							""".trimIndent() + if (oldTtsElement != null) {
+								logV("Removing old TTS highlight from $oldTtsElement")
 								"""
 								var element2 = document.getElementById("textElement$oldTtsElement");
 								element2.classList.remove("tts-border-style");
@@ -87,6 +90,7 @@ class ChapterReaderAccompanistWebViewClient(
 							null,
 						)
 					} else if (oldTtsElement != null) {
+						logV("TTS Stopped? Removing old TTS highlight from $oldTtsElement")
 						view.evaluateJavascript(
 							"""
 							var element2 = document.getElementById("textElement$oldTtsElement");
