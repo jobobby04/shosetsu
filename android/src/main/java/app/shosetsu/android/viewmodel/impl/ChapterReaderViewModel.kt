@@ -59,6 +59,7 @@ import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
+import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
@@ -1201,7 +1202,7 @@ class ChapterReaderViewModel(
 							// if we are not playing, make sure the TTS is stopped
 							if (playback != TTSPlayback.Playing) {
 								tts.stop()
-								@Suppress("LA   BEL_NAME_CLASH")
+								@Suppress("LABEL_NAME_CLASH")
 								return@collectLatest
 							}
 

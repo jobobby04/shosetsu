@@ -18,8 +18,8 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.ui.reader.page.StringPageContent
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -54,7 +54,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun ChapterReaderStringContent(
 	item: ReaderUIItem.ReaderChapterUI,
 
-	getStringContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<AChapterReaderViewModel.ChapterPassage>,
+	getStringContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,
 	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	progressFlow: () -> Flow<Double>,
 	textSizeFlow: () -> Flow<Float>,
@@ -67,11 +67,11 @@ fun ChapterReaderStringContent(
 ) {
 	val content by remember(item) {
 		getStringContent(item)
-	}.collectAsState(AChapterReaderViewModel.ChapterPassage.Loading)
+	}.collectAsState(ChapterPassage.Loading)
 
 	when (content) {
-		is AChapterReaderViewModel.ChapterPassage.Error -> {
-			val throwable = (content as? AChapterReaderViewModel.ChapterPassage.Error)?.throwable
+		is ChapterPassage.Error -> {
+			val throwable = (content as? ChapterPassage.Error)?.throwable
 			ErrorContent(
 				throwable?.message
 					?: "Unknown error",
@@ -81,7 +81,7 @@ fun ChapterReaderStringContent(
 				stackTrace = throwable?.stackTraceToString()
 			)
 		}
-		is AChapterReaderViewModel.ChapterPassage.Loading -> {
+		is ChapterPassage.Loading -> {
 			val backgroundColor by backgroundColorFlow().collectAsState(
 				Color.Gray.toArgb()
 			)
@@ -98,7 +98,7 @@ fun ChapterReaderStringContent(
 				)
 			}
 		}
-		is AChapterReaderViewModel.ChapterPassage.Success -> {
+		is ChapterPassage.Success -> {
 			val textSize by remember { textSizeFlow() }.collectAsState(SettingKey.ReaderTextSize.default)
 			val textColor by remember { textColorFlow() }.collectAsState(Color.White.toArgb())
 			val progress by remember { progressFlow() }.collectAsState(0.0)
@@ -109,7 +109,7 @@ fun ChapterReaderStringContent(
 
 
 			StringPageContent(
-				(content as? AChapterReaderViewModel.ChapterPassage.Success)?.content ?: "",
+				(content as? ChapterPassage.Success)?.content ?: "",
 				progress,
 				textSize = textSize,
 				onScroll = {
