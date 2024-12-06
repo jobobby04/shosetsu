@@ -20,7 +20,7 @@ variables:
 # Packages installation before running script
 before_script:
   - microdnf update
-  - microdnf install wget tar unzip lib32stdc++6 lib32z1
+  - microdnf install wget tar unzip libstdc++6 zlib
   - export ANDROID_HOME="${PWD}/android-home"
   - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/tools/bin/
   - export GRADLE_USER_HOME=`pwd`/.gradle
