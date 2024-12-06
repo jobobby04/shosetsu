@@ -5,10 +5,8 @@ import app.shosetsu.android.datasource.remote.base.RemoteGitlabContributorsDataS
 import app.shosetsu.android.domain.model.local.Contributor
 import app.shosetsu.android.domain.model.remote.GitlabContributor
 import app.shosetsu.android.domain.repository.base.ContributorsRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 
 /*
  * This file is part of shosetsu.
@@ -34,17 +32,33 @@ import kotlinx.coroutines.flow.flow
 class ContributorsRepositoryImpl(
 	private val remote: RemoteGitlabContributorsDataSource
 ) : ContributorsRepository {
+	/**
+	 * Backing state to pass
+	 */
 	private val contributors = MutableStateFlow(emptyList<Contributor>())
-	private var lastRefersh = 0;
+
+	/**
+	 * Time since last refresh
+	 */
+	private var lastRefresh = 0L
 
 	override fun getAll(): StateFlow<List<Contributor>> = contributors
 
+	/**
+	 * If time to refresh, loads in new data about contributors.
+	 */
 	override suspend fun refresh() {
-		// 10 minutes between checking again
-		if (lastRefersh + (60 * 60 * 1000) >= System.currentTimeMillis()) return;
+		// 60 minutes between checking again
+		if (lastRefresh + (60 * 60 * 1000) >= System.currentTimeMillis()) return;
+		lastRefresh = System.currentTimeMillis()
 
 		onIO {
 			val remoteContributors = arrayListOf<GitlabContributor>()
+
+			// the process below is:
+			// 1. add new contributors to the list
+			// 2. sort them by descending commit count
+			// 3. filter them as to ensure there are no duplicates
 
 			remoteContributors.addAll(remote.get(SHOSETSU_ID))
 			remoteContributors.sortByDescending { it.commits }
@@ -58,6 +72,7 @@ class ContributorsRepositoryImpl(
 			remoteContributors.sortByDescending { it.commits }
 			filter(remoteContributors)
 
+			// convert the gitlab users to Contributor entities
 			contributors.emit(remoteContributors.map {
 				Contributor(
 					it.name,
@@ -106,37 +121,68 @@ class ContributorsRepositoryImpl(
 	}
 
 	companion object {
+		/**
+		 * Associations between different usernames.
+		 */
 		private val knownLinks = listOf(
 			"clocks" to "doomsdayrs"
 		)
 
+		/**
+		 * Association between a name and an image url.
+		 *
+		 * Name can be preferred name.
+		 */
 		private val knownImages = listOf(
 			"Clocks" to "https://gitlab.com/uploads/-/system/user/avatar/3931112/avatar.png?width=256"
 		)
 
+		/**
+		 * Association between preferred names.
+		 *
+		 * For example, "doomsdayrs" should be mapped to "Clocks".
+		 */
 		private val preferredNames = listOf(
 			"doomsdayrs" to "Clocks"
 		)
 
+		/**
+		 * Association between a name and a website.
+		 *
+		 * Name can be preferred name.
+		 */
 		private val websites = listOf(
 			"clocks" to "https://doomsdayrs.page"
 		)
 
+		/**
+		 * Get the image url of a given user.
+		 */
 		private fun getImage(name: String) =
 			knownImages.firstOrNull { it.first.equals(name, true) }?.second
 
+		/**
+		 * Get the preferred name of a given user.
+		 */
 		private fun getPreferredName(name: String) =
 			preferredNames.firstOrNull { it.first.equals(name, true) }?.second ?: name
 
+		/**
+		 * Get if two usernames are linked.
+		 */
 		private fun isKnownLink(nameA: String, nameB: String) =
 			knownLinks.any {
 				it.first.equals(nameA, true) && it.second.equals(nameB, true)
 						|| it.first.equals(nameB, true) && it.second.equals(nameA, true)
 			}
 
+		/**
+		 * Get the website the user may have.
+		 */
 		private fun getWebsite(name: String) =
 			websites.firstOrNull { it.first.equals(name, true) }?.second
 
+		// gitlab project ids
 
 		private const val SHOSETSU_ID = 39099987
 		private const val EXTENSIONS_ID = 41616615
