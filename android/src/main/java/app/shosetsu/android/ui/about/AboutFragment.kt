@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -160,7 +161,7 @@ fun PreviewAboutContent() {
 			onOpenKofi = {
 			},
 			onBack = {},
-			contributors = emptyList()
+			contributors = listOf(Contributor("Clocks", "doomsdayrs.page", ""))
 		)
 	}
 }
@@ -182,10 +183,10 @@ fun ContributorItem(
 				contentDescription = contributor.name,
 				imageLoader = LocalContext.current.imageLoader,
 				contentScale = ContentScale.Crop,
-				modifier = Modifier.clip(CircleShape)
+				modifier = Modifier.clip(CircleShape).minimumInteractiveComponentSize()
 			)
 
-			Text(text = contributor.name)
+			Text(text = contributor.name, Modifier.padding(4.dp))
 		}
 	}
 }
@@ -298,7 +299,9 @@ fun AboutContent(
 				HorizontalDivider()
 			}
 			item {
-				LazyRow {
+				LazyRow(
+					contentPadding = PaddingValues(8.dp)
+				) {
 					items(contributors) {
 						ContributorItem(it)
 					}
