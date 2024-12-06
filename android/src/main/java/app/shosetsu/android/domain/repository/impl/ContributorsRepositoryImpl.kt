@@ -7,6 +7,7 @@ import app.shosetsu.android.domain.model.remote.GitlabContributor
 import app.shosetsu.android.domain.repository.base.ContributorsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 
 /*
@@ -34,24 +35,36 @@ class ContributorsRepositoryImpl(
 	private val remote: RemoteGitlabContributorsDataSource
 ) : ContributorsRepository {
 	private val contributors = MutableStateFlow(emptyList<Contributor>())
+	private var lastRefersh = 0;
 
-	override fun getAll(): Flow<List<Contributor>> = flow { }
+	override fun getAll(): StateFlow<List<Contributor>> = contributors
 
 	override suspend fun refresh() {
+		// 10 minutes between checking again
+		if (lastRefersh + (60 * 60 * 1000) >= System.currentTimeMillis()) return;
+
 		onIO {
 			val remoteContributors = arrayListOf<GitlabContributor>()
 
 			remoteContributors.addAll(remote.get(SHOSETSU_ID))
-			remoteContributors.sortBy { it.commits }
+			remoteContributors.sortByDescending { it.commits }
 			filter(remoteContributors)
 
 			remoteContributors.addAll(remote.get(EXTENSIONS_ID))
-			remoteContributors.sortBy { it.commits }
+			remoteContributors.sortByDescending { it.commits }
 			filter(remoteContributors)
 
 			remoteContributors.addAll(remote.get(LIB_ID))
-			remoteContributors.sortBy { it.commits }
+			remoteContributors.sortByDescending { it.commits }
 			filter(remoteContributors)
+
+			contributors.emit(remoteContributors.map {
+				Contributor(
+					it.name,
+					getWebsite(it.name) ?: ("mailto:" + it.email),
+					getImage(it.name)
+				)
+			})
 		}
 	}
 
@@ -59,46 +72,72 @@ class ContributorsRepositoryImpl(
 	 * Ensure contributors are unique
 	 */
 	private fun filter(remoteContributors: ArrayList<GitlabContributor>) {
-		for ((index, gc) in remoteContributors.withIndex()) {
-			if (index + 1 != remoteContributors.size) {
-				// Find duplicates
-				val matches =
-					remoteContributors.subList(index + 1, remoteContributors.size).filter {
-						it.name.equals(gc.name, true) || isKnownLink(
-							it.name,
-							gc.name
-						)
-					}
+		var index = 0
+		while (index < remoteContributors.size - 1) {
+			val gc = remoteContributors[index]
 
-				// Remove duplicates
-				remoteContributors.removeAll(matches.toSet())
+			// Find duplicates
+			val matches =
+				remoteContributors.subList(index + 1, remoteContributors.size).filter {
+					it.name.equals(gc.name, true) || isKnownLink(
+						it.name,
+						gc.name
+					)
+				}
 
-				// Add duplicate values to gc
-				val newCommits = matches.sumOf { it.commits }
-				val newAdditions = matches.sumOf { it.additions }
-				val newDeletions = matches.sumOf { it.deletions }
+			// Remove duplicates
+			remoteContributors.removeAll(matches.toSet())
 
-				// Set new value
-				remoteContributors[index] = gc.copy(
-					commits = gc.commits + newCommits,
-					additions = gc.additions + newAdditions,
-					deletions = gc.deletions + newDeletions
-				)
-			}
+			// Add duplicate values to gc
+			val newCommits = matches.sumOf { it.commits }
+			val newAdditions = matches.sumOf { it.additions }
+			val newDeletions = matches.sumOf { it.deletions }
+
+			// Set new value
+			remoteContributors[index] = gc.copy(
+				name = getPreferredName(gc.name),
+				commits = gc.commits + newCommits,
+				additions = gc.additions + newAdditions,
+				deletions = gc.deletions + newDeletions
+			)
+
+			index++
 		}
 	}
 
-	private val knownLinks = listOf(
-		"clocks" to "doomsdayrs"
-	)
-
-	private fun isKnownLink(nameA: String, nameB: String) =
-		knownLinks.any {
-			it.first == nameA && it.second == nameB
-					|| it.first == nameB && it.second == nameA
-		}
-
 	companion object {
+		private val knownLinks = listOf(
+			"clocks" to "doomsdayrs"
+		)
+
+		private val knownImages = listOf(
+			"Clocks" to "https://gitlab.com/uploads/-/system/user/avatar/3931112/avatar.png?width=256"
+		)
+
+		private val preferredNames = listOf(
+			"doomsdayrs" to "Clocks"
+		)
+
+		private val websites = listOf(
+			"clocks" to "https://doomsdayrs.page"
+		)
+
+		private fun getImage(name: String) =
+			knownImages.firstOrNull { it.first.equals(name, true) }?.second
+
+		private fun getPreferredName(name: String) =
+			preferredNames.firstOrNull { it.first.equals(name, true) }?.second ?: name
+
+		private fun isKnownLink(nameA: String, nameB: String) =
+			knownLinks.any {
+				it.first.equals(nameA, true) && it.second.equals(nameB, true)
+						|| it.first.equals(nameB, true) && it.second.equals(nameA, true)
+			}
+
+		private fun getWebsite(name: String) =
+			websites.firstOrNull { it.first.equals(name, true) }?.second
+
+
 		private const val SHOSETSU_ID = 39099987
 		private const val EXTENSIONS_ID = 41616615
 		private const val LIB_ID = 41584845

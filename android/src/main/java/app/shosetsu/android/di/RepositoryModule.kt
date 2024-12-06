@@ -1,6 +1,7 @@
 package app.shosetsu.android.di
 
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.ContributorsRepository
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupUriRepository
@@ -26,6 +27,7 @@ import app.shosetsu.android.domain.repository.impl.BackupUriRepository
 import app.shosetsu.android.domain.repository.impl.CategoryRepository
 import app.shosetsu.android.domain.repository.impl.ChapterHistoryRepositoryImpl
 import app.shosetsu.android.domain.repository.impl.ChaptersRepository
+import app.shosetsu.android.domain.repository.impl.ContributorsRepositoryImpl
 import app.shosetsu.android.domain.repository.impl.DownloadsRepository
 import app.shosetsu.android.domain.repository.impl.ExtRepoRepository
 import app.shosetsu.android.domain.repository.impl.ExtensionDownloadRepository
@@ -138,4 +140,7 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 
 	bind<ChapterHistoryRepository>() with singleton { ChapterHistoryRepositoryImpl(instance()) }
 
+	bind<ContributorsRepository>() with singleton {
+		ContributorsRepositoryImpl(instance())
+	}
 }

@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -57,6 +61,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.Contributor
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
 import coil.compose.AsyncImage
 import coil.imageLoader
@@ -171,24 +176,16 @@ fun ContributorItem(
 	contributor: Contributor
 ) {
 	val uriHandler = LocalUriHandler.current
-	Card(
-		onClick = {
+
+	NovelCardCozyContent(
+		contributor.name,
+		contributor.imageURL ?: "",
+		onClick =  {
 			if (contributor.link.isNotBlank())
 				uriHandler.openUri(contributor.link)
-		}
-	) {
-		Column {
-			AsyncImage(
-				model = contributor.imageURL,
-				contentDescription = contributor.name,
-				imageLoader = LocalContext.current.imageLoader,
-				contentScale = ContentScale.Crop,
-				modifier = Modifier.clip(CircleShape).minimumInteractiveComponentSize()
-			)
-
-			Text(text = contributor.name, Modifier.padding(4.dp))
-		}
-	}
+		},
+		onLongClick = {}
+	)
 }
 
 @ExperimentalMaterial3Api
@@ -300,7 +297,8 @@ fun AboutContent(
 			}
 			item {
 				LazyRow(
-					contentPadding = PaddingValues(8.dp)
+					contentPadding = PaddingValues(8.dp),
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
 				) {
 					items(contributors) {
 						ContributorItem(it)

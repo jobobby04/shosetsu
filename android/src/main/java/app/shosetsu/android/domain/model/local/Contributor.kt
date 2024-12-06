@@ -24,5 +24,5 @@ package app.shosetsu.android.domain.model.local
 data class Contributor(
 	val name: String,
 	val link: String,
-	val imageURL: String
+	val imageURL: String?
 )

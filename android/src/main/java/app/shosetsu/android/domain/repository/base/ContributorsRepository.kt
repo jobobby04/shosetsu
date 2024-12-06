@@ -2,6 +2,7 @@ package app.shosetsu.android.domain.repository.base
 
 import app.shosetsu.android.domain.model.local.Contributor
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -25,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
  * @author Clocks
  */
 interface ContributorsRepository {
-	fun getAll(): Flow<List<Contributor>>
+	fun getAll(): StateFlow<List<Contributor>>
 
 	suspend fun refresh()
 }
