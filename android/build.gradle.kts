@@ -1,53 +1,8 @@
-import org.jetbrains.kotlin.konan.properties.Properties
-import java.io.BufferedReader
-import java.io.FileInputStream
-import java.io.IOException
-import java.io.InputStreamReader
-
 plugins {
 	id("com.android.application")
 	kotlin("android")
 	kotlin("plugin.serialization")
 	id("com.google.devtools.ksp")
-}
-
-@Throws(IOException::class)
-fun String.execute(): Process = Runtime.getRuntime().exec(this)
-
-@Throws(IOException::class)
-fun Process.getText(): String =
-	org.codehaus.groovy.runtime.IOGroovyMethods.getText(
-		BufferedReader(
-			InputStreamReader(
-				inputStream
-			)
-		)
-	).also {
-		org.codehaus.groovy.runtime.ProcessGroovyMethods.closeStreams(this)
-	}
-
-@Throws(IOException::class)
-fun getCommitCount(): String = "git rev-list --count HEAD".execute().getText().trim()
-
-fun loadSProperties(name: String): Properties {
-	var properties = try {
-		extra.get(name) as? Properties
-	} catch (e: ExtraPropertiesExtension.UnknownPropertyException) {
-		null
-	}
-
-	if (properties != null)
-		return properties
-
-	val acraPropertiesFile = rootProject.file("$name.properties")
-	properties = Properties()
-
-	if (acraPropertiesFile.exists())
-		properties.load(FileInputStream(acraPropertiesFile))
-
-	ext.set(name, properties)
-
-	return properties
 }
 
 val CI_MODE = System.getenv("CI_MODE") == "true" || true
