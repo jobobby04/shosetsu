@@ -18,6 +18,8 @@
 package app.shosetsu.android.view.uimodels.model.reader
 
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.nodes.TextNode
 import java.util.UUID
 
 /**
@@ -34,15 +36,16 @@ class LazyTTSText(val element: Element) : TTSText {
 		// Finds the "actual" element
 		var actualElement = element
 		var parent = element.parent()
+		if (parent?.hasOwnText?.not() ?: false) parent = parent!!.parent()
 		// traverse upwards to find our parent
-		do {
-			if (!parent?.ownText().isNullOrEmpty()) {
-				actualElement = parent!!
-			}
+		while (parent?.hasOwnText ?: false) {
+			actualElement = parent!!
 			parent = actualElement.parent()
-		} while (!parent?.ownText().isNullOrEmpty())
+		}
 		actualElement
 	}
+
+	private val Node.hasOwnText: Boolean get() = childNodes().any { it is TextNode && !it.isBlank }
 
 	override val text by lazy {
 		// gets all the text from the html, then trims whitespace around it

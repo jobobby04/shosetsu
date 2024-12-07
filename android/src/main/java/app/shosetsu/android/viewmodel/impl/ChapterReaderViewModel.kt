@@ -400,7 +400,7 @@ class ChapterReaderViewModel(
 
 					val document = Jsoup.parse(result)
 
-					val ttsElements = document.body().select("*:not(:has(*))")
+					val ttsElements = document.body().select("*:not(:has(*)):not(br)")
 
 					// we need to generate the ids here
 					// as to ensure they stay here when the html is rendered
