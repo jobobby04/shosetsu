@@ -56,6 +56,8 @@ import org.kodein.di.android.x.androidXModule
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.OneArgFunction
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -160,6 +162,14 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		}
 
 		ShosetsuLuaLib.libLoader = libLoader@{ name ->
+			if (name == "xx-print") {
+				return@libLoader object : OneArgFunction() {
+					override fun call(arg: LuaValue): LuaValue {
+						Log.i("LuaLibLoader/print", arg.toString())
+						return arg
+					}
+				}
+			}
 			Log.i("LuaLibLoader", "Loading ($name)")
 			try {
 				val result = runBlocking { extLibRepository.loadExtLibrary(name) }
