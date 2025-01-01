@@ -36,13 +36,8 @@ fun NavGraphBuilder.moreGraph(
 				onNavToBackup = {
 					navController.navigate(Destination.BACKUP.route)
 				},
-				onNavToRepositories = {
-					navController.navigate(Destination.REPOSITORIES.route)
-				},
 				onNavToCategories = {
 					navController.navigate(Destination.CATEGORIES.route)
-				},
-				onNavToStyles = {
 				},
 				onNavToAddShare = {
 					navController.navigate(Destination.ADD_SHARE.route)

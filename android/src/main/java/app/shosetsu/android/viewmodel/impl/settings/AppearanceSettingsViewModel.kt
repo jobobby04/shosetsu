@@ -3,7 +3,7 @@ package app.shosetsu.android.viewmodel.impl.settings
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
-import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.AAppearanceSettingsViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -29,10 +29,10 @@ import kotlinx.coroutines.flow.stateIn
  * shosetsu
  * 31 / 08 / 2020
  */
-class ViewSettingsViewModel(
+class AppearanceSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
 	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase
-) : AViewSettingsViewModel(iSettingsRepository) {
+) : AAppearanceSettingsViewModel(iSettingsRepository) {
 	override val appTheme: StateFlow<AppThemes> =
 		loadLiveAppThemeUseCase()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)

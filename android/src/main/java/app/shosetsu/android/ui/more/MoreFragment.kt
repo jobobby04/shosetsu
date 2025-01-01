@@ -77,35 +77,11 @@ import kotlinx.coroutines.launch
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * shosetsu
- * 12 / 09 / 2020
- *
- * Option for download queue
- */
-@Deprecated("Compose")
-class MoreFragment
-	: ShosetsuFragment(), CollapsedToolBarController, HomeFragment {
-
-	override val viewTitleRes: Int = R.string.more
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
-
 @Composable
 fun MoreView(
 	onNavToDownloads: () -> Unit = {},
 	onNavToBackup: () -> Unit = {},
-	onNavToRepositories: () -> Unit = {},
 	onNavToCategories: () -> Unit = {},
-	onNavToStyles: () -> Unit = {},
 	onNavToAddShare: () -> Unit = {},
 	onNavToAnalytics: () -> Unit = {},
 	onNavToHistory: () -> Unit = {},
@@ -113,27 +89,15 @@ fun MoreView(
 	onNavToAbout: () -> Unit = {},
 	drawerIcon: @Composable () -> Unit
 ) {
-	val hostState = remember { SnackbarHostState() }
-	val scope = rememberCoroutineScope()
-	val context = LocalContext.current
-
 	MoreContent(
-		hostState,
-		showStyleBar = {
-			scope.launch {
-				hostState.showSnackbar(context.getString(R.string.style_wait))
-			}
-		},
-		onNavToDownloads,
-		onNavToBackup,
-		onNavToRepositories,
-		onNavToCategories,
-		onNavToStyles,
-		onNavToAddShare,
-		onNavToAnalytics,
-		onNavToHistory,
-		onNavToSettings,
-		onNavToAbout,
+		onNavToDownloads = onNavToDownloads,
+		onNavToBackup = onNavToBackup,
+		onNavToCategories = onNavToCategories,
+		onNavToAddShare = onNavToAddShare,
+		onNavToAnalytics = onNavToAnalytics,
+		onNavToHistory = onNavToHistory,
+		onNavToSettings = onNavToSettings,
+		onNavToAbout = onNavToAbout,
 		drawerIcon = drawerIcon
 	)
 }
@@ -169,7 +133,6 @@ fun MoreItemContent(
 @Composable
 fun PreviewMoreContent() {
 	MoreContent(
-		hostState = remember { SnackbarHostState() },
 		drawerIcon = { }
 	)
 }
@@ -177,13 +140,9 @@ fun PreviewMoreContent() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreContent(
-	hostState: SnackbarHostState,
-	showStyleBar: () -> Unit = {},
 	onNavToDownloads: () -> Unit = {},
 	onNavToBackup: () -> Unit = {},
-	onNavToRepositories: () -> Unit = {},
 	onNavToCategories: () -> Unit = {},
-	onNavToStyles: () -> Unit = {},
 	onNavToAddShare: () -> Unit = {},
 	onNavToAnalytics: () -> Unit = {},
 	onNavToHistory: () -> Unit = {},
@@ -200,9 +159,6 @@ fun MoreContent(
 				scrollBehavior = enterAlwaysScrollBehavior(),
 				navigationIcon = drawerIcon
 			)
-		},
-		snackbarHost = {
-			SnackbarHost(hostState)
 		},
 	) { padding ->
 		LazyColumn(
@@ -237,22 +193,10 @@ fun MoreContent(
 
 			item {
 				MoreItemContent(
-					R.string.repositories,
-					Icons.Outlined.AddShoppingCart,
-					onNavToRepositories
-				)
-			}
-
-			item {
-				MoreItemContent(
 					R.string.categories,
 					Icons.AutoMirrored.Outlined.Label,
 					onNavToCategories
 				)
-			}
-
-			item {
-				MoreItemContent(R.string.styles, Icons.Outlined.ImagesearchRoller, showStyleBar)
 			}
 
 			item {

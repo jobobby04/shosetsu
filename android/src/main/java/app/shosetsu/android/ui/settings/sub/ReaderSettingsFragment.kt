@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ImagesearchRoller
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,6 +61,7 @@ import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.settings.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
@@ -109,6 +112,7 @@ import java.util.Locale
 
 @Composable
 fun ReaderSettingsView(
+	hostState: SnackbarHostState,
 	onBack: () -> Unit,
 	openCSS: () -> Unit
 ) {
@@ -116,8 +120,6 @@ fun ReaderSettingsView(
 
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
-
-	val hostState = remember { SnackbarHostState() }
 
 	ReaderSettingsContent(
 		viewModel = viewModel,
@@ -248,13 +250,19 @@ fun ReaderSettingsContent(
 											.padding(8.dp)
 									)
 								}
-
 							}
 						}
 					}
 				}
 			}
 
+			item {
+				TextPreferenceWidget(
+					title = stringResource(R.string.styles),
+					icon = Icons.Outlined.ImagesearchRoller,
+					onPreferenceClick = showStyleAddSnackBar
+				)
+			}
 
 			item {
 				viewModel.invertChapterSwipeOption()

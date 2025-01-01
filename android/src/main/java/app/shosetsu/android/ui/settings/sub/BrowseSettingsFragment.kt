@@ -2,22 +2,28 @@ package app.shosetsu.android.ui.settings.sub
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.settings.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.HeaderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.viewmodel.abstracted.settings.ABrowseSettingsViewModel
 
@@ -45,16 +51,25 @@ import app.shosetsu.android.viewmodel.abstracted.settings.ABrowseSettingsViewMod
 
 @Composable
 fun BrowseSettingsView(
-	onBack: () -> Unit
+	onBack: () -> Unit,
+	onNavToRepositories: () -> Unit,
 ) {
 	val viewModel: ABrowseSettingsViewModel = viewModelDi()
 
-	BrowseSettingsContent(viewModel, onBack)
+	BrowseSettingsContent(
+		viewModel = viewModel,
+		onNavToRepositories = onNavToRepositories,
+		onBack = onBack
+	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BrowseSettingsContent(viewModel: ABrowseSettingsViewModel, onBack: () -> Unit) {
+fun BrowseSettingsContent(
+	viewModel: ABrowseSettingsViewModel,
+	onNavToRepositories: () -> Unit,
+	onBack: () -> Unit
+) {
 	Scaffold(
 		topBar = {
 			TopAppBar(
@@ -73,10 +88,16 @@ fun BrowseSettingsContent(viewModel: ABrowseSettingsViewModel, onBack: () -> Uni
 			modifier = Modifier.padding(paddingValues)
 		) {
 			item {
-				HeaderSettingContent(
-					stringResource(R.string.settings_update_header_repositories)
+				val reposCount by viewModel.repoCount.collectAsState()
+
+				TextPreferenceWidget(
+					title = stringResource(R.string.settings_browse_repositories_title),
+					subtitle = stringResource(R.string.settings_browse_repositories_desc, reposCount),
+					onPreferenceClick = onNavToRepositories
 				)
 			}
+
+			item { Spacer(modifier = Modifier.height(12.dp)) }
 
 			item {
 				SwitchSettingContent(
@@ -88,6 +109,7 @@ fun BrowseSettingsContent(viewModel: ABrowseSettingsViewModel, onBack: () -> Uni
 						.fillMaxWidth()
 				)
 			}
+			item { Spacer(modifier = Modifier.height(12.dp)) }
 			item {
 				SwitchSettingContent(
 					stringResource(R.string.settings_update_repo_on_low_bat_title),
@@ -98,6 +120,7 @@ fun BrowseSettingsContent(viewModel: ABrowseSettingsViewModel, onBack: () -> Uni
 						.fillMaxWidth()
 				)
 			}
+			item { Spacer(modifier = Modifier.height(12.dp)) }
 			item {
 				SwitchSettingContent(
 					stringResource(R.string.settings_update_repo_on_low_sto_title),
@@ -108,6 +131,7 @@ fun BrowseSettingsContent(viewModel: ABrowseSettingsViewModel, onBack: () -> Uni
 						.fillMaxWidth()
 				)
 			}
+			item { Spacer(modifier = Modifier.height(12.dp)) }
 			item {
 				SwitchSettingContent(
 					stringResource(R.string.settings_update_repo_disable_on_fail_title),

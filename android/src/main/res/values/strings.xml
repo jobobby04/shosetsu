@@ -713,5 +713,9 @@
     <string name="error_intent_handle">Failed to handle intent</string>
     <string name="support_ignore">Happy</string>
     <string name="display">Display</string>
+    <string name="settings_browse_repositories_desc">%1$d Repositories</string>
+    <string name="settings_library_categories_desc">%1$d Categories</string>
+    <string name="settings_library_categories_title">Edit Categories</string>
+    <string name="settings_browse_repositories_title">Edit Repositories</string>
 
 </resources>

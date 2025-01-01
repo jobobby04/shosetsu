@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -41,9 +43,10 @@ import app.shosetsu.android.common.StringSetKey
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.more.MoreItemContent
+import app.shosetsu.android.ui.settings.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
-import app.shosetsu.android.view.compose.setting.HeaderSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -55,16 +58,25 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun LibrarySettingsView(
+    onNavToCategories: () -> Unit,
     onBack: () -> Unit
 ) {
     val viewModel: ALibrarySettingsViewModel = viewModelDi()
 
-    LibrarySettingsContent(viewModel, onBack)
+    LibrarySettingsContent(
+        viewModel = viewModel,
+        onNavToCategories = onNavToCategories,
+        onBack = onBack
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibrarySettingsContent(viewModel: ALibrarySettingsViewModel, onBack: () -> Unit) {
+fun LibrarySettingsContent(
+    viewModel: ALibrarySettingsViewModel,
+    onNavToCategories: () -> Unit,
+    onBack: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -82,10 +94,12 @@ fun LibrarySettingsContent(viewModel: ALibrarySettingsViewModel, onBack: () -> U
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(paddingValues)
         ) {
-
             item {
-                HeaderSettingContent(
-                    stringResource(R.string.settings_update_header_novel),
+                val categories by viewModel.categories.collectAsState()
+                TextPreferenceWidget(
+                    title = stringResource(R.string.settings_library_categories_title),
+                    subtitle = stringResource(R.string.settings_library_categories_desc, categories.size),
+                    onPreferenceClick = onNavToCategories
                 )
             }
 

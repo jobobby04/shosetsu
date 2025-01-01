@@ -29,16 +29,13 @@ import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.settings.widget.AppThemeModePreferenceWidget
-import app.shosetsu.android.ui.settings.widget.ListPreferenceWidget
 import app.shosetsu.android.ui.settings.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.StableHolder
-import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
-import kotlinx.collections.immutable.toImmutableList
+import app.shosetsu.android.viewmodel.abstracted.settings.AAppearanceSettingsViewModel
 
 /*
  * This file is part of shosetsu.
@@ -61,7 +58,7 @@ import kotlinx.collections.immutable.toImmutableList
 fun AppearanceSettingsView(
 	onBack: () -> Unit
 ) {
-	val viewModel: AViewSettingsViewModel = viewModelDi()
+	val viewModel: AAppearanceSettingsViewModel = viewModelDi()
 
 	AppearanceSettingsContent(
 		viewModel,
@@ -72,7 +69,7 @@ fun AppearanceSettingsView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceSettingsContent(
-	viewModel: AViewSettingsViewModel,
+	viewModel: AAppearanceSettingsViewModel,
 	onBack: () -> Unit
 ) {
 	Scaffold(

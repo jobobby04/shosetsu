@@ -9,7 +9,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavBackStackEntry
@@ -17,16 +20,18 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import app.shosetsu.android.R
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.main.Destination.*
 import app.shosetsu.android.ui.settings.SettingsView
 import app.shosetsu.android.ui.settings.sub.AdvancedSettingsView
-import app.shosetsu.android.ui.settings.sub.DownloadsSettingsView
-import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
-import app.shosetsu.android.ui.settings.sub.BrowseSettingsView
 import app.shosetsu.android.ui.settings.sub.AppearanceSettingsView
+import app.shosetsu.android.ui.settings.sub.BrowseSettingsView
+import app.shosetsu.android.ui.settings.sub.DownloadsSettingsView
 import app.shosetsu.android.ui.settings.sub.LibrarySettingsView
+import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -100,12 +105,18 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 		}
 		settingsScreenRoute(SETTINGS_LIBRARY.route) {
 			LibrarySettingsView(
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
+				onNavToCategories = {
+					navController.navigate(CATEGORIES.route)
+				}
 			)
 		}
 		settingsScreenRoute(SETTINGS_BROWSE.route) {
 			BrowseSettingsView(
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
+				onNavToRepositories = {
+					navController.navigate(REPOSITORIES.route)
+				}
 			)
 		}
 		settingsScreenRoute(SETTINGS_ADVANCED.route) {
@@ -119,8 +130,11 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 			)
 		}
 		settingsScreenRoute(SETTINGS_READER.route) {
+			val hostState = remember { SnackbarHostState() }
 			val context = LocalContext.current
+
 			ReaderSettingsView(
+				hostState = hostState,
 				onBack = navController::popBackStack,
 				openCSS = {
 					ContextCompat.startActivity(

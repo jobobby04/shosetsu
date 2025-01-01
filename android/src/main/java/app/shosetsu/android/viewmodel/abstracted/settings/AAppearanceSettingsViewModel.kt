@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 31 / 08 / 2020
  */
-abstract class AViewSettingsViewModel(iSettingsRepository: ISettingsRepository) :
+abstract class AAppearanceSettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
 	abstract val appTheme: StateFlow<AppThemes>
 }
