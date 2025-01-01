@@ -30,12 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ACRAEnabled
-import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.AutoBookmarkFromQR
 import app.shosetsu.android.common.SettingKey.ExposeTrueChapterDelete
 import app.shosetsu.android.common.SettingKey.LogToFile
@@ -47,20 +45,17 @@ import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
 import app.shosetsu.android.common.SettingKey.VerifyCheckSum
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
-import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.ProxySettingsContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -214,7 +209,6 @@ fun AdvancedSettingsContent(
 				top = 16.dp,
 				bottom = 64.dp
 			),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
 

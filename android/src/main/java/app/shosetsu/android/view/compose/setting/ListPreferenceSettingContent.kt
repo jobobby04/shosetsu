@@ -12,7 +12,7 @@ import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 @Composable
 fun <T> ListPreferenceSettingContent(
     title: String,
-    description: String,
+    description: String? = null,
     choices: List<T>,
     stringify: (T) -> String,
     toKey: (T) -> Int = { choices.indexOf(it) },
@@ -25,7 +25,7 @@ fun <T> ListPreferenceSettingContent(
     ListPreferenceWidget(
         value = choices[choice],
         title = title,
-        subtitle = description,
+        subtitle = description ?: stringify(choices[choice]),
         icon = icon,
         entries = choices.associateWith { stringify(it) },
         onValueChange = {
@@ -35,7 +35,33 @@ fun <T> ListPreferenceSettingContent(
 }
 
 @Composable
-fun ListPreferenceSettingContent(
+fun <T> ListPreferenceSettingContent(
+    title: String,
+    description: String? = null,
+    choices: List<T>,
+    stringify: (T) -> String,
+    toKey: (T) -> String = { stringify(it) },
+    fromKey: (String) -> T,
+    icon: ImageVector? = null,
+    repo: ISettingsRepository,
+    key: SettingKey<String>
+) {
+    val choice by repo.getStringFlow(key).collectAsState()
+
+    ListPreferenceWidget(
+        title = title,
+        subtitle = description ?: stringify(fromKey(choice)),
+        icon = icon,
+        value = fromKey(choice),
+        entries = choices.associateWith { stringify(it) },
+        onValueChange = {
+            launchIO { repo.setString(key, toKey(it)) }
+        },
+    )
+}
+
+@Composable
+fun StringListPreferenceSettingContent(
     title: String,
     choices: List<String>,
     icon: ImageVector? = null,

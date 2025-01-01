@@ -63,9 +63,10 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.compose.setting.GenericRightSettingLayout
+import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
+import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.EditCSS
@@ -160,26 +161,21 @@ fun ReaderSettingsContent(
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
 			//TODO Text Preview at top
 
 			item {
-				viewModel.paragraphSpacingOption()
+				StringListPreferenceSettingContent(
+					title = stringResource(R.string.settings_reader_text_alignment_title),
+					choices = stringArrayResource(R.array.text_alignments).toList(),
+					repo = viewModel.settingsRepo,
+					key = ReaderTextAlignment,
+				)
 			}
 
 			item {
-				DropdownSettingContent(
-					title = stringResource(R.string.settings_reader_text_alignment_title),
-					description = stringResource(R.string.settings_reader_text_alignment_desc),
-					choices = stringArrayResource(R.array.text_alignments).toList()
-						.toImmutableList(),
-					modifier = Modifier
-						.fillMaxWidth(),
-					repo = viewModel.settingsRepo,
-					ReaderTextAlignment
-				)
+				viewModel.paragraphSpacingOption()
 			}
 
 			item {
@@ -298,21 +294,15 @@ fun ReaderSettingsContent(
 			}
 
 			item {
-				DropdownSettingContent(
-					stringResource(R.string.marking_mode),
-					stringResource(R.string.settings_reader_marking_mode_desc),
-					choices = stringArrayResource(R.array.marking_names)
-						.toList()
-						.toImmutableList(),
+				val names = stringArrayResource(R.array.marking_names)
+					.toList()
+					.toImmutableList()
+				ListPreferenceSettingContent(
+					title = stringResource(R.string.marking_mode),
+					choices = listOf(0, 1),
 					repo = viewModel.settingsRepo,
 					key = ReadingMarkingType,
-					stringToInt = {
-						when (MarkingType.valueOf(it)) {
-							MarkingType.ONSCROLL -> 1
-							MarkingType.ONVIEW -> 0
-						}
-					},
-					intToString = {
+					toKey = {
 						when (it) {
 							0 -> MarkingType.ONVIEW.name
 							1 -> MarkingType.ONSCROLL.name
@@ -322,8 +312,15 @@ fun ReaderSettingsContent(
 							}
 						}
 					},
-					modifier = Modifier
-						.fillMaxWidth()
+					fromKey = {
+						when (MarkingType.valueOf(it)) {
+							MarkingType.ONSCROLL -> 1
+							MarkingType.ONVIEW -> 0
+						}
+					},
+					stringify = {
+						names[it]
+					}
 				)
 			}
 

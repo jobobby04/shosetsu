@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.settings.sub
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +30,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.setting.widget.AppThemeModePreferenceWidget
 import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
+import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -140,7 +139,7 @@ fun AppearanceSettingsContent(
 			}
 
 			item {
-				ListPreferenceSettingContent(
+				StringListPreferenceSettingContent(
 					title = stringResource(R.string.novel_card_type_selector_title),
 					choices = stringArrayResource(R.array.novel_card_types).toList(),
 					repo = viewModel.settingsRepo,

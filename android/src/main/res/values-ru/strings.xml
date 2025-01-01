@@ -334,8 +334,6 @@
 	<string name="settings_view_legacy_nav_title">Используйте устаревшую навигацию</string>
 	<string name="settings_view_legacy_nav_desc">Используйте устаревшую навигацию по ящикам</string>
 	<string name="settings_reader_text_alignment_title">Выравнивание текста</string>
-	<string name="settings_reader_text_alignment_desc">Как текст выравнивается в программе чтения</string>
-	<string name="settings_reader_marking_mode_desc">Как главы помечаются как прочитанные</string>
 	<string name="settings_reader_resume_behavior_title">Возобновите сначала, не читая</string>
 	<string name="settings_reader_resume_behavior_desc">При нажатии на кнопку возобновления в представлении информации о новелле будет игнорироваться статус чтения, чтобы сначала открывать непрочитанное</string>
 	<string name="activity_css_export">Экспорт CSS</string>

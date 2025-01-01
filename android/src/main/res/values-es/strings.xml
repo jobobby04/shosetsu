@@ -317,8 +317,6 @@
     <string name="settings_view_legacy_nav_title">Usar navegación heredada</string>
     <string name="settings_view_legacy_nav_desc">Usar navegación de cajón heredada</string>
     <string name="settings_reader_text_alignment_title">Alineación del texto</string>
-    <string name="settings_reader_text_alignment_desc">Cómo se alinea el texto en el lector</string>
-    <string name="settings_reader_marking_mode_desc">Cómo se marcan los capítulos como leídos</string>
     <string name="settings_reader_resume_behavior_title">Reanudar primero sin leer</string>
     <string name="settings_reader_resume_behavior_desc">Al hacer clic en el botón de reanudar en la vista de información novedosa, ignorará el estado de lectura para abrir primero sin leer</string>
     <string name="activity_css_export">Exportar CSS</string>

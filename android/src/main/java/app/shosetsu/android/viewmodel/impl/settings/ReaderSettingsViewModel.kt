@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.VolumeUp
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderContinuousScroll
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
@@ -44,11 +46,14 @@ import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.load.LoadReaderThemes
-import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.FloatSliderSettingContent
+import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
+import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.ColorChoiceUI
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
@@ -390,31 +395,24 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 		settingsRepo.getStringFlow(ReaderEngine)
 	}.collectAsState()
 	if (!isInitialized) {
-		DropdownSettingContent(
+		TextPreferenceWidget(
 			title = stringResource(R.string.reader_engine),
-			description = "",
-			modifier = Modifier
-				.fillMaxWidth(),
-			choices = remember {
-				listOf(context.getString(R.string.loading)).toImmutableList()
-			},
-			selection = 0,
-			onSelection = {},
+			subtitle = stringResource(R.string.loading),
 		)
 		return
 	}
-	DropdownSettingContent(
+	val actualSelection = engines.indexOfFirst { it.name == selection }.takeUnless { it < 0 }
+		?: engines.indexOfFirst { it.name == tts.defaultEngine }.takeUnless { it < 0 }
+		?: 0
+	ListPreferenceWidget(
 		title = stringResource(R.string.reader_engine),
-		description = "",
-		modifier = Modifier
-			.fillMaxWidth(),
-		choices = remember {
-			engines.map { it.label }.toImmutableList()
+		subtitle = engines.getOrNull(actualSelection)?.label,
+		icon = null,
+		value = actualSelection,
+		entries = remember {
+			engines.withIndex().associate { it.index to it.value.label }
 		},
-		selection = engines.indexOfFirst { it.name == selection }.takeUnless { it < 0 }
-			?: engines.indexOfFirst { it.name == tts.defaultEngine }.takeUnless { it < 0 }
-			?: 0,
-		onSelection = {
+		onValueChange = {
 			scope.launch {
 				settingsRepo.setString(ReaderEngine, engines[it].name)
 				settingsRepo.setString(ReaderLanguage, "")
@@ -455,33 +453,26 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 	}.collectAsState()
 
 	if (!isInitialized || languages.isEmpty()) {
-		DropdownSettingContent(
+		TextPreferenceWidget(
 			title = stringResource(R.string.reader_language),
-			description = "",
-			modifier = Modifier
-				.fillMaxWidth(),
-			choices = remember {
-				listOf(context.getString(R.string.loading)).toImmutableList()
-			},
-			selection = 0,
-			onSelection = {},
+			subtitle = stringResource(R.string.loading),
 		)
 		return
 	}
-	DropdownSettingContent(
+	val actualSelection = remember(engine, selection, languages) {
+		languages.indexOfFirst { it.toLanguageTag() == selection }.takeUnless { it < 0 }
+			?: languages.indexOfFirst { it.toLanguageTag() == Locale.getDefault().toLanguageTag() }.takeUnless { it < 0 }
+			?: 0
+	}
+	ListPreferenceWidget(
 		title = stringResource(R.string.reader_language),
-		description = "",
-		modifier = Modifier
-			.fillMaxWidth(),
-		choices = remember {
-			languages.map { it.displayName }.toImmutableList()
+		subtitle = languages.getOrNull(actualSelection)?.displayName,
+		icon = null,
+		value = actualSelection,
+		entries = remember {
+			languages.withIndex().associate { it.index to it.value.displayName }
 		},
-		selection = remember(engine, selection, languages) {
-			languages.indexOfFirst { it.toLanguageTag() == selection }.takeUnless { it < 0 }
-				?: languages.indexOfFirst { it.toLanguageTag() == Locale.getDefault().toLanguageTag() }.takeUnless { it < 0 }
-				?: 0
-		},
-		onSelection = {
+		onValueChange = {
 			scope.launch {
 				settingsRepo.setString(ReaderLanguage, languages[it].toLanguageTag())
 				settingsRepo.setString(ReaderVoice, "")
@@ -526,33 +517,26 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 	}.collectAsState()
 
 	if (!isInitialized || voices.isEmpty()) {
-		DropdownSettingContent(
+		TextPreferenceWidget(
 			title = stringResource(R.string.reader_voice),
-			description = "",
-			modifier = Modifier
-				.fillMaxWidth(),
-			choices = remember {
-				listOf(context.getString(R.string.loading)).toImmutableList()
-			},
-			selection = 0,
-			onSelection = {},
+			subtitle = stringResource(R.string.loading),
 		)
 		return
 	}
-	DropdownSettingContent(
+	val actualSelection = remember(engine, language, selection, voices) {
+		voices.indexOfFirst { it.name == selection }.takeUnless { it < 0 }
+			?: voices.indexOfFirst { it.name == tts.defaultVoice?.name }.takeUnless { it < 0 }
+			?: 0
+	}
+	ListPreferenceWidget(
 		title = stringResource(R.string.reader_voice),
-		description = "",
-		modifier = Modifier
-			.fillMaxWidth(),
-		choices = remember {
-			voices.map { it.name }.toImmutableList()
+		subtitle = voices.getOrNull(actualSelection)?.name,
+		icon = null,
+		value = actualSelection,
+		entries = remember {
+			voices.withIndex().associate { it.index to it.value.name }
 		},
-		selection = remember(engine, language, selection, voices) {
-			voices.indexOfFirst { it.name == selection }.takeUnless { it < 0 }
-				?: voices.indexOfFirst { it.name == tts.defaultVoice?.name }.takeUnless { it < 0 }
-				?: 0
-		},
-		onSelection = {
+		onValueChange = {
 			scope.launch {
 				settingsRepo.setString(ReaderVoice, voices[it].name)
 			}
@@ -580,11 +564,10 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 		settingsRepo.getFloatFlow(ReaderSpeed)
 	}
 	val scope = rememberCoroutineScope()
-	ButtonSettingContent(
-		stringResource(R.string.reader_test),
-		"",
-		stringResource(R.string.start),
-		onClick = {
+	TextPreferenceWidget(
+		title = stringResource(R.string.reader_test),
+		widget = { Icon(Icons.AutoMirrored.Outlined.VolumeUp, stringResource(R.string.start)) },
+		onPreferenceClick = {
 			scope.launch {
 				val ttsResult = CompletableDeferred<Int>()
 				val tts = if (engine.value.isEmpty()) {
@@ -679,13 +662,9 @@ fun ExposedSettingsRepoViewModel.readerReadNextChapter() {
 
 @Composable
 fun ExposedSettingsRepoViewModel.EditCSS(openCSS: () -> Unit) {
-	val context = LocalContext.current
-	ButtonSettingContent(
-		stringResource(R.string.settings_reader_title_html_css),
-		stringResource(R.string.settings_reader_desc_html_css),
-		stringResource(R.string.open_in),
-		onClick = openCSS,
-		modifier = Modifier
-			.fillMaxWidth()
+	TextPreferenceWidget(
+		title = stringResource(R.string.settings_reader_title_html_css),
+		subtitle = stringResource(R.string.settings_reader_desc_html_css),
+		onPreferenceClick = openCSS,
 	)
 }
