@@ -360,7 +360,7 @@
     <string name="settings_advanced_clear_cookies_desc">Borrar todas las cookies que tiene shosetsu para sitios web</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies eliminadas</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Elimina cualquier novela e información sin marcar de Shosetsu]]></string>
-    <string name="fragment_configure_extension_listing_desc">¿Qué lista de novelas debe mostrarse cuando el usuario abre la extensión para navegar?</string>
+    <string name="fragment_configure_extension_listing_desc">¿Qué lista de novelas debe mostrarse cuando el usuario abre la extensión para navegar?\nCurrently: %s</string>
     <string name="fragment_downloads_set_all_pending_title">Establecer todo pendiente</string>
     <string name="fragment_downloads_delete_all_title">Eliminar todos</string>
     <plurals name="worker_novel_update_updated_novel_count">

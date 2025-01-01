@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.ExtensionType
@@ -121,7 +123,6 @@ fun ConfigureExtensionContent(
 		}
 	) { paddingValues ->
 		LazyColumn(
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			state = rememberLazyListState(),
 			contentPadding = PaddingValues(bottom = 8.dp),
 			modifier = Modifier.padding(paddingValues)
@@ -137,17 +138,15 @@ fun ConfigureExtensionContent(
 
 			if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
 				item {
-					DropdownSettingContent(
+					val selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0
+					val choices = extensionListingResult!!.choices
+					ListPreferenceWidget(
 						title = stringResource(R.string.listings),
-						description = stringResource(R.string.fragment_configure_extension_listing_desc),
-						choices = extensionListingResult!!.choices,
-						selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
-						onSelection = { index ->
-							viewModel.setSelectedListing(index)
-						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(top = 8.dp, start = 16.dp, end = 16.dp)
+						subtitle = stringResource(R.string.fragment_configure_extension_listing_desc, choices[selection]),
+						icon = null,
+						value = selection,
+						entries = choices.withIndex().associate { it.index to it.value },
+						onValueChange = { viewModel.setSelectedListing(it) }
 					)
 				}
 			}
@@ -171,14 +170,14 @@ fun SettingsItemAsCompose(
 						modifier = Modifier.fillMaxWidth()
 					) {
 						Text(data.name)
-						Divider()
+						HorizontalDivider()
 					}
 				}
 			}
 
 			is FilterEntity.Separator -> {
 				column.item(Random.nextInt() + 1000000) {
-					Divider()
+					HorizontalDivider()
 				}
 			}
 
@@ -253,7 +252,7 @@ fun SettingsItemAsCompose(
 							.fillMaxWidth()
 					) {
 						Text(data.name)
-						Divider()
+						HorizontalDivider()
 					}
 				}
 				SettingsItemAsCompose(column, viewModel, data.filters.toList())

@@ -15,31 +15,6 @@ fun <T> ListPreferenceSettingContent(
     description: String? = null,
     choices: List<T>,
     stringify: (T) -> String,
-    toKey: (T) -> Int = { choices.indexOf(it) },
-    icon: ImageVector? = null,
-    repo: ISettingsRepository,
-    key: SettingKey<Int>
-) {
-    val choice by repo.getIntFlow(key).collectAsState()
-
-    ListPreferenceWidget(
-        value = choices[choice],
-        title = title,
-        subtitle = description ?: stringify(choices[choice]),
-        icon = icon,
-        entries = choices.associateWith { stringify(it) },
-        onValueChange = {
-            launchIO { repo.setInt(key, toKey(it)) }
-        },
-    )
-}
-
-@Composable
-fun <T> ListPreferenceSettingContent(
-    title: String,
-    description: String? = null,
-    choices: List<T>,
-    stringify: (T) -> String,
     toKey: (T) -> String = { stringify(it) },
     fromKey: (String) -> T,
     icon: ImageVector? = null,

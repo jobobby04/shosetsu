@@ -375,7 +375,7 @@
     <string name="settings_advanced_clear_cookies_desc">Очистить все файлы cookie, которые Shosetsu имеет для веб-сайтов.</string>
     <string name="settings_advanced_clear_cookies_complete">Куки очищены</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Удаляет все не отмеченные новеллы и информацию из Shosetsu]]></string>
-    <string name="fragment_configure_extension_listing_desc">Какой список новелл должен отображаться, когда пользователь открывает расширение для просмотра</string>
+    <string name="fragment_configure_extension_listing_desc">Какой список новелл должен отображаться, когда пользователь открывает расширение для просмотра.\nCurrently: %s</string>
     <string name="fragment_downloads_set_all_pending_title">Установить все в ожидании</string>
     <string name="fragment_downloads_delete_all_title">Удалить все</string>
     <string name="fragment_novel_true_delete">Истинное удаление</string>
