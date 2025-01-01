@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.settings.widget.TextPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.viewmodel.abstracted.settings.ABrowseSettingsViewModel
@@ -82,7 +82,6 @@ fun BrowseSettingsContent(
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(bottom = 64.dp, top = 16.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
 			item {
@@ -95,19 +94,16 @@ fun BrowseSettingsContent(
 				)
 			}
 
-			item { Spacer(modifier = Modifier.height(12.dp)) }
-
 			item {
 				SwitchSettingContent(
-					stringResource(R.string.settings_update_repo_on_metered_title),
-					stringResource(R.string.settings_update_repo_on_metered_desc),
-					viewModel.settingsRepo,
-					SettingKey.RepoUpdateOnMeteredConnection,
+					title = stringResource(R.string.settings_update_repo_on_metered_title),
+					description = stringResource(R.string.settings_update_repo_on_metered_desc),
+					repo = viewModel.settingsRepo,
+					key = SettingKey.RepoUpdateOnMeteredConnection,
 					modifier = Modifier
 						.fillMaxWidth()
 				)
 			}
-			item { Spacer(modifier = Modifier.height(12.dp)) }
 			item {
 				SwitchSettingContent(
 					stringResource(R.string.settings_update_repo_on_low_bat_title),
@@ -118,7 +114,6 @@ fun BrowseSettingsContent(
 						.fillMaxWidth()
 				)
 			}
-			item { Spacer(modifier = Modifier.height(12.dp)) }
 			item {
 				SwitchSettingContent(
 					stringResource(R.string.settings_update_repo_on_low_sto_title),
@@ -129,7 +124,6 @@ fun BrowseSettingsContent(
 						.fillMaxWidth()
 				)
 			}
-			item { Spacer(modifier = Modifier.height(12.dp)) }
 			item {
 				SwitchSettingContent(
 					stringResource(R.string.settings_update_repo_disable_on_fail_title),

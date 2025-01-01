@@ -1,4 +1,4 @@
-package app.shosetsu.android.ui.settings.widget
+package app.shosetsu.android.view.compose.setting.widget
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

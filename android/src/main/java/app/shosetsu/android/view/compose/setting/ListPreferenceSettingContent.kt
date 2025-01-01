@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import app.shosetsu.android.ui.settings.widget.ListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 
 @Composable
 fun <T> ListPreferenceSettingContent(

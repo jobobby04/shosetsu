@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
-import app.shosetsu.android.ui.settings.widget.TextPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 
 /*

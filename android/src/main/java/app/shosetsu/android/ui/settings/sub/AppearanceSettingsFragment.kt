@@ -28,8 +28,8 @@ import app.shosetsu.android.common.SettingKey.NovelBadgeToast
 import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.settings.widget.AppThemeModePreferenceWidget
-import app.shosetsu.android.ui.settings.widget.PreferenceGroupHeader
+import app.shosetsu.android.view.compose.setting.widget.AppThemeModePreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
@@ -89,7 +89,6 @@ fun AppearanceSettingsContent(
 				top = 16.dp,
 				bottom = 64.dp
 			),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
 			item {
@@ -110,6 +109,8 @@ fun AppearanceSettingsContent(
 				)
 			}
 
+			item { Spacer(modifier = Modifier.height(12.dp)) }
+
 			item {
 				PreferenceGroupHeader(stringResource(R.string.display))
 			}
@@ -126,8 +127,6 @@ fun AppearanceSettingsContent(
 				)
 			}
 
-			item { Spacer(modifier = Modifier.height(12.dp)) }
-
 			item {
 				NumberPickerSettingContent(
 					title = stringResource(R.string.columns_of_novel_listing_h),
@@ -140,8 +139,6 @@ fun AppearanceSettingsContent(
 				)
 			}
 
-			item { Spacer(modifier = Modifier.height(12.dp)) }
-
 			item {
 				ListPreferenceSettingContent(
 					title = stringResource(R.string.novel_card_type_selector_title),
@@ -150,8 +147,6 @@ fun AppearanceSettingsContent(
 					key = SelectedNovelCardType
 				)
 			}
-
-			item { Spacer(modifier = Modifier.height(12.dp)) }
 
 			item {
 				SwitchSettingContent(
@@ -162,8 +157,6 @@ fun AppearanceSettingsContent(
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
-
-			item { Spacer(modifier = Modifier.height(12.dp)) }
 
 			item {
 				SwitchSettingContent(

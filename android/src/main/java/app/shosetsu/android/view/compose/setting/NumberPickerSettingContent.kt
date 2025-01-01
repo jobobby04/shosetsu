@@ -15,6 +15,7 @@ import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import com.chargemap.compose.numberpicker.NumberPicker
 
@@ -47,17 +48,15 @@ fun NumberPickerSettingContent(
 ) {
 	var openDialog by remember { mutableStateOf(false) }
 
-	GenericRightSettingLayout(
-		title,
-		description,
-		modifier,
-		onClick = { openDialog = !openDialog }) {
-		IconButton({
-			openDialog = true
-		}) {
+	TextPreferenceWidget(
+		modifier = modifier,
+		title = title,
+		subtitle =  description,
+		widget = {
 			Text("$value", color = MaterialTheme.colorScheme.tertiary)
-		}
-	}
+		},
+		onPreferenceClick = { openDialog = true }
+	)
 
 	if (openDialog)
 		Dialog({ openDialog = false }) {

@@ -1,4 +1,4 @@
-package app.shosetsu.android.ui.settings.widget
+package app.shosetsu.android.view.compose.setting.widget
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import app.shosetsu.android.ui.settings.util.secondaryItemAlpha
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.compose.secondaryItemAlpha
 
 @Composable
 fun TextPreferenceWidget(

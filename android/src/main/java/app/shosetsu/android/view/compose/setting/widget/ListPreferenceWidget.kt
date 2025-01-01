@@ -1,4 +1,4 @@
-package app.shosetsu.android.ui.settings.widget
+package app.shosetsu.android.view.compose.setting.widget
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.view.compose.ScrollbarLazyColumn
 
 @Composable
 fun <T> ListPreferenceWidget(

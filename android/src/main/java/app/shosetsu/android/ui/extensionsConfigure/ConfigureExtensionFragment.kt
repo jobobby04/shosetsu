@@ -40,12 +40,12 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
+import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
-import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.ExtensionType
@@ -198,16 +198,16 @@ fun SettingsItemAsCompose(
 
 			is FilterEntity.Switch -> {
 				column.item(data.id) {
-					SwitchSettingContent(
-						data.name,
-						"",
-						isChecked = data.state,
-						onCheckChange = { newValue ->
+					SwitchPreferenceWidget(
+                        title = data.name,
+                        subtitle = "",
+                        checked = data.state,
+                        modifier = Modifier.fillMaxWidth(),
+                        onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						},
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
+						}
+                    )
+                }
 			}
 
 			is FilterEntity.TriState -> {
@@ -265,16 +265,16 @@ fun SettingsItemAsCompose(
 
 			is FilterEntity.Checkbox -> {
 				column.item(data.id) {
-					SwitchSettingContent(
-						data.name,
-						"",
-						isChecked = data.state,
-						onCheckChange = { newValue ->
+					SwitchPreferenceWidget(
+                        title = data.name,
+                        subtitle = "",
+                        checked = data.state,
+                        modifier = Modifier.fillMaxWidth(),
+                        onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						},
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
+						}
+                    )
+                }
 			}
 
 			is FilterEntity.RadioGroup -> {

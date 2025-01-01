@@ -1,4 +1,4 @@
-package app.shosetsu.android.ui.settings.widget
+package app.shosetsu.android.view.compose
 
 import android.view.ViewConfiguration
 import androidx.compose.animation.core.Animatable
