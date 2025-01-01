@@ -17,17 +17,10 @@
 	<string name="extensions">Расширения</string>
 	<string name="downloads">Загрузки</string>
 	<string name="settings">Настройки</string>
-	<string name="settings_download">Настройки > Загрузка</string>
-	<string name="settings_update">Настройки > Обновление</string>
-	<string name="settings_view">Настройки > Вид</string>
-	<string name="settings_reader">Настройки > Считыватель</string>
-	<string name="settings_advanced">Настройки > Дополнительно</string>
-	<string name="fragment_backup_title">Резервное копирование</string>
 	<string name="text_size">Размер текста</string>
 	<string name="paragraph_spacing">Расстояние между абзацами</string>
 	<string name="paragraph_indent">Отступ абзаца</string>
 	<string name="novel_author">Автор(ы):</string>
-	<string name="download">Загрузки</string>
     <string name="fragment_novel_chapter_position">Позиция:</string>
 	<string name="backup_now">Резервное копирование сейчас</string>
 	<string name="pending">В ожидании</string>
@@ -93,7 +86,7 @@
 	<string name="chapters">Главы</string>
 	<string name="today">Сегодня</string>
 	<string name="yesterday">Вчера</string>
-	<string name="view">Просмотр</string>
+	<string name="appearance">Просмотр</string>
 	<string name="advanced">Расширенные</string>
 	<string name="backup">Резервное копирование</string>
 	<string name="loading">Загрузка…</string>

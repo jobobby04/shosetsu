@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.webkit.CookieManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,11 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -51,7 +47,6 @@ import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
 import app.shosetsu.android.common.SettingKey.VerifyCheckSum
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
@@ -63,13 +58,11 @@ import app.shosetsu.android.view.compose.setting.ProxySettingsContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-
 
 /*
  * This file is part of Shosetsu.
@@ -87,26 +80,6 @@ import kotlinx.coroutines.runBlocking
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-/**
- * Shosetsu
- * 13 / 07 / 2019
- */
-@Deprecated("Composed")
-class AdvancedSettingsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.settings_advanced
-
-	/***/
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun AdvancedSettingsView(
@@ -245,7 +218,7 @@ fun AdvancedSettingsContent(
 		topBar = {
 			TopAppBar(
 				title = {
-					Text(stringResource(R.string.settings_advanced))
+					Text(stringResource(R.string.advanced))
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)

@@ -877,7 +877,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showDownload
 			) {
 				Icon(
-					painterResource(R.drawable.download),
+					painterResource(R.drawable.downloads),
 					stringResource(R.string.fragment_novel_selected_download)
 				)
 			}

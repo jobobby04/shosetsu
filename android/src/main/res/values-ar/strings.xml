@@ -14,18 +14,12 @@
     <string name="extensions">الإضافات</string>
     <string name="downloads">التنزيلات</string>
     <string name="settings">الاعدادات</string>
-    <string name="settings_download">الاعدادات &gt; التنزيل</string>
-    <string name="settings_update">الإعدادات &gt; التحديث</string>
-    <string name="settings_view">الإعدادات &gt; العرض</string>
-    <string name="settings_reader">الإعدادات &gt; القارئ</string>
-    <string name="settings_advanced">الإعدادات &gt; متقدم</string>
-    <string name="fragment_backup_title"> النسخ الاحتياطي</string>
+
     <!-- Reader Settings -->
     <string name="text_size">حجم النص</string>
     <string name="paragraph_spacing">فضاء الفقرة</string>
     <string name="paragraph_indent">إزاحة الفقرة</string>
     <string name="novel_author">المؤلفون:</string>
-    <string name="download">نزّل</string>
     <string name="fragment_novel_chapter_position">الموقع:</string>
     <string name="backup_now">أنشئ نسخة احتياطية</string>
     <string name="pending">معلق</string>
@@ -94,7 +88,7 @@
     <string name="chapters">الفصول</string>
     <string name="today">اليوم</string>
     <string name="yesterday">البارحة</string>
-    <string name="view">اعرض</string>
+    <string name="appearance">اعرض</string>
     <string name="advanced">متقدم</string>
     <string name="backup">النسخ الاحتياطي</string>
     <string name="loading">يحمل…</string>

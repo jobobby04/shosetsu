@@ -375,7 +375,7 @@ class RepositoryUpdateWorker(
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_REPOSITORY_UPDATE)
-			.setSmallIcon(R.drawable.download)
+			.setSmallIcon(R.drawable.downloads)
 			.setContentTitle("Repository Update")
 			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
 			.setOngoing(true)

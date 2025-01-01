@@ -1,11 +1,7 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.os.Bundle
 import android.speech.tts.Voice
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -61,7 +57,6 @@ import app.shosetsu.android.common.SettingKey.ReaderTheme
 import app.shosetsu.android.common.SettingKey.ReadingMarkingType
 import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
@@ -69,7 +64,6 @@ import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.compose.setting.GenericRightSettingLayout
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.EditCSS
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
@@ -113,27 +107,6 @@ import java.util.Locale
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * Shosetsu
- *
- * @since 04 / 10 / 2021
- * @author Doomsdayrs
- */
-@Deprecated("Composed")
-class ReaderSettingsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.settings_reader
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
-
 @Composable
 fun ReaderSettingsView(
 	onBack: () -> Unit,
@@ -172,7 +145,7 @@ fun ReaderSettingsContent(
 		topBar = {
 			TopAppBar(
 				title = {
-					Text(stringResource(R.string.settings_reader))
+					Text(stringResource(R.string.reader))
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)

@@ -91,7 +91,7 @@ class DownloadWorker(
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_DOWNLOAD)
-			.setSmallIcon(R.drawable.download)
+			.setSmallIcon(R.drawable.downloads)
 			.setContentTitle("Downloader")
 			.setPriority(NotificationCompat.PRIORITY_HIGH)
 			.setOngoing(true)

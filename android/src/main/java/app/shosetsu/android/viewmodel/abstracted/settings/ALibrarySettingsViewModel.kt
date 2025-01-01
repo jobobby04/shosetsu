@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 31 / 08 / 2020
  */
-abstract class AUpdateSettingsViewModel(iSettingsRepository: ISettingsRepository) :
+abstract class ALibrarySettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
 
 	abstract val categories: StateFlow<ImmutableList<CategoryUI>>

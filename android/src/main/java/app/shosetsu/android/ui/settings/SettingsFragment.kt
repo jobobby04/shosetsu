@@ -1,27 +1,26 @@
 package app.shosetsu.android.ui.settings
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ChromeReaderMode
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.CollectionsBookmark
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
+import app.shosetsu.android.ui.settings.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 
 /*
@@ -49,54 +48,37 @@ import app.shosetsu.android.view.compose.NavigateBackButton
  */
 @Composable
 fun SettingsView(
-	navToView: () -> Unit,
+	navToAppearance: () -> Unit,
+	navToLibrary: () -> Unit,
 	navToReader: () -> Unit,
-	navToDownload: () -> Unit,
-	navToUpdate: () -> Unit,
+	navToDownloads: () -> Unit,
+	navToBrowse: () -> Unit,
 	navToAdvanced: () -> Unit,
+	navToAbout: () -> Unit,
 	onBack: () -> Unit
 ) {
 	SettingsContent(
-		navToView,
-		navToReader,
-		navToDownload,
-		navToUpdate,
-		navToAdvanced,
-		onBack
+		navToAppearance = navToAppearance,
+		navToLibrary = navToLibrary,
+		navToReader = navToReader,
+		navToDownloads = navToDownloads,
+		navToBrowse = navToBrowse,
+		navToAdvanced = navToAdvanced,
+		navToAbout = navToAbout,
+		onBack = onBack
 	)
-}
-
-@Composable
-fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClick: () -> Unit) {
-	Box(
-		modifier = Modifier
-			.clickable(onClick = onClick)
-			.fillMaxWidth(),
-	) {
-		Row(
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			Icon(
-				painterResource(drawableRes),
-				null,
-				modifier = Modifier
-					.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)
-					.size(24.dp),
-				tint = MaterialTheme.colorScheme.primary
-			)
-			Text(stringResource(title))
-		}
-	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsContent(
-	navToView: () -> Unit,
+	navToAppearance: () -> Unit,
+	navToLibrary: () -> Unit,
 	navToReader: () -> Unit,
-	navToDownload: () -> Unit,
-	navToUpdate: () -> Unit,
+	navToDownloads: () -> Unit,
+	navToBrowse: () -> Unit,
 	navToAdvanced: () -> Unit,
+	navToAbout: () -> Unit,
 	onBack: () -> Unit
 ) {
 	Scaffold(
@@ -114,15 +96,60 @@ fun SettingsContent(
 		Column(
 			Modifier.padding(paddingValues)
 		) {
-			SettingMenuItem(R.string.view, R.drawable.view_module, navToView)
+			TextPreferenceWidget(
+				title = stringResource(R.string.appearance),
+				subtitle = stringResource(R.string.appearance_summary),
+				icon = Icons.Outlined.Palette,
+				onPreferenceClick = navToAppearance
+			)
 
-			SettingMenuItem(R.string.reader, R.drawable.book, navToReader)
+			TextPreferenceWidget(
+				title = stringResource(R.string.library),
+				subtitle = stringResource(R.string.library_summary),
+				icon = Icons.Outlined.CollectionsBookmark,
+				onPreferenceClick = navToLibrary
+			)
 
-			SettingMenuItem(R.string.download, R.drawable.download, navToDownload)
+			TextPreferenceWidget(
+				title = stringResource(R.string.reader),
+				subtitle = stringResource(R.string.reader_summary),
+				icon = Icons.AutoMirrored.Outlined.ChromeReaderMode,
+				onPreferenceClick = navToReader
+			)
 
-			SettingMenuItem(R.string.update, R.drawable.update, navToUpdate)
+			TextPreferenceWidget(
+				title = stringResource(R.string.downloads),
+				subtitle = stringResource(R.string.downloads_summary),
+				icon = Icons.Outlined.Download,
+				onPreferenceClick = navToDownloads
+			)
 
-			SettingMenuItem(R.string.advanced, R.drawable.settings, navToAdvanced)
+			TextPreferenceWidget(
+				title = stringResource(R.string.browse),
+				subtitle = stringResource(R.string.browse_summary),
+				icon = Icons.Outlined.Explore,
+				onPreferenceClick = navToBrowse
+			)
+
+			TextPreferenceWidget(
+				title = stringResource(R.string.advanced),
+				subtitle = stringResource(R.string.advanced_summary),
+				icon = Icons.Outlined.Code,
+				onPreferenceClick = navToAdvanced
+			)
+
+			TextPreferenceWidget(
+				title = stringResource(R.string.about),
+				subtitle = stringResource(R.string.about_summary, BuildConfig.VERSION_NAME),
+				icon = Icons.Outlined.Info,
+				onPreferenceClick = navToAbout
+			)
 		}
 	}
+}
+
+@PreviewLightDark
+@Composable
+fun SettingsContentPreview() {
+	SettingsContent({}, {}, {}, {}, {}, {}, {}, {})
 }

@@ -14,17 +14,11 @@
     <string name="extensions">Extensiones</string>
     <string name="downloads">Descargas</string>
     <string name="settings">Ajustes</string>
-    <string name="settings_download">Configuración > Descargar</string>
-    <string name="settings_update">Configuración > Actualizar</string>
-    <string name="settings_view">Configuración > Vista</string>
-    <string name="settings_reader">Configuración > Lector</string>
-    <string name="settings_advanced">Configuración > Avanzado</string>
     <!-- Reader Settings -->
     <string name="text_size">Tamaño del texto</string>
     <string name="paragraph_spacing">Espaciado de párrafos</string>
     <string name="paragraph_indent">Sangría de párrafo</string>
     <string name="novel_author">Autor(es):</string>
-    <string name="download">Descargar</string>
     <string name="backup_now">Copia ahora</string>
     <string name="pending">Pendiente</string>
     <string name="downloaded">Descargado</string>
@@ -102,7 +96,7 @@
     <string name="chapters">Capítulos</string>
     <string name="today">Hoy</string>
     <string name="yesterday">Ayer</string>
-    <string name="view">Vista</string>
+    <string name="appearance">Vista</string>
     <string name="advanced">Avanzado</string>
     <string name="backup">Copia de Seguridad</string>
     <string name="loading">Cargando…</string>

@@ -25,17 +25,12 @@
 
     <!-- View Titles -->
     <string name="library">Library</string>
+    <string name="library_summary">Categories, global update</string>
     <string name="updates">Updates</string>
     <string name="extensions">Extensions</string>
     <string name="downloads">Downloads</string>
+    <string name="downloads_summary">Automatic download, download restrictions</string>
     <string name="settings">Settings</string>
-    <string name="settings_download">Settings > Download</string>
-    <string name="settings_update">Settings > Update</string>
-    <string name="settings_view">Settings > View</string>
-    <string name="settings_reader">Settings > Reader</string>
-    <string name="settings_advanced">Settings > Advanced</string>
-    <string name="fragment_backup_title">Backup</string>
-
 
     <!-- Reader Settings -->
     <string name="text_size">Text size</string>
@@ -43,7 +38,6 @@
     <string name="paragraph_indent">Paragraph indent</string>
 
     <string name="novel_author">Author(s): </string>
-    <string name="download">Download</string>
     <string name="fragment_novel_chapter_position">Position:</string>
     <string name="backup_now">Backup Now</string>
     <string name="pending">Pending</string>
@@ -108,6 +102,7 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="open_in">Open in</string>
     <string name="reader">Reader</string>
+    <string name="reader_summary">Reading display and behavior</string>
     <string name="default_reader">Default</string>
 
     <plurals name="toast_unread_count">
@@ -164,8 +159,10 @@
     <string name="chapters">Chapters</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
-    <string name="view">View</string>
+    <string name="appearance">Appearance</string>
+    <string name="appearance_summary">Change the appearance of the app</string>
     <string name="advanced">Advanced</string>
+    <string name="advanced_summary">Dump logs, site protection</string>
     <string name="backup">Backup</string>
     <string name="loading">Loading…</string>
     <string name="amoled">Amoled</string>
@@ -209,6 +206,7 @@
     <string name="extension_image_desc">Image of this extension</string>
     <string name="share">Share</string>
     <string name="browse">Browse</string>
+    <string name="browse_summary">Repositories</string>
     <string name="more">More</string>
     <string name="restart">Restart</string>
     <string name="need_restart">Activity needs to restart</string>
@@ -221,6 +219,7 @@
     <string name="settings_reader_volume_scroll_title">Volume Scroll</string>
     <string name="all">All</string>
     <string name="about">About</string>
+    <string name="about_summary">Shosetsu %s</string>
     <string name="check_for_app_update">Check for app update</string>
     <string name="source_licenses">Source Licenses</string>
     <string name="inverse_selection">Inverse Selection</string>
