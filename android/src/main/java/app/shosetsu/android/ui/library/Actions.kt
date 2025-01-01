@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -322,7 +323,7 @@ fun ViewTypeButton(
 			}
 		) {
 			Icon(
-				Icons.Outlined.FilterList, //TODO unify filter UI
+				Icons.Filled.ViewModule,
 				stringResource(R.string.novel_card_type_selector_title)
 			)
 		}
