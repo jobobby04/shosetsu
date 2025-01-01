@@ -54,6 +54,7 @@ import app.shosetsu.android.view.compose.setting.ProxySettingsContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import kotlinx.coroutines.launch
@@ -213,13 +214,10 @@ fun AdvancedSettingsContent(
 		) {
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.remove_novel_cache),
-					description = stringResource(R.string.settings_advanced_purge_novel_cache),
-					buttonText = stringResource(R.string.settings_advanced_purge_button),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onPurgeNovelCache
+					subtitle = stringResource(R.string.settings_advanced_purge_novel_cache),
+					onPreferenceClick = onPurgeNovelCache
 				)
 			}
 
@@ -227,8 +225,6 @@ fun AdvancedSettingsContent(
 				SwitchSettingContent(
 					title = stringResource(R.string.settings_advanced_verify_checksum_title),
 					description = stringResource(R.string.settings_advanced_verify_checksum_desc),
-					modifier = Modifier
-						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
 					key = VerifyCheckSum
 				)
@@ -238,43 +234,32 @@ fun AdvancedSettingsContent(
 				SwitchSettingContent(
 					title = stringResource(R.string.settings_advanced_require_double_back_title),
 					description = stringResource(R.string.settings_advanced_require_double_back_desc),
-					modifier = Modifier
-						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
 					key = RequireDoubleBackToExit
 				)
 			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_kill_cycle_workers_title),
-					description = stringResource(R.string.settings_advanced_kill_cycle_workers_desc),
-					buttonText = stringResource(R.string.settings_advanced_kill_cycle_workers_button),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onKillCycleWorkers
+					subtitle = stringResource(R.string.settings_advanced_kill_cycle_workers_desc),
+					onPreferenceClick = onKillCycleWorkers
 				)
 			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_force_repo_update_title),
-					description = stringResource(R.string.settings_advanced_force_repo_update_desc),
-					buttonText = stringResource(R.string.force),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onForceRepoSync
+					subtitle = stringResource(R.string.settings_advanced_force_repo_update_desc),
+					onPreferenceClick = onForceRepoSync
 				)
 			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_clear_cookies_title),
-					description = stringResource(R.string.settings_advanced_clear_cookies_desc),
-					buttonText = stringResource(R.string.settings_advanced_clear_cookies_button),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onClearCookies
+					subtitle = stringResource(R.string.settings_advanced_clear_cookies_desc),
+					onPreferenceClick = onClearCookies
 				)
 			}
 
