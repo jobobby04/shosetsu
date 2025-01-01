@@ -270,7 +270,6 @@
     <string name="fragment_settings_restart_worker">Перезапустите %s для применения новых настроек</string>
     <string name="settings_update_header_repositories">Репозитории</string>
     <string name="settings_update_header_novel">Новеллы</string>
-    <string name="settings_advanced_purge_button">ОЧИСТИТЬ</string>
     <string name="fragment_settings_advanced_snackbar_purge_failure">Не удалось очистить</string>
     <string name="fragment_settings_advanced_snackbar_purge_success">Очищенные новеллы без закладок</string>
     <string name="worker_novel_update_load_failure">Не удалось обновить %s</string>
@@ -374,10 +373,8 @@
     <string name="activity_main_app_update_download">Загрузка обновления приложения</string>
     <string name="settings_advanced_clear_cookies_title">Очистить куки</string>
     <string name="settings_advanced_clear_cookies_desc">Очистить все файлы cookie, которые Shosetsu имеет для веб-сайтов.</string>
-    <string name="settings_advanced_clear_cookies_button">Очистить</string>
     <string name="settings_advanced_clear_cookies_complete">Куки очищены</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Удаляет все не отмеченные новеллы и информацию из Shosetsu]]></string>
-    <string name="settings_advanced_kill_cycle_workers_button">Убить</string>
     <string name="fragment_configure_extension_listing_desc">Какой список новелл должен отображаться, когда пользователь открывает расширение для просмотра</string>
     <string name="fragment_downloads_set_all_pending_title">Установить все в ожидании</string>
     <string name="fragment_downloads_delete_all_title">Удалить все</string>
@@ -466,15 +463,11 @@
     <string name="fragment_catalogue_no_more">Больше нет контента, извините!</string>
     <string name="fragment_repositories_action_remove">Удалить репозиторий</string>
     <string name="backup_restore_low_storage">Резервное копирование при малом объеме памяти</string>
-    <string name="backup_restore_low_storage_desc">Позволяет выполнять резервное копирование при низком объеме памяти, также влияет на рабочий цикл</string>
     <string name="backup_restore_low_battery">Резервное копирование при низком заряде батареи</string>
-    <string name="backup_restore_low_battery_desc">Позволяет выполнять резервное копирование при разряженной батарее, также влияет на рабочий цикл</string>
     <string name="backup_restore_only_idle">Резервное копирование только в режиме ожидания</string>
-    <string name="backup_restore_only_idle_desc">Заставляет создавать резервные копии, когда устройство простаивает, также влияет на рабочий цикл.</string>
     <string name="cozy">Удобная сетка</string>
     <string name="settings_advanced_force_repo_update_title">Принудительная синхронизация репо</string>
     <string name="settings_advanced_force_repo_update_desc">Иногда синхронизация репо не загружается должным образом. Это заставит репо обновиться.</string>
-    <string name="force">Применить</string>
     <string name="fragment_novel_delete_previous_fail">Не удалось удалить предыдущую главу: %s</string>
 	<string name="missing_extension">Расширение отсутствует %i</string>
 	<string name="fragment_about_acra_id">Идентификация ACRA</string>

@@ -264,7 +264,6 @@
     <string name="fragment_settings_restart_worker">Reinicia %s para aplicar nuevas configuraciones</string>
     <string name="settings_update_header_repositories">Repositorios</string>
     <string name="settings_update_header_novel">Novelas</string>
-    <string name="settings_advanced_purge_button">PURGA</string>
     <string name="fragment_settings_advanced_snackbar_purge_failure">No se pudo purgar</string>
     <string name="fragment_settings_advanced_snackbar_purge_success">Novelas sin marcadores purgadas</string>
     <string name="worker_novel_update_load_failure">Error al actualizar %s</string>
@@ -359,10 +358,8 @@
     <string name="activity_main_app_update_download">Descargando la actualización de la aplicación</string>
     <string name="settings_advanced_clear_cookies_title">Eliminar cookies</string>
     <string name="settings_advanced_clear_cookies_desc">Borrar todas las cookies que tiene shosetsu para sitios web</string>
-    <string name="settings_advanced_clear_cookies_button">Claro</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies eliminadas</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Elimina cualquier novela e información sin marcar de Shosetsu]]></string>
-    <string name="settings_advanced_kill_cycle_workers_button">Matar</string>
     <string name="fragment_configure_extension_listing_desc">¿Qué lista de novelas debe mostrarse cuando el usuario abre la extensión para navegar?</string>
     <string name="fragment_downloads_set_all_pending_title">Establecer todo pendiente</string>
     <string name="fragment_downloads_delete_all_title">Eliminar todos</string>

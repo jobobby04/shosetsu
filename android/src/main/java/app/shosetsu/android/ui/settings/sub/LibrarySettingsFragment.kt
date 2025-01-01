@@ -26,6 +26,7 @@ import app.shosetsu.android.common.StringSetKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.setting.RestrictionSelectPreferenceWidget
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.compose.setting.TriStateListPreferenceWidget
@@ -165,33 +166,19 @@ fun LibrarySettingsContent(
             }
 
             item {
-                val restrictions = mapOf(
-                    R.string.settings_update_novel_on_metered_title to SettingKey.NovelUpdateOnMeteredConnection,
-                    R.string.settings_update_novel_on_low_bat_title to SettingKey.NovelUpdateOnLowBattery,
-                    R.string.settings_update_novel_on_low_sto_title to SettingKey.NovelUpdateOnLowStorage,
-                ) + if (BuildConfig.VERSION_CODE > Build.VERSION_CODES.M) {
-                    mapOf(R.string.settings_update_novel_only_idle_title to SettingKey.NovelUpdateOnlyWhenIdle)
-                } else {
-                    emptyMap()
-                }
-                val restrictionStates = restrictions.mapValues { (_, key) ->
-                    viewModel.settingsRepo.getBooleanFlow(key).collectAsState()
-                }
-                val subtitleSuffix = restrictionStates.toList()
-                    .filter { it.second.value }
-                    .map { stringResource(it.first) }
-                    .joinToString(", ")
-                MultiSelectListPreferenceWidget(
+                RestrictionSelectPreferenceWidget(
                     title = stringResource(R.string.settings_library_restrictions_title),
-                    subtitle = stringResource(R.string.settings_library_restrictions_desc, subtitleSuffix),
-                    possibleValues = restrictions.keys.toList(),
-                    selectedValues = restrictions.keys.filter { restrictionStates[it]!!.value }.toSet(),
-                    stringify = { stringResource(it) },
-                    onValuesChange = {
-                        restrictions.forEach { (title, key) ->
-                            launchIO { viewModel.settingsRepo.setBoolean(key, title in it) }
-                        }
-                    }
+                    subtitle = R.string.settings_library_restrictions_desc,
+                    restrictions = mapOf(
+                        R.string.settings_update_novel_on_metered_title to SettingKey.NovelUpdateOnMeteredConnection,
+                        R.string.settings_update_novel_on_low_bat_title to SettingKey.NovelUpdateOnLowBattery,
+                        R.string.settings_update_novel_on_low_sto_title to SettingKey.NovelUpdateOnLowStorage,
+                    ) + if (BuildConfig.VERSION_CODE > Build.VERSION_CODES.M) {
+                        mapOf(R.string.settings_update_novel_only_idle_title to SettingKey.NovelUpdateOnlyWhenIdle)
+                    } else {
+                        emptyMap()
+                    },
+                    repo = viewModel.settingsRepo
                 )
             }
 

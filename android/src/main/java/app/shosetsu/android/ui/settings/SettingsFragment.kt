@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,6 +54,7 @@ fun SettingsView(
 	navToReader: () -> Unit,
 	navToDownloads: () -> Unit,
 	navToBrowse: () -> Unit,
+	navToBackup: () -> Unit,
 	navToAdvanced: () -> Unit,
 	navToAbout: () -> Unit,
 	onBack: () -> Unit
@@ -63,6 +65,7 @@ fun SettingsView(
 		navToReader = navToReader,
 		navToDownloads = navToDownloads,
 		navToBrowse = navToBrowse,
+		navToBackup = navToBackup,
 		navToAdvanced = navToAdvanced,
 		navToAbout = navToAbout,
 		onBack = onBack
@@ -77,6 +80,7 @@ fun SettingsContent(
 	navToReader: () -> Unit,
 	navToDownloads: () -> Unit,
 	navToBrowse: () -> Unit,
+	navToBackup: () -> Unit,
 	navToAdvanced: () -> Unit,
 	navToAbout: () -> Unit,
 	onBack: () -> Unit
@@ -132,6 +136,13 @@ fun SettingsContent(
 			)
 
 			TextPreferenceWidget(
+				title = stringResource(R.string.backup),
+				subtitle = stringResource(R.string.backup_summary),
+				icon = Icons.Outlined.Restore,
+				onPreferenceClick = navToBackup
+			)
+
+			TextPreferenceWidget(
 				title = stringResource(R.string.advanced),
 				subtitle = stringResource(R.string.advanced_summary),
 				icon = Icons.Outlined.Code,
@@ -151,5 +162,5 @@ fun SettingsContent(
 @PreviewLightDark
 @Composable
 fun SettingsContentPreview() {
-	SettingsContent({}, {}, {}, {}, {}, {}, {}, {})
+	SettingsContent({}, {}, {}, {}, {}, {}, {}, {}, {})
 }

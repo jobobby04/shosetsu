@@ -39,7 +39,7 @@
 
     <string name="novel_author">Author(s): </string>
     <string name="fragment_novel_chapter_position">Position:</string>
-    <string name="backup_now">Backup Now</string>
+    <string name="backup_now">Create backup</string>
     <string name="pending">Pending</string>
     <string name="downloaded">Downloaded</string>
 
@@ -94,7 +94,7 @@
     <string name="completed">Completed</string>
     <string name="publishing">Publishing</string>
     <string name="unknown">Unknown</string>
-    <string name="restore_now">Restore now</string>
+    <string name="restore_now">Restore backup</string>
 
 
     <!-- Backup and restore -->
@@ -192,8 +192,8 @@
     <string name="intro_happy_end_desc">That\'s it for an intro, Read well!</string>
 
 
-    <string name="backup_settings_option">Backup Settings?</string>
-    <string name="backup_chapters_option">Backup Chapters?</string>
+    <string name="backup_settings_option">Backup Settings</string>
+    <string name="backup_chapters_option">Backup Chapters</string>
     <string name="backup_chapters_option_description">Default on, off will not save your progress</string>
     <string name="backup_settings_option_desc">Default is off, which will not save your settings</string>
 
@@ -372,7 +372,6 @@
     <string name="fragment_settings_restart_worker">Restart %s to apply new settings</string>
     <string name="settings_update_header_repositories">Repositories</string>
     <string name="settings_update_header_novel">Novels</string>
-    <string name="settings_advanced_purge_button">PURGE</string>
     <string name="fragment_settings_advanced_snackbar_purge_failure">Failed to purge</string>
     <string name="fragment_settings_advanced_snackbar_purge_success">Purged unbookmarked novels</string>
     <string name="worker_novel_update_load_failure">Failed to update %s</string>
@@ -478,10 +477,8 @@
     <string name="activity_main_app_update_download">Downloading app update</string>
     <string name="settings_advanced_clear_cookies_title">Clear cookies</string>
     <string name="settings_advanced_clear_cookies_desc">Clear all cookies that shosetsu has for websites</string>
-    <string name="settings_advanced_clear_cookies_button">Clear</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies cleared</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Removes any unbookmarked novels & info from Shosetsu]]></string>
-    <string name="settings_advanced_kill_cycle_workers_button">Kill</string>
     <string name="fragment_configure_extension_listing_desc">What list of novels should be displayed when the user opens up the extension to browse</string>
     <string name="fragment_downloads_set_all_pending_title">Set all pending</string>
     <string name="fragment_downloads_delete_all_title">Delete All</string>
@@ -573,16 +570,12 @@
 
     <string name="fragment_repositories_action_remove">Remove repository</string>
 
-    <string name="backup_restore_low_storage">Backup on low storage</string>
-    <string name="backup_restore_low_storage_desc">Allows backups to occur on low storage, also effects cycle worker</string>
-    <string name="backup_restore_low_battery">Backup on low battery</string>
-    <string name="backup_restore_low_battery_desc">Allows backups to occur on low battery, also effects cycle worker</string>
-    <string name="backup_restore_only_idle">Backup only when idle</string>
-    <string name="backup_restore_only_idle_desc">Forces backups to occur when device is idle, also effects cycle worker</string>
+    <string name="backup_restore_low_storage">Allow on low storage</string>
+    <string name="backup_restore_low_battery">Allow on low battery</string>
+    <string name="backup_restore_only_idle">Only when idle</string>
     <string name="cozy">Cozy</string>
     <string name="settings_advanced_force_repo_update_title">Force repo sync</string>
     <string name="settings_advanced_force_repo_update_desc">Sometimes, Repo sync does not load properly. This will force the repo to update.</string>
-    <string name="force">Force</string>
     <string name="fragment_novel_delete_previous_fail">Failed to delete previous chapter: %s</string>
     <string name="missing_extension">Extension is missing %i</string>
     <string name="fragment_about_acra_id">ACRA Identification</string>
@@ -715,5 +708,8 @@
     <string name="disabled">Disabled</string>
     <string name="settings_library_restrictions_title">Automatic updates device restrictions</string>
     <string name="settings_library_restrictions_desc">Restrictions: %s</string>
+    <string name="backup_summary"><![CDATA[Manual & automatic backups]]></string>
+    <string name="backup_restrictions_title">Automatic backups device restrictions</string>
+    <string name="backup_restrictions_desc">Restrictions: %s</string>
 
 </resources>

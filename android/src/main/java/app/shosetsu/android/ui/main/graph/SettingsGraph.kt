@@ -70,6 +70,9 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				navToBrowse = {
 					navController.navigate(SETTINGS_BROWSE.route)
 				},
+				navToBackup = {
+					navController.navigate(BACKUP.route)
+				},
 				navToAdvanced = {
 					navController.navigate(SETTINGS_ADVANCED.route)
 				},

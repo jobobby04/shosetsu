@@ -5,10 +5,10 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,7 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,9 +47,13 @@ import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.ButtonSettingContent
+import app.shosetsu.android.view.compose.setting.RestrictionSelectPreferenceWidget
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.BasePreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
+import app.shosetsu.android.view.compose.setting.widget.PrefsHorizontalPadding
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
 import kotlinx.coroutines.launch
@@ -238,72 +243,80 @@ fun BackupSettingsContent(
 	) {
 		LazyColumn(
 			contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 64.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(it)
 		) {
 
 			item {
-				ButtonSettingContent(
-					stringResource(R.string.backup_now),
-					"",
-					stringResource(R.string.backup_now),
-					onClick = backupNow, modifier = Modifier
-						.fillMaxWidth()
-				)
-			}
-
-			item {
-				var isDialogShowing: Boolean by remember { mutableStateOf(false) }
-				var isRestoreDialogShowing: Boolean by remember { mutableStateOf(false) }
-
-				ButtonSettingContent(
-					stringResource(R.string.restore_now),
-					"",
-					stringResource(R.string.restore_now),
-					modifier = Modifier
-						.fillMaxWidth()
-				) {
-					isDialogShowing = true
-				}
-				if (isRestoreDialogShowing)
-					BackupSelectionDialog(viewModel, { isRestoreDialogShowing = false }, restore)
-
-				if (isDialogShowing)
-					AlertDialog(
-						onDismissRequest = {
-							isDialogShowing = false
-						},
-						confirmButton = {
-							TextButton(onClick = {
-								// Open file selector
-								performFileSelection()
-								isDialogShowing = false
-							}) {
-								Text(stringResource(R.string.settings_backup_alert_location_external))
+				BasePreferenceWidget(
+					subcomponent = {
+						MultiChoiceSegmentedButtonRow(
+							modifier = Modifier
+								.fillMaxWidth()
+								.height(intrinsicSize = IntrinsicSize.Min)
+								.padding(horizontal = PrefsHorizontalPadding),
+						) {
+							SegmentedButton(
+								modifier = Modifier.fillMaxHeight(),
+								checked = false,
+								onCheckedChange = { backupNow() },
+								shape = SegmentedButtonDefaults.itemShape(0, 2)
+							) {
+								Text(stringResource(R.string.backup_now))
 							}
-							TextButton(onClick = {
-								isDialogShowing = false
-								isRestoreDialogShowing = true
-							}) {
-								Text(stringResource(R.string.settings_backup_alert_location_internal))
+
+							var isDialogShowing: Boolean by remember { mutableStateOf(false) }
+							var isRestoreDialogShowing: Boolean by remember { mutableStateOf(false) }
+							SegmentedButton(
+								modifier = Modifier.fillMaxHeight(),
+								checked = false,
+								onCheckedChange = { isDialogShowing = true },
+								shape = SegmentedButtonDefaults.itemShape(1, 2),
+							) {
+								Text(stringResource(R.string.restore_now))
 							}
-						},
-						title = {
-							Text(
-								stringResource(R.string.settings_backup_alert_select_location_title),
-								style = MaterialTheme.typography.titleLarge,
-								modifier = Modifier.padding(
-									bottom = 16.dp,
-									top = 8.dp,
-									start = 24.dp,
-									end = 24.dp
+
+							if (isRestoreDialogShowing)
+								BackupSelectionDialog(viewModel, { isRestoreDialogShowing = false }, restore)
+
+							if (isDialogShowing)
+								AlertDialog(
+									onDismissRequest = {
+										isDialogShowing = false
+									},
+									confirmButton = {
+										TextButton(onClick = {
+											// Open file selector
+											performFileSelection()
+											isDialogShowing = false
+										}) {
+											Text(stringResource(R.string.settings_backup_alert_location_external))
+										}
+										TextButton(onClick = {
+											isDialogShowing = false
+											isRestoreDialogShowing = true
+										}) {
+											Text(stringResource(R.string.settings_backup_alert_location_internal))
+										}
+									},
+									title = {
+										Text(
+											stringResource(R.string.settings_backup_alert_select_location_title),
+											style = MaterialTheme.typography.titleLarge,
+											modifier = Modifier.padding(
+												bottom = 16.dp,
+												top = 8.dp,
+												start = 24.dp,
+												end = 24.dp
+											)
+										)
+									},
+									modifier = Modifier.padding(8.dp)
 								)
-							)
-						},
-						modifier = Modifier.padding(8.dp)
-					)
+						}
+					}
+				)
 			}
 
 			item {
@@ -313,30 +326,14 @@ fun BackupSettingsContent(
 					BackupSelectionDialog(viewModel, { isExportShowing = false }, export)
 				}
 
-				ButtonSettingContent(
-					stringResource(R.string.settings_backup_export),
-					"",
-					stringResource(R.string.settings_backup_export),
-					onClick = {
-						isExportShowing = true
-					},
-					modifier = Modifier
-						.fillMaxWidth()
+				TextPreferenceWidget(
+					title = stringResource(R.string.settings_backup_export),
+					onPreferenceClick = { isExportShowing = true }
 				)
 			}
 
 			item {
-				Row(
-					verticalAlignment = Alignment.Bottom,
-					modifier = Modifier.padding(top = 8.dp)
-				) {
-					Text(
-						stringResource(R.string.fragment_backup_settings_label),
-						modifier = Modifier.padding(end = 8.dp),
-						style = MaterialTheme.typography.titleLarge
-					)
-					Divider()
-				}
+				PreferenceGroupHeader(stringResource(R.string.fragment_backup_settings_label))
 			}
 
 			item {
@@ -404,39 +401,19 @@ fun BackupSettingsContent(
 			}
 
 			item {
-				SwitchSettingContent(
-					stringResource(R.string.backup_restore_low_storage),
-					stringResource(R.string.backup_restore_low_storage_desc),
-					viewModel.settingsRepo,
-					SettingKey.BackupOnLowStorage,
-					modifier = Modifier
-						.fillMaxWidth()
+				RestrictionSelectPreferenceWidget(
+					title = stringResource(R.string.backup_restrictions_title),
+					subtitle = R.string.backup_restrictions_desc,
+					restrictions = mapOf(
+						R.string.backup_restore_low_storage to SettingKey.BackupOnLowStorage,
+						R.string.backup_restore_low_battery to SettingKey.BackupOnLowBattery,
+					) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+						mapOf(R.string.backup_restore_only_idle to SettingKey.BackupOnlyWhenIdle)
+					else
+						emptyMap(),
+					repo = viewModel.settingsRepo,
 				)
 			}
-
-			item {
-				SwitchSettingContent(
-					stringResource(R.string.backup_restore_low_battery),
-					stringResource(R.string.backup_restore_low_battery_desc),
-					viewModel.settingsRepo,
-					SettingKey.BackupOnLowBattery,
-					modifier = Modifier
-						.fillMaxWidth()
-				)
-			}
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-				item {
-					SwitchSettingContent(
-						stringResource(R.string.backup_restore_only_idle),
-						stringResource(R.string.backup_restore_only_idle_desc),
-						viewModel.settingsRepo,
-						SettingKey.BackupOnlyWhenIdle,
-						modifier = Modifier
-							.fillMaxWidth()
-					)
-				}
-
 		}
 	}
 }

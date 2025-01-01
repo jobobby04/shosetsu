@@ -28,6 +28,7 @@ import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 
 @Composable
 fun ProxySettingsContent(
@@ -37,13 +38,12 @@ fun ProxySettingsContent(
 	usedKey: SettingKey<Boolean>,
 	settingKey: SettingKey<String>,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
 ) {
 	val isUsed by repo.getBooleanFlow(usedKey).collectAsState()
 	val proxySetting by repo.getStringFlow(settingKey).collectAsState()
 
 	ProxySettingsContent(
-		title, description, isUsed, proxySetting, modifier, enabled
+		title, description, isUsed, proxySetting, modifier
 	) { used, settings ->
 		launchIO {
 			repo.setBoolean(usedKey, used)
@@ -59,23 +59,22 @@ fun ProxySettingsContent(
 	proxyEnabled: Boolean,
 	proxyString: String,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
 	onValueChanged: (newEnabled: Boolean, newSetting: String) -> Unit
 ) {
 	var openDialog by remember { mutableStateOf(false) }
 
-	GenericRightSettingLayout(
-		title,
-		description,
-		modifier,
-		enabled = enabled,
-		onClick = { openDialog = !openDialog }
-	) {
+	TextPreferenceWidget(
+		title = title,
+		subtitle = description,
+		modifier = modifier,
+		widget = {
 		Text(
 			color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
 			text = if (proxyEnabled) "On" else "Off"
 		)
-	}
+	},
+		onPreferenceClick = { openDialog = !openDialog }
+	)
 	Text(
 		color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
 		text = if (proxyEnabled) "On" else "Off"
@@ -120,13 +119,15 @@ fun ProxySettingsDialogContent(
 			modifier = Modifier.padding(16.dp),
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
-			GenericRightSettingLayout(
-				title,
-				description,
-				onClick = { enabled = !enabled }) {
-				Switch( enabled,  null )
-			}
-			Row() {
+			TextPreferenceWidget(
+				title = title,
+				subtitle = description,
+				widget = {
+						Switch( enabled,  null )
+					},
+				onPreferenceClick = { enabled = !enabled }
+			)
+			Row {
 				TextField(
 					enabled = enabled,
 					value = config.hostname,

@@ -46,11 +46,8 @@ import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.load.LoadReaderThemes
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.FloatSliderSettingContent
-import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
-import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
@@ -58,7 +55,6 @@ import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.ColorChoiceUI
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

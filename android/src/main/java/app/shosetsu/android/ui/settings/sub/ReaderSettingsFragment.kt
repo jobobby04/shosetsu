@@ -66,7 +66,6 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
-import app.shosetsu.android.view.compose.setting.GenericRightSettingLayout
 import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
@@ -387,24 +386,25 @@ fun ReaderSettingsVoiceOption(
 	var expanded by remember { mutableStateOf(false) }
 
 	Column {
-		GenericRightSettingLayout(
+		TextPreferenceWidget(
 			title = stringResource(R.string.settings_reader_voice_title),
-			description = stringResource(R.string.settings_reader_voice_desc),
-			onClick = { expanded = !expanded }
-		) {
-			IconToggleButton(
-				onCheckedChange = {
-					expanded = it
-				},
-				checked = expanded,
-				modifier = Modifier.wrapContentWidth()
-			) {
-				if (expanded)
-					Icon(Icons.Outlined.ExpandLess, "")
-				else
-					Icon(Icons.Outlined.ExpandMore, "")
-			}
-		}
+			subtitle = stringResource(R.string.settings_reader_voice_desc),
+			widget = {
+				IconToggleButton(
+					onCheckedChange = {
+						expanded = it
+					},
+					checked = expanded,
+					modifier = Modifier.wrapContentWidth()
+				) {
+					if (expanded)
+						Icon(Icons.Outlined.ExpandLess, "")
+					else
+						Icon(Icons.Outlined.ExpandMore, "")
+				}
+			},
+			onPreferenceClick = { expanded = !expanded }
+		)
 
 		val sortedVoices by remember { derivedStateOf { voices.sortedByDescending { it.quality } } }
 
