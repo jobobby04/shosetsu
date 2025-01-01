@@ -2,7 +2,9 @@ package app.shosetsu.android.ui.settings.sub
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -10,20 +12,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.ChapterColumnsInLandscape
 import app.shosetsu.android.common.SettingKey.ChapterColumnsInPortait
 import app.shosetsu.android.common.SettingKey.NavStyle
 import app.shosetsu.android.common.SettingKey.NovelBadgeToast
 import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
+import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.settings.widget.AppThemeModePreferenceWidget
+import app.shosetsu.android.ui.settings.widget.ListPreferenceWidget
+import app.shosetsu.android.ui.settings.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
+import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -85,6 +95,27 @@ fun AppearanceSettingsContent(
 			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
+			item {
+				PreferenceGroupHeader(stringResource(R.string.theme))
+			}
+
+			item {
+				val choice by viewModel.appTheme.collectAsState()
+
+				AppThemeModePreferenceWidget(
+					value = choice,
+					onItemClick = {
+						launchIO {
+							viewModel.settingsRepo.setInt(AppTheme, it.key)
+						}
+						it.setAppCompatDelegateThemeMode()
+					}
+				)
+			}
+
+			item {
+				PreferenceGroupHeader(stringResource(R.string.display))
+			}
 
 			item {
 				NumberPickerSettingContent(
@@ -98,6 +129,8 @@ fun AppearanceSettingsContent(
 				)
 			}
 
+			item { Spacer(modifier = Modifier.height(12.dp)) }
+
 			item {
 				NumberPickerSettingContent(
 					title = stringResource(R.string.columns_of_novel_listing_h),
@@ -110,20 +143,18 @@ fun AppearanceSettingsContent(
 				)
 			}
 
+			item { Spacer(modifier = Modifier.height(12.dp)) }
+
 			item {
-				DropdownSettingContent(
+				ListPreferenceSettingContent(
 					title = stringResource(R.string.novel_card_type_selector_title),
-					description = stringResource(R.string.novel_card_type_selector_desc),
-					choices = stringArrayResource(R.array.novel_card_types)
-						.toList()
-						.toImmutableList(),
+					choices = stringArrayResource(R.array.novel_card_types).toList(),
 					repo = viewModel.settingsRepo,
-					key = SelectedNovelCardType,
-					modifier = Modifier
-						.fillMaxWidth()
+					key = SelectedNovelCardType
 				)
 			}
 
+			item { Spacer(modifier = Modifier.height(12.dp)) }
 
 			item {
 				SwitchSettingContent(
@@ -134,6 +165,8 @@ fun AppearanceSettingsContent(
 					modifier = Modifier.fillMaxWidth()
 				)
 			}
+
+			item { Spacer(modifier = Modifier.height(12.dp)) }
 
 			item {
 				SwitchSettingContent(

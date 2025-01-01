@@ -36,7 +36,7 @@
 	<string name="disclaimer">Отказ от ответственности</string>
 	<string name="license">Лицензия</string>
 	<string name="privacy_policy">Политика конфиденциальности</string>
-	<string name="theme">Тема:</string>
+	<string name="theme">Тема</string>
 	<string name="select_between">Выберите между</string>
 	<string name="remove">Удалить</string>
 	<string name="update_now">Обновить сейчас</string>
@@ -100,7 +100,6 @@
 	<string name="compressed">Таблица</string>
 	<string name="comfy">Удобная сетка</string>
 	<string name="novel_card_type_selector_title">Вид списка</string>
-	<string name="novel_card_type_selector_desc">Переключение между сеткой и таблицей для отображения новелл</string>
 	<string name="novel_badge_toast_title">Тост</string>
 	<string name="novel_badge_toast_desc">Тост при нажатии на значок непрочитанного, чтобы объяснить, для чего он нужен</string>
 	<string name="apply">Применить</string>
@@ -383,7 +382,6 @@
     <string name="settings_advanced_clear_cookies_desc">Очистить все файлы cookie, которые Shosetsu имеет для веб-сайтов.</string>
     <string name="settings_advanced_clear_cookies_button">Очистить</string>
     <string name="settings_advanced_clear_cookies_complete">Куки очищены</string>
-    <string name="settings_advanced_theme_desc">Измените тему, которую использует приложение</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Удаляет все не отмеченные новеллы и информацию из Shosetsu]]></string>
     <string name="settings_advanced_kill_cycle_workers_button">Убить</string>
     <string name="fragment_configure_extension_listing_desc">Какой список новелл должен отображаться, когда пользователь открывает расширение для просмотра</string>
@@ -529,20 +527,4 @@
 		<item quantity="zero">Нет новых глав.</item>
 		<item quantity="other">%d новых глав.</item>
 	</plurals>
-	<array name="text_alignments">
-		<item>@string/text_alignment_start</item>
-		<item>@string/text_alignment_center</item>
-		<item>@string/text_alignment_justified</item>
-		<item>@string/text_alignment_end</item>
-	</array>
-	<array name="application_themes">
-		<item>@string/follow_system_theme</item>
-		<item>@string/light</item>
-		<item>@string/dark</item>
-	</array>
-	<array name="novel_card_types">
-		<item>@string/normal</item>
-		<item>@string/compressed</item>
-		<item>@string/comfy</item>
-	</array>
 </resources>

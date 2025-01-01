@@ -327,6 +327,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<AViewSettingsViewModel>() with provider {
 		ViewSettingsViewModel(
 			iSettingsRepository = instance(),
+			instance()
 		)
 	}
 	bind<ABrowseSettingsViewModel>() with provider {

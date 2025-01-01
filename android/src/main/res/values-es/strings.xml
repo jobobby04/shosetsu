@@ -34,7 +34,7 @@
     <string name="report_bug">Reportar un error</string>
     <string name="disclaimer">Descargo de responsabilidad</string>
     <string name="license">Licencia</string>
-    <string name="theme">Tema:</string>
+    <string name="theme">Tema</string>
     <string name="select_between">Seleccionar entre</string>
     <string name="remove">Eliminar</string>
     <string name="update_now">Actualizar ahora</string>
@@ -110,7 +110,6 @@
     <string name="compressed">Comprimido</string>
     <string name="comfy">Confortable</string>
     <string name="novel_card_type_selector_title">Tipo de tarjeta nuevo</string>
-    <string name="novel_card_type_selector_desc">Cambiar entre una cuadrícula o una lista para mostrar novelas</string>
     <string name="apply">Solicitar</string>
     <string name="reset">Reiniciar</string>
     <string name="listings">Listados</string>
@@ -368,7 +367,6 @@
     <string name="settings_advanced_clear_cookies_desc">Borrar todas las cookies que tiene shosetsu para sitios web</string>
     <string name="settings_advanced_clear_cookies_button">Claro</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies eliminadas</string>
-    <string name="settings_advanced_theme_desc">Cambiar el tema que usa la aplicación</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Elimina cualquier novela e información sin marcar de Shosetsu]]></string>
     <string name="settings_advanced_kill_cycle_workers_button">Matar</string>
     <string name="fragment_configure_extension_listing_desc">¿Qué lista de novelas debe mostrarse cuando el usuario abre la extensión para navegar?</string>
@@ -378,21 +376,4 @@
         <item quantity="one">%d capítulo nuevo.</item>
         <item quantity="other">%d capítulos nuevos.</item>
     </plurals>
-    <!-- Error Key Messages -->
-    <array name="text_alignments">
-        <item>@string/text_alignment_start</item>
-        <item>@string/text_alignment_center</item>
-        <item>@string/text_alignment_justified</item>
-        <item>@string/text_alignment_end</item>
-    </array>
-    <array name="application_themes">
-        <item>@string/follow_system_theme</item>
-        <item>@string/light</item>
-        <item>@string/dark</item>
-    </array>
-    <array name="novel_card_types">
-        <item>@string/normal</item>
-        <item>@string/compressed</item>
-        <item>@string/comfy</item>
-    </array>
 </resources>

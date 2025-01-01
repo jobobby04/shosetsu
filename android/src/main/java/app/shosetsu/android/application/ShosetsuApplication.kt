@@ -196,7 +196,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 	/***/
 	override fun onCreate() {
-
 		runBlocking {
 			if (settingsRepo.getBoolean(SettingKey.LogToFile))
 				setupDualOutput()

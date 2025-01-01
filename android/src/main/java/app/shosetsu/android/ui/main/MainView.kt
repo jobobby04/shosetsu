@@ -143,6 +143,10 @@ fun MainView() {
 		onUpdate = viewModel::update
 	)
 
+	LaunchedEffect(theme) {
+		theme.setAppCompatDelegateThemeMode()
+	}
+
 	ShosetsuTheme(
 		darkTheme = when (theme) {
 			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()

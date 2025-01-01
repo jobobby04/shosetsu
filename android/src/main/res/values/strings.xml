@@ -72,7 +72,7 @@
     <string name="license">License</string>
     <string name="privacy_policy">Privacy Policy</string>
 
-    <string name="theme">Theme:</string>
+    <string name="theme">Theme</string>
     <string name="select_between">Select between</string>
     <string name="remove">Remove</string>
     <string name="update_now">Update now</string>
@@ -176,7 +176,6 @@
     <string name="compressed">Compressed</string>
     <string name="comfy">Comfy</string>
     <string name="novel_card_type_selector_title">Novel card type</string>
-    <string name="novel_card_type_selector_desc">Swap between a grid or list for displaying novels</string>
     <string name="novel_badge_toast_title">Novel badge toast</string>
     <string name="novel_badge_toast_desc">Toast when the unread badge is clicked to explain what it is for</string>
     <string name="apply">Apply</string>
@@ -231,7 +230,7 @@
     <string name="settings_reader_desc_mark_read_as_reading">Allows the reader to mark a read chapter as reading when its opened up.</string>
     <string name="no_more_chapters">No more chapters</string>
 
-    <string name="follow_system_theme">Follow System</string>
+    <string name="follow_system_theme">System</string>
     <string name="sort">Sort</string>
     <string name="bookmarked">Bookmarked</string>
     <string name="genres">Genres</string>
@@ -344,6 +343,7 @@
     <string name="fragment_browse_option_Import">Import Novel</string>
     <string name="fragment_repositories_action_repo_update">Refresh</string>
     <string name="generic_undo">Undo</string>
+    <string name="generic_cancel">Cancel</string>
     <string name="generic_question_retry">Retry?</string>
     <string name="fragment_repositories_snackbar_fail_undo_repo_removal">Failed to undo repository removal</string>
     <string name="generic_wifi_settings">Wi-Fi Settings</string>
@@ -487,7 +487,6 @@
     <string name="settings_advanced_clear_cookies_desc">Clear all cookies that shosetsu has for websites</string>
     <string name="settings_advanced_clear_cookies_button">Clear</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies cleared</string>
-    <string name="settings_advanced_theme_desc">Change the theme that the application uses</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Removes any unbookmarked novels & info from Shosetsu]]></string>
     <string name="settings_advanced_kill_cycle_workers_button">Kill</string>
     <string name="fragment_configure_extension_listing_desc">What list of novels should be displayed when the user opens up the extension to browse</string>
@@ -686,20 +685,20 @@
     <!-- Error Key Messages -->
 
 
-    <array name="text_alignments">
+    <array name="text_alignments" translatable="false">
         <item>@string/text_alignment_start</item>
         <item>@string/text_alignment_center</item>
         <item>@string/text_alignment_justified</item>
         <item>@string/text_alignment_end</item>
     </array>
 
-    <array name="application_themes">
+    <array name="application_themes" translatable="false">
         <item>@string/follow_system_theme</item>
         <item>@string/light</item>
         <item>@string/dark</item>
     </array>
 
-    <array name="novel_card_types">
+    <array name="novel_card_types" translatable="false">
         <item>@string/normal</item>
         <item>@string/compressed</item>
         <item>@string/comfy</item>
@@ -713,5 +712,6 @@
     <string name="worker_update_install_missing">No update to install</string>
     <string name="error_intent_handle">Failed to handle intent</string>
     <string name="support_ignore">Happy</string>
+    <string name="display">Display</string>
 
 </resources>

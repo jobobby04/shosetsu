@@ -36,7 +36,7 @@
     <string name="report_bug">أبلغ عن علة</string>
     <string name="disclaimer">إِخلاء مسؤولية</string>
     <string name="license">الرخصة</string>
-    <string name="theme">السمة:</string>
+    <string name="theme">السمة</string>
     <string name="select_between">حدد بين</string>
     <string name="remove">أزل</string>
     <string name="update_now">حدّث الآن</string>
@@ -101,7 +101,6 @@
     <string name="normal">عادي</string>
     <string name="compressed">مضغوط</string>
     <string name="novel_card_type_selector_title">نوع بطاقة الرواية</string>
-    <string name="novel_card_type_selector_desc">بدّل بين عرض الرواية كشبكة أو كقائمة</string>
     <string name="apply">طبّق</string>
     <string name="reset">أعد التعيين</string>
     <string name="listings">يعرض</string>

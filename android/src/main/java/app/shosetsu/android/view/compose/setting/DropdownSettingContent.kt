@@ -48,7 +48,6 @@ fun DropdownSettingContent(
 	DropdownSettingContent(title, description, stringToInt(choice), choices, modifier) {
 		launchIO { repo.setString(key, intToString(it)) }
 	}
-
 }
 
 @Composable

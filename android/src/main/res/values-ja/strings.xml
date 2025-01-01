@@ -51,7 +51,7 @@
     <string name="settings_reader_tap_to_scroll_title">これらのスクリプトは疑わしいと思われるため、アクションを確認してください。キャンセルするとすべてがアンインストールされます</string>
     <string name="text_size">文字サイズ</string>
     <string name="todo">テーマ：</string>
-    <string name="theme">テーマ：</string>
+    <string name="theme">テーマ</string>
     <string name="uninstall">やること</string>
     <string name="unknown">不明</string>
     <string name="unread">未読</string>

@@ -123,24 +123,6 @@ fun AdvancedSettingsView(
 		}
 	}
 
-
-	fun themeSelected(position: Int) {
-		scope.launch {
-			val result = hostState.showSnackbar(
-				context.getString(R.string.fragment_settings_advanced_snackbar_ui_change),
-				actionLabel = context.getString(R.string.apply),
-				duration = SnackbarDuration.Indefinite,
-			)
-
-			if (result == SnackbarResult.ActionPerformed) {
-				onBack()
-				launchIO {
-					viewModel.settingsRepo.setInt(AppTheme, position)
-				}
-			}
-		}
-	}
-
 	LaunchedEffect(workerState) {
 		when (workerState) {
 			AAdvancedSettingsViewModel.RestartResult.RESTARTED -> {
@@ -171,7 +153,6 @@ fun AdvancedSettingsView(
 
 	AdvancedSettingsContent(
 		viewModel,
-		onThemeSelected = ::themeSelected,
 		onPurgeNovelCache = viewModel::purgeUselessData,
 		onKillCycleWorkers = ::killCycleWorkers,
 		onClearCookies = {
@@ -204,7 +185,6 @@ fun AdvancedSettingsView(
 @Composable
 fun AdvancedSettingsContent(
 	viewModel: AAdvancedSettingsViewModel,
-	onThemeSelected: (Int) -> Unit,
 	onPurgeNovelCache: () -> Unit,
 	onKillCycleWorkers: () -> Unit,
 	onForceRepoSync: () -> Unit,
@@ -237,22 +217,6 @@ fun AdvancedSettingsContent(
 			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
-			item {
-				val choice by viewModel.settingsRepo.getIntFlow(AppTheme)
-					.collectAsState()
-
-				DropdownSettingContent(
-					title = stringResource(R.string.theme),
-					description = stringResource(R.string.settings_advanced_theme_desc),
-					choices = stringArrayResource(R.array.application_themes)
-						.toList()
-						.toImmutableList(),
-					modifier = Modifier
-						.fillMaxWidth(),
-					selection = choice,
-					onSelection = onThemeSelected
-				)
-			}
 
 			item {
 				ButtonSettingContent(
