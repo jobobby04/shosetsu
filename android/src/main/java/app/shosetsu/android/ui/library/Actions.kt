@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.UnfoldLess
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -133,7 +134,7 @@ fun SelectBetweenButton(
 		onClick = onClick
 	) {
 		Icon(
-			painterResource(R.drawable.unfold_less),
+			Icons.Outlined.UnfoldLess,
 			stringResource(R.string.select_between)
 		)
 	}
@@ -153,7 +154,7 @@ fun LibrarySelectedMoreButton(
 			}
 		) {
 			Icon(
-				painterResource(R.drawable.unfold_less),
+				Icons.Outlined.UnfoldLess,
 				stringResource(R.string.select_between)
 			)
 		}

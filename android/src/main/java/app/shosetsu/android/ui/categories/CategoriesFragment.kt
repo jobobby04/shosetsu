@@ -29,6 +29,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -324,7 +326,7 @@ fun CategoriesContent(
 									if (index != 0)
 										IconButton(onClick = { onMoveDown(item) }) {
 											Icon(
-												painterResource(R.drawable.expand_less),
+												Icons.Outlined.ExpandLess,
 												contentDescription = null
 											)
 										}
@@ -332,7 +334,7 @@ fun CategoriesContent(
 									if (index != items.lastIndex)
 										IconButton(onClick = { onMoveUp(item) }) {
 											Icon(
-												painterResource(R.drawable.expand_more),
+												Icons.Outlined.ExpandMore,
 												contentDescription = null
 											)
 										}

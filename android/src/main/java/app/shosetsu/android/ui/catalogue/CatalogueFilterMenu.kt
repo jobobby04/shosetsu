@@ -17,6 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -288,9 +291,9 @@ fun CatalogFilterMenuFilterListContent(
 				checked = collapsed
 			) {
 				if (collapsed)
-					Icon(painterResource(R.drawable.expand_more), "")
+					Icon(Icons.Outlined.ExpandMore, "")
 				else
-					Icon(painterResource(R.drawable.expand_less), "")
+					Icon(Icons.Outlined.ExpandLess, "")
 			}
 		}
 
@@ -604,9 +607,9 @@ fun CatalogFilterMenuDropDownContent(
 			) {
 
 				if (expanded)
-					Icon(painterResource(R.drawable.expand_less), "")
+					Icon(Icons.Outlined.ExpandLess, "")
 				else
-					Icon(painterResource(R.drawable.expand_more), "")
+					Icon(Icons.Outlined.ExpandMore, "")
 			}
 			DropdownMenu(
 				expanded = expanded,
@@ -670,9 +673,9 @@ fun CatalogFilterMenuRadioGroupContent(
 				checked = expanded
 			) {
 				if (expanded)
-					Icon(painterResource(R.drawable.expand_less), "")
+					Icon(Icons.Outlined.ExpandLess, "")
 				else
-					Icon(painterResource(R.drawable.expand_more), "")
+					Icon(Icons.Outlined.ExpandMore, "")
 			}
 		}
 

@@ -390,8 +390,6 @@
     <string name="backup_restore_print_chapters_title">Печать названий глав при восстановлении</string>
     <string name="backup_restore_print_chapters_desc">Печатать названия глав в журнал во время восстановления.\nПолезно для отладки, не полезно в других случаях.\nНеобходимо установить перед восстановлением.</string>
     <string name="restore_notification_content_novel_fail_io">IOException: %s</string>
-    <string name="backup_only_modified_title">Резервное копирование только измененных</string>
-    <string name="backup_only_modified_desc">Резервное копирование только измененных глав, что позволяет экономить память и размер файла</string>
     <string name="fragment_backup_error_unselected">Для экспорта не выбрана резервная копия</string>
 	<string name="export_backup_notification_missing_uri">Не предоставлен URI для экспорта резервной копии</string>
 	<string name="export_backup_notification_invalid_backup">Такой резервной копии не существует</string>

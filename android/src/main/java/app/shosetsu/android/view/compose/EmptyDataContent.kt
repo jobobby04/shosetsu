@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -186,9 +189,8 @@ fun ErrorContent(
 					}
 				) {
 					Icon(
-						painter = if (!isStacktraceVisible)
-							painterResource(R.drawable.expand_more)
-						else painterResource(R.drawable.expand_less),
+						if (!isStacktraceVisible) Icons.Outlined.ExpandMore
+						else Icons.Outlined.ExpandLess,
 						contentDescription = if (!isStacktraceVisible)
 							stringResource(R.string.more)
 						else stringResource(R.string.less)

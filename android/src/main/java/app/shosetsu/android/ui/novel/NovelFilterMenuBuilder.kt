@@ -14,6 +14,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
@@ -420,13 +423,7 @@ fun NovelFilterMenuSortItemContent(
 			Box(modifier = Modifier.size(32.dp)) {
 				if (isExpected)
 					Icon(
-						painterResource(
-							if (reversed) {
-								R.drawable.expand_less
-							} else {
-								R.drawable.expand_more
-							}
-						),
+						if (reversed) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 						null,
 						modifier = Modifier.align(Alignment.Center)
 					)

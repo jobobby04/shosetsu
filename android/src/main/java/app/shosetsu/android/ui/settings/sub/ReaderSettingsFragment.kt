@@ -19,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.ImagesearchRoller
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -398,9 +400,9 @@ fun ReaderSettingsVoiceOption(
 				modifier = Modifier.wrapContentWidth()
 			) {
 				if (expanded)
-					Icon(painterResource(R.drawable.expand_less), "")
+					Icon(Icons.Outlined.ExpandLess, "")
 				else
-					Icon(painterResource(R.drawable.expand_more), "")
+					Icon(Icons.Outlined.ExpandMore, "")
 			}
 		}
 
