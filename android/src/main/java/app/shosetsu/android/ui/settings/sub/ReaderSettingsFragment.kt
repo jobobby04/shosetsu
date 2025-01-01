@@ -192,8 +192,8 @@ fun ReaderSettingsContent(
 
 			item {
 				GenericBottomSettingLayout(
-					stringResource(R.string.theme),
-					""
+					title = stringResource(R.string.theme),
+					description = ""
 				) {
 					val themes by viewModel.getReaderThemes().collectAsState(emptyList())
 

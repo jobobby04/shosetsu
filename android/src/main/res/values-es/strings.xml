@@ -297,13 +297,9 @@
     <string name="settings_update_novel_on_update_desc">Descargar nuevos capítulos automáticamente</string>
     <string name="settings_update_novel_only_ongoing_desc">Actualice solo las novelas que están en curso</string>
     <string name="settings_update_novel_on_metered_title">Permitir la actualización en una conexión medida</string>
-    <string name="settings_update_novel_on_metered_desc">Si está activado, permite que las novelas se actualicen mientras el dispositivo está en una conexión medida</string>
     <string name="settings_update_novel_on_low_bat_title">Actualización con batería baja</string>
-    <string name="settings_update_novel_on_low_bat_desc">Si está activado, permite que las novelas se actualicen mientras el dispositivo tiene un nivel de batería bajo</string>
     <string name="settings_update_novel_on_low_sto_title">Permitir la actualización con poco almacenamiento</string>
-    <string name="settings_update_novel_on_low_sto_desc">Si está activado, permite que las novelas se actualicen mientras el dispositivo se está quedando sin espacio de almacenamiento</string>
     <string name="settings_update_novel_only_idle_title">Actualizar solo cuando esté inactivo</string>
-    <string name="settings_update_novel_only_idle_desc">Si está activado, Novels solo se actualizará cuando el dispositivo esté inactivo</string>
     <string name="settings_update_novel_notification_style_title">Estilo de notificación</string>
     <string name="settings_update_novel_notification_style_desc">Cambia entre dos tipos de notificaciones. Échales un vistazo :D</string>
     <string name="settings_update_novel_show_progress_title">Notificar el progreso de la actualización</string>

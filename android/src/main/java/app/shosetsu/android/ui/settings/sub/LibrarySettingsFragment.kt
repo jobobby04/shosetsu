@@ -2,50 +2,35 @@ package app.shosetsu.android.ui.settings.sub
 
 import android.content.Context
 import android.os.Build
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.StringSetKey
-import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.TriStateListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.MultiSelectListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.settings.ALibrarySettingsViewModel
@@ -88,7 +73,6 @@ fun LibrarySettingsContent(
     ) { paddingValues ->
         LazyColumn(
             contentPadding = PaddingValues(bottom = 64.dp, top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(paddingValues)
         ) {
             item {
@@ -179,47 +163,37 @@ fun LibrarySettingsContent(
                         .fillMaxWidth()
                 )
             }
+
             item {
-                SwitchSettingContent(
-                    stringResource(R.string.settings_update_novel_on_metered_title),
-                    stringResource(R.string.settings_update_novel_on_metered_desc),
-                    viewModel.settingsRepo,
-                    SettingKey.NovelUpdateOnMeteredConnection,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
-            item {
-                SwitchSettingContent(
-                    stringResource(R.string.settings_update_novel_on_low_bat_title),
-                    stringResource(R.string.settings_update_novel_on_low_bat_desc),
-                    viewModel.settingsRepo,
-                    SettingKey.NovelUpdateOnLowBattery,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
-            item {
-                SwitchSettingContent(
-                    stringResource(R.string.settings_update_novel_on_low_sto_title),
-                    stringResource(R.string.settings_update_novel_on_low_sto_desc),
-                    viewModel.settingsRepo,
-                    SettingKey.NovelUpdateOnLowStorage,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            }
-            if (BuildConfig.VERSION_CODE > Build.VERSION_CODES.M)
-                item {
-                    SwitchSettingContent(
-                        stringResource(R.string.settings_update_novel_only_idle_title),
-                        stringResource(R.string.settings_update_novel_only_idle_desc),
-                        viewModel.settingsRepo,
-                        SettingKey.NovelUpdateOnlyWhenIdle,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
+                val restrictions = mapOf(
+                    R.string.settings_update_novel_on_metered_title to SettingKey.NovelUpdateOnMeteredConnection,
+                    R.string.settings_update_novel_on_low_bat_title to SettingKey.NovelUpdateOnLowBattery,
+                    R.string.settings_update_novel_on_low_sto_title to SettingKey.NovelUpdateOnLowStorage,
+                ) + if (BuildConfig.VERSION_CODE > Build.VERSION_CODES.M) {
+                    mapOf(R.string.settings_update_novel_only_idle_title to SettingKey.NovelUpdateOnlyWhenIdle)
+                } else {
+                    emptyMap()
                 }
+                val restrictionStates = restrictions.mapValues { (_, key) ->
+                    viewModel.settingsRepo.getBooleanFlow(key).collectAsState()
+                }
+                val subtitleSuffix = restrictionStates.toList()
+                    .filter { it.second.value }
+                    .map { stringResource(it.first) }
+                    .joinToString(", ")
+                MultiSelectListPreferenceWidget(
+                    title = stringResource(R.string.settings_library_restrictions_title),
+                    subtitle = stringResource(R.string.settings_library_restrictions_desc, subtitleSuffix),
+                    possibleValues = restrictions.keys.toList(),
+                    selectedValues = restrictions.keys.filter { restrictionStates[it]!!.value }.toSet(),
+                    stringify = { stringResource(it) },
+                    onValuesChange = {
+                        restrictions.forEach { (title, key) ->
+                            launchIO { viewModel.settingsRepo.setBoolean(key, title in it) }
+                        }
+                    }
+                )
+            }
 
             item {
                 SwitchSettingContent(
@@ -284,104 +258,25 @@ private fun ALibrarySettingsViewModel.LibraryUpdateCategories(
             .map { it.map(String::toInt).toImmutableList() }
     }.collectAsState(persistentListOf())
 
-    var dialogOpen by remember(includeKey, excludeKey) {
-        mutableStateOf(false)
-    }
     val context = LocalContext.current
     val description by remember { derivedStateOf { getCategorySelectDescription(context, categories, includedCategoryIds, excludedCategoryIds) } }
-    ButtonSettingContent(
+    TriStateListPreferenceWidget(
         title = title,
-        description = description,
-        buttonText = stringResource(R.string.settings_update_novel_categories_open)
-    ) {
-        dialogOpen = true
-    }
-    if (dialogOpen) {
-        CategoriesSelectDialog(
-            categories = categories,
-            onDismissRequest = { dialogOpen = false },
-            includedCategoryIds = includedCategoryIds,
-            excludedCategoryIds = excludedCategoryIds,
-            onSelect = { included, excluded ->
-                launchIO {
-                    settingsRepo.setStringSet(
-                        includeKey,
-                        included.map { it.toString() }.toSet()
-                    )
-                    settingsRepo.setStringSet(
-                        excludeKey,
-                        excluded.map { it.toString() }.toSet()
-                    )
-                }
-            }
-        )
-    }
-}
-
-@Composable
-fun CategoriesSelectDialog(
-    categories: List<CategoryUI>,
-    onDismissRequest: () -> Unit,
-    includedCategoryIds: List<Int>,
-    excludedCategoryIds: List<Int>,
-    onSelect: (included: List<Int>, excluded: List<Int>) -> Unit
-) {
-    val state = remember(includedCategoryIds, excludedCategoryIds) {
-        mutableStateMapOf<Int, TriStateState>().apply {
-            putAll(includedCategoryIds.map { it to TriStateState.CHECKED })
-            putAll(excludedCategoryIds.map { it to TriStateState.IGNORED })
-        }
-    }
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {
-            Text(stringResource(R.string.categories))
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onSelect(
-                        state.filter { it.value == TriStateState.CHECKED }
-                            .map { it.key },
-                        state.filter { it.value == TriStateState.IGNORED }
-                            .map { it.key },
-                    )
-                    onDismissRequest()
-                }
-            ) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(android.R.string.cancel))
-            }
-        },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                categories.forEach {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clickable {
-                                state[it.id] =
-                                    (state[it.id] ?: TriStateState.UNCHECKED).cycle(false)
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TriStateCheckbox(
-                            state = when (state[it.id]) {
-                                TriStateState.IGNORED -> ToggleableState.Indeterminate
-                                TriStateState.CHECKED -> ToggleableState.On
-                                else -> ToggleableState.Off
-                            },
-                            onClick = null,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-                        Text(it.name)
-                    }
-                }
+        subtitle = description,
+        possibleValues = categories,
+        initialChecked = includedCategoryIds.mapNotNull { id -> categories.firstOrNull { it.id == id } },
+        initialInversed = excludedCategoryIds.mapNotNull { id -> categories.firstOrNull { it.id == id } },
+        stringify = { it.name },
+        onValuesChange = { newIncluded, newExcluded ->
+            launchIO {
+                settingsRepo.setStringSet(
+                    includeKey,
+                    newIncluded.map { it.id.toString() }.toSet()
+                )
+                settingsRepo.setStringSet(
+                    excludeKey,
+                    newExcluded.map { it.id.toString() }.toSet()
+                )
             }
         }
     )

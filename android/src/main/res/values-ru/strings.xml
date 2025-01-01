@@ -307,13 +307,9 @@
 	<string name="settings_update_novel_only_ongoing_title">Обновить только выпускаемые</string>
 	<string name="settings_update_novel_only_ongoing_desc">Обновляйте только те новеллы, которые продолжаются</string>
 	<string name="settings_update_novel_on_metered_title">Разрешить обновление при подключении по лимитному соединению.</string>
-	<string name="settings_update_novel_on_metered_desc">Если включено, позволяет обновлять новеллы, пока устройство находится на лимитном соединении.</string>
 	<string name="settings_update_novel_on_low_bat_title">Обновление при низком заряде батареи</string>
-	<string name="settings_update_novel_on_low_bat_desc">Если включено, позволяет обновлять новеллы при низком уровне заряда батареи устройства.</string>
 	<string name="settings_update_novel_on_low_sto_title">Разрешить обновление при низком объеме памяти</string>
-	<string name="settings_update_novel_on_low_sto_desc">Если включено, позволяет обновлять новеллы, когда на устройстве заканчивается место для хранения данных.</string>
 	<string name="settings_update_novel_only_idle_title">Обновление только в режиме ожидания</string>
-	<string name="settings_update_novel_only_idle_desc">Если флажок включен, новеллы будет обновляться только тогда, когда устройство находится в режиме ожидания</string>
 	<string name="settings_update_novel_notification_style_title">Стиль уведомления</string>
 	<string name="settings_update_novel_notification_style_desc">Меняет местами два стиля уведомлений. Проверьте их :D</string>
 	<string name="settings_update_novel_show_progress_title">Уведомить о ходе обновления</string>

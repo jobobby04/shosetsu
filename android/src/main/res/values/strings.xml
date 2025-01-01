@@ -343,7 +343,6 @@
     <string name="fragment_browse_option_Import">Import Novel</string>
     <string name="fragment_repositories_action_repo_update">Refresh</string>
     <string name="generic_undo">Undo</string>
-    <string name="generic_cancel">Cancel</string>
     <string name="generic_question_retry">Retry?</string>
     <string name="fragment_repositories_snackbar_fail_undo_repo_removal">Failed to undo repository removal</string>
     <string name="generic_wifi_settings">Wi-Fi Settings</string>
@@ -409,14 +408,10 @@
     <string name="settings_update_novel_only_ongoing_title">Only update ongoing</string>
     <string name="settings_update_novel_on_update_desc">Download new chapters automatically</string>
     <string name="settings_update_novel_only_ongoing_desc">Only update novels that are ongoing</string>
-    <string name="settings_update_novel_on_metered_title">Allow updating on metered connection</string>
-    <string name="settings_update_novel_on_metered_desc">If toggled on, Allows novels to update while the device is on a metered connection</string>
+    <string name="settings_update_novel_on_metered_title">Allow on metered connection</string>
     <string name="settings_update_novel_on_low_bat_title">Update on low battery</string>
-    <string name="settings_update_novel_on_low_bat_desc">If toggled on, Allows novels to update while the device has a low battery level</string>
-    <string name="settings_update_novel_on_low_sto_title">Allow updating on low storage</string>
-    <string name="settings_update_novel_on_low_sto_desc">If toggled on, Allows novels to update while the device is running out of storage space</string>
-    <string name="settings_update_novel_only_idle_title">Update only when idle</string>
-    <string name="settings_update_novel_only_idle_desc">If toggled on, Novels will only update when the device is idle</string>
+    <string name="settings_update_novel_on_low_sto_title">Allow on low storage</string>
+    <string name="settings_update_novel_only_idle_title">Only when idle</string>
     <string name="settings_update_novel_notification_style_title">Notification Style</string>
     <string name="settings_update_novel_notification_style_desc">Swaps between two stypes of notifications. Check them out :D</string>
     <string name="settings_update_novel_show_progress_title">Notify update progress</string>
@@ -717,5 +712,10 @@
     <string name="settings_library_categories_desc">%1$d Categories</string>
     <string name="settings_library_categories_title">Edit Categories</string>
     <string name="settings_browse_repositories_title">Edit Repositories</string>
+    <string name="not_selected">Not selected</string>
+    <string name="selected">Selected</string>
+    <string name="disabled">Disabled</string>
+    <string name="settings_library_restrictions_title">Automatic updates device restrictions</string>
+    <string name="settings_library_restrictions_desc">Restrictions: %s</string>
 
 </resources>
