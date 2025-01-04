@@ -18,22 +18,27 @@
 package app.shosetsu.android.view.uimodels.model.reader
 
 /**
- * Represents text that TTS reads aloud to the user
+ * Represents the contents of a given chapter.
  */
-sealed interface TTSText {
+sealed class ChapterPassage {
+	/**
+	 * Currently loading this chapter
+	 */
+	data object Loading : ChapterPassage()
 
 	/**
-	 * Unique identification of this specific text
+	 * There was an error attempting to load the chapter
 	 */
-	val id: String
+	data class Error(val throwable: Throwable?) : ChapterPassage()
 
 	/**
-	 * The actual content of the text
+	 * Successfully loaded the chapter content
+	 *
+	 * @param content content of this chapter
+	 * @param ttsElements text to speech elements of this chapter
 	 */
-	val text: String
-
-	/**
-	 * If this text should be skipped from being read or not
-	 */
-	val ignore: Boolean
+	data class Success(
+		val content: String,
+		val ttsElements: RewindableMutableListIterator<TTSText>
+	) : ChapterPassage()
 }

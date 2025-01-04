@@ -17,8 +17,8 @@ import app.shosetsu.android.ui.reader.page.HTMLPage
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.uimodels.StableHolder
+import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -53,7 +53,7 @@ import kotlinx.coroutines.flow.StateFlow
 fun ChapterReaderHTMLContent(
 	item: ReaderUIItem.ReaderChapterUI,
 	progressFlow: () -> Flow<Double>,
-	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<AChapterReaderViewModel.ChapterPassage>,
+	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,
 	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
 	onClick: (String?) -> Unit,
@@ -63,11 +63,11 @@ fun ChapterReaderHTMLContent(
 ) {
 	val html by remember(item) {
 		getHTMLContent(item)
-	}.collectAsState(AChapterReaderViewModel.ChapterPassage.Loading)
+	}.collectAsState(ChapterPassage.Loading)
 
 	when (html) {
-		is AChapterReaderViewModel.ChapterPassage.Error -> {
-			val throwable = (html as? AChapterReaderViewModel.ChapterPassage.Error)?.throwable
+		is ChapterPassage.Error -> {
+			val throwable = (html as? ChapterPassage.Error)?.throwable
 			ErrorContent(
 				throwable?.message
 					?: "Unknown error",
@@ -78,7 +78,7 @@ fun ChapterReaderHTMLContent(
 			)
 		}
 
-		AChapterReaderViewModel.ChapterPassage.Loading -> {
+		ChapterPassage.Loading -> {
 			Box(
 				Modifier
 					.background(MaterialTheme.colorScheme.background)
@@ -92,10 +92,10 @@ fun ChapterReaderHTMLContent(
 			}
 		}
 
-		is AChapterReaderViewModel.ChapterPassage.Success -> {
+		is ChapterPassage.Success -> {
 			val progress by remember { progressFlow() }.collectAsState(0.0)
 			HTMLPage(
-				html = (html as AChapterReaderViewModel.ChapterPassage.Success).content,
+				html = (html as ChapterPassage.Success).content,
 				progress = progress,
 				onScroll = {
 					onScroll(item, it)
