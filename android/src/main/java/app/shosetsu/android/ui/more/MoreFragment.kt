@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -203,14 +204,15 @@ fun MoreContent(
 		) {
 			item {
 				Box(
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth().padding(12.dp)
 				) {
 					Image(
-						painterResource(R.drawable.shou_icon_thick),
+						painterResource(R.drawable.shou_icon),
 						stringResource(R.string.app_name),
 						modifier = Modifier
-							.height(120.dp)
+							.height(80.dp)
 							.align(Alignment.Center),
+						colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
 					)
 				}
 			}
