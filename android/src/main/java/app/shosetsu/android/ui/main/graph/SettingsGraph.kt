@@ -1,28 +1,14 @@
 package app.shosetsu.android.ui.main.graph
 
 import android.content.Intent
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import app.shosetsu.android.R
 import app.shosetsu.android.ui.css.CSSEditorActivity
-import app.shosetsu.android.ui.main.Destination
 import app.shosetsu.android.ui.main.Destination.*
 import app.shosetsu.android.ui.settings.SettingsView
 import app.shosetsu.android.ui.settings.sub.AdvancedSettingsView
@@ -31,7 +17,6 @@ import app.shosetsu.android.ui.settings.sub.BrowseSettingsView
 import app.shosetsu.android.ui.settings.sub.DownloadsSettingsView
 import app.shosetsu.android.ui.settings.sub.LibrarySettingsView
 import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
-import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -52,7 +37,7 @@ import kotlinx.coroutines.launch
 
 fun NavGraphBuilder.settingsGraph(navController: NavController) {
 	navigation(startDestination = "overview", SETTINGS.route) {
-		composable("overview") {
+		composableSub("overview") {
 			SettingsView(
 				onBack = navController::popBackStack,
 				navToAppearance = {
@@ -82,31 +67,12 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 			)
 		}
 
-		fun settingsScreenRoute(route: String, content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)) {
-			composable(
-				route,
-				enterTransition = { slideInHorizontally(animationSpec = tween(
-					durationMillis = 300
-				)) { it / 20 } + fadeIn(animationSpec = tween(
-					durationMillis = 195,
-					easing = LinearOutSlowInEasing
-				)) },
-				exitTransition = { slideOutHorizontally(animationSpec = tween(
-					durationMillis = 300
-				)) { it / 20 } + fadeOut(animationSpec = tween(
-					durationMillis = 195,
-					easing = FastOutLinearInEasing
-				)) },
-				content = content
-			)
-		}
-
-		settingsScreenRoute(SETTINGS_APPEARANCE.route) {
+		composableSub(SETTINGS_APPEARANCE.route) {
 			AppearanceSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		settingsScreenRoute(SETTINGS_LIBRARY.route) {
+		composableSub(SETTINGS_LIBRARY.route) {
 			LibrarySettingsView(
 				onBack = navController::popBackStack,
 				onNavToCategories = {
@@ -114,7 +80,7 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				}
 			)
 		}
-		settingsScreenRoute(SETTINGS_BROWSE.route) {
+		composableSub(SETTINGS_BROWSE.route) {
 			BrowseSettingsView(
 				onBack = navController::popBackStack,
 				onNavToRepositories = {
@@ -122,17 +88,17 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				}
 			)
 		}
-		settingsScreenRoute(SETTINGS_ADVANCED.route) {
+		composableSub(SETTINGS_ADVANCED.route) {
 			AdvancedSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		settingsScreenRoute(SETTINGS_DOWNLOADS.route) {
+		composableSub(SETTINGS_DOWNLOADS.route) {
 			DownloadsSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		settingsScreenRoute(SETTINGS_READER.route) {
+		composableSub(SETTINGS_READER.route) {
 			val hostState = remember { SnackbarHostState() }
 			val context = LocalContext.current
 

@@ -25,7 +25,7 @@ fun NavGraphBuilder.moreGraph(
 	drawerIcon: @Composable () -> Unit
 ) {
 	navigation(startDestination = "main", Destination.MORE.route) {
-		composable("main") {
+		composableMain("main") {
 			MoreView(
 				onNavToAbout = {
 					navController.navigate(Destination.ABOUT.route)
@@ -57,7 +57,7 @@ fun NavGraphBuilder.moreGraph(
 
 		assetReader(navController)
 
-		composable(Destination.ABOUT.route) {
+		composableSub(Destination.ABOUT.route) {
 			AboutView(
 				onOpenLicense = {
 					navController.navigate(
@@ -67,18 +67,18 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.CATEGORIES.route) {
+		composableSub(Destination.CATEGORIES.route) {
 			CategoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.DOWNLOADS.route) {
+		composableSub(Destination.DOWNLOADS.route) {
 			DownloadsView(
 				onBack = navController::popBackStack
 			)
 		}
 
-		composable(Destination.ADD_SHARE.route) { entry ->
+		composableSub(Destination.ADD_SHARE.route) { entry ->
 			val shareURL = entry.arguments!!.getString(BundleKeys.BUNDLE_URL)
 			AddShareView(
 				shareURL,
@@ -91,18 +91,18 @@ fun NavGraphBuilder.moreGraph(
 				}
 			)
 		}
-		composable(Destination.REPOSITORIES.route) {
+		composableSub(Destination.REPOSITORIES.route) {
 			RepositoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.BACKUP.route) {
+		composableSub(Destination.BACKUP.route) {
 			BackupView(
 				onBack = navController::popBackStack
 			)
 		}
 
-		composable(Destination.HISTORY.route) {
+		composableSub(Destination.HISTORY.route) {
 			val context = LocalContext.current
 			HistoryView(
 				openNovel = {
@@ -114,7 +114,7 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.ANALYTICS.route) {
+		composableSub(Destination.ANALYTICS.route) {
 			AnalyticsView(navController::popBackStack)
 		}
 

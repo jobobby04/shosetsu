@@ -22,7 +22,7 @@ fun NavGraphBuilder.browseGraph(
 	drawerIcon: @Composable () -> Unit
 ) {
 	navigation("main", BROWSE.route) {
-		composable("main") {
+		composableMain("main") {
 			BrowseView(
 				openCatalogue = {
 					navController.navigate(CATALOG.routeWith(it))
@@ -40,7 +40,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable(CATALOG.route, CATALOG.arguments) { entry ->
+		composableSub(CATALOG.route, CATALOG.arguments) { entry ->
 			val extensionId = entry.arguments!!.getInt(BundleKeys.BUNDLE_EXTENSION)
 			CatalogueView(
 				extensionId,
@@ -51,7 +51,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable(
+		composableSub(
 			CONFIGURE_EXTENSION.route,
 			CONFIGURE_EXTENSION.arguments
 		) { entry ->
@@ -62,7 +62,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable(SEARCH.route, SEARCH.arguments) { entry ->
+		composableSub(SEARCH.route, SEARCH.arguments) { entry ->
 			// TODO fix crash here
 			val query = entry.arguments?.getString(BundleKeys.BUNDLE_QUERY)
 			SearchView(
