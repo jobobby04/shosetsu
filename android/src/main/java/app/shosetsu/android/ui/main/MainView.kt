@@ -181,7 +181,7 @@ fun MainView() {
 
 				Scaffold(
 					bottomBar = {
-						AnimatedVisibility(isCompact && isMaterial) {
+						if (isCompact && isMaterial) {
 							BottomNavigationBar(
 								destinations,
 								navBackStackEntry,
@@ -208,7 +208,7 @@ fun MainView() {
 							navController,
 							sizeClass,
 							drawerIcon = {
-								AnimatedVisibility(isLegacy) {
+								if (isLegacy) {
 									IconButton(
 										onClick = {
 											scope.launch {
