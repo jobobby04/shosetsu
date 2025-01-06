@@ -1,12 +1,10 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,12 +30,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
 import kotlinx.coroutines.launch
@@ -59,26 +55,8 @@ import kotlinx.coroutines.launch
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * Shosetsu
- * 13 / 07 / 2019
- */
-@Deprecated("Composed")
-class DownloadSettingsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.settings_download
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
-
 @Composable
-fun DownloadSettingsView(
+fun DownloadsSettingsView(
 	onBack: () -> Unit
 ) {
 	val viewModel: ADownloadSettingsViewModel = viewModelDi()
@@ -106,7 +84,7 @@ fun DownloadSettingsView(
 		}
 	}
 
-	DownloadSettingsContent(
+	DownloadsSettingsContent(
 		viewModel,
 		hostState,
 		onBack
@@ -115,7 +93,7 @@ fun DownloadSettingsView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DownloadSettingsContent(
+fun DownloadsSettingsContent(
 	viewModel: ADownloadSettingsViewModel,
 	hostState: SnackbarHostState,
 	onBack: () -> Unit,
@@ -124,7 +102,7 @@ fun DownloadSettingsContent(
 		topBar = {
 			TopAppBar(
 				title = {
-					Text(stringResource(R.string.settings_download))
+					Text(stringResource(R.string.downloads))
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
@@ -141,7 +119,7 @@ fun DownloadSettingsContent(
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
+			verticalArrangement = Arrangement.spacedBy(12.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
 			item {

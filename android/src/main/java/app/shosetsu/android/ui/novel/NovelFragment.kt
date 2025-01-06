@@ -37,6 +37,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -874,7 +876,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showDownload
 			) {
 				Icon(
-					painterResource(R.drawable.download),
+					painterResource(R.drawable.downloads),
 					stringResource(R.string.fragment_novel_selected_download)
 				)
 			}
@@ -1502,11 +1504,8 @@ fun ExpandedText(
 			}
 		}
 		Icon(
-			painter = if (!isExpanded) {
-				painterResource(R.drawable.expand_more)
-			} else {
-				painterResource(R.drawable.expand_less)
-			},
+			if (!isExpanded) Icons.Outlined.ExpandMore
+			else Icons.Outlined.ExpandLess,
 			contentDescription = if (!isExpanded) {
 				stringResource(R.string.more)
 			} else {

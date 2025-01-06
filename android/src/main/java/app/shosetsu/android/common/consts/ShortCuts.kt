@@ -43,7 +43,7 @@ object ShortCuts {
 					})
 					.build(),
 				Builder(context, "Browse")
-					.setIcon(createWithResource(context, R.drawable.view_module))
+					.setIcon(createWithResource(context, R.drawable.explore))
 					.setLongLabel(context.getString(R.string.browse))
 					.setShortLabel(context.getString(R.string.browse))
 					.setIntent(Intent(context, MainActivity::class.java).apply {

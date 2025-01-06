@@ -151,14 +151,12 @@ class AddShareViewModel(
 								val ext = ExtensionLink(
 									http.queryParameter("extID")!!.toInt(),
 									http.queryParameter("extName")!!,
-									http.queryParameter("extURL")!!.toHttpUrl().toUri().normalize()
-										.toString(),
+									http.queryParameter("extURL") ?: "",
 									repo
 								)
 								val novel = NovelLink(
 									http.queryParameter("name")!!,
-									http.queryParameter("imageURL")!!.toHttpUrl().toUri()
-										.normalize().toString(),
+									http.queryParameter("imageURL") ?: "",
 									http.queryParameter("url")!!.toHttpUrl().toUri().normalize()
 										.toString(),
 									ext

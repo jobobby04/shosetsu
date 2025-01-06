@@ -7,7 +7,6 @@
     <string name="completed">完成</string>
     <string name="default_reader">默认</string>
     <string name="deselect_all">取消选择</string>
-    <string name="download">下载</string>
     <string name="disclaimer">通知</string>
     <string name="download_chapter_updates">下载章节更新</string>
     <string name="download_custom_chapters">下载自定义</string>
@@ -51,7 +50,7 @@
     <string name="settings">设定</string>
     <string name="paragraph_spacing">段落间距</string>
     <string name="settings_reader_tap_to_scroll_title">点击滚动</string>
-    <string name="theme">主题：</string>
+    <string name="theme">主题</string>
     <string name="text_size">字体大小</string>
     <string name="uninstall">卸载</string>
     <string name="todo">去做</string>
@@ -69,7 +68,7 @@
     <string name="updates">更新</string>
     <string name="yesterday">昨天</string>
     <string name="backup">后备</string>
-    <string name="view">查看</string>
+    <string name="appearance">查看</string>
     <string name="advanced">高级</string>
     <string name="regret">由于时间限制，尚未重新引入此功能</string>
 </resources>

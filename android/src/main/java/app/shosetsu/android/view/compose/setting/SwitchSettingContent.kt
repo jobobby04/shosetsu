@@ -1,43 +1,13 @@
 package app.shosetsu.android.view.compose.setting
 
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-
-@Preview
-@Composable
-fun PreviewSwitchSettingContent() {
-	SwitchSettingContent("A Switch", "This is a switch", true) {}
-}
-
-@Composable
-fun SwitchSettingContent(
-	title: String,
-	description: String,
-	isChecked: Boolean,
-	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
-	onCheckChange: (newValue: Boolean) -> Unit
-) {
-	GenericRightSettingLayout(
-		title,
-		description,
-		modifier,
-		enabled,
-		onClick = { onCheckChange(!isChecked) }) {
-		Switch(
-			isChecked,
-			null,
-			enabled = enabled
-		)
-	}
-}
+import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 
 @Composable
 fun SwitchSettingContent(
@@ -49,9 +19,13 @@ fun SwitchSettingContent(
 	enabled: Boolean = true
 ) {
 	val value by repo.getBooleanFlow(key).collectAsState()
-	SwitchSettingContent(
-		title, description, value, modifier, enabled
-	) {
+	SwitchPreferenceWidget(
+		title = title,
+		subtitle = description,
+		checked = value,
+		modifier = modifier,
+		enabled = enabled
+	) { it: Boolean ->
 		launchIO { repo.setBoolean(key, it) }
 	}
 }

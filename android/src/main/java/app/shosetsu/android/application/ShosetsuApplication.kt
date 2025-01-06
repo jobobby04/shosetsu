@@ -121,7 +121,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 	/***/
 	override fun onCreate() {
-
 		runBlocking {
 			System.setOut(LoggingPrintStream { Log.i("System,out", it) })
 			System.setErr(LoggingPrintStream { Log.e("System,err", it) })

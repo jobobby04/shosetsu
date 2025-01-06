@@ -292,27 +292,21 @@ dependencies {
 	}*/
 
 	// Compose
-	val androidxCompose = "1.5.4"
-	fun androidxCompose(
-		module: String,
-		submodule: String = module,
-		version: String = androidxCompose
-	) = "androidx.compose.$submodule:$module:$version"
-
-	implementation(platform("androidx.compose:compose-bom:2024.02.02"))
+	implementation(platform("androidx.compose:compose-bom:2024.12.01"))
 	implementation("androidx.compose.runtime:runtime")
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-tooling")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
 	implementation("androidx.compose.material3:material3")
+	implementation("androidx.compose.material:material-icons-extended")
 	implementation("androidx.compose.foundation:foundation")
 	implementation("androidx.compose.animation:animation")
 	implementation("androidx.compose.animation:animation-graphics")
 	implementation("androidx.compose.animation:animation-core")
 
 	// - accompanist
-	val accompanistVersion = "0.32.0"
+	val accompanistVersion = "0.36.0"
 	fun accompanist(module: String, version: String = accompanistVersion) =
 		"com.google.accompanist:$module:$version"
 
@@ -324,7 +318,7 @@ dependencies {
 	implementation(accompanist("accompanist-systemuicontroller"))
 
 	//- Integration with observables
-	implementation(androidxCompose("runtime-livedata", "runtime"))
+	implementation("androidx.compose.runtime:runtime-livedata")
 
 	// MDC Adapter
 	implementation(accompanist("accompanist-themeadapter-material"))
@@ -351,13 +345,13 @@ dependencies {
 	implementation(paging("paging-compose"))
 	implementation(kotlin("reflect"))
 
-	val navVersion = "2.7.2"
+	val navVersion = "2.8.5"
 	fun navigation(module: String, version: String = navVersion) =
 		"androidx.navigation:navigation-$module:$version"
 
 	implementation(navigation("compose"))
 
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 
 	implementation("com.holix.android:bottomsheetdialog-compose:1.5.0")
 }

@@ -360,7 +360,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, Notifications.CHANNEL_DOWNLOAD)
-			.setSmallIcon(R.drawable.download)
+			.setSmallIcon(R.drawable.downloads)
 			.setContentTitle(extensionDownloaderString)
 			.setPriority(NotificationCompat.PRIORITY_HIGH)
 			.setOngoing(true)

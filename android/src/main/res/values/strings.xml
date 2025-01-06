@@ -25,17 +25,12 @@
 
     <!-- View Titles -->
     <string name="library">Library</string>
+    <string name="library_summary">Categories, global update</string>
     <string name="updates">Updates</string>
     <string name="extensions">Extensions</string>
     <string name="downloads">Downloads</string>
+    <string name="downloads_summary">Automatic download, download restrictions</string>
     <string name="settings">Settings</string>
-    <string name="settings_download">Settings > Download</string>
-    <string name="settings_update">Settings > Update</string>
-    <string name="settings_view">Settings > View</string>
-    <string name="settings_reader">Settings > Reader</string>
-    <string name="settings_advanced">Settings > Advanced</string>
-    <string name="fragment_backup_title">Backup</string>
-
 
     <!-- Reader Settings -->
     <string name="text_size">Text size</string>
@@ -43,9 +38,8 @@
     <string name="paragraph_indent">Paragraph indent</string>
 
     <string name="novel_author">Author(s): </string>
-    <string name="download">Download</string>
     <string name="fragment_novel_chapter_position">Position:</string>
-    <string name="backup_now">Backup Now</string>
+    <string name="backup_now">Create backup</string>
     <string name="pending">Pending</string>
     <string name="downloaded">Downloaded</string>
 
@@ -78,7 +72,7 @@
     <string name="license">License</string>
     <string name="privacy_policy">Privacy Policy</string>
 
-    <string name="theme">Theme:</string>
+    <string name="theme">Theme</string>
     <string name="select_between">Select between</string>
     <string name="remove">Remove</string>
     <string name="update_now">Update now</string>
@@ -100,7 +94,7 @@
     <string name="completed">Completed</string>
     <string name="publishing">Publishing</string>
     <string name="unknown">Unknown</string>
-    <string name="restore_now">Restore now</string>
+    <string name="restore_now">Restore backup</string>
 
 
     <!-- Backup and restore -->
@@ -108,6 +102,7 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="open_in">Open in</string>
     <string name="reader">Reader</string>
+    <string name="reader_summary">Reading display and behavior</string>
     <string name="default_reader">Default</string>
 
     <plurals name="toast_unread_count">
@@ -164,8 +159,10 @@
     <string name="chapters">Chapters</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
-    <string name="view">View</string>
+    <string name="appearance">Appearance</string>
+    <string name="appearance_summary">Change the appearance of the app</string>
     <string name="advanced">Advanced</string>
+    <string name="advanced_summary">Dump logs, site protection</string>
     <string name="backup">Backup</string>
     <string name="loading">Loading…</string>
     <string name="amoled">Amoled</string>
@@ -179,7 +176,6 @@
     <string name="compressed">Compressed</string>
     <string name="comfy">Comfy</string>
     <string name="novel_card_type_selector_title">Novel card type</string>
-    <string name="novel_card_type_selector_desc">Swap between a grid or list for displaying novels</string>
     <string name="novel_badge_toast_title">Novel badge toast</string>
     <string name="novel_badge_toast_desc">Toast when the unread badge is clicked to explain what it is for</string>
     <string name="apply">Apply</string>
@@ -196,8 +192,8 @@
     <string name="intro_happy_end_desc">That\'s it for an intro, Read well!</string>
 
 
-    <string name="backup_settings_option">Backup Settings?</string>
-    <string name="backup_chapters_option">Backup Chapters?</string>
+    <string name="backup_settings_option">Backup Settings</string>
+    <string name="backup_chapters_option">Backup Chapters</string>
     <string name="backup_chapters_option_description">Default on, off will not save your progress</string>
     <string name="backup_settings_option_desc">Default is off, which will not save your settings</string>
 
@@ -209,6 +205,7 @@
     <string name="extension_image_desc">Image of this extension</string>
     <string name="share">Share</string>
     <string name="browse">Browse</string>
+    <string name="browse_summary">Repositories</string>
     <string name="more">More</string>
     <string name="restart">Restart</string>
     <string name="need_restart">Activity needs to restart</string>
@@ -221,6 +218,7 @@
     <string name="settings_reader_volume_scroll_title">Volume Scroll</string>
     <string name="all">All</string>
     <string name="about">About</string>
+    <string name="about_summary">Shosetsu %s</string>
     <string name="check_for_app_update">Check for app update</string>
     <string name="source_licenses">Source Licenses</string>
     <string name="inverse_selection">Inverse Selection</string>
@@ -232,7 +230,7 @@
     <string name="settings_reader_desc_mark_read_as_reading">Allows the reader to mark a read chapter as reading when its opened up.</string>
     <string name="no_more_chapters">No more chapters</string>
 
-    <string name="follow_system_theme">Follow System</string>
+    <string name="follow_system_theme">System</string>
     <string name="sort">Sort</string>
     <string name="bookmarked">Bookmarked</string>
     <string name="genres">Genres</string>
@@ -374,7 +372,6 @@
     <string name="fragment_settings_restart_worker">Restart %s to apply new settings</string>
     <string name="settings_update_header_repositories">Repositories</string>
     <string name="settings_update_header_novel">Novels</string>
-    <string name="settings_advanced_purge_button">PURGE</string>
     <string name="fragment_settings_advanced_snackbar_purge_failure">Failed to purge</string>
     <string name="fragment_settings_advanced_snackbar_purge_success">Purged unbookmarked novels</string>
     <string name="worker_novel_update_load_failure">Failed to update %s</string>
@@ -410,14 +407,10 @@
     <string name="settings_update_novel_only_ongoing_title">Only update ongoing</string>
     <string name="settings_update_novel_on_update_desc">Download new chapters automatically</string>
     <string name="settings_update_novel_only_ongoing_desc">Only update novels that are ongoing</string>
-    <string name="settings_update_novel_on_metered_title">Allow updating on metered connection</string>
-    <string name="settings_update_novel_on_metered_desc">If toggled on, Allows novels to update while the device is on a metered connection</string>
+    <string name="settings_update_novel_on_metered_title">Allow on metered connection</string>
     <string name="settings_update_novel_on_low_bat_title">Update on low battery</string>
-    <string name="settings_update_novel_on_low_bat_desc">If toggled on, Allows novels to update while the device has a low battery level</string>
-    <string name="settings_update_novel_on_low_sto_title">Allow updating on low storage</string>
-    <string name="settings_update_novel_on_low_sto_desc">If toggled on, Allows novels to update while the device is running out of storage space</string>
-    <string name="settings_update_novel_only_idle_title">Update only when idle</string>
-    <string name="settings_update_novel_only_idle_desc">If toggled on, Novels will only update when the device is idle</string>
+    <string name="settings_update_novel_on_low_sto_title">Allow on low storage</string>
+    <string name="settings_update_novel_only_idle_title">Only when idle</string>
     <string name="settings_update_novel_notification_style_title">Notification Style</string>
     <string name="settings_update_novel_notification_style_desc">Swaps between two stypes of notifications. Check them out :D</string>
     <string name="settings_update_novel_show_progress_title">Notify update progress</string>
@@ -442,8 +435,6 @@
     <string name="settings_view_legacy_nav_title">Use legacy navigation</string>
     <string name="settings_view_legacy_nav_desc">Use legacy drawer navigation</string>
     <string name="settings_reader_text_alignment_title">Text Alignment</string>
-    <string name="settings_reader_text_alignment_desc">How text is aligned in the reader</string>
-    <string name="settings_reader_marking_mode_desc">How chapters are marked as read</string>
     <string name="settings_reader_resume_behavior_title">Resume first unread</string>
     <string name="settings_reader_resume_behavior_desc">When clicking the resume button in the novel info view, will ignore reading status to open unread first</string>
     <string name="activity_css_export">Export CSS</string>
@@ -486,12 +477,9 @@
     <string name="activity_main_app_update_download">Downloading app update</string>
     <string name="settings_advanced_clear_cookies_title">Clear cookies</string>
     <string name="settings_advanced_clear_cookies_desc">Clear all cookies that shosetsu has for websites</string>
-    <string name="settings_advanced_clear_cookies_button">Clear</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies cleared</string>
-    <string name="settings_advanced_theme_desc">Change the theme that the application uses</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Removes any unbookmarked novels & info from Shosetsu]]></string>
-    <string name="settings_advanced_kill_cycle_workers_button">Kill</string>
-    <string name="fragment_configure_extension_listing_desc">What list of novels should be displayed when the user opens up the extension to browse</string>
+    <string name="fragment_configure_extension_listing_desc">What list of novels should be displayed when the user opens up the extension to browse.\nCurrently: %s</string>
     <string name="fragment_downloads_set_all_pending_title">Set all pending</string>
     <string name="fragment_downloads_delete_all_title">Delete All</string>
     <string name="fragment_novel_true_delete">True Delete</string>
@@ -580,12 +568,9 @@
 
     <string name="fragment_repositories_action_remove">Remove repository</string>
 
-    <string name="backup_restore_low_storage">Backup on low storage</string>
-    <string name="backup_restore_low_storage_desc">Allows backups to occur on low storage, also effects cycle worker</string>
-    <string name="backup_restore_low_battery">Backup on low battery</string>
-    <string name="backup_restore_low_battery_desc">Allows backups to occur on low battery, also effects cycle worker</string>
-    <string name="backup_restore_only_idle">Backup only when idle</string>
-    <string name="backup_restore_only_idle_desc">Forces backups to occur when device is idle, also effects cycle worker</string>
+    <string name="backup_restore_low_storage">Allow on low storage</string>
+    <string name="backup_restore_low_battery">Allow on low battery</string>
+    <string name="backup_restore_only_idle">Only when idle</string>
     <string name="cozy">Cozy</string>
     <string name="extended">Extended</string>
     <string name="language">Language</string>
@@ -595,7 +580,6 @@
     <string name="views">Views</string>
     <string name="settings_advanced_force_repo_update_title">Force repo sync</string>
     <string name="settings_advanced_force_repo_update_desc">Sometimes, Repo sync does not load properly. This will force the repo to update.</string>
-    <string name="force">Force</string>
     <string name="fragment_novel_delete_previous_fail">Failed to delete previous chapter: %s</string>
     <string name="missing_extension">Extension is missing %i</string>
     <string name="fragment_about_acra_id">ACRA Identification</string>
@@ -693,20 +677,20 @@
     <!-- Error Key Messages -->
 
 
-    <array name="text_alignments">
+    <array name="text_alignments" translatable="false">
         <item>@string/text_alignment_start</item>
         <item>@string/text_alignment_center</item>
         <item>@string/text_alignment_justified</item>
         <item>@string/text_alignment_end</item>
     </array>
 
-    <array name="application_themes">
+    <array name="application_themes" translatable="false">
         <item>@string/follow_system_theme</item>
         <item>@string/light</item>
         <item>@string/dark</item>
     </array>
 
-    <array name="novel_card_types">
+    <array name="novel_card_types" translatable="false">
         <item>@string/normal</item>
         <item>@string/compressed</item>
         <item>@string/comfy</item>
@@ -720,5 +704,18 @@
     <string name="worker_update_install_missing">No update to install</string>
     <string name="error_intent_handle">Failed to handle intent</string>
     <string name="support_ignore">Happy</string>
+    <string name="display">Display</string>
+    <string name="settings_browse_repositories_desc">%1$d Repositories</string>
+    <string name="settings_library_categories_desc">%1$d Categories</string>
+    <string name="settings_library_categories_title">Edit Categories</string>
+    <string name="settings_browse_repositories_title">Edit Repositories</string>
+    <string name="not_selected">Not selected</string>
+    <string name="selected">Selected</string>
+    <string name="disabled">Disabled</string>
+    <string name="settings_library_restrictions_title">Automatic updates device restrictions</string>
+    <string name="settings_library_restrictions_desc">Restrictions: %s</string>
+    <string name="backup_summary"><![CDATA[Manual & automatic backups]]></string>
+    <string name="backup_restrictions_title">Automatic backups device restrictions</string>
+    <string name="backup_restrictions_desc">Restrictions: %s</string>
 
 </resources>

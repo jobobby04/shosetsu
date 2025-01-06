@@ -5,15 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
-import app.shosetsu.android.common.ext.getNovelID
+import androidx.navigation.toRoute
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.ui.library.LibraryView
-import app.shosetsu.android.ui.main.Destination.LIBRARY
-import app.shosetsu.android.ui.main.Destination.MIGRATION
-import app.shosetsu.android.ui.main.Destination.NOVEL
-import app.shosetsu.android.ui.main.Destination.UPDATES
+import app.shosetsu.android.ui.main.Destination.Library
+import app.shosetsu.android.ui.main.Destination.Migration
+import app.shosetsu.android.ui.main.Destination.Novel
+import app.shosetsu.android.ui.main.Destination.Updates
 import app.shosetsu.android.ui.migration.MigrationView
 import app.shosetsu.android.ui.novel.NovelInfoView
 import app.shosetsu.android.ui.updates.UpdatesView
@@ -30,13 +29,13 @@ fun NavGraphBuilder.mainGraph(
 	sizeClass: WindowSizeClass,
 	drawerIcon: @Composable () -> Unit
 ) {
-	composable(LIBRARY.route) {
+    composableMain<Library> {
 		LibraryView(
 			onOpenNovel = { novelId ->
-				navController.navigate(NOVEL.routeWith(novelId))
+				navController.navigate(Novel(novelId))
 			},
 			onMigrate = {
-				navController.navigate(MIGRATION.routeWith(it))
+				navController.navigate(Migration(it))
 			},
 			drawerIcon = drawerIcon
 		)
@@ -49,27 +48,25 @@ fun NavGraphBuilder.mainGraph(
 		navController,
 		drawerIcon = drawerIcon
 	)
-	composable(UPDATES.route) {
+    composableMain<Updates> {
 		val context = LocalContext.current
 		UpdatesView(
 			openNovel = { novelId ->
-				navController.navigate(NOVEL.routeWith(novelId))
+				navController.navigate(Novel(novelId))
 			},
 			openChapter = context::openChapter,
 			drawerIcon = drawerIcon
 		)
 	}
-	composable(
-		NOVEL.route, arguments = NOVEL.arguments
-	) { entry ->
-		val novelId = entry.arguments!!.getNovelID();
+    composableMain<Novel> { entry ->
+		val novelId = entry.toRoute<Novel>().novelId
 		val context = LocalContext.current
 
 		NovelInfoView(
 			novelId,
 			windowSize = sizeClass,
 			onMigrate = {
-				navController.navigate(MIGRATION.routeWith(listOf(it)))
+				navController.navigate(Migration(listOf(it)))
 			},
 			openInWebView = context::openInWebView,
 			openChapter = context::openChapter,
@@ -78,7 +75,7 @@ fun NavGraphBuilder.mainGraph(
 		)
 	}
 
-	composable(MIGRATION.route) {
+    composableMain<Migration> {
 		MigrationView(emptyList())
 	}
 }

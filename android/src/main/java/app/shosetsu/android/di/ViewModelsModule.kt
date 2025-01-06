@@ -23,10 +23,11 @@ import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.ABrowseSettingsViewModel
 import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
-import app.shosetsu.android.viewmodel.abstracted.settings.AUpdateSettingsViewModel
-import app.shosetsu.android.viewmodel.abstracted.settings.AViewSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.ALibrarySettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.AAppearanceSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.AboutViewModel
 import app.shosetsu.android.viewmodel.impl.AddShareViewModel
 import app.shosetsu.android.viewmodel.impl.AnalyticsViewModelImpl
@@ -50,10 +51,11 @@ import app.shosetsu.android.viewmodel.impl.extension.ExtensionsViewModel
 import app.shosetsu.android.viewmodel.impl.extension.WebViewViewModelImpl
 import app.shosetsu.android.viewmodel.impl.settings.AdvancedSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.BackupSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.BrowseSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.DownloadSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.ReaderSettingsViewModel
-import app.shosetsu.android.viewmodel.impl.settings.UpdateSettingsViewModel
-import app.shosetsu.android.viewmodel.impl.settings.ViewSettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.LibrarySettingsViewModel
+import app.shosetsu.android.viewmodel.impl.settings.AppearanceSettingsViewModel
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -304,8 +306,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			loadReaderThemes = instance()
 		)
 	}
-	bind<AUpdateSettingsViewModel>() with provider {
-		UpdateSettingsViewModel(
+	bind<ALibrarySettingsViewModel>() with provider {
+		LibrarySettingsViewModel(
 			iSettingsRepository = instance(),
 			instance(),
 			instance(),
@@ -313,9 +315,16 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance()
 		)
 	}
-	bind<AViewSettingsViewModel>() with provider {
-		ViewSettingsViewModel(
+	bind<AAppearanceSettingsViewModel>() with provider {
+		AppearanceSettingsViewModel(
 			iSettingsRepository = instance(),
+			instance()
+		)
+	}
+	bind<ABrowseSettingsViewModel>() with provider {
+		BrowseSettingsViewModel(
+			iSettingsRepository = instance(),
+			instance()
 		)
 	}
 	bind<ATextAssetReaderViewModel>() with provider {

@@ -14,17 +14,11 @@
     <string name="extensions">Extensiones</string>
     <string name="downloads">Descargas</string>
     <string name="settings">Ajustes</string>
-    <string name="settings_download">Configuración > Descargar</string>
-    <string name="settings_update">Configuración > Actualizar</string>
-    <string name="settings_view">Configuración > Vista</string>
-    <string name="settings_reader">Configuración > Lector</string>
-    <string name="settings_advanced">Configuración > Avanzado</string>
     <!-- Reader Settings -->
     <string name="text_size">Tamaño del texto</string>
     <string name="paragraph_spacing">Espaciado de párrafos</string>
     <string name="paragraph_indent">Sangría de párrafo</string>
     <string name="novel_author">Autor(es):</string>
-    <string name="download">Descargar</string>
     <string name="backup_now">Copia ahora</string>
     <string name="pending">Pendiente</string>
     <string name="downloaded">Descargado</string>
@@ -40,7 +34,7 @@
     <string name="report_bug">Reportar un error</string>
     <string name="disclaimer">Descargo de responsabilidad</string>
     <string name="license">Licencia</string>
-    <string name="theme">Tema:</string>
+    <string name="theme">Tema</string>
     <string name="select_between">Seleccionar entre</string>
     <string name="remove">Eliminar</string>
     <string name="update_now">Actualizar ahora</string>
@@ -102,7 +96,7 @@
     <string name="chapters">Capítulos</string>
     <string name="today">Hoy</string>
     <string name="yesterday">Ayer</string>
-    <string name="view">Vista</string>
+    <string name="appearance">Vista</string>
     <string name="advanced">Avanzado</string>
     <string name="backup">Copia de Seguridad</string>
     <string name="loading">Cargando…</string>
@@ -116,7 +110,6 @@
     <string name="compressed">Comprimido</string>
     <string name="comfy">Confortable</string>
     <string name="novel_card_type_selector_title">Tipo de tarjeta nuevo</string>
-    <string name="novel_card_type_selector_desc">Cambiar entre una cuadrícula o una lista para mostrar novelas</string>
     <string name="apply">Solicitar</string>
     <string name="reset">Reiniciar</string>
     <string name="listings">Listados</string>
@@ -271,7 +264,6 @@
     <string name="fragment_settings_restart_worker">Reinicia %s para aplicar nuevas configuraciones</string>
     <string name="settings_update_header_repositories">Repositorios</string>
     <string name="settings_update_header_novel">Novelas</string>
-    <string name="settings_advanced_purge_button">PURGA</string>
     <string name="fragment_settings_advanced_snackbar_purge_failure">No se pudo purgar</string>
     <string name="fragment_settings_advanced_snackbar_purge_success">Novelas sin marcadores purgadas</string>
     <string name="worker_novel_update_load_failure">Error al actualizar %s</string>
@@ -304,13 +296,9 @@
     <string name="settings_update_novel_on_update_desc">Descargar nuevos capítulos automáticamente</string>
     <string name="settings_update_novel_only_ongoing_desc">Actualice solo las novelas que están en curso</string>
     <string name="settings_update_novel_on_metered_title">Permitir la actualización en una conexión medida</string>
-    <string name="settings_update_novel_on_metered_desc">Si está activado, permite que las novelas se actualicen mientras el dispositivo está en una conexión medida</string>
     <string name="settings_update_novel_on_low_bat_title">Actualización con batería baja</string>
-    <string name="settings_update_novel_on_low_bat_desc">Si está activado, permite que las novelas se actualicen mientras el dispositivo tiene un nivel de batería bajo</string>
     <string name="settings_update_novel_on_low_sto_title">Permitir la actualización con poco almacenamiento</string>
-    <string name="settings_update_novel_on_low_sto_desc">Si está activado, permite que las novelas se actualicen mientras el dispositivo se está quedando sin espacio de almacenamiento</string>
     <string name="settings_update_novel_only_idle_title">Actualizar solo cuando esté inactivo</string>
-    <string name="settings_update_novel_only_idle_desc">Si está activado, Novels solo se actualizará cuando el dispositivo esté inactivo</string>
     <string name="settings_update_novel_notification_style_title">Estilo de notificación</string>
     <string name="settings_update_novel_notification_style_desc">Cambia entre dos tipos de notificaciones. Échales un vistazo :D</string>
     <string name="settings_update_novel_show_progress_title">Notificar el progreso de la actualización</string>
@@ -328,8 +316,6 @@
     <string name="settings_view_legacy_nav_title">Usar navegación heredada</string>
     <string name="settings_view_legacy_nav_desc">Usar navegación de cajón heredada</string>
     <string name="settings_reader_text_alignment_title">Alineación del texto</string>
-    <string name="settings_reader_text_alignment_desc">Cómo se alinea el texto en el lector</string>
-    <string name="settings_reader_marking_mode_desc">Cómo se marcan los capítulos como leídos</string>
     <string name="settings_reader_resume_behavior_title">Reanudar primero sin leer</string>
     <string name="settings_reader_resume_behavior_desc">Al hacer clic en el botón de reanudar en la vista de información novedosa, ignorará el estado de lectura para abrir primero sin leer</string>
     <string name="activity_css_export">Exportar CSS</string>
@@ -372,33 +358,13 @@
     <string name="activity_main_app_update_download">Descargando la actualización de la aplicación</string>
     <string name="settings_advanced_clear_cookies_title">Eliminar cookies</string>
     <string name="settings_advanced_clear_cookies_desc">Borrar todas las cookies que tiene shosetsu para sitios web</string>
-    <string name="settings_advanced_clear_cookies_button">Claro</string>
     <string name="settings_advanced_clear_cookies_complete">Cookies eliminadas</string>
-    <string name="settings_advanced_theme_desc">Cambiar el tema que usa la aplicación</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Elimina cualquier novela e información sin marcar de Shosetsu]]></string>
-    <string name="settings_advanced_kill_cycle_workers_button">Matar</string>
-    <string name="fragment_configure_extension_listing_desc">¿Qué lista de novelas debe mostrarse cuando el usuario abre la extensión para navegar?</string>
+    <string name="fragment_configure_extension_listing_desc">¿Qué lista de novelas debe mostrarse cuando el usuario abre la extensión para navegar?\nCurrently: %s</string>
     <string name="fragment_downloads_set_all_pending_title">Establecer todo pendiente</string>
     <string name="fragment_downloads_delete_all_title">Eliminar todos</string>
     <plurals name="worker_novel_update_updated_novel_count">
         <item quantity="one">%d capítulo nuevo.</item>
         <item quantity="other">%d capítulos nuevos.</item>
     </plurals>
-    <!-- Error Key Messages -->
-    <array name="text_alignments">
-        <item>@string/text_alignment_start</item>
-        <item>@string/text_alignment_center</item>
-        <item>@string/text_alignment_justified</item>
-        <item>@string/text_alignment_end</item>
-    </array>
-    <array name="application_themes">
-        <item>@string/follow_system_theme</item>
-        <item>@string/light</item>
-        <item>@string/dark</item>
-    </array>
-    <array name="novel_card_types">
-        <item>@string/normal</item>
-        <item>@string/compressed</item>
-        <item>@string/comfy</item>
-    </array>
 </resources>

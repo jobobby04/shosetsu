@@ -24,13 +24,15 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -203,8 +205,6 @@ fun LibraryView(
 		onSelectBetween = viewModel::selectBetween,
 		query = query,
 		onSearch = viewModel::setQuery,
-		selectedType = type,
-		onSetType = viewModel::setViewType,
 		hostState = hostState,
 		onShowFilterMenu = viewModel::showFilterMenu,
 		drawerIcon = drawerIcon
@@ -253,8 +253,6 @@ fun LibraryContent(
 	onSelectBetween: () -> Unit,
 	query: String,
 	onSearch: (String) -> Unit,
-	selectedType: NovelCardType,
-	onSetType: (NovelCardType) -> Unit,
 	hostState: SnackbarHostState,
 	onShowFilterMenu: () -> Unit,
 	drawerIcon: @Composable () -> Unit
@@ -273,8 +271,7 @@ fun LibraryContent(
 				onSelectBetween = onSelectBetween,
 				query = query,
 				onSearch = onSearch,
-				selectedType = selectedType,
-				onSetType = onSetType,
+				onShowFilterMenu = onShowFilterMenu,
 				onRefresh = {
 					onRefresh(-1) // default, TODO maybe make better?
 				},
@@ -285,20 +282,6 @@ fun LibraryContent(
 		snackbarHost = {
 			SnackbarHost(hostState)
 		},
-		floatingActionButton = {
-			// TODO Collapsible
-			AnimatedVisibility(!isEmpty) {
-				ExtendedFloatingActionButton(
-					text = {
-						Text(stringResource(R.string.filter))
-					},
-					icon = {
-						Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
-					},
-					onClick = onShowFilterMenu
-				)
-			}
-		}
 	) { paddingValues ->
 		if (!isEmpty) {
 			if (items == null) {
@@ -354,8 +337,7 @@ fun LibraryAppBar(
 	onSelectBetween: () -> Unit,
 	query: String,
 	onSearch: (String) -> Unit,
-	selectedType: NovelCardType,
-	onSetType: (NovelCardType) -> Unit,
+	onShowFilterMenu: () -> Unit,
 	onRefresh: () -> Unit,
 	isEmpty: Boolean,
 	drawerIcon: @Composable () -> Unit
@@ -393,7 +375,9 @@ fun LibraryAppBar(
 				AnimatedVisibility(!isEmpty) {
 					Row {
 						SearchAction(query, onSearch, immediateSearch = true)
-						ViewTypeButton(selectedType, onSetType)
+						IconButton(onClick = onShowFilterMenu) {
+							Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
+						}
 						RefreshButton(onRefresh)
 					}
 				}
@@ -468,9 +452,9 @@ fun LibraryPager(
 			state = categoryPagerState,
 			modifier = Modifier.fillMaxSize()
 		) {
-			val id by derivedStateOf {
+			val id by remember { derivedStateOf {
 				library.categories[it].id
-			}
+			} }
 			val items by produceState(persistentListOf(), library, it, id) {
 				value = onIO {
 					library.novels[id] ?: persistentListOf()

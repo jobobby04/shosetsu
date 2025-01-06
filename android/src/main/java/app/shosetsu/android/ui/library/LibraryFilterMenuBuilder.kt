@@ -8,6 +8,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.UnfoldLess
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +23,7 @@ import androidx.compose.ui.state.ToggleableState.Off
 import androidx.compose.ui.state.ToggleableState.On
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelSortType
 import app.shosetsu.android.common.enums.NovelSortType.*
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
@@ -50,13 +55,13 @@ import kotlinx.coroutines.launch
  * 22 / 11 / 2020
  */
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun LibraryFilterMenuView(
 	viewModel: ALibraryViewModel
 ) {
 	val pages =
-		listOf(stringResource(R.string.filter), stringResource(R.string.sort))
+		listOf(stringResource(R.string.filter), stringResource(R.string.sort), stringResource(R.string.display))
 	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
 
@@ -84,6 +89,8 @@ fun LibraryFilterMenuView(
 				)
 			}
 		}
+		val horizontalPadding = 24.dp
+		val verticalPadding = 10.dp
 		Surface {
 			HorizontalPager(state = pagerState) {
 				when (it) {
@@ -162,6 +169,31 @@ fun LibraryFilterMenuView(
 							pinOnTopState,
 							viewModel::setPinnedOnTop
 						)
+					}
+
+					2 -> {
+						val type by viewModel.novelCardTypeFlow.collectAsState()
+						FlowRow(
+							modifier = Modifier.padding(
+								start = horizontalPadding,
+								top = 0.dp,
+								end = horizontalPadding,
+								bottom = verticalPadding,
+							).fillMaxHeight(),
+							horizontalArrangement = Arrangement.spacedBy(8.dp)
+						) {
+							mapOf(
+								R.string.normal to NovelCardType.NORMAL,
+								R.string.compressed to NovelCardType.COMPRESSED,
+								R.string.cozy to NovelCardType.COZY
+							).forEach { (s, kind) ->
+								FilterChip(
+									selected = type == kind,
+									onClick = { viewModel.setViewType(kind) },
+									label = { Text(stringResource(s)) }
+								)
+							}
+						}
 					}
 				}
 			}
@@ -363,13 +395,7 @@ fun LibraryFilterMenuSortItemContent(
 			Box(modifier = Modifier.size(32.dp)) {
 				if (isExpected)
 					Icon(
-						painterResource(
-							if (reversed) {
-								R.drawable.expand_less
-							} else {
-								R.drawable.expand_more
-							}
-						),
+						if (reversed) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 						null,
 						modifier = Modifier.align(Alignment.Center)
 					)
@@ -464,7 +490,7 @@ fun ColumnScope.FilterContent(
 				.padding(8.dp)
 		) {
 			Icon(
-				painterResource(if (isExpanded) R.drawable.expand_less else R.drawable.expand_more),
+				if (isExpanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 				null
 			)
 			Text(stringResource(name), modifier = Modifier.padding(start = 8.dp))

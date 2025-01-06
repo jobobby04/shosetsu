@@ -17,17 +17,10 @@
 	<string name="extensions">Расширения</string>
 	<string name="downloads">Загрузки</string>
 	<string name="settings">Настройки</string>
-	<string name="settings_download">Настройки > Загрузка</string>
-	<string name="settings_update">Настройки > Обновление</string>
-	<string name="settings_view">Настройки > Вид</string>
-	<string name="settings_reader">Настройки > Считыватель</string>
-	<string name="settings_advanced">Настройки > Дополнительно</string>
-	<string name="fragment_backup_title">Резервное копирование</string>
 	<string name="text_size">Размер текста</string>
 	<string name="paragraph_spacing">Расстояние между абзацами</string>
 	<string name="paragraph_indent">Отступ абзаца</string>
 	<string name="novel_author">Автор(ы):</string>
-	<string name="download">Загрузки</string>
     <string name="fragment_novel_chapter_position">Позиция:</string>
 	<string name="backup_now">Резервное копирование сейчас</string>
 	<string name="pending">В ожидании</string>
@@ -43,7 +36,7 @@
 	<string name="disclaimer">Отказ от ответственности</string>
 	<string name="license">Лицензия</string>
 	<string name="privacy_policy">Политика конфиденциальности</string>
-	<string name="theme">Тема:</string>
+	<string name="theme">Тема</string>
 	<string name="select_between">Выберите между</string>
 	<string name="remove">Удалить</string>
 	<string name="update_now">Обновить сейчас</string>
@@ -93,7 +86,7 @@
 	<string name="chapters">Главы</string>
 	<string name="today">Сегодня</string>
 	<string name="yesterday">Вчера</string>
-	<string name="view">Просмотр</string>
+	<string name="appearance">Просмотр</string>
 	<string name="advanced">Расширенные</string>
 	<string name="backup">Резервное копирование</string>
 	<string name="loading">Загрузка…</string>
@@ -107,7 +100,6 @@
 	<string name="compressed">Таблица</string>
 	<string name="comfy">Удобная сетка</string>
 	<string name="novel_card_type_selector_title">Вид списка</string>
-	<string name="novel_card_type_selector_desc">Переключение между сеткой и таблицей для отображения новелл</string>
 	<string name="novel_badge_toast_title">Тост</string>
 	<string name="novel_badge_toast_desc">Тост при нажатии на значок непрочитанного, чтобы объяснить, для чего он нужен</string>
 	<string name="apply">Применить</string>
@@ -278,7 +270,6 @@
     <string name="fragment_settings_restart_worker">Перезапустите %s для применения новых настроек</string>
     <string name="settings_update_header_repositories">Репозитории</string>
     <string name="settings_update_header_novel">Новеллы</string>
-    <string name="settings_advanced_purge_button">ОЧИСТИТЬ</string>
     <string name="fragment_settings_advanced_snackbar_purge_failure">Не удалось очистить</string>
     <string name="fragment_settings_advanced_snackbar_purge_success">Очищенные новеллы без закладок</string>
     <string name="worker_novel_update_load_failure">Не удалось обновить %s</string>
@@ -315,13 +306,9 @@
 	<string name="settings_update_novel_only_ongoing_title">Обновить только выпускаемые</string>
 	<string name="settings_update_novel_only_ongoing_desc">Обновляйте только те новеллы, которые продолжаются</string>
 	<string name="settings_update_novel_on_metered_title">Разрешить обновление при подключении по лимитному соединению.</string>
-	<string name="settings_update_novel_on_metered_desc">Если включено, позволяет обновлять новеллы, пока устройство находится на лимитном соединении.</string>
 	<string name="settings_update_novel_on_low_bat_title">Обновление при низком заряде батареи</string>
-	<string name="settings_update_novel_on_low_bat_desc">Если включено, позволяет обновлять новеллы при низком уровне заряда батареи устройства.</string>
 	<string name="settings_update_novel_on_low_sto_title">Разрешить обновление при низком объеме памяти</string>
-	<string name="settings_update_novel_on_low_sto_desc">Если включено, позволяет обновлять новеллы, когда на устройстве заканчивается место для хранения данных.</string>
 	<string name="settings_update_novel_only_idle_title">Обновление только в режиме ожидания</string>
-	<string name="settings_update_novel_only_idle_desc">Если флажок включен, новеллы будет обновляться только тогда, когда устройство находится в режиме ожидания</string>
 	<string name="settings_update_novel_notification_style_title">Стиль уведомления</string>
 	<string name="settings_update_novel_notification_style_desc">Меняет местами два стиля уведомлений. Проверьте их :D</string>
 	<string name="settings_update_novel_show_progress_title">Уведомить о ходе обновления</string>
@@ -346,8 +333,6 @@
 	<string name="settings_view_legacy_nav_title">Используйте устаревшую навигацию</string>
 	<string name="settings_view_legacy_nav_desc">Используйте устаревшую навигацию по ящикам</string>
 	<string name="settings_reader_text_alignment_title">Выравнивание текста</string>
-	<string name="settings_reader_text_alignment_desc">Как текст выравнивается в программе чтения</string>
-	<string name="settings_reader_marking_mode_desc">Как главы помечаются как прочитанные</string>
 	<string name="settings_reader_resume_behavior_title">Возобновите сначала, не читая</string>
 	<string name="settings_reader_resume_behavior_desc">При нажатии на кнопку возобновления в представлении информации о новелле будет игнорироваться статус чтения, чтобы сначала открывать непрочитанное</string>
 	<string name="activity_css_export">Экспорт CSS</string>
@@ -388,12 +373,9 @@
     <string name="activity_main_app_update_download">Загрузка обновления приложения</string>
     <string name="settings_advanced_clear_cookies_title">Очистить куки</string>
     <string name="settings_advanced_clear_cookies_desc">Очистить все файлы cookie, которые Shosetsu имеет для веб-сайтов.</string>
-    <string name="settings_advanced_clear_cookies_button">Очистить</string>
     <string name="settings_advanced_clear_cookies_complete">Куки очищены</string>
-    <string name="settings_advanced_theme_desc">Измените тему, которую использует приложение</string>
     <string name="settings_advanced_purge_novel_cache"><![CDATA[Удаляет все не отмеченные новеллы и информацию из Shosetsu]]></string>
-    <string name="settings_advanced_kill_cycle_workers_button">Убить</string>
-    <string name="fragment_configure_extension_listing_desc">Какой список новелл должен отображаться, когда пользователь открывает расширение для просмотра</string>
+    <string name="fragment_configure_extension_listing_desc">Какой список новелл должен отображаться, когда пользователь открывает расширение для просмотра.\nCurrently: %s</string>
     <string name="fragment_downloads_set_all_pending_title">Установить все в ожидании</string>
     <string name="fragment_downloads_delete_all_title">Удалить все</string>
     <string name="fragment_novel_true_delete">Истинное удаление</string>
@@ -405,8 +387,6 @@
     <string name="backup_restore_print_chapters_title">Печать названий глав при восстановлении</string>
     <string name="backup_restore_print_chapters_desc">Печатать названия глав в журнал во время восстановления.\nПолезно для отладки, не полезно в других случаях.\nНеобходимо установить перед восстановлением.</string>
     <string name="restore_notification_content_novel_fail_io">IOException: %s</string>
-    <string name="backup_only_modified_title">Резервное копирование только измененных</string>
-    <string name="backup_only_modified_desc">Резервное копирование только измененных глав, что позволяет экономить память и размер файла</string>
     <string name="fragment_backup_error_unselected">Для экспорта не выбрана резервная копия</string>
 	<string name="export_backup_notification_missing_uri">Не предоставлен URI для экспорта резервной копии</string>
 	<string name="export_backup_notification_invalid_backup">Такой резервной копии не существует</string>
@@ -481,15 +461,11 @@
     <string name="fragment_catalogue_no_more">Больше нет контента, извините!</string>
     <string name="fragment_repositories_action_remove">Удалить репозиторий</string>
     <string name="backup_restore_low_storage">Резервное копирование при малом объеме памяти</string>
-    <string name="backup_restore_low_storage_desc">Позволяет выполнять резервное копирование при низком объеме памяти, также влияет на рабочий цикл</string>
     <string name="backup_restore_low_battery">Резервное копирование при низком заряде батареи</string>
-    <string name="backup_restore_low_battery_desc">Позволяет выполнять резервное копирование при разряженной батарее, также влияет на рабочий цикл</string>
     <string name="backup_restore_only_idle">Резервное копирование только в режиме ожидания</string>
-    <string name="backup_restore_only_idle_desc">Заставляет создавать резервные копии, когда устройство простаивает, также влияет на рабочий цикл.</string>
     <string name="cozy">Удобная сетка</string>
     <string name="settings_advanced_force_repo_update_title">Принудительная синхронизация репо</string>
     <string name="settings_advanced_force_repo_update_desc">Иногда синхронизация репо не загружается должным образом. Это заставит репо обновиться.</string>
-    <string name="force">Применить</string>
     <string name="fragment_novel_delete_previous_fail">Не удалось удалить предыдущую главу: %s</string>
 	<string name="missing_extension">Расширение отсутствует %i</string>
 	<string name="fragment_about_acra_id">Идентификация ACRA</string>
@@ -534,20 +510,4 @@
 		<item quantity="zero">Нет новых глав.</item>
 		<item quantity="other">%d новых глав.</item>
 	</plurals>
-	<array name="text_alignments">
-		<item>@string/text_alignment_start</item>
-		<item>@string/text_alignment_center</item>
-		<item>@string/text_alignment_justified</item>
-		<item>@string/text_alignment_end</item>
-	</array>
-	<array name="application_themes">
-		<item>@string/follow_system_theme</item>
-		<item>@string/light</item>
-		<item>@string/dark</item>
-	</array>
-	<array name="novel_card_types">
-		<item>@string/normal</item>
-		<item>@string/compressed</item>
-		<item>@string/comfy</item>
-	</array>
 </resources>

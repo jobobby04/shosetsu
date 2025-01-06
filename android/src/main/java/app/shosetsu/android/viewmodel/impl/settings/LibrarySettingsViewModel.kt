@@ -10,7 +10,7 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.view.uimodels.model.CategoryUI
-import app.shosetsu.android.viewmodel.abstracted.settings.AUpdateSettingsViewModel
+import app.shosetsu.android.viewmodel.abstracted.settings.ALibrarySettingsViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -38,13 +38,13 @@ import kotlinx.coroutines.flow.*
  * shosetsu
  * 31 / 08 / 2020
  */
-class UpdateSettingsViewModel(
+class LibrarySettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
 	private val novelUpdateCycleManager: NovelUpdateCycleWorker.Manager,
 	private val novelUpdateManager: NovelUpdateWorker.Manager,
 	private val repoUpdateManager: RepositoryUpdateWorker.Manager,
 	private val getCategoriesUseCase: GetCategoriesUseCase,
-) : AUpdateSettingsViewModel(iSettingsRepository) {
+) : ALibrarySettingsViewModel(iSettingsRepository) {
 	private fun restartNovelUpdater() {
 		launchIO {
 			logI("Restarting novel updaters")

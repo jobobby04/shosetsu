@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,12 +43,13 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
+import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
-import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.ExtensionType
@@ -126,7 +128,6 @@ fun ConfigureExtensionContent(
 		}
 	) { paddingValues ->
 		LazyColumn(
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			state = rememberLazyListState(),
 			contentPadding = PaddingValues(bottom = 8.dp),
 			modifier = Modifier.padding(paddingValues)
@@ -159,14 +160,14 @@ fun SettingsItemAsCompose(
 						modifier = Modifier.fillMaxWidth()
 					) {
 						Text(data.name)
-						Divider()
+						HorizontalDivider()
 					}
 				}
 			}
 
 			is FilterEntity.Separator -> {
 				column.item(Random.nextInt() + 1000000) {
-					Divider()
+					HorizontalDivider()
 				}
 			}
 
@@ -186,16 +187,16 @@ fun SettingsItemAsCompose(
 
 			is FilterEntity.Switch -> {
 				column.item(data.id) {
-					SwitchSettingContent(
-						data.name,
-						"",
-						isChecked = data.state,
-						onCheckChange = { newValue ->
+					SwitchPreferenceWidget(
+                        title = data.name,
+                        subtitle = "",
+                        checked = data.state,
+                        modifier = Modifier.fillMaxWidth(),
+                        onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						},
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
+						}
+                    )
+                }
 			}
 
 			is FilterEntity.TriState -> {
@@ -241,7 +242,7 @@ fun SettingsItemAsCompose(
 							.fillMaxWidth()
 					) {
 						Text(data.name)
-						Divider()
+						HorizontalDivider()
 					}
 				}
 				SettingsItemAsCompose(column, viewModel, data.filters.toList())
@@ -253,16 +254,16 @@ fun SettingsItemAsCompose(
 
 			is FilterEntity.Checkbox -> {
 				column.item(data.id) {
-					SwitchSettingContent(
-						data.name,
-						"",
-						isChecked = data.state,
-						onCheckChange = { newValue ->
+					SwitchPreferenceWidget(
+                        title = data.name,
+                        subtitle = "",
+                        checked = data.state,
+                        modifier = Modifier.fillMaxWidth(),
+                        onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						},
-						modifier = Modifier.fillMaxWidth()
-					)
-				}
+						}
+                    )
+                }
 			}
 
 			is FilterEntity.RadioGroup -> {
