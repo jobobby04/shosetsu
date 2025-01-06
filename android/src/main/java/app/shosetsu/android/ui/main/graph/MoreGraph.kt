@@ -6,7 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import app.shosetsu.android.common.consts.BundleKeys
+import androidx.navigation.toRoute
 import app.shosetsu.android.common.enums.TextAsset
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
@@ -16,7 +16,19 @@ import app.shosetsu.android.ui.backup.BackupView
 import app.shosetsu.android.ui.categories.CategoriesView
 import app.shosetsu.android.ui.downloads.DownloadsView
 import app.shosetsu.android.ui.history.HistoryView
-import app.shosetsu.android.ui.main.Destination
+import app.shosetsu.android.ui.main.Destination.More
+import app.shosetsu.android.ui.main.Destination.More.About
+import app.shosetsu.android.ui.main.Destination.More.AddShare
+import app.shosetsu.android.ui.main.Destination.More.Analytics
+import app.shosetsu.android.ui.main.Destination.More.Backup
+import app.shosetsu.android.ui.main.Destination.More.Categories
+import app.shosetsu.android.ui.main.Destination.More.Downloads
+import app.shosetsu.android.ui.main.Destination.More.History
+import app.shosetsu.android.ui.main.Destination.More.Repositories
+import app.shosetsu.android.ui.main.Destination.More.Settings
+import app.shosetsu.android.ui.main.Destination.More.TextReader
+import app.shosetsu.android.ui.main.Destination.More.View
+import app.shosetsu.android.ui.main.Destination.Novel
 import app.shosetsu.android.ui.more.MoreView
 import app.shosetsu.android.ui.repository.RepositoriesView
 
@@ -24,37 +36,37 @@ fun NavGraphBuilder.moreGraph(
 	navController: NavHostController,
 	drawerIcon: @Composable () -> Unit
 ) {
-	navigation(startDestination = "main", Destination.MORE.route) {
-		composable("main") {
+	navigation<More>(View) {
+		composable<View> {
 			MoreView(
 				onNavToAbout = {
-					navController.navigate(Destination.ABOUT.route)
+					navController.navigate(About)
 				},
 				onNavToDownloads = {
-					navController.navigate(Destination.DOWNLOADS.route)
+					navController.navigate(Downloads)
 				},
 				onNavToBackup = {
-					navController.navigate(Destination.BACKUP.route)
+					navController.navigate(Backup)
 				},
 				onNavToRepositories = {
-					navController.navigate(Destination.REPOSITORIES.route)
+					navController.navigate(Repositories)
 				},
 				onNavToCategories = {
-					navController.navigate(Destination.CATEGORIES.route)
+					navController.navigate(Categories)
 				},
 				onNavToStyles = {
 				},
 				onNavToAddShare = {
-					navController.navigate(Destination.ADD_SHARE.route)
+					navController.navigate(AddShare(null))
 				},
 				onNavToAnalytics = {
-					navController.navigate(Destination.ANALYTICS.route)
+					navController.navigate(Analytics)
 				},
 				onNavToHistory = {
-					navController.navigate(Destination.HISTORY.route)
+					navController.navigate(History)
 				},
 				onNavToSettings = {
-					navController.navigate(Destination.SETTINGS.route)
+					navController.navigate(Settings)
 				},
 				drawerIcon = drawerIcon
 			)
@@ -62,56 +74,51 @@ fun NavGraphBuilder.moreGraph(
 
 		assetReader(navController)
 
-		composable(Destination.ABOUT.route) {
+		composable<About> {
 			AboutView(
 				onOpenLicense = {
-					navController.navigate(
-						Destination.TEXT_READER.routeWith(TextAsset.LICENSE.ordinal)
-					)
+					navController.navigate(TextReader(TextAsset.LICENSE.ordinal))
 				},
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.CATEGORIES.route) {
+		composable<Categories> {
 			CategoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.DOWNLOADS.route) {
+		composable<Downloads> {
 			DownloadsView(
 				onBack = navController::popBackStack
 			)
 		}
 
-		composable(Destination.ADD_SHARE.route) { entry ->
-			val shareURL = entry.arguments!!.getString(BundleKeys.BUNDLE_URL)
+		composable<AddShare> { entry ->
 			AddShareView(
-				shareURL,
+				entry.toRoute<AddShare>().url,
 				onBackPressed = navController::popBackStack,
 				openNovel = {
 					if (it != null)
-						navController.navigate(
-							Destination.NOVEL.routeWith(it.id!!)
-						)
+						navController.navigate(Novel(it.id!!))
 				}
 			)
 		}
-		composable(Destination.REPOSITORIES.route) {
+		composable<Repositories> {
 			RepositoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.BACKUP.route) {
+		composable<Backup> {
 			BackupView(
 				onBack = navController::popBackStack
 			)
 		}
 
-		composable(Destination.HISTORY.route) {
+		composable<History> {
 			val context = LocalContext.current
 			HistoryView(
 				openNovel = {
-					navController.navigate(Destination.NOVEL.routeWith(it))
+					navController.navigate(Novel(it))
 				},
 				openChapter = { nId, cId ->
 					context.openChapter(nId, cId)
@@ -119,7 +126,7 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(Destination.ANALYTICS.route) {
+		composable<Analytics> {
 			AnalyticsView(navController::popBackStack)
 		}
 

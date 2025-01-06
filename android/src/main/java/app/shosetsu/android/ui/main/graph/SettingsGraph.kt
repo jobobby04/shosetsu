@@ -8,12 +8,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.shosetsu.android.ui.css.CSSEditorActivity
-import app.shosetsu.android.ui.main.Destination.SETTINGS
-import app.shosetsu.android.ui.main.Destination.SETTINGS_ADVANCED
-import app.shosetsu.android.ui.main.Destination.SETTINGS_DOWNLOAD
-import app.shosetsu.android.ui.main.Destination.SETTINGS_READER
-import app.shosetsu.android.ui.main.Destination.SETTINGS_UPDATE
-import app.shosetsu.android.ui.main.Destination.SETTINGS_VIEW
+import app.shosetsu.android.ui.main.Destination.More.Settings
+import app.shosetsu.android.ui.main.Destination.More.Settings.Overview
 import app.shosetsu.android.ui.settings.SettingsView
 import app.shosetsu.android.ui.settings.sub.AdvancedSettingsView
 import app.shosetsu.android.ui.settings.sub.DownloadSettingsView
@@ -39,49 +35,49 @@ import app.shosetsu.android.ui.settings.sub.ViewSettingsView
  */
 
 fun NavGraphBuilder.settingsGraph(navController: NavController) {
-	navigation(startDestination = "overview", SETTINGS.route) {
-		composable("overview") {
+	navigation<Settings>(Overview) {
+		composable<Overview> {
 			SettingsView(
 				onBack = navController::popBackStack,
 				navToAdvanced = {
-					navController.navigate(SETTINGS_ADVANCED.route)
+					navController.navigate(Settings.Advanced)
 				},
 				navToView = {
-					navController.navigate(SETTINGS_VIEW.route)
+					navController.navigate(Settings.View)
 				},
 				navToDownload = {
-					navController.navigate(SETTINGS_DOWNLOAD.route)
+					navController.navigate(Settings.Download)
 				},
 				navToReader = {
-					navController.navigate(SETTINGS_READER.route)
+					navController.navigate(Settings.Reader)
 				},
 				navToUpdate = {
-					navController.navigate(SETTINGS_UPDATE.route)
+					navController.navigate(Settings.Update)
 				}
 			)
 		}
 
-		composable(SETTINGS_VIEW.route) {
+		composable<Settings.View> {
 			ViewSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(SETTINGS_UPDATE.route) {
+		composable<Settings.Update> {
 			UpdateSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(SETTINGS_ADVANCED.route) {
+		composable<Settings.Advanced> {
 			AdvancedSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(SETTINGS_DOWNLOAD.route) {
+		composable<Settings.Download> {
 			DownloadSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(SETTINGS_READER.route) {
+		composable<Settings.Reader> {
 			val context = LocalContext.current
 			ReaderSettingsView(
 				onBack = navController::popBackStack,
