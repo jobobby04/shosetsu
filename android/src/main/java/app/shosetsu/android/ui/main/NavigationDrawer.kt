@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -46,11 +46,11 @@ import app.shosetsu.android.ui.theme.Primary
  */
 
 @Composable
-fun <T> NavigationDrawerContent(
-	destinations: List<T>,
+fun NavigationDrawerContent(
+	destinations: List<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
+	onNavigate: (Root) -> Unit
+) {
 	ModalDrawerSheet {
 		Row(
 			verticalAlignment = Alignment.Bottom
@@ -71,18 +71,18 @@ fun <T> NavigationDrawerContent(
 			}
 		}
 
-		Divider()
+		HorizontalDivider()
 
 		destinations.forEach { destination ->
 			NavigationDrawerItem(
 				selected =
-				currentDestination?.destination?.route == destination.route,
+				currentDestination?.has(destination) == true,
 				icon = {
 					Icon(
 						painterResource(
 							destination.icon
 						),
-						destination.route
+						destination::class.simpleName
 					)
 				},
 				label = {

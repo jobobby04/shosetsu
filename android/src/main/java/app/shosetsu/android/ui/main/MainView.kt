@@ -39,10 +39,10 @@ import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import app.shosetsu.android.ui.intro.IntroductionActivity
-import app.shosetsu.android.ui.main.Destination.BROWSE
-import app.shosetsu.android.ui.main.Destination.LIBRARY
-import app.shosetsu.android.ui.main.Destination.MORE
-import app.shosetsu.android.ui.main.Destination.UPDATES
+import app.shosetsu.android.ui.main.Destination.Browse
+import app.shosetsu.android.ui.main.Destination.Library
+import app.shosetsu.android.ui.main.Destination.More
+import app.shosetsu.android.ui.main.Destination.Updates
 import app.shosetsu.android.ui.main.graph.mainGraph
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
@@ -101,10 +101,10 @@ fun MainView() {
 	val scope = rememberCoroutineScope()
 
 	val destinations = listOf(
-		LIBRARY,
-		UPDATES,
-		BROWSE,
-		MORE
+		Library,
+		Updates,
+		Browse,
+		More
 	)
 
 	val sizeClass = calculateWindowSizeClass(context as Activity)
@@ -118,7 +118,7 @@ fun MainView() {
 		onCloseDrawer = drawerState::close
 	)
 
-	fun navigate(route: String) {
+	fun navigate(route: ShosetsuDestination) {
 		navController.navigate(route) {
 			// Pop up to the start destination of the graph to
 			// avoid building up a large stack of destinations
@@ -132,10 +132,6 @@ fun MainView() {
 			// Restore state when reselecting a previously selected item
 			restoreState = true
 		}
-	}
-
-	fun navigate(destination: Destination) {
-		navigate(destination.route)
 	}
 
 	IntentHandler(
@@ -201,7 +197,7 @@ fun MainView() {
 				) { paddingValues ->
 					NavHost(
 						navController,
-						startDestination = LIBRARY.route,
+						startDestination = Library,
 						modifier = Modifier.padding(paddingValues)
 					) {
 						mainGraph(

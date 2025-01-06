@@ -9,37 +9,34 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import kotlin.reflect.KType
 
 fun fadeInX() = fadeIn(animationSpec = tween(700))
 fun fadeOutX() = fadeOut(animationSpec = tween(700))
 
-fun NavGraphBuilder.composableMain(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
+inline fun <reified T : Any> NavGraphBuilder.composableMain(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
-) = composable(
-    route = route,
-    arguments = arguments,
+    noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
+) = composable<T>(
+    typeMap = typeMap,
     deepLinks = deepLinks,
     content = content,
     enterTransition = { fadeInX() },
     exitTransition = { fadeOutX() },
 )
 
-fun NavGraphBuilder.composableSub(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
+inline fun <reified T : Any> NavGraphBuilder.composableSub(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
-) = composable(
-    route = route,
-    arguments = arguments,
+    noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
+) = composable<T>(
+    typeMap = typeMap,
     deepLinks = deepLinks,
     content = content,
     enterTransition = { slideInHorizontally(animationSpec = tween(
