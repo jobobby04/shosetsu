@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -156,8 +154,7 @@ fun NovelInfoView(
 	onMigrate: (novelId: Int) -> Unit,
 	openInWebView: (String) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
-	onBack: () -> Unit,
-	drawerIcon: @Composable () -> Unit
+	onBack: () -> Unit
 ) {
 	val viewModel: ANovelViewModel = viewModelDi()
 
@@ -272,8 +269,6 @@ fun NovelInfoView(
 		}
 	}
 
-	val state = LazyListState(0)
-
 	// If the data is not present, loads it
 	if (novelInfo != null && !novelInfo!!.loaded) {
 		viewModel.refresh()
@@ -321,7 +316,6 @@ fun NovelInfoView(
 		bookmarkSelected = viewModel::bookmarkSelected,
 		unbookmarkSelected = viewModel::removeBookmarkFromSelected,
 		hasSelected = hasSelected,
-		state = state,
 		windowSize = windowSize,
 		onSelectAll = viewModel::selectAll,
 		onSelectBetween = viewModel::selectBetween,
@@ -615,7 +609,6 @@ fun PreviewNovelInfoContent() {
 			bookmarkSelected = {},
 			unbookmarkSelected = {},
 			hasSelected = false,
-			state = rememberLazyListState(0),
 			windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height)),
 			onSelectAll = {},
 			onSelectBetween = {},
@@ -662,7 +655,6 @@ fun NovelInfoContent(
 	bookmarkSelected: () -> Unit,
 	unbookmarkSelected: () -> Unit,
 	hasSelected: Boolean,
-	state: LazyListState,
 	windowSize: WindowSizeClass,
 	onSelectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
@@ -759,11 +751,8 @@ fun NovelInfoContent(
 				}
 
 				Box(Modifier.fillMaxSize()) {
-					LazyColumnScrollbar(
-						listState = state,
-						thumbColor = MaterialTheme.colorScheme.primary,
-						thumbSelectedColor = Color.Gray,
-					) {
+					val state = rememberLazyListState()
+					LazyColumnScrollbar(listState = state) {
 						LazyColumn(
 							modifier = Modifier.fillMaxSize(),
 							state = state,
@@ -782,7 +771,7 @@ fun NovelInfoContent(
 								}
 							}
 
-							stickyHeader {
+							stickyHeader(key = "sticky:chapter") {
 								Surface(tonalElevation = 1.dp) {
 									NovelChapterBar(
 										chapters?.size ?: 0,
@@ -792,11 +781,7 @@ fun NovelInfoContent(
 								}
 							}
 
-							if (chapters != null)
-								NovelInfoChaptersContent(
-									chapters,
-									chapterContent
-								)
+							if (chapters != null) items(chapters) { chapterContent(it) }
 						}
 					}
 
@@ -954,13 +939,6 @@ fun PreviewChapterContent() {
 			selectionMode = false
 		)
 	}
-}
-
-fun LazyListScope.NovelInfoChaptersContent(
-	chapters: List<ChapterUI>,
-	chapterContent: @Composable (ChapterUI) -> Unit
-) {
-	items(chapters) { chapterContent(it) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

@@ -65,7 +65,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -215,11 +214,7 @@ fun DownloadsContent(
 			) {
 				val state = rememberLazyListState()
 
-				LazyColumnScrollbar(
-					listState = state,
-					thumbColor = MaterialTheme.colorScheme.primary,
-					thumbSelectedColor = Color.Gray,
-				) {
+				LazyColumnScrollbar(listState = state) {
 					LazyColumn(
 						modifier = Modifier.fillMaxSize(),
 						contentPadding = PaddingValues(bottom = 140.dp),
