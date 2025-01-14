@@ -71,8 +71,7 @@ fun NavGraphBuilder.mainGraph(
 			},
 			openInWebView = context::openInWebView,
 			openChapter = context::openChapter,
-			onBack = navController::popBackStack,
-			drawerIcon = drawerIcon
+			onBack = navController::popBackStack
 		)
 	}
 
