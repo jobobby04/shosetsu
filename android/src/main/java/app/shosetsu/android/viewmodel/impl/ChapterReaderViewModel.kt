@@ -43,6 +43,7 @@ import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
+import app.shosetsu.android.common.utils.transformCatching
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.INovelReaderSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
@@ -62,14 +63,14 @@ import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
+import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
+import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
-import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
-import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
+import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
@@ -264,7 +265,7 @@ class ChapterReaderViewModel(
 	}
 
 	private val stringMap = HashMap<Int, Flow<ChapterPassage>>()
-	private val refreshMap = HashMap<Int, MutableStateFlow<Boolean>>()
+	private val refreshMap = HashMap<Int, MutableSharedFlow<Unit>>()
 
 	override val isFirstFocusFlow: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderIsFirstFocus)
@@ -316,12 +317,13 @@ class ChapterReaderViewModel(
 
 	@Suppress("NOTHING_TO_INLINE") // We need every ns
 	private inline fun getRefreshFlow(item: ReaderChapterUI) =
-		refreshMap.getOrPut(item.id) { MutableStateFlow(false) }
+		refreshMap.getOrPut(item.id) { MutableSharedFlow<Unit>(replay = 1).apply {
+			viewModelScopeIO.launch { emit(Unit) }
+		} }
 
 	override fun retryChapter(item: ReaderChapterUI) {
-		//logV("$item")
 		val flow = getRefreshFlow(item)
-		flow.value = !flow.value
+		viewModelScopeIO.launch { flow.emit(Unit) }
 	}
 
 	private var cleanStringMapJob: Job? = null
@@ -388,7 +390,7 @@ class ChapterReaderViewModel(
 	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
 		val mutableFlow = stringMap.getOrPut(item.id) {
 			getRefreshFlow(item)
-				.transformLatest {
+				.transformCatching<Unit, ChapterPassage>(exceptional = { emit(ChapterPassage.Error(it)) }) {
 					emit(ChapterPassage.Loading)
 					val bytes = getChapterPassage(item)
 						?: throw Exception("No content received")
@@ -456,7 +458,6 @@ class ChapterReaderViewModel(
 						}
 					)
 				}
-				.catch { emit(ChapterPassage.Error(it)) }
 				.onIO()
 				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 		}
