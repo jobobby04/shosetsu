@@ -273,7 +273,7 @@ dependencies {
 
 
 	// Core libraries
-	implementation("org.luaj:luaj-jse:3.0.1")
+	implementation(libs.luaj.jse)
 	implementation("com.gitlab.shosetsuorg:kotlin-lib:9591ef55b2761cca78d3b32175326990d30d7167")
 	implementation("org.jsoup:jsoup:1.17.2")
 
