@@ -357,12 +357,6 @@ dependencies {
 	}*/
 
 	// Compose
-	val androidxCompose = "1.5.4"
-	fun androidxCompose(
-		module: String,
-		submodule: String = module,
-		version: String = androidxCompose
-	) = "androidx.compose.$submodule:$module:$version"
 
 	implementation(platform(libs.androidx.compose.bom))
 	implementation(libs.androidx.compose.runtime)
@@ -389,7 +383,7 @@ dependencies {
 	implementation(accompanist("accompanist-systemuicontroller"))
 
 	//- Integration with observables
-	implementation(androidxCompose("runtime-livedata", "runtime"))
+	implementation(libs.androidx.compose.runtime.livedata)
 
 	// MDC Adapter
 	implementation(accompanist("accompanist-themeadapter-material"))
