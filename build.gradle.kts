@@ -9,7 +9,7 @@ plugins {
 }
 
 buildscript {
-	val kotlinVersion: String by extra("2.1.0")
+	val kotlinVersion: String by extra("")
 
 	repositories {
 		google()
@@ -18,8 +18,8 @@ buildscript {
 
 	dependencies {
 		classpath(libs.gradle)
-		classpath(kotlin("gradle-plugin", version = kotlinVersion))
-		classpath(kotlin("serialization", version = kotlinVersion))
+		classpath(libs.kotlin.gradle.plugin)
+		classpath(libs.kotlin.serialization)
 	}
 }
 
