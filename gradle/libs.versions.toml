@@ -11,6 +11,7 @@ jodaTime = "2.12.7"
 jsoup = "1.17.2"
 junit = "4.13.2"
 kotlinLib = "9591ef55b2761cca78d3b32175326990d30d7167"
+kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesAndroid = "1.8.0"
 lifecycleRuntimeKtx = "2.7.0"
 luajJse = "3.0.1"
@@ -39,6 +40,7 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 joda-time = { module = "joda-time:joda-time", version.ref = "jodaTime" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 shosetsuorg-klib = { module = "com.gitlab.shosetsuorg:kotlin-lib", version.ref = "kotlinLib" }
 luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }
