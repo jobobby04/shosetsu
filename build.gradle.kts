@@ -17,7 +17,7 @@ buildscript {
 	}
 
 	dependencies {
-		classpath("com.android.tools.build:gradle:8.7.2")
+		classpath("com.android.tools.build:gradle:8.8.0")
 		classpath(kotlin("gradle-plugin", version = kotlinVersion))
 		classpath(kotlin("serialization", version = kotlinVersion))
 	}
