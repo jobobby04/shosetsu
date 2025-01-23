@@ -1,6 +1,6 @@
 [versions]
 accompanist = "0.32.0"
-activityCompose = "1.8.2"
+activity = "1.8.2"
 annotation = "1.7.1"
 appcompat = "1.6.1"
 bottomsheetdialogCompose = "1.5.0"
@@ -36,6 +36,9 @@ window = "1.2.0"
 workRuntime = "2.9.0"
 
 [libraries]
+androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 google-accompanist-appcompat-theme = { module = "com.google.accompanist:accompanist-appcompat-theme", version.ref = "accompanist" }
 google-accompanist-themeadapter-material3 = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist" }
 google-accompanist-themeadapter-material = { module = "com.google.accompanist:accompanist-themeadapter-material", version.ref = "accompanist" }
@@ -44,7 +47,6 @@ google-accompanist-permissions = { module = "com.google.accompanist:accompanist-
 google-accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanist" }
 google-accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
 google-accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-compose-animation-core = { module = "androidx.compose.animation:animation-core" }
 androidx-compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 androidx-compose-animation = { module = "androidx.compose.animation:animation" }

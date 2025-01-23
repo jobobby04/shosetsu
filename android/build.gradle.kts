@@ -386,12 +386,9 @@ dependencies {
 	implementation(libs.google.accompanist.themeadapter.material)
 	implementation(libs.google.accompanist.themeadapter.material3)
 
-	val androidxActivity = "1.7.2"
-	fun androidxActivity(module: String, version: String = androidxActivity) =
-		"androidx.activity:$module:$version"
-	implementation(androidxActivity("activity"))
-	implementation(androidxActivity("activity-ktx"))
-	implementation(androidxActivity("activity-compose"))
+	implementation(libs.androidx.activity)
+	implementation(libs.androidx.activity.ktx)
+	implementation(libs.androidx.activity.compose)
 
 	implementation(libs.numberpicker)
 
