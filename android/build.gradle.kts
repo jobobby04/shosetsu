@@ -51,7 +51,7 @@ fun loadSProperties(name: String): Properties {
 	return properties
 }
 
-val CI_MODE = System.getenv("CI_MODE") == "true" || true
+val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
 	compileSdk = 35
