@@ -22,6 +22,7 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx"
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-compose-material3-wsc = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3WindowSizeClass" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-window = { module = "androidx.window:window", version.ref = "window" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
