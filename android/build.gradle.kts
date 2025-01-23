@@ -287,7 +287,7 @@ dependencies {
 	//implementation("com.zhkrb.cloudflare-scrape-android:scrape-webview:0.0.3")
 
 	// Network
-	implementation("com.squareup.okhttp3:okhttp:4.12.0")
+	implementation(libs.okhttp)
 
 	// Kotlin libraries
 	implementation(kotlin("stdlib-jdk8"))
