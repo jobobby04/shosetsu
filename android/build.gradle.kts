@@ -228,6 +228,8 @@ android.applicationVariants.forEach { variant ->
 dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
+	implementation(platform(libs.kotlin.bom))
+
 	// Google view things
 	implementation(libs.google.material)
 

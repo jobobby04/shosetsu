@@ -113,6 +113,7 @@ kodein-di-framework-androidx-viewmodel = { module = "org.kodein.di:kodein-di-fra
 kodein-di-framework-androidx-viewmodel-savedstate = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate", version.ref = "kodein" }
 kodein-di-jvm = { module = "org.kodein.di:kodein-di-jvm", version.ref = "kodein" }
 # Kotlin
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
