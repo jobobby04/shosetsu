@@ -408,7 +408,7 @@ dependencies {
 	implementation(libs.numberpicker)
 
 	// QR Code
-	implementation("io.github.g0dkar:qrcode-kotlin-android:4.1.1")
+	implementation(libs.qrcode)
 
 	// - paging
 	val pagingVersion = "3.2.1"
