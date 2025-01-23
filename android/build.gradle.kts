@@ -241,7 +241,7 @@ dependencies {
 	implementation(libs.androidx.core.splashscreen)
 	implementation(libs.androidx.coordinatorlayout)
 	implementation(libs.androidx.window)
-	implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+	implementation(libs.androidx.compose.material3.wsc)
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 	implementation("androidx.activity:activity-compose:1.8.2")
 
