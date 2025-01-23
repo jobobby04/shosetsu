@@ -1,6 +1,9 @@
 [versions]
+workRuntime = "2.9.0"
 
 [libraries]
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
 
 [plugins]

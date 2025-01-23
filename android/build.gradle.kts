@@ -232,8 +232,8 @@ dependencies {
 	implementation(libs.google.material)
 
 	// Androidx
-	implementation("androidx.work:work-runtime:2.9.0")
-	implementation("androidx.work:work-runtime-ktx:2.9.0")
+	implementation(libs.androidx.work.runtime)
+	implementation(libs.androidx.work.runtime.ktx)
 	implementation("androidx.appcompat:appcompat:1.6.1")
 	implementation("androidx.annotation:annotation:1.7.1")
 	implementation("androidx.core:core-ktx:1.12.0")
