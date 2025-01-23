@@ -7,6 +7,7 @@ collectionKtx = "1.4.0"
 coordinatorlayout = "1.2.0"
 coreKtx = "1.12.0"
 coreSplashscreen = "1.0.1"
+desugar_jdk_libs = "2.1.4"
 guava = "33.0.0-android"
 jodaTime = "2.12.7"
 jsoup = "1.17.2"
@@ -39,6 +40,7 @@ androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-testmanifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-window = { module = "androidx.window:window", version.ref = "window" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
