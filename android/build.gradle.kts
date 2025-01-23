@@ -368,16 +368,16 @@ dependencies {
 	) = "androidx.compose.$submodule:$module:$version"
 
 	implementation(platform(libs.androidx.compose.bom))
-	implementation("androidx.compose.runtime:runtime")
-	implementation("androidx.compose.ui:ui")
-	implementation("androidx.compose.ui:ui-tooling")
-	implementation("androidx.compose.ui:ui-graphics")
-	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3")
-	implementation("androidx.compose.foundation:foundation")
-	implementation("androidx.compose.animation:animation")
-	implementation("androidx.compose.animation:animation-graphics")
-	implementation("androidx.compose.animation:animation-core")
+	implementation(libs.androidx.compose.runtime)
+	implementation(libs.androidx.compose.ui)
+	implementation(libs.androidx.compose.ui.tooling)
+	implementation(libs.androidx.compose.ui.graphics)
+	implementation(libs.androidx.compose.ui.tooling.preview)
+	implementation(libs.androidx.compose.material3)
+	implementation(libs.androidx.foundation)
+	implementation(libs.androidx.compose.animation)
+	implementation(libs.androidx.compose.animation.graphics)
+	implementation(libs.androidx.compose.animation.core)
 
 	// - accompanist
 	val accompanistVersion = "0.32.0"
