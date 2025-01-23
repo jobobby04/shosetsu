@@ -243,7 +243,7 @@ dependencies {
 	implementation(libs.androidx.window)
 	implementation(libs.androidx.compose.material3.wsc)
 	implementation(libs.androidx.lifecycle.runtime.ktx)
-	implementation("androidx.activity:activity-compose:1.8.2")
+	implementation(libs.androidx.activity.compose)
 
 	implementation(platform("androidx.compose:compose-bom:2024.02.02"))
 	androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
