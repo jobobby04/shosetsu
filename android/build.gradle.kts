@@ -269,7 +269,7 @@ dependencies {
 	testImplementation(libs.junit)
 	testImplementation(libs.androidx.test.ext.junit)
 	androidTestImplementation(libs.androidx.test.runner)
-	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+	androidTestImplementation(libs.androidx.test.espresso.core)
 
 
 	// Core libraries
