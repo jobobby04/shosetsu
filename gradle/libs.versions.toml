@@ -6,6 +6,7 @@ coordinatorlayout = "1.2.0"
 coreKtx = "1.12.0"
 coreSplashscreen = "1.0.1"
 okhttp = "4.12.0"
+window = "1.2.0"
 workRuntime = "2.9.0"
 
 [libraries]
@@ -15,6 +16,7 @@ androidx-collection-ktx = { module = "androidx.collection:collection-ktx", versi
 androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "coordinatorlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-window = { module = "androidx.window:window", version.ref = "window" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
