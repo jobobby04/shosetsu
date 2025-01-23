@@ -38,6 +38,7 @@ runner = "1.5.2"
 runtimeLivedata = "1.5.4"
 window = "1.2.0"
 workRuntime = "2.9.0"
+ksp="2.1.0-1.0.29"
 
 [libraries]
 acra-dialog = { module = "ch.acra:acra-dialog", version.ref = "acra" }
@@ -118,3 +119,4 @@ luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]
+google-ksp = {id="com.google.devtools.ksp", version.ref="ksp"}

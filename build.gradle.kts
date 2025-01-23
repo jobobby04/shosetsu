@@ -4,7 +4,7 @@ import java.io.BufferedReader
 import java.io.IOException
 
 plugins {
-	id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+	alias(libs.plugins.google.ksp)
 	id("org.jetbrains.kotlin.plugin.compose") version "2.1.0" apply false
 }
 

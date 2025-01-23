@@ -8,7 +8,7 @@ plugins {
 	id("com.android.application")
 	kotlin("android")
 	kotlin("plugin.serialization")
-	id("com.google.devtools.ksp")
+	alias(libs.plugins.google.ksp)
 	id("org.jetbrains.kotlin.plugin.compose")
 }
 
