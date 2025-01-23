@@ -238,7 +238,7 @@ dependencies {
 	implementation(libs.androidx.annotation)
 	implementation(libs.androidx.core.ktx)
 	implementation(libs.androidx.collection.ktx)
-	implementation("androidx.core:core-splashscreen:1.0.1")
+	implementation(libs.androidx.core.splashscreen)
 	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 	implementation("androidx.window:window:1.2.0")
 	implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
