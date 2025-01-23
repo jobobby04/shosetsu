@@ -124,3 +124,5 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 [plugins]
 google-ksp = {id="com.google.devtools.ksp", version.ref="ksp"}
 kotlin-compose = {id="org.jetbrains.kotlin.plugin.compose", version.ref="kotlin"}
+kotlin-android = {id="org.jetbrains.kotlin.android"}
+kotlin-serialization = {id="org.jetbrains.kotlin.plugin.serialization"}

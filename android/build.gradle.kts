@@ -6,8 +6,8 @@ import java.io.InputStreamReader
 
 plugins {
 	id("com.android.application")
-	kotlin("android")
-	kotlin("plugin.serialization")
+	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.google.ksp)
 	alias(libs.plugins.kotlin.compose)
 }
