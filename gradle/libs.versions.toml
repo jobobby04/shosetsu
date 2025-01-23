@@ -6,6 +6,7 @@ collectionKtx = "1.4.0"
 coordinatorlayout = "1.2.0"
 coreKtx = "1.12.0"
 coreSplashscreen = "1.0.1"
+jsoup = "1.17.2"
 junit = "4.13.2"
 kotlinLib = "9591ef55b2761cca78d3b32175326990d30d7167"
 lifecycleRuntimeKtx = "2.7.0"
@@ -31,6 +32,7 @@ androidx-window = { module = "androidx.window:window", version.ref = "window" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
 shosetsuorg-klib = { module = "com.gitlab.shosetsuorg:kotlin-lib", version.ref = "kotlinLib" }
 luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }

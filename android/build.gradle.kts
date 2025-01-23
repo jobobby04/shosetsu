@@ -275,7 +275,7 @@ dependencies {
 	// Core libraries
 	implementation(libs.luaj.jse)
 	implementation(libs.shosetsuorg.klib)
-	implementation("org.jsoup:jsoup:1.17.2")
+	implementation(libs.jsoup)
 
 	// Image loading
 	implementation("io.coil-kt:coil-compose:2.6.0")
