@@ -4,12 +4,12 @@ import java.io.BufferedReader
 import java.io.IOException
 
 plugins {
-	id("com.google.devtools.ksp") version "1.9.21-1.0.16"
-	id("org.jetbrains.kotlin.android") version "1.9.0" apply false
+	id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+	id("org.jetbrains.kotlin.plugin.compose") version "2.1.0" apply false
 }
 
 buildscript {
-	val kotlinVersion: String by extra("1.9.21")
+	val kotlinVersion: String by extra("2.1.0")
 
 	repositories {
 		google()
