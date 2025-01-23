@@ -5,7 +5,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 plugins {
-	id("com.android.application")
+	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.android)
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.google.ksp)

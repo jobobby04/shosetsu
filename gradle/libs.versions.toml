@@ -122,6 +122,7 @@ luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]
+android-application = {id="com.android.application"}
 google-ksp = {id="com.google.devtools.ksp", version.ref="ksp"}
 kotlin-compose = {id="org.jetbrains.kotlin.plugin.compose", version.ref="kotlin"}
 kotlin-android = {id="org.jetbrains.kotlin.android"}
