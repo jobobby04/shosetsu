@@ -416,11 +416,7 @@ dependencies {
 	implementation(paging("paging-compose"))
 	implementation(kotlin("reflect"))
 
-	val navVersion = "2.8.5"
-	fun navigation(module: String, version: String = navVersion) =
-		"androidx.navigation:navigation-$module:$version"
-
-	implementation(navigation("compose"))
+	implementation(libs.androidx.navigation.compose)
 
 	coreLibraryDesugaring(libs.desugar)
 
