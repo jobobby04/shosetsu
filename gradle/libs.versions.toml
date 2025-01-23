@@ -1,12 +1,14 @@
 [versions]
 annotation = "1.7.1"
 appcompat = "1.6.1"
+coreKtx = "1.12.0"
 okhttp = "4.12.0"
 workRuntime = "2.9.0"
 
 [libraries]
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
