@@ -348,7 +348,7 @@ dependencies {
 	implementation(libs.kotlinx.coroutines.jdk8)
 
 	// KTX - Serialization
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+	implementation(libs.kotlinx.serialization.json)
 
 	// Roomigrant
 	/*val enableRoomigrant = false

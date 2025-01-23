@@ -15,6 +15,7 @@ kotlinLib = "9591ef55b2761cca78d3b32175326990d30d7167"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesAndroid = "1.8.0"
 kotlinxCoroutinesJdk8 = "1.8.0"
+kotlinxSerializationJson = "1.6.3"
 lifecycleRuntimeKtx = "2.7.0"
 luajJse = "3.0.1"
 material3WindowSizeClass = "1.2.1"
@@ -46,6 +47,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutinesJdk8" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 shosetsuorg-klib = { module = "com.gitlab.shosetsuorg:kotlin-lib", version.ref = "kotlinLib" }
 luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
