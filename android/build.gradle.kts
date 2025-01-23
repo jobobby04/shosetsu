@@ -229,7 +229,7 @@ dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
 	// Google view things
-	implementation("com.google.android.material:material:1.10.0")
+	implementation(libs.google.material)
 
 	// Androidx
 	implementation("androidx.work:work-runtime:2.9.0")
