@@ -267,7 +267,7 @@ dependencies {
 
 	// Test classes
 	testImplementation(libs.junit)
-	testImplementation("androidx.test.ext:junit:1.1.5")
+	testImplementation(libs.androidx.test.ext.junit)
 	androidTestImplementation("androidx.test:runner:1.5.2")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 

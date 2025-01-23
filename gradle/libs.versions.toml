@@ -14,6 +14,7 @@ guava = "33.0.0-android"
 jodaTime = "2.12.7"
 jsoup = "1.17.2"
 junit = "4.13.2"
+junitVersion = "1.1.5"
 kotlinLib = "9591ef55b2761cca78d3b32175326990d30d7167"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesAndroid = "1.8.0"
@@ -38,6 +39,7 @@ androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorl
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-compose-material3-wsc = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3WindowSizeClass" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-testmanifest = { module = "androidx.compose.ui:ui-test-manifest" }
