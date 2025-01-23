@@ -367,7 +367,7 @@ dependencies {
 		version: String = androidxCompose
 	) = "androidx.compose.$submodule:$module:$version"
 
-	implementation(platform("androidx.compose:compose-bom:2024.02.02"))
+	implementation(platform(libs.androidx.compose.bom))
 	implementation("androidx.compose.runtime:runtime")
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-tooling")
