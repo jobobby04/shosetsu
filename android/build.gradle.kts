@@ -256,13 +256,10 @@ dependencies {
 
 	// - Life Cycle
 
-	val lifecycleVersion = "2.6.2"
-	fun lifecycle(module: String, version: String = lifecycleVersion) =
-		"androidx.lifecycle:lifecycle-$module:$version"
-	implementation(lifecycle("viewmodel-ktx"))
-	implementation(lifecycle("viewmodel-compose"))
-	implementation(lifecycle("viewmodel-savedstate"))
-	implementation(lifecycle("runtime-ktx"))
+	implementation(libs.androidx.lifecycle.viewmodel.ktx)
+	implementation(libs.androidx.lifecycle.viewmodel.compose)
+	implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+	implementation(libs.androidx.lifecycle.runtime.ktx)
 
 
 	// Test classes
