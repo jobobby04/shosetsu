@@ -405,7 +405,7 @@ dependencies {
 	implementation(androidxActivity("activity-ktx"))
 	implementation(androidxActivity("activity-compose"))
 
-	implementation("com.chargemap.compose:numberpicker:1.0.3")
+	implementation(libs.numberpicker)
 
 	// QR Code
 	implementation("io.github.g0dkar:qrcode-kotlin-android:4.1.1")
