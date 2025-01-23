@@ -427,5 +427,5 @@ dependencies {
 
 	coreLibraryDesugaring(libs.desugar)
 
-	implementation("com.holix.android:bottomsheetdialog-compose:1.5.0")
+	implementation(libs.bottomsheetdialog)
 }
