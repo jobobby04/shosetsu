@@ -23,8 +23,7 @@ kodein = "7.20.2"
 kotlin = "2.1.0"
 kotlinLib = "9591ef55b2761cca78d3b32175326990d30d7167"
 kotlinxCollectionsImmutable = "0.3.7"
-kotlinxCoroutinesAndroid = "1.8.0"
-kotlinxCoroutinesJdk8 = "1.8.0"
+kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.6.3"
 ksp = "2.1.0-1.0.29"
 lifecycle = "2.7.0"
@@ -116,8 +115,8 @@ kodein-di-jvm = { module = "org.kodein.di:kodein-di-jvm", version.ref = "kodein"
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
-kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutinesJdk8" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }
 numberpicker = { module = "com.chargemap.compose:numberpicker", version.ref = "numberpicker" }
