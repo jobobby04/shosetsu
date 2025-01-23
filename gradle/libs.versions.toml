@@ -39,6 +39,7 @@ runtimeLivedata = "1.5.4"
 window = "1.2.0"
 workRuntime = "2.9.0"
 ksp="2.1.0-1.0.29"
+kotlin="2.1.0"
 
 [libraries]
 acra-dialog = { module = "ch.acra:acra-dialog", version.ref = "acra" }
@@ -120,3 +121,4 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]
 google-ksp = {id="com.google.devtools.ksp", version.ref="ksp"}
+kotlin-compose = {id="org.jetbrains.kotlin.plugin.compose", version.ref="kotlin"}

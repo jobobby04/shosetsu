@@ -5,7 +5,7 @@ import java.io.IOException
 
 plugins {
 	alias(libs.plugins.google.ksp)
-	id("org.jetbrains.kotlin.plugin.compose") version "2.1.0" apply false
+	alias(libs.plugins.kotlin.compose) apply false
 }
 
 buildscript {

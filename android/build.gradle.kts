@@ -9,7 +9,7 @@ plugins {
 	kotlin("android")
 	kotlin("plugin.serialization")
 	alias(libs.plugins.google.ksp)
-	id("org.jetbrains.kotlin.plugin.compose")
+	alias(libs.plugins.kotlin.compose)
 }
 
 @Throws(IOException::class)
