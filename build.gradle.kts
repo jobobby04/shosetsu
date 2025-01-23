@@ -9,8 +9,6 @@ plugins {
 }
 
 buildscript {
-	val kotlinVersion: String by extra("")
-
 	repositories {
 		google()
 		mavenCentral()
