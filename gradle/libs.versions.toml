@@ -107,10 +107,10 @@ junit = { module = "junit:junit", version.ref = "junit" }
 # Kodein
 kodein-di = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kodein-di-framework-android-core = { module = "org.kodein.di:kodein-di-framework-android-core", version.ref = "kodein" }
-kodein-di-framework-androidx-viewmodel-savedstate = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate", version.ref = "kodein" }
-kodein-di-framework-androidx-viewmodel = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel", version.ref = "kodein" }
-kodein-di-framework-androidx = { module = "org.kodein.di:kodein-di-framework-android-x", version.ref = "kodein" }
 kodein-di-framework-android-support = { module = "org.kodein.di:kodein-di-framework-android-support", version.ref = "kodein" }
+kodein-di-framework-androidx = { module = "org.kodein.di:kodein-di-framework-android-x", version.ref = "kodein" }
+kodein-di-framework-androidx-viewmodel = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel", version.ref = "kodein" }
+kodein-di-framework-androidx-viewmodel-savedstate = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate", version.ref = "kodein" }
 kodein-di-jvm = { module = "org.kodein.di:kodein-di-jvm", version.ref = "kodein" }
 # Kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
