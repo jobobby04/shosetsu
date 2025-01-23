@@ -2,6 +2,7 @@
 activityCompose = "1.8.2"
 annotation = "1.7.1"
 appcompat = "1.6.1"
+coilCompose = "2.6.0"
 collectionKtx = "1.4.0"
 coordinatorlayout = "1.2.0"
 coreKtx = "1.12.0"
@@ -29,6 +30,7 @@ androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtim
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-testmanifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-window = { module = "androidx.window:window", version.ref = "window" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
