@@ -234,7 +234,7 @@ dependencies {
 	// Androidx
 	implementation(libs.androidx.work.runtime)
 	implementation(libs.androidx.work.runtime.ktx)
-	implementation("androidx.appcompat:appcompat:1.6.1")
+	implementation(libs.androidx.appcompat)
 	implementation("androidx.annotation:annotation:1.7.1")
 	implementation("androidx.core:core-ktx:1.12.0")
 	implementation("androidx.collection:collection-ktx:1.4.0")
