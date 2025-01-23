@@ -322,17 +322,14 @@ dependencies {
 	implementation(libs.google.guava)
 
 	// kode-in
-	val kodeinVersion = "7.20.2"
-	fun kodein(module: String, version: String = kodeinVersion) =
-		"org.kodein.di:kodein-di$module:$version"
 
-	implementation(kodein(""))
-	implementation(kodein("-jvm"))
-	implementation(kodein("-framework-android-core"))
-	implementation(kodein("-framework-android-support"))
-	implementation(kodein("-framework-android-x"))
-	implementation(kodein("-framework-android-x-viewmodel"))
-	implementation(kodein("-framework-android-x-viewmodel-savedstate"))
+	implementation(libs.kodein.di)
+	implementation(libs.kodein.di.jvm)
+	implementation(libs.kodein.di.framework.android.core)
+	implementation(libs.kodein.di.framework.android.support)
+	implementation(libs.kodein.di.framework.androidx)
+	implementation(libs.kodein.di.framework.androidx.viewmodel)
+	implementation(libs.kodein.di.framework.androidx.viewmodel.savedstate)
 
 	// KTX
 

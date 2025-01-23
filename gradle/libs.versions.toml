@@ -18,6 +18,7 @@ jodaTime = "2.12.7"
 jsoup = "1.17.2"
 junit = "4.13.2"
 junitVersion = "1.1.5"
+kodein = "7.20.2"
 kotlinLib = "9591ef55b2761cca78d3b32175326990d30d7167"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesAndroid = "1.8.0"
@@ -97,6 +98,13 @@ google-guava = { module = "com.google.guava:guava", version.ref = "guava" }
 joda-time = { module = "joda-time:joda-time", version.ref = "jodaTime" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kodein-di = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
+kodein-di-framework-android-core = { module = "org.kodein.di:kodein-di-framework-android-core", version.ref = "kodein" }
+kodein-di-framework-androidx-viewmodel-savedstate = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate", version.ref = "kodein" }
+kodein-di-framework-androidx-viewmodel = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel", version.ref = "kodein" }
+kodein-di-framework-androidx = { module = "org.kodein.di:kodein-di-framework-android-x", version.ref = "kodein" }
+kodein-di-framework-android-support = { module = "org.kodein.di:kodein-di-framework-android-support", version.ref = "kodein" }
+kodein-di-jvm = { module = "org.kodein.di:kodein-di-jvm", version.ref = "kodein" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutinesJdk8" }
