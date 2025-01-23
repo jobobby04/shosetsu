@@ -6,6 +6,7 @@ collectionKtx = "1.4.0"
 coordinatorlayout = "1.2.0"
 coreKtx = "1.12.0"
 coreSplashscreen = "1.0.1"
+junit = "4.13.2"
 lifecycleRuntimeKtx = "2.7.0"
 material3WindowSizeClass = "1.2.1"
 okhttp = "4.12.0"
@@ -28,6 +29,7 @@ androidx-window = { module = "androidx.window:window", version.ref = "window" }
 google-material = { group = "com.google.android.material", name = "material", version = "1.10.0" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "workRuntime" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
+junit = { module = "junit:junit", version.ref = "junit" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]
