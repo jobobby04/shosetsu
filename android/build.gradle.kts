@@ -345,7 +345,7 @@ dependencies {
 
 	// KTX
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.8.0")
+	implementation(libs.kotlinx.coroutines.jdk8)
 
 	// KTX - Serialization
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
