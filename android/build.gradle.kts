@@ -408,12 +408,10 @@ dependencies {
 	implementation(libs.qrcode)
 
 	// - paging
-	val pagingVersion = "3.2.1"
-	fun paging(module: String, version: String = pagingVersion) =
-		"androidx.paging:$module:$version"
 
-	implementation(paging("paging-runtime"))
-	implementation(paging("paging-compose"))
+	implementation(libs.androidx.paging.runtime)
+	implementation(libs.androidx.paging.compose)
+
 	implementation(kotlin("reflect"))
 
 	implementation(libs.androidx.navigation.compose)
