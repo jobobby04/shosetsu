@@ -311,15 +311,12 @@ dependencies {
 	 */
 
 	// Room
-	val roomVersion = "2.5.2"
-	fun room(module: String, version: String = roomVersion) =
-		"androidx.room:$module:$version"
 
-	implementation(room("room-runtime"))
-	annotationProcessor(room("room-compiler"))
-	ksp(room("room-compiler"))
-	implementation(room("room-ktx"))
-	implementation(room("room-paging"))
+	implementation(libs.androidx.room.runtime)
+	annotationProcessor(libs.androidx.room.compiler)
+	ksp(libs.androidx.room.compiler)
+	implementation(libs.androidx.room.ktx)
+	implementation(libs.androidx.room.paging)
 
 	// Guava cache
 	implementation(libs.google.guava)
