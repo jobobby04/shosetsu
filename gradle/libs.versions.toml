@@ -2,7 +2,7 @@
 accompanist = "0.32.0"
 acra = "5.11.2"
 activity = "1.10.0"
-annotation = "1.7.1"
+annotation = "1.9.1"
 appcompat = "1.6.1"
 bottomsheetdialogCompose = "1.5.0"
 coilCompose = "2.6.0"
