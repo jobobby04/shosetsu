@@ -39,7 +39,7 @@ room = "2.6.1"
 runner = "1.6.2"
 runtimeLivedata = "1.5.4"
 window = "1.2.0"
-workRuntime = "2.9.0"
+workRuntime = "2.10.0"
 
 [libraries]
 acra-dialog = { module = "ch.acra:acra-dialog", version.ref = "acra" }
