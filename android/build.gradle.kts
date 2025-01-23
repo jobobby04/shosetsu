@@ -371,23 +371,20 @@ dependencies {
 	implementation(libs.androidx.compose.animation.core)
 
 	// - accompanist
-	val accompanistVersion = "0.32.0"
-	fun accompanist(module: String, version: String = accompanistVersion) =
-		"com.google.accompanist:$module:$version"
 
-	implementation(accompanist("accompanist-appcompat-theme"))
-	implementation(accompanist("accompanist-webview"))
-	implementation(accompanist("accompanist-placeholder-material"))
-	implementation(accompanist("accompanist-pager-indicators"))
-	implementation(accompanist("accompanist-permissions"))
-	implementation(accompanist("accompanist-systemuicontroller"))
+	implementation(libs.google.accompanist.appcompat.theme)
+	implementation(libs.google.accompanist.webview)
+	implementation(libs.google.accompanist.placeholder.material)
+	implementation(libs.google.accompanist.pager.indicators)
+	implementation(libs.google.accompanist.permissions)
+	implementation(libs.google.accompanist.systemuicontroller)
 
 	//- Integration with observables
 	implementation(libs.androidx.compose.runtime.livedata)
 
 	// MDC Adapter
-	implementation(accompanist("accompanist-themeadapter-material"))
-	implementation(accompanist("accompanist-themeadapter-material3"))
+	implementation(libs.google.accompanist.themeadapter.material)
+	implementation(libs.google.accompanist.themeadapter.material3)
 
 	val androidxActivity = "1.7.2"
 	fun androidxActivity(module: String, version: String = androidxActivity) =
