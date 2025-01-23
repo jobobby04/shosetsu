@@ -1,5 +1,6 @@
 [versions]
 accompanist = "0.32.0"
+acra = "5.11.2"
 activity = "1.8.2"
 annotation = "1.7.1"
 appcompat = "1.6.1"
@@ -36,6 +37,8 @@ window = "1.2.0"
 workRuntime = "2.9.0"
 
 [libraries]
+acra-dialog = { module = "ch.acra:acra-dialog", version.ref = "acra" }
+acra-http = { module = "ch.acra:acra-http", version.ref = "acra" }
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity" }

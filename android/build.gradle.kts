@@ -295,12 +295,9 @@ dependencies {
 	implementation(libs.kotlinx.collections.immutable)
 
 	// Error logging
-	val acraVersion = "5.11.2"
-	fun acra(module: String, version: String = acraVersion) =
-		"ch.acra:$module:$version"
 
-	implementation(acra("acra-http"))
-	implementation(acra("acra-dialog"))
+	implementation(libs.acra.http)
+	implementation(libs.acra.dialog)
 
 	// Conductor
 	/*
