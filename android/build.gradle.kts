@@ -252,7 +252,7 @@ dependencies {
 	androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
 
 	debugImplementation(libs.androidx.compose.ui.tooling)
-	debugImplementation("androidx.compose.ui:ui-test-manifest")
+	debugImplementation(libs.androidx.compose.ui.testmanifest)
 
 	// - Life Cycle
 
