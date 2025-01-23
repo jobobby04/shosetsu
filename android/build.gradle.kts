@@ -245,11 +245,11 @@ dependencies {
 	implementation(libs.androidx.lifecycle.runtime.ktx)
 	implementation(libs.androidx.activity.compose)
 
-	implementation(platform("androidx.compose:compose-bom:2024.02.02"))
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+	implementation(platform(libs.androidx.compose.bom))
+	androidTestImplementation(platform(libs.androidx.compose.bom))
 
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+	androidTestImplementation(platform(libs.androidx.compose.bom))
 
 	debugImplementation(libs.androidx.compose.ui.tooling)
 	debugImplementation(libs.androidx.compose.ui.testmanifest)
