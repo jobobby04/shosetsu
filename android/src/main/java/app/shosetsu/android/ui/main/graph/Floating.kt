@@ -3,8 +3,8 @@ package app.shosetsu.android.ui.main.graph
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import app.shosetsu.android.common.consts.BundleKeys
-import app.shosetsu.android.ui.main.Destination
+import androidx.navigation.toRoute
+import app.shosetsu.android.ui.main.Destination.More.TextReader
 import app.shosetsu.android.ui.settings.sub.TextAssetReaderView
 
 /*
@@ -31,8 +31,8 @@ import app.shosetsu.android.ui.settings.sub.TextAssetReaderView
  * @author Doomsdayrs
  */
 fun NavGraphBuilder.assetReader(navController: NavController) {
-	composable(Destination.TEXT_READER.route, Destination.TEXT_READER.arguments) { entry ->
-		val assetId = entry.arguments!!.getInt(BundleKeys.BUNDLE_ID)
+	composable<TextReader> { entry ->
+		val assetId = entry.toRoute<TextReader>().assetId
 
 		TextAssetReaderView(
 			assetId,

@@ -4,22 +4,20 @@ import java.io.BufferedReader
 import java.io.IOException
 
 plugins {
-	id("com.google.devtools.ksp") version "1.9.21-1.0.16"
-	id("org.jetbrains.kotlin.android") version "1.9.0" apply false
+	alias(libs.plugins.google.ksp)
+	alias(libs.plugins.kotlin.compose) apply false
 }
 
 buildscript {
-	val kotlinVersion: String by extra("1.9.21")
-
 	repositories {
 		google()
 		mavenCentral()
 	}
 
 	dependencies {
-		classpath("com.android.tools.build:gradle:8.7.2")
-		classpath(kotlin("gradle-plugin", version = kotlinVersion))
-		classpath(kotlin("serialization", version = kotlinVersion))
+		classpath(libs.gradle)
+		classpath(libs.kotlin.gradle.plugin)
+		classpath(libs.kotlin.serialization)
 	}
 }
 

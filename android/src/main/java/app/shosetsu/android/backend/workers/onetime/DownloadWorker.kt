@@ -24,6 +24,7 @@ import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_DOWNLOAD
 import app.shosetsu.android.common.consts.WorkerTags.DOWNLOAD_WORK_ID
 import app.shosetsu.android.common.enums.DownloadStatus
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.DownloadEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository

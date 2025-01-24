@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hierarchy
 
 /*
  * This file is part of shosetsu.
@@ -37,16 +38,15 @@ import androidx.navigation.NavBackStackEntry
  * @author Doomsdayrs
  */
 @Composable
-fun <T> BottomNavigationBar(
-	destinations: List<T>,
+fun BottomNavigationBar(
+	destinations: List<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
+	onNavigate: (Root) -> Unit
+) {
 	var isVisible by remember { mutableStateOf(true) }
 
 	isVisible = destinations.any { destination ->
-		currentDestination?.destination?.route == destination.route ||
-				currentDestination?.destination?.route == "main"
+		currentDestination?.topIs(destination.viewOrigin) == true
 	}
 
 	if (isVisible) {
@@ -54,13 +54,13 @@ fun <T> BottomNavigationBar(
 			destinations.forEach { destination ->
 				NavigationBarItem(
 					selected =
-					currentDestination?.destination?.route == destination.route,
+					currentDestination?.has(destination) == true,
 					icon = {
 						Icon(
 							painterResource(
 								destination.icon
 							),
-							destination.route
+							destination::class.simpleName
 						)
 					},
 					label = {

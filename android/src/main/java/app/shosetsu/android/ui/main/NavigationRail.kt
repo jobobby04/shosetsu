@@ -33,20 +33,20 @@ import androidx.navigation.NavBackStackEntry
  * @author Doomsdayrs
  */
 @Composable
-fun <T> NavigationRail(
-	destinations: List<T>,
+fun NavigationRail(
+	destinations: List<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
+	onNavigate: (Root) -> Unit
+) {
 	NavigationRail {
 		destinations.forEach { destination ->
 			NavigationRailItem(
 				selected =
-				currentDestination?.destination?.route == destination.route,
+				currentDestination?.has(destination) == true,
 				icon = {
 					Icon(
 						painterResource(destination.icon),
-						destination.route
+						destination::class.simpleName
 					)
 				},
 				label = {

@@ -22,6 +22,7 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.WorkerTags.APP_UPDATE_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit

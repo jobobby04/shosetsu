@@ -5,7 +5,7 @@ import androidx.work.Data
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.WorkManager.getInstance
+import androidx.work.WorkManager.Companion.getInstance
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
