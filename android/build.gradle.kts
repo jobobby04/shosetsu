@@ -340,6 +340,9 @@ dependencies {
 	// KTX - Serialization
 	implementation(libs.kotlinx.serialization.json)
 
+	// Kryo
+	implementation(libs.kryo)
+
 	// Roomigrant
 	/*val enableRoomigrant = false
 

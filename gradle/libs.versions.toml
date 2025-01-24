@@ -22,10 +22,11 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 kodein = "7.20.2"
 kotlin = "2.1.0"
-kotlinLib = "5c04c7d99addc238600976fd5500c3ee67e72a6b"
+kotlinLib = "c7fd8b2aa5"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.8.0"
+kryo = "5.6.2"
 ksp = "2.1.0-1.0.29"
 lifecycle = "2.8.7"
 luajJse = "3.0.1"
@@ -124,7 +125,8 @@ luaj-jse = { module = "org.luaj:luaj-jse", version.ref = "luajJse" }
 numberpicker = { module = "com.chargemap.compose:numberpicker", version.ref = "numberpicker" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 qrcode = { module = "io.github.g0dkar:qrcode-kotlin-android", version.ref = "qrcodeKotlinAndroid" }
-shosetsuorg-klib = { module = "com.gitlab.jobobby04:kotlin-lib", version.ref = "kotlinLib" }
+kryo = { module = "com.esotericsoftware:kryo", version.ref = "kryo" }
+shosetsuorg-klib = { module = "com.gitlab.JFronny:shosetsu-kotlin-lib", version.ref = "kotlinLib" }
 
 [plugins]
 android-application = { id = "com.android.application" }

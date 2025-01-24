@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import app.shosetsu.android.common.utils.ListingSerializer
 import app.shosetsu.android.ui.browse.BrowseView
 import app.shosetsu.android.ui.catalogue.CatalogueView
 import app.shosetsu.android.ui.extensionsConfigure.ConfigureExtensionView
@@ -16,6 +17,7 @@ import app.shosetsu.android.ui.main.Destination.More.Repositories
 import app.shosetsu.android.ui.main.Destination.Novel
 import app.shosetsu.android.ui.main.Destination.Search
 import app.shosetsu.android.ui.search.SearchView
+import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.browseGraph(
 	navController: NavHostController,
@@ -25,7 +27,7 @@ fun NavGraphBuilder.browseGraph(
 		composable<Browse.View> {
 			BrowseView(
 				openCatalogue = {
-					navController.navigate(Catalog(it))
+					navController.navigate(Catalog(it, ListingSerializer.SerializableListing(null)))
 				},
 				openSettings = {
 					navController.navigate(ConfigureExtension(it))
@@ -40,14 +42,18 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<Catalog> { entry ->
-			val extensionId = entry.toRoute<Catalog>().extensionId
+		composable<Catalog>(typeMap = mapOf(typeOf<ListingSerializer.SerializableListing>() to ListingSerializer.NavParameter)) { entry ->
+			val route = entry.toRoute<Catalog>()
 			CatalogueView(
-				extensionId,
+				extensionId = route.extensionId,
 				onOpenNovel = {
 					navController.navigate(Novel(it))
 				},
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
+				onSelectListing = {
+					navController.navigate(Catalog(route.extensionId, ListingSerializer.SerializableListing(it)))
+				},
+				listing = route.listing.listing
 			)
 		}
 

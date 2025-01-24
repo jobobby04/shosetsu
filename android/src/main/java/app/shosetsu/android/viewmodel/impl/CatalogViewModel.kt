@@ -104,7 +104,8 @@ class CatalogViewModel(
 			val ext = getExtensionUseCase(extensionID)
 
 			// Ensure listings are initialized
-			selectedListing.value = ext?.listings()
+			if (selectedListing.value == null) selectedListing.compareAndSet(null, ext?.listings())
+
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
