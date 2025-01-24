@@ -13,6 +13,7 @@ import com.esotericsoftware.kryo.io.Output
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.ByteArraySerializer
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.IntArraySerializer
 import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.ObjectArraySerializer
+import com.esotericsoftware.kryo.serializers.DefaultArraySerializers.StringArraySerializer
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -22,6 +23,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import okhttp3.Headers
+import okhttp3.OkHttp
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LocVars
 import org.luaj.vm2.LuaBoolean
@@ -81,6 +84,7 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
 
             register<IntArray>(IntArraySerializer())
             register<ByteArray>(ByteArraySerializer())
+            register<Array<String>>(StringArraySerializer())
 
             register<LuaBoolean>()
             register<LuaClosure>()
@@ -101,6 +105,11 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
             registerArray<UpValue>()
             registerArray(Class.forName("org.luaj.vm2.LuaTable\$Slot"))
 
+            register(Class.forName("org.luaj.vm2.lib.jse.JavaArray"))
+            register(Class.forName("org.luaj.vm2.lib.jse.JavaInstance"))
+            register(Class.forName("org.luaj.vm2.lib.jse.JavaMethod"))
+
+            register<Headers>()
 
             registerWithSubclasses<BaseLib>()
             registerWithSubclasses<JseBaseLib>()
