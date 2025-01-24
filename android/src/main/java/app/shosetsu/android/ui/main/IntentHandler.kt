@@ -14,6 +14,7 @@ import app.shosetsu.android.common.consts.ACTION_OPEN_LIBRARY
 import app.shosetsu.android.common.consts.ACTION_OPEN_SEARCH
 import app.shosetsu.android.common.consts.ACTION_OPEN_UPDATES
 import app.shosetsu.android.common.ext.logD
+import app.shosetsu.android.common.ext.logE
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -36,17 +37,17 @@ private fun handleIntentAction(
 			)
 		}
 
-//		Intent.ACTION_VIEW -> {
-//			if (intent.data != null) {
-//				if (intent.data!!.scheme != null) {
-//					onNavigate(
-//						Destination.More.AddShare(
-//							intent.data!!.scheme + "://" + intent.data!!.host
-//						)
-//					)
-//				} else intent.logE("Scheme was null")
-//			} else intent.logE("View action data null")
-//		}
+		Intent.ACTION_VIEW -> {
+			if (intent.data != null) {
+				if (intent.data!!.scheme != null) {
+					onNavigate(
+						Destination.More.AddShare(
+							intent.data!!.scheme + "://" + intent.data!!.host
+						)
+					)
+				} else intent.logE("Scheme was null")
+			} else intent.logE("View action data null")
+		}
 
 		Intent.ACTION_MAIN -> {}
 		else -> {}

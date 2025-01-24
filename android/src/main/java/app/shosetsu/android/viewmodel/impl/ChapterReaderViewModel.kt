@@ -66,11 +66,11 @@ import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
 import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
+import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
-import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
