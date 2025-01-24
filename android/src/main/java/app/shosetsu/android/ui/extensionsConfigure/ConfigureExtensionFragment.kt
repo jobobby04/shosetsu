@@ -141,7 +141,7 @@ fun ConfigureExtensionContent(
 				}
 			}
 
-			SettingsItemAsCompose(this, viewModel, extensionSettingsResult)
+            SettingsItemAsCompose(this, viewModel, extensionSettingsResult)
 		}
 	}
 }

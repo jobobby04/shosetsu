@@ -4,10 +4,7 @@ import android.webkit.CookieManager
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
 import androidx.paging.LoadStates
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
@@ -109,7 +106,8 @@ class CatalogViewModel(
 			val ext = getExtensionUseCase(extensionID)
 
 			// Ensure listings are initialized
-			selectedListing.value = ext?.listings()
+			if (selectedListing.value == null) selectedListing.compareAndSet(null, ext?.listings())
+
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}

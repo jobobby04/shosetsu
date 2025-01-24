@@ -126,13 +126,16 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun CatalogueView(
 	extensionId: Int,
+	listing: IExtension.Listing?,
 	onOpenNovel: (novelId: Int) -> Unit,
+	onSelectListing: (IExtension.Listing) -> Unit,
 	onBack: () -> Unit
 ) {
 	val viewModel: ACatalogViewModel = viewModelDi()
 
 	LaunchedEffect(extensionId) {
 		viewModel.setExtensionID(extensionId)
+		if (listing != null) viewModel.setSelectedListing(listing)
 	}
 
 	val type by viewModel.novelCardTypeLive.collectAsState()
@@ -270,7 +273,7 @@ fun CatalogueView(
 		hostState = hostState,
 		selectedListing = selectedListing?.let { StableHolder(it) },
 		listingOptions = listingOptions,
-		setSelectedListing = viewModel::setSelectedListing
+		setSelectedListing = onSelectListing
 	)
 	if (categoriesDialogItem != null) {
 		CategoriesDialog(
@@ -349,7 +352,6 @@ fun ListingsContent(
 			}
 		}
 	}
-
 }
 
 /**

@@ -6,6 +6,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import app.shosetsu.android.R
+import app.shosetsu.android.common.utils.ListingSerializer
 import kotlinx.serialization.Serializable
 
 interface ShosetsuDestination
@@ -54,7 +55,7 @@ object Destination {
 		override val viewOrigin: ShosetsuDestination get() = View
 
 		@Serializable object View : ShosetsuDestination
-		@Serializable data class Catalog(val extensionId: Int) : ShosetsuDestination
+		@Serializable data class Catalog(val extensionId: Int, val listing: ListingSerializer.SerializableListing) : ShosetsuDestination
 		@Serializable data class ConfigureExtension(val extensionId: Int) : ShosetsuDestination
 	}
 	@Serializable object Library : Root {

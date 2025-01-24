@@ -1,11 +1,7 @@
 package app.shosetsu.android.datasource.remote.impl
 
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.LISTING_INDEX
-import app.shosetsu.lib.Novel
-import app.shosetsu.lib.PAGE_INDEX
-import app.shosetsu.lib.QUERY_INDEX
+import app.shosetsu.lib.*
 import app.shosetsu.lib.exceptions.HTTPException
 import org.luaj.vm2.LuaError
 import java.io.IOException
@@ -33,7 +29,6 @@ import java.io.IOException
  * 10 / May / 2020
  */
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
-
 	@Suppress("DEPRECATION") // todo remove getListing
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	override suspend fun list(
@@ -46,7 +41,7 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 			if (!listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
 				emptyList()
 			} else try {
-				listing.getListing!!(data).toList()
+				listing.getListing(data).toList()
 			} catch (e: LuaError) {
 				if (e.cause != null)
 					throw e.cause!!

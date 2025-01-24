@@ -15,6 +15,7 @@ import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_WORK_ID
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
