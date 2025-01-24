@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -79,7 +80,7 @@ class CatalogViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ACatalogViewModel() {
-	override val queryFlow: MutableStateFlow<String> by lazy { MutableStateFlow("") }
+	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 	private val filtersApplied: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	/**
@@ -96,27 +97,21 @@ class CatalogViewModel(
 
 	override val exceptionFlow = MutableSharedFlow<Throwable>()
 
-	override val selectedListing: MutableStateFlow<StableHolder<IExtension.Listing>?> = MutableStateFlow(null)
+	override val selectedListing: MutableStateFlow<IExtension.Listing?> = MutableStateFlow(null)
 
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
 			val ext = getExtensionUseCase(extensionID)
 
-			// Ensure filter is initialized
-			ext?.searchFiltersModel?.toList()?.init()
-			applyFilters()
 			// Ensure listings are initialized
-			selectedListing.value = ext?.let { StableHolder(it.listings()) }
+			selectedListing.value = ext?.listings()
 			ext
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	override val listingOptions = selectedListing.mapLatest { listing ->
-		when (listing?.item) {
-			is IExtension.Listing.List -> (listing.item as IExtension.Listing.List)
-				.getListings()
-				.map { StableHolder(it) }
-				.toImmutableList()
+	override val listingOptions = selectedListing.mapLatest {
+		when (it) {
+			is IExtension.Listing.List -> it.getListings().toList().toImmutableList()
 			else -> persistentListOf()
 		}
 	}.catch {
@@ -134,11 +129,11 @@ class CatalogViewModel(
 				is Filter.Dropdown -> getFilterIntState(filter)
 				is Filter.RadioGroup -> getFilterIntState(filter)
 				is Filter.FList -> {
-					filter.filters.toList().init()
+					filter.filters.init()
 				}
 
 				is Filter.Group<*> -> {
-					filter.filters.toList().init()
+					filter.filters.init()
 				}
 
 				is Filter.Header -> {
@@ -161,14 +156,14 @@ class CatalogViewModel(
 					queryFlow.combine(filtersApplied) { query, filtersApplied ->
 						query to filtersApplied
 					}.flatMapLatest { (query, filtersApplied) ->
-						if (query.isEmpty() && !filtersApplied && listing?.item !is IExtension.Listing.Item) {
+						if (query.isEmpty() && !filtersApplied && listing !is IExtension.Listing.Item) {
 							return@flatMapLatest flowOf(null)
 						}
 						filterDataFlow.mapLatest { data ->
 							Pager(
 								PagingConfig(10)
 							) {
-								getCatalogueListingData(ext, query, data, listing?.item as? IExtension.Listing.Item)
+								getCatalogueListingData(ext, query, data, listing as? IExtension.Listing.Item)
 							}
 						}
 					}
@@ -183,7 +178,7 @@ class CatalogViewModel(
 		}.transformLatest {(pager, listing) ->
 			if (pager != null)
 				emitAll(pager.flow)
-			else if (listing?.item !is IExtension.Listing.Item) {
+			else if (listing !is IExtension.Listing.Item) {
 				emit(
 					PagingData.empty(
 						sourceLoadStates = LoadStates(
@@ -201,18 +196,21 @@ class CatalogViewModel(
 		}.cachedIn(viewModelScope)
 	}
 
-	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> by lazy {
-		iExtensionFlow.mapLatest {
-			it?.searchFiltersModel?.toList() ?: emptyList()
+	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> = iExtensionFlow.combine(
+		selectedListing.map { (it as? IExtension.Listing.Item)?.link }.distinctUntilChanged()
+	) { a, b -> a to b }
+		.mapLatest { (extension, listing) ->
+			extension?.getCatalogueFilters(listing)?.toList() ?: emptyList()
 		}.mapLatest {
 			filterDataState.clear() // Reset filter state so no data conflicts occur
+			it.init()
 			it.map { StableHolder(it) }.toImmutableList()
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
-	}
+		}
+		.onIO()
+		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
 
 	override val hasFilters: StateFlow<Boolean> by lazy {
-		iExtensionFlow.mapLatest { it?.searchFiltersModel?.isNotEmpty() ?: false }
-			.onIO()
+		filterItemsLive.mapLatest { it.isNotEmpty() }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
@@ -249,7 +247,7 @@ class CatalogViewModel(
 	}
 
 	override fun setSelectedListing(listing: IExtension.Listing) {
-		selectedListing.value = StableHolder(listing)
+		selectedListing.value = listing
 	}
 
 	override fun applyQuery(newQuery: String) {

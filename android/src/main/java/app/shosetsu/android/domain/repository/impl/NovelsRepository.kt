@@ -138,7 +138,7 @@ class NovelsRepository(
 	@Throws(LuaError::class)
 	override suspend fun listCatalogue(
 		ext: IExtension,
-		query: String?,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
 	): List<Novel.Info> = onIO { remoteCatalogueDataSource.list(ext, query, data, listing) }

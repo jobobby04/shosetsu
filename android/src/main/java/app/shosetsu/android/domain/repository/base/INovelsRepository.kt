@@ -127,7 +127,7 @@ interface INovelsRepository {
 	@Throws(LuaError::class)
 	suspend fun listCatalogue(
 		ext: IExtension,
-		query: String?,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
 	): List<Novel.Info>

@@ -29,20 +29,19 @@ import java.io.IOException
  * 10 / May / 2020
  */
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
-
 	@Suppress("DEPRECATION") // todo remove getListing
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	override suspend fun list(
 		ext: IExtension,
-		query: String?,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
 	): List<Novel.Info> {
-		return if (query == null && listing?.getListing != null) { // old extension, todo remove
+		return if (query.isEmpty() && listing?.getListing != null) { // old extension, todo remove
 			if (!listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
 				emptyList()
 			} else try {
-				listing.getListing!!(data).toList()
+				listing.getListing(data).toList()
 			} catch (e: LuaError) {
 				if (e.cause != null)
 					throw e.cause!!

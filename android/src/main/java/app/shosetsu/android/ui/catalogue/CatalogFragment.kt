@@ -238,63 +238,54 @@ fun CatalogueView(
 		}
 	}
 
-    if (
-        items.loadState.refresh is LoadState.NotLoading &&
-        items.itemCount == 0 &&
-        selectedListing?.item !is IExtension.Listing.Item
-    ) {
-        ListingsContent(
-            listingOptions,
-            viewModel::setSelectedListing
-        )
-    } else {
-        CatalogContent(
-            items = items,
-            cardType = type,
-            columnsInV = columnsInV,
-            columnsInH = columnsInH,
-            onClick = {
-                onOpenNovel(it.id)
-            },
-            onLongClick = {
-                if (categories.isNotEmpty() && !it.bookmarked) {
-                    categoriesDialogItem = it
-                } else {
-                    viewModel.backgroundNovelAdd(it)
-                }
-            },
-            hasFilters = hasFilters,
-            openWebView = {
-                context.openInWebView(baseURL ?: return@CatalogContent)
-            },
-            clearCookies = {
-                viewModel.clearCookies()
-                items.refresh()
-            },
-            onShowFilterMenu = viewModel::showFilterMenu,
-            extensionName = extensionName,
-            query = query,
-            onSetQuery = viewModel::applyQuery,
-            onSetCardType = viewModel::setViewType,
-            onBack = onBack,
-            hasSearch = hasSearch,
-            hostState = hostState
-        )
-    }
-
-    if (categoriesDialogItem != null) {
-        CategoriesDialog(
-            onDismissRequest = { categoriesDialogItem = null },
-            categories = categories,
-            setCategories = {
-                viewModel.backgroundNovelAdd(
-                    item = categoriesDialogItem ?: return@CategoriesDialog,
-                    categories = it
-                )
-            },
-            novelCategories = remember { persistentListOf() }
-        )
-    }
+	CatalogContent(
+		items = items,
+		cardType = type,
+		columnsInV = columnsInV,
+		columnsInH = columnsInH,
+		onClick = {
+			onOpenNovel(it.id)
+		},
+		onLongClick = {
+			if (categories.isNotEmpty() && !it.bookmarked) {
+				categoriesDialogItem = it
+			} else {
+				viewModel.backgroundNovelAdd(it)
+			}
+		},
+		hasFilters = hasFilters,
+		openWebView = {
+			context.openInWebView(baseURL ?: return@CatalogContent)
+		},
+		clearCookies = {
+			viewModel.clearCookies()
+			items.refresh()
+		},
+		onShowFilterMenu = viewModel::showFilterMenu,
+		extensionName = extensionName,
+		query = query,
+		onSetQuery = viewModel::applyQuery,
+		onSetCardType = viewModel::setViewType,
+		onBack = onBack,
+		hasSearch = hasSearch,
+		hostState = hostState,
+		selectedListing = selectedListing?.let { StableHolder(it) },
+		listingOptions = listingOptions,
+		setSelectedListing = viewModel::setSelectedListing//onSelectListing
+	)
+	if (categoriesDialogItem != null) {
+		CategoriesDialog(
+			onDismissRequest = { categoriesDialogItem = null },
+			categories = categories,
+			setCategories = {
+				viewModel.backgroundNovelAdd(
+					item = categoriesDialogItem ?: return@CategoriesDialog,
+					categories = it
+				)
+			},
+			novelCategories = remember { persistentListOf() }
+		)
+	}
 
 	if (isFilterMenuVisible) {
 		val filterItems by viewModel.filterItemsLive.collectAsState()
@@ -316,7 +307,7 @@ fun CatalogueView(
 
 @Composable
 fun ListingsContent(
-	items: ImmutableList<StableHolder<IExtension.Listing>>,
+	items: ImmutableList<IExtension.Listing>,
 	onSelectListing: (IExtension.Listing) -> Unit
 ) {
 	Crossfade(items, label = "listing_items") {
@@ -331,24 +322,24 @@ fun ListingsContent(
 						Row(
 							Modifier
 								.fillMaxWidth()
-								.clickable { onSelectListing(it.item) }
+								.clickable { onSelectListing(it) }
 								.padding(horizontal = 8.dp, vertical = 16.dp),
 							verticalAlignment = Alignment.CenterVertically
 						) {
-							when (it.item) {
+							when (it) {
 								is IExtension.Listing.Item -> {
-									Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "list")
+									Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
 									Spacer(modifier = Modifier.width(16.dp))
 									Text(
-										text = it.item.name,
+										text = it.name,
 										style = MaterialTheme.typography.bodyLarge
 									)
 								}
 								is IExtension.Listing.List -> {
-									Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = "list")
+									Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "list")
 									Spacer(modifier = Modifier.width(16.dp))
 									Text(
-										text = it.item.name,
+										text = it.name,
 										style = MaterialTheme.typography.bodyLarge
 									)
 								}
@@ -383,7 +374,10 @@ fun CatalogContent(
 	onShowFilterMenu: () -> Unit,
 	onBack: () -> Unit,
 	hasSearch: Boolean,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
+	selectedListing: StableHolder<IExtension.Listing>?,
+	listingOptions: ImmutableList<IExtension.Listing>,
+	setSelectedListing: (IExtension.Listing) -> Unit,
 ) {
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -428,7 +422,18 @@ fun CatalogContent(
 						.pullRefresh(pullRefreshState)
 						.padding(padding)
 				) {
-					CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
+					if (
+						items.loadState.refresh is LoadState.NotLoading &&
+						items.itemCount == 0 &&
+						selectedListing?.item !is IExtension.Listing.Item
+					) {
+						ListingsContent(
+							listingOptions,
+							setSelectedListing
+						)
+					} else {
+						CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
+					}
 				}
 			}
 		}

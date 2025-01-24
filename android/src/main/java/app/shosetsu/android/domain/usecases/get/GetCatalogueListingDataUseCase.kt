@@ -47,7 +47,7 @@ class GetCatalogueListingDataUseCase(
 ) {
 	inner class MyPagingSource(
 		private val iExtension: IExtension,
-		val query: String?,
+		val query: String,
 		val data: Map<Int, Any>,
 		private val listing: IExtension.Listing.Item?,
 	) : PagingSource<Int, ACatalogNovelUI>() {
@@ -120,7 +120,7 @@ class GetCatalogueListingDataUseCase(
 	)
 	suspend operator fun invoke(
 		extID: Int,
-		query: String?,
+		query: String,
 		filters: Map<Int, Any>,
 		listing: IExtension.Listing.Item?
 	): MyPagingSource = getExt(extID)?.let {
@@ -130,12 +130,12 @@ class GetCatalogueListingDataUseCase(
 	@Throws(SSLException::class, LuaError::class)
 	operator fun invoke(
 		iExtension: IExtension,
-		query: String?,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
 	) = MyPagingSource(
 		iExtension,
-		query?.takeUnless { it.isEmpty() },
+		query,
 		data,
 		listing
 	)
@@ -143,7 +143,7 @@ class GetCatalogueListingDataUseCase(
 	@Throws(SSLException::class, LuaError::class)
 	suspend fun search(
 		iExtension: IExtension,
-		query: String?,
+		query: String,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item?,
 	): List<ACatalogNovelUI> =
