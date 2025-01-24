@@ -17,6 +17,7 @@ import app.shosetsu.android.common.consts.Notifications.ID_RESTORE
 import app.shosetsu.android.common.consts.VERSION_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.RESTORE_WORK_ID
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.*
 import app.shosetsu.android.domain.model.local.backup.*
@@ -512,8 +513,8 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(RESTORE_WORK_ID).await()

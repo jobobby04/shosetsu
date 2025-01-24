@@ -34,7 +34,7 @@ abstract class ATextAssetReaderViewModel : ShosetsuViewModel(), SubscribeViewMod
 	/**
 	 * [LiveData] of text to display
 	 */
-	abstract override val liveData: StateFlow<String?>
+	abstract override val liveData: StateFlow<String>
 
 	/**
 	 * [LiveData] of the current [TextAsset]

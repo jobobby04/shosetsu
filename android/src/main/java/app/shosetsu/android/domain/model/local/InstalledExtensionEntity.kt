@@ -1,5 +1,6 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBInstalledExtensionEntity
 import app.shosetsu.lib.ExtensionType
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.Version
@@ -26,41 +27,39 @@ import app.shosetsu.lib.Version
  *
  * @since 10 / 02 / 2022
  * @author Doomsdayrs
+ *
+ * @param id [DBInstalledExtensionEntity.id]
+ * @param repoID [DBInstalledExtensionEntity.repoID]
+ * @param name [DBInstalledExtensionEntity.name]
+ * @param fileName [DBInstalledExtensionEntity.fileName]
+ * @param imageURL [DBInstalledExtensionEntity.imageURL]
+ * @param lang [DBInstalledExtensionEntity.lang]
+ * @param version [DBInstalledExtensionEntity.version]
+ * @param md5 [DBInstalledExtensionEntity.md5]
+ * @param type [DBInstalledExtensionEntity.type]
+ * @param enabled [DBInstalledExtensionEntity.enabled]
+ * @param chapterType [DBInstalledExtensionEntity.chapterType]
  */
 data class InstalledExtensionEntity(
-	/** Extension ID */
 	val id: Int,
 
-	/** Repository extension belongs too*/
 	val repoID: Int,
 
-	/** Name of the extension, can be changed */
 	val name: String,
 
-	/** FileName of the extension */
 	val fileName: String,
 
-	/** Image URL of the extension*/
 	val imageURL: String,
 
-	/** The language of the extension */
 	val lang: String,
 
-	/**
-	 * Version currently installed
-	 */
 	val version: Version,
 
-	/** MD5 to check against */
 	val md5: String,
 
 	val type: ExtensionType,
 
-	/** If extension is enabled */
 	val enabled: Boolean,
 
-	/**
-	 * The reader type of this extension
-	 */
 	val chapterType: Novel.ChapterType,
 )

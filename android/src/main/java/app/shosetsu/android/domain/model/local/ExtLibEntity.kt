@@ -1,5 +1,6 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBExtLibEntity
 import app.shosetsu.lib.Version
 
 /*
@@ -26,6 +27,10 @@ import app.shosetsu.lib.Version
  *
  * @author github.com/doomsdayrs
  * This class represents a library that is installed in system
+ *
+ * @param scriptName [DBExtLibEntity.scriptName]
+ * @param version [DBExtLibEntity.version]
+ * @param repoID [DBExtLibEntity.repoID]
  */
 
 data class ExtLibEntity(

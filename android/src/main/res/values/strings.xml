@@ -59,6 +59,15 @@
 
     <string name="reader_pitch">TTS Pitch</string>
     <string name="reader_speed">TTS Speed</string>
+    <string name="reader_engine">TTS Engine</string>
+    <string name="reader_voice">TTS Voice</string>
+    <string name="reader_language">TTS Language</string>
+    <string name="reader_test">Test TTS</string>
+    <string name="reader_test_invalid_engine">TTS engine failed to start</string>
+    <string name="reader_test_invalid_language">Invalid language selection</string>
+    <string name="reader_test_invalid_voice">Invalid voice selection</string>
+    <string name="reader_read_next_chapter_title">TTS Read Next Chapter</string>
+    <string name="reader_read_next_chapter_desc">Automatically start reading the next chapter when using TTS.</string>
 
     <!-- Migration View -->
 
@@ -447,6 +456,7 @@
     <html>
         <head>
             <style>%s</style>
+            <style>%s</style>
         </head>
         <body>
             <h1>Header 1</h1>
@@ -616,17 +626,12 @@
     <string name="date_format_mdy_desc">If toggled on, dates on the Updates page will be shown month-first</string>
     <string name="intro_support_title">Support the Developer</string>
     <string name="intro_support_desc">
-        Hi I am Doomsdayrs the developer.\n
-        Due to college, I am currently struggling financially,
-        and I am aware that there at least over 4000 users using Shosetsu.\n\n
+        Hoi, Am Clocks! The developer!\n
+        I am well off now, Thank you for helping me survive.
 
-        All I am asking is that you consider donating at least $1 (USD) via the services below.\n
-        - If 500 people donate once a month, I will be financially stable again.\n
-        - If 1000 donate once a month, I will be able to work on Shosetsu nearly full time.\n\n
+        You can still chose to donate to help show your support, but you do not need to anymore.\n
 
-        Please, do consider supporting.
-        Either by helping financially, programming new features / fixes, or spreading this message.\n
-        Thank you for your time.
+        To all those who helped support me before, thank you!!!!
     </string>
     <string name="support_agree_1">Support the developer.</string>
     <string name="support_agree_2">I love Shosetsu.</string>
@@ -655,7 +660,7 @@
     <string name="reader_long_reading_desc">Please look at something at least 5–10 meters away for 20 seconds to avoid eye damage.</string>
     <string name="settings_reader_track_long_reading_title">Track long reading</string>
     <string name="settings_reader_track_long_reading_desc">Track users reading time to ensure the user maintains their eye health by requiring the user to look at something 5-10 meters away for 20 seconds every 20 minutes.</string>
-    <string name="global_search">Global Search\n</string>
+    <string name="global_search">Global Search</string>
     <string name="settings_reader_voice_title">Text to Speech Voice</string>
     <string name="settings_reader_voice_desc">Which voice to use for Text to Speech</string>
     <string name="voice_very_high">Highest</string>
@@ -700,5 +705,14 @@
         <item>@string/compressed</item>
         <item>@string/comfy</item>
     </array>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="icon_desc_back">Arrow pointing to the left to navigate back.</string>
+    <string name="view_title_configure">Configure</string>
+    <string name="view_novel_refresh_failed">Failed to refresh novel: %s</string>
+    <string name="view_backup_restore_start">Restoring now...</string>
+    <string name="view_backup_exporting_start">Exporting now...</string>
+    <string name="worker_update_install_missing">No update to install</string>
+    <string name="error_intent_handle">Failed to handle intent</string>
+    <string name="support_ignore">Happy</string>
 
 </resources>

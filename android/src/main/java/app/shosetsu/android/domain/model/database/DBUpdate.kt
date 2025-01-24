@@ -26,7 +26,13 @@ import app.shosetsu.android.dto.Convertible
 
 /**
  * shosetsu
- * 05 / 12 / 2020
+ * @since 05 / 12 / 2020
+ *
+ * Represents a chapter being added to a novel.
+ *
+ * @param chapterID [DBChapterEntity.id]
+ * @param novelID [DBNovelEntity.id]
+ * @param time Time this update occured
  */
 @Entity(
 	tableName = "updates",

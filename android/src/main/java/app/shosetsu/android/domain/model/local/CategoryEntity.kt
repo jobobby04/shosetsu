@@ -1,5 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBCategoryEntity
+
 /*
  * This file is part of shosetsu.
  *
@@ -21,6 +23,10 @@ package app.shosetsu.android.domain.model.local
 /**
  * shosetsu
  * 08 / 08 / 2022
+ *
+ * @param id [DBCategoryEntity.id]
+ * @param name [DBCategoryEntity.name]
+ * @param order [DBCategoryEntity.order]
  */
 data class CategoryEntity(
 	var id: Int? = null,

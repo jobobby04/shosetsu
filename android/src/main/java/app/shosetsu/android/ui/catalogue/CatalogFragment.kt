@@ -1,54 +1,84 @@
 package app.shosetsu.android.ui.catalogue
 
 import android.content.res.Configuration
-import android.os.Bundle
-import android.view.*
-import androidx.appcompat.widget.SearchView
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import androidx.core.view.MenuProvider
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.BundleKeys
-import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_EXTENSION
 import app.shosetsu.android.common.enums.NovelCardType
-import app.shosetsu.android.common.enums.NovelCardType.*
-import app.shosetsu.android.common.ext.*
-import app.shosetsu.android.ui.catalogue.listeners.CatalogueSearchQuery
+import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
+import app.shosetsu.android.common.enums.NovelCardType.COZY
+import app.shosetsu.android.common.enums.NovelCardType.NORMAL
+import app.shosetsu.android.common.ext.openInWebView
+import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.library.SearchAction
+import app.shosetsu.android.ui.library.ViewTypeButton
 import app.shosetsu.android.ui.novel.CategoriesDialog
+import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
-import app.shosetsu.android.view.compose.*
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.ExtendedFABController
-import app.shosetsu.android.view.controller.base.ExtendedFABController.EFabMaintainer
-import app.shosetsu.android.view.controller.base.syncFABWithCompose
+import app.shosetsu.android.view.compose.ErrorAction
+import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.LazyColumnScrollbar
+import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.NovelCardCompressedContent
+import app.shosetsu.android.view.compose.NovelCardCozyContent
+import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.itemsIndexed
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
@@ -56,11 +86,8 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import app.shosetsu.lib.IExtension
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.Job
 import org.acra.ACRA
 
 /*
@@ -87,364 +114,202 @@ import org.acra.ACRA
  *
  * @author github.com/doomsdayrs
  */
-class CatalogFragment : ShosetsuFragment(), ExtendedFABController, MenuProvider {
-	private var bsg: BottomSheetDialog? = null
 
-	/***/
-	val viewModel: ACatalogViewModel by viewModel()
-	//private val progressAdapter by lazy { ItemAdapter<ProgressItem>() }
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		activity?.addMenuProvider(this, viewLifecycleOwner)
-		setViewTitle()
-		return ComposeView {
-			CatalogueView(
-				viewModel = viewModel,
-				fab,
-				onOpenNovel = {
-					try {
-						findNavController().navigateSafely(
-							R.id.action_catalogController_to_novelController, bundleOf(
-								BundleKeys.BUNDLE_NOVEL_ID to it.id,
-								BUNDLE_EXTENSION to requireArguments().getInt(
-									BUNDLE_EXTENSION
-								)
-							),
-							navOptions {
-								setShosetsuTransition()
-							}
-						)
-					} catch (ignored: Exception) {
-						// ignore dup
-					}
-				},
-				errorMessage = { message, action ->
-					makeSnackBar(message)
-						?.setAction(R.string.retry) {
-							action()
-						}
-						?.show()
-				},
-				openInWebView = ::openInWebView,
-				makeSnackBar = { res, arg ->
-					makeSnackBar(
-						if (arg != null) {
-							getString(res, arg)
-						} else {
-							getString(res)
-						}
-					)
-				}
-			)
-		}
-	}
-
-
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		viewModel.setExtensionID(requireArguments().getInt(BUNDLE_EXTENSION))
-		setupObservers()
-	}
-
-	override fun onDestroy() {
-		super.onDestroy()
-		viewModel.destroy()
-	}
-
-	/***/
-	override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-		menu.clear()
-		inflater.inflate(R.menu.toolbar_catalogue, menu)
-	}
-
-	private var optionSyncJob: Job? = null
-
-	override fun onPrepareMenu(menu: Menu) {
-		logI("Preparing option menu")
-		optionSyncJob?.cancel()
-		optionSyncJob =
-			viewModel.novelCardTypeLive.collectLA(this@CatalogFragment, catch = {}) {
-				when (it) {
-					NORMAL -> {
-						menu.findItem(R.id.view_type_normal)?.isChecked = true
-					}
-
-					COMPRESSED -> {
-						menu.findItem(R.id.view_type_comp)?.isChecked = true
-					}
-
-					COZY -> menu.findItem(R.id.view_type_cozy)?.isChecked = true
-				}
-			}
-
-		menu.findItem(R.id.search_item)?.let { searchItem ->
-			viewModel.hasSearchLive.collectLA(this, catch = {}) {
-				if (!it) {
-					logV("Hiding search icon")
-					menu.removeItem(R.id.search_item)
-				} else {
-					logV("Showing search icon")
-					(searchItem.actionView as SearchView).apply {
-						setOnQueryTextListener(CatalogueSearchQuery(this@CatalogFragment))
-						setOnCloseListener {
-							logV("closing search view")
-							viewModel.applyQuery("")
-							viewModel.resetView()
-							true
-						}
-					}
-				}
-			}
-
-		}
-	}
-
-	override fun onMenuItemSelected(item: MenuItem): Boolean =
-		when (item.itemId) {
-			R.id.view_type_normal -> {
-				item.isChecked = true
-				viewModel.setViewType(NORMAL)
-				true
-			}
-
-			R.id.view_type_comp -> {
-				item.isChecked = true
-				viewModel.setViewType(COMPRESSED)
-				true
-			}
-
-			R.id.view_type_cozy -> {
-				item.isChecked = true
-				viewModel.setViewType(COZY)
-				true
-			}
-
-			R.id.web_view -> {
-				openInWebView()
-				true
-			}
-
-			else -> false
-		}
-
-	private fun openInWebView() {
-		viewModel.getBaseURL().firstLa(
-			this,
-			catch = {
-				makeSnackBar(
-					getString(
-						R.string.fragment_catalogue_error_base_url,
-						it.message ?: "Unknown exception"
-					)
-				)?.setAction(R.string.report) { _ ->
-					ACRA.errorReporter.handleSilentException(it)
-				}?.show()
-			}
-		) {
-			activity?.openInWebView(it)
-		}
-	}
-
-	private fun setupObservers() {
-		setViewTitle(getString(R.string.loading))
-		viewModel.extensionName.observe(catch = {
-			makeSnackBar(
-				getString(
-					R.string.fragment_catalogue_error_name,
-					it.message ?: "Unknown exception"
-				)
-			)?.setAction(R.string.report) { _ ->
-				ACRA.errorReporter.handleSilentException(it)
-			}?.show()
-		}) {
-			setViewTitle(it)
-		}
-
-		viewModel.hasSearchLive.observe(catch = {
-			makeSnackBar(
-				getString(
-					R.string.fragment_catalogue_error_has_search,
-					it.message ?: "Unknown exception"
-				)
-			)?.setAction(R.string.report) { _ ->
-				ACRA.errorReporter.handleSilentException(it)
-			}?.show()
-		}) {
-			activity?.invalidateOptionsMenu()
-		}
-	}
-
-	private lateinit var fab: EFabMaintainer
-	override fun manipulateFAB(fab: EFabMaintainer) {
-		this.fab = fab
-		fab.setIconResource(R.drawable.filter)
-		fab.setText(R.string.filter)
-		fab.setOnClickListener {
-			viewModel.showFilterMenu()
-		}
-		viewModel.hasFilters.collectLatestLA(this, catch = {}) {
-			if (it)
-				fab.show()
-			else {
-				fab.hide()
-			}
-		}
-	}
-}
-
+/**
+ * A catalogue is a view showcasing novels from a given extension.
+ */
 @Composable
 fun CatalogueView(
-	viewModel: ACatalogViewModel = viewModelDi(),
-	fab: EFabMaintainer,
-	onOpenNovel: (ACatalogNovelUI) -> Unit,
-	errorMessage: (String, () -> Unit) -> Unit,
-	openInWebView: () -> Unit,
-	makeSnackBar: (Int, String?) -> Snackbar?
+	extensionId: Int,
+	onOpenNovel: (novelId: Int) -> Unit,
+	onBack: () -> Unit
 ) {
-	ShosetsuCompose {
-		val type by viewModel.novelCardTypeLive.collectAsState()
+	val viewModel: ACatalogViewModel = viewModelDi()
 
-		val columnsInV by viewModel.columnsInV.collectAsState()
-		val columnsInH by viewModel.columnsInH.collectAsState()
+	LaunchedEffect(extensionId) {
+		viewModel.setExtensionID(extensionId)
+	}
 
-		val items = viewModel.itemsLive.collectAsLazyPagingItems()
+	val type by viewModel.novelCardTypeLive.collectAsState()
 
-		val exception by viewModel.exceptionFlow.collectAsState()
-		val hasFilters by viewModel.hasFilters.collectAsState()
+	val query by viewModel.queryFlow.collectAsState()
+	val baseURL by viewModel.baseURL.collectAsState()
+	val extensionName by viewModel.extensionName.collectAsState()
+	val hasSearch by viewModel.hasSearchLive.collectAsState()
 
-		val selectedListing by viewModel.selectedListing.collectAsState()
-		val listingOptions by viewModel.listingOptions.collectAsState()
+	val columnsInV by viewModel.columnsInV.collectAsState()
+	val columnsInH by viewModel.columnsInH.collectAsState()
 
-		val categories by viewModel.categories.collectAsState()
-		var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
+	val items = viewModel.itemsLive.collectAsLazyPagingItems()
 
-		val backgroundAddState by viewModel.backgroundAddState.collectAsState()
-		val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+	val exception by viewModel.exceptionFlow.collectAsState(null)
+	val hasFilters by viewModel.hasFilters.collectAsState()
 
-		LaunchedEffect(backgroundAddState) {
-			when (backgroundAddState) {
-				is Added -> {
-					makeSnackBar(
+	val selectedListing by viewModel.selectedListing.collectAsState()
+	val listingOptions by viewModel.listingOptions.collectAsState()
+
+	val categories by viewModel.categories.collectAsState()
+
+
+	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
+	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+
+	val context = LocalContext.current
+	val hostState = remember { SnackbarHostState() }
+	var categoriesDialogItem by remember { mutableStateOf<ACatalogNovelUI?>(null) }
+
+	LaunchedEffect(backgroundAddState) {
+		when (backgroundAddState) {
+			is Added -> {
+				hostState.showSnackbar(
+					context.getString(
 						R.string.fragment_catalogue_toast_background_add_success,
 						(backgroundAddState as Added).title
-					)?.show()
-				}
+					)
+				)
+			}
 
-				Adding -> {
-					makeSnackBar(R.string.fragment_catalogue_toast_background_add, null)?.show()
-				}
+			Adding -> {
+				hostState.showSnackbar(
+					context.getString(
+						R.string.fragment_catalogue_toast_background_add
+					)
+				)
+			}
 
-				is BackgroundNovelAddProgress.Failure -> {
-					val error = (backgroundAddState as BackgroundNovelAddProgress.Failure).error
-					makeSnackBar(
+			is BackgroundNovelAddProgress.Failure -> {
+				val error = (backgroundAddState as BackgroundNovelAddProgress.Failure).error
+
+				val result = hostState.showSnackbar(
+					context.getString(
 						R.string.fragment_catalogue_toast_background_add_fail,
 						error.message
 							?: "Unknown exception"
-					)?.setAction(R.string.report) { _ ->
-						ACRA.errorReporter.handleSilentException(error)
-					}?.show()
-				}
-
-				BackgroundNovelAddProgress.Unknown -> {
-				}
-			}
-		}
-
-		if (exception != null)
-			LaunchedEffect(Unit) {
-				launchUI {
-					errorMessage(exception!!.message ?: "Unknown error") {
-						viewModel.resetView()
-					}
-				}
-			}
-
-		val prepend = items.loadState.prepend
-		if (prepend is LoadState.Error) {
-			LaunchedEffect(Unit) {
-				launchUI {
-					errorMessage(prepend.error.message ?: "Unknown error") {
-						items.retry()
-					}
-				}
-			}
-		}
-		val append = items.loadState.prepend
-		if (append is LoadState.Error) {
-			LaunchedEffect(Unit) {
-				launchUI {
-					errorMessage(append.error.message ?: "Unknown error") {
-						items.retry()
-					}
-				}
-			}
-		}
-
-		if (
-			items.loadState.refresh is LoadState.NotLoading &&
-			items.itemCount == 0 &&
-			selectedListing?.item !is IExtension.Listing.Item
-		) {
-			ListingsContent(
-				listingOptions,
-				viewModel::setSelectedListing
-			)
-		} else {
-			CatalogContent(
-				items,
-				type,
-				columnsInV,
-				columnsInH,
-				onClick = onOpenNovel,
-				onLongClick = {
-					if (categories.isNotEmpty() && !it.bookmarked) {
-						categoriesDialogItem = it
-					} else {
-						viewModel.backgroundNovelAdd(it)
-					}
-				},
-				hasFilters = hasFilters,
-				fab,
-				openWebView = openInWebView,
-				clearCookies = {
-					viewModel.clearCookies()
-					items.refresh()
-				}
-			)
-		}
-
-		if (categoriesDialogItem != null) {
-			CategoriesDialog(
-				onDismissRequest = { categoriesDialogItem = null },
-				categories = categories,
-				setCategories = {
-					viewModel.backgroundNovelAdd(
-						item = categoriesDialogItem ?: return@CategoriesDialog,
-						categories = it
-					)
-				},
-				novelCategories = remember { persistentListOf() }
-			)
-		}
-
-		if (isFilterMenuVisible) {
-			val filterItems by viewModel.filterItemsLive.collectAsState()
-			BottomSheetDialog(viewModel::hideFilterMenu) {
-				CatalogFilterMenu(
-					items = filterItems,
-					getBoolean = viewModel::getFilterBooleanState,
-					setBoolean = viewModel::setFilterBooleanState,
-					getInt = viewModel::getFilterIntState,
-					setInt = viewModel::setFilterIntState,
-					getString = viewModel::getFilterStringState,
-					setString = viewModel::setFilterStringState,
-					applyFilter = viewModel::applyFilter,
-					resetFilter = viewModel::resetFilter
+					),
+					actionLabel = context.getString(R.string.report)
 				)
+
+				if (result == SnackbarResult.ActionPerformed) {
+					ACRA.errorReporter.handleSilentException(error)
+				}
 			}
+
+			BackgroundNovelAddProgress.Unknown -> {
+			}
+		}
+	}
+
+	LaunchedEffect(exception) {
+		if (exception != null) {
+			val result = hostState.showSnackbar(
+				exception?.message ?: "Unknown error",
+				actionLabel = context.getString(R.string.reset)
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				viewModel.resetView()
+			}
+		}
+	}
+
+	val prepend = items.loadState.prepend
+
+	LaunchedEffect(prepend) {
+		if (prepend is LoadState.Error) {
+			val result = hostState.showSnackbar(
+				prepend.error.message ?: "Unknown error",
+				actionLabel = context.getString(R.string.retry)
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				items.retry()
+			}
+		}
+	}
+
+	val append = items.loadState.prepend
+	LaunchedEffect(append) {
+		if (append is LoadState.Error) {
+			val result = hostState.showSnackbar(
+				append.error.message ?: "Unknown error",
+				actionLabel = context.getString(R.string.retry)
+			)
+			if (result == SnackbarResult.ActionPerformed) {
+				items.retry()
+			}
+		}
+	}
+
+    if (
+        items.loadState.refresh is LoadState.NotLoading &&
+        items.itemCount == 0 &&
+        selectedListing?.item !is IExtension.Listing.Item
+    ) {
+        ListingsContent(
+            listingOptions,
+            viewModel::setSelectedListing
+        )
+    } else {
+        CatalogContent(
+            items = items,
+            cardType = type,
+            columnsInV = columnsInV,
+            columnsInH = columnsInH,
+            onClick = {
+                onOpenNovel(it.id)
+            },
+            onLongClick = {
+                if (categories.isNotEmpty() && !it.bookmarked) {
+                    categoriesDialogItem = it
+                } else {
+                    viewModel.backgroundNovelAdd(it)
+                }
+            },
+            hasFilters = hasFilters,
+            openWebView = {
+                context.openInWebView(baseURL ?: return@CatalogContent)
+            },
+            clearCookies = {
+                viewModel.clearCookies()
+                items.refresh()
+            },
+            onShowFilterMenu = viewModel::showFilterMenu,
+            extensionName = extensionName,
+            query = query,
+            onSetQuery = viewModel::applyQuery,
+            onSetCardType = viewModel::setViewType,
+            onBack = onBack,
+            hasSearch = hasSearch,
+            hostState = hostState
+        )
+    }
+
+    if (categoriesDialogItem != null) {
+        CategoriesDialog(
+            onDismissRequest = { categoriesDialogItem = null },
+            categories = categories,
+            setCategories = {
+                viewModel.backgroundNovelAdd(
+                    item = categoriesDialogItem ?: return@CategoriesDialog,
+                    categories = it
+                )
+            },
+            novelCategories = remember { persistentListOf() }
+        )
+    }
+
+	if (isFilterMenuVisible) {
+		val filterItems by viewModel.filterItemsLive.collectAsState()
+		BottomSheetDialog(viewModel::hideFilterMenu) {
+			CatalogFilterMenu(
+				items = filterItems,
+				getBoolean = viewModel::getFilterBooleanState,
+				setBoolean = viewModel::setFilterBooleanState,
+				getInt = viewModel::getFilterIntState,
+				setInt = viewModel::setFilterIntState,
+				getString = viewModel::getFilterStringState,
+				setString = viewModel::setFilterStringState,
+				applyFilter = viewModel::applyFilter,
+				resetFilter = viewModel::resetFilter
+			)
 		}
 	}
 }
@@ -472,7 +337,7 @@ fun ListingsContent(
 						) {
 							when (it.item) {
 								is IExtension.Listing.Item -> {
-									Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "list")
+									Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "list")
 									Spacer(modifier = Modifier.width(16.dp))
 									Text(
 										text = it.item.name,
@@ -480,7 +345,7 @@ fun ListingsContent(
 									)
 								}
 								is IExtension.Listing.List -> {
-									Icon(imageVector = Icons.Default.List, contentDescription = "list")
+									Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = "list")
 									Spacer(modifier = Modifier.width(16.dp))
 									Text(
 										text = it.item.name,
@@ -494,155 +359,342 @@ fun ListingsContent(
 			}
 		}
 	}
-
 }
 
+/**
+ * Content of [CatalogueView]
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CatalogContent(
+	extensionName: String,
+	query: String,
+	onSetQuery: (String) -> Unit,
 	items: LazyPagingItems<ACatalogNovelUI>,
 	cardType: NovelCardType,
+	onSetCardType: (NovelCardType) -> Unit,
 	columnsInV: Int,
 	columnsInH: Int,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
 	hasFilters: Boolean,
-	fab: EFabMaintainer,
 	clearCookies: () -> Unit,
-	openWebView: () -> Unit
+	openWebView: () -> Unit,
+	onShowFilterMenu: () -> Unit,
+	onBack: () -> Unit,
+	hasSearch: Boolean,
+	hostState: SnackbarHostState
 ) {
-	Box(
+	Scaffold(
 		modifier = Modifier.fillMaxSize(),
-	) {
+		floatingActionButton = {
+			CatalogFloatingActionButton(hasFilters, onShowFilterMenu)
+		},
+		topBar = {
+			CatalogTopBar(
+				extensionName,
+				onBack,
+				hasSearch,
+				query,
+				onSetQuery,
+				cardType,
+				onSetCardType,
+				openWebView
+			)
+		},
+		snackbarHost = {
+			SnackbarHost(hostState)
+		}
+	) { padding ->
 		val pullRefreshState = rememberPullRefreshState(
 			items.loadState.refresh == LoadState.Loading,
 			onRefresh = { items.refresh() }
 		)
 
-		Box(Modifier.pullRefresh(pullRefreshState)) {
-			val w = LocalConfiguration.current.screenWidthDp
-			val o = LocalConfiguration.current.orientation
+		Column {
+			CatalogRefreshBar(items)
 
-			val size =
-				(w / when (o) {
-					Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-					else -> columnsInV
-				}).dp - 8.dp
-
-			val state = rememberLazyGridState()
-			if (hasFilters)
-				syncFABWithCompose(state, fab)
-			LazyVerticalGrid(
-				modifier = Modifier.fillMaxSize(),
-				columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
-				contentPadding = PaddingValues(
-					bottom = 200.dp,
-					start = 8.dp,
-					end = 8.dp,
-					top = 4.dp
-				),
-				state = state,
-				horizontalArrangement = Arrangement.spacedBy(4.dp),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				itemsIndexed(
+			val errorState = items.loadState.refresh
+			if (errorState is LoadState.Error) {
+				CatalogErrorContent(
+					errorState,
 					items,
-					key = { index, item -> item.hashCode() + index }
-				) { _, item ->
-					when (cardType) {
-						NORMAL -> {
-							if (item != null)
-								NovelCardNormalContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
-
-						COMPRESSED -> {
-							if (item != null)
-								NovelCardCompressedContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
-
-						COZY -> {
-							if (item != null)
-								NovelCardCozyContent(
-									item.title,
-									item.imageURL,
-									onClick = {
-										onClick(item)
-									},
-									onLongClick = {
-										onLongClick(item)
-									},
-									isBookmarked = item.bookmarked
-								)
-						}
-					}
-				}
-				if (items.loadState.append == LoadState.Loading) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-					}
-				}
-				if (items.loadState.refresh.endOfPaginationReached && items.loadState.append.endOfPaginationReached) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						CatalogContentNoMore()
-					}
-				}
-				val errorState = items.loadState.refresh
-				if (errorState is LoadState.Error) {
-					item(span = { GridItemSpan(maxLineSpan) }) {
-						ErrorContent(
-							errorState.error.message ?: "Unknown",
-							actions = arrayOf(
-								ErrorAction(R.string.retry) {
-									items.refresh()
-								},
-								ErrorAction(R.string.action_open_in_webview) {
-									openWebView()
-								},
-								ErrorAction(R.string.settings_advanced_clear_cookies_title) {
-									clearCookies()
-								},
-							),
-							stackTrace = errorState.error.stackTraceToString()
-						)
-					}
+					openWebView,
+					clearCookies
+				)
+			} else {
+				Box(
+					Modifier
+						.pullRefresh(pullRefreshState)
+						.padding(padding)
+				) {
+					CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
 				}
 			}
 		}
+	}
+}
 
-		if (items.loadState.refresh == LoadState.Loading)
+/**
+ * The refresh bar on top of the content
+ */
+@Composable
+fun CatalogRefreshBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	AnimatedVisibility(items.loadState.refresh == LoadState.Loading) {
+		LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+	}
+}
+
+/**
+ * The filter button
+ */
+@Composable
+fun CatalogFloatingActionButton(hasFilters: Boolean, onShowFilterMenu: () -> Unit) {
+	// TODO Collapsible
+	AnimatedVisibility(hasFilters) {
+		ExtendedFloatingActionButton(
+			text = {
+				Text(stringResource(R.string.filter))
+			},
+			icon = {
+				Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+			},
+			onClick = onShowFilterMenu
+		)
+	}
+}
+
+/**
+ * Catalogs top bar
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CatalogTopBar(
+	extensionName: String,
+	onBack: () -> Unit,
+	hasSearch: Boolean,
+	query: String,
+	onSetQuery: (String) -> Unit,
+	cardType: NovelCardType,
+	onSetCardType: (NovelCardType) -> Unit,
+	openWebView: () -> Unit
+) {
+	var isSearchExpanded by remember { mutableStateOf(false) }
+	TopAppBar(
+		title = {
+			Text(extensionName)
+		},
+		navigationIcon = {
+			if (!isSearchExpanded) {
+				NavigateBackButton(onBack)
+			}
+		},
+		actions = {
+			AnimatedVisibility(hasSearch) {
+				SearchAction(
+					query,
+					onSetQuery,
+					onSetExpanded = { isSearchExpanded = it }
+				)
+			}
+			ViewTypeButton(
+				cardType,
+				onSetCardType
+			)
+
+			IconButton(
+				onClick = openWebView
+			) {
+				Icon(
+					painterResource(R.drawable.open_in_browser),
+					stringResource(R.string.action_open_in_webview)
+				)
+			}
+		}
+	)
+}
+
+/**
+ * Main content, the grid of items
+ */
+@Composable
+fun CatalogGrid(
+	items: LazyPagingItems<ACatalogNovelUI>,
+	columnsInH: Int,
+	columnsInV: Int,
+	cardType: NovelCardType,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	val w = LocalConfiguration.current.screenWidthDp
+	val o = LocalConfiguration.current.orientation
+
+	val size =
+		(w / when (o) {
+			Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+			else -> columnsInV
+		}).dp - 8.dp
+
+	val state = rememberLazyGridState()
+
+	LazyVerticalGrid(
+		modifier = Modifier.fillMaxSize(),
+		columns = GridCells.Adaptive(if (cardType != COMPRESSED) size else 400.dp),
+		contentPadding = PaddingValues(
+			bottom = 200.dp,
+			start = 8.dp,
+			end = 8.dp,
+			top = 4.dp
+		),
+		state = state,
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		verticalArrangement = Arrangement.spacedBy(4.dp)
+	) {
+		itemsIndexed(
+			items,
+			key = { index, item -> item.hashCode() + index }
+		) { _, item ->
+			when (cardType) {
+				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
+				COMPRESSED -> CatalogCompressedCard(item, onClick, onLongClick)
+				COZY -> CatalogCozyCard(item, onClick, onLongClick)
+			}
+		}
+		appendBar(items)
+		noMoreBar(items)
+	}
+}
+
+/**
+ * [NovelCardNormalContent] adapted for [CatalogueView]
+ */
+@Composable
+fun CatalogNormalCard(
+	item: ACatalogNovelUI?,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	if (item != null)
+		NovelCardNormalContent(
+			item.title,
+			item.imageURL,
+			onClick = {
+				onClick(item)
+			},
+			onLongClick = {
+				onLongClick(item)
+			},
+			isBookmarked = item.bookmarked
+		)
+}
+
+/**
+ * [NovelCardCompressedContent] adapted for [CatalogueView]
+ */
+@Composable
+fun CatalogCompressedCard(
+	item: ACatalogNovelUI?,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	if (item != null)
+		NovelCardCompressedContent(
+			item.title,
+			item.imageURL,
+			onClick = {
+				onClick(item)
+			},
+			onLongClick = {
+				onLongClick(item)
+			},
+			isBookmarked = item.bookmarked
+		)
+}
+
+/**
+ * [NovelCardCozyContent] adapted for [CatalogueView]
+ */
+@Composable
+fun CatalogCozyCard(
+	item: ACatalogNovelUI?,
+	onClick: (ACatalogNovelUI) -> Unit,
+	onLongClick: (ACatalogNovelUI) -> Unit
+) {
+	if (item != null)
+		NovelCardCozyContent(
+			item.title,
+			item.imageURL,
+			onClick = {
+				onClick(item)
+			},
+			onLongClick = {
+				onLongClick(item)
+			},
+			isBookmarked = item.bookmarked
+		)
+}
+
+/**
+ * Catalogs error view
+ */
+@Composable
+fun CatalogErrorContent(
+	errorState: LoadState.Error,
+	items: LazyPagingItems<ACatalogNovelUI>,
+	openWebView: () -> Unit,
+	clearCookies: () -> Unit
+) {
+	ErrorContent(
+		errorState.error.message ?: "Unknown",
+		actions = arrayOf(
+			ErrorAction(R.string.retry, items::refresh),
+			ErrorAction(R.string.action_open_in_webview, openWebView),
+			ErrorAction(R.string.settings_advanced_clear_cookies_title, clearCookies),
+		),
+		stackTrace = errorState.error.stackTraceToString()
+	)
+}
+
+/**
+ * Loading bar appended to the bottom of [CatalogGrid]
+ */
+fun LazyGridScope.appendBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	if (items.loadState.append == LoadState.Loading) {
+		item(span = { GridItemSpan(maxLineSpan) }) {
 			LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+		}
+	}
+}
+
+/**
+ * No more message appended to the bottom of [CatalogGrid]
+ */
+fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
+	if (items.loadState.refresh.endOfPaginationReached ||
+		items.loadState.append.endOfPaginationReached
+	) {
+		item(span = { GridItemSpan(maxLineSpan) }) {
+			CatalogContentNoMore()
+		}
 	}
 }
 
 
+/**
+ * Preview [CatalogContentNoMore]
+ */
 @Preview
 @Composable
 fun PreviewCatalogContentNoMore() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		CatalogContentNoMore()
 	}
 }
 
+/**
+ * Tells the user there is no more content to see.
+ * Appears at the bottom of the listing.
+ */
 @Composable
 fun CatalogContentNoMore() {
 	Box(

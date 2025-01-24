@@ -18,8 +18,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFirstOrNull
+import androidx.compose.ui.util.fastSumBy
 import kotlinx.coroutines.launch
 import kotlin.math.floor
 
@@ -27,7 +31,6 @@ import kotlin.math.floor
 fun LazyColumnScrollbar(
 	modifier: Modifier = Modifier,
 	listState: LazyListState,
-	rightSide: Boolean = true,
 	thickness: Dp = 6.dp,
 	padding: Dp = 8.dp,
 	thumbMinHeight: Float = 0.1f,
@@ -36,12 +39,12 @@ fun LazyColumnScrollbar(
 	thumbShape: Shape = CircleShape,
 	content: @Composable () -> Unit
 ) {
+	val direction = LocalLayoutDirection.current
 	Box {
 		content()
 		LazyColumnScrollbar(
-			modifier = modifier.align(if (rightSide) Alignment.TopEnd else Alignment.TopStart),
+			modifier = modifier.align(if (direction == LayoutDirection.Ltr) Alignment.TopEnd else Alignment.TopStart),
 			listState = listState,
-			rightSide = rightSide,
 			thickness = thickness,
 			padding = padding,
 			thumbMinHeight = thumbMinHeight,
@@ -56,7 +59,6 @@ fun LazyColumnScrollbar(
 fun LazyColumnScrollbar(
 	modifier: Modifier,
 	listState: LazyListState,
-	rightSide: Boolean = true,
 	thickness: Dp = 6.dp,
 	padding: Dp = 8.dp,
 	thumbMinHeight: Float = 0.1f,
@@ -68,7 +70,7 @@ fun LazyColumnScrollbar(
 
 	var isSelected by remember { mutableStateOf(false) }
 
-	var dragOffset by remember { mutableStateOf(0f) }
+	var dragOffset by remember { mutableFloatStateOf(0f) }
 
 	fun normalizedThumbSize() = listState.layoutInfo.let {
 		if (it.totalItemsCount == 0) return@let 0f
@@ -80,11 +82,18 @@ fun LazyColumnScrollbar(
 	}
 		.coerceAtLeast(thumbMinHeight)
 		.coerceAtMost(2 * thumbMinHeight)
-
-	fun normalizedOffsetPosition() = listState.layoutInfo.let {
-		if (it.totalItemsCount == 0 || it.visibleItemsInfo.isEmpty()) 0f
-		else it.visibleItemsInfo.first()
-			.run { index.toFloat() - offset.toFloat() / size.toFloat() } / it.totalItemsCount.toFloat()
+	
+	fun computeStartOffset() = listState.layoutInfo.let {
+		val items = it.visibleItemsInfo
+		if (items.isEmpty()) return@let 0f
+		val estimatedSize = items.fastSumBy { it.size }.toFloat() / items.size
+		val totalSize = estimatedSize * it.totalItemsCount
+		val viewportSize = it.viewportSize.height - it.beforeContentPadding - it.afterContentPadding
+		items.fastFirstOrNull { (it.key as? String)?.startsWith("sticky:")?.not() ?: true }
+			?.run {
+				it.beforeContentPadding + (estimatedSize * index - offset) / totalSize * viewportSize
+			}
+			?: 0f
 	}
 
 	fun setScrollOffset(newOffset: Float) {
@@ -123,7 +132,6 @@ fun LazyColumnScrollbar(
 	val isThumbVisible = alpha > 0f
 
 	BoxWithConstraints(modifier.fillMaxHeight()) {
-
 		val dragState = rememberDraggableState { delta ->
 			setScrollOffset(dragOffset + delta / constraints.maxHeight.toFloat())
 		}
@@ -131,7 +139,7 @@ fun LazyColumnScrollbar(
 		Box(
 			Modifier
 				.graphicsLayer {
-					translationY = constraints.maxHeight.toFloat() * normalizedOffsetPosition()
+					translationY = computeStartOffset()
 				}
 				.draggable(
 					state = dragState,
@@ -151,7 +159,7 @@ fun LazyColumnScrollbar(
 						Modifier.systemGestureExclusion()
 					} else Modifier,
 				)
-				.absoluteOffset(x = if (rightSide) displacement.dp else -displacement.dp)
+				.offset(x = displacement.dp)
 				.fillMaxHeight(normalizedThumbSize())
 				.padding(horizontal = padding)
 				.width(thickness)

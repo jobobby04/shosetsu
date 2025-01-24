@@ -8,18 +8,22 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.utils.archURL
 import app.shosetsu.android.common.utils.flavor
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
+import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
+import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import app.shosetsu.android.domain.usecases.CanAppSelfUpdateUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
-import app.shosetsu.android.domain.usecases.load.LoadAppUpdateFlowLiveUseCase
-import app.shosetsu.android.domain.usecases.load.LoadAppUpdateUseCase
-import app.shosetsu.android.domain.usecases.load.LoadBackupProgressFlowUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCase
 import app.shosetsu.android.domain.usecases.start.StartAppUpdateInstallWorkerUseCase
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of shosetsu.
@@ -43,74 +47,81 @@ import kotlinx.coroutines.flow.*
  * 20 / 06 / 2020
  */
 class MainViewModel(
-	private val loadAppUpdateFlowLiveUseCase: LoadAppUpdateFlowLiveUseCase,
+	private val appUpdateRepo: IAppUpdatesRepository,
 	private val isOnlineUseCase: IsOnlineUseCase,
-	private val loadNavigationStyleUseCase: LoadNavigationStyleUseCase,
+	loadNavigationStyleUseCase: LoadNavigationStyleUseCase,
 	private val loadRequireDoubleBackUseCase: LoadRequireDoubleBackUseCase,
-	private var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
+	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 	private val startInstallWorker: StartAppUpdateInstallWorkerUseCase,
-	private val canAppSelfUpdateUseCase: CanAppSelfUpdateUseCase,
-	private val loadAppUpdateUseCase: LoadAppUpdateUseCase,
-	private val loadBackupProgress: LoadBackupProgressFlowUseCase,
+	backupRepo: IBackupRepository,
 	private val settingsRepository: ISettingsRepository
 ) : AMainViewModel() {
 
-	override val requireDoubleBackToExit by lazy {
+	override val requireDoubleBackToExit: StateFlow<Boolean> by lazy {
 		loadRequireDoubleBackUseCase()
 	}
 
-	override fun startAppUpdateCheck(): StateFlow<AppUpdateEntity?> =
-		loadAppUpdateFlowLiveUseCase()
+	override val openUpdate: MutableSharedFlow<UserUpdate> = MutableSharedFlow()
 
-	override val navigationStyle =
-		loadNavigationStyleUseCase().map { NavigationStyle.values()[it] }
-			.onIO()
+	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
+
+	override val navigationStyle: StateFlow<NavigationStyle> =
+		loadNavigationStyleUseCase().map {
+			if (it) {
+				NavigationStyle.LEGACY
+			} else {
+				NavigationStyle.MATERIAL
+			}
+		}
 			.stateIn(viewModelScopeIO, SharingStarted.Eagerly, NavigationStyle.MATERIAL)
 
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
-	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
+	override val appTheme: StateFlow<AppThemes> =
 		loadLiveAppThemeUseCase()
-			.onIO()
-			.shareIn(viewModelScopeIO, SharingStarted.Lazily, replay = 1)
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
+
+	override fun update() {
+		launchIO {
+			if (appUpdateRepo.canSelfUpdate) {
+				startInstallWorker()
+			} else {
+				val update = appUpdateRepo.appUpdate.first()
+
+				if (update != null) {
+					openUpdate.emit(
+						UserUpdate(
+							update.archURL(),
+							when (flavor()) {
+								ProductFlavors.PLAY_STORE -> "com.android.vending"
+								ProductFlavors.F_DROID -> "org.fdroid.fdroid"
+								else -> null
+							}
+						)
+					)
+				}
+			}
+		}
 	}
 
-	override fun handleAppUpdate(): Flow<AppUpdateAction?> =
-		flow {
-			emit(
-				canAppSelfUpdateUseCase().let { canSelfUpdate ->
-					if (canSelfUpdate) {
-						startInstallWorker()
-						AppUpdateAction.SelfUpdate
-					} else {
-						loadAppUpdateUseCase().let {
-							AppUpdateAction.UserUpdate(
-								it.archURL(),
-								when (flavor()) {
-									ProductFlavors.PLAY_STORE -> "com.android.vending"
-									ProductFlavors.F_DROID -> "org.fdroid.fdroid"
-									else -> null
-								}
-							)
-						}
-					}
-				}
-			)
-		}.onIO()
+	override val backupProgressState: StateFlow<IBackupRepository.BackupProgress> =
+		backupRepo.backupProgress
 
-	override val backupProgressState = loadBackupProgress()
-
-	private val showIntro by lazy {
+	override val showIntro: StateFlow<Boolean> by lazy {
 		settingsRepository.getBooleanFlow(SettingKey.FirstTime)
 	}
 
-	override suspend fun showIntro(): Boolean =
-		settingsRepository.getBoolean(SettingKey.FirstTime)
+	override fun dismissUpdateDialog() {
+		appUpdate.value = null
+	}
 
-	override fun toggleShowIntro() {
+	init {
 		launchIO {
-			settingsRepository.setBoolean(SettingKey.FirstTime, !showIntro.value)
+			// Pass updates to UI
+			appUpdateRepo.appUpdate.collect { it ->
+				appUpdate.emit(it)
+			}
 		}
 	}
 }

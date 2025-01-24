@@ -1,7 +1,45 @@
 package app.shosetsu.android.di
 
-import app.shosetsu.android.domain.repository.base.*
-import app.shosetsu.android.domain.repository.impl.*
+import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
+import app.shosetsu.android.domain.repository.base.IBackupRepository
+import app.shosetsu.android.domain.repository.base.IBackupUriRepository
+import app.shosetsu.android.domain.repository.base.ICategoryRepository
+import app.shosetsu.android.domain.repository.base.IChaptersRepository
+import app.shosetsu.android.domain.repository.base.IDownloadsRepository
+import app.shosetsu.android.domain.repository.base.IExtensionDownloadRepository
+import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
+import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
+import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
+import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
+import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
+import app.shosetsu.android.domain.repository.base.INovelPinsRepository
+import app.shosetsu.android.domain.repository.base.INovelReaderSettingsRepository
+import app.shosetsu.android.domain.repository.base.INovelSettingsRepository
+import app.shosetsu.android.domain.repository.base.INovelsRepository
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.domain.repository.base.IUpdatesRepository
+import app.shosetsu.android.domain.repository.impl.AppUpdatesRepository
+import app.shosetsu.android.domain.repository.impl.BackupRepository
+import app.shosetsu.android.domain.repository.impl.BackupUriRepository
+import app.shosetsu.android.domain.repository.impl.CategoryRepository
+import app.shosetsu.android.domain.repository.impl.ChapterHistoryRepositoryImpl
+import app.shosetsu.android.domain.repository.impl.ChaptersRepository
+import app.shosetsu.android.domain.repository.impl.DownloadsRepository
+import app.shosetsu.android.domain.repository.impl.ExtRepoRepository
+import app.shosetsu.android.domain.repository.impl.ExtensionDownloadRepository
+import app.shosetsu.android.domain.repository.impl.ExtensionEntitiesRepository
+import app.shosetsu.android.domain.repository.impl.ExtensionLibrariesRepository
+import app.shosetsu.android.domain.repository.impl.ExtensionSettingsRepository
+import app.shosetsu.android.domain.repository.impl.ExtensionsRepository
+import app.shosetsu.android.domain.repository.impl.NovelCategoryRepository
+import app.shosetsu.android.domain.repository.impl.NovelPinsRepository
+import app.shosetsu.android.domain.repository.impl.NovelReaderSettingsRepository
+import app.shosetsu.android.domain.repository.impl.NovelSettingsRepository
+import app.shosetsu.android.domain.repository.impl.NovelsRepository
+import app.shosetsu.android.domain.repository.impl.SettingsRepository
+import app.shosetsu.android.domain.repository.impl.UpdatesRepository
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -68,7 +106,10 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 
 	bind<IUpdatesRepository>() with singleton { UpdatesRepository(instance()) }
 
-	bind<IAppUpdatesRepository>() with singleton { AppUpdatesRepository(instance(), instance()) }
+	bind<IAppUpdatesRepository>() with singleton {
+		AppUpdatesRepository(instance(), instance())
+		//FakeAppUpdatesRepository()
+	}
 
 	bind<ISettingsRepository>() with singleton { SettingsRepository(instance()) }
 

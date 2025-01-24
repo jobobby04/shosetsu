@@ -24,7 +24,7 @@ import app.shosetsu.android.dto.Convertible
 
 /**
  * shosetsu
- * 08 / 08 / 2022
+ * @since 08 / 08 / 2022
  */
 @Entity(
 	tableName = "categories",

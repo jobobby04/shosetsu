@@ -6,7 +6,11 @@ import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.readAsset
 import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of shosetsu.
@@ -36,14 +40,14 @@ class TextAssetReaderViewModel(val application: Application) : ATextAssetReaderV
 	override val targetLiveData = MutableStateFlow<TextAsset?>(null)
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	override val liveData: StateFlow<String?> by lazy {
+	override val liveData: StateFlow<String> by lazy {
 		targetLiveData.mapLatest {
 			if (it != null) {
 				application.readAsset(it.assetName + ".txt")
 			} else {
-				null
+				""
 			}
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, "")
 	}
 
 	override fun setTarget(targetOrdinal: Int) {

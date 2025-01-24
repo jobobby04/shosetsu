@@ -2,6 +2,8 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
+import app.shosetsu.android.R
+import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.trimDate
@@ -70,14 +72,21 @@ class UpdatesViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentMapOf())
 	}
 
-	override fun startUpdateManager(categoryID: Int) = startUpdateWorkerUseCase(categoryID)
+	override fun startUpdateManager(categoryID: Int) {
+		if (isOnlineFlow.value) {
+			startUpdateWorkerUseCase(categoryID)
+		} else {
+			error.tryEmit(OfflineException(R.string.generic_error_cannot_update_library_offline))
+		}
+	}
 
-	override val isOnlineFlow = isOnlineUseCase.getFlow()
+	private val isOnlineFlow = isOnlineUseCase.getFlow()
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, false)
 
 	override fun isOnline(): Boolean = isOnlineFlow.value
 
-	override val displayDateAsMDYFlow = settingsRepository.getBooleanFlow(SettingKey.NovelUpdateDateMDY)
+	override val displayDateAsMDYFlow =
+		settingsRepository.getBooleanFlow(SettingKey.NovelUpdateDateMDY)
 
 	@SuppressLint("StopShip")
 	override suspend fun updateChapter(
@@ -99,4 +108,16 @@ class UpdatesViewModel(
 			updatesRepository.clearBefore(date)
 		}
 	}
+
+	override fun showClearBefore() {
+		isClearBeforeVisible.value = true
+	}
+
+	override fun hideClearBefore() {
+		isClearBeforeVisible.value = false
+	}
+
+	override val error = MutableSharedFlow<Throwable>()
+
+	override val isClearBeforeVisible = MutableStateFlow(false)
 }

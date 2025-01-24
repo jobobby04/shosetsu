@@ -13,7 +13,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
-import app.shosetsu.android.common.FLAG_CONCURRENT_MEMORY
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
@@ -98,6 +97,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	private val settingsRepo: ISettingsRepository by instance()
 	private val getUserAgent: GetUserAgentUseCase by instance()
 
+	/***/
 	override val di: DI by DI.lazy {
 		bind<ViewModelFactory>() with singleton { ViewModelFactory(applicationContext) }
 		import(othersModule)
@@ -111,6 +111,9 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		import(androidXModule(this@ShosetsuApplication))
 	}
 
+	/**
+	 * Perform setup as soon as context is available
+	 */
 	override fun attachBaseContext(base: Context?) {
 		super.attachBaseContext(base)
 		Notifications.createChannels(this)
@@ -191,13 +194,12 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		)
 	}
 
+	/***/
 	override fun onCreate() {
 
 		runBlocking {
 			if (settingsRepo.getBoolean(SettingKey.LogToFile))
 				setupDualOutput()
-
-			FLAG_CONCURRENT_MEMORY = settingsRepo.getBoolean(SettingKey.ConcurrentMemoryExperiment)
 		}
 
 		setupCoreLib()
@@ -267,7 +269,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 
 	override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {}
 
-	override fun getWorkManagerConfiguration(): Configuration =
+	override val workManagerConfiguration: Configuration =
 		Configuration.Builder().apply {
 		}.build()
 
@@ -282,6 +284,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				}.build()
 			}
 
+			@Suppress("ReplaceNotNullAssertionWithElvisReturn")
 			allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
 
 			// Coil spawns a new thread for every image load by default

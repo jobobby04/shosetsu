@@ -3,7 +3,6 @@ package app.shosetsu.android.datasource.local.file.base
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
-import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 import java.io.InputStream
 
@@ -29,20 +28,16 @@ import java.io.InputStream
  * 07 / 09 / 2020
  */
 interface IFileCachedAppUpdateDataSource {
-	/**
-	 * Live data of the current update
-	 */
-	val updateAvaLive: StateFlow<AppUpdateEntity?>
 
 	/**
 	 * Accessor method to read the current cached update
 	 */
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	suspend fun loadCachedAppUpdate(): AppUpdateEntity
+	suspend fun load(): AppUpdateEntity
 
 	/** Puts an update into cache */
 	@Throws(FilePermissionException::class, IOException::class)
-	suspend fun putAppUpdateInCache(appUpdate: AppUpdateEntity, isUpdate: Boolean)
+	suspend fun save(appUpdate: AppUpdateEntity)
 
 	/**
 	 * Saves the APK bytes to the filesystem
@@ -50,5 +45,5 @@ interface IFileCachedAppUpdateDataSource {
 	 * @return the path to the APK
 	 */
 	@Throws(IOException::class, FilePermissionException::class, FileNotFoundException::class)
-	fun saveAPK(appUpdate: AppUpdateEntity, bytes: InputStream): String
+	fun writeAPK(appUpdate: AppUpdateEntity, bytes: InputStream): String
 }

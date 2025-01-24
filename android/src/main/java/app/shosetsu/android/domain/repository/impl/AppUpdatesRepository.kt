@@ -6,6 +6,7 @@ import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.MissingFeatureException
 import app.shosetsu.android.common.enums.ProductFlavors
+import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.onIO
@@ -16,7 +17,8 @@ import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
 
 /*
@@ -45,8 +47,22 @@ class AppUpdatesRepository(
 	private val iFileAppUpdateDataSource: IFileCachedAppUpdateDataSource,
 ) : IAppUpdatesRepository {
 
-	override fun loadAppUpdateFlow(): StateFlow<AppUpdateEntity?> =
-		iFileAppUpdateDataSource.updateAvaLive
+	/**
+	 * SharedFlow so that the UI can always get whatever is last pushed.
+	 *
+	 * A StateFlow would not update the UI if the user clicks the update button twice
+	 */
+	override val appUpdate: MutableSharedFlow<AppUpdateEntity> = MutableSharedFlow(1)
+
+	init {
+		launchIO {
+			try {
+				appUpdate.emit(iFileAppUpdateDataSource.load())
+			} catch (ignore: Exception) {
+				// If it doesn't work, meh!
+			}
+		}
+	}
 
 	private fun compareVersion(newVersion: AppUpdateEntity): Int {
 		when (flavor()) {
@@ -58,6 +74,7 @@ class AppUpdatesRepository(
 
 				return remoteVersion.compareTo(currentVersion)
 			}
+
 			else -> {
 				val currentV: Int
 				val remoteV: Int
@@ -76,24 +93,26 @@ class AppUpdatesRepository(
 						//println("This a future release compared to $newVersion")
 						-1
 					}
+
 					remoteV > currentV -> {
 						//println("Update found compared to $newVersion")
 						1
 					}
-					remoteV == currentV -> {
+
+					else -> {
 						//println("This the current release compared to $newVersion")
 						0
 					}
-					else -> 0
 				}
 			}
 		}
 	}
 
 	@Throws(FilePermissionException::class, IOException::class, HTTPException::class)
-	override suspend fun loadRemoteUpdate(): AppUpdateEntity? = onIO {
+	override suspend fun fetch(): AppUpdateEntity? = onIO {
 		// Ignore any attempt to run updater on non-standard debug versions
 		if (flavor() != ProductFlavors.STANDARD && BuildConfig.DEBUG) return@onIO null
+
 		val appUpdateEntity = try {
 			iRemoteAppUpdateDataSource.loadAppUpdate()
 		} catch (e: EmptyResponseBodyException) {
@@ -104,22 +123,15 @@ class AppUpdatesRepository(
 		val compared = compareVersion(appUpdateEntity)
 		logV("Compared value $compared")
 		if (compared > 0) {
-			iFileAppUpdateDataSource.putAppUpdateInCache(
-				appUpdateEntity,
-				true
-			)
+			iFileAppUpdateDataSource.save(appUpdateEntity)
+			appUpdate.emit(appUpdateEntity)
 			return@onIO appUpdateEntity
 		}
 
 		return@onIO null
 	}
 
-
-	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun loadAppUpdate(): AppUpdateEntity =
-		onIO { iFileAppUpdateDataSource.loadCachedAppUpdate() }
-
-	override fun canSelfUpdate(): Boolean =
+	override val canSelfUpdate: Boolean =
 		iRemoteAppUpdateDataSource is IRemoteAppUpdateDataSource.Downloadable
 
 	@Throws(
@@ -128,13 +140,20 @@ class AppUpdatesRepository(
 		FileNotFoundException::class,
 		MissingFeatureException::class,
 		EmptyResponseBodyException::class,
-		HTTPException::class
+		HTTPException::class,
+		NoSuchElementException::class
 	)
-	override suspend fun downloadAppUpdate(appUpdateEntity: AppUpdateEntity): String = onIO {
-		if (iRemoteAppUpdateDataSource is IRemoteAppUpdateDataSource.Downloadable)
-			iRemoteAppUpdateDataSource.downloadAppUpdate(appUpdateEntity).let { response ->
-				iFileAppUpdateDataSource.saveAPK(appUpdateEntity, response)
-			}
-		else throw MissingFeatureException("self update")
+	override suspend fun downloadAppUpdate(): String = onIO {
+		if (iRemoteAppUpdateDataSource is IRemoteAppUpdateDataSource.Downloadable) {
+			val update = appUpdate.firstOrNull()
+
+			if (update != null) {
+				// Download
+				val response = iRemoteAppUpdateDataSource.downloadAppUpdate(update)
+
+				// Write
+				iFileAppUpdateDataSource.writeAPK(update, response)
+			} else throw NoSuchElementException("No update")
+		} else throw MissingFeatureException("self update")
 	}
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import app.shosetsu.android.backend.workers.perodic.AppUpdateCheckCycleWorker
+import app.shosetsu.android.backend.workers.perodic.BackupCycleWorker
 import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
@@ -30,9 +31,10 @@ class BootReceiver : BroadcastReceiver() {
 			logE("Action did not match")
 			return
 		}
-		// Starts perodic workers
+		// Starts periodic workers
 		AutoStartUpdateWorker(context).invoke()
 		AutoStartAppUpdateWorker(context).invoke()
+		AutoStartBackupWorker(context).invoke()
 	}
 
 	internal class AutoStartUpdateWorker(val context: Context) : DIAware {
@@ -59,6 +61,20 @@ class BootReceiver : BroadcastReceiver() {
 				val b = iSettingsRepository.getBoolean(SettingKey.AppUpdateOnStartup)
 				if (b && !manager.isRunning()) {
 					Log.i(logID(), "Starting app update worker on boot")
+					manager.start()
+				}
+			}
+		}
+	}
+
+	internal class AutoStartBackupWorker(val context: Context) : DIAware {
+		override val di: DI by closestDI(context)
+		private val manager: BackupCycleWorker.Manager by instance()
+		private val iSettingsRepository: ISettingsRepository by instance()
+		operator fun invoke() {
+			launchIO {
+				if (!manager.isRunning()) {
+					Log.i(logID(), "Starting backup worker on boot")
 					manager.start()
 				}
 			}

@@ -4,6 +4,9 @@ import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import com.google.accompanist.web.AccompanistWebViewClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -29,7 +32,9 @@ import com.google.accompanist.web.AccompanistWebViewClient
  * @author Doomsdayrs
  */
 class ChapterReaderAccompanistWebViewClient(
-	private val openURI: (Uri) -> Unit
+	private val openURI: (Uri) -> Unit,
+	private val scope: CoroutineScope,
+	private val ttsState: StateFlow<String?>,
 ) : AccompanistWebViewClient() {
 	private var applied = false
 
@@ -54,10 +59,45 @@ class ChapterReaderAccompanistWebViewClient(
 		if (!applied) {
 			view.evaluateJavascript(
 				"""
-				window.addEventListener("click",(event)=>{ shosetsuScript.onClick(); });
+				window.addEventListener("click",(event)=>{ shosetsuScript.onClick(null); });
 				window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
+				var elements = document.querySelectorAll('[id]');
+            	elements.forEach(function(element) {
+                	element.addEventListener('click', function(event) {
+				        event.stopPropagation();
+                   		shosetsuScript.onClick(element.id);
+                	});
+            	});
 				""".trimIndent(), null
 			)
+			scope.launch {
+				var oldTtsElement: String? = null
+				ttsState.collect { id ->
+					if (id != null) {
+						view.evaluateJavascript(
+							"""
+							var element = document.getElementById("textElement$id");
+							element.classList.add("tts-border-style");
+							""".trimIndent() + if (oldTtsElement != null) {
+								"""
+								var element2 = document.getElementById("textElement$oldTtsElement");
+								element2.classList.remove("tts-border-style");
+								""".trimIndent()
+							} else "",
+							null,
+						)
+					} else if (oldTtsElement != null) {
+						view.evaluateJavascript(
+							"""
+							var element2 = document.getElementById("textElement$oldTtsElement");
+							element2.classList.remove("tts-border-style");
+							""".trimIndent(),
+							null,
+						)
+					}
+					oldTtsElement = id
+				}
+			}
 			applied = true
 		}
 	}

@@ -2,7 +2,6 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.compose.runtime.Immutable
 import app.shosetsu.android.view.uimodels.model.DownloadUI
-import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -35,9 +34,9 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class ADownloadsViewModel :
 	SubscribeViewModel<ImmutableList<DownloadUI>>,
-	ShosetsuViewModel(),
-	IsOnlineCheckViewModel {
+	ShosetsuViewModel() {
 
+	abstract val error: Flow<Throwable>
 	abstract val selectedDownloadState: StateFlow<SelectedDownloadsState>
 	abstract val isDownloadPaused: StateFlow<Boolean>
 	abstract val hasSelectedFlow: StateFlow<Boolean>

@@ -7,12 +7,11 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
 import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.view.uimodels.model.QRCodeData
-import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import javax.security.auth.Destroyable
 
 /*
  * This file is part of shosetsu.
@@ -39,7 +38,27 @@ import javax.security.auth.Destroyable
  * @author github.com/doomsdayrs
  */
 abstract class ANovelViewModel
-	: ShosetsuViewModel(), IsOnlineCheckViewModel, Destroyable {
+	: ShosetsuViewModel() {
+
+	/**
+	 * A flow that throws the UI a chapter to open
+	 */
+	abstract val openLastReadResult: SharedFlow<LastOpenResult>
+
+	/**
+	 * Result returned by [openLastReadResult]
+	 */
+	sealed interface LastOpenResult {
+		/**
+		 * User has read all chapters
+		 */
+		data object Complete : LastOpenResult
+
+		/**
+		 * Open the following chapters
+		 */
+		data class Open(val chapterUI: ChapterUI) : LastOpenResult
+	}
 
 	abstract val hasSelected: StateFlow<Boolean>
 	abstract fun clearSelection()
@@ -53,9 +72,10 @@ abstract class ANovelViewModel
 	abstract val chaptersLive: StateFlow<ImmutableList<ChapterUI>>
 	abstract val selectedChaptersState: StateFlow<SelectedChaptersState>
 
-	abstract val otherException: StateFlow<Throwable?>
-	abstract val novelException: StateFlow<Throwable?>
-	abstract val chaptersException: StateFlow<Throwable?>
+	/**
+	 * Provides errors
+	 */
+	abstract val error: Flow<Throwable?>
 
 	abstract val novelSettingFlow: StateFlow<NovelSettingUI?>
 
@@ -133,10 +153,10 @@ abstract class ANovelViewModel
 	 *
 	 * @return Next chapter to read uwu
 	 */
-	abstract fun openLastRead(): Flow<ChapterUI?>
+	abstract fun openLastRead()
 
 	/** Refresh media */
-	abstract fun refresh(): Flow<Unit>
+	abstract fun refresh()
 
 	/**
 	 * Is the novel bookmarked?
@@ -163,7 +183,7 @@ abstract class ANovelViewModel
 
 	abstract fun updateNovelSetting(novelSettingUI: NovelSettingUI)
 
-	abstract fun getIfAllowTrueDelete(): Flow<Boolean>
+	abstract val showTrueDelete: StateFlow<Boolean>
 
 	abstract fun bookmarkSelected()
 	abstract fun removeBookmarkFromSelected()
@@ -219,6 +239,12 @@ abstract class ANovelViewModel
 	abstract fun showFilterMenu()
 
 	abstract fun hideFilterMenu()
+
+	abstract val isDownloadDialogVisible: StateFlow<Boolean>
+
+	abstract fun showDownloadDialog()
+
+	abstract fun hideDownloadDialog()
 
 	/**
 	 * @param showRemoveBookmark If any chapters are bookmarked, show the remove bookmark logo

@@ -34,17 +34,39 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class ASearchViewModel : ShosetsuViewModel() {
 
-	abstract val query: StateFlow<String?>
+	/**
+	 * Query that is currently typed in by the user
+	 */
+	abstract val query: StateFlow<String>
 
+	/**
+	 * The listings to showcase
+	 */
 	abstract val listings: StateFlow<ImmutableList<SearchRowUI>>
 
+	/**
+	 * Should be cozy typed or not
+	 */
 	abstract val isCozy: StateFlow<Boolean>
 
+	/**
+	 * Initialize the view model with a query
+	 */
 	abstract fun initQuery(string: String?)
+
+	/**
+	 * Set the query as the user types
+	 */
 	abstract fun setQuery(query: String)
+
+	/**
+	 * Apply the query
+	 */
 	abstract fun applyQuery(query: String)
 
-
+	/**
+	 * Get search results of the library
+	 */
 	abstract fun searchLibrary(): Flow<PagingData<ACatalogNovelUI>>
 
 	/**

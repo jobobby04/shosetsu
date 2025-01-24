@@ -22,7 +22,12 @@ import app.shosetsu.android.dto.Convertible
 
 /**
  * shosetsu
- * 19 / 12 / 2020
+ * @since 19 / 12 / 2020
+ *
+ * @param id [DBNovelEntity.id]
+ * @param title [DBNovelEntity.title]
+ * @param imageURL [DBNovelEntity.imageURL]
+ * @param bookmarked [DBNovelEntity.bookmarked]
  */
 data class DBStrippedNovelEntity(
 	val id: Int,
@@ -30,5 +35,6 @@ data class DBStrippedNovelEntity(
 	val imageURL: String,
 	var bookmarked: Boolean,
 ) : Convertible<StrippedNovelEntity> {
-	override fun convertTo() = StrippedNovelEntity(id, title, imageURL, bookmarked)
+	override fun convertTo(): StrippedNovelEntity =
+		StrippedNovelEntity(id, title, imageURL, bookmarked)
 }

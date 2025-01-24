@@ -4,16 +4,17 @@ import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import app.shosetsu.android.R
-import app.shosetsu.android.activity.MainActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
 
+@Deprecated("Compose")
 fun Fragment.makeSnackBar(
 	@StringRes stringRes: Int,
 	@BaseTransientBottomBar.Duration length: Int = Snackbar.LENGTH_SHORT,
-) = (activity as? MainActivity)?.makeSnackBar(stringRes, length)
+): Snackbar? = null
 
+@Deprecated("Compose")
 fun Fragment.displayOfflineSnackBar(@StringRes res: Int = R.string.you_not_online) {
 	makeSnackBar(
 		res,
@@ -23,7 +24,8 @@ fun Fragment.displayOfflineSnackBar(@StringRes res: Int = R.string.you_not_onlin
 	}?.show()
 }
 
+@Deprecated("Compose")
 fun Fragment.makeSnackBar(
 	string: String,
 	@BaseTransientBottomBar.Duration length: Int = Snackbar.LENGTH_SHORT,
-) = (activity as? MainActivity)?.makeSnackBar(string, length)
+): Snackbar? = null

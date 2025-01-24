@@ -1,5 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBUpdate
+
 /*
  * This file is part of shosetsu.
  *
@@ -23,8 +25,11 @@ package app.shosetsu.android.domain.model.local
  * 22 / 04 / 2020
  *
  * @author github.com/doomsdayrs
+ *
+ * @param chapterID [DBUpdate.chapterID]
+ * @param novelID [DBUpdate.novelID]
+ * @param time [DBUpdate.time]
  */
-
 data class UpdateEntity(
 	val chapterID: Int,
 	val novelID: Int,

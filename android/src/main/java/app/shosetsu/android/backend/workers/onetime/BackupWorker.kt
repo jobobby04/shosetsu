@@ -15,6 +15,7 @@ import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_WORK_ID
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
@@ -327,8 +328,8 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(BACKUP_WORK_ID).await()

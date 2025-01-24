@@ -18,11 +18,19 @@
 
 package app.shosetsu.android.view.compose
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.*
+import androidx.compose.material3.LocalAbsoluteTonalElevation
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
@@ -73,7 +81,7 @@ fun Surface(
 				)
 				.combinedClickable(
 					interactionSource = interactionSource,
-					indication = rememberRipple(),
+					indication = LocalIndication.current,
 					enabled = enabled,
 					role = Role.Button,
 					onClick = onClick,
@@ -91,7 +99,8 @@ private fun Modifier.surface(
 	backgroundColor: Color,
 	border: BorderStroke?,
 	shadowElevation: Dp
-) = this.shadow(shadowElevation, shape, clip = false)
+) = this
+	.shadow(shadowElevation, shape, clip = false)
 	.then(if (border != null) Modifier.border(border, shape) else Modifier)
 	.background(color = backgroundColor, shape = shape)
 	.clip(shape)

@@ -3,11 +3,11 @@ package app.shosetsu.android.viewmodel.abstracted
 import androidx.compose.runtime.Immutable
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
-import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Locale
 
@@ -37,8 +37,7 @@ import java.util.Locale
  */
 abstract class ABrowseViewModel :
 	ShosetsuViewModel(),
-	SubscribeViewModel<ImmutableList<BrowseExtensionUI>?>,
-	IsOnlineCheckViewModel {
+	SubscribeViewModel<ImmutableList<BrowseExtensionUI>?> {
 
 	@Immutable
 	data class LanguageFilter(val lang: String, val displayLang: String) {
@@ -50,6 +49,10 @@ abstract class ABrowseViewModel :
 		val languages: ImmutableList<LanguageFilter>,
 		val states: ImmutableMap<String, Boolean>
 	)
+
+	abstract val isOnline: StateFlow<Boolean>
+
+	abstract val error: Flow<Throwable>
 
 	/** Refreshes the repositories and data values */
 	abstract fun refresh()

@@ -10,8 +10,6 @@ import app.shosetsu.android.datasource.local.file.base.IFileCachedAppUpdateDataS
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.model.remote.AppUpdateDTO
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
@@ -41,9 +39,6 @@ import java.io.InputStream
 class FileAppUpdateDataSource(
 	private val iFileSystemProvider: IFileSystemProvider
 ) : IFileCachedAppUpdateDataSource {
-	override val updateAvaLive: MutableStateFlow<AppUpdateEntity?> by lazy {
-		MutableStateFlow(null)
-	}
 
 	init {
 		try {
@@ -63,30 +58,35 @@ class FileAppUpdateDataSource(
 		)
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun loadCachedAppUpdate(): AppUpdateEntity =
-		updateAvaLive.value ?: Json.decodeFromString<AppUpdateDTO>(
+	override suspend fun load(): AppUpdateEntity =
+		Json.decodeFromString<AppUpdateDTO>(
 			iFileSystemProvider.readFile(CACHE, APP_UPDATE_CACHE_FILE).decodeToString()
 		).convertTo()
 
 
 	@Throws(FilePermissionException::class, IOException::class)
-	override suspend fun putAppUpdateInCache(
-		appUpdate: AppUpdateEntity,
-		isUpdate: Boolean
+	override suspend fun save(
+		appUpdate: AppUpdateEntity
 	) {
-		updateAvaLive.value = if (isUpdate) appUpdate else null
 		write(AppUpdateDTO.fromEntity(appUpdate))
 	}
 
 	@Throws(IOException::class, FilePermissionException::class, FileNotFoundException::class)
-	override fun saveAPK(
+	override fun writeAPK(
 		appUpdate: AppUpdateEntity,
 		bytes: InputStream
 	): String {
+		// Ensure no previous file exists
 		if (iFileSystemProvider.doesFileExist(CACHE, updatesCPath))
 			iFileSystemProvider.deleteFile(CACHE, updatesCPath)
+
+		// Create the new file
 		iFileSystemProvider.createFile(CACHE, updatesCPath)
+
+		// Write to the new file
 		iFileSystemProvider.writeFile(CACHE, updatesCPath, bytes)
+
+		// Return the file path
 		return iFileSystemProvider.retrievePath(CACHE, updatesCPath)
 	}
 

@@ -16,6 +16,7 @@ import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.ID_EXPORT
 import app.shosetsu.android.common.consts.WorkerTags.EXPORT_BACKUP_WORK_ID
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupUriRepository
@@ -174,8 +175,8 @@ class ExportBackupWorker(appContext: Context, params: WorkerParameters) : Corout
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int): WorkInfo.State =
-			getWorkerInfoList()[index].state
+		override suspend fun getWorkerState(index: Int) =
+			getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(EXPORT_BACKUP_WORK_ID).await()

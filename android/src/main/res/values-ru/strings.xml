@@ -359,6 +359,7 @@
     <html>
         <head>
             <style>%s</style>
+            <style>%s</style>
         </head>
         <body>
             <h1>Заголовок 1</h1>

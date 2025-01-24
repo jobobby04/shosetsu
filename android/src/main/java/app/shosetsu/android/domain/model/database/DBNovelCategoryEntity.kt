@@ -26,7 +26,11 @@ import app.shosetsu.android.dto.Convertible
 
 /**
  * shosetsu
- * 08 / 08 / 2022
+ * @since 08 / 08 / 2022
+ *
+ * @param id of this association
+ * @param novelID id of associated novel
+ * @param categoryID id of the category the novel is associated with
  */
 @Entity(
 	tableName = "novel_categories",
@@ -47,7 +51,6 @@ import app.shosetsu.android.dto.Convertible
 	indices = [Index("categoryID"), Index("novelID")]
 )
 data class DBNovelCategoryEntity(
-	/** Extension ID */
 	@PrimaryKey(autoGenerate = true)
 	val id: Int? = null,
 	val novelID: Int,

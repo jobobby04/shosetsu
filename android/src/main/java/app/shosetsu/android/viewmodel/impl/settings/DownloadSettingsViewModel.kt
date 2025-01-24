@@ -9,7 +9,7 @@ import app.shosetsu.android.common.SettingKey.DownloadOnlyWhenIdle
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.viewmodel.abstracted.settings.ADownloadSettingsViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 
 /*
@@ -39,7 +39,7 @@ class DownloadSettingsViewModel(
 ) : ADownloadSettingsViewModel(iSettingsRepository) {
 
 
-	override val notifyRestartWorker = MutableStateFlow<Boolean>(false)
+	override val notifyRestartWorker = MutableSharedFlow<Request>()
 
 	init {
 		launchIO {
@@ -49,7 +49,7 @@ class DownloadSettingsViewModel(
 				.combine(settingsRepo.getBooleanFlow(DownloadOnMeteredConnection)) { a, b -> a to b }
 				.collect {
 					if (manager.getCount() != 0 && manager.getWorkerState() == WorkInfo.State.ENQUEUED)
-						notifyRestartWorker.value = true
+						notifyRestartWorker.emit(Request)
 				}
 		}
 	}
@@ -57,10 +57,5 @@ class DownloadSettingsViewModel(
 	override fun restartDownloadWorker() {
 		manager.stop()
 		manager.start()
-		notifyRestartWorker.value = false
-	}
-
-	override fun dismissNotifyRestartWorker() {
-		notifyRestartWorker.value = false
 	}
 }

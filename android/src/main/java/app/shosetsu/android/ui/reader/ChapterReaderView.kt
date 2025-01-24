@@ -16,16 +16,17 @@
  */
 package app.shosetsu.android.ui.reader
 
-import android.speech.tts.TextToSpeech
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import android.content.Intent
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,32 +34,38 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
-import app.shosetsu.android.common.ext.collectLA
-import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.reader.content.ChapterReaderBottomSheetContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderHTMLContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
 import app.shosetsu.android.ui.reader.page.DividierPageContent
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
+import app.shosetsu.android.viewmodel.impl.settings.EditCSS
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapSystem
 import app.shosetsu.android.viewmodel.impl.settings.enableFullscreen
 import app.shosetsu.android.viewmodel.impl.settings.invertChapterSwipeOption
 import app.shosetsu.android.viewmodel.impl.settings.matchFullscreenToFocus
+import app.shosetsu.android.viewmodel.impl.settings.readerEngineOption
 import app.shosetsu.android.viewmodel.impl.settings.readerKeepScreenOnOption
+import app.shosetsu.android.viewmodel.impl.settings.readerLanguageOption
 import app.shosetsu.android.viewmodel.impl.settings.readerPitchOption
+import app.shosetsu.android.viewmodel.impl.settings.readerReadNextChapter
 import app.shosetsu.android.viewmodel.impl.settings.readerSpeedOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTableHackOption
+import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
+import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
 import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
@@ -67,9 +74,8 @@ import app.shosetsu.lib.Novel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
-import org.jsoup.Jsoup
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterReaderView(
 	viewModel: AChapterReaderViewModel = viewModelDi(),
@@ -91,8 +97,7 @@ fun ChapterReaderView(
 	val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
 	val chapterType by viewModel.chapterType.collectAsState()
 	val currentChapterID by viewModel.currentChapterID.collectAsState()
-	val isTTSCapable by viewModel.isTTSCapable.collectAsState()
-	val isTTSPlaying by viewModel.isTTSPlaying.collectAsState()
+	val ttsPlayback by viewModel.ttsPlayback.collectAsState()
 	val setting by viewModel.getSettings().collectAsState()
 	val currentPage by viewModel.currentPage.collectAsState()
 
@@ -104,22 +109,6 @@ fun ChapterReaderView(
 	val trackLongReading by viewModel.trackLongReading.collectAsState()
 
 	val context = LocalContext.current
-	val utteranceListener =
-		remember { ShosetsuUtteranceProgressListener(viewModel::setIsTTSPlaying) }
-
-	lateinit var tts: TextToSpeech
-	val initListener = remember {
-		ShosetsuTextToSpeechInitListener({ tts }, viewModel::setIsTTSCapable)
-	}
-	tts = remember {
-		TextToSpeech(
-			context,
-			initListener
-		).apply {
-			if (setOnUtteranceProgressListener(utteranceListener) != 0)
-				logE("Could not set utterance progress listener")
-		}
-	}
 
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
@@ -133,7 +122,8 @@ fun ChapterReaderView(
 		}
 
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
-	ShosetsuCompose {
+	ShosetsuTheme {
+		viewModel.colorScheme.value = MaterialTheme.colorScheme
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
 			isFocused = isFocused,
@@ -141,8 +131,7 @@ fun ChapterReaderView(
 			sheetContent = { state ->
 				ChapterReaderBottomSheetContent(
 					scaffoldState = state,
-					isTTSCapable = isTTSCapable,
-					isTTSPlaying = isTTSPlaying,
+					ttsPlayback = ttsPlayback,
 					isBookmarked = isBookmarked,
 					isRotationLocked = isRotationLocked,
 					setting = setting,
@@ -150,73 +139,10 @@ fun ChapterReaderView(
 					toggleBookmark = viewModel::toggleBookmark,
 					exit = onExit,
 					onPlayTTS = {
-						launchIO {
-							if (chapterType == null) return@launchIO
-							items
-								.orEmpty()
-								.filterIsInstance<ReaderUIItem.ReaderChapterUI>()
-								.find { it.id == currentChapterID }
-								?.let { item ->
-									tts.setPitch(viewModel.ttsPitch.value / 10)
-									tts.setSpeechRate(viewModel.ttsSpeed.value / 10)
-									tts.voice =
-										tts.voices?.find { it.name == viewModel.ttsVoice.value }
-											?: tts.defaultVoice
-
-									when (chapterType!!) {
-										Novel.ChapterType.STRING -> {
-											viewModel.getChapterStringPassage(item)
-												.collectLA(
-													owner,
-													catch = {}) { content ->
-													if (content is AChapterReaderViewModel.ChapterPassage.Success)
-														tts.speak(
-															content.content,
-															TextToSpeech.QUEUE_FLUSH,
-															null,
-															content.hashCode().toString()
-														)
-													if (content is AChapterReaderViewModel.ChapterPassage.Success) {
-														customSpeak(
-															tts,
-															content.content,
-															content.hashCode()
-														)
-													}
-												}
-
-										}
-
-										Novel.ChapterType.HTML -> {
-											viewModel.getChapterHTMLPassage(item)
-												.collectLA(
-													owner,
-													catch = {}) { content ->
-													if (content is AChapterReaderViewModel.ChapterPassage.Success)
-														tts.speak(
-															content.content,
-															TextToSpeech.QUEUE_FLUSH,
-															null,
-															content.hashCode().toString()
-														)
-													if (content is AChapterReaderViewModel.ChapterPassage.Success) {
-														customSpeak(
-															tts,
-															Jsoup.parse(content.content).text(),
-															content.hashCode()
-														)
-													}
-												}
-										}
-
-										else -> {}
-									}
-								}
-						}
+						viewModel.onPlayTts()
 					},
-					onStopTTS = {
-						tts.stop()
-					},
+					onPauseTTS = viewModel::onPauseTts,
+					onStopTTS = viewModel::onStopTts,
 					updateSetting = viewModel::updateSetting,
 					lowerSheet = {
 						item { viewModel.textSizeOption() }
@@ -232,10 +158,28 @@ fun ChapterReaderView(
 						item { viewModel.doubleTapFocus() }
 						item { viewModel.doubleTapSystem() }
 						item { viewModel.readerTableHackOption() }
+						item {
+							viewModel.EditCSS(
+								openCSS = {
+									ContextCompat.startActivity(
+										context,
+										Intent(context, CSSEditorActivity::class.java).apply {
+											putExtra(CSSEditorActivity.CSS_ID, -1)
+										},
+										null
+									)
+								}
+							)
+						}
 						item { viewModel.readerTextSelectionToggle() }
 						item { viewModel.trackLongReadingOption() }
 						item { viewModel.readerPitchOption() }
 						item { viewModel.readerSpeedOption() }
+						item { viewModel.readerEngineOption() }
+						item { viewModel.readerLanguageOption() }
+						item { viewModel.readerVoiceOption() }
+						item { viewModel.readerTestOption() }
+						item { viewModel.readerReadNextChapter() }
 					},
 					toggleFocus = viewModel::toggleFocus,
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
@@ -254,9 +198,8 @@ fun ChapterReaderView(
 						viewModel.setCurrentChapterID(it.id)
 					},
 					onChapterRead = viewModel::updateChapterAsRead,
-					onStopTTS = {
-						tts.stop()
-					},
+					onStopTTS = viewModel::onStopTts,
+					pageJumper = StableHolder(viewModel.pageJumper),
 					createPage = { page ->
 						when (val item = items.orEmpty()[page]) {
 							is ReaderUIItem.ReaderChapterUI -> {
@@ -271,7 +214,7 @@ fun ChapterReaderView(
 											backgroundColorFlow = { viewModel.backgroundColor },
 											disableTextSelFlow = { viewModel.disableTextSelection },
 											onScroll = viewModel::onScroll,
-											onClick = viewModel::onReaderClicked,
+											onClick = { viewModel.onReaderClicked(null) },
 											onDoubleClick = viewModel::onReaderDoubleClicked,
 											progressFlow = {
 												viewModel.getChapterProgress(item)
@@ -289,6 +232,9 @@ fun ChapterReaderView(
 											onDoubleClick = viewModel::onReaderDoubleClicked,
 											progressFlow = {
 												viewModel.getChapterProgress(item)
+											},
+											ttsProgress = remember {
+												StableHolder(viewModel.ttsProgress)
 											}
 										)
 									}
@@ -322,7 +268,7 @@ fun ChapterReaderView(
 				},
 				confirmButton = {
 					var isEnabled by remember { mutableStateOf(false) }
-					var timeLeft by remember { mutableStateOf(20) }
+					var timeLeft by remember { mutableIntStateOf(20) }
 
 					LaunchedEffect(Unit) {
 						repeat(20) {
@@ -349,12 +295,6 @@ fun ChapterReaderView(
 					dismissOnClickOutside = false
 				)
 			)
-		}
-	}
-
-	DisposableEffect(Unit) {
-		onDispose {
-			tts.stop()
 		}
 	}
 }

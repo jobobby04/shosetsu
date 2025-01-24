@@ -1,6 +1,6 @@
 package app.shosetsu.android
 
-import app.shosetsu.android.datasource.local.memory.impl.AbstractMemoryDataSource
+import app.shosetsu.android.datasource.local.memory.impl.AbstractConMemoryDataSource
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -31,8 +31,8 @@ import kotlin.time.measureTime
  */
 class AbstractMemoryDataSourceTest {
 
-	private val source: AbstractMemoryDataSource<Int, String> by lazy {
-		object : AbstractMemoryDataSource<Int, String>() {
+	private val source: AbstractConMemoryDataSource<Int, String> by lazy {
+		object : AbstractConMemoryDataSource<Int, String>() {
 			override val maxSize: Long
 				get() = 100
 			override val expireTime: Long

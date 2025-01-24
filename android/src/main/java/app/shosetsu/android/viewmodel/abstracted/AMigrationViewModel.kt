@@ -62,7 +62,7 @@ abstract class AMigrationViewModel : ShosetsuViewModel() {
 	/**
 	 * Set the novels to work with
 	 */
-	abstract fun setNovels(array: IntArray)
+	abstract fun setNovels(array: List<Int>)
 
 	/**
 	 * Set which extension to use with the currently selected novel

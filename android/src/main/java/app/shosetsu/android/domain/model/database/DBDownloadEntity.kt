@@ -28,7 +28,15 @@ import app.shosetsu.android.dto.Convertible
 
 /**
  * shosetsu
- * 05 / 12 / 2020
+ * @since 05 / 12 / 2020
+ *
+ * @param chapterID id of chapter that is being downloaded
+ * @param novelID id of novel the chapter is associated with
+ * @param chapterURL url of the chapter (copy of [DBChapterEntity.url])
+ * @param chapterName name of the chapter (copy of [DBChapterEntity.title])
+ * @param novelName name of the novel (copy of [DBNovelEntity.title])
+ * @param extensionID id of the extension to use to download this chapter.
+ * @param status of this novel.
  */
 @Entity(
 	tableName = "downloads",

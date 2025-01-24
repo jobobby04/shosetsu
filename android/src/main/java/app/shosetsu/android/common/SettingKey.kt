@@ -223,7 +223,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ChapterColumnsInLandscape : IntKey("columnsInNovelsViewH", 6)
 	object NovelBadgeToast : BooleanKey("novelBadge", true)
 	object SelectedNovelCardType : IntKey("novelCardType", 0)
-	object NavStyle : IntKey("navigationStyle", 0)
+	object NavStyle : BooleanKey("legacy_navigation", false)
 
 	// Backup Options
 	object ShouldBackupChapters : BooleanKey("backupChapters", true)
@@ -258,6 +258,12 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ReaderTrackLongReading : BooleanKey("reader_track_long_reading", true)
 
 	object ReaderVoice : StringKey("reader_voice", "")
+
+	object ReaderEngine : StringKey("reader_engine", "")
+
+	object ReaderLanguage : StringKey("reader_language", "")
+
+	object ReaderNextChapter : BooleanKey("reader_next_chapter", false)
 
 
 	// Advanced settings
@@ -298,11 +304,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 * Delay between each request to a site
 	 */
 	object SiteProtectionDelay : IntKey("site_protection_delay", 300)
-
-	/**
-	 * Flag for concurrent memory experimentation
-	 */
-	object ConcurrentMemoryExperiment : BooleanKey("concurrent_memory", false)
 
 	class CustomString(
 		name: String,

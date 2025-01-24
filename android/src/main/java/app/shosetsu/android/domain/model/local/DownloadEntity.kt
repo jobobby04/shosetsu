@@ -1,6 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
 import app.shosetsu.android.common.enums.DownloadStatus
+import app.shosetsu.android.domain.model.database.DBDownloadEntity
 
 /*
  * This file is part of shosetsu.
@@ -25,8 +26,15 @@ import app.shosetsu.android.common.enums.DownloadStatus
  * 22 / 04 / 2020
  *
  * @author github.com/doomsdayrs
+ *
+ * @param chapterID [DBDownloadEntity.chapterID]
+ * @param novelID [DBDownloadEntity.novelID]
+ * @param chapterURL [DBDownloadEntity.chapterURL]
+ * @param chapterName [DBDownloadEntity.chapterName]
+ * @param novelName [DBDownloadEntity.novelName]
+ * @param extensionID [DBDownloadEntity.extensionID]
+ * @param status [DBDownloadEntity.status]
  */
-
 data class DownloadEntity(
 	val chapterID: Int,
 	val novelID: Int,

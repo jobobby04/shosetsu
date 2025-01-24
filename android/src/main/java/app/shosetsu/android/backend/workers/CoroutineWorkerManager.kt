@@ -5,7 +5,7 @@ import androidx.work.Data
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.WorkManager.getInstance
+import androidx.work.WorkManager.Companion.getInstance
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -35,6 +35,9 @@ import org.kodein.di.android.closestDI
 abstract class CoroutineWorkerManager(
 	val context: Context
 ) : DIAware {
+	/**
+	 * Dependency injection
+	 */
 	override val di: DI by closestDI(context)
 
 	/**
@@ -47,14 +50,33 @@ abstract class CoroutineWorkerManager(
 	 */
 	abstract suspend fun getCount(): Int
 
-	abstract suspend fun getWorkerState(index: Int = 0): WorkInfo.State
+	/**
+	 * Get the state of a worker.
+	 *
+	 * @param index the index of the worker in [getWorkerInfoList]
+	 */
+	abstract suspend fun getWorkerState(index: Int = 0): WorkInfo.State?
 
+	/**
+	 * Get worker information
+	 */
 	abstract suspend fun getWorkerInfoList(): List<WorkInfo>
 
+	/**
+	 * Is the given worker running or not.
+	 */
 	open suspend fun isRunning(): Boolean =
 		getWorkerState() == WorkInfo.State.RUNNING
 
+	/**
+	 * Start the given worker
+	 *
+	 * @param data to pass to the worker.
+	 */
 	abstract fun start(data: Data = Data.EMPTY)
 
+	/**
+	 * Stop the worker
+	 */
 	abstract fun stop(): Operation
 }

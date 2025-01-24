@@ -43,7 +43,7 @@ abstract class ACatalogViewModel :
 	 */
 	abstract val itemsLive: Flow<PagingData<ACatalogNovelUI>>
 
-	abstract val exceptionFlow: StateFlow<Throwable?>
+	abstract val exceptionFlow: Flow<Throwable>
 
 	/**
 	 * Displayed listings from the extension
@@ -148,7 +148,7 @@ abstract class ACatalogViewModel :
 	/**
 	 * Get the URL to open web view for the extension
 	 */
-	abstract fun getBaseURL(): Flow<String>
+	abstract val baseURL: StateFlow<String?>
 
 	/**
 	 * Clear the cookies
@@ -160,4 +160,5 @@ abstract class ACatalogViewModel :
 	abstract fun showFilterMenu()
 
 	abstract fun hideFilterMenu()
+	abstract val queryFlow: StateFlow<String>
 }

@@ -7,6 +7,7 @@ import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.ExtensionType
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.Version
+import app.shosetsu.lib.json.RepoExtension
 
 /*
  * This file is part of Shosetsu.
@@ -27,47 +28,45 @@ import app.shosetsu.lib.Version
 
 /**
  * shosetsu
- * 05 / 12 / 2020
+ * @since 05 / 12 / 2020
+ *
+ * @param id [RepoExtension.id]
+ * @param repoID Repository id that the extension belongs too
+ * @param name [RepoExtension.name]
+ * @param fileName [RepoExtension.fileName]
+ * @param imageURL [RepoExtension.imageURL]
+ * @param lang [RepoExtension.lang]
+ * @param version [RepoExtension.version] Version currently installed
+ * @param md5 [RepoExtension.md5]
+ * @param type [RepoExtension.type]
+ * @param enabled If extension is enabled
+ * @param chapterType The reader type of this extension
  */
 @Entity(
 	tableName = "installed_extension",
 )
 data class DBInstalledExtensionEntity(
-	/** Extension ID */
 	@PrimaryKey
 	val id: Int,
 
-	/** Repository extension belongs too*/
 	val repoID: Int,
 
-	/** Name of the extension, can be changed */
 	var name: String = "",
 
-	/** FileName of the extension */
 	val fileName: String = "",
 
-	/** Image URL of the extension*/
 	var imageURL: String,
 
-	/** The language of the extension */
 	val lang: String = "",
 
-	/**
-	 * Version currently installed
-	 */
 	var version: Version,
 
-	/** MD5 to check against */
 	var md5: String = "",
 
 	val type: ExtensionType,
 
-	/** If extension is enabled */
 	var enabled: Boolean = false,
 
-	/**
-	 * The reader type of this extension
-	 */
 	var chapterType: Novel.ChapterType,
 ) : Convertible<InstalledExtensionEntity> {
 	override fun convertTo(): InstalledExtensionEntity = InstalledExtensionEntity(

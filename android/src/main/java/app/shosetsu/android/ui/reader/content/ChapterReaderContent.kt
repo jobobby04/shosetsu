@@ -3,7 +3,13 @@ package app.shosetsu.android.ui.reader.content
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.*
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -12,9 +18,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.view.compose.ShosetsuCompose
+import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 /*
@@ -40,11 +49,11 @@ import kotlinx.coroutines.launch
  * @since 26 / 05 / 2022
  * @author Doomsdayrs
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewChapterReaderContent() {
-	ShosetsuCompose {
+	ShosetsuTheme {
 		ChapterReaderContent(
 			isFirstFocusProvider = { false },
 			onFirstFocus = {},
@@ -60,6 +69,7 @@ fun PreviewChapterReaderContent() {
 					onPageChanged = {},
 					isSwipeInverted = false,
 					paddingValues = PaddingValues(),
+					pageJumper = StableHolder(MutableSharedFlow()),
 					createPage = {
 					}
 				)
@@ -67,8 +77,7 @@ fun PreviewChapterReaderContent() {
 			sheetContent = {
 				ChapterReaderBottomSheetContent(
 					scaffoldState = it,
-					isTTSCapable = false,
-					isTTSPlaying = false,
+					ttsPlayback = TTSPlayback.Stopped,
 					isBookmarked = false,
 					isRotationLocked = false,
 					setting = NovelReaderSettingUI(-1, 0, 0f),
@@ -76,6 +85,7 @@ fun PreviewChapterReaderContent() {
 					toggleBookmark = {},
 					exit = {},
 					onPlayTTS = {},
+					onPauseTTS = {},
 					onStopTTS = {},
 					updateSetting = {},
 					lowerSheet = {},
@@ -89,7 +99,7 @@ fun PreviewChapterReaderContent() {
 /**
  * Main reader content
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterReaderContent(
 	isFocused: Boolean,
@@ -102,9 +112,11 @@ fun ChapterReaderContent(
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
 
-	BackHandler(scaffoldState.bottomSheetState.isExpanded) {
+	BackHandler(
+		scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
+	) {
 		scope.launch {
-			scaffoldState.bottomSheetState.collapse()
+			scaffoldState.bottomSheetState.partialExpand()
 		}
 	}
 
@@ -113,11 +125,12 @@ fun ChapterReaderContent(
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocused) BottomSheetScaffoldDefaults.SheetPeekHeight else 0.dp,
+		sheetPeekHeight = if (!isFocused) BottomSheetDefaults.SheetPeekHeight else 0.dp,
 		content = { paddingValues ->
 			content(paddingValues)
 		},
-		sheetShape = RectangleShape
+		sheetShape = RectangleShape,
+		sheetDragHandle = null,
 	)
 
 	if (isFocused && isFirstFocusProvider()) {

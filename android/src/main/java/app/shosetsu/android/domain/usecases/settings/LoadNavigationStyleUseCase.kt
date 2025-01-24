@@ -28,5 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
 class LoadNavigationStyleUseCase(
 	private val iSettingsRepository: ISettingsRepository
 ) {
-	operator fun invoke(): StateFlow<Int> = iSettingsRepository.getIntFlow(SettingKey.NavStyle)
+	operator fun invoke(): StateFlow<Boolean> =
+		iSettingsRepository.getBooleanFlow(SettingKey.NavStyle)
 }

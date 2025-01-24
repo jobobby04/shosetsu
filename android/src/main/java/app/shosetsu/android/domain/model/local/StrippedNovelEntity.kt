@@ -1,5 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.domain.model.database.DBStrippedNovelEntity
+
 /*
  * This file is part of Shosetsu.
  *
@@ -20,6 +22,11 @@ package app.shosetsu.android.domain.model.local
 /**
  * shosetsu
  * 19 / 12 / 2020
+ *
+ * @param id [DBStrippedNovelEntity.id]
+ * @param title [DBStrippedNovelEntity.title]
+ * @param imageURL [DBStrippedNovelEntity.imageURL]
+ * @param bookmarked [DBStrippedNovelEntity.bookmarked]
  */
 data class StrippedNovelEntity(
 	val id: Int,

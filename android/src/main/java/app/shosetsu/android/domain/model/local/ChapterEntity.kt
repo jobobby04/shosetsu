@@ -1,6 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
 import app.shosetsu.android.common.enums.ReadingStatus
+import app.shosetsu.android.domain.model.database.DBChapterEntity
 
 /*
  * This file is part of shosetsu.
@@ -25,7 +26,18 @@ import app.shosetsu.android.common.enums.ReadingStatus
  * 23 / 04 / 2020
  *
  * @author github.com/doomsdayrs
- * @param readingPosition The progress through an chapter. Will be interpreted as 0 - 99%
+ *
+ * @param id [DBChapterEntity.id]
+ * @param url [DBChapterEntity.url]
+ * @param novelID [DBChapterEntity.novelID]
+ * @param extensionID [DBChapterEntity.extensionID]
+ * @param title [DBChapterEntity.title]
+ * @param releaseDate [DBChapterEntity.releaseDate]
+ * @param order [DBChapterEntity.order]
+ * @param readingPosition [DBChapterEntity.readingPosition]
+ * @param readingStatus [DBChapterEntity.readingStatus]
+ * @param bookmarked [DBChapterEntity.bookmarked]
+ * @param isSaved [DBChapterEntity.isSaved]
  */
 data class ChapterEntity(
 	var id: Int? = null,

@@ -47,6 +47,9 @@ interface NotificationCapable {
 	 */
 	val notifyContext: Context
 
+	/**
+	 * Default notification id to be used when notifying
+	 */
 	val defaultNotificationID: Int
 
 	fun CoroutineWorker.notify(

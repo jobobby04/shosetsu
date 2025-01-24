@@ -26,7 +26,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * @author Doomsdayrs
  */
 object Migration1To2 : RemoveMigration(1, 2) {
-	override fun migrate(database: SupportSQLiteDatabase) {
-		deleteColumnFromTable(database, "chapters", "savePath")
+	override fun migrate(db: SupportSQLiteDatabase) {
+		deleteColumnFromTable(db, "chapters", "savePath")
 	}
 }

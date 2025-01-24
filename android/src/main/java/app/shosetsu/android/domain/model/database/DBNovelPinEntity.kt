@@ -31,6 +31,8 @@ import app.shosetsu.android.dto.Convertible
  *
  * @param novelId id of the novel
  * @param pinned if the novel specified by [novelId] is pinned or not
+ *
+ * @see NovelPinEntity
  */
 @Entity(
 	tableName = "novel_pins",

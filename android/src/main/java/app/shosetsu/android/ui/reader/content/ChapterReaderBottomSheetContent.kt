@@ -1,14 +1,19 @@
 package app.shosetsu.android.ui.reader.content
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,15 +27,15 @@ import app.shosetsu.android.view.compose.DiscreteSlider
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
+import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterReaderBottomSheetContent(
 	scaffoldState: BottomSheetScaffoldState,
-	isTTSCapable: Boolean,
-	isTTSPlaying: Boolean,
+	ttsPlayback: TTSPlayback,
 	isBookmarked: Boolean,
 	isRotationLocked: Boolean,
 	setting: NovelReaderSettingUI,
@@ -39,6 +44,7 @@ fun ChapterReaderBottomSheetContent(
 	toggleBookmark: () -> Unit,
 	exit: () -> Unit,
 	onPlayTTS: () -> Unit,
+	onPauseTTS: () -> Unit,
 	onStopTTS: () -> Unit,
 	updateSetting: (NovelReaderSettingUI) -> Unit,
 	lowerSheet: LazyListScope.() -> Unit,
@@ -88,7 +94,7 @@ fun ChapterReaderBottomSheetContent(
 				)
 			}
 
-			if (isTTSCapable && !isTTSPlaying)
+			if (ttsPlayback != TTSPlayback.Playing)
 				IconButton(onClick = onPlayTTS) {
 					Icon(
 						painterResource(R.drawable.ic_baseline_audiotrack_24),
@@ -96,7 +102,15 @@ fun ChapterReaderBottomSheetContent(
 					)
 				}
 
-			if (isTTSPlaying)
+			if (ttsPlayback == TTSPlayback.Playing)
+				IconButton(onClick = onPauseTTS) {
+					Icon(
+						painterResource(R.drawable.ic_pause_circle_outline_24dp),
+						null
+					)
+				}
+
+			if (ttsPlayback != TTSPlayback.Stopped)
 				IconButton(onClick = onStopTTS) {
 					Icon(
 						painterResource(R.drawable.ic_baseline_stop_circle_24),
@@ -116,13 +130,15 @@ fun ChapterReaderBottomSheetContent(
 
 		IconButton(onClick = {
 			coroutineScope.launch {
-				if (!scaffoldState.bottomSheetState.isExpanded)
+				if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
 					scaffoldState.bottomSheetState.expand()
-				else scaffoldState.bottomSheetState.collapse()
+				} else {
+					scaffoldState.bottomSheetState.partialExpand()
+				}
 			}
 		}) {
 			Icon(
-				if (scaffoldState.bottomSheetState.isExpanded) {
+				if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
 					painterResource(R.drawable.expand_more)
 				} else {
 					painterResource(R.drawable.expand_less)
