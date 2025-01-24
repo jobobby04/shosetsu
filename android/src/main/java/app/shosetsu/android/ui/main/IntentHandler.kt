@@ -43,17 +43,17 @@ private fun handleIntentAction(
 			onUpdate()
 		}
 
-//		Intent.ACTION_VIEW -> {
-//			if (intent.data != null) {
-//				if (intent.data!!.scheme != null) {
-//					onNavigate(
-//						Destination.More.AddShare(
-//							intent.data!!.scheme + "://" + intent.data!!.host
-//						)
-//					)
-//				} else intent.logE("Scheme was null")
-//			} else intent.logE("View action data null")
-//		}
+		Intent.ACTION_VIEW -> {
+			if (intent.data != null) {
+				if (intent.data!!.scheme != null) {
+					onNavigate(
+						Destination.More.AddShare(
+							intent.data!!.scheme + "://" + intent.data!!.host
+						)
+					)
+				} else intent.logE("Scheme was null")
+			} else intent.logE("View action data null")
+		}
 
 		Intent.ACTION_MAIN -> {}
 		else -> {}
