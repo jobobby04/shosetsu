@@ -4,10 +4,10 @@ import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
+import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
-import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
@@ -69,12 +69,6 @@ abstract class AChapterReaderViewModel :
 	abstract val appThemeLiveData: SharedFlow<AppThemes>
 
 	abstract fun retryChapter(item: ReaderChapterUI)
-
-	sealed class ChapterPassage {
-		data object Loading : ChapterPassage()
-		data class Error(val throwable: Throwable?) : ChapterPassage()
-		data class Success(val content: String, val ttsElements: List<TTSText>) : ChapterPassage()
-	}
 
 	abstract fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage>
 

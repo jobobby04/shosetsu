@@ -5,10 +5,11 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 plugins {
-	id("com.android.application")
-	kotlin("android")
-	kotlin("plugin.serialization")
-	id("com.google.devtools.ksp")
+	alias(libs.plugins.android.application)
+	alias(libs.plugins.kotlin.android)
+	alias(libs.plugins.kotlin.serialization)
+	alias(libs.plugins.google.ksp)
+	alias(libs.plugins.kotlin.compose)
 }
 
 @Throws(IOException::class)
@@ -50,16 +51,16 @@ fun loadSProperties(name: String): Properties {
 	return properties
 }
 
-val CI_MODE = System.getenv("CI_MODE") == "true" || true
+val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
-	compileSdk = 34
+	compileSdk = 35
 	defaultConfig {
 		applicationId = "app.shosetsu.android"
 		minSdk = 22
-		targetSdk = 34
+		targetSdk = 35
 		versionCode = 45
-		versionName = "2.4.4"
+		versionName = "2.5.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 
@@ -227,82 +228,78 @@ android.applicationVariants.forEach { variant ->
 dependencies {
 	implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
+	implementation(platform(libs.kotlin.bom))
+
 	// Google view things
-	implementation("com.google.android.material:material:1.10.0")
+	implementation(libs.google.material)
 
 	// Androidx
-	implementation("androidx.work:work-runtime:2.9.0")
-	implementation("androidx.work:work-runtime-ktx:2.9.0")
-	implementation("androidx.appcompat:appcompat:1.6.1")
-	implementation("androidx.annotation:annotation:1.7.1")
-	implementation("androidx.core:core-ktx:1.12.0")
-	implementation("androidx.collection:collection-ktx:1.4.0")
-	implementation("androidx.core:core-splashscreen:1.0.1")
-	implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-	implementation("androidx.window:window:1.2.0")
-	implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-	implementation("androidx.activity:activity-compose:1.8.2")
+	implementation(libs.androidx.work.runtime)
+	implementation(libs.androidx.work.runtime.ktx)
+	implementation(libs.androidx.appcompat)
+	implementation(libs.androidx.annotation)
+	implementation(libs.androidx.core.ktx)
+	implementation(libs.androidx.collection.ktx)
+	implementation(libs.androidx.core.splashscreen)
+	implementation(libs.androidx.coordinatorlayout)
+	implementation(libs.androidx.window)
+	implementation(libs.androidx.compose.material3.wsc)
+	implementation(libs.androidx.lifecycle.runtime.ktx)
+	implementation(libs.androidx.activity.compose)
 
-	implementation(platform("androidx.compose:compose-bom:2024.02.02"))
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+	implementation(platform(libs.androidx.compose.bom))
+	androidTestImplementation(platform(libs.androidx.compose.bom))
 
-	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.02"))
+	androidTestImplementation(libs.androidx.compose.ui.testjunit4)
+	androidTestImplementation(platform(libs.androidx.compose.bom))
 
-	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest")
+	debugImplementation(libs.androidx.compose.ui.tooling)
+	debugImplementation(libs.androidx.compose.ui.testmanifest)
 
 	// - Life Cycle
 
-	val lifecycleVersion = "2.6.2"
-	fun lifecycle(module: String, version: String = lifecycleVersion) =
-		"androidx.lifecycle:lifecycle-$module:$version"
-	implementation(lifecycle("viewmodel-ktx"))
-	implementation(lifecycle("viewmodel-compose"))
-	implementation(lifecycle("viewmodel-savedstate"))
-	implementation(lifecycle("runtime-ktx"))
+	implementation(libs.androidx.lifecycle.viewmodel.ktx)
+	implementation(libs.androidx.lifecycle.viewmodel.compose)
+	implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+	implementation(libs.androidx.lifecycle.runtime.ktx)
 
 
 	// Test classes
-	testImplementation("junit:junit:4.13.2")
-	testImplementation("androidx.test.ext:junit:1.1.5")
-	androidTestImplementation("androidx.test:runner:1.5.2")
-	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+	testImplementation(libs.junit)
+	testImplementation(libs.androidx.test.ext.junit)
+	androidTestImplementation(libs.androidx.test.runner)
+	androidTestImplementation(libs.androidx.test.espresso.core)
 
 
 	// Core libraries
-	implementation("org.luaj:luaj-jse:3.0.1")
-	implementation("com.gitlab.shosetsuorg:kotlin-lib:9591ef55b2761cca78d3b32175326990d30d7167")
-	implementation("org.jsoup:jsoup:1.17.2")
+	implementation(libs.luaj.jse)
+	implementation(libs.shosetsuorg.klib)
+	implementation(libs.jsoup)
 
 	// Image loading
-	implementation("io.coil-kt:coil-compose:2.6.0")
+	implementation(libs.coil.compose)
 
 	// Time control
-	implementation("joda-time:joda-time:2.12.7")
+	implementation(libs.joda.time)
 
 	// Cloud flare calculator
 	//implementation("com.zhkrb.cloudflare-scrape-android:scrape-webview:0.0.3")
 
 	// Network
-	implementation("com.squareup.okhttp3:okhttp:4.12.0")
+	implementation(libs.okhttp)
 
 	// Kotlin libraries
 	implementation(kotlin("stdlib-jdk8"))
 	//implementation(kotlin("reflect"))
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+	implementation(libs.kotlinx.coroutines.android)
 
-	implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.7")
+	implementation(libs.kotlinx.collections.immutable)
 
 	// Error logging
-	val acraVersion = "5.11.2"
-	fun acra(module: String, version: String = acraVersion) =
-		"ch.acra:$module:$version"
 
-	implementation(acra("acra-http"))
-	implementation(acra("acra-dialog"))
+	implementation(libs.acra.http)
+	implementation(libs.acra.dialog)
 
 	// Conductor
 	/*
@@ -316,38 +313,32 @@ dependencies {
 	 */
 
 	// Room
-	val roomVersion = "2.5.2"
-	fun room(module: String, version: String = roomVersion) =
-		"androidx.room:$module:$version"
 
-	implementation(room("room-runtime"))
-	annotationProcessor(room("room-compiler"))
-	ksp(room("room-compiler"))
-	implementation(room("room-ktx"))
-	implementation(room("room-paging"))
+	implementation(libs.androidx.room.runtime)
+	annotationProcessor(libs.androidx.room.compiler)
+	ksp(libs.androidx.room.compiler)
+	implementation(libs.androidx.room.ktx)
+	implementation(libs.androidx.room.paging)
 
 	// Guava cache
-	implementation("com.google.guava:guava:33.0.0-android")
+	implementation(libs.google.guava)
 
 	// kode-in
-	val kodeinVersion = "7.20.2"
-	fun kodein(module: String, version: String = kodeinVersion) =
-		"org.kodein.di:kodein-di$module:$version"
 
-	implementation(kodein(""))
-	implementation(kodein("-jvm"))
-	implementation(kodein("-framework-android-core"))
-	implementation(kodein("-framework-android-support"))
-	implementation(kodein("-framework-android-x"))
-	implementation(kodein("-framework-android-x-viewmodel"))
-	implementation(kodein("-framework-android-x-viewmodel-savedstate"))
+	implementation(libs.kodein.di)
+	implementation(libs.kodein.di.jvm)
+	implementation(libs.kodein.di.framework.android.core)
+	implementation(libs.kodein.di.framework.android.support)
+	implementation(libs.kodein.di.framework.androidx)
+	implementation(libs.kodein.di.framework.androidx.viewmodel)
+	implementation(libs.kodein.di.framework.androidx.viewmodel.savedstate)
 
 	// KTX
 
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.8.0")
+	implementation(libs.kotlinx.coroutines.jdk8)
 
 	// KTX - Serialization
-	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+	implementation(libs.kotlinx.serialization.json)
 
 	// Roomigrant
 	/*val enableRoomigrant = false
@@ -359,66 +350,55 @@ dependencies {
 	}*/
 
 	// Compose
-	implementation(platform("androidx.compose:compose-bom:2024.12.01"))
-	implementation("androidx.compose.runtime:runtime")
-	implementation("androidx.compose.ui:ui")
-	implementation("androidx.compose.ui:ui-tooling")
-	implementation("androidx.compose.ui:ui-graphics")
-	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3")
-	implementation("androidx.compose.material:material-icons-extended")
-	implementation("androidx.compose.foundation:foundation")
-	implementation("androidx.compose.animation:animation")
-	implementation("androidx.compose.animation:animation-graphics")
-	implementation("androidx.compose.animation:animation-core")
+
+	implementation(platform(libs.androidx.compose.bom))
+	implementation(libs.androidx.compose.runtime)
+	implementation(libs.androidx.compose.ui)
+	implementation(libs.androidx.compose.ui.tooling)
+	implementation(libs.androidx.compose.ui.graphics)
+	implementation(libs.androidx.compose.ui.tooling.preview)
+	implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.material.icons.extended)
+	implementation(libs.androidx.compose.foundation)
+	implementation(libs.androidx.compose.animation)
+	implementation(libs.androidx.compose.animation.graphics)
+	implementation(libs.androidx.compose.animation.core)
 
 	// - accompanist
-	val accompanistVersion = "0.36.0"
-	fun accompanist(module: String, version: String = accompanistVersion) =
-		"com.google.accompanist:$module:$version"
 
-	implementation(accompanist("accompanist-appcompat-theme"))
-	implementation(accompanist("accompanist-webview"))
-	implementation(accompanist("accompanist-placeholder-material"))
-	implementation(accompanist("accompanist-pager-indicators"))
-	implementation(accompanist("accompanist-permissions"))
-	implementation(accompanist("accompanist-systemuicontroller"))
+	implementation(libs.google.accompanist.appcompat.theme)
+	implementation(libs.google.accompanist.webview)
+	implementation(libs.google.accompanist.placeholder.material)
+	implementation(libs.google.accompanist.pager.indicators)
+	implementation(libs.google.accompanist.permissions)
+	implementation(libs.google.accompanist.systemuicontroller)
 
 	//- Integration with observables
-	implementation("androidx.compose.runtime:runtime-livedata")
+	implementation(libs.androidx.compose.runtime.livedata)
 
 	// MDC Adapter
-	implementation(accompanist("accompanist-themeadapter-material"))
-	implementation(accompanist("accompanist-themeadapter-material3"))
+	implementation(libs.google.accompanist.themeadapter.material)
+	implementation(libs.google.accompanist.themeadapter.material3)
 
-	val androidxActivity = "1.7.2"
-	fun androidxActivity(module: String, version: String = androidxActivity) =
-		"androidx.activity:$module:$version"
-	implementation(androidxActivity("activity"))
-	implementation(androidxActivity("activity-ktx"))
-	implementation(androidxActivity("activity-compose"))
+	implementation(libs.androidx.activity)
+	implementation(libs.androidx.activity.ktx)
+	implementation(libs.androidx.activity.compose)
 
-	implementation("com.chargemap.compose:numberpicker:1.0.3")
+	implementation(libs.numberpicker)
 
 	// QR Code
-	implementation("io.github.g0dkar:qrcode-kotlin-android:4.1.1")
+	implementation(libs.qrcode)
 
 	// - paging
-	val pagingVersion = "3.2.1"
-	fun paging(module: String, version: String = pagingVersion) =
-		"androidx.paging:$module:$version"
 
-	implementation(paging("paging-runtime"))
-	implementation(paging("paging-compose"))
+	implementation(libs.androidx.paging.runtime)
+	implementation(libs.androidx.paging.compose)
+
 	implementation(kotlin("reflect"))
 
-	val navVersion = "2.8.5"
-	fun navigation(module: String, version: String = navVersion) =
-		"androidx.navigation:navigation-$module:$version"
+	implementation(libs.androidx.navigation.compose)
 
-	implementation(navigation("compose"))
+	coreLibraryDesugaring(libs.desugar)
 
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-
-	implementation("com.holix.android:bottomsheetdialog-compose:1.5.0")
+	implementation(libs.bottomsheetdialog)
 }
