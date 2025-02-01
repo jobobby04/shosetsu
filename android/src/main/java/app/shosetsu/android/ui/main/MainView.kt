@@ -220,14 +220,14 @@ fun MainView() {
 				}
 			}
 		}
-	}
 
-	if (update != null) {
-		AppUpdateDialog(
-			update ?: return,
-			onDismissRequest = viewModel::dismissUpdateDialog,
-			onUpdate = viewModel::update
-		)
+		update?.let { concrete ->
+			AppUpdateDialog(
+				concrete,
+				onDismissRequest = viewModel::dismissUpdateDialog,
+				onUpdate = viewModel::update
+			)
+		}
 	}
 
 	LaunchedEffect(updateToOpen) {
