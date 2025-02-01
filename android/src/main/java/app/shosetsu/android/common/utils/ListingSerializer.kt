@@ -122,7 +122,7 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
             registerWithSubclasses<JseOsLib>()
             registerWithSubclasses<LuajavaLib>()
 
-            instantiatorStrategy = DefaultInstantiatorStrategy(StdInstantiatorStrategy())
+            instantiatorStrategy = StdInstantiatorStrategy()
             isRegistrationRequired = true
             warnUnregisteredClasses = true
         }
