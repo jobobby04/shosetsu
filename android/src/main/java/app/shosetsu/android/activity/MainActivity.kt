@@ -19,6 +19,7 @@ package app.shosetsu.android.activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import app.shosetsu.android.ui.main.MainView
 
@@ -29,9 +30,10 @@ import app.shosetsu.android.ui.main.MainView
  * @author github.com/doomsdayrs
  */
 class MainActivity : ComponentActivity() {
-
 	/***/
 	override fun onCreate(savedInstanceState: Bundle?) {
+		enableEdgeToEdge()
+
 		@Suppress("UNUSED_VARIABLE") // We keep this value
 		val splashScreen = installSplashScreen()
 
