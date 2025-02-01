@@ -7,12 +7,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,12 +27,12 @@ import app.shosetsu.android.common.SettingKey.NovelBadgeToast
 import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
+import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
+import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.compose.setting.widget.AppThemeModePreferenceWidget
 import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
-import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
-import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
-import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAppearanceSettingsViewModel
 
@@ -83,10 +80,6 @@ fun AppearanceSettingsContent(
 				navigationIcon = {
 					NavigateBackButton(onBack)
 				},
-				colors = TopAppBarDefaults.topAppBarColors(
-					containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-					titleContentColor = MaterialTheme.colorScheme.onSurface,
-				)
 			)
 		}
 	) { paddingValues ->

@@ -5,24 +5,22 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
@@ -48,7 +46,7 @@ fun CSSEditorTopBarContent(
 					onClick = onBack
 				) {
 					Icon(
-						Icons.Filled.ArrowBack,
+						Icons.AutoMirrored.Filled.ArrowBack,
 						stringResource(R.string.abc_action_bar_up_description),
 					)
 				}
@@ -62,18 +60,14 @@ fun CSSEditorTopBarContent(
 						stringResource(app.shosetsu.android.R.string.help),
 					)
 				}
-			},
-			colors = TopAppBarDefaults.topAppBarColors(
-				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-				titleContentColor = MaterialTheme.colorScheme.onSurface,
-			)
+			}
 		)
 		TabRow(
 			// Our selected tab is our current page
 			selectedTabIndex = pagerState.currentPage,
 			// Override the indicator, using the provided pagerTabIndicatorOffset modifier
 			indicator = { tabPositions ->
-				TabRowDefaults.Indicator(
+				SecondaryIndicator(
 					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
 				)
 			}

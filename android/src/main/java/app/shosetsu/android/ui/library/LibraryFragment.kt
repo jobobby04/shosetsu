@@ -46,7 +46,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -362,10 +361,6 @@ fun LibraryAppBar(
 				LibrarySelectedMoreButton(onMigrate, onTogglePin, onSetCategories)
 			},
 			navigationIcon = drawerIcon,
-			colors = TopAppBarDefaults.topAppBarColors(
-				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-				titleContentColor = MaterialTheme.colorScheme.onSurface,
-			),
 		)
 	} else {
 		TopAppBar(
@@ -383,10 +378,6 @@ fun LibraryAppBar(
 				}
 			},
 			navigationIcon = drawerIcon,
-			colors = TopAppBarDefaults.topAppBarColors(
-				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-				titleContentColor = MaterialTheme.colorScheme.onSurface,
-			)
 		)
 	}
 }

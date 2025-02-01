@@ -31,8 +31,6 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ShosetsuAccompanistWebChromeClient
@@ -262,11 +259,7 @@ fun WebViewScreen(
 								}
 							)
 						}
-					},
-					colors = TopAppBarDefaults.topAppBarColors(
-						containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-						titleContentColor = MaterialTheme.colorScheme.onSurface,
-					)
+					}
 				)
 				when (val loadingState = state.loadingState) {
 					is LoadingState.Initializing -> LinearProgressIndicator(
