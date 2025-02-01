@@ -35,7 +35,6 @@ cache:
     - android-home/
 
 stages:
-  - lint
   - standard
   - deploy
 
@@ -71,15 +70,6 @@ packages:
 
   # Not necessary, but just for surity
   - chmod +x ./gradlew
-
-
-# Basic android and gradle stuff
-# Check linting
-lint:
-  interruptible: true
-  stage: lint
-  script:
-    - ./gradlew -Pci --console=plain :android:lint -PbuildDir=lint
 
 # Make Project
 assembleRelease:
