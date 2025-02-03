@@ -41,7 +41,6 @@ import app.shosetsu.lib.lua.shosetsuGlobals
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
-import com.google.android.material.color.DynamicColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
@@ -217,7 +216,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			}
 		}
 		super.onCreate()
-		DynamicColors.applyToActivitiesIfAvailable(this)
 	}
 
 	/**
