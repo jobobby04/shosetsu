@@ -33,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,7 +46,6 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -349,7 +347,7 @@ fun LibraryAppBar(
 	val behavior = enterAlwaysScrollBehavior()
 
 	if (hasSelected) {
-		LargeTopAppBar(
+		TopAppBar(
 			title = { title() },
 			scrollBehavior = behavior,
 			actions = {
@@ -381,7 +379,6 @@ fun LibraryAppBar(
 		)
 	}
 }
-
 
 /**
  * Pager for categories
@@ -420,10 +417,9 @@ fun LibraryPager(
 						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
 					)
 				},
-				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+				containerColor = MaterialTheme.colorScheme.background,
 				edgePadding = 0.dp,
-				contentColor = MaterialTheme.colorScheme.onSurface,
-				divider = {}
+				divider = {}, // replaced with our own divider that stretches to the full width
 			) {
 				library.categories.forEachIndexed { index, category ->
 					Tab(
