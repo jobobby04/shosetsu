@@ -27,6 +27,6 @@ enum class AppThemes(val key: Int) {
 	DARK(2);
 
 	companion object {
-		fun fromKey(key: Int): AppThemes = values().find { it.key == key } ?: FOLLOW_SYSTEM
+		fun fromKey(key: Int): AppThemes = entries.find { it.key == key } ?: FOLLOW_SYSTEM
 	}
 }
