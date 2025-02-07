@@ -16,8 +16,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import kotlin.reflect.KType
 
-fun fadeInX() = fadeIn(animationSpec = tween(700))
-fun fadeOutX() = fadeOut(animationSpec = tween(700))
+fun fadeInX() = fadeIn(animationSpec = tween(250))
+fun fadeOutX() = fadeOut(animationSpec = tween(250))
 
 inline fun <reified T : Any> NavGraphBuilder.composableMain(
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
