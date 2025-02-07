@@ -5,7 +5,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.main.Destination.More.Settings
@@ -36,7 +35,7 @@ import app.shosetsu.android.ui.settings.sub.ViewSettingsView
 
 fun NavGraphBuilder.settingsGraph(navController: NavController) {
 	navigation<Settings>(Overview) {
-		composable<Overview> {
+		composableSub<Overview> {
 			SettingsView(
 				onBack = navController::popBackStack,
 				navToAdvanced = {
@@ -57,27 +56,27 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 			)
 		}
 
-		composable<Settings.View> {
+		composableSub<Settings.View> {
 			ViewSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Settings.Update> {
+		composableSub<Settings.Update> {
 			UpdateSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Settings.Advanced> {
+		composableSub<Settings.Advanced> {
 			AdvancedSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Settings.Download> {
+		composableSub<Settings.Download> {
 			DownloadSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Settings.Reader> {
+		composableSub<Settings.Reader> {
 			val context = LocalContext.current
 			ReaderSettingsView(
 				onBack = navController::popBackStack,

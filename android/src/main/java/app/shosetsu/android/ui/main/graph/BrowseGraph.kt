@@ -3,7 +3,6 @@ package app.shosetsu.android.ui.main.graph
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import app.shosetsu.android.ui.browse.BrowseView
@@ -22,7 +21,7 @@ fun NavGraphBuilder.browseGraph(
 	drawerIcon: @Composable () -> Unit
 ) {
 	navigation<Browse>(Browse.View) {
-		composable<Browse.View> {
+		composableMain<Browse.View> {
 			BrowseView(
 				openCatalogue = {
 					navController.navigate(Catalog(it))
@@ -40,7 +39,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<Catalog> { entry ->
+		composableSub<Catalog> { entry ->
 			val extensionId = entry.toRoute<Catalog>().extensionId
 			CatalogueView(
 				extensionId,
@@ -51,7 +50,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<ConfigureExtension> { entry ->
+		composableSub<ConfigureExtension> { entry ->
 			val extensionId = entry.toRoute<ConfigureExtension>().extensionId
 			ConfigureExtensionView(
 				extensionId,
@@ -59,7 +58,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<Search> { entry ->
+		composableSub<Search> { entry ->
 			// TODO fix crash here
 			val query = entry.toRoute<Search>().query
 			SearchView(
