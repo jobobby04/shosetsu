@@ -14,11 +14,33 @@ import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
-fun fadeInX() = fadeIn(animationSpec = tween(700))
-fun fadeOutX() = fadeOut(animationSpec = tween(700))
+/**
+ * Creates a fade-in animation with a common duration.
+ *
+ * @return A fade-in animation spec.
+ */
+fun fadeInX() = fadeIn(animationSpec = tween(250))
 
+/**
+ * Creates a fade-out animation with a common duration.
+ *
+ * @return A fade-out animation spec.
+ */
+fun fadeOutX() = fadeOut(animationSpec = tween(250))
+
+/**
+ * Add the [Composable] to the [NavGraphBuilder] with transitions appropriate for a
+ * top-level screen accessible using the bottom navigation bar.
+ *
+ * @param T route from a [KClass] for the destination
+ * @param typeMap map of destination arguments' kotlin type [KType] to its respective custom
+ *   [NavType]. May be empty if [T] does not use custom NavTypes.
+ * @param deepLinks list of deep links to associate with the destinations
+ * @param content composable for the destination
+ */
 inline fun <reified T : Any> NavGraphBuilder.composableMain(
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
@@ -31,6 +53,16 @@ inline fun <reified T : Any> NavGraphBuilder.composableMain(
     exitTransition = { fadeOutX() },
 )
 
+/**
+ * Add the [Composable] to the [NavGraphBuilder] with transitions appropriate for a
+ * sub-screen accessible not from the bottom navigation bar but from another screen.
+ *
+ * @param T route from a [KClass] for the destination
+ * @param typeMap map of destination arguments' kotlin type [KType] to its respective custom
+ *   [NavType]. May be empty if [T] does not use custom NavTypes.
+ * @param deepLinks list of deep links to associate with the destinations
+ * @param content composable for the destination
+ */
 inline fun <reified T : Any> NavGraphBuilder.composableSub(
     typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
