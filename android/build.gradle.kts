@@ -60,7 +60,7 @@ android {
 		minSdk = 22
 		targetSdk = 35
 		versionCode = 45
-		versionName = "2.4.4"
+		versionName = "2.5.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 
@@ -230,9 +230,6 @@ dependencies {
 
 	implementation(platform(libs.kotlin.bom))
 
-	// Google view things
-	implementation(libs.google.material)
-
 	// Androidx
 	implementation(libs.androidx.work.runtime)
 	implementation(libs.androidx.work.runtime.ktx)
@@ -328,7 +325,6 @@ dependencies {
 	implementation(libs.kodein.di)
 	implementation(libs.kodein.di.jvm)
 	implementation(libs.kodein.di.framework.android.core)
-	implementation(libs.kodein.di.framework.android.support)
 	implementation(libs.kodein.di.framework.androidx)
 	implementation(libs.kodein.di.framework.androidx.viewmodel)
 	implementation(libs.kodein.di.framework.androidx.viewmodel.savedstate)

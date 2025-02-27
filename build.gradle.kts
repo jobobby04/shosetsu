@@ -53,8 +53,8 @@ open class WriteDebugUpdate : DefaultTask() {
 			"git rev-list --count HEAD".execute().getText().trim()
 
 		@Throws(IOException::class)
-		private fun getLatestCommitMsg(): String =
-			"git log -1 --pretty=%B".execute().getText().trim()
+		private fun getLatestCommitMsg(current: Int, since: Int): String =
+			"git log -${current - since} --pretty=%B".execute().getText().trim()
 	}
 
 
@@ -65,14 +65,31 @@ open class WriteDebugUpdate : DefaultTask() {
 		val file = File("android/src/debug/assets/update.json")
 		// up the commit by one for when shosetsu-preview builds
 		val commitCount = getCommitCount().toInt()
+		// the last file contains the commit count since the last generation
+		val lastFile = File("android/src/debug/assets/last")
+		// get the previous commit count
+		val prevCommitCount = lastFile.readText().toInt()
+		// save the new commit count
+		lastFile.writeText(commitCount.toString())
+
+		val releaseNotes = getLatestCommitMsg(current = commitCount, since = prevCommitCount)
+			// Format it so it goes well into the json
+			//.replace("\n", "\",\n\t\t\t\t\"-")
+			.split("\n")
+			.map { it.trim() }
+			.filter { it.isNotBlank() }
+			.map { it.replace("\"", "'") }
+			.joinToString("\n\t\t\t\t") { "\"- $it\"," }
+			.removeSuffix(",")
+
 		file.writeText(
 			"""
 		{
-		  "latestVersion":"$commitCount",
-		  "url":"https://github.com/shosetsuorg/shosetsu-preview/releases/download/r$commitCount/shosetsu-r$commitCount.apk",
-		  "releaseNotes":[
-		    "${getLatestCommitMsg().replace("\n", "\",\n\t\t\t\t\"")}"
-		  ]
+			"latestVersion":"$commitCount",
+			"url":"https://cdn.shosetsu.app/debug/r$commitCount/shosetsu-r$commitCount.apk",
+			"releaseNotes":[
+				$releaseNotes
+			]
 		}
 		""".trimIndent()
 		)

@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.openInWebView
@@ -30,7 +29,7 @@ fun NavGraphBuilder.mainGraph(
 	sizeClass: WindowSizeClass,
 	drawerIcon: @Composable () -> Unit
 ) {
-	composable<Library> {
+	composableMain<Library> {
 		LibraryView(
 			onOpenNovel = { novelId ->
 				navController.navigate(Novel(novelId))
@@ -49,7 +48,7 @@ fun NavGraphBuilder.mainGraph(
 		navController,
 		drawerIcon = drawerIcon
 	)
-	composable<Updates> {
+	composableMain<Updates> {
 		val context = LocalContext.current
 		UpdatesView(
 			openNovel = { novelId ->
@@ -59,7 +58,7 @@ fun NavGraphBuilder.mainGraph(
 			drawerIcon = drawerIcon
 		)
 	}
-	composable<Novel> { entry ->
+	composableMain<Novel> { entry ->
 		val novelId = entry.toRoute<Novel>().novelId
 		val context = LocalContext.current
 
@@ -75,7 +74,7 @@ fun NavGraphBuilder.mainGraph(
 		)
 	}
 
-	composable<Migration> {
+	composableMain<Migration> {
 		MigrationView(emptyList())
 	}
 }

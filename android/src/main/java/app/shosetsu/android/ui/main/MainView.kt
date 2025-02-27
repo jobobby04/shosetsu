@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.main
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
@@ -8,12 +9,11 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
  * @author Doomsdayrs
  */
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainView() {
 	val viewModel: AMainViewModel = viewModelDi()
@@ -193,8 +194,7 @@ fun MainView() {
 				) { paddingValues ->
 					NavHost(
 						navController,
-						startDestination = Library,
-						modifier = Modifier.padding(paddingValues)
+						startDestination = Library
 					) {
 						mainGraph(
 							navController,
@@ -220,14 +220,14 @@ fun MainView() {
 				}
 			}
 		}
-	}
 
-	if (update != null) {
-		AppUpdateDialog(
-			update ?: return,
-			onDismissRequest = viewModel::dismissUpdateDialog,
-			onUpdate = viewModel::update
-		)
+		update?.let { concrete ->
+			AppUpdateDialog(
+				concrete,
+				onDismissRequest = viewModel::dismissUpdateDialog,
+				onUpdate = viewModel::update
+			)
+		}
 	}
 
 	LaunchedEffect(updateToOpen) {

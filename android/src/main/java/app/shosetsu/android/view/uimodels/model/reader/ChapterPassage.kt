@@ -1,5 +1,3 @@
-package app.shosetsu.android.common.enums
-
 /*
  * This file is part of Shosetsu.
  *
@@ -15,18 +13,32 @@ package app.shosetsu.android.common.enums
  *
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
+package app.shosetsu.android.view.uimodels.model.reader
 
 /**
- * shosetsu
- * 22 / 11 / 2020
+ * Represents the contents of a given chapter.
  */
-enum class AppThemes(val key: Int) {
-	FOLLOW_SYSTEM(0),
-	LIGHT(1),
-	DARK(2);
+sealed class ChapterPassage {
+	/**
+	 * Currently loading this chapter
+	 */
+	data object Loading : ChapterPassage()
 
-	companion object {
-		fun fromKey(key: Int): AppThemes = entries.find { it.key == key } ?: FOLLOW_SYSTEM
-	}
+	/**
+	 * There was an error attempting to load the chapter
+	 */
+	data class Error(val throwable: Throwable?) : ChapterPassage()
+
+	/**
+	 * Successfully loaded the chapter content
+	 *
+	 * @param content content of this chapter
+	 * @param ttsElements text to speech elements of this chapter
+	 */
+	data class Success(
+		val content: String,
+		val ttsElements: RewindableMutableListIterator<TTSText>
+	) : ChapterPassage()
 }
