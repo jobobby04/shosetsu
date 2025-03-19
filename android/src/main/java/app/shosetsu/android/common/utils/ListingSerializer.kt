@@ -180,7 +180,7 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
             instantiatorStrategy = StdInstantiatorStrategy()
             isRegistrationRequired = true
             warnUnregisteredClasses = true
-//            references = true
+            references = true
         }
     }
 
