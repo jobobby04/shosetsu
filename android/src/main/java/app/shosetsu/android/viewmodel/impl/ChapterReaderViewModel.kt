@@ -311,9 +311,11 @@ class ChapterReaderViewModel(
 
 	@Suppress("NOTHING_TO_INLINE") // We need every ns
 	private inline fun getRefreshFlow(item: ReaderChapterUI) =
-		refreshMap.getOrPut(item.id) { MutableSharedFlow<Unit>(replay = 1).apply {
-			viewModelScopeIO.launch { emit(Unit) }
-		} }
+		refreshMap.getOrPut(item.id) {
+			MutableSharedFlow<Unit>(replay = 1).apply {
+				viewModelScopeIO.launch { emit(Unit) }
+			}
+		}
 
 	override fun retryChapter(item: ReaderChapterUI) {
 		val flow = getRefreshFlow(item)
@@ -384,7 +386,13 @@ class ChapterReaderViewModel(
 	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
 		val mutableFlow = stringMap.getOrPut(item.id) {
 			getRefreshFlow(item)
-				.transformCatching<Unit, ChapterPassage>(exceptional = { emit(ChapterPassage.Error(it)) }) {
+				.transformCatching<Unit, ChapterPassage>(exceptional = {
+					emit(
+						ChapterPassage.Error(
+							it
+						)
+					)
+				}) {
 					emit(ChapterPassage.Loading)
 					val bytes = getChapterPassage(item)
 						?: throw Exception("No content received")
