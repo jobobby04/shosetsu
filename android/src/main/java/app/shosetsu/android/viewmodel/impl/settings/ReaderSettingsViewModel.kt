@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderContinuousScroll
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
