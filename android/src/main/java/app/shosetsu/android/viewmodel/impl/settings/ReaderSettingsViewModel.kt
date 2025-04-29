@@ -378,7 +378,7 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 		mutableStateOf(false)
 	}
 	val tts = remember {
-		TextToSpeech(context) { isInitialized = true}
+		TextToSpeech(context) { isInitialized = true }
 	}
 	val engines = remember(isInitialized) {
 		if (isInitialized) {
@@ -590,7 +590,8 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 						else -> false
 					}
 				} else {
-					val ttsLocale = tts.availableLanguages.find { it.toLanguageTag() == language.value }
+					val ttsLocale =
+						tts.availableLanguages.find { it.toLanguageTag() == language.value }
 					if (ttsLocale != null) {
 						locale = ttsLocale
 						val result = tts.setLanguage(locale)
