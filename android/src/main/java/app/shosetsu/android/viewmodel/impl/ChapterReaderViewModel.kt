@@ -39,7 +39,6 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
-import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.common.utils.transformCatching
@@ -60,14 +59,14 @@ import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
+import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
+import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
-import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
-import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
+import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
@@ -166,6 +165,8 @@ class ChapterReaderViewModel(
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@ChapterReaderViewModel.colorScheme
 	}
+
+	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
 
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
@@ -1017,7 +1018,7 @@ class ChapterReaderViewModel(
 		when (ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
 			else -> {
-				application.toast(R.string.reader_test_invalid_engine)
+				exceptions.emit(application.getString(R.string.reader_test_invalid_engine))
 				null
 			}
 		}
@@ -1059,7 +1060,7 @@ class ChapterReaderViewModel(
 
 			// Do not continue if a language has not been set successfully
 			if (!languageSuccess) {
-				application.toast(R.string.reader_test_invalid_language)
+				exceptions.emit(application.getString(R.string.reader_test_invalid_language))
 				return@filter false
 			}
 
@@ -1088,7 +1089,7 @@ class ChapterReaderViewModel(
 
 			// do not proceed if voice was not successful
 			if (!voiceSuccess) {
-				application.toast(R.string.reader_test_invalid_voice)
+				exceptions.emit(application.getString(R.string.reader_test_invalid_voice))
 				return@filter false
 			}
 			true

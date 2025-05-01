@@ -45,6 +45,11 @@ abstract class AChapterReaderViewModel :
 	ExposedSettingsRepoViewModel {
 
 	/**
+	 * Exceptions from various processes internal to the view model to show to the user.
+	 */
+	abstract val exceptions: SharedFlow<String>
+
+	/**
 	 * Has the user been reading for too long?
 	 *
 	 * If so, then the user will be notified
