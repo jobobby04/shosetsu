@@ -69,6 +69,9 @@ fun DropdownSettingContent(
 	modifier: Modifier = Modifier,
 	onSelection: (newValue: Int) -> Unit
 ) {
+	// nothing to render if nothing is given
+	if (choices.isEmpty()) return
+
 	var expanded by remember { mutableStateOf(false) }
 
 	GenericRightSettingLayout(title, description, modifier, onClick = { expanded = !expanded }) {
