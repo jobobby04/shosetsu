@@ -105,18 +105,6 @@ fun ExposedSettingsRepoViewModel.stringAsHtmlOption() {
 
 @SuppressLint("ComposableNaming")
 @Composable
-fun ExposedSettingsRepoViewModel.horizontalSwitchOption() {
-	SwitchSettingContent(
-		stringResource(R.string.settings_reader_title_horizontal_option),
-		stringResource(R.string.settings_reader_desc_horizontal_option),
-		settingsRepo,
-		ReaderHorizontalPageSwap, modifier = Modifier
-			.fillMaxWidth()
-	)
-}
-
-@SuppressLint("ComposableNaming")
-@Composable
 fun ExposedSettingsRepoViewModel.invertChapterSwipeOption() {
 	SwitchSettingContent(
 		stringResource(R.string.settings_reader_inverted_swipe_title),
