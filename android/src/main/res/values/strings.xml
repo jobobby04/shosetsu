@@ -711,5 +711,7 @@
     <string name="backup_summary"><![CDATA[Manual & automatic backups]]></string>
     <string name="backup_restrictions_title">Automatic backups device restrictions</string>
     <string name="backup_restrictions_desc">Restrictions: %s</string>
+    <string name="app_language">App Language</string>
+    <string name="app_language_default">Default</string>
 
 </resources>

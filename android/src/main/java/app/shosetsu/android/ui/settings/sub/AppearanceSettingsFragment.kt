@@ -1,5 +1,7 @@
 package app.shosetsu.android.ui.settings.sub
 
+import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,13 +13,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.ChapterColumnsInLandscape
@@ -26,15 +33,21 @@ import app.shosetsu.android.common.SettingKey.NavStyle
 import app.shosetsu.android.common.SettingKey.NovelBadgeToast
 import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.setting.widget.AppThemeModePreferenceWidget
-import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
+import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.AppThemeModePreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAppearanceSettingsViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import org.xmlpull.v1.XmlPullParser
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -115,6 +128,33 @@ fun AppearanceSettingsContent(
 			}
 
 			item {
+				val context = LocalContext.current
+				val langs = remember { getLangs(context) }
+				var currentLanguage by remember {
+					mutableStateOf(AppCompatDelegate.getApplicationLocales().get(0)?.toLanguage() ?: context.defaultLanguage)
+				}
+
+				LaunchedEffect(currentLanguage) {
+					logI("Gutis Vorstilvarg ${currentLanguage.langTag}")
+					val locale = if (currentLanguage.langTag.isEmpty()) {
+						LocaleListCompat.getEmptyLocaleList()
+					} else {
+						LocaleListCompat.forLanguageTags(currentLanguage.langTag)
+					}
+					AppCompatDelegate.setApplicationLocales(locale)
+				}
+
+				ListPreferenceWidget(
+					title = stringResource(R.string.app_language),
+					subtitle = currentLanguage.localizedDisplayName ?: currentLanguage.displayName,
+					icon = null,
+					value = currentLanguage,
+					entries = langs.associateWith { it.localizedDisplayName ?: it.displayName },
+					onValueChange = { currentLanguage = it },
+				)
+			}
+
+			item {
 				NumberPickerSettingContent(
 					title = stringResource(R.string.columns_of_novel_listing_p),
 					description = stringResource(R.string.columns_zero_automatic),
@@ -169,3 +209,39 @@ fun AppearanceSettingsContent(
 		}
 	}
 }
+
+private fun getLangs(context: Context): ImmutableList<Language> {
+	val langs = mutableListOf<Language>()
+	val parser = context.resources.getXml(R.xml.locales_config)
+	var eventType = parser.eventType
+	while (eventType != XmlPullParser.END_DOCUMENT) {
+		if (eventType == XmlPullParser.START_TAG && parser.name == "locale") {
+			for (i in 0..<parser.attributeCount) {
+				if (parser.getAttributeName(i) == "name") {
+					val langTag = parser.getAttributeValue(i)
+					val language = Locale.forLanguageTag(langTag).toLanguage()
+					if (language.displayName.isNotEmpty()) {
+						langs.add(language)
+					}
+				}
+			}
+		}
+		eventType = parser.next()
+	}
+
+	langs.sortBy { it.displayName }
+	langs.add(0, context.defaultLanguage)
+
+	return langs.toImmutableList()
+}
+
+private fun Locale.toLanguage(): Language =
+	Language(toLanguageTag(), displayName, getDisplayName(this))
+private val Context.defaultLanguage: Language get() =
+	Language("", getString(R.string.app_language_default), null)
+
+private data class Language(
+	val langTag: String,
+	val displayName: String,
+	val localizedDisplayName: String?,
+)
