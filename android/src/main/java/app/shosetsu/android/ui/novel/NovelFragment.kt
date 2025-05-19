@@ -1048,6 +1048,7 @@ fun PreviewHeaderContent() {
 
 @Composable
 fun NovelInfoCoverContent(
+	title: String,
 	imageURL: String,
 	modifier: Modifier = Modifier,
 	contentScale: ContentScale = ContentScale.Fit,
@@ -1063,7 +1064,7 @@ fun NovelInfoCoverContent(
 			.clickable(onClick = onClick),
 		contentScale = contentScale,
 		error = {
-			ImageLoadingError()
+			ImageLoadingError(title)
 		},
 		loading = {
 			Box(Modifier.placeholder(true))
@@ -1071,7 +1072,6 @@ fun NovelInfoCoverContent(
 	)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NovelInfoHeaderContent(
 	novelInfo: NovelUI,
@@ -1084,6 +1084,7 @@ fun NovelInfoHeaderContent(
 	if (isCoverClicked)
 		Dialog(onDismissRequest = { isCoverClicked = false }) {
 			NovelInfoCoverContent(
+				novelInfo.title,
 				novelInfo.imageURL,
 				modifier = Modifier.fillMaxWidth()
 			) {
@@ -1109,7 +1110,7 @@ fun NovelInfoHeaderContent(
 					.alpha(.10f),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(novelInfo.title)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
@@ -1127,6 +1128,7 @@ fun NovelInfoHeaderContent(
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						NovelInfoCoverContent(
+							novelInfo.title,
 							novelInfo.imageURL,
 							modifier = Modifier
 								.fillMaxWidth(.35f)

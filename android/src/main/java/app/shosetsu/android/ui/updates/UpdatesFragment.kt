@@ -364,7 +364,7 @@ fun UpdateItemContent(
 					.clip(MaterialTheme.shapes.small)
 					.clickable(onClick = onCoverClick),
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(updateUI.novelName)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
@@ -372,6 +372,7 @@ fun UpdateItemContent(
 			)
 		} else {
 			ImageLoadingError(
+				updateUI.novelName,
 				Modifier
 					.aspectRatio(coverRatio)
 					.clip(MaterialTheme.shapes.small)
