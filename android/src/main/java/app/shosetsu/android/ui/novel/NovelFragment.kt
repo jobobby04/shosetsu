@@ -1436,31 +1436,34 @@ fun ExpandedText(
 			modifier = Modifier.padding(start = 8.dp, end = 8.dp)
 		)
 
-		if (!isExpanded) {
-			LazyRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-				contentPadding = PaddingValues(horizontal = 8.dp)
-			) {
-				items(genre) {
-					NovelGenre(it)
+		if (genre.isNotEmpty()) {
+			if (!isExpanded) {
+				LazyRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+					contentPadding = PaddingValues(horizontal = 8.dp)
+				) {
+					items(genre) {
+						NovelGenre(it)
+					}
 				}
-			}
-		} else {
-			FlowRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				genre.forEach {
-					NovelGenre(it)
+			} else {
+				FlowRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					genre.forEach {
+						NovelGenre(it)
+					}
 				}
 			}
 		}
+
 		Icon(
 			painter = if (!isExpanded) {
 				painterResource(R.drawable.expand_more)
@@ -1477,7 +1480,6 @@ fun ExpandedText(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NovelGenre(
 	text: String

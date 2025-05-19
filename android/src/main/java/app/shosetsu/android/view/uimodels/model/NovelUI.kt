@@ -58,9 +58,9 @@ data class NovelUI(
 	val status: Novel.Status,
 ) : Convertible<NovelEntity> {
 
-	val displayAuthors = authors.joinToString(", ")
-	val displayArtists = artists.joinToString(", ")
-	val displayGenre = genres.toImmutableList()
+	val displayAuthors = authors.filter { it.isNotBlank() }.joinToString(", ")
+	val displayArtists = artists.filter { it.isNotBlank() }.joinToString(", ")
+	val displayGenre = genres.filter { it.isNotBlank() }.toImmutableList()
 
 	override fun convertTo(): NovelEntity = NovelEntity(
 		id = id,
