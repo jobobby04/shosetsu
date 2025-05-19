@@ -89,19 +89,19 @@ fun LibraryFilterMenuView(
 				when (it) {
 					0 -> {
 						val genres by viewModel.genresFlow.collectAsState(persistentListOf())
-						val genresIsNotEmpty by derivedStateOf { genres.isNotEmpty() }
+						val genresIsNotEmpty by remember(genres) { derivedStateOf { genres.isNotEmpty() } }
 						var genresIsExpanded by remember { mutableStateOf(false) }
 
 						val tags by viewModel.tagsFlow.collectAsState(persistentListOf())
-						val tagsIsNotEmpty by derivedStateOf { tags.isNotEmpty() }
+						val tagsIsNotEmpty by remember(tags) { derivedStateOf { tags.isNotEmpty() } }
 						var tagsIsExpanded by remember { mutableStateOf(false) }
 
 						val authors by viewModel.authorsFlow.collectAsState(persistentListOf())
-						val authorsIsNotEmpty by derivedStateOf { authors.isNotEmpty() }
+						val authorsIsNotEmpty by remember(authors) { derivedStateOf { authors.isNotEmpty() } }
 						var authorsIsExpanded by remember { mutableStateOf(false) }
 
 						val artists by viewModel.artistsFlow.collectAsState(persistentListOf())
-						val artistsIsNotEmpty by derivedStateOf { artists.isNotEmpty() }
+						val artistsIsNotEmpty by remember(artists) { derivedStateOf { artists.isNotEmpty() } }
 						var artistsIsExpanded by remember { mutableStateOf(false) }
 						val unreadStatusFilterState by viewModel.getUnreadFilter()
 							.collectAsState(Off)

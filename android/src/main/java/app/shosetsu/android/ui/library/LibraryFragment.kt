@@ -456,9 +456,7 @@ fun LibraryPager(
 			state = categoryPagerState,
 			modifier = Modifier.fillMaxSize()
 		) {
-			val id by derivedStateOf {
-				library.categories[it].id
-			}
+			val id by remember(library) { derivedStateOf { library.categories[it].id } }
 			val items by produceState(persistentListOf(), library, it, id) {
 				value = onIO {
 					library.novels[id] ?: persistentListOf()
