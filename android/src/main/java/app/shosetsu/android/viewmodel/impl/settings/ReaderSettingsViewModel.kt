@@ -378,7 +378,7 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 		mutableStateOf(false)
 	}
 	val tts = remember {
-		TextToSpeech(context) { isInitialized = true}
+		TextToSpeech(context) { isInitialized = true }
 	}
 	val engines = remember(isInitialized) {
 		if (isInitialized) {
@@ -457,7 +457,9 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 	}
 	val actualSelection = remember(engine, selection, languages) {
 		languages.indexOfFirst { it.toLanguageTag() == selection }.takeUnless { it < 0 }
-			?: languages.indexOfFirst { it.toLanguageTag() == Locale.getDefault().toLanguageTag() }.takeUnless { it < 0 }
+			?: languages.indexOfFirst {
+					it.toLanguageTag() == Locale.getDefault().toLanguageTag()
+				}.takeUnless { it < 0 }
 			?: 0
 	}
 	ListPreferenceWidget(
@@ -590,7 +592,8 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 						else -> false
 					}
 				} else {
-					val ttsLocale = tts.availableLanguages.find { it.toLanguageTag() == language.value }
+					val ttsLocale =
+						tts.availableLanguages.find { it.toLanguageTag() == language.value }
 					if (ttsLocale != null) {
 						locale = ttsLocale
 						val result = tts.setLanguage(locale)
