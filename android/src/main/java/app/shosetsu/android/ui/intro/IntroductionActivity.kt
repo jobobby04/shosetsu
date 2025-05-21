@@ -93,9 +93,9 @@ import org.kodein.di.android.closestDI
  */
 class IntroductionActivity : AppCompatActivity(), DIAware {
 
-    override val di: DI by closestDI()
+	override val di: DI by closestDI()
 
-    /***/
+	/***/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -108,7 +108,6 @@ class IntroductionActivity : AppCompatActivity(), DIAware {
 /**
  * Introduction view in compose
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun IntroView(
     viewModel: AIntroViewModel = viewModelDi(),

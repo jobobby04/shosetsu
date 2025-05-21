@@ -30,84 +30,84 @@ import kotlinx.coroutines.flow.stateIn
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class ShosetsuCssViewModelComponent {
-    abstract val settingsRepo: ISettingsRepository
-    abstract val viewModelScopeIO: CoroutineScope
-    abstract val indentSizeFlow: Flow<Int>
-    abstract val paragraphSpacingFlow: Flow<Float>
-    abstract val colorSchemeFlow: Flow<ColorScheme>
+	abstract val settingsRepo: ISettingsRepository
+	abstract val viewModelScopeIO: CoroutineScope
+	abstract val indentSizeFlow: Flow<Int>
+	abstract val paragraphSpacingFlow: Flow<Float>
+	abstract val colorSchemeFlow: Flow<ColorScheme>
 
-    val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
-        settingsRepo.getIntFlow(ReaderTheme).mapLatest { id: Int ->
-            settingsRepo.getStringSet(ReaderUserThemes)
-                .map { ColorChoiceData.fromString(it) }
-                .find { it.identifier == id.toLong() }
-                ?.let { (_, _, textColor, backgroundColor) ->
-                    (textColor to backgroundColor)
-                } ?: (Color.BLACK to Color.WHITE)
-        }.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, Color.BLACK to Color.WHITE)
-    }
+	val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
+		settingsRepo.getIntFlow(ReaderTheme).mapLatest { id: Int ->
+			settingsRepo.getStringSet(ReaderUserThemes)
+				.map { ColorChoiceData.fromString(it) }
+				.find { it.identifier == id.toLong() }
+				?.let { (_, _, textColor, backgroundColor) ->
+					(textColor to backgroundColor)
+				} ?: (Color.BLACK to Color.WHITE)
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, Color.BLACK to Color.WHITE)
+	}
 
-    val disableTextSelection: StateFlow<Boolean> by lazy {
-        settingsRepo.getBooleanFlow(ReaderDisableTextSelection)
-    }
+	val disableTextSelection: StateFlow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderDisableTextSelection)
+	}
 
-    val liveTextSize: StateFlow<Float> by lazy {
-        settingsRepo.getFloatFlow(ReaderTextSize)
-    }
+	val liveTextSize: StateFlow<Float> by lazy {
+		settingsRepo.getFloatFlow(ReaderTextSize)
+	}
 
-    val tableHackEnabledFlow: Flow<Boolean> by lazy {
-        settingsRepo.getBooleanFlow(ReaderTableHack)
-    }
+	val tableHackEnabledFlow: Flow<Boolean> by lazy {
+		settingsRepo.getBooleanFlow(ReaderTableHack)
+	}
 
-    val shosetsuCss: Flow<String> by lazy {
-        themeFlow.combine(liveTextSize) { (fore, back), textSize ->
-            ShosetsuCSSBuilder(
-                backgroundColor = back,
-                foregroundColor = fore,
-                textSize = textSize
-            )
-        }.combine(indentSizeFlow) { builder, indent ->
-            builder.copy(
-                indentSize = indent
-            )
-        }.combine(paragraphSpacingFlow) { builder, space ->
-            builder.copy(
-                paragraphSpacing = space
-            )
-        }.combine(tableHackEnabledFlow) { builder, enabled ->
-            builder.copy(
-                tableHackEnabled = enabled
-            )
-        }.combine(disableTextSelection) { builder, enabled ->
-            builder.copy(
-                disableTextSelection = enabled
-            )
-        }.combine(colorSchemeFlow) { builder, colorScheme ->
-            builder.copy(
-                colorScheme = colorScheme
-            )
-        }.map {
-            val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
+	val shosetsuCss: Flow<String> by lazy {
+		themeFlow.combine(liveTextSize) { (fore, back), textSize ->
+			ShosetsuCSSBuilder(
+				backgroundColor = back,
+				foregroundColor = fore,
+				textSize = textSize
+			)
+		}.combine(indentSizeFlow) { builder, indent ->
+			builder.copy(
+				indentSize = indent
+			)
+		}.combine(paragraphSpacingFlow) { builder, space ->
+			builder.copy(
+				paragraphSpacing = space
+			)
+		}.combine(tableHackEnabledFlow) { builder, enabled ->
+			builder.copy(
+				tableHackEnabled = enabled
+			)
+		}.combine(disableTextSelection) { builder, enabled ->
+			builder.copy(
+				disableTextSelection = enabled
+			)
+		}.combine(colorSchemeFlow) { builder, colorScheme ->
+			builder.copy(
+				colorScheme = colorScheme
+			)
+		}.map {
+			val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
 
-            fun setShosetsuStyle(elem: String, action: HashMap<String, String>.() -> Unit) =
-                shosetsuStyle.getOrPut(elem) { hashMapOf() }.apply(action)
+			fun setShosetsuStyle(elem: String, action: HashMap<String, String>.() -> Unit) =
+				shosetsuStyle.getOrPut(elem) { hashMapOf() }.apply(action)
 
-            fun Int.cssColor(): String = "rgb($red,$green,$blue)"
+			fun Int.cssColor(): String = "rgb($red,$green,$blue)"
 
-            if (it.disableTextSelection) {
-                setShosetsuStyle("*") {
-                    this["-webkit-user-select"] = "none"
-                    this["user-select"] = "none"
-                }
-            }
+			if (it.disableTextSelection) {
+				setShosetsuStyle("*") {
+					this["-webkit-user-select"] = "none"
+					this["user-select"] = "none"
+				}
+			}
 
-            setShosetsuStyle(":root") {
-                // Naming is based on the Material Theme Builder's CSS output
-                fun color(name: String, color: androidx.compose.ui.graphics.Color) {
-                    this["--md-sys-color-$name"] = color.toArgb().cssColor()
-                }
-                it.colorScheme.run {
-                    color("primary", primary)
+			setShosetsuStyle(":root") {
+				// Naming is based on the Material Theme Builder's CSS output
+				fun color(name: String, color: androidx.compose.ui.graphics.Color) {
+					this["--md-sys-color-$name"] = color.toArgb().cssColor()
+				}
+				it.colorScheme.run {
+				    color("primary", primary)
                     color("surface-tint", surfaceTint)
                     color("on-primary", onPrimary)
                     color("primary-container", primaryContainer)

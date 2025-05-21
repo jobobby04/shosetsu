@@ -42,9 +42,9 @@ fun fadeOutX() = fadeOut(animationSpec = tween(250))
  * @param content composable for the destination
  */
 inline fun <reified T : Any> NavGraphBuilder.composableMain(
-    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
-    deepLinks: List<NavDeepLink> = emptyList(),
-    noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
+	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
+	deepLinks: List<NavDeepLink> = emptyList(),
+	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
 ) = composable<T>(
     typeMap = typeMap,
     deepLinks = deepLinks,

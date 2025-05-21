@@ -11,8 +11,8 @@ import kotlin.coroutines.resumeWithException
  * @see androidx.work.await
  */
 suspend inline fun <R> ListenableFuture<R>.await(): R {
-    // Mirrors androidx.work.await
-    if (isDone) {
+	// Mirrors androidx.work.await
+	if (isDone) {
         try {
             return get()
         } catch (e: ExecutionException) {

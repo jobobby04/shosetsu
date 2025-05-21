@@ -63,7 +63,7 @@ class ChapterReaderAccompanistWebViewClient(
 				window.addEventListener("click",(event)=>{ shosetsuScript.onClick(null); });
 				window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
 				var elements = document.querySelectorAll('[id]');
-            	elements.forEach(function(element) {
+	        	elements.forEach(function(element) {
                 	element.addEventListener('click', function(event) {
 				        event.stopPropagation();
                    		shosetsuScript.onClick(element.id);

@@ -1,7 +1,7 @@
 package app.shosetsu.android.common.utils
 
 data class ProxyConfig(
-    val hostname: String,
+	val hostname: String,
     val port: Int,
     val authUsed: Boolean,
     val username: String,
