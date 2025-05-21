@@ -137,7 +137,7 @@ fun NovelCardNormalContent(
 					.clip(MaterialTheme.shapes.small),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(title)
 				}
 			)
 
@@ -247,7 +247,7 @@ fun NovelCardCozyContent(
 					.clip(MaterialTheme.shapes.small),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(title)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
@@ -548,7 +548,7 @@ fun NovelCardCompressedContent(
 					.clip(MaterialTheme.shapes.small),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(title)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))

@@ -374,7 +374,7 @@ fun AddShareContent(
 													.heightIn(max = 128.dp)
 													.aspectRatio(coverRatio),
 												error = {
-													ImageLoadingError()
+													ImageLoadingError(novelLink.name)
 												},
 												loading = {
 													Box(Modifier.placeholder(true))

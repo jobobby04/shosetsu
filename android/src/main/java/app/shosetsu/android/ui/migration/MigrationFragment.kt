@@ -197,7 +197,6 @@ fun PreviewMigrationExtensionItemContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MigrationExtensionItemContent(
 	item: MigrationExtensionUI,
@@ -317,7 +316,6 @@ fun PreviewMigrationNovelItemContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI) -> Unit) {
 	Card(
@@ -354,14 +352,14 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 					contentDescription = null,
 					modifier = modifier,
 					error = {
-						ImageLoadingError()
+						ImageLoadingError(item.title)
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
 					}
 				)
 			} else {
-				ImageLoadingError(modifier)
+				ImageLoadingError(item.title, modifier)
 			}
 
 			Text(
