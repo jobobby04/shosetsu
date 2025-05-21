@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.webkit.CookieManager
 import androidx.navigation.NavType
+import app.shosetsu.android.application.ShosetsuApplication
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
@@ -105,12 +106,12 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
 			register<IExtension.Listing>()
 			register<IExtension.Listing.List>()
 			register<IExtension.Listing.Item>()
-			register<Novel.Status>()
 			register<Novel.Chapter>()
 			register<Novel.Info>()
 			register<Novel.ChapterType>()
 			register<LuaExtension.LuaStableFunction>()
 			registerSingleton<Globals> { shosetsuGlobals() }
+			registerSingleton<ShosetsuApplication.ShosetsuLibLoader.PrintLib> { ShosetsuApplication.ShosetsuLibLoader.PrintLib }
 //			register<Globals>(object : FieldSerializer<Globals>(this, Globals::class.java) {
 //				override fun create(kryo: Kryo?, input: Input?, type: Class<out Globals>?) = shosetsuGlobals()
 //				override fun createCopy(kryo: Kryo?, original: Globals?) = throw UnsupportedOperationException()

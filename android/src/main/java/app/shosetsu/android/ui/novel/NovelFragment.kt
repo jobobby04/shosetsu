@@ -1452,8 +1452,7 @@ fun ExpandedText(
 						NovelGenre(it)
 					}
 				}
-			} else {
-				if (mappedGenre.isNotEmpty()) {
+			} else if (mappedGenre.isNotEmpty()) {
 				mappedGenre.forEach { (namespace, genre) ->
 					Row(Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
 						NovelGenre(text = namespace)

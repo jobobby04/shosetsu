@@ -5,22 +5,16 @@ import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.util.Log
-import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.Configuration
-import app.shosetsu.android.BuildConfig
-import app.shosetsu.android.R
-import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
-import app.shosetsu.android.common.ext.fileOut
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.LoggingPrintStream
 import app.shosetsu.android.common.utils.SiteProtector
@@ -57,13 +51,9 @@ import org.kodein.di.instance
 import org.kodein.di.singleton
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.PrintStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+
+typealias LibLoader = (name: String) -> LuaValue?
+typealias ShosetsuLogger = (extensionName: String, log: String) -> Unit
 
 /*
  * This file is part of shosetsu.
@@ -153,22 +143,24 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	 */
 	private fun setupCoreLib() {
 		ShosetsuSharedLib.httpClient = okHttpClient
+		ShosetsuSharedLib.logger = SLog
+		ShosetsuLuaLib.libLoader = ShosetsuLibLoader(extLibRepository)
+		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
+			"User-Agent" to runBlocking { getUserAgent() }
+		)
+	}
 
-		ShosetsuSharedLib.logger = { ext, arg ->
-			Log.i(ext, arg)
+	object SLog : ShosetsuLogger {
+		override fun invoke(ext: String, log: String) {
+			Log.i(ext, log)
 		}
+	}
 
-		ShosetsuLuaLib.libLoader = libLoader@{ name ->
-			if (name == "xx-print") {
-				return@libLoader object : OneArgFunction() {
-					override fun call(arg: LuaValue): LuaValue {
-						Log.i("LuaLibLoader/print", arg.toString())
-						return arg
-					}
-				}
-			}
+	class ShosetsuLibLoader(private val extLibRepository: IExtensionLibrariesRepository) : LibLoader {
+		override fun invoke(name: String): LuaValue? {
+			if (name == "xx-print") return PrintLib
 			Log.i("LuaLibLoader", "Loading ($name)")
-			try {
+			return try {
 				val result = runBlocking { extLibRepository.loadExtLibrary(name) }
 				val l =
 					shosetsuGlobals().apply {
@@ -182,9 +174,12 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			}
 		}
 
-		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
-			"User-Agent" to runBlocking { getUserAgent() }
-		)
+		object PrintLib : OneArgFunction() {
+			override fun call(arg: LuaValue): LuaValue {
+				Log.i("LuaLibLoader/print", arg.toString())
+				return arg
+			}
+		}
 	}
 
 	override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {}
