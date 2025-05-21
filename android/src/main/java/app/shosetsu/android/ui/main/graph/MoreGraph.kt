@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import app.shosetsu.android.common.enums.TextAsset
@@ -37,7 +36,7 @@ fun NavGraphBuilder.moreGraph(
 	drawerIcon: @Composable () -> Unit
 ) {
 	navigation<More>(View) {
-		composable<View> {
+		composableMain<View> {
 			MoreView(
 				onNavToAbout = {
 					navController.navigate(About)
@@ -74,7 +73,7 @@ fun NavGraphBuilder.moreGraph(
 
 		assetReader(navController)
 
-		composable<About> {
+		composableSub<About> {
 			AboutView(
 				onOpenLicense = {
 					navController.navigate(TextReader(TextAsset.LICENSE.ordinal))
@@ -82,18 +81,18 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Categories> {
+		composableSub<Categories> {
 			CategoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Downloads> {
+		composableSub<Downloads> {
 			DownloadsView(
 				onBack = navController::popBackStack
 			)
 		}
 
-		composable<AddShare> { entry ->
+		composableSub<AddShare> { entry ->
 			AddShareView(
 				entry.toRoute<AddShare>().url,
 				onBackPressed = navController::popBackStack,
@@ -103,18 +102,18 @@ fun NavGraphBuilder.moreGraph(
 				}
 			)
 		}
-		composable<Repositories> {
+		composableSub<Repositories> {
 			RepositoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Backup> {
+		composableSub<Backup> {
 			BackupView(
 				onBack = navController::popBackStack
 			)
 		}
 
-		composable<History> {
+		composableSub<History> {
 			val context = LocalContext.current
 			HistoryView(
 				openNovel = {
@@ -126,7 +125,7 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-		composable<Analytics> {
+		composableSub<Analytics> {
 			AnalyticsView(navController::popBackStack)
 		}
 

@@ -7,20 +7,19 @@ appcompat = "1.7.0"
 bottomsheetdialogCompose = "1.5.0"
 coilCompose = "2.6.0"
 collectionKtx = "1.4.5"
-composeBom = "2025.01.00"
+composeBom = "2025.01.01"
 coordinatorlayout = "1.2.0"
 coreKtx = "1.15.0"
 coreSplashscreen = "1.0.1"
 desugar_jdk_libs = "2.1.4"
 espressoCore = "3.6.1"
-googleMaterial = "1.12.0"
 gradle = "8.8.0"
 guava = "33.4.0-android"
 jodaTime = "2.12.7"
 jsoup = "1.18.3"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-kodein = "7.20.2"
+kodein = "7.25.0"
 kotlin = "2.1.0"
 kotlinLib = "c7fd8b2aa5"
 kotlinxCollectionsImmutable = "0.3.7"
@@ -100,7 +99,6 @@ google-accompanist-themeadapter-material = { module = "com.google.accompanist:ac
 google-accompanist-themeadapter-material3 = { module = "com.google.accompanist:accompanist-themeadapter-material3", version.ref = "accompanist" }
 google-accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
 google-guava = { module = "com.google.guava:guava", version.ref = "guava" }
-google-material = { group = "com.google.android.material", name = "material", version.ref = "googleMaterial" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 joda-time = { module = "joda-time:joda-time", version.ref = "jodaTime" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
@@ -108,7 +106,6 @@ junit = { module = "junit:junit", version.ref = "junit" }
 # Kodein
 kodein-di = { module = "org.kodein.di:kodein-di", version.ref = "kodein" }
 kodein-di-framework-android-core = { module = "org.kodein.di:kodein-di-framework-android-core", version.ref = "kodein" }
-kodein-di-framework-android-support = { module = "org.kodein.di:kodein-di-framework-android-support", version.ref = "kodein" }
 kodein-di-framework-androidx = { module = "org.kodein.di:kodein-di-framework-android-x", version.ref = "kodein" }
 kodein-di-framework-androidx-viewmodel = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel", version.ref = "kodein" }
 kodein-di-framework-androidx-viewmodel-savedstate = { module = "org.kodein.di:kodein-di-framework-android-x-viewmodel-savedstate", version.ref = "kodein" }

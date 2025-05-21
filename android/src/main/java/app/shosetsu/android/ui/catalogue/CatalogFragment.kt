@@ -228,7 +228,7 @@ fun CatalogueView(
 		}
 	}
 
-	val append = items.loadState.prepend
+	val append = items.loadState.append
 	LaunchedEffect(append) {
 		if (append is LoadState.Error) {
 			val result = hostState.showSnackbar(

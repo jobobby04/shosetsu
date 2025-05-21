@@ -15,7 +15,25 @@
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
-
 package app.shosetsu.android.view.uimodels.model.reader
 
-data class TTSText(val id: String, val text: String)
+/**
+ * Represents text that TTS reads aloud to the user
+ */
+sealed interface TTSText {
+
+	/**
+	 * Unique identification of this specific text
+	 */
+	val id: String
+
+	/**
+	 * The actual content of the text
+	 */
+	val text: String
+
+	/**
+	 * If this text should be skipped from being read or not
+	 */
+	val ignore: Boolean
+}

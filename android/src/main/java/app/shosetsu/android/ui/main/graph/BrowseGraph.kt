@@ -3,7 +3,6 @@ package app.shosetsu.android.ui.main.graph
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import app.shosetsu.android.common.utils.ListingSerializer
@@ -24,7 +23,7 @@ fun NavGraphBuilder.browseGraph(
 	drawerIcon: @Composable () -> Unit
 ) {
 	navigation<Browse>(Browse.View) {
-		composable<Browse.View> {
+		composableMain<Browse.View> {
 			BrowseView(
 				openCatalogue = {
 					navController.navigate(Catalog(it, ListingSerializer.SerializableListing(null)))
@@ -42,7 +41,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<Catalog>(typeMap = mapOf(typeOf<ListingSerializer.SerializableListing>() to ListingSerializer.NavParameter)) { entry ->
+		composableSub<Catalog>(typeMap = mapOf(typeOf<ListingSerializer.SerializableListing>() to ListingSerializer.NavParameter)) { entry ->
 			val route = entry.toRoute<Catalog>()
 			CatalogueView(
 				extensionId = route.extensionId,
@@ -57,7 +56,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<ConfigureExtension> { entry ->
+		composableSub<ConfigureExtension> { entry ->
 			val extensionId = entry.toRoute<ConfigureExtension>().extensionId
 			ConfigureExtensionView(
 				extensionId,
@@ -65,7 +64,7 @@ fun NavGraphBuilder.browseGraph(
 			)
 		}
 
-		composable<Search> { entry ->
+		composableSub<Search> { entry ->
 			// TODO fix crash here
 			val query = entry.toRoute<Search>().query
 			SearchView(

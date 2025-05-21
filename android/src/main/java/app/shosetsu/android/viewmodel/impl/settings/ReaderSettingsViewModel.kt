@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderContinuousScroll
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
@@ -377,7 +376,7 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 		mutableStateOf(false)
 	}
 	val tts = remember {
-		TextToSpeech(context) { isInitialized = true}
+		TextToSpeech(context) { isInitialized = true }
 	}
 	val engines = remember(isInitialized) {
 		if (isInitialized) {
@@ -478,7 +477,9 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 		},
 		selection = remember(engine, selection, languages) {
 			languages.indexOfFirst { it.toLanguageTag() == selection }.takeUnless { it < 0 }
-				?: languages.indexOfFirst { it.toLanguageTag() == Locale.getDefault().toLanguageTag() }.takeUnless { it < 0 }
+				?: languages.indexOfFirst {
+					it.toLanguageTag() == Locale.getDefault().toLanguageTag()
+				}.takeUnless { it < 0 }
 				?: 0
 		},
 		onSelection = {
@@ -611,7 +612,8 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 						else -> false
 					}
 				} else {
-					val ttsLocale = tts.availableLanguages.find { it.toLanguageTag() == language.value }
+					val ttsLocale =
+						tts.availableLanguages.find { it.toLanguageTag() == language.value }
 					if (ttsLocale != null) {
 						locale = ttsLocale
 						val result = tts.setLanguage(locale)

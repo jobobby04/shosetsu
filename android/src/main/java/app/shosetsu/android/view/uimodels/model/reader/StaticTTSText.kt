@@ -1,5 +1,3 @@
-package app.shosetsu.android.common.enums
-
 /*
  * This file is part of Shosetsu.
  *
@@ -15,18 +13,13 @@ package app.shosetsu.android.common.enums
  *
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
+ *
  */
+package app.shosetsu.android.view.uimodels.model.reader
 
 /**
- * shosetsu
- * 22 / 11 / 2020
+ * Used for when there is no other way to stream the text contents.
  */
-enum class AppThemes(val key: Int) {
-	FOLLOW_SYSTEM(0),
-	LIGHT(1),
-	DARK(2);
-
-	companion object {
-		fun fromKey(key: Int): AppThemes = entries.find { it.key == key } ?: FOLLOW_SYSTEM
-	}
+data class StaticTTSText(override val id: String, override val text: String) : TTSText {
+	override val ignore: Boolean = false
 }
