@@ -108,7 +108,6 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
 			register<IExtension.Listing.Item>()
 			register<Novel.Chapter>()
 			register<Novel.Info>()
-			register<Novel.ChapterType>()
 			register<LuaExtension.LuaStableFunction>()
 			registerSingleton<Globals> { shosetsuGlobals() }
 			registerSingleton<ShosetsuApplication.ShosetsuLibLoader.PrintLib> { ShosetsuApplication.ShosetsuLibLoader.PrintLib }
