@@ -2,9 +2,13 @@ package app.shosetsu.android.common.utils
 
 import android.os.Bundle
 import android.util.Log
+import android.webkit.CookieManager
 import androidx.navigation.NavType
+import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Novel
 import app.shosetsu.lib.lua.LuaExtension
+import app.shosetsu.lib.lua.ShosetsuLuaLib
 import app.shosetsu.lib.lua.shosetsuGlobals
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.Serializer
@@ -22,7 +26,27 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import okhttp3.CacheControl
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.FormBody
 import okhttp3.Headers
+import okhttp3.HttpUrl
+import okhttp3.Interceptor
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.Response
+import okio.ByteString
+import org.jsoup.nodes.Attribute
+import org.jsoup.nodes.Attributes
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
+import org.jsoup.select.Elements
+import org.jsoup.select.NodeVisitor
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LocVars
 import org.luaj.vm2.LuaBoolean
@@ -78,8 +102,13 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
             }
         })
         Kryo().apply {
+            register<IExtension.Listing>()
             register<IExtension.Listing.List>()
             register<IExtension.Listing.Item>()
+            register<Novel.Status>()
+            register<Novel.Chapter>()
+            register<Novel.Info>()
+            register<Novel.ChapterType>()
             register<LuaExtension.LuaStableFunction>()
             registerSingleton<Globals> { shosetsuGlobals() }
 //            register<Globals>(object : FieldSerializer<Globals>(this, Globals::class.java) {
@@ -163,6 +192,41 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
 //            register(Class.forName("app.shosetsu.lib.lua.GlobalsKt\$frozen\$3"))
 
             register<Headers>()
+            register<Headers.Builder>()
+            register<RequestBody>()
+            register<FormBody>()
+            register<FormBody.Builder>()
+            register<ByteString>()
+            register<MultipartBody>()
+            register<Request>()
+            register<Request.Builder>()
+            register<CacheControl>()
+            register<MediaType>()
+            register<Cookie>()
+            register<Cookie.Builder>()
+            registerSingleton<CookieManager> { CookieManager.getInstance() }
+            register<CookieJar>()
+            register<CookieJarSync>()
+            register<ShosetsuLuaLib.LibFunctions.CustomCookieJar>()
+            register<HttpUrl>()
+            register<HttpUrl.Builder>()
+            register<Interceptor>()
+            register<ShosetsuLuaLib.LibFunctions.CustomInterceptor>()
+            register<OkHttpClient>()
+            register<OkHttpClient.Builder>()
+            register<Response>()
+            register<Response.Builder>()
+
+            register<Attribute>()
+            register<Attributes>()
+            register<Node>()
+            register<Document>()
+            register<Element>()
+            register<Elements>()
+            register<NodeVisitor>()
+            register<ShosetsuLuaLib.LibFunctions.CustomNodeVisitor>()
+
+            registerWithSubclasses<Filter<*>>()
 
             registerWithSubclasses<BaseLib>()
             registerWithSubclasses<JseBaseLib>()
