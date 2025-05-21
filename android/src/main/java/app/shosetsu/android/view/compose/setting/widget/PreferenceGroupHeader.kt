@@ -12,17 +12,17 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PreferenceGroupHeader(title: String) {
-    Box(
-        contentAlignment = Alignment.CenterStart,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp, top = 14.dp),
-    ) {
-        Text(
-            text = title,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-    }
+	Box(
+		contentAlignment = Alignment.CenterStart,
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(bottom = 8.dp, top = 14.dp),
+	) {
+		Text(
+			text = title,
+			color = MaterialTheme.colorScheme.secondary,
+			modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
+			style = MaterialTheme.typography.bodyMedium,
+		)
+	}
 }

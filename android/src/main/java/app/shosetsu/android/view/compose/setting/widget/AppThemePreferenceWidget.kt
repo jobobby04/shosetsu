@@ -15,33 +15,33 @@ import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 internal fun AppThemeModePreferenceWidget(
-    value: AppThemes,
-    onItemClick: (AppThemes) -> Unit,
+	value: AppThemes,
+	onItemClick: (AppThemes) -> Unit,
 ) {
-    BasePreferenceWidget(
-        subcomponent = {
-            MultiChoiceSegmentedButtonRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = PrefsHorizontalPadding),
-            ) {
-                val names = stringArrayResource(R.array.application_themes)
-                    .toList()
-                    .toImmutableList()
-                val options = AppThemes.entries.associateWith { names[it.key] }
-                options.onEachIndexed { index, (mode, labelRes) ->
-                    SegmentedButton(
-                        checked = mode == value,
-                        onCheckedChange = { onItemClick(mode) },
-                        shape = SegmentedButtonDefaults.itemShape(
-                            index,
-                            options.size,
-                        ),
-                    ) {
-                        Text(labelRes)
-                    }
-                }
-            }
-        },
-    )
+	BasePreferenceWidget(
+		subcomponent = {
+			MultiChoiceSegmentedButtonRow(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(horizontal = PrefsHorizontalPadding),
+			) {
+				val names = stringArrayResource(R.array.application_themes)
+					.toList()
+					.toImmutableList()
+				val options = AppThemes.entries.associateWith { names[it.key] }
+				options.onEachIndexed { index, (mode, labelRes) ->
+					SegmentedButton(
+						checked = mode == value,
+						onCheckedChange = { onItemClick(mode) },
+						shape = SegmentedButtonDefaults.itemShape(
+							index,
+							options.size,
+						),
+					) {
+						Text(labelRes)
+					}
+				}
+			}
+		},
+	)
 }

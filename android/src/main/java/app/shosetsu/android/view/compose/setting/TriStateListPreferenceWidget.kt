@@ -11,38 +11,38 @@ import app.shosetsu.android.view.compose.setting.widget.TriStateListDialog
 
 @Composable
 fun <T> TriStateListPreferenceWidget(
-    title: String,
-    subtitle: String? = null,
-    dialogMessage: String? = null,
-    icon: ImageVector? = null,
-    possibleValues: List<T>,
-    initialChecked: List<T>,
-    initialInversed: List<T>,
-    stringify: @Composable (T) -> String,
-    onValuesChange: (newIncluded: List<T>, newExcluded: List<T>) -> Unit,
+	title: String,
+	subtitle: String? = null,
+	dialogMessage: String? = null,
+	icon: ImageVector? = null,
+	possibleValues: List<T>,
+	initialChecked: List<T>,
+	initialInversed: List<T>,
+	stringify: @Composable (T) -> String,
+	onValuesChange: (newIncluded: List<T>, newExcluded: List<T>) -> Unit,
 ) {
-    var isDialogShown by remember { mutableStateOf(false) }
+	var isDialogShown by remember { mutableStateOf(false) }
 
-    TextPreferenceWidget(
-        title = title,
-        subtitle = subtitle,
-        icon = icon,
-        onPreferenceClick = { isDialogShown = true },
-    )
+	TextPreferenceWidget(
+		title = title,
+		subtitle = subtitle,
+		icon = icon,
+		onPreferenceClick = { isDialogShown = true },
+	)
 
-    if (isDialogShown) {
-        TriStateListDialog(
-            title = title,
-            message = dialogMessage,
-            items = possibleValues,
-            initialChecked = initialChecked,
-            initialInversed = initialInversed,
-            itemLabel = stringify,
-            onDismissRequest = { isDialogShown = false },
-            onValueChanged = { newIncluded, newExcluded ->
-                onValuesChange(newIncluded, newExcluded)
-                isDialogShown = false
-            },
-        )
-    }
+	if (isDialogShown) {
+		TriStateListDialog(
+			title = title,
+			message = dialogMessage,
+			items = possibleValues,
+			initialChecked = initialChecked,
+			initialInversed = initialInversed,
+			itemLabel = stringify,
+			onDismissRequest = { isDialogShown = false },
+			onValueChanged = { newIncluded, newExcluded ->
+				onValuesChange(newIncluded, newExcluded)
+				isDialogShown = false
+			},
+		)
+	}
 }

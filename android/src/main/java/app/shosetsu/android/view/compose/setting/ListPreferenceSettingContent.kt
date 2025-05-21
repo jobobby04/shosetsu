@@ -11,48 +11,48 @@ import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 
 @Composable
 fun <T> ListPreferenceSettingContent(
-    title: String,
-    description: String? = null,
-    choices: List<T>,
-    stringify: (T) -> String,
-    toKey: (T) -> String = { stringify(it) },
-    fromKey: (String) -> T,
-    icon: ImageVector? = null,
-    repo: ISettingsRepository,
-    key: SettingKey<String>
+	title: String,
+	description: String? = null,
+	choices: List<T>,
+	stringify: (T) -> String,
+	toKey: (T) -> String = { stringify(it) },
+	fromKey: (String) -> T,
+	icon: ImageVector? = null,
+	repo: ISettingsRepository,
+	key: SettingKey<String>
 ) {
-    val choice by repo.getStringFlow(key).collectAsState()
+	val choice by repo.getStringFlow(key).collectAsState()
 
-    ListPreferenceWidget(
-        title = title,
-        subtitle = description ?: stringify(fromKey(choice)),
-        icon = icon,
-        value = fromKey(choice),
-        entries = choices.associateWith { stringify(it) },
-        onValueChange = {
-            launchIO { repo.setString(key, toKey(it)) }
-        },
-    )
+	ListPreferenceWidget(
+		title = title,
+		subtitle = description ?: stringify(fromKey(choice)),
+		icon = icon,
+		value = fromKey(choice),
+		entries = choices.associateWith { stringify(it) },
+		onValueChange = {
+			launchIO { repo.setString(key, toKey(it)) }
+		},
+	)
 }
 
 @Composable
 fun StringListPreferenceSettingContent(
-    title: String,
-    choices: List<String>,
-    icon: ImageVector? = null,
-    repo: ISettingsRepository,
-    key: SettingKey<Int>,
+	title: String,
+	choices: List<String>,
+	icon: ImageVector? = null,
+	repo: ISettingsRepository,
+	key: SettingKey<Int>,
 ) {
-    val choice by repo.getIntFlow(key).collectAsState()
+	val choice by repo.getIntFlow(key).collectAsState()
 
-    ListPreferenceWidget(
-        value = choices[choice],
-        title = title,
-        subtitle = choices[choice],
-        icon = icon,
-        entries = choices.associateWith { it },
-        onValueChange = {
-            launchIO { repo.setInt(key, choices.indexOf(it)) }
-        },
-    )
+	ListPreferenceWidget(
+		value = choices[choice],
+		title = title,
+		subtitle = choices[choice],
+		icon = icon,
+		entries = choices.associateWith { it },
+		onValueChange = {
+			launchIO { repo.setInt(key, choices.indexOf(it)) }
+		},
+	)
 }

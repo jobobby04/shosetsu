@@ -18,65 +18,65 @@ import app.shosetsu.android.view.compose.secondaryItemAlpha
 
 @Composable
 fun TextPreferenceWidget(
-    modifier: Modifier = Modifier,
-    title: String? = null,
-    subtitle: String? = null,
-    icon: ImageVector? = null,
-    iconTint: Color = MaterialTheme.colorScheme.primary,
-    widget: @Composable (() -> Unit)? = null,
-    onPreferenceClick: (() -> Unit)? = null,
+	modifier: Modifier = Modifier,
+	title: String? = null,
+	subtitle: String? = null,
+	icon: ImageVector? = null,
+	iconTint: Color = MaterialTheme.colorScheme.primary,
+	widget: @Composable (() -> Unit)? = null,
+	onPreferenceClick: (() -> Unit)? = null,
 ) {
-    BasePreferenceWidget(
-        modifier = modifier,
-        title = title,
-        subcomponent = if (!subtitle.isNullOrBlank()) {
-            {
-                Text(
-                    text = subtitle,
-                    modifier = Modifier
-                        .padding(horizontal = PrefsHorizontalPadding)
-                        .secondaryItemAlpha(),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 10,
-                )
-            }
-        } else {
-            null
-        },
-        icon = if (icon != null) {
-            {
-                Icon(
-                    imageVector = icon,
-                    tint = iconTint,
-                    contentDescription = null,
-                )
-            }
-        } else {
-            null
-        },
-        onClick = onPreferenceClick,
-        widget = widget,
-    )
+	BasePreferenceWidget(
+		modifier = modifier,
+		title = title,
+		subcomponent = if (!subtitle.isNullOrBlank()) {
+			{
+				Text(
+					text = subtitle,
+					modifier = Modifier
+						.padding(horizontal = PrefsHorizontalPadding)
+						.secondaryItemAlpha(),
+					style = MaterialTheme.typography.bodySmall,
+					maxLines = 10,
+				)
+			}
+		} else {
+			null
+		},
+		icon = if (icon != null) {
+			{
+				Icon(
+					imageVector = icon,
+					tint = iconTint,
+					contentDescription = null,
+				)
+			}
+		} else {
+			null
+		},
+		onClick = onPreferenceClick,
+		widget = widget,
+	)
 }
 
 @PreviewLightDark
 @Composable
 private fun TextPreferenceWidgetPreview() {
-    ShosetsuTheme {
-        Surface {
-            Column {
-                TextPreferenceWidget(
-                    title = "Text preference with icon",
-                    subtitle = "Text preference summary",
-                    icon = Icons.Filled.Build,
-                    onPreferenceClick = {},
-                )
-                TextPreferenceWidget(
-                    title = "Text preference",
-                    subtitle = "Text preference summary",
-                    onPreferenceClick = {},
-                )
-            }
-        }
-    }
+	ShosetsuTheme {
+		Surface {
+			Column {
+				TextPreferenceWidget(
+					title = "Text preference with icon",
+					subtitle = "Text preference summary",
+					icon = Icons.Filled.Build,
+					onPreferenceClick = {},
+				)
+				TextPreferenceWidget(
+					title = "Text preference",
+					subtitle = "Text preference summary",
+					onPreferenceClick = {},
+				)
+			}
+		}
+	}
 }

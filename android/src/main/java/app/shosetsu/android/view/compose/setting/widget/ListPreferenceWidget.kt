@@ -24,89 +24,88 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.ScrollbarLazyColumn
 
 @Composable
 fun <T> ListPreferenceWidget(
-    value: T,
-    title: String,
-    subtitle: String?,
-    icon: ImageVector?,
-    entries: Map<out T, String>,
-    onValueChange: (T) -> Unit,
+	value: T,
+	title: String,
+	subtitle: String?,
+	icon: ImageVector?,
+	entries: Map<out T, String>,
+	onValueChange: (T) -> Unit,
 ) {
-    var isDialogShown by remember { mutableStateOf(false) }
+	var isDialogShown by remember { mutableStateOf(false) }
 
-    TextPreferenceWidget(
-        title = title,
-        subtitle = subtitle,
-        icon = icon,
-        onPreferenceClick = { isDialogShown = true },
-    )
+	TextPreferenceWidget(
+		title = title,
+		subtitle = subtitle,
+		icon = icon,
+		onPreferenceClick = { isDialogShown = true },
+	)
 
-    if (isDialogShown) {
-        AlertDialog(
-            onDismissRequest = { isDialogShown = false },
-            title = { Text(text = title) },
-            text = {
-                Box {
-                    val state = rememberLazyListState()
-                    ScrollbarLazyColumn(state = state) {
-                        entries.forEach { current ->
-                            val isSelected = value == current.key
-                            item {
-                                DialogRow(
-                                    label = current.value,
-                                    isSelected = isSelected,
-                                    onSelected = {
-                                        onValueChange(current.key!!)
-                                        isDialogShown = false
-                                    },
-                                )
-                            }
-                        }
-                    }
-                    if (state.canScrollBackward) HorizontalDivider(modifier = Modifier.align(
-                        Alignment.TopCenter))
-                    if (state.canScrollForward) HorizontalDivider(modifier = Modifier.align(
-                        Alignment.BottomCenter))
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { isDialogShown = false }) {
-                    Text(text = stringResource(android.R.string.cancel))
-                }
-            },
-        )
-    }
+	if (isDialogShown) {
+		AlertDialog(
+			onDismissRequest = { isDialogShown = false },
+			title = { Text(text = title) },
+			text = {
+				Box {
+					val state = rememberLazyListState()
+					ScrollbarLazyColumn(state = state) {
+						entries.forEach { current ->
+							val isSelected = value == current.key
+							item {
+								DialogRow(
+									label = current.value,
+									isSelected = isSelected,
+									onSelected = {
+										onValueChange(current.key!!)
+										isDialogShown = false
+									},
+								)
+							}
+						}
+					}
+					if (state.canScrollBackward) HorizontalDivider(modifier = Modifier.align(
+						Alignment.TopCenter))
+					if (state.canScrollForward) HorizontalDivider(modifier = Modifier.align(
+						Alignment.BottomCenter))
+				}
+			},
+			confirmButton = {
+				TextButton(onClick = { isDialogShown = false }) {
+					Text(text = stringResource(android.R.string.cancel))
+				}
+			},
+		)
+	}
 }
 
 @Composable
 private fun DialogRow(
-    label: String,
-    isSelected: Boolean,
-    onSelected: () -> Unit,
+	label: String,
+	isSelected: Boolean,
+	onSelected: () -> Unit,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(MaterialTheme.shapes.small)
-            .selectable(
-                selected = isSelected,
-                onClick = { if (!isSelected) onSelected() },
-            )
-            .fillMaxWidth()
-            .minimumInteractiveComponentSize(),
-    ) {
-        RadioButton(
-            selected = isSelected,
-            onClick = null,
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge.merge(),
-            modifier = Modifier.padding(start = 24.dp),
-        )
-    }
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.clip(MaterialTheme.shapes.small)
+			.selectable(
+				selected = isSelected,
+				onClick = { if (!isSelected) onSelected() },
+			)
+			.fillMaxWidth()
+			.minimumInteractiveComponentSize(),
+	) {
+		RadioButton(
+			selected = isSelected,
+			onClick = null,
+		)
+		Text(
+			text = label,
+			style = MaterialTheme.typography.bodyLarge.merge(),
+			modifier = Modifier.padding(start = 24.dp),
+		)
+	}
 }

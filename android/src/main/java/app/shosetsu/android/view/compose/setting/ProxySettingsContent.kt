@@ -161,7 +161,7 @@ fun ProxySettingsDialogContent(
 					checked = config.authUsed,
 					onCheckedChange = {
 						config = config.copy(authUsed=it)
-				    },
+					},
 				)
 				Text(
 					text = "use authentication",

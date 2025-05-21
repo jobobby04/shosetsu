@@ -102,7 +102,7 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 		}
         composableSub<Settings.Reader> {
 			val context = LocalContext.current
-            val hostState = remember { SnackbarHostState() }
+			val hostState = remember { SnackbarHostState() }
 
 			ReaderSettingsView(
 				hostState = hostState,

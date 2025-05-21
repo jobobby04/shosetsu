@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class BrowseSettingsViewModel(
-    iSettingsRepository: ISettingsRepository,
-    loadRepositoriesUseCase: LoadRepositoriesUseCase
+	iSettingsRepository: ISettingsRepository,
+	loadRepositoriesUseCase: LoadRepositoriesUseCase
 ) : ABrowseSettingsViewModel(iSettingsRepository) {
-    override val repoCount: StateFlow<Int> by lazy {
-        loadRepositoriesUseCase()
-            .map { it.size }
-            .stateIn(viewModelScopeIO, SharingStarted.Lazily, 0)
-    }
+	override val repoCount: StateFlow<Int> by lazy {
+		loadRepositoriesUseCase()
+			.map { it.size }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, 0)
+	}
 }
