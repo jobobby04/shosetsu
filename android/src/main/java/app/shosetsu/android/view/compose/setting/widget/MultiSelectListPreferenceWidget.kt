@@ -16,66 +16,66 @@ import app.shosetsu.android.view.compose.LabeledCheckbox
 
 @Composable
 fun <T> MultiSelectListPreferenceWidget(
-    title: String,
-    subtitle: String,
-    icon: ImageVector? = null,
-    possibleValues: List<T>,
-    selectedValues: Set<T>,
-    stringify: @Composable (T) -> String,
-    onValuesChange: (Set<T>) -> Unit,
+	title: String,
+	subtitle: String,
+	icon: ImageVector? = null,
+	possibleValues: List<T>,
+	selectedValues: Set<T>,
+	stringify: @Composable (T) -> String,
+	onValuesChange: (Set<T>) -> Unit,
 ) {
-    var isDialogShown by remember { mutableStateOf(false) }
+	var isDialogShown by remember { mutableStateOf(false) }
 
-    TextPreferenceWidget(
-        title = title,
-        subtitle = subtitle,
-        icon = icon,
-        onPreferenceClick = { isDialogShown = true },
-    )
+	TextPreferenceWidget(
+		title = title,
+		subtitle = subtitle,
+		icon = icon,
+		onPreferenceClick = { isDialogShown = true },
+	)
 
-    if (isDialogShown) {
-        val selected = selectedValues.toMutableSet()
-        AlertDialog(
-            onDismissRequest = { isDialogShown = false },
-            title = { Text(text = title) },
-            text = {
-                LazyColumn {
-                    possibleValues.forEach { current ->
-                        item {
-                            val isSelected = selected.contains(current)
-                            LabeledCheckbox(
-                                label = stringify(current),
-                                checked = isSelected,
-                                onCheckedChange = {
-                                    if (it) {
-                                        selected.add(current)
-                                    } else {
-                                        selected.remove(current)
-                                    }
-                                },
-                            )
-                        }
-                    }
-                }
-            },
-            properties = DialogProperties(
-                usePlatformDefaultWidth = true,
-            ),
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onValuesChange(selected.toMutableSet())
-                        isDialogShown = false
-                    },
-                ) {
-                    Text(text = stringResource(android.R.string.ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { isDialogShown = false }) {
-                    Text(text = stringResource(android.R.string.cancel))
-                }
-            },
-        )
-    }
+	if (isDialogShown) {
+		val selected = selectedValues.toMutableSet()
+		AlertDialog(
+			onDismissRequest = { isDialogShown = false },
+			title = { Text(text = title) },
+			text = {
+				LazyColumn {
+					possibleValues.forEach { current ->
+						item {
+							val isSelected = selected.contains(current)
+							LabeledCheckbox(
+								label = stringify(current),
+								checked = isSelected,
+								onCheckedChange = {
+									if (it) {
+										selected.add(current)
+									} else {
+										selected.remove(current)
+									}
+								},
+							)
+						}
+					}
+				}
+			},
+			properties = DialogProperties(
+				usePlatformDefaultWidth = true,
+			),
+			confirmButton = {
+				TextButton(
+					onClick = {
+						onValuesChange(selected.toMutableSet())
+						isDialogShown = false
+					},
+				) {
+					Text(text = stringResource(android.R.string.ok))
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { isDialogShown = false }) {
+					Text(text = stringResource(android.R.string.cancel))
+				}
+			},
+		)
+	}
 }

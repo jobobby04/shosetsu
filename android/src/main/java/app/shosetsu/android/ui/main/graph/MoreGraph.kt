@@ -36,7 +36,7 @@ fun NavGraphBuilder.moreGraph(
 	drawerIcon: @Composable () -> Unit
 ) {
 	navigation<More>(View) {
-        composableMain<View> {
+		composableMain<View> {
 			MoreView(
 				onNavToAbout = {
 					navController.navigate(About)
@@ -68,7 +68,7 @@ fun NavGraphBuilder.moreGraph(
 
 		assetReader(navController)
 
-        composableSub<About> {
+		composableSub<About> {
 			AboutView(
 				onOpenLicense = {
 					navController.navigate(TextReader(TextAsset.LICENSE.ordinal))
@@ -76,18 +76,18 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-        composableSub<Categories> {
+		composableSub<Categories> {
 			CategoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-        composableSub<Downloads> {
+		composableSub<Downloads> {
 			DownloadsView(
 				onBack = navController::popBackStack
 			)
 		}
 
-        composableSub<AddShare> { entry ->
+		composableSub<AddShare> { entry ->
 			AddShareView(
 				entry.toRoute<AddShare>().url,
 				onBackPressed = navController::popBackStack,
@@ -97,18 +97,18 @@ fun NavGraphBuilder.moreGraph(
 				}
 			)
 		}
-        composableSub<Repositories> {
+		composableSub<Repositories> {
 			RepositoriesView(
 				onBack = navController::popBackStack
 			)
 		}
-        composableSub<Backup> {
+		composableSub<Backup> {
 			BackupView(
 				onBack = navController::popBackStack
 			)
 		}
 
-        composableSub<History> {
+		composableSub<History> {
 			val context = LocalContext.current
 			HistoryView(
 				openNovel = {
@@ -120,7 +120,7 @@ fun NavGraphBuilder.moreGraph(
 				onBack = navController::popBackStack
 			)
 		}
-        composableSub<Analytics> {
+		composableSub<Analytics> {
 			AnalyticsView(navController::popBackStack)
 		}
 

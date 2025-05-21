@@ -33,8 +33,8 @@ object Destination {
 		@Serializable object Settings : ShosetsuDestination {
 			@Serializable object Overview : ShosetsuDestination
 			@Serializable object Appearance : ShosetsuDestination
-            @Serializable object Library : ShosetsuDestination
-            @Serializable object Browse : ShosetsuDestination
+			@Serializable object Library : ShosetsuDestination
+			@Serializable object Browse : ShosetsuDestination
 			@Serializable object Advanced : ShosetsuDestination
 			@Serializable object Downloads : ShosetsuDestination
 			@Serializable object Reader : ShosetsuDestination

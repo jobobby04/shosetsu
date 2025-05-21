@@ -17,34 +17,34 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun LabeledCheckbox(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
+	label: String,
+	checked: Boolean,
+	onCheckedChange: (Boolean) -> Unit,
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
 ) {
-    Row(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.small)
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .clickable(
-                role = Role.Checkbox,
-                onClick = {
-                    if (enabled) {
-                        onCheckedChange(!checked)
-                    }
-                },
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = null,
-            enabled = enabled,
-        )
+	Row(
+		modifier = modifier
+			.clip(MaterialTheme.shapes.small)
+			.fillMaxWidth()
+			.heightIn(min = 48.dp)
+			.clickable(
+				role = Role.Checkbox,
+				onClick = {
+					if (enabled) {
+						onCheckedChange(!checked)
+					}
+				},
+			),
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(8.dp),
+	) {
+		Checkbox(
+			checked = checked,
+			onCheckedChange = null,
+			enabled = enabled,
+		)
 
-        Text(text = label)
-    }
+		Text(text = label)
+	}
 }

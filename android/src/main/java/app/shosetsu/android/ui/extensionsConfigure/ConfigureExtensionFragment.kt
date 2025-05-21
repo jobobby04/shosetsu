@@ -198,15 +198,15 @@ fun SettingsItemAsCompose(
 			is FilterEntity.Switch -> {
 				column.item(data.id) {
 					SwitchPreferenceWidget(
-                        title = data.name,
-                        subtitle = "",
-                        checked = data.state,
-                        modifier = Modifier.fillMaxWidth(),
-                        onCheckedChanged = { newValue ->
+						title = data.name,
+						subtitle = "",
+						checked = data.state,
+						modifier = Modifier.fillMaxWidth(),
+						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
 						}
-                    )
-                }
+					)
+				}
 			}
 
 			is FilterEntity.TriState -> {
@@ -265,15 +265,15 @@ fun SettingsItemAsCompose(
 			is FilterEntity.Checkbox -> {
 				column.item(data.id) {
 					SwitchPreferenceWidget(
-                        title = data.name,
-                        subtitle = "",
-                        checked = data.state,
-                        modifier = Modifier.fillMaxWidth(),
-                        onCheckedChanged = { newValue ->
+						title = data.name,
+						subtitle = "",
+						checked = data.state,
+						modifier = Modifier.fillMaxWidth(),
+						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
 						}
-                    )
-                }
+					)
+				}
 			}
 
 			is FilterEntity.RadioGroup -> {

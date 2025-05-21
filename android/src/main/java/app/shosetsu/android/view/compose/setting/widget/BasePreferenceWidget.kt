@@ -40,86 +40,86 @@ val LocalPreferenceMinHeight = compositionLocalOf(structuralEqualityPolicy()) { 
 
 @Composable
 internal fun BasePreferenceWidget(
-    modifier: Modifier = Modifier,
-    title: String? = null,
-    subcomponent: @Composable (ColumnScope.() -> Unit)? = null,
-    icon: @Composable (() -> Unit)? = null,
-    onClick: (() -> Unit)? = null,
-    widget: @Composable (() -> Unit)? = null,
+	modifier: Modifier = Modifier,
+	title: String? = null,
+	subcomponent: @Composable (ColumnScope.() -> Unit)? = null,
+	icon: @Composable (() -> Unit)? = null,
+	onClick: (() -> Unit)? = null,
+	widget: @Composable (() -> Unit)? = null,
 ) {
-    val highlighted = LocalPreferenceHighlighted.current
-    val minHeight = LocalPreferenceMinHeight.current
-    Row(
-        modifier = modifier
-            .highlightBackground(highlighted)
-            .sizeIn(minHeight = minHeight)
-            .clickable(enabled = onClick != null, onClick = { onClick?.invoke() })
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (icon != null) {
-            Box(
-                modifier = Modifier.padding(start = PrefsHorizontalPadding, end = 8.dp),
-                content = { icon() },
-            )
-        }
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = PrefsVerticalPadding),
-        ) {
-            if (!title.isNullOrBlank()) {
-                Text(
-                    modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
-                    text = title,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontSize = TitleFontSize,
-                )
-            }
-            subcomponent?.invoke(this)
-        }
-        if (widget != null) {
-            Box(
-                modifier = Modifier.padding(end = PrefsHorizontalPadding),
-                content = { widget() },
-            )
-        }
-    }
+	val highlighted = LocalPreferenceHighlighted.current
+	val minHeight = LocalPreferenceMinHeight.current
+	Row(
+		modifier = modifier
+			.highlightBackground(highlighted)
+			.sizeIn(minHeight = minHeight)
+			.clickable(enabled = onClick != null, onClick = { onClick?.invoke() })
+			.fillMaxWidth(),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		if (icon != null) {
+			Box(
+				modifier = Modifier.padding(start = PrefsHorizontalPadding, end = 8.dp),
+				content = { icon() },
+			)
+		}
+		Column(
+			modifier = Modifier
+				.weight(1f)
+				.padding(vertical = PrefsVerticalPadding),
+		) {
+			if (!title.isNullOrBlank()) {
+				Text(
+					modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
+					text = title,
+					overflow = TextOverflow.Ellipsis,
+					maxLines = 2,
+					style = MaterialTheme.typography.titleLarge,
+					fontSize = TitleFontSize,
+				)
+			}
+			subcomponent?.invoke(this)
+		}
+		if (widget != null) {
+			Box(
+				modifier = Modifier.padding(end = PrefsHorizontalPadding),
+				content = { widget() },
+			)
+		}
+	}
 }
 
 internal fun Modifier.highlightBackground(highlighted: Boolean): Modifier = composed {
-    var highlightFlag by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        if (highlighted) {
-            highlightFlag = true
-            delay(3.seconds)
-            highlightFlag = false
-        }
-    }
-    val highlight by animateColorAsState(
-        targetValue = if (highlightFlag) {
-            MaterialTheme.colorScheme.surfaceTint.copy(alpha = .12f)
-        } else {
-            Color.Transparent
-        },
-        animationSpec = if (highlightFlag) {
-            repeatable(
-                iterations = 5,
-                animation = tween(durationMillis = 200),
-                repeatMode = RepeatMode.Reverse,
-                initialStartOffset = StartOffset(
-                    offsetMillis = 600,
-                    offsetType = StartOffsetType.Delay,
-                ),
-            )
-        } else {
-            tween(200)
-        },
-        label = "highlight",
-    )
-    Modifier.background(color = highlight)
+	var highlightFlag by remember { mutableStateOf(false) }
+	LaunchedEffect(Unit) {
+		if (highlighted) {
+			highlightFlag = true
+			delay(3.seconds)
+			highlightFlag = false
+		}
+	}
+	val highlight by animateColorAsState(
+		targetValue = if (highlightFlag) {
+			MaterialTheme.colorScheme.surfaceTint.copy(alpha = .12f)
+		} else {
+			Color.Transparent
+		},
+		animationSpec = if (highlightFlag) {
+			repeatable(
+				iterations = 5,
+				animation = tween(durationMillis = 200),
+				repeatMode = RepeatMode.Reverse,
+				initialStartOffset = StartOffset(
+					offsetMillis = 600,
+					offsetType = StartOffsetType.Delay,
+				),
+			)
+		} else {
+			tween(200)
+		},
+		label = "highlight",
+	)
+	Modifier.background(color = highlight)
 }
 
 internal val TrailingWidgetBuffer = 16.dp

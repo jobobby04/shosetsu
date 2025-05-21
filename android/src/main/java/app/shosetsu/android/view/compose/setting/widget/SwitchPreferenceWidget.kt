@@ -14,61 +14,61 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 @Composable
 fun SwitchPreferenceWidget(
-    modifier: Modifier = Modifier,
-    title: String,
-    subtitle: String? = null,
-    icon: ImageVector? = null,
-    checked: Boolean = false,
-    enabled: Boolean = true,
-    onCheckedChanged: (Boolean) -> Unit,
+	modifier: Modifier = Modifier,
+	title: String,
+	subtitle: String? = null,
+	icon: ImageVector? = null,
+	checked: Boolean = false,
+	enabled: Boolean = true,
+	onCheckedChanged: (Boolean) -> Unit,
 ) {
-    TextPreferenceWidget(
-        modifier = modifier,
-        title = title,
-        subtitle = subtitle,
-        icon = icon,
-        widget = {
-            Switch(
-                checked = checked,
-                onCheckedChange = null,
-                modifier = Modifier.padding(start = TrailingWidgetBuffer),
-                enabled = enabled
-            )
-        },
-        onPreferenceClick = { if (enabled) onCheckedChanged(!checked) },
-    )
+	TextPreferenceWidget(
+		modifier = modifier,
+		title = title,
+		subtitle = subtitle,
+		icon = icon,
+		widget = {
+			Switch(
+				checked = checked,
+				onCheckedChange = null,
+				modifier = Modifier.padding(start = TrailingWidgetBuffer),
+				enabled = enabled
+			)
+		},
+		onPreferenceClick = { if (enabled) onCheckedChanged(!checked) },
+	)
 }
 
 @PreviewLightDark
 @Composable
 private fun SwitchPreferenceWidgetPreview() {
-    ShosetsuTheme {
-        Surface {
-            Column {
-                SwitchPreferenceWidget(
-                    title = "Text preference with icon",
-                    subtitle = "Text preference summary",
-                    icon = Icons.Filled.Preview,
-                    checked = true,
-                    onCheckedChanged = {},
-                )
-                SwitchPreferenceWidget(
-                    title = "Text preference",
-                    subtitle = "Text preference summary",
-                    checked = false,
-                    onCheckedChanged = {},
-                )
-                SwitchPreferenceWidget(
-                    title = "Text preference no summary",
-                    checked = false,
-                    onCheckedChanged = {},
-                )
-                SwitchPreferenceWidget(
-                    title = "Another text preference no summary",
-                    checked = false,
-                    onCheckedChanged = {},
-                )
-            }
-        }
-    }
+	ShosetsuTheme {
+		Surface {
+			Column {
+				SwitchPreferenceWidget(
+					title = "Text preference with icon",
+					subtitle = "Text preference summary",
+					icon = Icons.Filled.Preview,
+					checked = true,
+					onCheckedChanged = {},
+				)
+				SwitchPreferenceWidget(
+					title = "Text preference",
+					subtitle = "Text preference summary",
+					checked = false,
+					onCheckedChanged = {},
+				)
+				SwitchPreferenceWidget(
+					title = "Text preference no summary",
+					checked = false,
+					onCheckedChanged = {},
+				)
+				SwitchPreferenceWidget(
+					title = "Another text preference no summary",
+					checked = false,
+					onCheckedChanged = {},
+				)
+			}
+		}
+	}
 }

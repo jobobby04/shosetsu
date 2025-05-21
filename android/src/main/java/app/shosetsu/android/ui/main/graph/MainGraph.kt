@@ -29,7 +29,7 @@ fun NavGraphBuilder.mainGraph(
 	sizeClass: WindowSizeClass,
 	drawerIcon: @Composable () -> Unit
 ) {
-    composableMain<Library> {
+	composableMain<Library> {
 		LibraryView(
 			onOpenNovel = { novelId ->
 				navController.navigate(Novel(novelId))
@@ -48,7 +48,7 @@ fun NavGraphBuilder.mainGraph(
 		navController,
 		drawerIcon = drawerIcon
 	)
-    composableMain<Updates> {
+	composableMain<Updates> {
 		val context = LocalContext.current
 		UpdatesView(
 			openNovel = { novelId ->
@@ -58,7 +58,7 @@ fun NavGraphBuilder.mainGraph(
 			drawerIcon = drawerIcon
 		)
 	}
-    composableMain<Novel> { entry ->
+	composableMain<Novel> { entry ->
 		val novelId = entry.toRoute<Novel>().novelId
 		val context = LocalContext.current
 
@@ -74,7 +74,7 @@ fun NavGraphBuilder.mainGraph(
 		)
 	}
 
-    composableMain<Migration> {
+	composableMain<Migration> {
 		MigrationView(emptyList())
 	}
 }
