@@ -212,11 +212,11 @@ fun IntroContent(
 			}
 
 			IntroPages.Support.ordinal -> IntroSupportPage(
-                {
-                    viewModel.supportShowNext()
-                },
-                nextPage
-            )
+				{
+					viewModel.supportShowNext()
+				},
+				nextPage
+			)
 
 			IntroPages.Permissions.ordinal -> IntroPermissionPage()
 			IntroPages.End.ordinal -> IntroEndPage()
@@ -230,8 +230,8 @@ enum class IntroPages {
 	Explanation,
 	License,
 	Permissions,
-    Support,
-    End
+	Support,
+	End
 }
 
 @Preview

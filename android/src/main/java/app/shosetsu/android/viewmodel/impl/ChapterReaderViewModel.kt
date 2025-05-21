@@ -1036,18 +1036,18 @@ class ChapterReaderViewModel(
 	override val ttsPlayback = MutableStateFlow<TTSPlayback>(TTSPlayback.Stopped)
 
 	data class TTSBuilder(
-        val context: Context,
+		val context: Context,
 		val engine: String,
 		val language: String,
 		val voice: String,
 	)
 
-    private val context = MutableStateFlow<Context?>(null)
+	private val context = MutableStateFlow<Context?>(null)
 	/**
 	 * Provides a TTS to use
 	 */
 	private val tts = ttsEngine.combine(context) { engine, context ->
-        context ?: return@combine null
+		context ?: return@combine null
 		TTSBuilder(context, engine, "", "")
 	}.filterNotNull().combine(ttsLanguage) { builder, language ->
 		builder.copy(language = language)
@@ -1324,7 +1324,7 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onPlayTts(context: Context) {
-        this.context.value = context.applicationContext
+		this.context.value = context.applicationContext
 		ttsPlayback.value = TTSPlayback.Playing
 	}
 

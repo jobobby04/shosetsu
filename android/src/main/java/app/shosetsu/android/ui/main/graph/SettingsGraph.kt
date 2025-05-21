@@ -39,7 +39,7 @@ import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
 
 fun NavGraphBuilder.settingsGraph(navController: NavController) {
 	navigation<Settings>(Overview) {
-        composableSub<Overview> {
+		composableSub<Overview> {
 			SettingsView(
 				onBack = navController::popBackStack,
 				navToAppearance = {
@@ -90,17 +90,17 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				}
 			)
 		}
-        composableSub<Settings.Advanced> {
+		composableSub<Settings.Advanced> {
 			AdvancedSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-        composableSub<Settings.Downloads> {
-            DownloadsSettingsView(
+		composableSub<Settings.Downloads> {
+			DownloadsSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-        composableSub<Settings.Reader> {
+		composableSub<Settings.Reader> {
 			val context = LocalContext.current
 			val hostState = remember { SnackbarHostState() }
 

@@ -50,17 +50,17 @@ class BootReceiver : BroadcastReceiver() {
 		}
 	}
 
-    internal class AutoStartBackupWorker(val context: Context) : DIAware {
-        override val di: DI by closestDI(context)
-        private val manager: BackupCycleWorker.Manager by instance()
-        private val iSettingsRepository: ISettingsRepository by instance()
-        operator fun invoke() {
-            launchIO {
-                if (!manager.isRunning()) {
-                    Log.i(logID(), "Starting backup worker on boot")
-                    manager.start()
-                }
-            }
-        }
-    }
+	internal class AutoStartBackupWorker(val context: Context) : DIAware {
+		override val di: DI by closestDI(context)
+		private val manager: BackupCycleWorker.Manager by instance()
+		private val iSettingsRepository: ISettingsRepository by instance()
+		operator fun invoke() {
+			launchIO {
+				if (!manager.isRunning()) {
+					Log.i(logID(), "Starting backup worker on boot")
+					manager.start()
+				}
+			}
+		}
+	}
 }

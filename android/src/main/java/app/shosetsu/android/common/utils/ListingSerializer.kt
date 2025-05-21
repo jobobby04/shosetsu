@@ -81,220 +81,220 @@ import com.esotericsoftware.minlog.Log as KryoLog
 
 @OptIn(ExperimentalEncodingApi::class)
 class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
-    override val descriptor: SerialDescriptor
-        get() = PrimitiveSerialDescriptor(
-            "ExtensionListingSerializer",
-            PrimitiveKind.STRING
-        )
+	override val descriptor: SerialDescriptor
+		get() = PrimitiveSerialDescriptor(
+			"ExtensionListingSerializer",
+			PrimitiveKind.STRING
+		)
 
-    private val kryo by lazy {
-        KryoLog.setLogger(object : KryoLog.Logger() {
-            override fun print(message: String) {
-                Log.i("Kryo", message)
-            }
+	private val kryo by lazy {
+		KryoLog.setLogger(object : KryoLog.Logger() {
+			override fun print(message: String) {
+				Log.i("Kryo", message)
+			}
 
-            override fun log(level: Int, category: String?, message: String?, ex: Throwable?) {
-                Log.println(level + 1, "Kryo", buildString {
-                    if (category != null) append('[').append(category).append("] ")
-                    if (message != null) append(message)
-                    if (ex != null) append('\n').append(Log.getStackTraceString(ex))
-                })
-            }
-        })
-        Kryo().apply {
-            register<IExtension.Listing>()
-            register<IExtension.Listing.List>()
-            register<IExtension.Listing.Item>()
-            register<Novel.Status>()
-            register<Novel.Chapter>()
-            register<Novel.Info>()
-            register<Novel.ChapterType>()
-            register<LuaExtension.LuaStableFunction>()
-            registerSingleton<Globals> { shosetsuGlobals() }
-//            register<Globals>(object : FieldSerializer<Globals>(this, Globals::class.java) {
-//                override fun create(kryo: Kryo?, input: Input?, type: Class<out Globals>?) = shosetsuGlobals()
-//                override fun createCopy(kryo: Kryo?, original: Globals?) = throw UnsupportedOperationException()
+			override fun log(level: Int, category: String?, message: String?, ex: Throwable?) {
+				Log.println(level + 1, "Kryo", buildString {
+					if (category != null) append('[').append(category).append("] ")
+					if (message != null) append(message)
+					if (ex != null) append('\n').append(Log.getStackTraceString(ex))
+				})
+			}
+		})
+		Kryo().apply {
+			register<IExtension.Listing>()
+			register<IExtension.Listing.List>()
+			register<IExtension.Listing.Item>()
+			register<Novel.Status>()
+			register<Novel.Chapter>()
+			register<Novel.Info>()
+			register<Novel.ChapterType>()
+			register<LuaExtension.LuaStableFunction>()
+			registerSingleton<Globals> { shosetsuGlobals() }
+//			register<Globals>(object : FieldSerializer<Globals>(this, Globals::class.java) {
+//				override fun create(kryo: Kryo?, input: Input?, type: Class<out Globals>?) = shosetsuGlobals()
+//				override fun createCopy(kryo: Kryo?, original: Globals?) = throw UnsupportedOperationException()
 //
-//                override fun write(kryo: Kryo, output: Output, `object`: Globals) {
-//                    if (`object`.getmetatable()?.get("__index") !is Globals) {
-//                        output.writeBoolean(true)
-//                        return
-//                    }
-//                    output.writeBoolean(false)
-//                    super.write(kryo, output, `object`)
-//                }
+//				override fun write(kryo: Kryo, output: Output, `object`: Globals) {
+//					if (`object`.getmetatable()?.get("__index") !is Globals) {
+//						output.writeBoolean(true)
+//						return
+//					}
+//					output.writeBoolean(false)
+//					super.write(kryo, output, `object`)
+//				}
 //
-//                override fun read(kryo: Kryo, input: Input, type: Class<out Globals>): Globals {
-//                    return if (input.readBoolean()) shosetsuGlobals()
-//                    else super.read(kryo, input, type)
-//                }
+//				override fun read(kryo: Kryo, input: Input, type: Class<out Globals>): Globals {
+//					return if (input.readBoolean()) shosetsuGlobals()
+//					else super.read(kryo, input, type)
+//				}
 //
-//                init {
-//                    removeField("STDIN")
-//                    removeField("STDOUT")
-//                    removeField("STDERR")
-//                    removeField("loader")
-//                    removeField("compiler")
-//                    removeField("undumper")
-//                }
-//            })
+//				init {
+//					removeField("STDIN")
+//					removeField("STDOUT")
+//					removeField("STDERR")
+//					removeField("loader")
+//					removeField("compiler")
+//					removeField("undumper")
+//				}
+//			})
 
-            register<IntArray>(IntArraySerializer())
-            register<ByteArray>(ByteArraySerializer())
-            register<Array<String>>(StringArraySerializer())
-//            register<Random>()
-//            register<WeakReference<*>>(object : Serializer<WeakReference<*>>() {
-//                override fun write(kryo: Kryo, output: Output, `object`: WeakReference<*>) {
-//                    kryo.writeClassAndObject(output, `object`.get())
-//                }
+			register<IntArray>(IntArraySerializer())
+			register<ByteArray>(ByteArraySerializer())
+			register<Array<String>>(StringArraySerializer())
+//			register<Random>()
+//			register<WeakReference<*>>(object : Serializer<WeakReference<*>>() {
+//				override fun write(kryo: Kryo, output: Output, `object`: WeakReference<*>) {
+//					kryo.writeClassAndObject(output, `object`.get())
+//				}
 //
-//                override fun read(kryo: Kryo, input: Input, type: Class<out WeakReference<*>>): WeakReference<*> {
-//                    return WeakReference(kryo.readClassAndObject(input))
-//                }
-//            })
+//				override fun read(kryo: Kryo, input: Input, type: Class<out WeakReference<*>>): WeakReference<*> {
+//					return WeakReference(kryo.readClassAndObject(input))
+//				}
+//			})
 
-            register<LuaBoolean>(object : Serializer<LuaBoolean>() {
-                override fun write(kryo: Kryo, output: Output, `object`: LuaBoolean) = output.writeBoolean(`object`.booleanValue())
-                override fun read(kryo: Kryo, input: Input, type: Class<out LuaBoolean>): LuaBoolean = LuaBoolean.valueOf(input.readBoolean())
-            })
-            register<LuaClosure>()
-            register<LuaDouble>(object : Serializer<LuaDouble>() {
-                override fun write(kryo: Kryo, output: Output, `object`: LuaDouble) = output.writeDouble(`object`.todouble())
-                override fun read(kryo: Kryo, input: Input, type: Class<out LuaDouble>): LuaDouble = LuaDouble.valueOf(input.readDouble()) as LuaDouble
-            })
-            register<LuaInteger>(object : Serializer<LuaInteger>() {
-                override fun write(kryo: Kryo, output: Output, `object`: LuaInteger) = output.writeInt(`object`.toint())
-                override fun read(kryo: Kryo, input: Input, type: Class<out LuaInteger>): LuaInteger = LuaInteger.valueOf(input.readInt())
-            })
-            registerSingleton<LuaNil> { LuaValue.NIL as LuaNil }
-            register(LuaValue.NONE.javaClass, SingletonSerializer { LuaValue.NONE })
-            register<LuaString>()
-            register<LuaThread>()
-            register<LuaThread.State>()
-            registerWithSubclasses<LuaTable>()
-            registerArray<LuaValue>()
-            register<Prototype>()
-            registerArray<Prototype>()
-            register<UpValue>()
+			register<LuaBoolean>(object : Serializer<LuaBoolean>() {
+				override fun write(kryo: Kryo, output: Output, `object`: LuaBoolean) = output.writeBoolean(`object`.booleanValue())
+				override fun read(kryo: Kryo, input: Input, type: Class<out LuaBoolean>): LuaBoolean = LuaBoolean.valueOf(input.readBoolean())
+			})
+			register<LuaClosure>()
+			register<LuaDouble>(object : Serializer<LuaDouble>() {
+				override fun write(kryo: Kryo, output: Output, `object`: LuaDouble) = output.writeDouble(`object`.todouble())
+				override fun read(kryo: Kryo, input: Input, type: Class<out LuaDouble>): LuaDouble = LuaDouble.valueOf(input.readDouble()) as LuaDouble
+			})
+			register<LuaInteger>(object : Serializer<LuaInteger>() {
+				override fun write(kryo: Kryo, output: Output, `object`: LuaInteger) = output.writeInt(`object`.toint())
+				override fun read(kryo: Kryo, input: Input, type: Class<out LuaInteger>): LuaInteger = LuaInteger.valueOf(input.readInt())
+			})
+			registerSingleton<LuaNil> { LuaValue.NIL as LuaNil }
+			register(LuaValue.NONE.javaClass, SingletonSerializer { LuaValue.NONE })
+			register<LuaString>()
+			register<LuaThread>()
+			register<LuaThread.State>()
+			registerWithSubclasses<LuaTable>()
+			registerArray<LuaValue>()
+			register<Prototype>()
+			registerArray<Prototype>()
+			register<UpValue>()
 
-            register<LocVars>()
-            registerArray<LocVars>()
-            register<Upvaldesc>()
-            registerArray<Upvaldesc>()
-            registerArray<UpValue>()
-            registerArray(Class.forName("org.luaj.vm2.LuaTable\$Slot"))
+			register<LocVars>()
+			registerArray<LocVars>()
+			register<Upvaldesc>()
+			registerArray<Upvaldesc>()
+			registerArray<UpValue>()
+			registerArray(Class.forName("org.luaj.vm2.LuaTable\$Slot"))
 
-            register(Class.forName("org.luaj.vm2.lib.jse.JavaArray"))
-            register(Class.forName("org.luaj.vm2.lib.jse.JavaInstance"))
-            register(Class.forName("org.luaj.vm2.lib.jse.JavaMethod"))
+			register(Class.forName("org.luaj.vm2.lib.jse.JavaArray"))
+			register(Class.forName("org.luaj.vm2.lib.jse.JavaInstance"))
+			register(Class.forName("org.luaj.vm2.lib.jse.JavaMethod"))
 
-//            register(Class.forName("app.shosetsu.lib.lua.GlobalsKt\$frozen\$2"))
-//            register(Class.forName("app.shosetsu.lib.lua.GlobalsKt\$frozen\$3"))
+//			register(Class.forName("app.shosetsu.lib.lua.GlobalsKt\$frozen\$2"))
+//			register(Class.forName("app.shosetsu.lib.lua.GlobalsKt\$frozen\$3"))
 
-            register<Headers>()
-            register<Headers.Builder>()
-            register<RequestBody>()
-            register<FormBody>()
-            register<FormBody.Builder>()
-            register<ByteString>()
-            register<MultipartBody>()
-            register<Request>()
-            register<Request.Builder>()
-            register<CacheControl>()
-            register<MediaType>()
-            register<Cookie>()
-            register<Cookie.Builder>()
-            registerSingleton<CookieManager> { CookieManager.getInstance() }
-            register<CookieJar>()
-            register<CookieJarSync>()
-            register<ShosetsuLuaLib.LibFunctions.CustomCookieJar>()
-            register<HttpUrl>()
-            register<HttpUrl.Builder>()
-            register<Interceptor>()
-            register<ShosetsuLuaLib.LibFunctions.CustomInterceptor>()
-            register<OkHttpClient>()
-            register<OkHttpClient.Builder>()
-            register<Response>()
-            register<Response.Builder>()
+			register<Headers>()
+			register<Headers.Builder>()
+			register<RequestBody>()
+			register<FormBody>()
+			register<FormBody.Builder>()
+			register<ByteString>()
+			register<MultipartBody>()
+			register<Request>()
+			register<Request.Builder>()
+			register<CacheControl>()
+			register<MediaType>()
+			register<Cookie>()
+			register<Cookie.Builder>()
+			registerSingleton<CookieManager> { CookieManager.getInstance() }
+			register<CookieJar>()
+			register<CookieJarSync>()
+			register<ShosetsuLuaLib.LibFunctions.CustomCookieJar>()
+			register<HttpUrl>()
+			register<HttpUrl.Builder>()
+			register<Interceptor>()
+			register<ShosetsuLuaLib.LibFunctions.CustomInterceptor>()
+			register<OkHttpClient>()
+			register<OkHttpClient.Builder>()
+			register<Response>()
+			register<Response.Builder>()
 
-            register<Attribute>()
-            register<Attributes>()
-            register<Node>()
-            register<Document>()
-            register<Element>()
-            register<Elements>()
-            register<NodeVisitor>()
-            register<ShosetsuLuaLib.LibFunctions.CustomNodeVisitor>()
+			register<Attribute>()
+			register<Attributes>()
+			register<Node>()
+			register<Document>()
+			register<Element>()
+			register<Elements>()
+			register<NodeVisitor>()
+			register<ShosetsuLuaLib.LibFunctions.CustomNodeVisitor>()
 
-            registerWithSubclasses<Filter<*>>()
+			registerWithSubclasses<Filter<*>>()
 
-            registerWithSubclasses<BaseLib>()
-            registerWithSubclasses<JseBaseLib>()
-            registerWithSubclasses<PackageLib>()
-            registerWithSubclasses<Bit32Lib>()
-            registerWithSubclasses<TableLib>()
-            registerWithSubclasses<StringLib>()
-            registerWithSubclasses<CoroutineLib>()
-            registerWithSubclasses<MathLib>()
-            registerWithSubclasses<JseMathLib>()
-            registerWithSubclasses<OsLib>()
-            registerWithSubclasses<JseOsLib>()
-            registerWithSubclasses<LuajavaLib>()
+			registerWithSubclasses<BaseLib>()
+			registerWithSubclasses<JseBaseLib>()
+			registerWithSubclasses<PackageLib>()
+			registerWithSubclasses<Bit32Lib>()
+			registerWithSubclasses<TableLib>()
+			registerWithSubclasses<StringLib>()
+			registerWithSubclasses<CoroutineLib>()
+			registerWithSubclasses<MathLib>()
+			registerWithSubclasses<JseMathLib>()
+			registerWithSubclasses<OsLib>()
+			registerWithSubclasses<JseOsLib>()
+			registerWithSubclasses<LuajavaLib>()
 
-            instantiatorStrategy = StdInstantiatorStrategy()
-            isRegistrationRequired = true
-            warnUnregisteredClasses = true
-            references = true
-        }
-    }
+			instantiatorStrategy = StdInstantiatorStrategy()
+			isRegistrationRequired = true
+			warnUnregisteredClasses = true
+			references = true
+		}
+	}
 
-    private inline fun <reified T> Kryo.register() = register(T::class.java)
-    private inline fun <reified T> Kryo.register(serializer: Serializer<T>) = register(T::class.java, serializer)
-    private inline fun <reified T> Kryo.registerSingleton(noinline supplier: () -> T) = register(SingletonSerializer(supplier))
-    class SingletonSerializer<T>(private val supplier: () -> T) : Serializer<T>() {
-        override fun write(kryo: Kryo?, output: Output?, `object`: T) = Unit // Singleton
-        override fun read(kryo: Kryo?, input: Input?, type: Class<out T>?): T = supplier()
-    }
-    private inline fun <reified T> Kryo.registerArray() = registerArray(T::class.java)
-    private inline fun Kryo.registerArray(clazz: Class<*>) = Class.forName("[L${clazz.name};").let { register(it, ObjectArraySerializer(this, it)) }
-    private inline fun <reified T> Kryo.registerWithSubclasses() = (listOf(T::class) + T::class.nestedClasses).forEach { register(it.java) }
+	private inline fun <reified T> Kryo.register() = register(T::class.java)
+	private inline fun <reified T> Kryo.register(serializer: Serializer<T>) = register(T::class.java, serializer)
+	private inline fun <reified T> Kryo.registerSingleton(noinline supplier: () -> T) = register(SingletonSerializer(supplier))
+	class SingletonSerializer<T>(private val supplier: () -> T) : Serializer<T>() {
+		override fun write(kryo: Kryo?, output: Output?, `object`: T) = Unit // Singleton
+		override fun read(kryo: Kryo?, input: Input?, type: Class<out T>?): T = supplier()
+	}
+	private inline fun <reified T> Kryo.registerArray() = registerArray(T::class.java)
+	private inline fun Kryo.registerArray(clazz: Class<*>) = Class.forName("[L${clazz.name};").let { register(it, ObjectArraySerializer(this, it)) }
+	private inline fun <reified T> Kryo.registerWithSubclasses() = (listOf(T::class) + T::class.nestedClasses).forEach { register(it.java) }
 
-    private val base64 = Base64.UrlSafe
+	private val base64 = Base64.UrlSafe
 
-    fun serializeBytes(value: IExtension.Listing?): ByteArray = if (value == null) byteArrayOf() else ByteArrayOutputStream().use { Output(it).use { output ->
-        kryo.writeClassAndObject(output, value)
-    }; it.toByteArray() }
+	fun serializeBytes(value: IExtension.Listing?): ByteArray = if (value == null) byteArrayOf() else ByteArrayOutputStream().use { Output(it).use { output ->
+		kryo.writeClassAndObject(output, value)
+	}; it.toByteArray() }
 
-    fun deserializeBytes(bytes: ByteArray): IExtension.Listing? = if (bytes.isEmpty()) null else Input(bytes).use { input ->
-        kryo.readClassAndObject(input) as IExtension.Listing
-    }
+	fun deserializeBytes(bytes: ByteArray): IExtension.Listing? = if (bytes.isEmpty()) null else Input(bytes).use { input ->
+		kryo.readClassAndObject(input) as IExtension.Listing
+	}
 
-    override fun serialize(encoder: Encoder, value: SerializableListing) =
-        encoder.encodeString(base64.encode(serializeBytes(value.listing)))
+	override fun serialize(encoder: Encoder, value: SerializableListing) =
+		encoder.encodeString(base64.encode(serializeBytes(value.listing)))
 
-    override fun deserialize(decoder: Decoder): SerializableListing =
-        SerializableListing(deserializeBytes(base64.decode(decoder.decodeString())))
+	override fun deserialize(decoder: Decoder): SerializableListing =
+		SerializableListing(deserializeBytes(base64.decode(decoder.decodeString())))
 
-    @Serializable(with = ListingSerializer::class)
-    data class SerializableListing(val listing: IExtension.Listing?)
+	@Serializable(with = ListingSerializer::class)
+	data class SerializableListing(val listing: IExtension.Listing?)
 
-    object NavParameter : NavType<SerializableListing>(isNullableAllowed = false) {
-        private val serializer by lazy { ListingSerializer() }
+	object NavParameter : NavType<SerializableListing>(isNullableAllowed = false) {
+		private val serializer by lazy { ListingSerializer() }
 
-        override fun get(bundle: Bundle, key: String): SerializableListing {
-            return bundle.getString(key)?.let { parseValue(it) } ?: SerializableListing(null)
-        }
+		override fun get(bundle: Bundle, key: String): SerializableListing {
+			return bundle.getString(key)?.let { parseValue(it) } ?: SerializableListing(null)
+		}
 
-        override fun put(bundle: Bundle, key: String, value: SerializableListing) {
-            bundle.putString(key, serializeAsValue(value))
-        }
+		override fun put(bundle: Bundle, key: String, value: SerializableListing) {
+			bundle.putString(key, serializeAsValue(value))
+		}
 
-        override fun parseValue(value: String): SerializableListing {
-            return if (value.isEmpty()) SerializableListing(null) else Json.decodeFromString(serializer, value)
-        }
+		override fun parseValue(value: String): SerializableListing {
+			return if (value.isEmpty()) SerializableListing(null) else Json.decodeFromString(serializer, value)
+		}
 
-        override fun serializeAsValue(value: SerializableListing): String {
-            return if (value.listing == null) "" else Json.encodeToString(serializer, value)
-        }
-    }
+		override fun serializeAsValue(value: SerializableListing): String {
+			return if (value.listing == null) "" else Json.encodeToString(serializer, value)
+		}
+	}
 }
