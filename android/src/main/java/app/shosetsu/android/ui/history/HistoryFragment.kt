@@ -296,13 +296,14 @@ fun HistoryItemContent(
 					.aspectRatio(coverRatio)
 					.clickable(onClick = openNovel),
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(updateUI.novelTitle)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
 				})
 		} else {
 			ImageLoadingError(
+				updateUI?.novelTitle,
 				Modifier
 					.aspectRatio(coverRatio)
 					.placeholder(updateUI == null)

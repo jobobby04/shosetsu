@@ -121,7 +121,7 @@ fun NovelCardNormalContent(
 					.placeholder(visible = isPlaceholder),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(title)
 				}
 			)
 
@@ -232,7 +232,7 @@ fun NovelCardCozyContent(
 						.placeholder(visible = isPlaceholder),
 					contentScale = ContentScale.Crop,
 					error = {
-						ImageLoadingError()
+						ImageLoadingError(title)
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
@@ -322,7 +322,7 @@ fun NovelCardCompressedContent(
 							.aspectRatio(1.0f),
 						contentScale = ContentScale.Crop,
 						error = {
-							ImageLoadingError()
+							ImageLoadingError(title)
 						},
 						loading = {
 							Box(Modifier.placeholder(true))

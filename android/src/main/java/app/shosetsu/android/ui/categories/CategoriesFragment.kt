@@ -292,6 +292,7 @@ fun CategoriesContent(
 			)
 		}
 	) { padding ->
+		val isNotSingular by remember(items) { derivedStateOf { items.size > 1 } }
 		if (items.isNotEmpty())
 			LazyColumn(
 				Modifier
@@ -306,8 +307,6 @@ fun CategoriesContent(
 				),
 				verticalArrangement = Arrangement.spacedBy(4.dp)
 			) {
-				val isNotSingluar by derivedStateOf { items.size > 1 }
-
 				itemsIndexed(items) { index, item ->
 					Card {
 						Row(
@@ -322,7 +321,7 @@ fun CategoriesContent(
 								verticalAlignment = Alignment.CenterVertically,
 								horizontalArrangement = Arrangement.SpaceBetween
 							) {
-								if (isNotSingluar) {
+								if (isNotSingular) {
 									if (index != 0)
 										IconButton(onClick = { onMoveDown(item) }) {
 											Icon(

@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -197,7 +196,6 @@ fun PreviewMigrationExtensionItemContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MigrationExtensionItemContent(
 	item: MigrationExtensionUI,
@@ -317,7 +315,6 @@ fun PreviewMigrationNovelItemContent() {
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI) -> Unit) {
 	Card(
@@ -354,14 +351,14 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 					contentDescription = null,
 					modifier = modifier,
 					error = {
-						ImageLoadingError()
+						ImageLoadingError(item.title)
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
 					}
 				)
 			} else {
-				ImageLoadingError(modifier)
+				ImageLoadingError(item.title, modifier)
 			}
 
 			Text(

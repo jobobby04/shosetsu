@@ -1050,6 +1050,7 @@ fun PreviewHeaderContent() {
 
 @Composable
 fun NovelInfoCoverContent(
+	title: String,
 	imageURL: String,
 	modifier: Modifier = Modifier,
 	contentScale: ContentScale = ContentScale.Fit,
@@ -1065,7 +1066,7 @@ fun NovelInfoCoverContent(
 			.clickable(onClick = onClick),
 		contentScale = contentScale,
 		error = {
-			ImageLoadingError()
+			ImageLoadingError(title)
 		},
 		loading = {
 			Box(Modifier.placeholder(true))
@@ -1073,7 +1074,6 @@ fun NovelInfoCoverContent(
 	)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NovelInfoHeaderContent(
 	novelInfo: NovelUI,
@@ -1086,6 +1086,7 @@ fun NovelInfoHeaderContent(
 	if (isCoverClicked)
 		Dialog(onDismissRequest = { isCoverClicked = false }) {
 			NovelInfoCoverContent(
+				novelInfo.title,
 				novelInfo.imageURL,
 				modifier = Modifier.fillMaxWidth()
 			) {
@@ -1111,7 +1112,7 @@ fun NovelInfoHeaderContent(
 					.alpha(.10f),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(novelInfo.title)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
@@ -1129,6 +1130,7 @@ fun NovelInfoHeaderContent(
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						NovelInfoCoverContent(
+							novelInfo.title,
 							novelInfo.imageURL,
 							modifier = Modifier
 								.fillMaxWidth(.35f)
@@ -1438,31 +1440,34 @@ fun ExpandedText(
 			modifier = Modifier.padding(start = 8.dp, end = 8.dp)
 		)
 
-		if (!isExpanded) {
-			LazyRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-				contentPadding = PaddingValues(horizontal = 8.dp)
-			) {
-				items(genre) {
-					NovelGenre(it)
+		if (genre.isNotEmpty()) {
+			if (!isExpanded) {
+				LazyRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+					contentPadding = PaddingValues(horizontal = 8.dp)
+				) {
+					items(genre) {
+						NovelGenre(it)
+					}
 				}
-			}
-		} else {
-			FlowRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				genre.forEach {
-					NovelGenre(it)
+			} else {
+				FlowRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					genre.forEach {
+						NovelGenre(it)
+					}
 				}
 			}
 		}
+
 		Icon(
 			if (!isExpanded) Icons.Outlined.ExpandMore
 			else Icons.Outlined.ExpandLess,
@@ -1476,7 +1481,6 @@ fun ExpandedText(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NovelGenre(
 	text: String
