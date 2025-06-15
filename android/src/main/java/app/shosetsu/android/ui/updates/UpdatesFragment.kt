@@ -19,7 +19,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.DatePicker
@@ -221,7 +221,7 @@ fun UpdatesAppBar(
 							showDropwDown = !showDropwDown
 						}
 					) {
-						Icon(Icons.Default.MoreVert, stringResource(R.string.clear))
+						Icon(Icons.Default.DeleteSweep, stringResource(R.string.clear))
 					}
 
 					DropdownMenu(
