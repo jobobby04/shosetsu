@@ -719,5 +719,8 @@
     <string name="backup_restrictions_desc">Restrictions: %s</string>
     <string name="app_language">App Language</string>
     <string name="app_language_default">Default</string>
+    <string name="updates_last_update_info">Library last updated: %s</string>
+    <string name="relative_time_span_never">Never</string>
+    <string name="updates_last_update_info_just_now">Just now</string>
 
 </resources>

@@ -15,10 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.DatePicker
@@ -34,7 +35,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -54,6 +54,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,6 +69,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
+import app.shosetsu.android.view.compose.relativeTimeSpanString
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
@@ -110,6 +113,7 @@ fun UpdatesView(
 	val error by viewModel.error.collectAsState(null)
 	val isClearBeforeVisible by viewModel.isClearBeforeVisible.collectAsState()
 	val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
+	val lastUpdated by viewModel.lastUpdated.collectAsState()
 
 	val context = LocalContext.current
 	val hostState = remember { SnackbarHostState() }
@@ -131,6 +135,7 @@ fun UpdatesView(
 
 	UpdatesContent(
 		items = items,
+		lastUpdated = lastUpdated,
 		onRefresh = {
 			viewModel.startUpdateManager(-1)
 		},
@@ -215,7 +220,7 @@ fun UpdatesAppBar(
 							showDropwDown = !showDropwDown
 						}
 					) {
-						Icon(Icons.Default.MoreVert, stringResource(R.string.clear))
+						Icon(Icons.Default.DeleteSweep, stringResource(R.string.clear))
 					}
 
 					DropdownMenu(
@@ -249,6 +254,7 @@ fun UpdatesAppBar(
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
+	lastUpdated: Long,
 	onRefresh: () -> Unit,
 	openNovel: (UpdatesUI) -> Unit,
 	openChapter: (UpdatesUI) -> Unit,
@@ -284,8 +290,10 @@ fun UpdatesContent(
 					contentPadding = PaddingValues(bottom = 112.dp),
 					verticalArrangement = Arrangement.spacedBy(4.dp)
 				) {
+					updatesLastUpdatedItem(lastUpdated)
+
 					items.forEach { (header, updateItems) ->
-						stickyHeader {
+						item {
 							UpdateHeaderItemContent(
 								remember(header) { StableHolder(header) },
 								displayDateAsMDY
@@ -307,6 +315,21 @@ fun UpdatesContent(
 				isRefreshing,
 				pullRefreshState,
 				Modifier.align(Alignment.TopCenter)
+			)
+		}
+	}
+}
+
+internal fun LazyListScope.updatesLastUpdatedItem(lastUpdated: Long) {
+	item(key = "updates-lastUpdated") {
+		Box(
+			modifier = Modifier
+				.animateItem(fadeInSpec = null, fadeOutSpec = null)
+				.padding(horizontal = 16.dp, vertical = 8.dp),
+		) {
+			Text(
+				text = stringResource(R.string.updates_last_update_info, relativeTimeSpanString(lastUpdated)),
+				fontStyle = FontStyle.Italic,
 			)
 		}
 	}
@@ -348,7 +371,7 @@ fun UpdateItemContent(
 			.fillMaxWidth()
 			.height(72.dp)
 			.clickable(onClick = onClick)
-			.padding(start = 8.dp, end = 8.dp),
+			.padding(start = 16.dp, end = 8.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		if (updateUI.novelImageURL.isNotEmpty()) {
@@ -409,29 +432,26 @@ fun UpdateItemContent(
 
 @Composable
 fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: Boolean) {
-	Surface(
-		modifier = Modifier.fillMaxWidth(),
-		shadowElevation = 2.dp,
-		tonalElevation = 2.dp
-	) {
-		val context = LocalContext.current
-		val text = remember(dateTime, context) {
-			when (dateTime.item) {
-				DateTime(System.currentTimeMillis()).trimDate() ->
-					context.getString(R.string.today)
+	val context = LocalContext.current
+	val text = remember(dateTime, context) {
+		when (dateTime.item) {
+			DateTime(System.currentTimeMillis()).trimDate() ->
+				context.getString(R.string.today)
 
-				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
-					context.getString(R.string.yesterday)
+			DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
+				context.getString(R.string.yesterday)
 
-				else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
-			}
+			else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 		}
-		Text(
-			text,
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp, vertical = 8.dp),
-			fontSize = 14.sp
-		)
 	}
+	Text(
+		text,
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp, vertical = 8.dp),
+//		fontSize = 14.sp
+		color = MaterialTheme.colorScheme.onSurfaceVariant,
+		fontWeight = FontWeight.SemiBold,
+		style = MaterialTheme.typography.bodyMedium,
+	)
 }

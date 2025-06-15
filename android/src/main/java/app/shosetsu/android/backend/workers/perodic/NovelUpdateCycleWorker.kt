@@ -3,10 +3,11 @@ package app.shosetsu.android.backend.workers.perodic
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
-import androidx.work.ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
 import androidx.work.Operation
@@ -28,6 +29,7 @@ import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit.HOURS
+import java.util.concurrent.TimeUnit.MINUTES
 import androidx.work.PeriodicWorkRequestBuilder as PWRB
 
 /*
@@ -147,7 +149,7 @@ class NovelUpdateCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					UPDATE_CYCLE_WORK_ID,
-					CANCEL_AND_REENQUEUE,
+					ExistingPeriodicWorkPolicy.UPDATE,
 					PWRB<NovelUpdateCycleWorker>(
 						updateCycle(),
 						HOURS
@@ -164,6 +166,7 @@ class NovelUpdateCycleWorker(
 								setRequiresDeviceIdle(updateOnlyIdle())
 						}.build()
 					)
+						.setBackoffCriteria(BackoffPolicy.LINEAR, 10, MINUTES)
 						.build()
 				)
 				val info = workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
