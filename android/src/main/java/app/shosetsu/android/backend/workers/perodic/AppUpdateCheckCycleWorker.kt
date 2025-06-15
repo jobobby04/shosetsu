@@ -130,7 +130,7 @@ class AppUpdateCheckCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					APP_UPDATE_CYCLE_WORK_ID,
-					ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+					ExistingPeriodicWorkPolicy.UPDATE,
 					PeriodicWorkRequestBuilder<AppUpdateCheckCycleWorker>(
 						appUpdateCycle(),
 						TimeUnit.HOURS

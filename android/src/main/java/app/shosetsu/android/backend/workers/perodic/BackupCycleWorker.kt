@@ -131,7 +131,7 @@ class BackupCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					BACKUP_CYCLE_WORK_ID,
-					ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+					ExistingPeriodicWorkPolicy.UPDATE,
 					PeriodicWorkRequestBuilder<BackupCycleWorker>(
 						backupCycle(),
 						TimeUnit.HOURS
