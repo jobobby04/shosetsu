@@ -159,5 +159,4 @@ class BackupCycleWorker(
 		 */
 		override fun stop(): Operation = workerManager.cancelUniqueWork(BACKUP_CYCLE_WORK_ID)
 	}
-
 }

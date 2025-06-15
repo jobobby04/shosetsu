@@ -12,7 +12,6 @@ import androidx.work.Operation
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.AppUpdateCheckWorker
 import app.shosetsu.android.common.SettingKey.AppUpdateCycle
@@ -160,5 +159,4 @@ class AppUpdateCheckCycleWorker(
 		 */
 		override fun stop(): Operation = workerManager.cancelUniqueWork(APP_UPDATE_CYCLE_WORK_ID)
 	}
-
 }

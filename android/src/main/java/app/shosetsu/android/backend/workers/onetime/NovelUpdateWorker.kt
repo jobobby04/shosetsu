@@ -27,6 +27,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.DownloadNewNovelChapters
 import app.shosetsu.android.common.SettingKey.ExcludedCategoriesInUpdate
 import app.shosetsu.android.common.SettingKey.IncludeCategoriesInUpdate
@@ -77,6 +78,7 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
 import java.io.IOException
+import java.time.Instant
 import kotlin.coroutines.cancellation.CancellationException
 
 /*
@@ -164,6 +166,9 @@ class NovelUpdateWorker(
 
 	private suspend fun classicFinale(): Boolean =
 		iSettingsRepository.getBoolean(NovelUpdateClassicFinish)
+
+	private suspend fun setLastUpdatedTimestamp(value: Long) =
+		iSettingsRepository.setLong(SettingKey.NovelUpdateLastTimestamp, value)
 
 	override suspend fun doWork(): Result {
 		// Log that the worker is executing
@@ -330,6 +335,8 @@ class NovelUpdateWorker(
 				//TODO Handle null
 				progress++
 			}
+
+			setLastUpdatedTimestamp(Instant.now().toEpochMilli())
 
 			notify(R.string.update_complete) {
 				setNotOngoing()
