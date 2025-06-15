@@ -35,7 +35,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -294,7 +293,7 @@ fun UpdatesContent(
 					updatesLastUpdatedItem(lastUpdated)
 
 					items.forEach { (header, updateItems) ->
-						stickyHeader {
+						item {
 							UpdateHeaderItemContent(
 								remember(header) { StableHolder(header) },
 								displayDateAsMDY
@@ -372,7 +371,7 @@ fun UpdateItemContent(
 			.fillMaxWidth()
 			.height(72.dp)
 			.clickable(onClick = onClick)
-			.padding(start = 8.dp, end = 8.dp),
+			.padding(start = 16.dp, end = 8.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		if (updateUI.novelImageURL.isNotEmpty()) {
@@ -433,29 +432,26 @@ fun UpdateItemContent(
 
 @Composable
 fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: Boolean) {
-	Surface(
-		modifier = Modifier.fillMaxWidth(),
-		shadowElevation = 2.dp,
-		tonalElevation = 2.dp
-	) {
-		val context = LocalContext.current
-		val text = remember(dateTime, context) {
-			when (dateTime.item) {
-				DateTime(System.currentTimeMillis()).trimDate() ->
-					context.getString(R.string.today)
+	val context = LocalContext.current
+	val text = remember(dateTime, context) {
+		when (dateTime.item) {
+			DateTime(System.currentTimeMillis()).trimDate() ->
+				context.getString(R.string.today)
 
-				DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
-					context.getString(R.string.yesterday)
+			DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
+				context.getString(R.string.yesterday)
 
-				else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
-			}
+			else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
 		}
-		Text(
-			text,
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp, vertical = 8.dp),
-			fontSize = 14.sp
-		)
 	}
+	Text(
+		text,
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(horizontal = 16.dp, vertical = 8.dp),
+//		fontSize = 14.sp
+		color = MaterialTheme.colorScheme.onSurfaceVariant,
+		fontWeight = FontWeight.SemiBold,
+		style = MaterialTheme.typography.bodyMedium,
+	)
 }
