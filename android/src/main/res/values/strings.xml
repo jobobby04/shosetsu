@@ -714,5 +714,8 @@
     <string name="worker_update_install_missing">No update to install</string>
     <string name="error_intent_handle">Failed to handle intent</string>
     <string name="support_ignore">Happy</string>
+    <string name="updates_last_update_info">Library last updated: %s</string>
+    <string name="relative_time_span_never">Never</string>
+    <string name="updates_last_update_info_just_now">Just now</string>
 
 </resources>

@@ -120,4 +120,5 @@ class UpdatesViewModel(
 	override val error = MutableSharedFlow<Throwable>()
 
 	override val isClearBeforeVisible = MutableStateFlow(false)
+	override val lastUpdated = settingsRepository.getLongFlow(SettingKey.NovelUpdateLastTimestamp)
 }

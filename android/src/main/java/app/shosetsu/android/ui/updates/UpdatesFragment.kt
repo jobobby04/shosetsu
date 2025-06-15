@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -54,6 +55,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,6 +70,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
+import app.shosetsu.android.view.compose.relativeTimeSpanString
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.UpdatesUI
@@ -110,6 +114,7 @@ fun UpdatesView(
 	val error by viewModel.error.collectAsState(null)
 	val isClearBeforeVisible by viewModel.isClearBeforeVisible.collectAsState()
 	val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
+	val lastUpdated by viewModel.lastUpdated.collectAsState()
 
 	val context = LocalContext.current
 	val hostState = remember { SnackbarHostState() }
@@ -131,6 +136,7 @@ fun UpdatesView(
 
 	UpdatesContent(
 		items = items,
+		lastUpdated = lastUpdated,
 		onRefresh = {
 			viewModel.startUpdateManager(-1)
 		},
@@ -249,6 +255,7 @@ fun UpdatesAppBar(
 @Composable
 fun UpdatesContent(
 	items: ImmutableMap<DateTime, List<UpdatesUI>>,
+	lastUpdated: Long,
 	onRefresh: () -> Unit,
 	openNovel: (UpdatesUI) -> Unit,
 	openChapter: (UpdatesUI) -> Unit,
@@ -284,6 +291,8 @@ fun UpdatesContent(
 					contentPadding = PaddingValues(bottom = 112.dp),
 					verticalArrangement = Arrangement.spacedBy(4.dp)
 				) {
+					updatesLastUpdatedItem(lastUpdated)
+
 					items.forEach { (header, updateItems) ->
 						stickyHeader {
 							UpdateHeaderItemContent(
@@ -307,6 +316,21 @@ fun UpdatesContent(
 				isRefreshing,
 				pullRefreshState,
 				Modifier.align(Alignment.TopCenter)
+			)
+		}
+	}
+}
+
+internal fun LazyListScope.updatesLastUpdatedItem(lastUpdated: Long) {
+	item(key = "updates-lastUpdated") {
+		Box(
+			modifier = Modifier
+				.animateItem(fadeInSpec = null, fadeOutSpec = null)
+				.padding(horizontal = 16.dp, vertical = 8.dp),
+		) {
+			Text(
+				text = stringResource(R.string.updates_last_update_info, relativeTimeSpanString(lastUpdated)),
+				fontStyle = FontStyle.Italic,
 			)
 		}
 	}
