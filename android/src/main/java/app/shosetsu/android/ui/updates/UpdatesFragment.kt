@@ -330,6 +330,7 @@ internal fun LazyListScope.updatesLastUpdatedItem(lastUpdated: Long) {
 			Text(
 				text = stringResource(R.string.updates_last_update_info, relativeTimeSpanString(lastUpdated)),
 				fontStyle = FontStyle.Italic,
+				style = MaterialTheme.typography.bodySmall,
 			)
 		}
 	}
