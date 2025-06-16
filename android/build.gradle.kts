@@ -117,8 +117,8 @@ android {
 			versionNameSuffix = "-${getCommitCount()}"
 			applicationIdSuffix = ".debug"
 			isDebuggable = true
-			isMinifyEnabled = !CI_MODE
-			isShrinkResources = !CI_MODE
+			isMinifyEnabled = false
+			isShrinkResources = false
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
