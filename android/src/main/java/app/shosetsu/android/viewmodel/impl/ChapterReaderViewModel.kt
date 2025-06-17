@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteException
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.compose.material3.ColorScheme
+import androidx.core.app.NotificationManagerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
@@ -1293,6 +1294,17 @@ class ChapterReaderViewModel(
 				}
 			}
 		}
+		viewModelScopeIO.launch {
+			novelIDLive.combine(currentChapterID, ::Pair)
+				.combine(context.filterNotNull(), ::Pair)
+				.collectLatest { (spec, context) ->
+					val (novel, chapter) = spec
+					NotificationManagerCompat.from(context).cancel(
+						"update/$novel/$chapter",
+						10000 + novel
+					)
+				}
+		}
 	}
 
 	private fun syncTTSIterator(ttsElements: RewindableMutableListIterator<TTSText>) {
@@ -1324,7 +1336,7 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onPlayTts(context: Context) {
-		this.context.value = context.applicationContext
+		setContext(context)
 		ttsPlayback.value = TTSPlayback.Playing
 	}
 
@@ -1341,6 +1353,10 @@ class ChapterReaderViewModel(
 
 	override fun onCleared() {
 		tts.value?.stop()
+	}
+
+	override fun setContext(context: Context) {
+		this.context.value = context.applicationContext
 	}
 
 	companion object {

@@ -145,10 +145,8 @@ class BackupCycleWorker(
 					).build()
 				)
 				logI(
-					"Worker State ${
-						workerManager.getWorkInfosForUniqueWork(
-							BACKUP_CYCLE_WORK_ID
-						).await()[0].state
+					"BackupCycleWorker State ${
+						workerManager.getWorkInfosForUniqueWork(BACKUP_CYCLE_WORK_ID).await()[0]
 					}"
 				)
 			}

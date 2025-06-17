@@ -209,4 +209,6 @@ abstract class AChapterReaderViewModel :
 	abstract fun onStopTts()
 
 	abstract val colorScheme: MutableStateFlow<ColorScheme>
+
+	abstract fun setContext(context: Context)
 }

@@ -52,7 +52,6 @@ class LibrarySettingsViewModel(
 			if (novelUpdateManager.getCount() != 0 && novelUpdateManager.getWorkerState() == WorkInfo.State.ENQUEUED)
 				novelUpdateManager.stop()
 
-			novelUpdateCycleManager.stop()
 			novelUpdateCycleManager.start()
 		}
 	}

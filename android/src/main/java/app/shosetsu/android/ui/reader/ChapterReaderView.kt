@@ -120,6 +120,10 @@ fun ChapterReaderView(
 	val scope = rememberCoroutineScope()
 	val uriHandler = LocalUriHandler.current
 
+	LaunchedEffect(context) {
+		viewModel.setContext(context)
+	}
+
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
 			while (!isReadingTooLong) {

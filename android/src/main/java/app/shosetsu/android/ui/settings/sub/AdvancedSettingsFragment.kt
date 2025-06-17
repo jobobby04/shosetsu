@@ -140,14 +140,10 @@ fun AdvancedSettingsView(
 		}
 	}
 
-	fun killCycleWorkers() {
-		viewModel.killCycleWorkers()
-	}
-
 	AdvancedSettingsContent(
 		viewModel,
 		onPurgeNovelCache = viewModel::purgeUselessData,
-		onKillCycleWorkers = ::killCycleWorkers,
+		onKillCycleWorkers = viewModel::killCycleWorkers,
 		onClearCookies = {
 			viewModel.logV("Clearing cookies")
 			CookieManager.getInstance().removeAllCookies {
