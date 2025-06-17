@@ -147,7 +147,7 @@ class CatalogViewModel(
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query.isNotEmpty())
+								if (query.isEmpty())
 									getCatalogueListingData(ext, data)
 								else loadCatalogueQueryDataUseCase(
 									ext,
