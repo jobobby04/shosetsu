@@ -3,7 +3,6 @@ package app.shosetsu.android.backend.workers.perodic
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -23,7 +22,6 @@ import app.shosetsu.android.common.SettingKey.NovelUpdateOnlyWhenIdle
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.WorkerTags.UPDATE_CYCLE_WORK_ID
 import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -166,12 +164,11 @@ class NovelUpdateCycleWorker(
 								setRequiresDeviceIdle(updateOnlyIdle())
 						}.build()
 					)
-						.setBackoffCriteria(BackoffPolicy.LINEAR, 10, MINUTES)
 						.build()
 				)
-				val info = workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
-				logD("State ${info.state}")
-
+				logI("NovelUpdateCycleWorker State ${
+					workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
+				}")
 			}
 		}
 
