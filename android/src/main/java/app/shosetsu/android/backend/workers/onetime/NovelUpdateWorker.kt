@@ -360,7 +360,7 @@ class NovelUpdateWorker(
 			}
 
 		// Will update only if downloadOnUpdate is enabled and there have been chapters
-		if (downloadOnUpdate() && updateNovels.size > 0 && updatedChapters.size > 0)
+		if (downloadOnUpdate() && updateNovels.isNotEmpty() && updatedChapters.isNotEmpty())
 			startDownloadWorker(updatedChapters)
 
 		return Result.success()
@@ -378,6 +378,7 @@ class NovelUpdateWorker(
 	) {
 		val chapterSize: Int = chapters.size
 		val firstChapterId = chapters.minByOrNull { it.order }?.id
+		val lastChapterId = chapters.maxByOrNull { it.order }?.id
 		val bitmap: Bitmap? =
 			applicationContext.imageLoader.execute(
 				ImageRequest.Builder(applicationContext).data(novel.imageURL)
@@ -390,7 +391,8 @@ class NovelUpdateWorker(
 				chapterSize,
 				chapterSize
 			),
-			notificationId = 10000 + novel.id
+			notificationId = 10000 + novel.id,
+			tag = lastChapterId?.let { ch -> "update/${novel.id}/$ch" },
 		) {
 			setContentTitle(
 				getString(

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteException
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import androidx.compose.material3.ColorScheme
+import androidx.core.app.NotificationManagerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
@@ -483,11 +484,11 @@ class ChapterReaderViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	private val extFlow: Flow<IExtension?> by lazy {
+	private val extFlow: SharedFlow<IExtension?> by lazy {
 		novelIDLive.mapLatest { id ->
 			val novel = novelRepo.getNovel(id) ?: return@mapLatest null
 			getExt(novel.extensionID)
-		}
+		}.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
 	private val convertStringToHtml by lazy {
@@ -1239,6 +1240,15 @@ class ChapterReaderViewModel(
 					}
 				}
 			}
+		}
+		viewModelScopeIO.launch {
+			novelIDLive.combine(currentChapterID, ::Pair)
+				.collectLatest { (novel, chapter) ->
+					NotificationManagerCompat.from(application).cancel(
+						"update/$novel/$chapter",
+						10000 + novel
+					)
+				}
 		}
 	}
 
