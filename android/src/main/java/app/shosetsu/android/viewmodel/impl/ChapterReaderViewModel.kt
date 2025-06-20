@@ -683,6 +683,13 @@ class ChapterReaderViewModel(
 			}
 
 			deletePrevious(chapter)
+
+            context.value?.applicationContext?.let { application ->
+				NotificationManagerCompat.from(application).cancel(
+					"update/${novelIDLive.value}/${chapter.id}",
+					10000 + chapter.id
+				)
+			}
 		}
 	}
 
@@ -1293,17 +1300,6 @@ class ChapterReaderViewModel(
 					}
 				}
 			}
-		}
-		viewModelScopeIO.launch {
-			novelIDLive.combine(currentChapterID, ::Pair)
-				.combine(context.filterNotNull(), ::Pair)
-				.collectLatest { (spec, context) ->
-					val (novel, chapter) = spec
-					NotificationManagerCompat.from(context).cancel(
-						"update/$novel/$chapter",
-						10000 + novel
-					)
-				}
 		}
 	}
 
