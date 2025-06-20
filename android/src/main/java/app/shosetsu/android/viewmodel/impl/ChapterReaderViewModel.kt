@@ -678,6 +678,11 @@ class ChapterReaderViewModel(
 			}
 
 			deletePrevious(chapter)
+
+			NotificationManagerCompat.from(application).cancel(
+				"update/${novelIDLive.value}/${chapter.id}",
+				10000 + chapter.id
+			)
 		}
 	}
 
@@ -1240,15 +1245,6 @@ class ChapterReaderViewModel(
 					}
 				}
 			}
-		}
-		viewModelScopeIO.launch {
-			novelIDLive.combine(currentChapterID, ::Pair)
-				.collectLatest { (novel, chapter) ->
-					NotificationManagerCompat.from(application).cancel(
-						"update/$novel/$chapter",
-						10000 + novel
-					)
-				}
 		}
 	}
 
