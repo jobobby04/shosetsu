@@ -186,8 +186,8 @@ class NovelUpdateWorker(
 		/** Collect updated chapters to be used */
 		val updatedChapters = arrayListOf<ChapterEntity>()
 
+		val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 		iNovelsRepository.loadLibraryNovelEntities().first().let { list ->
-			val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 			if (categoryID >= 0) {
 				list.filter { it.category == categoryID }
 			} else {
@@ -336,7 +336,7 @@ class NovelUpdateWorker(
 				progress++
 			}
 
-			setLastUpdatedTimestamp(Instant.now().toEpochMilli())
+			if (categoryID < 0) setLastUpdatedTimestamp(Instant.now().toEpochMilli())
 
 			notify(R.string.update_complete) {
 				setNotOngoing()
