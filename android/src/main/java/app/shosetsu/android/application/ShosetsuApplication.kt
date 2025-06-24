@@ -51,6 +51,7 @@ import org.kodein.di.instance
 import org.kodein.di.singleton
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.OneArgFunction
+import org.luaj.vm2.lib.ZeroArgFunction
 
 typealias LibLoader = (name: String) -> LuaValue?
 typealias ShosetsuLogger = (extensionName: String, log: String) -> Unit
@@ -159,6 +160,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 	class ShosetsuLibLoader(private val extLibRepository: IExtensionLibrariesRepository) : LibLoader {
 		override fun invoke(name: String): LuaValue? {
 			if (name == "xx-print") return PrintLib
+			if (name == "xx-time") return TimeLib
 			Log.i("LuaLibLoader", "Loading ($name)")
 			return try {
 				val result = runBlocking { extLibRepository.loadExtLibrary(name) }
@@ -180,6 +182,12 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				return arg
 			}
 		}
+
+        object TimeLib : ZeroArgFunction() {
+            override fun call(): LuaValue {
+				return valueOf(System.currentTimeMillis().toDouble()) // Y2038 bug, but we don't care
+            }
+        }
 	}
 
 	override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {}

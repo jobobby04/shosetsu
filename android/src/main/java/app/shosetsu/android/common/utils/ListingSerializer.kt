@@ -111,6 +111,7 @@ class ListingSerializer : KSerializer<ListingSerializer.SerializableListing> {
 			register<LuaExtension.LuaStableFunction>()
 			registerSingleton<Globals> { shosetsuGlobals() }
 			registerSingleton<ShosetsuApplication.ShosetsuLibLoader.PrintLib> { ShosetsuApplication.ShosetsuLibLoader.PrintLib }
+			registerSingleton<ShosetsuApplication.ShosetsuLibLoader.TimeLib> { ShosetsuApplication.ShosetsuLibLoader.TimeLib }
 //			register<Globals>(object : FieldSerializer<Globals>(this, Globals::class.java) {
 //				override fun create(kryo: Kryo?, input: Input?, type: Class<out Globals>?) = shosetsuGlobals()
 //				override fun createCopy(kryo: Kryo?, original: Globals?) = throw UnsupportedOperationException()
