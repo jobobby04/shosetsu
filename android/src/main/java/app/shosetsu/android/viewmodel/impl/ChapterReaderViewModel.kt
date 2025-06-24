@@ -681,7 +681,7 @@ class ChapterReaderViewModel(
 
 			NotificationManagerCompat.from(application).cancel(
 				"update/${novelIDLive.value}/${chapter.id}",
-				10000 + chapter.id
+				10000 + novelIDLive.value
 			)
 		}
 	}
