@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
@@ -129,7 +129,9 @@ fun ChapterReaderContent(
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (isFocused) 0.dp else insets.calculateBottomPadding() + BottomSheetDefaults.SheetPeekHeight,
+		sheetPeekHeight = if (!isFocused) WindowInsets.safeContent.asPaddingValues().calculateBottomPadding().plus(
+			BottomSheetDefaults.SheetPeekHeight
+		) else 0.dp,
 		content = { paddingValues ->
 			content(WindowInsets.safeDrawing.asPaddingValues(), paddingValues)
 		},
