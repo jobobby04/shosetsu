@@ -71,7 +71,9 @@ fun CSSEditorTopBarContent(
 				TabRowDefaults.SecondaryIndicator(
 					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
 				)
-			}
+			},
+			containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+			contentColor = MaterialTheme.colorScheme.onSurface
 		) {
 			// Add tabs for all of our pages
 			pages.forEachIndexed { index, title ->
