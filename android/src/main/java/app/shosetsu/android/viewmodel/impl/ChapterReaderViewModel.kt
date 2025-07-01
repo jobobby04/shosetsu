@@ -40,8 +40,8 @@ import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
-import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.onIO
+import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.common.utils.transformCatching
@@ -64,14 +64,14 @@ import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
+import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
+import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
-import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
-import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
-import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
+import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
@@ -111,9 +111,9 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -805,7 +805,6 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	override val pageJumper: MutableSharedFlow<Int> = MutableSharedFlow(replay = 0)
 	override suspend fun jumpToChapter(url: String): Boolean = onIO {
 		val chapters = getChapters(novelIDLive.value).first()
 			.map { it.copy(link = it.link.removeSuffix("/")) }
