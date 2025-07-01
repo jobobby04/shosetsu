@@ -163,7 +163,6 @@ abstract class AChapterReaderViewModel :
 	abstract val chapterHistory: StateFlow<ImmutableList<ReaderChapterUI>>
 	abstract fun popHistory()
 
-	abstract val pageJumper: SharedFlow<Int>
 	abstract suspend fun jumpToChapter(url: String): Boolean
 
 	/**
