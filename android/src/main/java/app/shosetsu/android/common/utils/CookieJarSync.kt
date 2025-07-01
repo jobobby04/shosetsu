@@ -51,4 +51,33 @@ object CookieJarSync : CookieJar {
 			}
 		}
 	}
+
+	fun get(url: HttpUrl): List<Cookie> {
+		val cookies = androidCookieManager.getCookie(url.toString())
+
+		return if (cookies != null && cookies.isNotEmpty()) {
+			cookies.split(";").mapNotNull { Cookie.parse(url, it) }
+		} else {
+			emptyList()
+		}
+	}
+
+	fun remove(url: HttpUrl, cookieNames: List<String>? = null, maxAge: Int = -1): Int {
+		val urlString = url.toString()
+		val cookies = androidCookieManager.getCookie(urlString) ?: return 0
+
+		fun List<String>.filterNames(): List<String> {
+			return if (cookieNames != null) {
+				this.filter { it in cookieNames }
+			} else {
+				this
+			}
+		}
+
+		return cookies.split(";")
+			.map { it.substringBefore("=") }
+			.filterNames()
+			.onEach { androidCookieManager.setCookie(urlString, "$it=;Max-Age=$maxAge") }
+			.count()
+	}
 }
