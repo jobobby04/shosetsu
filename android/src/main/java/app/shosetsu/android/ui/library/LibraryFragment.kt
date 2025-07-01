@@ -429,7 +429,7 @@ fun LibraryPager(
 						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
 					)
 				},
-				containerColor = MaterialTheme.colorScheme.background,
+				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
 				edgePadding = 0.dp,
 				contentColor = MaterialTheme.colorScheme.onSurface,
 				divider = { }, // replaced with our own divider that stretches to the full width
