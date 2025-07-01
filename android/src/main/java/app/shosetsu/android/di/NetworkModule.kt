@@ -30,5 +30,5 @@ import org.kodein.di.singleton
  * 01 / 05 / 2020
  */
 internal val networkModule = DI.Module("network_module") {
-	bind<OkHttpClient>() with singleton { createOkHttpClient(instance()) }
+	bind<OkHttpClient>() with singleton { createOkHttpClient(instance(), instance()) }
 }
