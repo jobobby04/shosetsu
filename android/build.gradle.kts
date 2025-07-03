@@ -57,6 +57,7 @@ val computedVersionCode by lazy {
 fun getCommitCount(): String = "git rev-list --count HEAD".execute().getText().trim()
 
 android {
+	buildToolsVersion = "35.0.1"
 	compileSdk = 35
 	defaultConfig {
 		applicationId = "app.shosetsu.android.sy"

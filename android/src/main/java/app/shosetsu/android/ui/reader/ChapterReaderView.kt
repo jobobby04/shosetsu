@@ -78,6 +78,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,10 +121,6 @@ fun ChapterReaderView(
 	val scope = rememberCoroutineScope()
 	val uriHandler = LocalUriHandler.current
 
-	LaunchedEffect(context) {
-		viewModel.setContext(context)
-	}
-
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
 			while (!isReadingTooLong) {
@@ -153,7 +150,7 @@ fun ChapterReaderView(
 					toggleBookmark = viewModel::toggleBookmark,
 					exit = onExit,
 					onPlayTTS = {
-						viewModel.onPlayTts(context)
+						viewModel.onPlayTts()
 					},
 					onPauseTTS = viewModel::onPauseTts,
 					onStopTTS = viewModel::onStopTts,
@@ -247,6 +244,9 @@ fun ChapterReaderView(
 											progressFlow = {
 												viewModel.getChapterProgress(item)
 											},
+											ttsProgress = remember {
+												StableHolder(viewModel.ttsProgress)
+											},
 											openUri = {
 												scope.launch {
 													if (!viewModel.jumpToChapter(it)) {
@@ -254,9 +254,6 @@ fun ChapterReaderView(
 													}
 												}
 											},
-											ttsProgress = remember {
-												StableHolder(viewModel.ttsProgress)
-											}
 										)
 									}
 

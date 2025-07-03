@@ -183,7 +183,7 @@ fun HistoryContent(
 						onClearAll,
 						onOpenClearBefore,
 					)
-				}
+				},
 			)
 		}
 	) { paddingValues ->

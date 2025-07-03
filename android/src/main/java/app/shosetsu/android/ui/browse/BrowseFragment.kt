@@ -284,7 +284,7 @@ fun BrowseContent(
 					}
 					HelpButton(BROWSE_HELP_URL)
 				},
-				navigationIcon = drawerIcon
+				navigationIcon = drawerIcon,
 			)
 		},
 		snackbarHost = {

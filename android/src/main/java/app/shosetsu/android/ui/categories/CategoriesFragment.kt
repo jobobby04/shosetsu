@@ -274,7 +274,7 @@ fun CategoriesContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 		floatingActionButton = {

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +20,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
@@ -60,7 +60,7 @@ fun CSSEditorTopBarContent(
 						stringResource(app.shosetsu.android.R.string.help),
 					)
 				}
-			}
+			},
 		)
 		TabRow(
 			// Our selected tab is our current page
@@ -70,7 +70,7 @@ fun CSSEditorTopBarContent(
 				SecondaryIndicator(
 					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
 				)
-			}
+			},
 		) {
 			// Add tabs for all of our pages
 			pages.forEachIndexed { index, title ->

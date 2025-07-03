@@ -237,7 +237,7 @@ fun BackupSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		}
 	) {

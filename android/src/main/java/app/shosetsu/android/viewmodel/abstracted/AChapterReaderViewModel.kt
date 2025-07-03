@@ -1,6 +1,5 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import android.content.Context
 import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.LiveData
 import app.shosetsu.android.common.enums.AppThemes
@@ -176,7 +175,6 @@ abstract class AChapterReaderViewModel :
 	abstract val chapterHistory: StateFlow<ImmutableList<ReaderChapterUI>>
 	abstract fun popHistory()
 
-	abstract val pageJumper: SharedFlow<Int>
 	abstract suspend fun jumpToChapter(url: String): Boolean
 
 	/**
@@ -202,13 +200,12 @@ abstract class AChapterReaderViewModel :
 
 	abstract fun clearMemory()
 
+	abstract val pageJumper: SharedFlow<Int>
 	abstract val ttsProgress: StateFlow<String?>
 	abstract val ttsPlayback: StateFlow<TTSPlayback>
-	abstract fun onPlayTts(context: Context)
+	abstract fun onPlayTts()
 	abstract fun onPauseTts()
 	abstract fun onStopTts()
 
 	abstract val colorScheme: MutableStateFlow<ColorScheme>
-
-	abstract fun setContext(context: Context)
 }

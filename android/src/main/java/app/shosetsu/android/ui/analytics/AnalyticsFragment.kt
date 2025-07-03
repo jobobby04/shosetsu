@@ -181,7 +181,7 @@ fun AnalyticsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 	) { padding ->

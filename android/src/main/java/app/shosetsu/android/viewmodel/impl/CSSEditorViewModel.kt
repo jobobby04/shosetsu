@@ -50,6 +50,10 @@ class CSSEditorViewModel(
 	private val settingsRepo: ISettingsRepository,
 	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : ACSSEditorViewModel() {
+	override val appTheme: StateFlow<AppThemes> =
+		loadLiveAppThemeUseCase()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
+
 
 	private val css = object : ShosetsuCssViewModelComponent() {
 		override val settingsRepo: ISettingsRepository
@@ -65,10 +69,6 @@ class CSSEditorViewModel(
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@CSSEditorViewModel.colorScheme
 	}
-
-	override val appTheme: StateFlow<AppThemes> =
-		loadLiveAppThemeUseCase()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
 
 	private val undoStack by lazy { Stack<String>() }
 	private val redoStack by lazy { Stack<String>() }

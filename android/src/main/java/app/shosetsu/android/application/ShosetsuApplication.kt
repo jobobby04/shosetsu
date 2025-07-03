@@ -1,11 +1,12 @@
 package app.shosetsu.android.application
 
-import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteException
+import android.os.Build
+import android.os.Looper
 import android.util.Log
-import androidx.core.content.getSystemService
+import android.webkit.WebView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -16,8 +17,11 @@ import app.shosetsu.android.common.consts.ShortCuts
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
+import app.shosetsu.android.common.utils.CloudflareInterceptor
+import app.shosetsu.android.common.utils.DeviceUtil
 import app.shosetsu.android.common.utils.LoggingPrintStream
 import app.shosetsu.android.common.utils.SiteProtector
+import app.shosetsu.android.common.utils.webview.WebViewUtil
 import app.shosetsu.android.di.dataSourceModule
 import app.shosetsu.android.di.databaseModule
 import app.shosetsu.android.di.networkModule
@@ -137,6 +141,12 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			}
 		}
 		super.onCreate()
+
+		// Avoid potential crashes
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			val process = getProcessName()
+			if (packageName != process) WebView.setDataDirectorySuffix(process)
+		}
 	}
 
 	/**
@@ -203,6 +213,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				okHttpClient.newBuilder()
 					.apply {
 						interceptors().remove(SiteProtector)
+						interceptors().removeIf { it is CloudflareInterceptor }
 					}
 					.build()
 			)
@@ -213,12 +224,33 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				}.build()
 			}
 
-			@Suppress("ReplaceNotNullAssertionWithElvisReturn")
-			allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
+			DeviceUtil.isLowRamDevice(this@ShosetsuApplication)
 
 			// Coil spawns a new thread for every image load by default
 			fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
 			decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
 			transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
 		}.build()
+
+
+	override fun getPackageName(): String {
+		// This causes freezes in Android 6/7 for some reason
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			try {
+				// Override the value passed as X-Requested-With in WebView requests
+				val stackTrace = Looper.getMainLooper().thread.stackTrace
+				val chromiumElement = stackTrace.find {
+					it.className.equals(
+						"org.chromium.base.BuildInfo",
+						ignoreCase = true,
+					)
+				}
+				if (chromiumElement?.methodName.equals("getAll", ignoreCase = true)) {
+					return WebViewUtil.SPOOF_PACKAGE_NAME
+				}
+			} catch (_: Exception) {
+			}
+		}
+		return super.getPackageName()
+	}
 }

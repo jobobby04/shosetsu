@@ -2,6 +2,7 @@ package app.shosetsu.android.datasource.remote.impl
 
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
 import app.shosetsu.lib.*
+import app.shosetsu.lib.LISTING_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
 import org.luaj.vm2.LuaError
 import java.io.IOException

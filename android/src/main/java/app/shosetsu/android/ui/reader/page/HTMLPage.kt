@@ -66,8 +66,8 @@ fun HTMLPage(
 	onScroll: (perc: Double) -> Unit,
 	onClick: (String?) -> Unit,
 	onDoubleClick: () -> Unit,
-	openUri: (String) -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
+	openUri: (String) -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()

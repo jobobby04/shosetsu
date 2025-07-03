@@ -398,7 +398,7 @@ fun DownloadsAppBar(
 			},
 			navigationIcon = {
 				NavigateBackButton(onBack)
-			}
+			},
 		)
 	}
 }

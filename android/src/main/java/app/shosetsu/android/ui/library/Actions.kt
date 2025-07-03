@@ -35,6 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -271,7 +276,16 @@ fun SearchAction(
 				},
 				modifier = Modifier
 					.fillMaxWidth()
-					.focusRequester(focusRequester),
+					.focusRequester(focusRequester)
+					.onKeyEvent(
+						onKeyEvent = {
+							if (it.key == Key.Enter && it.type == KeyEventType.KeyUp) {
+								onSearch(searchQuery)
+								focusManager.clearFocus()
+							}
+							false
+						}
+					),
 				keyboardActions = KeyboardActions {
 					onSearch(searchQuery)
 					focusManager.clearFocus()

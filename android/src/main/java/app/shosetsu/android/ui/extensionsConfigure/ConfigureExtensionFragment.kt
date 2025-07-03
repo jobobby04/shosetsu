@@ -115,7 +115,7 @@ fun ConfigureExtensionContent(
 				navigationIcon = {
 					NavigateBackButton(onBack)
 				},
-				scrollBehavior = enterAlwaysScrollBehavior()
+				scrollBehavior = enterAlwaysScrollBehavior(),
 			)
 		}
 	) { paddingValues ->

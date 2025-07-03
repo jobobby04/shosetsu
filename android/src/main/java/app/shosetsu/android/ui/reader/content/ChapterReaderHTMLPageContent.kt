@@ -58,8 +58,8 @@ fun ChapterReaderHTMLContent(
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
 	onClick: (String?) -> Unit,
 	onDoubleClick: () -> Unit,
-	openUri: (String) -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
+	openUri: (String) -> Unit
 ) {
 	val html by remember(item) {
 		getHTMLContent(item)
@@ -102,8 +102,8 @@ fun ChapterReaderHTMLContent(
 				},
 				onClick = onClick,
 				onDoubleClick = onDoubleClick,
-				openUri = openUri,
 				ttsProgress = ttsProgress,
+				openUri = openUri,
 			)
 		}
 	}

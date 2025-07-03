@@ -217,7 +217,7 @@ fun AddShareContent(
 				},
 				actions = {
 					HelpButton(SHARE_HELP_URL)
-				}
+				},
 			)
 		}
 	) { padding ->

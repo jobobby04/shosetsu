@@ -209,7 +209,7 @@ fun AboutContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		}
 	) { paddingValues ->

@@ -259,7 +259,7 @@ fun WebViewScreen(
 								}
 							)
 						}
-					}
+					},
 				)
 				when (val loadingState = state.loadingState) {
 					is LoadingState.Initializing -> LinearProgressIndicator(
