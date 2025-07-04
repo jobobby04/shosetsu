@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
+import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -37,7 +38,7 @@ import androidx.navigation.NavBackStackEntry
  */
 @Composable
 fun NavigationRail(
-	destinations: List<Root>,
+	destinations: ImmutableList<Root>,
 	currentDestination: NavBackStackEntry?,
 	onNavigate: (Root) -> Unit
 ) {

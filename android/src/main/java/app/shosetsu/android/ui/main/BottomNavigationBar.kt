@@ -5,6 +5,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -12,7 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavDestination.Companion.hierarchy
+import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -39,14 +40,19 @@ import androidx.navigation.NavDestination.Companion.hierarchy
  */
 @Composable
 fun BottomNavigationBar(
-	destinations: List<Root>,
+	destinations: ImmutableList<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Root) -> Unit
+	onNavigate: (Root) -> Unit,
+	onIsVisible: (Boolean) -> Unit,
 ) {
 	var isVisible by remember { mutableStateOf(true) }
 
-	isVisible = destinations.any { destination ->
-		currentDestination?.topIs(destination.viewOrigin) == true
+	DisposableEffect(currentDestination) {
+		isVisible = destinations.any { destination ->
+			currentDestination?.topIs(destination.viewOrigin) == true
+		}
+		onIsVisible(isVisible)
+		onDispose {}
 	}
 
 	if (isVisible) {

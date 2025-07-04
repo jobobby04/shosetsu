@@ -8,7 +8,13 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -24,10 +30,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -46,6 +56,7 @@ import app.shosetsu.android.ui.main.Destination.Updates
 import app.shosetsu.android.ui.main.graph.mainGraph
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
 /*
@@ -101,12 +112,14 @@ fun MainView() {
 	val drawerState = rememberDrawerState(DrawerValue.Closed)
 	val scope = rememberCoroutineScope()
 
-	val destinations = listOf(
-		Library,
-		Updates,
-		Browse,
-		More
-	)
+	val destinations = remember {
+		persistentListOf(
+			Library,
+			Updates,
+			Browse,
+			More
+		)
+	}
 
 	val sizeClass = calculateWindowSizeClass(context as Activity)
 	val isCompact = sizeClass.widthSizeClass == WindowWidthSizeClass.Compact
@@ -171,6 +184,7 @@ fun MainView() {
 						onNavigate = ::navigate
 					)
 				}
+				var bottomBarVisible by remember { mutableStateOf(false) }
 
 				Scaffold(
 					bottomBar = {
@@ -178,7 +192,8 @@ fun MainView() {
 							BottomNavigationBar(
 								destinations,
 								navBackStackEntry,
-								::navigate
+								::navigate,
+								onIsVisible = { bottomBarVisible = it }
 							)
 						}
 					},
@@ -191,10 +206,20 @@ fun MainView() {
 							BackupProgressIndicator()
 						}
 					},
+					contentWindowInsets = WindowInsets(0.dp)
 				) { paddingValues ->
 					NavHost(
 						navController,
-						startDestination = Library
+						startDestination = Library,
+						modifier = if (bottomBarVisible) {
+							Modifier.consumeWindowInsets(
+								WindowInsets.systemBars.only(
+									WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+								)
+							)
+						} else {
+							Modifier
+						}.padding(paddingValues)
 					) {
 						mainGraph(
 							navController,
