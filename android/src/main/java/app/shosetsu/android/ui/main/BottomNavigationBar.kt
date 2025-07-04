@@ -1,11 +1,20 @@
 package app.shosetsu.android.ui.main
 
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hierarchy
+import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -32,20 +41,34 @@ import androidx.navigation.NavBackStackEntry
  */
 @Composable
 fun BottomNavigationBar(
+	destinations: ImmutableList<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (ShosetsuDestination.Primary) -> Unit
+	onNavigate: (Root) -> Unit,
+	onIsVisible: (Boolean) -> Unit,
 ) {
-	NavigationBar {
-		ShosetsuDestination.Primary.all.forEach { destination ->
-			val isSelected = currentDestination?.has(destination) == true
-			NavigationBarItem(
-				selected = isSelected,
-				icon = { DestinationIcon(destination, isSelected) },
-				label = { Text(stringResource(destination.name)) },
-				onClick = {
-					onNavigate(destination)
-				}
-			)
+	var isVisible by remember { mutableStateOf(true) }
+
+	DisposableEffect(currentDestination) {
+		isVisible = destinations.any { destination ->
+			currentDestination?.topIs(destination.viewOrigin) == true
+		}
+		onIsVisible(isVisible)
+		onDispose {}
+	}
+
+	if (isVisible) {
+		NavigationBar {
+			ShosetsuDestination.Primary.all.forEach { destination ->
+				val isSelected = currentDestination?.has(destination) == true
+				NavigationBarItem(
+					selected = isSelected,
+					icon = { DestinationIcon(destination, isSelected) },
+					label = { Text(stringResource(destination.name)) },
+					onClick = {
+						onNavigate(destination)
+					}
+				)
+			}
 		}
 	}
 }

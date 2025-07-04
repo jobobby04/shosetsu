@@ -88,14 +88,13 @@ fun MainView() {
 		onUpdate = viewModel::update
 	)
 
-	LaunchedEffect(theme) {
-		theme.setAppCompatDelegateThemeMode()
-	}
-
-	ShosetsuTheme(theme) {
-		if (showVerificationWarning) {
-			VerificationWarning(viewModel::dismissVerificationWarning)
+	ShosetsuTheme(
+		darkTheme = when (theme) {
+			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+			AppThemes.LIGHT -> false
+			AppThemes.DARK -> true
 		}
+	) {
 
 		NavHost(
 			navController.root,

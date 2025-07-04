@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import app.shosetsu.android.R
 import app.shosetsu.android.ui.theme.Primary
+import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -46,6 +47,7 @@ import app.shosetsu.android.ui.theme.Primary
 
 @Composable
 fun NavigationDrawerContent(
+	destinations: ImmutableList<Root>,
 	currentDestination: NavBackStackEntry?,
 	onNavigate: (ShosetsuDestination.Primary) -> Unit
 ) {
