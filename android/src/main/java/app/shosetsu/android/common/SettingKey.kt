@@ -3,7 +3,6 @@ package app.shosetsu.android.common
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.domain.model.local.LibraryFilterState
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /*
@@ -30,6 +29,7 @@ import kotlinx.serialization.json.Json
 
 
 typealias IntKey = SettingKey<Int>
+typealias LongKey = SettingKey<Long>
 typealias BooleanKey = SettingKey<Boolean>
 typealias FloatKey = SettingKey<Float>
 typealias StringKey = SettingKey<String>
@@ -203,6 +203,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object NovelUpdateShowProgress : BooleanKey("novelUpdateShowProgress", true)
 	object NovelUpdateClassicFinish : BooleanKey("novelUpdateClassicFinish", false)
 	object NovelUpdateDateMDY : BooleanKey("novelUpdateDateMDY", false)
+	object NovelUpdateLastTimestamp : LongKey("novelUpdateLastTimestamp", 0L)
 
 	object RepoUpdateOnLowStorage : BooleanKey("repoUpdateLowStorage", true)
 	object RepoUpdateOnLowBattery : BooleanKey("repoUpdateLowBattery", true)

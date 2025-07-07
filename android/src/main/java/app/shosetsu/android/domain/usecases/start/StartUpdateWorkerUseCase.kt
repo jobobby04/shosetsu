@@ -3,7 +3,7 @@ package app.shosetsu.android.domain.usecases.start
 import androidx.work.Data
 import androidx.work.await
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
-import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker.Manager
+import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import app.shosetsu.android.common.ext.launchIO
 
 /*
@@ -28,7 +28,8 @@ import app.shosetsu.android.common.ext.launchIO
  * 23 / 06 / 2020
  */
 class StartUpdateWorkerUseCase(
-	private val manager: Manager
+	private val manager: NovelUpdateWorker.Manager,
+	private val cycleManager: NovelUpdateCycleWorker.Manager
 ) {
 	/**
 	 * Starts the update worker
@@ -49,7 +50,8 @@ class StartUpdateWorkerUseCase(
 						.build()
 				)
 			} else {
-				manager.start()
+				cycleManager.stop()
+				cycleManager.start()
 			}
 		}
 	}

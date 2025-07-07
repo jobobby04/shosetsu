@@ -117,8 +117,8 @@ android {
 			versionNameSuffix = "-${getCommitCount()}"
 			applicationIdSuffix = ".debug"
 			isDebuggable = true
-			isMinifyEnabled = !CI_MODE
-			isShrinkResources = !CI_MODE
+			isMinifyEnabled = false
+			isShrinkResources = false
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
@@ -354,7 +354,7 @@ dependencies {
 	implementation(libs.androidx.compose.ui.graphics)
 	implementation(libs.androidx.compose.ui.tooling.preview)
 	implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.material.icons.extended)
+	implementation(libs.androidx.material.icons.extended)
 	implementation(libs.androidx.compose.foundation)
 	implementation(libs.androidx.compose.animation)
 	implementation(libs.androidx.compose.animation.graphics)

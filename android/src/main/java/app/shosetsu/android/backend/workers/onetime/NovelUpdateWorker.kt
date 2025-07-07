@@ -27,6 +27,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.DownloadNewNovelChapters
 import app.shosetsu.android.common.SettingKey.ExcludedCategoriesInUpdate
 import app.shosetsu.android.common.SettingKey.IncludeCategoriesInUpdate
@@ -77,6 +78,7 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
 import java.io.IOException
+import java.time.Instant
 import kotlin.coroutines.cancellation.CancellationException
 
 /*
@@ -165,6 +167,9 @@ class NovelUpdateWorker(
 	private suspend fun classicFinale(): Boolean =
 		iSettingsRepository.getBoolean(NovelUpdateClassicFinish)
 
+	private suspend fun setLastUpdatedTimestamp(value: Long) =
+		iSettingsRepository.setLong(SettingKey.NovelUpdateLastTimestamp, value)
+
 	override suspend fun doWork(): Result {
 		// Log that the worker is executing
 		logI(SERVICE_EXECUTE)
@@ -181,8 +186,8 @@ class NovelUpdateWorker(
 		/** Collect updated chapters to be used */
 		val updatedChapters = arrayListOf<ChapterEntity>()
 
+		val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 		iNovelsRepository.loadLibraryNovelEntities().first().let { list ->
-			val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 			if (categoryID >= 0) {
 				list.filter { it.category == categoryID }
 			} else {
@@ -331,6 +336,8 @@ class NovelUpdateWorker(
 				progress++
 			}
 
+			if (categoryID < 0) setLastUpdatedTimestamp(Instant.now().toEpochMilli())
+
 			notify(R.string.update_complete) {
 				setNotOngoing()
 				removeProgress()
@@ -353,7 +360,7 @@ class NovelUpdateWorker(
 			}
 
 		// Will update only if downloadOnUpdate is enabled and there have been chapters
-		if (downloadOnUpdate() && updateNovels.size > 0 && updatedChapters.size > 0)
+		if (downloadOnUpdate() && updateNovels.isNotEmpty() && updatedChapters.isNotEmpty())
 			startDownloadWorker(updatedChapters)
 
 		return Result.success()
@@ -371,6 +378,7 @@ class NovelUpdateWorker(
 	) {
 		val chapterSize: Int = chapters.size
 		val firstChapterId = chapters.minByOrNull { it.order }?.id
+		val lastChapterId = chapters.maxByOrNull { it.order }?.id
 		val bitmap: Bitmap? =
 			applicationContext.imageLoader.execute(
 				ImageRequest.Builder(applicationContext).data(novel.imageURL)
@@ -383,7 +391,8 @@ class NovelUpdateWorker(
 				chapterSize,
 				chapterSize
 			),
-			notificationId = 10000 + novel.id
+			notificationId = 10000 + novel.id,
+			tag = lastChapterId?.let { ch -> "update/${novel.id}/$ch" },
 		) {
 			setContentTitle(
 				getString(

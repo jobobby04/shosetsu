@@ -12,7 +12,6 @@ import androidx.work.Operation
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import androidx.work.await
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.onetime.AppUpdateCheckWorker
 import app.shosetsu.android.common.SettingKey.AppUpdateCycle
@@ -131,7 +130,7 @@ class AppUpdateCheckCycleWorker(
 				logI(LogConstants.SERVICE_NEW)
 				workerManager.enqueueUniquePeriodicWork(
 					APP_UPDATE_CYCLE_WORK_ID,
-					ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+					ExistingPeriodicWorkPolicy.UPDATE,
 					PeriodicWorkRequestBuilder<AppUpdateCheckCycleWorker>(
 						appUpdateCycle(),
 						TimeUnit.HOURS
@@ -146,10 +145,8 @@ class AppUpdateCheckCycleWorker(
 					).build()
 				)
 				logI(
-					"Worker State ${
-						workerManager.getWorkInfosForUniqueWork(
-							APP_UPDATE_CYCLE_WORK_ID
-						).await()[0].state
+					"AppUpdateCheckCycleWorker State ${
+						workerManager.getWorkInfosForUniqueWork(APP_UPDATE_CYCLE_WORK_ID).await()[0].state
 					}"
 				)
 			}
@@ -160,5 +157,4 @@ class AppUpdateCheckCycleWorker(
 		 */
 		override fun stop(): Operation = workerManager.cancelUniqueWork(APP_UPDATE_CYCLE_WORK_ID)
 	}
-
 }

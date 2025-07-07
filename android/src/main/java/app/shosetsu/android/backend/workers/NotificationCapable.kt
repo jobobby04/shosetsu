@@ -55,13 +55,15 @@ interface NotificationCapable {
 	fun CoroutineWorker.notify(
 		@StringRes messageId: Int,
 		notificationId: Int = defaultNotificationID,
-		action: Builder.() -> Unit = {}
-	) = notify(notifyContext.getText(messageId), notificationId, action)
+		tag: String? = null,
+		action: Builder.() -> Unit = {},
+	) = notify(notifyContext.getText(messageId), notificationId, tag, action)
 
 	fun CoroutineWorker.notify(
 		contentText: CharSequence? = null,
 		notificationId: Int = defaultNotificationID,
-		action: Builder.() -> Unit = {}
+		tag: String? = null,
+		action: Builder.() -> Unit = {},
 	) {
 		if (
 			ActivityCompat.checkSelfPermission(
@@ -72,6 +74,7 @@ interface NotificationCapable {
 			return
 		}
 		notificationManager.notify(
+			tag,
 			notificationId,
 			baseNotificationBuilder.apply {
 				setContentText(contentText)

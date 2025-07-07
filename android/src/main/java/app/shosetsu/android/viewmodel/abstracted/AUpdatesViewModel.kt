@@ -59,4 +59,6 @@ abstract class AUpdatesViewModel
 	abstract val error: Flow<Throwable>
 
 	abstract val isClearBeforeVisible: StateFlow<Boolean>
+
+	abstract val lastUpdated: StateFlow<Long>
 }
