@@ -59,6 +59,6 @@ class TextAssetReaderViewModel(val application: Application) : ATextAssetReaderV
 				return
 		}
 		targetLiveData.value = null
-		targetLiveData.value = TextAsset.values()[targetOrdinal]
+		targetLiveData.value = TextAsset.entries[targetOrdinal]
 	}
 }

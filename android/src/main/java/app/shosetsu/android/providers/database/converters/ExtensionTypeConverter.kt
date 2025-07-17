@@ -32,5 +32,5 @@ class ExtensionTypeConverter {
 	fun toInt(entity: ExtensionType) = entity.ordinal
 
 	@TypeConverter
-	fun toExtensionType(ordinal: Int): ExtensionType = ExtensionType.values()[ordinal]
+	fun toExtensionType(ordinal: Int): ExtensionType = ExtensionType.entries[ordinal]
 }
