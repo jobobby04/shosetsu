@@ -52,7 +52,6 @@ import app.shosetsu.android.domain.usecases.RecordChapterIsReadingUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
-import app.shosetsu.android.domain.usecases.get.GetLastReadChapterUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
@@ -151,7 +150,6 @@ class ChapterReaderViewModel(
 	private val recordChapterIsReading: RecordChapterIsReadingUseCase,
 	private val recordChapterIsRead: RecordChapterIsReadUseCase,
 	private val getExt: GetExtensionUseCase,
-	private val getLastReadChapter: GetLastReadChapterUseCase,
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {

@@ -38,9 +38,6 @@ val SHOSETSU_USER_AGENT =
 
 const val SELECTED_STROKE_WIDTH: Int = 4
 
-/** How fast the user must fling inorder to activate the scroll to last */
-const val FLING_THRESHOLD = 19999
-
 /**
  * Size of sub text, used for description
  */

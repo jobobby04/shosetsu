@@ -21,7 +21,6 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -38,7 +37,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -155,11 +153,6 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 }
 
 @Composable
-fun MigrationExtensionsLoadingContent() {
-	LinearProgressIndicator()
-}
-
-@Composable
 fun MigrationExtensionsContent(
 	list: ImmutableList<MigrationExtensionUI>,
 	onClick: (MigrationExtensionUI) -> Unit
@@ -241,11 +234,6 @@ fun MigrationExtensionItemContent(
 			)
 		}
 	}
-}
-
-@Composable
-fun MigrationNovelsLoadingContent() {
-	LinearProgressIndicator()
 }
 
 @Composable
