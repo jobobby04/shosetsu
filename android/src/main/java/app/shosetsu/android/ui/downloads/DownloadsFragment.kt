@@ -33,8 +33,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -244,7 +248,7 @@ fun DownloadsContent(
 								enabled = selectedDownloadState.pauseVisible
 							) {
 								Icon(
-									painterResource(R.drawable.pause),
+									Icons.Outlined.Pause,
 									stringResource(R.string.pause)
 								)
 							}
@@ -253,7 +257,7 @@ fun DownloadsContent(
 								enabled = selectedDownloadState.startVisible
 							) {
 								Icon(
-									painterResource(R.drawable.play_arrow),
+									Icons.Default.PlayArrow,
 									stringResource(R.string.start)
 								)
 							}
@@ -262,7 +266,7 @@ fun DownloadsContent(
 								enabled = selectedDownloadState.restartVisible
 							) {
 								Icon(
-									painterResource(R.drawable.refresh),
+									Icons.Default.Refresh,
 									stringResource(R.string.restart)
 								)
 							}
@@ -271,7 +275,7 @@ fun DownloadsContent(
 								enabled = selectedDownloadState.deleteVisible
 							) {
 								Icon(
-									painterResource(R.drawable.trash),
+									Icons.Filled.Delete,
 									stringResource(R.string.delete)
 								)
 							}
@@ -327,7 +331,7 @@ fun DownloadsFAB(
 			if (isPaused) {
 				Icon(Icons.Default.PlayArrow, stringResource(R.string.start))
 			} else {
-				Icon(painterResource(R.drawable.pause), stringResource(R.string.pause))
+				Icon(Icons.Default.Pause, stringResource(R.string.pause))
 			}
 		}
 	)

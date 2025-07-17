@@ -5,6 +5,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,7 +47,7 @@ fun CSSEditorTopBarContent(
 					onClick = onBack
 				) {
 					Icon(
-						Icons.Filled.ArrowBack,
+						Icons.AutoMirrored.Filled.ArrowBack,
 						stringResource(R.string.abc_action_bar_up_description),
 					)
 				}
@@ -55,7 +57,7 @@ fun CSSEditorTopBarContent(
 					onClick = onHelp
 				) {
 					Icon(
-						painterResource(app.shosetsu.android.R.drawable.help_outline_24),
+						Icons.AutoMirrored.Outlined.HelpOutline,
 						stringResource(app.shosetsu.android.R.string.help),
 					)
 				}
@@ -66,7 +68,7 @@ fun CSSEditorTopBarContent(
 			selectedTabIndex = pagerState.currentPage,
 			// Override the indicator, using the provided pagerTabIndicatorOffset modifier
 			indicator = { tabPositions ->
-				TabRowDefaults.Indicator(
+				TabRowDefaults.SecondaryIndicator(
 					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
 				)
 			}

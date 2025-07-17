@@ -35,10 +35,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.LibraryAddCheck
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.BookmarkRemove
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.LibraryAddCheck
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -875,7 +884,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showDelete
 			) {
 				Icon(
-					painterResource(R.drawable.trash),
+					Icons.Filled.Delete,
 					stringResource(R.string.fragment_novel_selected_delete)
 				)
 			}
@@ -884,7 +893,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showMarkAsRead
 			) {
 				Icon(
-					painterResource(R.drawable.read_mark),
+					Icons.Filled.LibraryAddCheck,
 					stringResource(R.string.fragment_novel_selected_read)
 				)
 			}
@@ -893,7 +902,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showMarkAsUnread
 			) {
 				Icon(
-					painterResource(R.drawable.unread_mark),
+					Icons.Outlined.LibraryAddCheck,
 					stringResource(R.string.fragment_novel_selected_unread)
 				)
 			}
@@ -902,7 +911,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showBookmark
 			) {
 				Icon(
-					painterResource(R.drawable.ic_outline_bookmark_add_24),
+					Icons.Outlined.BookmarkAdd,
 					stringResource(R.string.fragment_novel_selected_bookmark)
 				)
 			}
@@ -911,7 +920,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showRemoveBookmark
 			) {
 				Icon(
-					painterResource(R.drawable.ic_baseline_bookmark_remove_24),
+					Icons.Outlined.BookmarkRemove,
 					stringResource(R.string.fragment_novel_selected_unbookmark)
 				)
 			}
@@ -1239,9 +1248,9 @@ fun NovelInfoHeaderContent(
 						) {
 							Icon(
 								if (novelInfo.bookmarked) {
-									painterResource(R.drawable.ic_heart_svg_filled)
+									Icons.Filled.Favorite
 								} else {
-									painterResource(R.drawable.ic_heart_svg)
+									Icons.Filled.FavoriteBorder
 								},
 								null,
 								tint = if (novelInfo.bookmarked)
@@ -1307,7 +1316,7 @@ fun NovelInfoHeaderContent(
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
 							Icon(
-								painterResource(R.drawable.open_in_browser),
+								Icons.Default.OpenInBrowser,
 								stringResource(R.string.action_open_in_webview),
 								modifier = Modifier.size(20.dp),
 								tint = MaterialTheme.colorScheme.onSurface
@@ -1400,10 +1409,7 @@ fun NovelChapterBar(
 						.padding(horizontal = 4.dp),
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					Icon(
-						painterResource(R.drawable.filter),
-						null,
-					)
+					Icon(Icons.Outlined.FilterList, null)
 					Text(stringResource(R.string.filter))
 				}
 			}

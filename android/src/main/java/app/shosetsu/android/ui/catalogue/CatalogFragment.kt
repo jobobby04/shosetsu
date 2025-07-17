@@ -15,6 +15,9 @@ import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -377,7 +380,7 @@ fun CatalogFloatingActionButton(hasFilters: Boolean, onShowFilterMenu: () -> Uni
 				Text(stringResource(R.string.filter))
 			},
 			icon = {
-				Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+				Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 			},
 			onClick = onShowFilterMenu
 		)
@@ -426,7 +429,7 @@ fun CatalogTopBar(
 				onClick = openWebView
 			) {
 				Icon(
-					painterResource(R.drawable.open_in_browser),
+					Icons.Default.OpenInBrowser,
 					stringResource(R.string.action_open_in_webview)
 				)
 			}

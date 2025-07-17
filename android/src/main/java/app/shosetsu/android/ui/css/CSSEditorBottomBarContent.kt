@@ -9,6 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Redo
+import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.outlined.Undo
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
@@ -98,7 +104,7 @@ fun CSSEditorBottomBarContent(
 				) {
 					IconButton(onClick = onUndo, enabled = canUndo) {
 						Icon(
-							painterResource(R.drawable.ic_baseline_undo_24),
+							Icons.AutoMirrored.Outlined.Undo,
 							stringResource(R.string.activity_css_undo)
 						)
 					}
@@ -124,7 +130,7 @@ fun CSSEditorBottomBarContent(
 					contentColor = colorResource(android.R.color.white)
 				) {
 					Icon(
-						painterResource(R.drawable.ic_baseline_save_24),
+						Icons.Filled.Save,
 						stringResource(R.string.activity_css_save)
 					)
 				}
@@ -137,13 +143,13 @@ fun CSSEditorBottomBarContent(
 						modifier = Modifier.padding(end = 8.dp)
 					) {
 						Icon(
-							painterResource(R.drawable.ic_baseline_save_alt_24),
+							Icons.Filled.SaveAlt,
 							stringResource(R.string.activity_css_export)
 						)
 					}
 					IconButton(onClick = onRedo, enabled = canRedo) {
 						Icon(
-							painterResource(R.drawable.ic_baseline_redo_24),
+							Icons.AutoMirrored.Outlined.Redo,
 							stringResource(R.string.activity_css_redo)
 						)
 					}

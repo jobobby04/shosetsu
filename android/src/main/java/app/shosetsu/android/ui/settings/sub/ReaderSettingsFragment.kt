@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Card
@@ -244,7 +245,7 @@ fun ReaderSettingsContent(
 									contentAlignment = Alignment.Center
 								) {
 									Image(
-										painterResource(R.drawable.add_circle_outline),
+										Icons.Outlined.AddCircle,
 										stringResource(R.string.style_add),
 										modifier = Modifier
 											.size(64.dp)

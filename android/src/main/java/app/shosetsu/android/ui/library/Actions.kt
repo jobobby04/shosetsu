@@ -13,6 +13,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material.icons.outlined.Deselect
+import androidx.compose.material.icons.outlined.FlipToBack
+import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material.icons.outlined.UnfoldLess
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -73,7 +76,7 @@ fun InverseSelectionButton(
 		onClick = onClick
 	) {
 		Icon(
-			painterResource(R.drawable.flip_to_back),
+			Icons.Outlined.FlipToBack,
 			stringResource(R.string.inverse_selection)
 		)
 	}
@@ -87,7 +90,7 @@ fun SelectAllButton(
 		onClick = onClick
 	) {
 		Icon(
-			painterResource(R.drawable.select_all),
+			Icons.Outlined.SelectAll,
 			stringResource(R.string.select_all)
 		)
 	}
@@ -119,7 +122,7 @@ fun DeselectAllButton(
 		onClick = onClick
 	) {
 		Icon(
-			painterResource(R.drawable.deselect),
+			Icons.Outlined.Deselect,
 			stringResource(R.string.deselect_all)
 		)
 	}

@@ -45,6 +45,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -297,7 +298,7 @@ fun BrowseContent(
 					Text(stringResource(R.string.filter))
 				},
 				icon = {
-					Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+					Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 				},
 				onClick = onOpenFilter
 			)

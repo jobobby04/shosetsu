@@ -24,6 +24,9 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Badge
@@ -290,7 +293,7 @@ fun LibraryContent(
 						Text(stringResource(R.string.filter))
 					},
 					icon = {
-						Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+						Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 					},
 					onClick = onShowFilterMenu
 				)
@@ -563,7 +566,7 @@ fun LibraryCategory(
 							containerColor = MaterialTheme.colorScheme.secondaryContainer
 						) {
 							Icon(
-								painterResource(R.drawable.ic_baseline_push_pin_24),
+								Icons.Filled.PushPin,
 								stringResource(R.string.pin_on_top),
 								modifier = Modifier.size(16.dp)
 							)

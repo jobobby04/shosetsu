@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.AlertDialog
@@ -340,7 +341,7 @@ fun CategoriesContent(
 								}
 								IconButton(onClick = { onRemove(item) }) {
 									Icon(
-										painterResource(R.drawable.trash),
+										Icons.Filled.Delete,
 										contentDescription = null
 									)
 								}
