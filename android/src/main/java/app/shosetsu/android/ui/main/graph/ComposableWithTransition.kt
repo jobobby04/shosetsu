@@ -46,11 +46,11 @@ inline fun <reified T : Any> NavGraphBuilder.composableMain(
 	deepLinks: List<NavDeepLink> = emptyList(),
 	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
 ) = composable<T>(
-    typeMap = typeMap,
-    deepLinks = deepLinks,
-    content = content,
-    enterTransition = { fadeInX() },
-    exitTransition = { fadeOutX() },
+	typeMap = typeMap,
+	deepLinks = deepLinks,
+	content = content,
+	enterTransition = { fadeInX() },
+	exitTransition = { fadeOutX() },
 )
 
 /**
@@ -64,24 +64,24 @@ inline fun <reified T : Any> NavGraphBuilder.composableMain(
  * @param content composable for the destination
  */
 inline fun <reified T : Any> NavGraphBuilder.composableSub(
-    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
-    deepLinks: List<NavDeepLink> = emptyList(),
-    noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
+	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
+	deepLinks: List<NavDeepLink> = emptyList(),
+	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
 ) = composable<T>(
-    typeMap = typeMap,
-    deepLinks = deepLinks,
-    content = content,
-    enterTransition = { slideInHorizontally(animationSpec = tween(
-        durationMillis = 300
-    )) { it / 20 } + fadeIn(animationSpec = tween(
-        durationMillis = 195,
-        easing = LinearOutSlowInEasing
-    )) },
-    exitTransition = { slideOutHorizontally(animationSpec = tween(
-        durationMillis = 300
-    )) { it / 20 } + fadeOut(animationSpec = tween(
-        durationMillis = 195,
-        easing = FastOutLinearInEasing
-    )) },
-    popEnterTransition = { fadeInX() },
+	typeMap = typeMap,
+	deepLinks = deepLinks,
+	content = content,
+	enterTransition = { slideInHorizontally(animationSpec = tween(
+		durationMillis = 300
+	)) { it / 20 } + fadeIn(animationSpec = tween(
+		durationMillis = 195,
+		easing = LinearOutSlowInEasing
+	)) },
+	exitTransition = { slideOutHorizontally(animationSpec = tween(
+		durationMillis = 300
+	)) { it / 20 } + fadeOut(animationSpec = tween(
+		durationMillis = 195,
+		easing = FastOutLinearInEasing
+	)) },
+	popEnterTransition = { fadeInX() },
 )

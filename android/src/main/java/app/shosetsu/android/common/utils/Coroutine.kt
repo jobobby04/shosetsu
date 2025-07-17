@@ -8,11 +8,11 @@ inline fun <T, R> Flow<T>.transformCatching(
 	crossinline exceptional: suspend FlowCollector<R>.(exception: Throwable) -> Unit,
 	crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
 ): Flow<R> = flow {
-    collect { value ->
-        try {
-            return@collect transform(value)
-        } catch (e: Throwable) {
-            exceptional(e)
-        }
-    }
+	collect { value ->
+		try {
+			return@collect transform(value)
+		} catch (e: Throwable) {
+			exceptional(e)
+		}
+	}
 }

@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.settings
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -9,6 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +23,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
@@ -67,7 +72,7 @@ fun SettingsView(
 }
 
 @Composable
-fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClick: () -> Unit) {
+fun SettingMenuItem(@StringRes title: Int, icon: ImageVector, onClick: () -> Unit) {
 	Box(
 		modifier = Modifier
 			.clickable(onClick = onClick)
@@ -77,7 +82,7 @@ fun SettingMenuItem(@StringRes title: Int, @DrawableRes drawableRes: Int, onClic
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Icon(
-				painterResource(drawableRes),
+				icon,
 				null,
 				modifier = Modifier
 					.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)
@@ -114,15 +119,15 @@ fun SettingsContent(
 		Column(
 			Modifier.padding(paddingValues)
 		) {
-			SettingMenuItem(R.string.view, R.drawable.view_module, navToView)
+			SettingMenuItem(R.string.view, Icons.Filled.ViewModule, navToView)
 
-			SettingMenuItem(R.string.reader, R.drawable.book, navToReader)
+			SettingMenuItem(R.string.reader, Icons.Outlined.Book, navToReader)
 
-			SettingMenuItem(R.string.download, R.drawable.download, navToDownload)
+			SettingMenuItem(R.string.download, Icons.Outlined.Download, navToDownload)
 
-			SettingMenuItem(R.string.update, R.drawable.update, navToUpdate)
+			SettingMenuItem(R.string.update, Icons.Outlined.Update, navToUpdate)
 
-			SettingMenuItem(R.string.advanced, R.drawable.settings, navToAdvanced)
+			SettingMenuItem(R.string.advanced, Icons.Outlined.Settings, navToAdvanced)
 		}
 	}
 }

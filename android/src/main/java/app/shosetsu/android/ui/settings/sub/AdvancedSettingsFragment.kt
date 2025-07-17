@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.webkit.CookieManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +47,7 @@ import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
 import app.shosetsu.android.common.SettingKey.VerifyCheckSum
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
-import app.shosetsu.android.common.ext.ComposeView
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
@@ -63,7 +59,6 @@ import app.shosetsu.android.view.compose.setting.ProxySettingsContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -87,26 +82,6 @@ import kotlinx.coroutines.runBlocking
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-/**
- * Shosetsu
- * 13 / 07 / 2019
- */
-@Deprecated("Composed")
-class AdvancedSettingsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.settings_advanced
-
-	/***/
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun AdvancedSettingsView(
@@ -152,20 +127,10 @@ fun AdvancedSettingsView(
 
 
 	fun themeSelected(position: Int) {
-		scope.launch {
-			val result = hostState.showSnackbar(
-				context.getString(R.string.fragment_settings_advanced_snackbar_ui_change),
-				actionLabel = context.getString(R.string.apply),
-				duration = SnackbarDuration.Indefinite,
-			)
-
-			if (result == SnackbarResult.ActionPerformed) {
-				onBack()
-				launchIO {
-					viewModel.settingsRepo.setInt(AppTheme, position)
-				}
-			}
+		launchIO {
+			viewModel.settingsRepo.setInt(AppTheme, position)
 		}
+		AppThemes.fromKey(position).setAppCompatDelegateThemeMode()
 	}
 
 	LaunchedEffect(workerState) {

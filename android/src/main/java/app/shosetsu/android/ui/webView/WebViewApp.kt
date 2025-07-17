@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -239,7 +240,7 @@ fun WebViewScreen(
 							animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
 						)
 						LinearProgressIndicator(
-							progress = animatedProgress,
+							progress = { animatedProgress },
 							modifier = Modifier
 								.fillMaxWidth()
 								.align(Alignment.BottomCenter),

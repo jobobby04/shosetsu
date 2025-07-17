@@ -1,9 +1,5 @@
 package app.shosetsu.android.ui.more
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -17,8 +13,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.automirrored.outlined.Launch
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.HistoryEdu
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Link
+import androidx.compose.material.icons.outlined.Restore
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.Style
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,16 +42,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.view.controller.ShosetsuFragment
-import app.shosetsu.android.view.controller.base.CollapsedToolBarController
-import app.shosetsu.android.view.controller.base.HomeFragment
 import kotlinx.coroutines.launch
 
 /*
@@ -61,28 +67,6 @@ import kotlinx.coroutines.launch
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-/**
- * shosetsu
- * 12 / 09 / 2020
- *
- * Option for download queue
- */
-@Deprecated("Compose")
-class MoreFragment
-	: ShosetsuFragment(), CollapsedToolBarController, HomeFragment {
-
-	override val viewTitleRes: Int = R.string.more
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun MoreView(
@@ -126,7 +110,7 @@ fun MoreView(
 @Composable
 fun MoreItemContent(
 	@StringRes title: Int,
-	@DrawableRes drawableRes: Int,
+	icon: ImageVector,
 	onClick: () -> Unit
 ) {
 	Box(
@@ -138,7 +122,7 @@ fun MoreItemContent(
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			Icon(
-				painterResource(drawableRes),
+				icon,
 				null,
 				modifier = Modifier
 					.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)
@@ -201,7 +185,7 @@ fun MoreContent(
 					modifier = Modifier.fillMaxWidth()
 				) {
 					Image(
-						painterResource(R.drawable.shou_icon_thick),
+						painterResource(R.drawable.shou_icon),
 						stringResource(R.string.app_name),
 						modifier = Modifier
 							.height(120.dp)
@@ -211,20 +195,20 @@ fun MoreContent(
 				}
 			}
 			item {
-				Divider()
+				HorizontalDivider()
 			}
 			item {
-				MoreItemContent(R.string.downloads, R.drawable.download, onNavToDownloads)
+				MoreItemContent(R.string.downloads, Icons.Outlined.Download, onNavToDownloads)
 			}
 
 			item {
-				MoreItemContent(R.string.backup, R.drawable.restore, onNavToBackup)
+				MoreItemContent(R.string.backup, Icons.Outlined.Restore, onNavToBackup)
 			}
 
 			item {
 				MoreItemContent(
 					R.string.repositories,
-					R.drawable.add_shopping_cart,
+					Icons.Outlined.ShoppingCart,
 					onNavToRepositories
 				)
 			}
@@ -232,19 +216,19 @@ fun MoreContent(
 			item {
 				MoreItemContent(
 					R.string.categories,
-					R.drawable.ic_baseline_label_24,
+					Icons.AutoMirrored.Outlined.Label,
 					onNavToCategories
 				)
 			}
 
 			item {
-				MoreItemContent(R.string.styles, R.drawable.ic_baseline_style_24, showStyleBar)
+				MoreItemContent(R.string.styles, Icons.Outlined.Style, showStyleBar)
 			}
 
 			item {
 				MoreItemContent(
 					R.string.qr_code_scan,
-					R.drawable.ic_baseline_link_24,
+					Icons.Outlined.Link,
 					onNavToAddShare
 				)
 			}
@@ -253,7 +237,7 @@ fun MoreContent(
 			item {
 				MoreItemContent(
 					R.string.fragment_more_dest_analytics,
-					R.drawable.baseline_analytics_24,
+					Icons.Outlined.Analytics,
 					onNavToAnalytics
 				)
 			}
@@ -261,17 +245,17 @@ fun MoreContent(
 			item {
 				MoreItemContent(
 					R.string.fragment_more_dest_history,
-					R.drawable.baseline_history_edu_24,
+					Icons.Outlined.HistoryEdu,
 					onNavToHistory
 				)
 			}
 
 			item {
-				MoreItemContent(R.string.settings, R.drawable.settings, onNavToSettings)
+				MoreItemContent(R.string.settings, Icons.Outlined.Settings, onNavToSettings)
 			}
 
 			item {
-				MoreItemContent(R.string.about, R.drawable.info_outline, onNavToAbout)
+				MoreItemContent(R.string.about, Icons.Outlined.Info, onNavToAbout)
 			}
 		}
 	}

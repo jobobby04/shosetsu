@@ -26,7 +26,7 @@ import android.view.MenuItem
  * @author github.com/doomsdayrs
  *
  * <p>
- *     This file contains random methods/pieces of code that don't seem to be important or make their respective files messy
+ *	 This file contains random methods/pieces of code that don't seem to be important or make their respective files messy
  * </p>
  */
 class SHOWCASE {
@@ -48,7 +48,7 @@ class SHOWCASE {
 /**
  * Demarks a list of items, setting only one to be checked.
  *
- * @param menuItems      Items to sort through
+ * @param menuItems	  Items to sort through
  * @param positionSpared Item to set checked
  * @param demarkAction   Any action to proceed with
  */

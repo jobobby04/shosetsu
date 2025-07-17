@@ -13,30 +13,30 @@ import kotlin.coroutines.resumeWithException
 suspend inline fun <R> ListenableFuture<R>.await(): R {
 	// Mirrors androidx.work.await
 	if (isDone) {
-        try {
-            return get()
-        } catch (e: ExecutionException) {
-            throw e.cause ?: e
-        }
-    }
-    return suspendCancellableCoroutine { continuation ->
-        addListener(
-            {
-                try {
-                    continuation.resume(get())
-                } catch (e: Throwable) {
-                    val cause = e.cause ?: e
-                    when (e) {
-                        is CancellationException -> continuation.cancel(cause)
-                        else -> continuation.resumeWithException(e)
-                    }
-                }
-            },
-            { it.run() }
-        )
+		try {
+			return get()
+		} catch (e: ExecutionException) {
+			throw e.cause ?: e
+		}
+	}
+	return suspendCancellableCoroutine { continuation ->
+		addListener(
+			{
+				try {
+					continuation.resume(get())
+				} catch (e: Throwable) {
+					val cause = e.cause ?: e
+					when (e) {
+						is CancellationException -> continuation.cancel(cause)
+						else -> continuation.resumeWithException(e)
+					}
+				}
+			},
+			{ it.run() }
+		)
 
-        continuation.invokeOnCancellation {
-            cancel(false)
-        }
-    }
+		continuation.invokeOnCancellation {
+			cancel(false)
+		}
+	}
 }

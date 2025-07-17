@@ -140,6 +140,10 @@ fun MainView() {
 		onUpdate = viewModel::update
 	)
 
+	LaunchedEffect(theme) {
+		theme.setAppCompatDelegateThemeMode()
+	}
+
 	ShosetsuTheme(
 		darkTheme = when (theme) {
 			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
@@ -174,7 +178,7 @@ fun MainView() {
 
 				Scaffold(
 					bottomBar = {
-						AnimatedVisibility(isCompact && isMaterial) {
+						if (isCompact && isMaterial) {
 							BottomNavigationBar(
 								destinations,
 								navBackStackEntry,
@@ -200,7 +204,7 @@ fun MainView() {
 							navController,
 							sizeClass,
 							drawerIcon = {
-								AnimatedVisibility(isLegacy) {
+								if (isLegacy) {
 									IconButton(
 										onClick = {
 											scope.launch {

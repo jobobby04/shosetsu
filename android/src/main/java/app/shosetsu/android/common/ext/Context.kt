@@ -38,7 +38,7 @@ import androidx.core.app.NotificationManagerCompat
  *
  * @author github.com/doomsdayrs
  * <p>
- *     I have to admit to copying tachiyomi ;-;
+ *	 I have to admit to copying tachiyomi ;-;
  * </p>
  */
 

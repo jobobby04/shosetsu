@@ -1,6 +1,8 @@
 package app.shosetsu.android.view
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -78,9 +80,7 @@ fun NovelShareMenu(
 						.padding(start = 16.dp)
 				) {
 					Icon(
-						painterResource(
-							R.drawable.ic_baseline_link_24
-						),
+						Icons.Outlined.Link,
 						"",
 						modifier = Modifier.padding(end = 8.dp)
 					)

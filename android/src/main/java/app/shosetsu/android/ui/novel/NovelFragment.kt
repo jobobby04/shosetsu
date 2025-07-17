@@ -34,7 +34,11 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -862,7 +866,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showDownload
 			) {
 				Icon(
-					painterResource(R.drawable.download),
+					Icons.Outlined.Download,
 					stringResource(R.string.fragment_novel_selected_download)
 				)
 			}
@@ -1279,7 +1283,7 @@ fun NovelInfoHeaderContent(
 								horizontalAlignment = Alignment.CenterHorizontally
 							) {
 								Icon(
-									painterResource(R.drawable.ic_baseline_label_24),
+									Icons.AutoMirrored.Outlined.Label,
 									stringResource(R.string.categories),
 									modifier = Modifier.size(20.dp),
 									tint = MaterialTheme.colorScheme.onSurface
@@ -1467,10 +1471,10 @@ fun ExpandedText(
 		}
 
 		Icon(
-			painter = if (!isExpanded) {
-				painterResource(R.drawable.expand_more)
+			imageVector = if (!isExpanded) {
+				Icons.Outlined.ExpandMore
 			} else {
-				painterResource(R.drawable.expand_less)
+				Icons.Outlined.ExpandLess
 			},
 			contentDescription = if (!isExpanded) {
 				stringResource(R.string.more)

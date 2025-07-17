@@ -142,8 +142,8 @@ abstract class AChapterReaderViewModel :
 
 
 	/**
-	 * false    -> vertical paging
-	 * true     -> horizontal paging
+	 * false	-> vertical paging
+	 * true	 -> horizontal paging
 	 */
 	abstract val isHorizontalReading: StateFlow<Boolean>
 

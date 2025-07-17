@@ -107,103 +107,103 @@ abstract class ShosetsuCssViewModelComponent {
 					this["--md-sys-color-$name"] = color.toArgb().cssColor()
 				}
 				it.colorScheme.run {
-				    color("primary", primary)
-                    color("surface-tint", surfaceTint)
-                    color("on-primary", onPrimary)
-                    color("primary-container", primaryContainer)
-                    color("on-primary-container", onPrimaryContainer)
-                    color("secondary", secondary)
-                    color("on-secondary", onSecondary)
-                    color("secondary-container", secondaryContainer)
-                    color("on-secondary-container", onSecondaryContainer)
-                    color("tertiary", tertiary)
-                    color("on-tertiary", onTertiary)
-                    color("tertiary-container", tertiaryContainer)
-                    color("on-tertiary-container", onTertiaryContainer)
-                    color("error", error)
-                    color("on-error", onError)
-                    color("error-container", errorContainer)
-                    color("on-error-container", onErrorContainer)
-                    color("background", background)
-                    color("on-background", onBackground)
-                    color("surface", surface)
-                    color("on-surface", onSurface)
-                    color("surface-variant", surfaceVariant)
-                    color("on-surface-variant", onSurfaceVariant)
-                    color("outline", outline)
-                    color("outline-variant", outlineVariant)
-                    color("shadow", scrim) // doesn't exist in ColorScheme
-                    color("scrim", scrim)
-                    color("inverse-surface", inverseSurface)
-                    color("inverse-on-surface", inverseOnSurface)
-                    color("inverse-primary", inversePrimary)
-                    color("primary-fixed", primary) // doesn't exist in ColorScheme
-                    color("on-primary-fixed", onPrimary) // doesn't exist in ColorScheme
-                    color("primary-fixed-dim", primary) // doesn't exist in ColorScheme
-                    color("on-primary-fixed-variant", onPrimary) // doesn't exist in ColorScheme
-                    color("secondary-fixed", secondary) // doesn't exist in ColorScheme
-                    color("on-secondary-fixed", onSecondary) // doesn't exist in ColorScheme
-                    color("secondary-fixed-dim", secondary) // doesn't exist in ColorScheme
-                    color("on-secondary-fixed-variant", onSecondary) // doesn't exist in ColorScheme
-                    color("tertiary-fixed", tertiary) // doesn't exist in ColorScheme
-                    color("on-tertiary-fixed", onTertiary) // doesn't exist in ColorScheme
-                    color("tertiary-fixed-dim", tertiary) // doesn't exist in ColorScheme
-                    color("on-tertiary-fixed-variant", onTertiary) // doesn't exist in ColorScheme
-                    color("surface-dim", surfaceDim)
-                    color("surface-bright", surfaceBright)
-                    color("surface-container-lowest", surfaceContainerLowest)
-                    color("surface-container-low", surfaceContainerLow)
-                    color("surface-container", surfaceContainer)
-                    color("surface-container-high", surfaceContainerHigh)
-                    color("surface-container-highest", surfaceContainerHighest)
-                }
-            }
+					color("primary", primary)
+					color("surface-tint", surfaceTint)
+					color("on-primary", onPrimary)
+					color("primary-container", primaryContainer)
+					color("on-primary-container", onPrimaryContainer)
+					color("secondary", secondary)
+					color("on-secondary", onSecondary)
+					color("secondary-container", secondaryContainer)
+					color("on-secondary-container", onSecondaryContainer)
+					color("tertiary", tertiary)
+					color("on-tertiary", onTertiary)
+					color("tertiary-container", tertiaryContainer)
+					color("on-tertiary-container", onTertiaryContainer)
+					color("error", error)
+					color("on-error", onError)
+					color("error-container", errorContainer)
+					color("on-error-container", onErrorContainer)
+					color("background", background)
+					color("on-background", onBackground)
+					color("surface", surface)
+					color("on-surface", onSurface)
+					color("surface-variant", surfaceVariant)
+					color("on-surface-variant", onSurfaceVariant)
+					color("outline", outline)
+					color("outline-variant", outlineVariant)
+					color("shadow", scrim) // doesn't exist in ColorScheme
+					color("scrim", scrim)
+					color("inverse-surface", inverseSurface)
+					color("inverse-on-surface", inverseOnSurface)
+					color("inverse-primary", inversePrimary)
+					color("primary-fixed", primary) // doesn't exist in ColorScheme
+					color("on-primary-fixed", onPrimary) // doesn't exist in ColorScheme
+					color("primary-fixed-dim", primary) // doesn't exist in ColorScheme
+					color("on-primary-fixed-variant", onPrimary) // doesn't exist in ColorScheme
+					color("secondary-fixed", secondary) // doesn't exist in ColorScheme
+					color("on-secondary-fixed", onSecondary) // doesn't exist in ColorScheme
+					color("secondary-fixed-dim", secondary) // doesn't exist in ColorScheme
+					color("on-secondary-fixed-variant", onSecondary) // doesn't exist in ColorScheme
+					color("tertiary-fixed", tertiary) // doesn't exist in ColorScheme
+					color("on-tertiary-fixed", onTertiary) // doesn't exist in ColorScheme
+					color("tertiary-fixed-dim", tertiary) // doesn't exist in ColorScheme
+					color("on-tertiary-fixed-variant", onTertiary) // doesn't exist in ColorScheme
+					color("surface-dim", surfaceDim)
+					color("surface-bright", surfaceBright)
+					color("surface-container-lowest", surfaceContainerLowest)
+					color("surface-container-low", surfaceContainerLow)
+					color("surface-container", surfaceContainer)
+					color("surface-container-high", surfaceContainerHigh)
+					color("surface-container-highest", surfaceContainerHighest)
+				}
+			}
 
-            setShosetsuStyle("body") {
-                this["background-color"] = it.backgroundColor.cssColor()
-                this["color"] = it.foregroundColor.cssColor()
-                this["font-size"] = "${it.textSize / HTML_SIZE_DIVISION}pt"
-                this["scroll-behavior"] = "smooth"
-                this["text-indent"] = "${it.indentSize}em"
-                this["overflow-wrap"] = "break-word"
-                this["padding"] = "0.5em" // ensure everything stays away from the edge
-            }
+			setShosetsuStyle("body") {
+				this["background-color"] = it.backgroundColor.cssColor()
+				this["color"] = it.foregroundColor.cssColor()
+				this["font-size"] = "${it.textSize / HTML_SIZE_DIVISION}pt"
+				this["scroll-behavior"] = "smooth"
+				this["text-indent"] = "${it.indentSize}em"
+				this["overflow-wrap"] = "break-word"
+				this["padding"] = "0.5em" // ensure everything stays away from the edge
+			}
 
-            setShosetsuStyle("p") {
-                this["margin-top"] = "${it.paragraphSpacing}em"
-            }
+			setShosetsuStyle("p") {
+				this["margin-top"] = "${it.paragraphSpacing}em"
+			}
 
-            setShosetsuStyle("img") {
-                this["max-width"] = "100%"
-                this["height"] = "initial !important"
-            }
+			setShosetsuStyle("img") {
+				this["max-width"] = "100%"
+				this["height"] = "initial !important"
+			}
 
-            setShosetsuStyle(".tts-border-style") {
-                this["border"] = "2px solid red"
-            }
+			setShosetsuStyle(".tts-border-style") {
+				this["border"] = "2px solid red"
+			}
 
-            if (it.tableHackEnabled)
-                setShosetsuStyle("table") {
-                    this["overflow-x"] = "auto"
-                    this["display"] = "block"
-                    this["white-space"] = "nowrap"
-                }
+			if (it.tableHackEnabled)
+				setShosetsuStyle("table") {
+					this["overflow-x"] = "auto"
+					this["display"] = "block"
+					this["white-space"] = "nowrap"
+				}
 
-            shosetsuStyle.map { elem ->
-                "${elem.key} {" + elem.value.map { rule -> "${rule.key}:${rule.value}" }
-                    .joinToString(";", postfix = ";") + "}"
-            }.joinToString("")
-        }.onIO()
-    }
+			shosetsuStyle.map { elem ->
+				"${elem.key} {" + elem.value.map { rule -> "${rule.key}:${rule.value}" }
+					.joinToString(";", postfix = ";") + "}"
+			}.joinToString("")
+		}.onIO()
+	}
 
-    data class ShosetsuCSSBuilder(
-        val backgroundColor: Int = Color.WHITE,
-        val foregroundColor: Int = Color.BLACK,
-        val textSize: Float = ReaderTextSize.default,
-        val indentSize: Int = ReaderIndentSize.default,
-        val paragraphSpacing: Float = ReaderParagraphSpacing.default,
-        val tableHackEnabled: Boolean = ReaderTableHack.default,
-        val disableTextSelection: Boolean = ReaderDisableTextSelection.default,
-        val colorScheme: ColorScheme = FallbackColorScheme,
-    )
+	data class ShosetsuCSSBuilder(
+		val backgroundColor: Int = Color.WHITE,
+		val foregroundColor: Int = Color.BLACK,
+		val textSize: Float = ReaderTextSize.default,
+		val indentSize: Int = ReaderIndentSize.default,
+		val paragraphSpacing: Float = ReaderParagraphSpacing.default,
+		val tableHackEnabled: Boolean = ReaderTableHack.default,
+		val disableTextSelection: Boolean = ReaderDisableTextSelection.default,
+		val colorScheme: ColorScheme = FallbackColorScheme,
+	)
 }

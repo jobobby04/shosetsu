@@ -42,7 +42,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ManageSearch
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Card
@@ -272,7 +275,7 @@ fun BrowseContent(
 						onSearch = onSetQuery,
 						icon = {
 							Icon(
-								painterResource(R.drawable.baseline_manage_search_24),
+								Icons.AutoMirrored.Outlined.ManageSearch,
 								stringResource(R.string.search)
 							)
 						}
@@ -487,7 +490,7 @@ fun BrowseExtensionContent(
 								else install(item.installOptions[0])
 							}
 						) {
-							Icon(painterResource(R.drawable.download), null)
+							Icon(Icons.Outlined.Download, null)
 						}
 						DropdownMenu(
 							expanded = isDropdownVisible,
@@ -520,7 +523,7 @@ fun BrowseExtensionContent(
 							onClick = update
 						) {
 							Icon(
-								painterResource(R.drawable.download),
+								Icons.Outlined.Download,
 								stringResource(R.string.update),
 								modifier = Modifier.rotate(180f),
 								tint = MaterialTheme.colorScheme.tertiary
@@ -533,7 +536,7 @@ fun BrowseExtensionContent(
 							onClick = openSettings
 						) {
 							Icon(
-								painterResource(R.drawable.settings),
+								Icons.Outlined.Settings,
 								stringResource(R.string.settings)
 							)
 						}
