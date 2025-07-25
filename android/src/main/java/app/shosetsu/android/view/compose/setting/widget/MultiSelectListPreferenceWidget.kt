@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -15,14 +16,14 @@ import androidx.compose.ui.window.DialogProperties
 import app.shosetsu.android.view.compose.LabeledCheckbox
 
 @Composable
-fun <T> MultiSelectListPreferenceWidget(
-	title: String,
-	subtitle: String,
-	icon: ImageVector? = null,
-	possibleValues: List<T>,
-	selectedValues: Set<T>,
-	stringify: @Composable (T) -> String,
-	onValuesChange: (Set<T>) -> Unit,
+inline fun <reified T> MultiSelectListPreferenceWidget(
+    title: String,
+    subtitle: String,
+    icon: ImageVector? = null,
+    possibleValues: List<T>,
+    selectedValues: Set<T>,
+    crossinline stringify: @Composable (T) -> String,
+    crossinline onValuesChange: (Set<T>) -> Unit,
 ) {
 	var isDialogShown by remember { mutableStateOf(false) }
 
@@ -34,7 +35,7 @@ fun <T> MultiSelectListPreferenceWidget(
 	)
 
 	if (isDialogShown) {
-		val selected = selectedValues.toMutableSet()
+		val selected = remember { mutableStateListOf(*selectedValues.toTypedArray()) }
 		AlertDialog(
 			onDismissRequest = { isDialogShown = false },
 			title = { Text(text = title) },
