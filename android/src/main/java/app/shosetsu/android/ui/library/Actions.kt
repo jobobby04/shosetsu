@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
@@ -151,8 +152,8 @@ fun LibrarySelectedMoreButton(
 			}
 		) {
 			Icon(
-				painterResource(R.drawable.unfold_less),
-				stringResource(R.string.select_between)
+				Icons.Default.MoreVert,
+				stringResource(R.string.more)
 			)
 		}
 		DropdownMenu(
