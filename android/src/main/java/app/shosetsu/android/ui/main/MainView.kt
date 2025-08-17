@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
@@ -45,6 +43,7 @@ import app.shosetsu.android.ui.main.Destination.More
 import app.shosetsu.android.ui.main.Destination.Updates
 import app.shosetsu.android.ui.main.graph.mainGraph
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
 import kotlinx.coroutines.launch
 
@@ -201,18 +200,15 @@ fun MainView() {
 							sizeClass,
 							drawerIcon = {
 								AnimatedVisibility(isLegacy) {
-									IconButton(
+									SimpleIconButton(
+										Icons.Default.Menu,
+										stringResource(R.string.navigation_drawer_open),
 										onClick = {
 											scope.launch {
 												drawerState.open()
 											}
 										}
-									) {
-										Icon(
-											Icons.Default.Menu,
-											stringResource(R.string.navigation_drawer_open)
-										)
-									}
+									)
 								}
 							}
 						)

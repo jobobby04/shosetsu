@@ -15,8 +15,6 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -33,12 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.NovelCardType
+import app.shosetsu.android.view.compose.SimpleIconButton
 
 /*
  * This file is part of shosetsu.
@@ -68,42 +68,33 @@ import app.shosetsu.android.common.enums.NovelCardType
 fun InverseSelectionButton(
 	onClick: () -> Unit
 ) {
-	IconButton(
+	SimpleIconButton(
+		painterResource(R.drawable.flip_to_back),
+		stringResource(R.string.inverse_selection),
 		onClick = onClick
-	) {
-		Icon(
-			painterResource(R.drawable.flip_to_back),
-			stringResource(R.string.inverse_selection)
-		)
-	}
+	)
 }
 
 @Composable
 fun SelectAllButton(
 	onClick: () -> Unit
 ) {
-	IconButton(
+	SimpleIconButton(
+		painterResource(R.drawable.select_all),
+		stringResource(R.string.select_all),
 		onClick = onClick
-	) {
-		Icon(
-			painterResource(R.drawable.select_all),
-			stringResource(R.string.select_all)
-		)
-	}
+	)
 }
 
 @Composable
 fun RemoveAllButton(
 	onClick: () -> Unit
 ) {
-	IconButton(
+	SimpleIconButton(
+		Icons.Default.Delete,
+		stringResource(R.string.remove),
 		onClick = onClick
-	) {
-		Icon(
-			Icons.Default.Delete,
-			stringResource(R.string.remove)
-		)
-	}
+	)
 }
 
 // Migrate is in more
@@ -114,28 +105,22 @@ fun RemoveAllButton(
 fun DeselectAllButton(
 	onClick: () -> Unit
 ) {
-	IconButton(
+	SimpleIconButton(
+		painterResource(R.drawable.deselect),
+		stringResource(R.string.deselect_all),
 		onClick = onClick
-	) {
-		Icon(
-			painterResource(R.drawable.deselect),
-			stringResource(R.string.deselect_all)
-		)
-	}
+	)
 }
 
 @Composable
 fun SelectBetweenButton(
 	onClick: () -> Unit
 ) {
-	IconButton(
+	SimpleIconButton(
+		painterResource(R.drawable.unfold_less),
+		stringResource(R.string.select_between),
 		onClick = onClick
-	) {
-		Icon(
-			painterResource(R.drawable.unfold_less),
-			stringResource(R.string.select_between)
-		)
-	}
+	)
 }
 
 @Composable
@@ -146,16 +131,13 @@ fun LibrarySelectedMoreButton(
 ) {
 	Box {
 		var showDropDown by remember { mutableStateOf(false) }
-		IconButton(
+		SimpleIconButton(
+			Icons.Default.MoreVert,
+			stringResource(R.string.more),
 			onClick = {
 				showDropDown = !showDropDown
 			}
-		) {
-			Icon(
-				Icons.Default.MoreVert,
-				stringResource(R.string.more)
-			)
-		}
+		)
 		DropdownMenu(
 			showDropDown,
 			onDismissRequest = {
@@ -212,9 +194,7 @@ fun SearchAction(
 	onSearch: (String) -> Unit,
 	immediateSearch: Boolean = false,
 	onSetExpanded: (Boolean) -> Unit = {},
-	icon: @Composable () -> Unit = {
-		Icon(Icons.Default.Search, stringResource(R.string.search))
-	}
+	icon: ImageVector = Icons.Default.Search,
 ) {
 	var expanded by remember { mutableStateOf(query.isNotEmpty()) }
 	var searchQuery by remember { mutableStateOf(query) }
@@ -239,7 +219,9 @@ fun SearchAction(
 	Row(
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		IconButton(
+		SimpleIconButton(
+			if (expanded) Icons.Default.ArrowBack else icon,
+			if (expanded) stringResource(android.R.string.cancel) else stringResource(android.R.string.search_go),
 			onClick = {
 				if (expanded) {
 					searchQuery = ""
@@ -247,13 +229,7 @@ fun SearchAction(
 				}
 				expanded = !expanded
 			}
-		) {
-			if (expanded) {
-				Icon(Icons.Default.ArrowBack, stringResource(android.R.string.cancel))
-			} else {
-				icon()
-			}
-		}
+		)
 
 		if (expanded) {
 			LaunchedEffect(focusManager) {
@@ -314,45 +290,40 @@ fun ViewTypeButton(
 	selectedType: NovelCardType,
 	onSetType: (NovelCardType) -> Unit,
 ) {
-	Box {
-		var showDropDown by remember { mutableStateOf(false) }
-		IconButton(
-			onClick = {
-				showDropDown = !showDropDown
-			}
-		) {
-			Icon(
-				painterResource(R.drawable.view_module),
-				stringResource(R.string.novel_card_type_selector_title)
-			)
+	var showDropDown by remember { mutableStateOf(false) }
+	SimpleIconButton(
+		painterResource(R.drawable.view_module),
+		stringResource(R.string.novel_card_type_selector_title),
+		onClick = {
+			showDropDown = !showDropDown
 		}
-		DropdownMenu(
-			showDropDown,
-			onDismissRequest = {
-				showDropDown = false
-			}
-		) {
-			ViewTypeItem(
-				stringResource(R.string.normal),
-				NovelCardType.NORMAL,
-				selectedType,
-				onSetType
-			)
-
-			ViewTypeItem(
-				stringResource(R.string.compressed),
-				NovelCardType.COMPRESSED,
-				selectedType,
-				onSetType
-			)
-
-			ViewTypeItem(
-				stringResource(R.string.cozy),
-				NovelCardType.COZY,
-				selectedType,
-				onSetType
-			)
+	)
+	DropdownMenu(
+		showDropDown,
+		onDismissRequest = {
+			showDropDown = false
 		}
+	) {
+		ViewTypeItem(
+			stringResource(R.string.normal),
+			NovelCardType.NORMAL,
+			selectedType,
+			onSetType
+		)
+
+		ViewTypeItem(
+			stringResource(R.string.compressed),
+			NovelCardType.COMPRESSED,
+			selectedType,
+			onSetType
+		)
+
+		ViewTypeItem(
+			stringResource(R.string.cozy),
+			NovelCardType.COZY,
+			selectedType,
+			onSetType
+		)
 	}
 }
 
@@ -360,12 +331,9 @@ fun ViewTypeButton(
 fun RefreshButton(
 	onRefresh: () -> Unit
 ) {
-	IconButton(
+	SimpleIconButton(
+		Icons.Default.Refresh,
+		stringResource(R.string.update_now),
 		onClick = onRefresh
-	) {
-		Icon(
-			Icons.Default.Refresh,
-			stringResource(R.string.update_now)
-		)
-	}
+	)
 }

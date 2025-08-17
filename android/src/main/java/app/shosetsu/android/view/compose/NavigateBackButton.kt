@@ -2,8 +2,6 @@ package app.shosetsu.android.view.compose
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
@@ -33,7 +31,5 @@ import app.shosetsu.android.R
  */
 @Composable
 fun NavigateBackButton(onBack: () -> Unit) {
-	IconButton(onBack) {
-		Icon(Icons.Default.ArrowBack, stringResource(R.string.icon_desc_back))
-	}
+	SimpleIconButton(Icons.Default.ArrowBack, stringResource(R.string.icon_desc_back), onBack)
 }

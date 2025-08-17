@@ -11,8 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -24,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.DiscreteSlider
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -59,76 +58,74 @@ fun ChapterReaderBottomSheetContent(
 		horizontalArrangement = Arrangement.SpaceBetween,
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		IconButton(onClick = exit) {
-			Icon(Icons.Filled.ArrowBack, null)
-		}
+		SimpleIconButton(Icons.Filled.ArrowBack, null, onClick = exit)
 
 		Row {
-			IconButton(onClick = toggleFocus) {
-				Icon(
-					painterResource(R.drawable.ic_baseline_visibility_off_24),
-					null
-				)
-			}
-			IconButton(onClick = toggleBookmark) {
-				Icon(
-					painterResource(
-						if (!isBookmarked) {
-							R.drawable.empty_bookmark
-						} else {
-							R.drawable.filled_bookmark
-						}
-					),
-					null
-				)
-			}
+			SimpleIconButton(
+				painterResource(R.drawable.ic_baseline_visibility_off_24),
+				null,
+				onClick = toggleFocus
+			)
+			SimpleIconButton(
+				painterResource(
+					if (!isBookmarked) {
+						R.drawable.empty_bookmark
+					} else {
+						R.drawable.filled_bookmark
+					}
+				),
+				null,
+				onClick = toggleBookmark
+			)
 
-			IconButton(onClick = toggleRotationLock) {
-				Icon(
-					painterResource(
-						if (!isRotationLocked)
-							R.drawable.ic_baseline_screen_rotation_24
-						else R.drawable.ic_baseline_screen_lock_rotation_24
-					),
-					null
-				)
-			}
+			SimpleIconButton(
+				painterResource(
+					if (!isRotationLocked)
+						R.drawable.ic_baseline_screen_rotation_24
+					else R.drawable.ic_baseline_screen_lock_rotation_24
+				),
+				null,
+				onClick = toggleRotationLock
+			)
 
 			if (ttsPlayback != TTSPlayback.Playing)
-				IconButton(onClick = onPlayTTS) {
-					Icon(
-						painterResource(R.drawable.ic_baseline_audiotrack_24),
-						null
-					)
-				}
+				SimpleIconButton(
+					painterResource(R.drawable.ic_baseline_audiotrack_24),
+					null,
+					onClick = onPlayTTS
+				)
 
 			if (ttsPlayback == TTSPlayback.Playing)
-				IconButton(onClick = onPauseTTS) {
-					Icon(
-						painterResource(R.drawable.ic_pause_circle_outline_24dp),
-						null
-					)
-				}
+				SimpleIconButton(
+					painterResource(R.drawable.ic_pause_circle_outline_24dp),
+					null,
+					onClick = onPauseTTS
+				)
 
 			if (ttsPlayback != TTSPlayback.Stopped)
-				IconButton(onClick = onStopTTS) {
-					Icon(
-						painterResource(R.drawable.ic_baseline_stop_circle_24),
-						null
-					)
-				}
+				SimpleIconButton(
+					painterResource(R.drawable.ic_baseline_stop_circle_24),
+					null,
+					onClick = onStopTTS
+				)
 
 			if (onShowNavigation != null) {
-				IconButton(onClick = onShowNavigation) {
-					Icon(
-						painterResource(R.drawable.unfold_less),
-						null
-					)
-				}
+				SimpleIconButton(
+					painterResource(R.drawable.unfold_less),
+					null,
+					onClick = onShowNavigation
+				)
 			}
 		}
 
-		IconButton(onClick = {
+		SimpleIconButton(
+			if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+				painterResource(R.drawable.expand_more)
+			} else {
+				painterResource(R.drawable.expand_less)
+			},
+			null,
+			onClick = {
 			coroutineScope.launch {
 				if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
 					scaffoldState.bottomSheetState.expand()
@@ -136,16 +133,7 @@ fun ChapterReaderBottomSheetContent(
 					scaffoldState.bottomSheetState.partialExpand()
 				}
 			}
-		}) {
-			Icon(
-				if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
-					painterResource(R.drawable.expand_more)
-				} else {
-					painterResource(R.drawable.expand_less)
-				},
-				null
-			)
-		}
+		})
 	}
 
 	LazyColumn(

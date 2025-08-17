@@ -45,7 +45,6 @@ import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -102,6 +101,7 @@ import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.LongClickTextButton
 import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.NovelSettingUI
@@ -857,60 +857,42 @@ fun BoxScope.ChapterSelectionBar(
 			.align(BiasAlignment(0f, 0.7f))
 	) {
 		Row {
-			IconButton(
+			SimpleIconButton(
+				painterResource(R.drawable.download),
+				stringResource(R.string.fragment_novel_selected_download),
 				onClick = downloadSelected,
 				enabled = selectedChaptersState.showDownload
-			) {
-				Icon(
-					painterResource(R.drawable.download),
-					stringResource(R.string.fragment_novel_selected_download)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				painterResource(R.drawable.trash),
+				stringResource(R.string.fragment_novel_selected_delete),
 				onClick = deleteSelected,
 				enabled = selectedChaptersState.showDelete
-			) {
-				Icon(
-					painterResource(R.drawable.trash),
-					stringResource(R.string.fragment_novel_selected_delete)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				painterResource(R.drawable.read_mark),
+				stringResource(R.string.fragment_novel_selected_read),
 				onClick = markSelectedAsRead,
 				enabled = selectedChaptersState.showMarkAsRead
-			) {
-				Icon(
-					painterResource(R.drawable.read_mark),
-					stringResource(R.string.fragment_novel_selected_read)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				painterResource(R.drawable.unread_mark),
+				stringResource(R.string.fragment_novel_selected_unread),
 				onClick = markSelectedAsUnread,
 				enabled = selectedChaptersState.showMarkAsUnread
-			) {
-				Icon(
-					painterResource(R.drawable.unread_mark),
-					stringResource(R.string.fragment_novel_selected_unread)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				painterResource(R.drawable.ic_outline_bookmark_add_24),
+				stringResource(R.string.fragment_novel_selected_bookmark),
 				onClick = bookmarkSelected,
 				enabled = selectedChaptersState.showBookmark
-			) {
-				Icon(
-					painterResource(R.drawable.ic_outline_bookmark_add_24),
-					stringResource(R.string.fragment_novel_selected_bookmark)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				painterResource(R.drawable.ic_baseline_bookmark_remove_24),
+				stringResource(R.string.fragment_novel_selected_unbookmark),
 				onClick = unbookmarkSelected,
 				enabled = selectedChaptersState.showRemoveBookmark
-			) {
-				Icon(
-					painterResource(R.drawable.ic_baseline_bookmark_remove_24),
-					stringResource(R.string.fragment_novel_selected_unbookmark)
-				)
-			}
+			)
 		}
 	}
 }

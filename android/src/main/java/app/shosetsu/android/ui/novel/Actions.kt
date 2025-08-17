@@ -1,13 +1,10 @@
 package app.shosetsu.android.ui.novel
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
+import app.shosetsu.android.view.compose.SimpleIconButton
 
 /*
  * This file is part of shosetsu.
@@ -49,31 +47,26 @@ fun NovelSelectedMoreButton(
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 
-	Box {
-		IconButton(
-			onClick = {
-				showDropDown = true
-			}
+	SimpleIconButton(
+		Icons.Default.MoreVert,
+		stringResource(R.string.more),
+		onClick = {
+			showDropDown = true
+		}
+	)
+
+	if (showTrueDelete)
+		DropdownMenu(
+			expanded = showDropDown,
+			onDismissRequest = { showDropDown = false },
 		) {
-			Icon(
-				Icons.Default.MoreVert,
-				stringResource(R.string.more)
+			DropdownMenuItem(
+				text = {
+					Text(stringResource(R.string.fragment_novel_true_delete))
+				},
+				onClick = onTrueDelete
 			)
 		}
-
-		if (showTrueDelete)
-			DropdownMenu(
-				expanded = showDropDown,
-				onDismissRequest = { showDropDown = false },
-			) {
-				DropdownMenuItem(
-					text = {
-						Text(stringResource(R.string.fragment_novel_true_delete))
-					},
-					onClick = onTrueDelete
-				)
-			}
-	}
 }
 
 @Composable
@@ -87,62 +80,57 @@ fun NovelDownloadButton(
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 
-	Box {
-		IconButton(
-			onClick = {
-				showDropDown = true
-			}
-		) {
-			Icon(
-				painterResource(R.drawable.download),
-				stringResource(R.string.download)
-			)
+	SimpleIconButton(
+		painterResource(R.drawable.download),
+		stringResource(R.string.download),
+		onClick = {
+			showDropDown = true
 		}
+	)
 
-		DropdownMenu(showDropDown,
-			onDismissRequest = { showDropDown = false }) {
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.download_next_chapter))
-				},
-				onClick = onDownloadNext
-			)
+	DropdownMenu(showDropDown,
+		onDismissRequest = { showDropDown = false }) {
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.download_next_chapter))
+			},
+			onClick = onDownloadNext
+		)
 
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.download_next_5_chapters))
-				},
-				onClick = onDownloadNext5
-			)
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.download_next_5_chapters))
+			},
+			onClick = onDownloadNext5
+		)
 
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.download_next_10_chapters))
-				},
-				onClick = onDownloadNext10
-			)
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.download_next_10_chapters))
+			},
+			onClick = onDownloadNext10
+		)
 
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.download_custom_chapters))
-				},
-				onClick = onDownloadCustom
-			)
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.download_custom_chapters))
+			},
+			onClick = onDownloadCustom
+		)
 
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.unread))
-				},
-				onClick = onDownloadUnread
-			)
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.unread))
+			},
+			onClick = onDownloadUnread
+		)
 
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.all))
-				},
-				onClick = onDownloadAll
-			)
-		}
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.all))
+			},
+			onClick = onDownloadAll
+		)
 	}
 }
 
@@ -156,43 +144,38 @@ fun NovelMoreButton(
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 
-	Box {
-		IconButton(
-			onClick = {
-				showDropDown = true
-			}
-		) {
-			Icon(
-				Icons.Default.MoreVert,
-				stringResource(R.string.more)
-			)
+	SimpleIconButton(
+		Icons.Default.MoreVert,
+		stringResource(R.string.more),
+		onClick = {
+			showDropDown = true
 		}
+	)
 
-		DropdownMenu(showDropDown,
-			onDismissRequest = { showDropDown = false }) {
-			if (canMigrate)
-				DropdownMenuItem(
-					text = {
-						Text(stringResource(R.string.migrate_source))
-					},
-					onClick = onMigrate
-				)
-
+	DropdownMenu(showDropDown,
+		onDismissRequest = { showDropDown = false }) {
+		if (canMigrate)
 			DropdownMenuItem(
 				text = {
-					Text(stringResource(R.string.jump_to_chapter))
+					Text(stringResource(R.string.migrate_source))
 				},
-				onClick = onJump
+				onClick = onMigrate
 			)
 
-			if (hasCategories)
-				DropdownMenuItem(
-					text = {
-						Text(stringResource(R.string.set_categories))
-					},
-					onClick = onSetCategories
-				)
-		}
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.jump_to_chapter))
+			},
+			onClick = onJump
+		)
+
+		if (hasCategories)
+			DropdownMenuItem(
+				text = {
+					Text(stringResource(R.string.set_categories))
+				},
+				onClick = onSetCategories
+			)
 	}
 }
 
@@ -201,14 +184,9 @@ fun NovelMoreButton(
 fun NovelShareButton(
 	onShare: () -> Unit,
 ) {
-	Box {
-		IconButton(
-			onClick = onShare
-		) {
-			Icon(
-				Icons.Default.Share,
-				stringResource(R.string.share)
-			)
-		}
-	}
+	SimpleIconButton(
+		Icons.Default.Share,
+		stringResource(R.string.share),
+		onClick = onShare
+	)
 }
