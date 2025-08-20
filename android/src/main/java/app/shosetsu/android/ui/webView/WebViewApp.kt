@@ -34,6 +34,7 @@ import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import com.google.accompanist.web.*
 import org.kodein.di.DI
@@ -159,44 +160,35 @@ fun WebViewScreen(
 						)
 					},
 					navigationIcon = {
-						IconButton(onClick = onUp) {
-							Icon(imageVector = Icons.Default.Close, contentDescription = null)
-						}
+						SimpleIconButton(Icons.Default.Close, description = null, onClick = onUp)
 					},
 					actions = {
-						IconButton(
+						SimpleIconButton(
+							Icons.Default.ArrowBack,
+							description = stringResource(R.string.action_webview_back),
 							onClick = {
 								if (navigator.canGoBack) {
 									navigator.navigateBack()
 								}
 							},
 							enabled = navigator.canGoBack,
-						) {
-							Icon(
-								imageVector = Icons.Default.ArrowBack,
-								contentDescription = stringResource(R.string.action_webview_back)
-							)
-						}
-						IconButton(
+						)
+						SimpleIconButton(
+							Icons.Default.ArrowForward,
+							description = stringResource(R.string.action_webview_forward),
 							onClick = {
 								if (navigator.canGoForward) {
 									navigator.navigateForward()
 								}
 							},
 							enabled = navigator.canGoForward,
-						) {
-							Icon(
-								imageVector = Icons.Default.ArrowForward,
-								contentDescription = stringResource(R.string.action_webview_forward)
-							)
-						}
+						)
 						var overflow by remember { mutableStateOf(false) }
-						IconButton(onClick = { overflow = !overflow }) {
-							Icon(
-								Icons.Default.MoreVert,
-								contentDescription = stringResource(R.string.more)
-							)
-						}
+						SimpleIconButton(
+							Icons.Default.MoreVert,
+							description = stringResource(R.string.more),
+							onClick = { overflow = !overflow }
+						)
 						DropdownMenu(expanded = overflow, onDismissRequest = { overflow = false }) {
 							DropdownMenuItem(onClick = { navigator.reload(); overflow = false },
 								text = {

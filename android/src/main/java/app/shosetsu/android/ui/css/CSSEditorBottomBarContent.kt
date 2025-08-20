@@ -19,7 +19,6 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.view.compose.SimpleIconButton
 
 @Preview
 @Composable
@@ -102,22 +102,19 @@ fun CSSEditorBottomBarContent(
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					IconButton(onClick = onUndo, enabled = canUndo) {
-						Icon(
-							Icons.AutoMirrored.Outlined.Undo,
-							stringResource(R.string.activity_css_undo)
-						)
-					}
+					SimpleIconButton(
+						Icons.AutoMirrored.Outlined.Undo,
+						stringResource(R.string.activity_css_undo),
+						onClick = onUndo,
+						enabled = canUndo
+					)
 
-					IconButton(
+					SimpleIconButton(
+						painterResource(androidx.appcompat.R.drawable.abc_ic_menu_paste_mtrl_am_alpha),
+						stringResource(R.string.activity_css_paste),
 						onClick = onPaste, enabled = hasPaste,
 						modifier = Modifier.padding(start = 8.dp)
-					) {
-						Icon(
-							painterResource(androidx.appcompat.R.drawable.abc_ic_menu_paste_mtrl_am_alpha),
-							stringResource(R.string.activity_css_paste)
-						)
-					}
+					)
 				}
 
 				val shapes = MaterialTheme.shapes
@@ -138,21 +135,17 @@ fun CSSEditorBottomBarContent(
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					IconButton(
+					SimpleIconButton(
+						Icons.Filled.SaveAlt,
+						stringResource(R.string.activity_css_export),
 						onClick = onExport, enabled = false,
 						modifier = Modifier.padding(end = 8.dp)
-					) {
-						Icon(
-							Icons.Filled.SaveAlt,
-							stringResource(R.string.activity_css_export)
-						)
-					}
-					IconButton(onClick = onRedo, enabled = canRedo) {
-						Icon(
-							Icons.AutoMirrored.Outlined.Redo,
-							stringResource(R.string.activity_css_redo)
-						)
-					}
+					)
+					SimpleIconButton(
+						Icons.AutoMirrored.Outlined.Redo,
+						stringResource(R.string.activity_css_redo),
+						onClick = onRedo, enabled = canRedo
+					)
 				}
 			}
 		}

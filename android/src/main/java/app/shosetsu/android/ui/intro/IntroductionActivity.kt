@@ -27,7 +27,6 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -58,6 +57,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ScrollStateBar
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -136,54 +136,52 @@ fun IntroView(
 		}
 	}
 
-	ShosetsuTheme {
-		Scaffold(
-			bottomBar = {
-				BottomAppBar {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.SpaceBetween,
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Box {
-							if (state.currentPage > 0) {
-								NavigateBackButton {
-									scope.launch {
-										state.scrollToPage(state.currentPage - 1)
-									}
-								}
-							}
-						}
-						Box {
-							if (
-								state.currentPage != IntroPages.Support.ordinal ||
-								shouldSupportShowNext
-							) {
-								IconButton(
-									onClick = {
-										nextPage()
-									}
-								) {
-									Icon(
-										if (state.currentPage != IntroPages.End.ordinal)
-											Icons.Default.ArrowForward
-										else Icons.Default.Close,
-										stringResource(
-											if (state.currentPage != IntroPages.End.ordinal)
-												R.string.intro_page_next else R.string.intro_close
-										)
-									)
-								}
-							}
+    ShosetsuTheme  {
+        
+                Scaffold(
+        	bottomBar = {
+        		BottomAppBar {
+        		    Row(
+        		    	modifier = Modifier.fillMaxWidth(),
+        		    	horizontalArrangement = Arrangement.SpaceBetween,
+        		    	verticalAlignment = Alignment.CenterVertically
+        		    ) {
+        		        Box {
+        		        	if (state.currentPage > 0) {
+        		        		NavigateBackButton {
+        		        			scope.launch {
+        		        				state.scrollToPage(state.currentPage - 1)
+        		        			}
+        		        		}
+        		        	}
+        		        }
+        		        Box {
+        		            if (
+        		            	state.currentPage != IntroPages.Support.ordinal ||
+        		            	shouldSupportShowNext
+        		            ) {
+        		                SimpleIconButton(
+        		                	if (state.currentPage != IntroPages.End.ordinal)
+        		                		Icons.Default.ArrowForward
+        		                	else Icons.Default.Close,
+        		                    stringResource(
+        		                    	if (state.currentPage != IntroPages.End.ordinal)
+        		                    		R.string.intro_page_next else R.string.intro_close
+        		                    ),
+        		                    onClick = {
+        		                    	nextPage()
+        		                    }
+        		                )
+        		            }
 
-						}
+        		        }
 					}
 				}
 			}
-		) {
-			IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
-		}
-	}
+        ) {
+        	IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
+        }
+    }
 }
 
 @Composable

@@ -55,7 +55,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -96,6 +95,7 @@ import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
@@ -274,16 +274,9 @@ fun BrowseContent(
 					SearchAction(
 						query = query,
 						onSearch = onSetQuery,
-						icon = {
-							Icon(
-								Icons.AutoMirrored.Outlined.ManageSearch,
-								stringResource(R.string.search)
-							)
-						}
+						icon = Icons.AutoMirrored.Outlined.ManageSearch
 					)
-					IconButton(onOpenSearch) {
-						Icon(Icons.Default.Search, stringResource(R.string.global_search))
-					}
+					SimpleIconButton(Icons.Default.Search, stringResource(R.string.global_search), onOpenSearch)
 					HelpButton(BROWSE_HELP_URL)
 				},
 				navigationIcon = drawerIcon
@@ -483,16 +476,16 @@ fun BrowseExtensionContent(
 				) {
 					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
 						var isDropdownVisible by remember { mutableStateOf(false) }
-						IconButton(
+						SimpleIconButton(
+                            Icons.Outlined.Download,
+							null,
 							onClick = {
 								// We can skip to dropdown if there is only 1 install option
 								if (item.installOptions.size != 1)
 									isDropdownVisible = true
 								else install(item.installOptions[0])
 							}
-						) {
-							Icon(Icons.Outlined.Download, null)
-						}
+						)
 						DropdownMenu(
 							expanded = isDropdownVisible,
 							onDismissRequest = { isDropdownVisible = false },
@@ -520,45 +513,34 @@ fun BrowseExtensionContent(
 					}
 
 					if (item.isUpdateAvailable) {
-						IconButton(
-							onClick = update
-						) {
-							Icon(
-								Icons.Outlined.Download,
-								stringResource(R.string.update),
-								modifier = Modifier.rotate(180f),
-								tint = MaterialTheme.colorScheme.tertiary
-							)
-						}
+						SimpleIconButton(
+							Icons.Outlined.Download,
+							stringResource(R.string.update),
+							onClick = update,
+							modifier = Modifier.rotate(180f),
+							tint = MaterialTheme.colorScheme.tertiary
+						)
 					}
 
 					if (item.isInstalled) {
-						IconButton(
+						SimpleIconButton(
+							Icons.Outlined.Settings,
+							stringResource(R.string.settings),
 							onClick = openSettings
-						) {
-							Icon(
-								Icons.Outlined.Settings,
-								stringResource(R.string.settings)
-							)
-						}
+						)
 					}
 
 					if (item.isInstalling) {
-						IconButton(
+						val image = AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
+						SimpleIconButton(
+							rememberAnimatedVectorPainter(image, false),
+							stringResource(R.string.installing),
 							onClick = {},
 							modifier = Modifier.combinedClickable(
 								onClick = {},
 								onLongClick = cancelInstall,
 							)
-						) {
-							val image =
-								AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
-
-							Icon(
-								rememberAnimatedVectorPainter(image, false),
-								stringResource(R.string.installing)
-							)
-						}
+						)
 					}
 				}
 

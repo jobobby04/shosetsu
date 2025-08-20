@@ -27,8 +27,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -67,6 +65,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.relativeTimeSpanString
@@ -215,13 +214,12 @@ fun UpdatesAppBar(
 			AnimatedVisibility(!isEmpty) {
 				Box {
 					var showDropwDown by remember { mutableStateOf(false) }
-					IconButton(
+					SimpleIconButton(
+						Icons.Default.DeleteSweep, stringResource(R.string.clear),
 						onClick = {
 							showDropwDown = !showDropwDown
 						}
-					) {
-						Icon(Icons.Default.DeleteSweep, stringResource(R.string.clear))
-					}
+					)
 
 					DropdownMenu(
 						showDropwDown,

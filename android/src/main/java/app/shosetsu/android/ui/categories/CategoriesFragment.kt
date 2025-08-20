@@ -37,7 +37,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -66,6 +65,7 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel.CategoryChangeState
@@ -324,27 +324,24 @@ fun CategoriesContent(
 							) {
 								if (isNotSingular) {
 									if (index != 0)
-										IconButton(onClick = { onMoveDown(item) }) {
-											Icon(
-												Icons.Outlined.ExpandLess,
-												contentDescription = null
-											)
-										}
+										SimpleIconButton(
+											Icons.Outlined.ExpandLess,
+											description = null,
+											onClick = { onMoveDown(item) }
+										)
 
 									if (index != items.lastIndex)
-										IconButton(onClick = { onMoveUp(item) }) {
-											Icon(
-												Icons.Outlined.ExpandMore,
-												contentDescription = null
-											)
-										}
+										SimpleIconButton(
+											Icons.Outlined.ExpandMore,
+											description = null,
+											onClick = { onMoveUp(item) }
+										)
 								}
-								IconButton(onClick = { onRemove(item) }) {
-									Icon(
-										Icons.Filled.Delete,
-										contentDescription = null
-									)
-								}
+								SimpleIconButton(
+									Icons.Filled.Delete,
+									description = null,
+									onClick = { onRemove(item) }
+								)
 							}
 						}
 					}

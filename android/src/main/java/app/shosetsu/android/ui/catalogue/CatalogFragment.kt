@@ -23,7 +23,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -67,6 +66,7 @@ import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
@@ -425,14 +425,11 @@ fun CatalogTopBar(
 				onSetCardType
 			)
 
-			IconButton(
+			SimpleIconButton(
+				Icons.Default.OpenInBrowser,
+				stringResource(R.string.action_open_in_webview),
 				onClick = openWebView
-			) {
-				Icon(
-					Icons.Default.OpenInBrowser,
-					stringResource(R.string.action_open_in_webview)
-				)
-			}
+			)
 		}
 	)
 }

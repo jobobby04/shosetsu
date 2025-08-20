@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +51,7 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.setting.ButtonSettingContent
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.ProxySettingsContent
@@ -392,16 +391,15 @@ fun AdvancedSettingsContent(
 						key = UserAgent,
 						enabled = !useShosetsuAgent
 					)
-					IconButton(
+					SimpleIconButton(
+						Icons.Default.Refresh, stringResource(R.string.reset),
 						onClick = {
 							runBlocking {
 								viewModel.settingsRepo.setString(UserAgent, DEFAULT_USER_AGENT)
 							}
 						},
 						enabled = !useShosetsuAgent
-					) {
-						Icon(Icons.Default.Refresh, stringResource(R.string.reset))
-					}
+					)
 				}
 			}
 
