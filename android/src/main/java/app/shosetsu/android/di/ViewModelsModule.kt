@@ -205,7 +205,6 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance(),
 			instance()
 		)
 	}
@@ -253,9 +252,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<AReaderSettingsViewModel>() with provider {
 		ReaderSettingsViewModel(
 			iSettingsRepository = instance(),
-			app = instance(),
 
-			loadReaderThemes = instance()
+            loadReaderThemes = instance()
 		)
 	}
 	bind<ALibrarySettingsViewModel>() with provider {
@@ -284,7 +282,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 
 	bind<AMigrationViewModel>() with provider {
-		MigrationViewModel(instance(), instance(), instance())
+		MigrationViewModel(instance(), instance())
 	}
 
 	bind<ACSSEditorViewModel>() with provider {

@@ -43,10 +43,12 @@ import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
 import app.shosetsu.android.common.SettingKey.VerifyCheckSum
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.setting.ProxySettingsContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
@@ -332,16 +334,15 @@ fun AdvancedSettingsContent(
 						key = UserAgent,
 						enabled = !useShosetsuAgent
 					)
-					IconButton(
+					SimpleIconButton(
+						Icons.Default.Refresh, stringResource(R.string.reset),
 						onClick = {
 							runBlocking {
 								viewModel.settingsRepo.setString(UserAgent, DEFAULT_USER_AGENT)
 							}
 						},
 						enabled = !useShosetsuAgent
-					) {
-						Icon(Icons.Default.Refresh, stringResource(R.string.reset))
-					}
+					)
 				}
 			}
 

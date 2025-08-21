@@ -27,12 +27,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -82,6 +83,7 @@ import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardExtendedContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
@@ -462,7 +464,7 @@ fun CatalogFloatingActionButton(hasFilters: Boolean, onShowFilterMenu: () -> Uni
 				Text(stringResource(R.string.filter))
 			},
 			icon = {
-				Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+				Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 			},
 			onClick = onShowFilterMenu
 		)
@@ -508,14 +510,11 @@ fun CatalogTopBar(
 				showExtended = true,
 			)
 
-			IconButton(
+			SimpleIconButton(
+				Icons.Default.OpenInBrowser,
+				stringResource(R.string.action_open_in_webview),
 				onClick = openWebView
-			) {
-				Icon(
-					painterResource(R.drawable.open_in_browser),
-					stringResource(R.string.action_open_in_webview)
-				)
-			}
+			)
 		}
 	)
 }

@@ -1,20 +1,20 @@
 package app.shosetsu.android.view.compose.setting
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.view.compose.StandardDialog
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import com.chargemap.compose.numberpicker.NumberPicker
@@ -58,59 +58,26 @@ fun NumberPickerSettingContent(
 		onPreferenceClick = { openDialog = true }
 	)
 
-	if (openDialog)
-		Dialog({ openDialog = false }) {
-			NumberPickerSettingDialogContent(
-				title,
-				value,
-				range,
-				onValueChanged
-			)
-		}
-
-}
-
-@Composable
-fun NumberPickerSettingDialogContent(
-	title: String,
-	value: Int,
-	range: StableHolder<IntRange>,
-	onValueChanged: (newValue: Int) -> Unit,
-) {
-	Card(
-		modifier = Modifier.fillMaxWidth()
-			.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-	) {
-		Column(
-			modifier = Modifier
-				.padding(16.dp),
-			horizontalAlignment = Alignment.CenterHorizontally,
+	if (openDialog) {
+		var currentValue by remember { mutableIntStateOf(value) }
+		StandardDialog(
+			onDismissRequest = { openDialog = false },
+			title = { Text(title) },
+			onConfirm = {
+				openDialog = false
+				if (currentValue != value) {
+					onValueChanged(currentValue)
+				}
+			},
 		) {
-			Text(
-				title,
-				modifier = Modifier.padding(bottom = 8.dp),
-				textAlign = TextAlign.Center
-			)
 			NumberPicker(
-				value = value,
-				onValueChange = onValueChanged,
+				value = currentValue,
+				onValueChange = { currentValue = it },
 				range = range.item,
 				dividersColor = MaterialTheme.colorScheme.tertiary,
+				textStyle = MaterialTheme.typography.bodyMedium
+					.copy(color = MaterialTheme.colorScheme.onSurface),
 			)
-		}
-	}
-}
-
-
-@Preview
-@Composable
-fun PreviewNumberPickerSettingDialogContent() {
-	Box(modifier = Modifier.size(300.dp, 500.dp)) {
-		NumberPickerSettingDialogContent(
-			value = 5,
-			range = remember { StableHolder(0..10) },
-			title = "Test Dialog",
-		) {
 		}
 	}
 }

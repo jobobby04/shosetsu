@@ -33,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -76,6 +77,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
@@ -368,9 +370,7 @@ fun LibraryAppBar(
 				AnimatedVisibility(!isEmpty) {
 					Row {
 						SearchAction(query, onSearch, immediateSearch = true)
-						IconButton(onClick = onShowFilterMenu) {
-							Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
-						}
+						SimpleIconButton(Icons.Outlined.FilterList, stringResource(R.string.filter), onClick = onShowFilterMenu)
 						RefreshButton(onRefresh)
 					}
 				}
@@ -546,7 +546,7 @@ fun LibraryCategory(
 							containerColor = MaterialTheme.colorScheme.secondaryContainer
 						) {
 							Icon(
-								painterResource(R.drawable.ic_baseline_push_pin_24),
+								Icons.Filled.PushPin,
 								stringResource(R.string.pin_on_top),
 								modifier = Modifier.size(16.dp)
 							)

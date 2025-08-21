@@ -21,7 +21,6 @@ import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -141,7 +140,7 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 		Text(text = "To")
 
 		Icon(
-			Icons.Outlined.ExpandMore,
+			imageVector = Icons.Outlined.ExpandMore,
 			contentDescription = "The above will transfer to the below"
 		)
 
@@ -151,11 +150,6 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 			Text(text = "This is under construction, Try again in another release :D")
 		}
 	}
-}
-
-@Composable
-fun MigrationExtensionsLoadingContent() {
-	LinearProgressIndicator()
 }
 
 @Composable
@@ -240,11 +234,6 @@ fun MigrationExtensionItemContent(
 			)
 		}
 	}
-}
-
-@Composable
-fun MigrationNovelsLoadingContent() {
-	LinearProgressIndicator()
 }
 
 @Composable

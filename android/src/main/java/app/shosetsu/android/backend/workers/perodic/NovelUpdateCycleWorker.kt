@@ -51,7 +51,7 @@ import androidx.work.PeriodicWorkRequestBuilder as PWRB
  * 07 / 02 / 2020
  *
  * <p>
- *     Handles update requests for the entire application
+ *	 Handles update requests for the entire application
  * </p>
  */
 class NovelUpdateCycleWorker(

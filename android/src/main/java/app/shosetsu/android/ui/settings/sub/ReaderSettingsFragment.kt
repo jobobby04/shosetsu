@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.ImagesearchRoller
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -240,7 +241,7 @@ fun ReaderSettingsContent(
 									contentAlignment = Alignment.Center
 								) {
 									Image(
-										painterResource(R.drawable.add_circle_outline),
+										Icons.Outlined.AddCircle,
 										stringResource(R.string.style_add),
 										modifier = Modifier
 											.size(64.dp)

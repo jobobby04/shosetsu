@@ -41,7 +41,6 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.onIO
-import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.asHtml
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.common.utils.transformCatching
@@ -55,7 +54,6 @@ import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
-import app.shosetsu.android.domain.usecases.get.GetLastReadChapterUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderChaptersUseCase
 import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
@@ -158,7 +156,6 @@ class ChapterReaderViewModel(
 	private val recordChapterIsRead: RecordChapterIsReadUseCase,
 	private val getChapters: GetChapterUIsUseCase,
 	private val getExt: GetExtensionUseCase,
-	private val getLastReadChapter: GetLastReadChapterUseCase,
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
 ) : AChapterReaderViewModel() {
@@ -175,6 +172,8 @@ class ChapterReaderViewModel(
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@ChapterReaderViewModel.colorScheme
 	}
+
+	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
 
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
@@ -1070,7 +1069,7 @@ class ChapterReaderViewModel(
 		when (ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
 			else -> {
-                application.toast(R.string.reader_test_invalid_engine)
+				exceptions.emit(application.getString(R.string.reader_test_invalid_engine))
 				null
 			}
 		}
@@ -1112,7 +1111,7 @@ class ChapterReaderViewModel(
 
 			// Do not continue if a language has not been set successfully
 			if (!languageSuccess) {
-                application.toast(R.string.reader_test_invalid_language)
+				exceptions.emit(application.getString(R.string.reader_test_invalid_language))
 				return@filter false
 			}
 
@@ -1141,7 +1140,7 @@ class ChapterReaderViewModel(
 
 			// do not proceed if voice was not successful
 			if (!voiceSuccess) {
-                application.toast(R.string.reader_test_invalid_voice)
+				exceptions.emit(application.getString(R.string.reader_test_invalid_voice))
 				return@filter false
 			}
 			true

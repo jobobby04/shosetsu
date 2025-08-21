@@ -33,7 +33,6 @@ import app.shosetsu.android.common.SettingKey.NavStyle
 import app.shosetsu.android.common.SettingKey.NovelBadgeToast
 import app.shosetsu.android.common.SettingKey.SelectedNovelCardType
 import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.NumberPickerSettingContent
@@ -135,7 +134,6 @@ fun AppearanceSettingsContent(
 				}
 
 				LaunchedEffect(currentLanguage) {
-					logI("Gutis Vorstilvarg ${currentLanguage.langTag}")
 					val locale = if (currentLanguage.langTag.isEmpty()) {
 						LocaleListCompat.getEmptyLocaleList()
 					} else {

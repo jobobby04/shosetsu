@@ -1,7 +1,6 @@
 package app.shosetsu.android.viewmodel.impl.settings
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -84,7 +83,6 @@ import java.util.Locale
  */
 class ReaderSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
-	private val app: Application,
 	val loadReaderThemes: LoadReaderThemes
 ) : AReaderSettingsViewModel(iSettingsRepository) {
 
@@ -103,18 +101,6 @@ fun ExposedSettingsRepoViewModel.stringAsHtmlOption() {
 		stringResource(R.string.settings_reader_desc_string_to_html),
 		settingsRepo,
 		ReaderStringToHtml, modifier = Modifier
-			.fillMaxWidth()
-	)
-}
-
-@SuppressLint("ComposableNaming")
-@Composable
-fun ExposedSettingsRepoViewModel.horizontalSwitchOption() {
-	SwitchSettingContent(
-		stringResource(R.string.settings_reader_title_horizontal_option),
-		stringResource(R.string.settings_reader_desc_horizontal_option),
-		settingsRepo,
-		ReaderHorizontalPageSwap, modifier = Modifier
 			.fillMaxWidth()
 	)
 }

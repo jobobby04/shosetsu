@@ -69,7 +69,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	private val extensionsRepoRepo by instance<IExtensionRepoRepository>()
 	private val initializeExtensionsUseCase by instance<StartRepositoryUpdateManagerUseCase>()
 	private val extensionsRepo by instance<IExtensionsRepository>()
-	private val extensionEntitiesRepo by instance<IExtensionEntitiesRepository>()
 	private val installExtension: InstallExtensionUseCase by instance()
 	private val novelsRepo by instance<INovelsRepository>()
 	private val novelPinsRepo by instance<INovelPinsRepository>()

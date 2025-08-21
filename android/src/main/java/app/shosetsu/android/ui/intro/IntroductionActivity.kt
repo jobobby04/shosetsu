@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,9 +26,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,7 +34,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +57,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.ScrollStateBar
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -113,7 +110,7 @@ fun IntroView(
 	viewModel: AIntroViewModel = viewModelDi(),
 	exit: () -> Unit
 ) {
-	val state = rememberPagerState { IntroPages.values().size }
+	val state = rememberPagerState { IntroPages.entries.size }
 	val scope = rememberCoroutineScope()
 	val isLicenseRead by viewModel.isLicenseRead.collectAsState()
 	val shouldSupportShowNext by viewModel.shouldSupportShowNext.collectAsState()
@@ -139,54 +136,53 @@ fun IntroView(
 		}
 	}
 
-	ShosetsuTheme {
-		Scaffold(
-			bottomBar = {
-				BottomAppBar {
-					Row(
-						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.SpaceBetween,
-						verticalAlignment = Alignment.CenterVertically
-					) {
-						Box {
-							if (state.currentPage > 0) {
-								NavigateBackButton {
-									scope.launch {
-										state.scrollToPage(state.currentPage - 1)
-									}
-								}
-							}
-						}
-						Box {
-							if (
-								state.currentPage != IntroPages.Support.ordinal ||
-								shouldSupportShowNext
-							) {
-								IconButton(
-									onClick = {
-										nextPage()
-									}
-								) {
-									Icon(
-										if (state.currentPage != IntroPages.End.ordinal)
-											Icons.Default.ArrowForward
-										else Icons.Default.Close,
-										stringResource(
-											if (state.currentPage != IntroPages.End.ordinal)
-												R.string.intro_page_next else R.string.intro_close
-										)
-									)
-								}
-							}
+    ShosetsuTheme   {
+        
+                
+                Scaffold(
+                	bottomBar = {
+                		BottomAppBar {
+                		    Row(
+                		    	modifier = Modifier.fillMaxWidth(),
+                		    	horizontalArrangement = Arrangement.SpaceBetween,
+                		    	verticalAlignment = Alignment.CenterVertically
+                		    ) {
+                		        Box {
+                		        	if (state.currentPage > 0) {
+                		        		NavigateBackButton {
+                		        			scope.launch {
+                		        				state.scrollToPage(state.currentPage - 1)
+                		        			}
+                		        		}
+                		        	}
+                		        }
+                		        Box {
+                		            if (
+                		            	state.currentPage != IntroPages.Support.ordinal ||
+                		            	shouldSupportShowNext
+                		            ) {
+                		                SimpleIconButton(
+                		                	if (state.currentPage != IntroPages.End.ordinal)
+                		                		Icons.Default.ArrowForward
+                		                	else Icons.Default.Close,
+                		                    stringResource(
+                		                    	if (state.currentPage != IntroPages.End.ordinal)
+                		                    		R.string.intro_page_next else R.string.intro_close
+                		                    ),
+                		                    onClick = {
+                		                    	nextPage()
+                		                    }
+                		                )
+                		            }
 
-						}
+                		        }
 					}
 				}
 			}
-		) {
-			IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
-		}
-	}
+        ) {
+                	IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
+                }
+    }
 }
 
 @Composable

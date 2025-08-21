@@ -1,6 +1,6 @@
 package app.shosetsu.android.ui.novel
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,22 +46,19 @@ fun NovelCustomDownloadDialog(
 	var value by remember { mutableIntStateOf(0) }
 	StandardDialog(
 		onDismissRequest = onDismissRequest,
-		title = {
-			Text(stringResource(R.string.download_custom_chapters))
-		},
+		title = { Text(stringResource(R.string.download_custom_chapters)) },
 		onConfirm = {
 			onDownload(value)
 		}
 	) {
-		Box {
-			NumberPicker(
-				value = value,
-				onValueChange = {
-					value = it
-				},
-				range = 0 until chapterCount,
-			)
-		}
+		NumberPicker(
+			value = value,
+			onValueChange = { value = it },
+			range = 0 until chapterCount,
+			dividersColor = MaterialTheme.colorScheme.tertiary,
+			textStyle = MaterialTheme.typography.bodyMedium
+				.copy(color = MaterialTheme.colorScheme.onSurface),
+		)
 	}
 }
 

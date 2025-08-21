@@ -1,10 +1,9 @@
 package app.shosetsu.android.view.compose
 
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.openInWebView
@@ -36,11 +35,10 @@ import app.shosetsu.android.common.ext.openInWebView
 fun HelpButton(helpURL: String) {
 	val context = LocalContext.current
 
-	IconButton(
+	SimpleIconButton(
+		Icons.AutoMirrored.Outlined.HelpOutline, stringResource(R.string.help),
 		onClick = {
 			context.openInWebView(helpURL)
 		}
-	) {
-		Icon(painterResource(R.drawable.help_outline_24), stringResource(R.string.help))
-	}
+	)
 }

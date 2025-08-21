@@ -1,8 +1,12 @@
 package app.shosetsu.android.view.compose.setting
 
 import androidx.compose.foundation.clickable
-import app.shosetsu.android.common.utils.ProxyConfig
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
@@ -10,13 +14,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -27,8 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.utils.ProxyConfig
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
+
+import app.shosetsu.android.view.compose.SimpleIconButton
 
 @Composable
 fun ProxySettingsContent(
@@ -195,9 +205,7 @@ fun ProxySettingsDialogContent(
 				enabled = enabled and config.authUsed,
 				trailingIcon = {
 					val icon = if (passwordVisible) Icons.Outlined.Info else Icons.Filled.Info
-					IconButton(onClick = { passwordVisible = !passwordVisible} ) {
-						Icon(imageVector = icon, "")
-					}
+					SimpleIconButton(icon, description = null, onClick = { passwordVisible = !passwordVisible} )
 				}
 			)
 			Button(

@@ -94,7 +94,8 @@ fun PreviewChapterReaderContent() {
 					lowerSheet = {},
 					toggleFocus = {}
 				) {}
-			}
+			},
+			exception = null
 		)
 	}
 }
@@ -110,7 +111,8 @@ fun ChapterReaderContent(
 
 	onFirstFocus: () -> Unit,
 	content: @Composable (PaddingValues) -> Unit,
-	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit
+	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
+	exception: String?
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
@@ -137,6 +139,12 @@ fun ChapterReaderContent(
 		sheetShape = RectangleShape,
 		sheetDragHandle = null,
 	)
+
+	LaunchedEffect(exception) {
+		if (exception != null) {
+			scaffoldState.snackbarHostState.showSnackbar(exception)
+		}
+	}
 
 	if (isFocused && isFirstFocusProvider()) {
 		val string = stringResource(R.string.reader_first_focus)
