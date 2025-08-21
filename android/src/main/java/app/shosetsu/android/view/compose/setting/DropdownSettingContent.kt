@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -31,6 +32,9 @@ fun DropdownSettingContent(
 	modifier: Modifier = Modifier,
 	onSelection: (newValue: Int) -> Unit
 ) {
+	// nothing to render if nothing is given
+	if (choices.isEmpty()) return
+
 	var expanded by remember { mutableStateOf(false) }
 
 	TextPreferenceWidget(

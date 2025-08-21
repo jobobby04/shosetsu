@@ -22,8 +22,6 @@ import androidx.compose.material.icons.outlined.UnfoldLess
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.DiscreteSlider
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -69,68 +68,66 @@ fun ChapterReaderBottomSheetContent(
 		horizontalArrangement = Arrangement.SpaceBetween,
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		IconButton(onClick = exit) {
-			Icon(Icons.Filled.ArrowBack, null)
-		}
+		SimpleIconButton(Icons.Filled.ArrowBack, null, onClick = exit)
 
 		Row {
-			IconButton(onClick = toggleFocus) {
-				Icon(
-					Icons.Outlined.VisibilityOff,
-					null
-				)
-			}
-			IconButton(onClick = toggleBookmark) {
-				Icon(
+			SimpleIconButton(
+				Icons.Outlined.VisibilityOff,
+				null,
+				onClick = toggleFocus
+			)
+			SimpleIconButton(
 					if (!isBookmarked) Icons.Outlined.BookmarkBorder
 					else Icons.Outlined.Bookmark,
-					null
-				)
-			}
+				null,
+				onClick = toggleBookmark
+			)
 
-			IconButton(onClick = toggleRotationLock) {
-				Icon(
+			SimpleIconButton(
 					if (!isRotationLocked) Icons.Outlined.ScreenRotation
 					else Icons.Outlined.ScreenLockRotation,
-					null
-				)
-			}
+				null,
+				onClick = toggleRotationLock
+			)
 
 			if (ttsPlayback != TTSPlayback.Playing)
-				IconButton(onClick = onPlayTTS) {
-					Icon(
-						Icons.Outlined.Audiotrack,
-						null
-					)
-				}
+				SimpleIconButton(
+					Icons.Outlined.Audiotrack,
+					null,
+					onClick = onPlayTTS
+				)
 
 			if (ttsPlayback == TTSPlayback.Playing)
-				IconButton(onClick = onPauseTTS) {
-					Icon(
-						Icons.Outlined.PauseCircle,
-						null
-					)
-				}
+				SimpleIconButton(
+					Icons.Outlined.PauseCircle,
+					null,
+					onClick = onPauseTTS
+				)
 
 			if (ttsPlayback != TTSPlayback.Stopped)
-				IconButton(onClick = onStopTTS) {
-					Icon(
-						Icons.Outlined.StopCircle,
-						null
-					)
-				}
+				SimpleIconButton(
+					Icons.Outlined.StopCircle,
+					null,
+					onClick = onStopTTS
+				)
 
 			if (onShowNavigation != null) {
-				IconButton(onClick = onShowNavigation) {
-					Icon(
-						Icons.Outlined.UnfoldLess,
-						null
-					)
-				}
+				SimpleIconButton(
+					Icons.Outlined.UnfoldLess,
+					null,
+					onClick = onShowNavigation
+				)
 			}
 		}
 
-		IconButton(onClick = {
+		SimpleIconButton(
+			if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
+                Icons.Outlined.ExpandMore
+			} else {
+                Icons.Outlined.ExpandLess
+			},
+			null,
+			onClick = {
 			coroutineScope.launch {
 				if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
 					scaffoldState.bottomSheetState.expand()
@@ -138,16 +135,7 @@ fun ChapterReaderBottomSheetContent(
 					scaffoldState.bottomSheetState.partialExpand()
 				}
 			}
-		}) {
-			Icon(
-				if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
-					Icons.Outlined.ExpandMore
-				} else {
-					Icons.Outlined.ExpandLess
-				},
-				null
-			)
-		}
+		})
 	}
 
 	LazyColumn(
@@ -173,7 +161,6 @@ fun ChapterReaderBottomSheetContent(
 					remember { StableHolder(0..10) },
 				)
 			}
-
 		}
 
 		item {

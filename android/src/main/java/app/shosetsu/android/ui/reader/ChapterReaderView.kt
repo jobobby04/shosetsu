@@ -108,6 +108,8 @@ fun ChapterReaderView(
 	val isReadingTooLong by viewModel.isReadingTooLong.collectAsState()
 	val trackLongReading by viewModel.trackLongReading.collectAsState()
 
+	val exception by viewModel.exceptions.collectAsState(null)
+
 	val context = LocalContext.current
 
 	if (trackLongReading)
@@ -255,6 +257,7 @@ fun ChapterReaderView(
 				)
 			},
 			//isTapToScroll = isTapToScroll
+			exception = exception
 		)
 		if (isReadingTooLong) {
 			AlertDialog(

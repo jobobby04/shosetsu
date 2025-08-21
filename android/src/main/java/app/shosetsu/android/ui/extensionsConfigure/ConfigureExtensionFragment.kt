@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,6 +44,7 @@ import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
@@ -367,14 +368,11 @@ fun ConfigureExtensionHeaderContent(
 				}
 			}
 
-			IconButton(
+			SimpleIconButton(
+				Icons.Filled.Delete,
+				stringResource(R.string.uninstall),
 				onClick = onUninstall,
-			) {
-				Icon(
-					painterResource(R.drawable.trash),
-					stringResource(R.string.uninstall)
-				)
-			}
+			)
 		}
 	}
 }

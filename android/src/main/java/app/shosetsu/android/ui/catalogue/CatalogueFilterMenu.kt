@@ -25,6 +25,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.OutlinedTextField
@@ -166,10 +167,10 @@ fun CatalogFilterMenuFilterListContent(
 		list.forEach { filter ->
 			when (filter.item) {
 				is Filter.Header -> Column {
-					Divider()
+					HorizontalDivider()
 				}
 
-				is Filter.Separator -> Divider()
+				is Filter.Separator -> HorizontalDivider()
 				is Filter.Password -> CatalogFilterMenuTextContent(
 					filter as StableHolder<Filter.Text>,
 					getString,
@@ -306,10 +307,10 @@ fun CatalogFilterMenuFilterListContent(
 				list.forEach { filter ->
 					when (filter.item) {
 						is Filter.Header -> Column {
-							Divider()
+							HorizontalDivider()
 						}
 
-						is Filter.Separator -> Divider()
+						is Filter.Separator -> HorizontalDivider()
 						is Filter.Password -> CatalogFilterMenuTextContent(
 							filter as StableHolder<Filter.Text>,
 							getString,

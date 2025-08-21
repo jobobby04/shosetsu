@@ -33,15 +33,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -86,6 +89,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDownloadsState
@@ -239,42 +243,30 @@ fun DownloadsContent(
 							.align(BiasAlignment(0f, 0.7f))
 					) {
 						Row {
-							IconButton(
+							SimpleIconButton(
+								Icons.Outlined.Pause,
+								stringResource(R.string.pause),
 								onClick = pauseSelection,
 								enabled = selectedDownloadState.pauseVisible
-							) {
-								Icon(
-									painterResource(R.drawable.pause),
-									stringResource(R.string.pause)
-								)
-							}
-							IconButton(
+							)
+							SimpleIconButton(
+								Icons.Default.PlayArrow,
+								stringResource(R.string.start),
 								onClick = startSelection,
 								enabled = selectedDownloadState.startVisible
-							) {
-								Icon(
-									painterResource(R.drawable.play_arrow),
-									stringResource(R.string.start)
-								)
-							}
-							IconButton(
+							)
+							SimpleIconButton(
+								Icons.Default.Refresh,
+								stringResource(R.string.restart),
 								onClick = startFailedSelection,
 								enabled = selectedDownloadState.restartVisible
-							) {
-								Icon(
-									painterResource(R.drawable.refresh),
-									stringResource(R.string.restart)
-								)
-							}
-							IconButton(
+							)
+							SimpleIconButton(
+								Icons.Filled.Delete,
+								stringResource(R.string.delete),
 								onClick = deleteSelected,
 								enabled = selectedDownloadState.deleteVisible
-							) {
-								Icon(
-									painterResource(R.drawable.trash),
-									stringResource(R.string.delete)
-								)
-							}
+							)
 						}
 					}
 				}
@@ -327,7 +319,7 @@ fun DownloadsFAB(
 			if (isPaused) {
 				Icon(Icons.Default.PlayArrow, stringResource(R.string.start))
 			} else {
-				Icon(painterResource(R.drawable.pause), stringResource(R.string.pause))
+				Icon(Icons.Default.Pause, stringResource(R.string.pause))
 			}
 		}
 	)
@@ -411,13 +403,12 @@ fun DownloadsMoreOption(
 	var showDropDown by remember { mutableStateOf(false) }
 
 	Box {
-		IconButton(
+		SimpleIconButton(
+			Icons.Default.MoreVert, stringResource(R.string.more),
 			onClick = {
 				showDropDown = true
 			}
-		) {
-			Icon(Icons.Default.MoreVert, stringResource(R.string.more))
-		}
+		)
 
 		DropdownMenu(
 			showDropDown,

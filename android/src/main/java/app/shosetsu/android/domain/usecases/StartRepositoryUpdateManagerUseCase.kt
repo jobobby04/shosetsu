@@ -24,7 +24,7 @@ import app.shosetsu.android.common.ext.launchIO
  * shosetsu
  * 13 / 05 / 2020
  * <p>
- *     Initializes formatters, libraries, and repositories
+ *	 Initializes formatters, libraries, and repositories
  * </p>
  */
 class StartRepositoryUpdateManagerUseCase(

@@ -63,11 +63,6 @@ class DownloadsViewModel(
 	}
 
 	@Throws(SQLiteException::class)
-	private suspend fun updateDownloadUseCase(downloadUI: DownloadUI) {
-		downloadsRepository.update(downloadUI.convertTo())
-	}
-
-	@Throws(SQLiteException::class)
 	private suspend fun deleteDownloadUseCase(downloadUI: DownloadUI) {
 		downloadsRepository.deleteEntity(downloadUI.convertTo())
 	}

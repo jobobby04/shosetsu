@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -189,7 +188,7 @@ fun ErrorContent(
 					}
 				) {
 					Icon(
-						if (!isStacktraceVisible) Icons.Outlined.ExpandMore
+						imageVector = if (!isStacktraceVisible) Icons.Outlined.ExpandMore
 						else Icons.Outlined.ExpandLess,
 						contentDescription = if (!isStacktraceVisible)
 							stringResource(R.string.more)

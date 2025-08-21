@@ -132,8 +132,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 
 	bind<RequestInstallExtensionUseCase>() with provider {
 		RequestInstallExtensionUseCase(
-			instance(),
-			instance(),
+            instance(),
 			instance()
 		)
 	}

@@ -34,9 +34,20 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.LibraryAddCheck
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.BookmarkRemove
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.LibraryAddCheck
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -47,7 +58,6 @@ import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -104,6 +114,7 @@ import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.LongClickTextButton
 import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.NovelSettingUI
@@ -859,60 +870,42 @@ fun BoxScope.ChapterSelectionBar(
 			.align(BiasAlignment(0f, 0.7f))
 	) {
 		Row {
-			IconButton(
+			SimpleIconButton(
+				Icons.Outlined.Download,
+				stringResource(R.string.fragment_novel_selected_download),
 				onClick = downloadSelected,
 				enabled = selectedChaptersState.showDownload
-			) {
-				Icon(
-					painterResource(R.drawable.downloads),
-					stringResource(R.string.fragment_novel_selected_download)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Filled.Delete,
+				stringResource(R.string.fragment_novel_selected_delete),
 				onClick = deleteSelected,
 				enabled = selectedChaptersState.showDelete
-			) {
-				Icon(
-					painterResource(R.drawable.trash),
-					stringResource(R.string.fragment_novel_selected_delete)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Filled.LibraryAddCheck,
+				stringResource(R.string.fragment_novel_selected_read),
 				onClick = markSelectedAsRead,
 				enabled = selectedChaptersState.showMarkAsRead
-			) {
-				Icon(
-					painterResource(R.drawable.read_mark),
-					stringResource(R.string.fragment_novel_selected_read)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Outlined.LibraryAddCheck,
+				stringResource(R.string.fragment_novel_selected_unread),
 				onClick = markSelectedAsUnread,
 				enabled = selectedChaptersState.showMarkAsUnread
-			) {
-				Icon(
-					painterResource(R.drawable.unread_mark),
-					stringResource(R.string.fragment_novel_selected_unread)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Outlined.BookmarkAdd,
+				stringResource(R.string.fragment_novel_selected_bookmark),
 				onClick = bookmarkSelected,
 				enabled = selectedChaptersState.showBookmark
-			) {
-				Icon(
-					painterResource(R.drawable.ic_outline_bookmark_add_24),
-					stringResource(R.string.fragment_novel_selected_bookmark)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Outlined.BookmarkRemove,
+				stringResource(R.string.fragment_novel_selected_unbookmark),
 				onClick = unbookmarkSelected,
 				enabled = selectedChaptersState.showRemoveBookmark
-			) {
-				Icon(
-					painterResource(R.drawable.ic_baseline_bookmark_remove_24),
-					stringResource(R.string.fragment_novel_selected_unbookmark)
-				)
-			}
+			)
 		}
 	}
 }
@@ -1237,9 +1230,9 @@ fun NovelInfoHeaderContent(
 						) {
 							Icon(
 								if (novelInfo.bookmarked) {
-									painterResource(R.drawable.ic_heart_svg_filled)
+									Icons.Filled.Favorite
 								} else {
-									painterResource(R.drawable.ic_heart_svg)
+									Icons.Filled.FavoriteBorder
 								},
 								null,
 								tint = if (novelInfo.bookmarked)
@@ -1281,7 +1274,7 @@ fun NovelInfoHeaderContent(
 								horizontalAlignment = Alignment.CenterHorizontally
 							) {
 								Icon(
-									painterResource(R.drawable.ic_baseline_label_24),
+									Icons.AutoMirrored.Outlined.Label,
 									stringResource(R.string.categories),
 									modifier = Modifier.size(20.dp),
 									tint = MaterialTheme.colorScheme.onSurface
@@ -1305,7 +1298,7 @@ fun NovelInfoHeaderContent(
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
 							Icon(
-								painterResource(R.drawable.open_in_browser),
+								Icons.Default.OpenInBrowser,
 								stringResource(R.string.action_open_in_webview),
 								modifier = Modifier.size(20.dp),
 								tint = MaterialTheme.colorScheme.onSurface
@@ -1398,10 +1391,7 @@ fun NovelChapterBar(
 						.padding(horizontal = 4.dp),
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					Icon(
-						painterResource(R.drawable.filter),
-						null,
-					)
+					Icon(Icons.Outlined.FilterList, null)
 					Text(stringResource(R.string.filter))
 				}
 			}
@@ -1469,8 +1459,11 @@ fun ExpandedText(
 		}
 
 		Icon(
-			if (!isExpanded) Icons.Outlined.ExpandMore
-			else Icons.Outlined.ExpandLess,
+			imageVector = if (!isExpanded) {
+				Icons.Outlined.ExpandMore
+			} else {
+				Icons.Outlined.ExpandLess
+			},
 			contentDescription = if (!isExpanded) {
 				stringResource(R.string.more)
 			} else {

@@ -25,8 +25,6 @@ package app.shosetsu.android.common.consts
  * 02 / 05 / 2020
  */
 object LogConstants {
-	const val SERVICE_CANCEL: String = "Cancelling job"
 	const val SERVICE_NEW: String = "Making new job"
 	const val SERVICE_EXECUTE: String = "Executing job"
-	const val SERVICE_REJECT_RUNNING: String = "Cannot start new task, already processing"
 }

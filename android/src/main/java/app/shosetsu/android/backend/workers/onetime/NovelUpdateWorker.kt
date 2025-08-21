@@ -103,7 +103,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * 07 / 02 / 2020
  *
  * <p>
- *     Handles update requests for the entire application
+ *	 Handles update requests for the entire application
  * </p>
  */
 class NovelUpdateWorker(
@@ -515,10 +515,7 @@ class NovelUpdateWorker(
 
 	companion object {
 		const val ACTION_CANCEL_NOVEL_UPDATE = "shosetsu_action_cancel_novel_update"
-		const val KEY_TARGET: String = "Target"
-		const val KEY_CHAPTERS: String = "Novels"
 
-		const val KEY_NOVELS: Int = 0x00
 		const val KEY_CATEGORY: String = "category"
 	}
 }

@@ -1,17 +1,10 @@
 package app.shosetsu.android.common.ext
 
-import android.Manifest.permission.POST_NOTIFICATIONS
-import android.Manifest.permission.WAKE_LOCK
-import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
 import android.widget.Toast.LENGTH_SHORT
 import android.widget.Toast.makeText
 import androidx.annotation.StringRes
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 
 /*
@@ -38,7 +31,7 @@ import androidx.core.app.NotificationManagerCompat
  *
  * @author github.com/doomsdayrs
  * <p>
- *     I have to admit to copying tachiyomi ;-;
+ *	 I have to admit to copying tachiyomi ;-;
  * </p>
  */
 
@@ -61,33 +54,9 @@ fun Context.toast(string: String, duration: Int = LENGTH_SHORT) {
 	makeText(this, string, duration).show()
 }
 
-fun Context.checkActivitySelfPermission(permission: String): Int =
-	ActivityCompat.checkSelfPermission(this, permission)
-
 /**
  * Property to get the notification manager from the context.
  */
 val Context.notificationManager: NotificationManagerCompat
 	get() = NotificationManagerCompat.from(this)
 
-fun Context.requestPerms() {
-	if (
-		(SDK_INT >= TIRAMISU && checkActivitySelfPermission(POST_NOTIFICATIONS) != PERMISSION_GRANTED) ||
-		checkActivitySelfPermission(WAKE_LOCK) != PERMISSION_GRANTED
-	) {
-		ActivityCompat.requestPermissions(
-			this as Activity,
-			if (SDK_INT >= TIRAMISU) {
-				arrayOf(
-					WAKE_LOCK,
-					POST_NOTIFICATIONS,
-				)
-			} else {
-				arrayOf(
-					WAKE_LOCK,
-				)
-			},
-			1
-		)
-	}
-}
