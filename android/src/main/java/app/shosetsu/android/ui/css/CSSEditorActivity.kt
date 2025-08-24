@@ -38,7 +38,7 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 
 	companion object {
 		const val CSS_ID = "css-id"
-		const val HELP_WEBSITE = "https://developer.mozilla.org/en-US/docs/Learn/CSS"
+		const val HELP_WEBSITE = "https://shosetsu.app/help/guides/css.html"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,4 +61,3 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 		}
 	}
 }
-

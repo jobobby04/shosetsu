@@ -157,20 +157,23 @@ abstract class ShosetsuCssViewModelComponent {
 					color("surface-container-high", surfaceContainerHigh)
 					color("surface-container-highest", surfaceContainerHighest)
 				}
+				this["--shosetsu-indent-size"] = "${it.indentSize}em"
+				this["--shosetsu-text-size"] = "${it.textSize / HTML_SIZE_DIVISION}pt"
+				this["--shosetsu-paragraph-spacing"] = "${it.paragraphSpacing}em"
 			}
 
 			setShosetsuStyle("body") {
 				this["background-color"] = it.backgroundColor.cssColor()
 				this["color"] = it.foregroundColor.cssColor()
-				this["font-size"] = "${it.textSize / HTML_SIZE_DIVISION}pt"
+				this["font-size"] = "var(--shosetsu-text-size)"
 				this["scroll-behavior"] = "smooth"
-				this["text-indent"] = "${it.indentSize}em"
+				this["text-indent"] = "var(--shosetsu-indent-size)"
 				this["overflow-wrap"] = "break-word"
 				this["padding"] = "0.5em" // ensure everything stays away from the edge
 			}
 
 			setShosetsuStyle("p") {
-				this["margin-top"] = "${it.paragraphSpacing}em"
+				this["margin-top"] = "var(--shosetsu-paragraph-spacing)"
 			}
 
 			setShosetsuStyle("img") {
