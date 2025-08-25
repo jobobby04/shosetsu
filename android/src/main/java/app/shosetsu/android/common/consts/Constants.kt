@@ -81,9 +81,13 @@ const val MAX_CONTINOUS_READING_TIME: Long = 1000L * 60 * 20
  */
 const val VERSION_BACKUP: String = "1.3.0"
 const val BACKUP_FILE_EXTENSION = "sbk"
-const val REPOSITORY_HELP_URL = "https://shosetsu.app/help/guides/repositories/"
-const val BROWSE_HELP_URL = "https://shosetsu.app/help/guides/browse/"
-const val SHARE_HELP_URL = "https://shosetsu.app/help/guides/share/"
+
+/**
+ * Links
+ */
+const val REPOSITORY_HELP_URL = "https://shosetsu.app/help/guides/repositories.html"
+const val BROWSE_HELP_URL = "https://shosetsu.app/help/guides/browse.html"
+const val SHARE_HELP_URL = "https://shosetsu.app/help/guides/share.html"
 const val URL_WEBSITE = "https://shosetsu.app"
 const val URL_PRIVACY = "https://shosetsu.app/privacy"
 const val URL_DISCLAIMER = "https://shosetsu.app/disclaimer"
