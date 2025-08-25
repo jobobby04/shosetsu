@@ -48,7 +48,7 @@ private fun handleIntentAction(
 				if (intent.data!!.scheme != null) {
 					onNavigate(
 						Destination.More.AddShare(
-							intent.data!!.scheme + "://" + intent.data!!.host
+							intent.data.toString()
 						)
 					)
 				} else intent.logE("Scheme was null")
