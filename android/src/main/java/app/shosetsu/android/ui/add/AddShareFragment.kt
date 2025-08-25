@@ -33,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.SHARE_HELP_URL
+import app.shosetsu.android.common.consts.URL_HELP_SHARE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.view.compose.ErrorAction
@@ -216,7 +216,7 @@ fun AddShareContent(
 					NavigateBackButton(onBack)
 				},
 				actions = {
-					HelpButton(SHARE_HELP_URL)
+					HelpButton(URL_HELP_SHARE)
 				}
 			)
 		}

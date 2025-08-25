@@ -77,7 +77,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
@@ -86,7 +85,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
-import app.shosetsu.android.common.consts.BROWSE_HELP_URL
+import app.shosetsu.android.common.consts.URL_HELP_BROWSE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
@@ -277,7 +276,7 @@ fun BrowseContent(
 						icon = Icons.AutoMirrored.Outlined.ManageSearch
 					)
 					SimpleIconButton(Icons.Default.Search, stringResource(R.string.global_search), onOpenSearch)
-					HelpButton(BROWSE_HELP_URL)
+					HelpButton(URL_HELP_BROWSE)
 				},
 				navigationIcon = drawerIcon
 			)
