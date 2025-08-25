@@ -38,7 +38,6 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 
 	companion object {
 		const val CSS_ID = "css-id"
-		const val HELP_WEBSITE = "https://shosetsu.app/help/guides/css.html"
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +47,7 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 			window.setDecorFitsSystemWindows(false)
 		} else {
 			@Suppress("DEPRECATION")
-			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 		}
 
 		setContent {
