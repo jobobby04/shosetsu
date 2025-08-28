@@ -3,7 +3,6 @@ package app.shosetsu.android.di
 import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository
-import app.shosetsu.android.domain.repository.base.IBackupUriRepository
 import app.shosetsu.android.domain.repository.base.ICategoryRepository
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository
@@ -22,7 +21,6 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.repository.base.IUpdatesRepository
 import app.shosetsu.android.domain.repository.impl.AppUpdatesRepository
 import app.shosetsu.android.domain.repository.impl.BackupRepository
-import app.shosetsu.android.domain.repository.impl.BackupUriRepository
 import app.shosetsu.android.domain.repository.impl.CategoryRepository
 import app.shosetsu.android.domain.repository.impl.ChapterHistoryRepositoryImpl
 import app.shosetsu.android.domain.repository.impl.ChaptersRepository
@@ -113,7 +111,7 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 
 	bind<ISettingsRepository>() with singleton { SettingsRepository(instance()) }
 
-	bind<IBackupRepository>() with singleton { BackupRepository(instance()) }
+	bind<IBackupRepository>() with singleton { BackupRepository() }
 
 	bind<INovelSettingsRepository>() with singleton { NovelSettingsRepository(instance()) }
 	bind<INovelReaderSettingsRepository>() with singleton { NovelReaderSettingsRepository(instance()) }
@@ -130,10 +128,6 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 			instance(),
 			instance()
 		)
-	}
-
-	bind<IBackupUriRepository>() with singleton {
-		BackupUriRepository()
 	}
 
 	bind<ChapterHistoryRepository>() with singleton { ChapterHistoryRepositoryImpl(instance()) }

@@ -239,11 +239,7 @@
     <string name="artists">Artists</string>
     <string name="unread_status">Unread status</string>
     <string name="update_novel">Novel Updater</string>
-    <string name="settings_backup_alert_select_location_title">Select location</string>
-    <string name="settings_backup_alert_select_backup_title">Select backup</string>
     <string name="fragment_backup_settings_label">Backup Settings</string>
-    <string name="settings_backup_alert_location_external">External</string>
-    <string name="settings_backup_alert_location_internal">Internal</string>
     <string name="restore_notification_content_text_outdated">Backup is outdated</string>
     <string name="restore_notification_content_missing_key">Backup does not contain \‘version\’ key</string>
     <string name="restore_notification_content_decoding_string">Decoding</string>
@@ -393,9 +389,6 @@
     <string name="activity_main_backup_in_progress_warning">Please avoid changing data</string>
     <string name="settings_update_repo_disable_on_fail_title">Disable on fail</string>
     <string name="settings_update_repo_disable_on_fail_desc">Disable a repository if it fails to update, mostly for testing.</string>
-    <string name="settings_backup_export">Export backup</string>
-    <string name="export_backup_notification_subtext">Export Backup</string>
-    <string name="export_backup_notification_content_starting">Export Starting</string>
     <string name="logo_desc">This is the icon of Shosetsu</string>
     <string name="settings_advanced_kill_cycle_workers_title">Kill Cycle Workers</string>
     <string name="settings_advanced_kill_cycle_workers_desc">Kill all cyclic workers to reset them.</string>
@@ -491,9 +484,7 @@
     <string name="backup_restore_print_chapters_title">Print chapter names during restore</string>
     <string name="backup_restore_print_chapters_desc">Print chapter names to log during restore.\nUseful for debugging, not useful otherwise.\nMust be set before restoring</string>
     <string name="restore_notification_content_novel_fail_io">IOException: %s</string>
-    <string name="fragment_backup_error_unselected">No backup has been selected to export</string>
     <string name="export_backup_notification_missing_uri">URI not provided to export backup to</string>
-    <string name="export_backup_notification_invalid_backup">No such backup exists</string>
     <string name="settings_advanced_log_title">Log to file</string>
     <string name="settings_advanced_log_desc">Enabling logs to a file, but may cause slow downs.\nRequires a restart</string>
     <string name="update_to">Update: %s</string>
@@ -694,7 +685,6 @@
     <string name="view_title_configure">Configure</string>
     <string name="view_novel_refresh_failed">Failed to refresh novel: %s</string>
     <string name="view_backup_restore_start">Restoring now...</string>
-    <string name="view_backup_exporting_start">Exporting now...</string>
     <string name="worker_update_install_missing">No update to install</string>
     <string name="error_intent_handle">Failed to handle intent</string>
     <string name="support_ignore">Happy</string>
@@ -716,5 +706,8 @@
     <string name="backup_restrictions_desc">Restrictions: %s</string>
     <string name="app_language">App Language</string>
     <string name="app_language_default">Default</string>
+    <string name="file_picker_uri_permission_unsupported">Failed to acquire persistent folder access. The app may behave unexpectedly.</string>
+    <string name="settings_backup_location">Storage location</string>
+    <string name="file_picker_error">No file picker app found</string>
 
 </resources>

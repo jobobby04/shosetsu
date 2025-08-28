@@ -1,15 +1,9 @@
 package app.shosetsu.android.domain.repository.impl
 
-import app.shosetsu.android.common.FileNotFoundException
-import app.shosetsu.android.common.FilePermissionException
-import app.shosetsu.android.common.ext.onIO
-import app.shosetsu.android.datasource.local.file.base.IFileBackupDataSource
-import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -31,9 +25,7 @@ import java.io.IOException
 /**
  * 18 / 01 / 2021
  */
-class BackupRepository(
-	private val iFileBackupDataSource: IFileBackupDataSource
-) : IBackupRepository {
+class BackupRepository : IBackupRepository {
 	private val _backupProgress: MutableStateFlow<BackupProgress> by lazy {
 		MutableStateFlow(
 			BackupProgress.NOT_STARTED
@@ -46,15 +38,4 @@ class BackupRepository(
 	override fun updateProgress(result: BackupProgress) {
 		_backupProgress.value = result
 	}
-
-	override suspend fun loadBackups(): List<String> =
-		onIO { iFileBackupDataSource.loadBackups() }
-
-	@Throws(FilePermissionException::class, FileNotFoundException::class)
-	override suspend fun loadBackup(path: String, isExternal: Boolean): BackupEntity =
-		onIO { iFileBackupDataSource.loadBackup(path, isExternal) }
-
-	@Throws(FilePermissionException::class, IOException::class)
-	override suspend fun saveBackup(backupEntity: BackupEntity): String =
-		onIO { iFileBackupDataSource.saveBackup(backupEntity) }
 }

@@ -227,6 +227,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object NavStyle : BooleanKey("legacy_navigation", false)
 
 	// Backup Options
+	object BackupStorageLocation : StringKey("backupStorageLocation", "")
 	object ShouldBackupChapters : BooleanKey("backupChapters", true)
 	object ShouldBackupSettings : BooleanKey("backupSettings", false)
 	object BackupCycle : IntKey("backupCycle", 12)

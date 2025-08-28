@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.work.*
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
@@ -76,7 +77,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	private val novelsSettingsRepo by instance<INovelSettingsRepository>()
 	private val chaptersRepo by instance<IChaptersRepository>()
 	private val chapterHistoryRepo by instance<ChapterHistoryRepository>()
-	private val backupUriRepo by instance<IBackupUriRepository>()
 	private val categoriesRepo by instance<ICategoryRepository>()
 	private val novelCategoriesRepo by instance<INovelCategoryRepository>()
 	private val addCategoryUseCase by instance<AddCategoryUseCase>()
@@ -124,21 +124,16 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	@Throws(IOException::class)
 	override suspend fun doWork(): Result {
 		logI("Starting restore")
-		val backupName = inputData.getString(BACKUP_DATA_KEY)
-		val isExternal = inputData.getBoolean(BACKUP_DIR_KEY, false)
+		val backupUri = inputData.getString(BACKUP_URI_KEY)?.toUri()
 
-		if (!isExternal && backupName == null) {
-			logE("null backupName, Internal Restore requires backupName")
+		if (backupUri == null) {
+			logE("null backupUri, cannot restore")
 			return Result.failure()
 		}
 
 		notify(R.string.restore_notification_content_starting)
 		val backupEntity = try {
-			if (isExternal) {
-				backupUriRepo.take()?.let { loadBackupFromUri(it) }
-			} else {
-				backupRepo.loadBackup(backupName!!)
-			}
+			loadBackupFromUri(backupUri)
 		} catch (e: Exception) {//TODO specify
 			with(e) {
 				logE(" $message", e)
@@ -153,16 +148,8 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				return Result.failure()
 			}
 		}
-		if (backupEntity == null) {
-			logE("Received empty, impossible")
-			notify(R.string.restore_notification_content_unexpected_empty) {
-				setNotOngoing()
-			}
-			return Result.failure()
-		}
 
-
-		// Decode encrypted string to bytes via Base64
+        // Decode encrypted string to bytes via Base64
 		notify(R.string.restore_notification_content_decoding_string)
 		val decodedBytes: ByteArray = if (isBase64Encoded(backupEntity.content.inputStream())) {
 			Base64.decode(backupEntity.content, Base64.DEFAULT)
@@ -553,16 +540,9 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 		private const val MESSAGE_LOG_JSON_OUTDATED = "BACKUP JSON MISMATCH"
 
-
 		/**
-		 * Path / name of file
+		 * URI of the backup file
 		 */
-		const val BACKUP_DATA_KEY = "BACKUP_NAME"
-
-		/**
-		 * If true, the [BACKUP_DATA_KEY] is a full path pointing to a specific file, other wise
-		 * it is an internal path
-		 */
-		const val BACKUP_DIR_KEY = "BACKUP_DIR"
+		const val BACKUP_URI_KEY = "BACKUP_URI"
 	}
 }

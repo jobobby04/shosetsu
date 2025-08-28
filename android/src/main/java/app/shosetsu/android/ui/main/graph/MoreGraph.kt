@@ -11,7 +11,6 @@ import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.ui.about.AboutView
 import app.shosetsu.android.ui.add.AddShareView
 import app.shosetsu.android.ui.analytics.AnalyticsView
-import app.shosetsu.android.ui.backup.BackupView
 import app.shosetsu.android.ui.categories.CategoriesView
 import app.shosetsu.android.ui.downloads.DownloadsView
 import app.shosetsu.android.ui.history.HistoryView
@@ -19,7 +18,6 @@ import app.shosetsu.android.ui.main.Destination.More
 import app.shosetsu.android.ui.main.Destination.More.About
 import app.shosetsu.android.ui.main.Destination.More.AddShare
 import app.shosetsu.android.ui.main.Destination.More.Analytics
-import app.shosetsu.android.ui.main.Destination.More.Backup
 import app.shosetsu.android.ui.main.Destination.More.Categories
 import app.shosetsu.android.ui.main.Destination.More.Downloads
 import app.shosetsu.android.ui.main.Destination.More.History
@@ -45,7 +43,7 @@ fun NavGraphBuilder.moreGraph(
 					navController.navigate(Downloads)
 				},
 				onNavToBackup = {
-					navController.navigate(Backup)
+					navController.navigate(Settings.Backup)
 				},
 				onNavToCategories = {
 					navController.navigate(Categories)
@@ -99,11 +97,6 @@ fun NavGraphBuilder.moreGraph(
 		}
 		composableSub<Repositories> {
 			RepositoriesView(
-				onBack = navController::popBackStack
-			)
-		}
-		composableSub<Backup> {
-			BackupView(
 				onBack = navController::popBackStack
 			)
 		}
