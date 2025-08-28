@@ -113,7 +113,7 @@ fun BackupView(
 			}
 
 			launchIO {
-				viewModel.settingsRepo.setString(SettingKey.BackupStorageLocation, uri.toString())
+				viewModel.setBackupStorageLocation(context, uri)
 			}
 		}
 	}

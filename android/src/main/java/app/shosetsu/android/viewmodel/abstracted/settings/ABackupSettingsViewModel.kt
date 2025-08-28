@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted.settings
 
+import android.content.Context
 import android.net.Uri
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.collections.immutable.ImmutableList
@@ -34,8 +35,11 @@ abstract class ABackupSettingsViewModel(iSettingsRepository: ISettingsRepository
 
 	/**
 	 * Load backup via the uri
-	 *
-	 * For external backups
 	 */
 	abstract fun restore(uri: Uri)
+
+	/**
+	 * Set the backup storage location
+	 */
+	abstract suspend fun setBackupStorageLocation(context: Context, uri: Uri)
 }
