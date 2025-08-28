@@ -9,5 +9,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BackupExtensionEntity(
 	val id: Int,
+	val repoId: Int? = null,
 	val novels: List<BackupNovelEntity> = emptyList(),
 )

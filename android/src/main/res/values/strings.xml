@@ -709,5 +709,6 @@
     <string name="file_picker_uri_permission_unsupported">Failed to acquire persistent folder access. The app may behave unexpectedly.</string>
     <string name="settings_backup_location">Storage location</string>
     <string name="file_picker_error">No file picker app found</string>
+    <string name="restore_notification_content_extension_not_found">Extension referenced in the backup was not found:</string>
 
 </resources>

@@ -202,21 +202,27 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 			notify("Adding repositories")
 			// Adds the repositories
-			backup.repos.forEach { (url, name) ->
+			val oldRepositories = extensionsRepoRepo.loadRepositories()
+			val idMap = backup.repos.map { (id, url, name) ->
 				notify("") {
 					setContentTitle(getString(R.string.restore_notification_title_adding_repos))
 					setContentText("$name\n$url")
 				}
+				oldRepositories.find { it.url == url }?.let {
+					logI("Repository already exists, skipping")
+					return@map id to it.id
+				}
 				try {
-					extensionsRepoRepo.addRepository(
+					return@map id to extensionsRepoRepo.addRepository(
 						url,
 						name,
-					)
+					).toInt()
 				} catch (e: SQLiteException) {
 					logE("Failed to add repo", e)
 					// its likely constraint, we can ignore it
+					return@map null to null
 				}
-			}
+			}.filter { it.first != null }.toMap()
 
 			notify("Loading repository data")
 			// Load the data from the repositories
@@ -227,6 +233,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 			backup.extensions.forEach {
 				restoreExtension(
+					idMap[it.repoId],
 					extensions,
 					it,
 					categoryOrderToCategoryIds
@@ -247,6 +254,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	}
 
 	private suspend fun restoreExtension(
+		repoId: Int?,
 		extensions: List<GenericExtensionEntity>,
 		backupExtensionEntity: BackupExtensionEntity,
 		categoryOrderToCategoryIds: Map<Int, Int>
@@ -254,42 +262,50 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		val extensionID = backupExtensionEntity.id
 		val backupNovels = backupExtensionEntity.novels
 		logI("$extensionID")
-		extensions.find { it.id == extensionID }?.let { extensionEntity ->
-			// Install the extension
-			if (!extensionsRepo.isExtensionInstalled(extensionEntity)) {
-				logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
-				notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
-				try {
-					installExtension(extensionEntity)
-				} catch (e: InvalidMetaDataException) {
-					notify(
-						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
-						notificationId = extensionID
-					)
-					return
-				} catch (e: Exception) {
-					notify(
-						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
-						notificationId = extensionID
-					)
-					ACRA.errorReporter.handleSilentException(e)
-					return
-				}
-			} else {
-				logI("Extension is installed, moving on")
+		val extensionEntity = extensions.find { (repoId == null || it.repoID == repoId) && it.id == extensionID }
+		if (extensionEntity == null) {
+			//TODO this should probably be handled
+			notify(
+				getString(R.string.restore_notification_content_extension_not_found) + " $extensionID",
+				notificationId = extensionID
+			)
+			logE("Extension not found")
+			return
+		}
+		// Install the extension
+		if (!extensionsRepo.isExtensionInstalled(extensionEntity)) {
+			logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
+			notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
+			try {
+				installExtension(extensionEntity)
+			} catch (e: InvalidMetaDataException) {
+				notify(
+					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
+					notificationId = extensionID
+				)
+				return
+			} catch (e: Exception) {
+				notify(
+					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
+					notificationId = extensionID
+				)
+				ACRA.errorReporter.handleSilentException(e)
+				return
 			}
+		} else {
+			logI("Extension is installed, moving on")
+		}
 
-			logI("Restoring extension novels")
-			backupNovels.forEach novelLoop@{ novelEntity ->
-				try {
-					restoreNovel(
-						extensionID,
-						novelEntity,
-						categoryOrderToCategoryIds
-					)
-				} catch (e: Exception) {
-					e.printStackTrace()
-				}
+		logI("Restoring extension novels")
+		backupNovels.forEach novelLoop@{ novelEntity ->
+			try {
+				restoreNovel(
+					extensionID,
+					novelEntity,
+					categoryOrderToCategoryIds
+				)
+			} catch (e: Exception) {
+				e.printStackTrace()
 			}
 		}
 	}
@@ -361,6 +377,12 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				ACRA.errorReporter.handleSilentException(e)
 			}
 			logI("Inserted new chapters")
+		} else {
+			if (backupNovelEntity.bookmarked) {
+				novelsRepo.getNovel(targetNovelID)
+					?.copy(bookmarked = true)
+					?.let { novelsRepo.update(it) }
+			}
 		}
 
 		// if the ID is still -1, return
@@ -376,7 +398,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 		// get the chapters
 		val repoChapters = chaptersRepo.getChapters(targetNovelID)
-
 
 		val chapterMap = buildMap {
 			bChapters.forEach { backupChapter ->

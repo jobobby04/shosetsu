@@ -244,8 +244,8 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 						extensions.any { extensionEntity ->
 							extensionEntity.repoID == repositoryEntity.id
 						}
-					}.map { (_, url, name) ->
-						BackupRepositoryEntity(url, name)
+					}.map { (id, url, name) ->
+						BackupRepositoryEntity(id, url, name)
 					}
 
 			val zippedBytes = gzip { gzip ->
@@ -257,6 +257,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					extensions = extensions.map { extensionEntity ->
 						BackupExtensionEntity(
 							extensionEntity.id,
+							extensionEntity.repoID,
 							novelsToChapters.filter { (novel, _) ->
 								novel.extensionID == extensionEntity.id
 							}.map { (novel, chapters) ->
