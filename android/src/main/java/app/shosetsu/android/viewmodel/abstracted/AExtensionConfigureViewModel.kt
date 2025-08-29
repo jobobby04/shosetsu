@@ -36,14 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 abstract class AExtensionConfigureViewModel
 	: ShosetsuViewModel(), SubscribeViewModel<InstalledExtensionUI?> {
 
-	abstract val extensionListing: StateFlow<ListingSelectionData?>
 	abstract val extensionSettings: StateFlow<ImmutableList<FilterEntity>>
-
-	@Immutable
-	data class ListingSelectionData(
-		val choices: ImmutableList<String>,
-		val selection: Int
-	)
 
 
 	/** Set the extension ID to use */
@@ -62,6 +55,4 @@ abstract class AExtensionConfigureViewModel
 	abstract fun saveSetting(id: Int, value: String)
 	abstract fun saveSetting(id: Int, value: Boolean)
 	abstract fun saveSetting(id: Int, value: Int)
-
-	abstract fun setSelectedListing(value: Int)
 }

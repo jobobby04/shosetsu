@@ -133,7 +133,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			loadSearchRowUIUseCase = instance(),
 			loadCatalogueQueryDataUseCase = instance(),
 			getExtensionUseCase = instance(),
-			loadNovelUITypeUseCase = instance()
+			loadNovelUITypeUseCase = instance(),
 		)
 	}
 	bind<AUpdatesViewModel>() with provider {
@@ -206,9 +206,6 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 	bind<AExtensionConfigureViewModel>() with provider {
 		ExtensionConfigureViewModel(
-			instance(),
-			instance(),
-			instance(),
 			instance(),
 			instance(),
 			instance(),

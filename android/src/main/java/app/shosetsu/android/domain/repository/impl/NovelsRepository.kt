@@ -142,15 +142,16 @@ class NovelsRepository(
 	override suspend fun getCatalogueSearch(
 		ext: IExtension,
 		query: String,
-		data: Map<Int, Any>
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, query, data) }
+		data: Map<Int, Any>,
+		search: IExtension.Listing.Search,
+	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, query, data, search) }
 
 	@Throws(SSLException::class, LuaError::class)
 	override suspend fun getCatalogueData(
 		ext: IExtension,
-		listing: Int,
 		data: Map<Int, Any>,
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data) }
+		listing: IExtension.Listing.Item,
+	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, data, listing) }
 
 	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> =
 		database.getAnalytics()

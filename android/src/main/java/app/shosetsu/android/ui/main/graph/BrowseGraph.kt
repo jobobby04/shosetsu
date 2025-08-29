@@ -24,7 +24,7 @@ fun NavGraphBuilder.browseGraph(
 		composableMain<Browse.View> {
 			BrowseView(
 				openCatalogue = {
-					navController.navigate(Catalog(it))
+					navController.navigate(Catalog(it, null))
 				},
 				openSettings = {
 					navController.navigate(ConfigureExtension(it))
@@ -40,13 +40,17 @@ fun NavGraphBuilder.browseGraph(
 		}
 
 		composableSub<Catalog> { entry ->
-			val extensionId = entry.toRoute<Catalog>().extensionId
+			val route = entry.toRoute<Catalog>()
 			CatalogueView(
-				extensionId,
+				extensionId = route.extensionId,
+				listing = route.listing,
 				onOpenNovel = {
 					navController.navigate(Novel(it))
 				},
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
+				onSelectListing = {
+					navController.navigate(Catalog(route.extensionId, it.link))
+				}
 			)
 		}
 

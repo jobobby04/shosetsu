@@ -28,25 +28,24 @@ import java.io.IOException
  * 04 / 05 / 2020
  */
 interface IRemoteCatalogueDataSource {
-
 	/**
 	 * Runs a search on an extension
 	 */
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
-	suspend fun search(
+	suspend fun loadListing(
 		ext: IExtension,
-		query: String,
 		data: Map<Int, Any>,
+		listing: IExtension.Listing.Item,
 	): List<Novel.Info>
-
 
 	/**
 	 * Loads a listings data from an extension
 	 */
-	@Throws(HTTPException::class, LuaError::class, IOException::class)
-	suspend fun loadListing(
+	@Throws(HTTPException::class, IOException::class, LuaError::class)
+	suspend fun search(
 		ext: IExtension,
-		listingIndex: Int,
+		query: String?,
 		data: Map<Int, Any>,
+		search: IExtension.Listing.Search,
 	): List<Novel.Info>
 }

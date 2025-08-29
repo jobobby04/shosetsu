@@ -2,6 +2,8 @@ package app.shosetsu.android.viewmodel.impl
 
 import android.webkit.CookieManager
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -39,14 +41,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.sync.Mutex
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.emptyList
 
 /*
  * This file is part of shosetsu.
@@ -82,7 +88,8 @@ class CatalogViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ACatalogViewModel() {
-	override val queryFlow: MutableStateFlow<String> by lazy { MutableStateFlow("") }
+	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
+	private val filtersApplied: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	/**
 	 * Map of filter id to the state to pass into the extension
@@ -91,23 +98,36 @@ class CatalogViewModel(
 
 	private val filterDataFlow = MutableStateFlow<Map<Int, Any>>(hashMapOf())
 
+	override val exceptionFlow = MutableSharedFlow<Throwable>()
+
 	/**
 	 * Flow source for extension ID
 	 */
 	private val extensionIDFlow: MutableStateFlow<Int> = MutableStateFlow(-1)
-
-	override val exceptionFlow = MutableSharedFlow<Throwable>()
-
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
 		extensionIDFlow.mapLatest { extensionID ->
-			val ext = getExtensionUseCase(extensionID)
-
-			// Ensure filter is initialized
-			ext?.searchFiltersModel?.toList()?.init()
-			applyFilter()
-			ext
+			getExtensionUseCase(extensionID)
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
+
+	private val selectedListingLink = MutableStateFlow<String?>(null)
+	override val selectedListing: StateFlow<IExtension.Listing?> = iExtensionFlow
+		.combine(selectedListingLink, ::Pair)
+		.mapLatest { (ext, link) -> ext?.getListing(link) }
+		.mapLatest { ext ->
+			resetFilter()
+			ext
+		}
+		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
+
+	override val listingOptions: StateFlow<ImmutableList<IExtension.Listing>> = selectedListing.mapLatest {
+		when (it) {
+			is IExtension.Listing.List -> it.listings.toList().toImmutableList()
+			else -> persistentListOf()
+		}
+	}.catch {
+		exceptionFlow.emit(it)
+	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
 	private fun List<Filter<*>>.init() {
 		forEach { filter ->
@@ -120,11 +140,11 @@ class CatalogViewModel(
 				is Filter.Dropdown -> getFilterIntState(filter)
 				is Filter.RadioGroup -> getFilterIntState(filter)
 				is Filter.FList -> {
-					filter.filters.toList().init()
+					filter.filters.init()
 				}
 
 				is Filter.Group<*> -> {
-					filter.filters.toList().init()
+					filter.filters.init()
 				}
 
 				is Filter.Header -> {
@@ -136,59 +156,79 @@ class CatalogViewModel(
 		}
 	}
 
-	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy {
-		iExtensionFlow.transformLatest { ext ->
-			if (ext == null) {
-				emit(null)
-			} else {
-				emitAll(
-					queryFlow.flatMapLatest { query ->
+	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy { iExtensionFlow
+			.combine(selectedListing, ::Pair)
+			.transformLatest { (ext, listing) ->
+				if (ext == null) {
+					emit(null)
+					return@transformLatest
+				}
+				emitAll(queryFlow
+					.combine(filtersApplied, ::Pair)
+					.flatMapLatest { (query, filtersApplied) ->
+						if (listing == null) return@flatMapLatest flowOf(null)
+						if (query.isEmpty() && !filtersApplied && listing !is IExtension.Listing.Item) return@flatMapLatest flowOf(null)
+						val search = listing.search ?: return@flatMapLatest flowOf(null)
 						filterDataFlow.mapLatest { data ->
 							Pager(
 								PagingConfig(10)
 							) {
-								if (query.isEmpty())
-									getCatalogueListingData(ext, data)
+								if (query.isEmpty() && listing is IExtension.Listing.Item)
+									getCatalogueListingData(ext, data, listing)
 								else loadCatalogueQueryDataUseCase(
 									ext,
 									query,
-									data
+									data,
+									search
 								)
 							}
 						}
 					}
 				)
-			}
-		}.onIO()
+			}.onIO()
 	}
 
 	override val itemsLive: Flow<PagingData<ACatalogNovelUI>> by lazy {
-		pagerFlow.transformLatest {
-			if (it != null)
-				emitAll(it.flow)
-			else emit(PagingData.empty())
+		pagerFlow.combine(selectedListing, ::Pair).transformLatest { (pager, listing) ->
+			if (pager != null)
+				emitAll(pager.flow)
+			else if (listing !is IExtension.Listing.Item) {
+				emit(
+					PagingData.empty(
+						sourceLoadStates = LoadStates(
+							LoadState.NotLoading(false),
+							LoadState.NotLoading(false),
+							LoadState.NotLoading(false)
+						)
+					)
+				)
+			} else {
+				emit(PagingData.empty())
+			}
 		}.catch {
 			exceptionFlow.emit(it)
 		}.cachedIn(viewModelScope)
 	}
 
-	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> by lazy {
-		iExtensionFlow.mapLatest {
-			it?.searchFiltersModel?.toList() ?: emptyList()
-		}.mapLatest {
-			filterDataState.clear() // Reset filter state so no data conflicts occur
-			it.map { StableHolder(it) }.toImmutableList()
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
+	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> = iExtensionFlow.combine(
+		selectedListing.map { it as? IExtension.Listing.Item }.distinctUntilChanged(), ::Pair
+	).mapLatest { (extension, listing) ->
+		listing?.search?.filters?.toList() ?: emptyList()
+	}.mapLatest {
+		filterDataState.clear() // Reset filter state so no data conflicts occur
+		it.init()
+		it.map { StableHolder(it) }.toImmutableList()
 	}
+	.onIO()
+	.stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
 
 	override val hasFilters: StateFlow<Boolean> by lazy {
-		iExtensionFlow.mapLatest { it?.searchFiltersModel?.isNotEmpty() ?: false }
-			.onIO()
+		filterItemsLive.mapLatest { it.isNotEmpty() }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
 	override val hasSearchLive: StateFlow<Boolean> by lazy {
-		iExtensionFlow.mapLatest { it?.hasSearch ?: false }
+		selectedListing.mapLatest { it?.search != null }
 			.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
@@ -203,7 +243,7 @@ class CatalogViewModel(
 		iExtensionFlow.map { it?.baseURL }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 
-	override fun setExtensionID(extensionID: Int) {
+	override fun setListing(extensionID: Int, link: String?) {
 		when {
 			extensionIDFlow.value == -1 ->
 				logI("Setting NovelID")
@@ -217,6 +257,7 @@ class CatalogViewModel(
 			}
 		}
 		extensionIDFlow.value = extensionID
+		selectedListingLink.value = link
 	}
 
 	override fun applyQuery(newQuery: String) {
@@ -290,12 +331,17 @@ class CatalogViewModel(
 	private val filterMutex = Mutex()
 	override fun applyFilter() {
 		launchIO {
-			if (filterMutex.tryLock()) {
-				try {
-					filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
-				} finally {
-					filterMutex.unlock()
-				}
+			applyFilters()
+			filtersApplied.value = true
+		}
+	}
+
+	private fun applyFilters() {
+		if (filterMutex.tryLock()) {
+			try {
+				filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
+			} finally {
+				filterMutex.unlock()
 			}
 		}
 	}
@@ -349,7 +395,8 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-			applyFilter()
+			applyFilters()
+			filtersApplied.value = false
 		}
 	}
 

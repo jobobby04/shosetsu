@@ -110,7 +110,7 @@ fun SearchView(
 			if (it == -1)
 				viewModel.searchLibrary()
 			else
-				viewModel.searchExtension(it)
+				viewModel.searchExtension(it, null)
 		},
 		getException = viewModel::getException,
 		onClick = {

@@ -54,7 +54,7 @@ object Destination {
 		override val viewOrigin: ShosetsuDestination get() = View
 
 		@Serializable object View : ShosetsuDestination
-		@Serializable data class Catalog(val extensionId: Int) : ShosetsuDestination
+		@Serializable data class Catalog(val extensionId: Int, val listing: String?) : ShosetsuDestination
 		@Serializable data class ConfigureExtension(val extensionId: Int) : ShosetsuDestination
 	}
 	@Serializable object Library : Root {

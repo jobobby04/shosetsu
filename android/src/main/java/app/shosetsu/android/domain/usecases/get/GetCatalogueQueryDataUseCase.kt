@@ -48,6 +48,7 @@ class GetCatalogueQueryDataUseCase(
 		val iExtension: IExtension,
 		val query: String,
 		val data: Map<Int, Any>,
+		private val search: IExtension.Listing.Search,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? {
 			return state.anchorPosition?.let {
@@ -72,7 +73,8 @@ class GetCatalogueQueryDataUseCase(
 						novelsRepository.getCatalogueSearch(
 							iExtension,
 							query,
-							HashMap(data).also { it[PAGE_INDEX] = pageNumber }
+							HashMap(data).also { it[PAGE_INDEX] = pageNumber },
+							search
 						).let {
 							val data: List<Novel.Info> = it
 							(data.map { novelListing ->
@@ -122,25 +124,11 @@ class GetCatalogueQueryDataUseCase(
 		}
 	}
 
-	@Throws(
-		SQLiteException::class,
-		IncompatibleExtensionException::class,
-		LuaError::class,
-		MissingExtensionException::class
-	)
-	suspend operator fun invoke(
-		extID: Int,
-		query: String,
-		filters: Map<Int, Any>
-	): MyPagingSource = getExt(extID)?.let {
-		invoke(it, query, filters)
-	} ?: throw MissingExtensionException(extID)
-
 	@Throws(LuaError::class)
 	operator fun invoke(
 		ext: IExtension,
 		query: String,
-		filters: Map<Int, Any>
-	): MyPagingSource = MyPagingSource(ext, query, filters)
-
+		filters: Map<Int, Any>,
+		search: IExtension.Listing.Search,
+	): MyPagingSource = MyPagingSource(ext, query, filters, search)
 }
