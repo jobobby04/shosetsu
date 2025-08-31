@@ -12,6 +12,7 @@ import androidx.paging.cachedIn
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
@@ -91,14 +92,22 @@ class CatalogViewModel(
 
 	override val exceptionFlow = MutableSharedFlow<Throwable>()
 
+	init {
+		launchIO {
+			exceptionFlow.collect {
+				this@CatalogViewModel.logE("Exception in CatalogViewModel", it)
+			}
+		}
+	}
+
 	/**
 	 * Flow source for extension ID
 	 */
 	private val extensionIDFlow: MutableStateFlow<Int> = MutableStateFlow(-1)
 	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
-		extensionIDFlow.mapLatest { extensionID ->
-			getExtensionUseCase(extensionID)
-		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+		extensionIDFlow.mapLatest { extensionID -> getExtensionUseCase(extensionID) }
+			.catch { exceptionFlow.emit(it) }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	private val selectedListingLink = MutableStateFlow<String?>(null)
@@ -112,9 +121,9 @@ class CatalogViewModel(
 			is IExtension.Listing.List -> it.getListings().toList().toImmutableList()
 			else -> persistentListOf()
 		}
-	}.catch {
-		exceptionFlow.emit(it)
-	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
+	}
+		.catch { exceptionFlow.emit(it) }
+		.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
 	private fun List<Filter<*>>.init(map: ConcurrentHashMap<Int, MutableStateFlow<Any>>): ConcurrentHashMap<Int, MutableStateFlow<Any>> {
 		forEach { filter ->
@@ -211,9 +220,9 @@ class CatalogViewModel(
 			} else {
 				emit(PagingData.empty())
 			}
-		}.catch {
-			exceptionFlow.emit(it)
-		}.cachedIn(viewModelScope)
+		}
+			.catch { exceptionFlow.emit(it) }
+			.cachedIn(viewModelScope)
 	}
 
 	override val hasSearchLive: StateFlow<Boolean> by lazy {

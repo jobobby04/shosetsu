@@ -27,7 +27,7 @@ class LoadSearchRowUIUseCase(
 						list.forEach { extension ->
 							try {
 								extEntitiesRepo.get(extension.generify()).let { entity ->
-									if (entity.hasSearch) {
+									if (entity.getListing(null).search != null) {
 										arrayList.add(extension)
 									}
 								}
