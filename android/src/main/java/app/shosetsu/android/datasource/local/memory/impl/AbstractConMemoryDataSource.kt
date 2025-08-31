@@ -100,4 +100,7 @@ abstract class AbstractConMemoryDataSource<K : Any, V : Any> {
 		} else null
 	}
 
+	fun clear() {
+		_hashMap.clear()
+	}
 }

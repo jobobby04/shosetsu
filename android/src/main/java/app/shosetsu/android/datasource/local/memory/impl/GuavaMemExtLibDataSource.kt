@@ -50,4 +50,9 @@ class GuavaMemExtLibDataSource : IMemExtLibDataSource {
 	override fun removeLibrary(name: String) {
 		libraries.invalidate(name)
 	}
+
+	override fun clearExtLibs() {
+		libraries.invalidateAll()
+		libraries.cleanUp()
+	}
 }

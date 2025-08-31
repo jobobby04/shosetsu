@@ -40,4 +40,8 @@ class ConcurrentMemExtLibDataSource : IMemExtLibDataSource,
 	override fun removeLibrary(name: String) {
 		remove(name)
 	}
+
+	override fun clearExtLibs() {
+		clear()
+	}
 }

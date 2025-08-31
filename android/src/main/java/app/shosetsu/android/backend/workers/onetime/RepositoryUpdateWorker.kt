@@ -30,6 +30,7 @@ import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.common.ext.setOngoing
 import app.shosetsu.android.common.utils.await
+import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.domain.model.local.RepositoryEntity
@@ -80,6 +81,7 @@ class RepositoryUpdateWorker(
 	private val removeExtension: RemoveExtensionEntityUseCase by instance()
 	private val extRepoRepo: IExtensionRepoRepository by instance()
 	private val extensionLibrariesRepo: IExtensionLibrariesRepository by instance()
+	private val memExtLibDataSource: IMemExtLibDataSource by instance()
 
 	private val iSettingsRepository by instance<ISettingsRepository>()
 
@@ -95,6 +97,7 @@ class RepositoryUpdateWorker(
 	private suspend fun updateLibraries(
 		repoExtLibList: List<RepoLibrary>,
 		repository: RepositoryEntity,
+		force: Boolean,
 	) {
 		val databaseLibs = try {
 			extensionLibrariesRepo.loadExtLibByRepo(repository.id)
@@ -120,11 +123,11 @@ class RepositoryUpdateWorker(
 
 			val isInstalled = databaseLibs.any { it.scriptName == repoLibName }
 
-			var install = false
+			var install = !isInstalled || force
 			var extensionLibraryEntity: ExtLibEntity? = null
 			var repoVersion = Version(0, 0, 0)
 
-			if (isInstalled) {
+			if (!install) {
 				//  Checks if an update need
 				repoVersion = repoLibVersion
 				extensionLibraryEntity =
@@ -142,8 +145,6 @@ class RepositoryUpdateWorker(
 						}
 					}
 				}
-			} else {
-				install = true
 			}
 
 			// If install is true, then it adds it to the list for later
@@ -254,6 +255,7 @@ class RepositoryUpdateWorker(
 	}
 
 	override suspend fun doWork(): Result {
+		val force = inputData.getBoolean(FORCE, false)
 		logI("Starting Update")
 		notify("Starting Repository Update") { setOngoing() }
 		extRepoRepo.loadEnabledRepos().let { repos: List<RepositoryEntity> ->
@@ -324,7 +326,7 @@ class RepositoryUpdateWorker(
 					continue
 				}
 
-				updateLibraries(repoIndex.libraries, repo)
+				updateLibraries(repoIndex.libraries, repo, force)
 
 				val result = updateExtensions(repoIndex.extensions, repo)
 				presentExtensions.addAll(result)
@@ -333,6 +335,7 @@ class RepositoryUpdateWorker(
 
 			handlePresentExtensions(extRepo.loadRepositoryExtensions(), presentExtensions)
 		}
+		memExtLibDataSource.clearExtLibs()
 		notify("Completed") { setNotOngoing() }
 		delay(1000)
 		notificationManager.cancel(defaultNotificationID)
@@ -395,9 +398,12 @@ class RepositoryUpdateWorker(
 				workerManager.enqueueUniqueWork(
 					REPOSITORY_UPDATE_TAG,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<RepositoryUpdateWorker>().setInputData(data)
-						.setConstraints(
-							Constraints.Builder().apply {
+					OneTimeWorkRequestBuilder<RepositoryUpdateWorker>()
+						.setInputData(Data.Builder().apply {
+								putAll(data)
+								putBoolean(FORCE, force)
+							}.build())
+						.setConstraints(Constraints.Builder().apply {
 								if (!force) {
 									setRequiredNetworkType(
 										if (updateOnMetered()) {
@@ -434,4 +440,7 @@ class RepositoryUpdateWorker(
 			workerManager.cancelUniqueWork(REPOSITORY_UPDATE_TAG)
 	}
 
+	companion object {
+		const val FORCE = "force"
+	}
 }
