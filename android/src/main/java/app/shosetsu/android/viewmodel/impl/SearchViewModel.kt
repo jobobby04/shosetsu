@@ -20,7 +20,6 @@ import app.shosetsu.android.domain.usecases.load.LoadSearchRowUIUseCase
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
-import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.mapify
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -240,10 +239,7 @@ class SearchViewModel(
 									loadCatalogueQueryDataUseCase(
 										ext,
 										query,
-										HashMap<Int, Any>().apply {
-											putAll(listing.filters.toList().mapify())
-											this[PAGE_INDEX] = ext.startIndex
-										},
+										listing.filters.toList().mapify(),
 										listing
 									)
 								}

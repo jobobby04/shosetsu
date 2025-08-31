@@ -201,7 +201,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<IsOnlineUseCase>() with provider { IsOnlineUseCase(instance()) }
 
 	bind<GetCatalogueQueryDataUseCase>() with provider {
-		GetCatalogueQueryDataUseCase(instance(), instance())
+		GetCatalogueQueryDataUseCase(instance())
 	}
 	bind<LoadSearchRowUIUseCase>() with provider {
 		LoadSearchRowUIUseCase(

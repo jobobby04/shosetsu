@@ -9,7 +9,6 @@ import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
 import kotlinx.coroutines.Dispatchers
@@ -70,8 +69,9 @@ class GetCatalogueListingDataUseCase(
 					val response =
 						search(
 							iExtension,
-							HashMap(data).also { it[PAGE_INDEX] = pageNumber },
-							listing
+							data,
+							listing,
+							pageNumber,
 						)
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
@@ -118,11 +118,13 @@ class GetCatalogueListingDataUseCase(
 		iExtension: IExtension,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item,
+		page: Int,
 	): List<ACatalogNovelUI> =
 		novelsRepository.getCatalogueData(
 			iExtension,
-			data,
 			listing,
+			data,
+			page,
 		).let { list ->
 			list.map { novelListing ->
 				novelListing.convertTo(iExtension)

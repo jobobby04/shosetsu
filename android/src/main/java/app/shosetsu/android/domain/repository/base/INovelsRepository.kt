@@ -128,9 +128,10 @@ interface INovelsRepository {
 	@Throws(LuaError::class)
 	suspend fun getCatalogueSearch(
 		ext: IExtension,
-		query: String,
-		data: Map<Int, Any>,
 		search: IExtension.Listing.Search,
+		query: String,
+		filters: Map<Int, Any>,
+		page: Int,
 	): List<Novel.Info>
 
 	/**
@@ -139,8 +140,9 @@ interface INovelsRepository {
 	@Throws(SSLException::class, LuaError::class)
 	suspend fun getCatalogueData(
 		ext: IExtension,
-		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item,
+		data: Map<Int, Any>,
+		page: Int,
 	): List<Novel.Info>
 
 	/**

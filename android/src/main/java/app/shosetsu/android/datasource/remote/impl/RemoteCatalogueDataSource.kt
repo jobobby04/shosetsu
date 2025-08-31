@@ -2,13 +2,8 @@ package app.shosetsu.android.datasource.remote.impl
 
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
 import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.LISTING_INDEX
 import app.shosetsu.lib.Novel
-import app.shosetsu.lib.PAGE_INDEX
-import app.shosetsu.lib.QUERY_INDEX
-import app.shosetsu.lib.exceptions.HTTPException
 import org.luaj.vm2.LuaError
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -35,13 +30,14 @@ import java.io.IOException
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	override suspend fun loadListing(
 		ext: IExtension,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
-		listing: IExtension.Listing.Item
+		page: Int,
 	): List<Novel.Info> {
-		return if (!listing.search.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
+		return if (!listing.isIncrementing && page > ext.startIndex) {
 			emptyList()
 		} else try {
-            listing.getListing(data).toList()
+            listing.getListing(data, page).toList()
 		} catch (e: LuaError) {
 			throw e.cause ?: e
 		}
@@ -49,21 +45,16 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 
 	override suspend fun search(
 		ext: IExtension,
+		search: IExtension.Listing.Search,
 		query: String?,
-		data: Map<Int, Any>,
-		search: IExtension.Listing.Search
+		filters: Map<Int, Any>,
+		page: Int,
 	): List<Novel.Info> {
 		val query = query ?: ""
-		return if (!search.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
+		return if (!search.isIncrementing && page > ext.startIndex) {
 			emptyList()
 		} else try {
-			if (query.isEmpty()) {
-				search.getListing(data)?.toList() ?: emptyList()
-			} else {
-				search.getListing(HashMap(data).apply {
-					this[QUERY_INDEX] = query
-				})?.toList() ?: emptyList()
-			}
+			search.getListing(query, filters, page)?.toList() ?: emptyList()
 		} catch (e: LuaError) {
 			throw e.cause ?: e
 		}

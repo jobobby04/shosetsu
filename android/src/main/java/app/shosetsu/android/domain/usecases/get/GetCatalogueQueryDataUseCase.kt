@@ -3,15 +3,12 @@ package app.shosetsu.android.domain.usecases.get
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import app.shosetsu.android.common.IncompatibleExtensionException
-import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
-import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
 import kotlinx.coroutines.Dispatchers
@@ -41,13 +38,12 @@ import java.io.IOException
  * 15 / 05 / 2020
  */
 class GetCatalogueQueryDataUseCase(
-	private val getExt: GetExtensionUseCase,
 	private val novelsRepository: INovelsRepository,
 ) {
 	inner class MyPagingSource(
 		val iExtension: IExtension,
 		val query: String,
-		val data: Map<Int, Any>,
+		val filters: Map<Int, Any>,
 		private val search: IExtension.Listing.Search,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? {
@@ -72,9 +68,10 @@ class GetCatalogueQueryDataUseCase(
 					val response =
 						novelsRepository.getCatalogueSearch(
 							iExtension,
+							search,
 							query,
-							HashMap(data).also { it[PAGE_INDEX] = pageNumber },
-							search
+							filters,
+							pageNumber,
 						).let {
 							val data: List<Novel.Info> = it
 							(data.map { novelListing ->

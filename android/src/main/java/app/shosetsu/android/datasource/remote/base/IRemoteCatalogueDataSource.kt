@@ -34,8 +34,9 @@ interface IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	suspend fun loadListing(
 		ext: IExtension,
-		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item,
+		data: Map<Int, Any>,
+		page: Int,
 	): List<Novel.Info>
 
 	/**
@@ -44,8 +45,9 @@ interface IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	suspend fun search(
 		ext: IExtension,
-		query: String?,
-		data: Map<Int, Any>,
 		search: IExtension.Listing.Search,
+		query: String?,
+		filters: Map<Int, Any>,
+		page: Int,
 	): List<Novel.Info>
 }
