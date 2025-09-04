@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
@@ -15,6 +14,7 @@ import app.shosetsu.android.ui.main.Destination.More.Settings.Overview
 import app.shosetsu.android.ui.settings.SettingsView
 import app.shosetsu.android.ui.settings.sub.AdvancedSettingsView
 import app.shosetsu.android.ui.settings.sub.AppearanceSettingsView
+import app.shosetsu.android.ui.settings.sub.BackupView
 import app.shosetsu.android.ui.settings.sub.BrowseSettingsView
 import app.shosetsu.android.ui.settings.sub.DownloadsSettingsView
 import app.shosetsu.android.ui.settings.sub.LibrarySettingsView
@@ -58,7 +58,7 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 					navController.navigate(Settings.Browse)
 				},
 				navToBackup = {
-					navController.navigate(More.Backup)
+					navController.navigate(Settings.Backup)
 				},
 				navToAdvanced = {
 					navController.navigate(Settings.Advanced)
@@ -82,24 +82,6 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				}
 			)
 		}
-		composableSub<Settings.Browse> {
-			BrowseSettingsView(
-				onBack = navController::popBackStack,
-				onNavToRepositories = {
-					navController.navigate(More.Repositories)
-				}
-			)
-		}
-		composableSub<Settings.Advanced> {
-			AdvancedSettingsView(
-				onBack = navController::popBackStack
-			)
-		}
-		composableSub<Settings.Downloads> {
-			DownloadsSettingsView(
-				onBack = navController::popBackStack
-			)
-		}
 		composableSub<Settings.Reader> {
 			val context = LocalContext.current
 			val hostState = remember { SnackbarHostState() }
@@ -108,14 +90,36 @@ fun NavGraphBuilder.settingsGraph(navController: NavController) {
 				hostState = hostState,
 				onBack = navController::popBackStack,
 				openCSS = {
-					ContextCompat.startActivity(
-						context,
+					context.startActivity(
 						Intent(context, CSSEditorActivity::class.java).apply {
 							putExtra(CSSEditorActivity.CSS_ID, -1)
 						},
 						null
 					)
 				}
+			)
+		}
+		composableSub<Settings.Downloads> {
+			DownloadsSettingsView(
+				onBack = navController::popBackStack
+			)
+		}
+		composableSub<Settings.Browse> {
+			BrowseSettingsView(
+				onBack = navController::popBackStack,
+				onNavToRepositories = {
+					navController.navigate(More.Repositories)
+				}
+			)
+		}
+		composableSub<Settings.Backup> {
+			BackupView(
+				onBack = navController::popBackStack
+			)
+		}
+		composableSub<Settings.Advanced> {
+			AdvancedSettingsView(
+				onBack = navController::popBackStack
 			)
 		}
 	}

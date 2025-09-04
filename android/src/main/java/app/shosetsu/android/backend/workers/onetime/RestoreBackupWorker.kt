@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.Base64
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.work.*
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
@@ -75,7 +76,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	private val novelsSettingsRepo by instance<INovelSettingsRepository>()
 	private val chaptersRepo by instance<IChaptersRepository>()
 	private val chapterHistoryRepo by instance<ChapterHistoryRepository>()
-	private val backupUriRepo by instance<IBackupUriRepository>()
 	private val categoriesRepo by instance<ICategoryRepository>()
 	private val novelCategoriesRepo by instance<INovelCategoryRepository>()
 	private val addCategoryUseCase by instance<AddCategoryUseCase>()
@@ -123,21 +123,16 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	@Throws(IOException::class)
 	override suspend fun doWork(): Result {
 		logI("Starting restore")
-		val backupName = inputData.getString(BACKUP_DATA_KEY)
-		val isExternal = inputData.getBoolean(BACKUP_DIR_KEY, false)
+		val backupUri = inputData.getString(BACKUP_URI_KEY)?.toUri()
 
-		if (!isExternal && backupName == null) {
-			logE("null backupName, Internal Restore requires backupName")
+		if (backupUri == null) {
+			logE("null backupUri, cannot restore")
 			return Result.failure()
 		}
 
 		notify(R.string.restore_notification_content_starting)
 		val backupEntity = try {
-			if (isExternal) {
-				backupUriRepo.take()?.let { loadBackupFromUri(it) }
-			} else {
-				backupRepo.loadBackup(backupName!!)
-			}
+			loadBackupFromUri(backupUri)
 		} catch (e: Exception) {//TODO specify
 			with(e) {
 				logE(" $message", e)
@@ -152,16 +147,8 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				return Result.failure()
 			}
 		}
-		if (backupEntity == null) {
-			logE("Received empty, impossible")
-			notify(R.string.restore_notification_content_unexpected_empty) {
-				setNotOngoing()
-			}
-			return Result.failure()
-		}
 
-
-		// Decode encrypted string to bytes via Base64
+        // Decode encrypted string to bytes via Base64
 		notify(R.string.restore_notification_content_decoding_string)
 		val decodedBytes: ByteArray = if (isBase64Encoded(backupEntity.content.inputStream())) {
 			Base64.decode(backupEntity.content, Base64.DEFAULT)
@@ -214,21 +201,27 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 			notify("Adding repositories")
 			// Adds the repositories
-			backup.repos.forEach { (url, name) ->
+			val oldRepositories = extensionsRepoRepo.loadRepositories()
+			val idMap = backup.repos.map { (id, url, name) ->
 				notify("") {
 					setContentTitle(getString(R.string.restore_notification_title_adding_repos))
 					setContentText("$name\n$url")
 				}
+				oldRepositories.find { it.url == url }?.let {
+					logI("Repository already exists, skipping")
+					return@map id to it.id
+				}
 				try {
-					extensionsRepoRepo.addRepository(
+					return@map id to extensionsRepoRepo.addRepository(
 						url,
 						name,
-					)
+					).toInt()
 				} catch (e: SQLiteException) {
 					logE("Failed to add repo", e)
 					// its likely constraint, we can ignore it
+					return@map null to null
 				}
-			}
+			}.filter { it.first != null }.toMap()
 
 			notify("Loading repository data")
 			// Load the data from the repositories
@@ -239,6 +232,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 			backup.extensions.forEach {
 				restoreExtension(
+					idMap[it.repoId],
 					extensions,
 					it,
 					categoryOrderToCategoryIds
@@ -259,6 +253,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	}
 
 	private suspend fun restoreExtension(
+		repoId: Int?,
 		extensions: List<GenericExtensionEntity>,
 		backupExtensionEntity: BackupExtensionEntity,
 		categoryOrderToCategoryIds: Map<Int, Int>
@@ -266,41 +261,49 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		val extensionID = backupExtensionEntity.id
 		val backupNovels = backupExtensionEntity.novels
 		logI("$extensionID")
-		extensions.find { it.id == extensionID }?.let { extensionEntity ->
-			// Install the extension
-			if (!extensionsRepo.isExtensionInstalled(extensionEntity)) {
-				logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
-				notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
-				try {
-					installExtension(extensionEntity)
-				} catch (e: InvalidMetaDataException) {
-					notify(
-						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
-						notificationId = extensionID
-					)
-					return
-				} catch (e: Exception) {
-					notify(
-						getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
-						notificationId = extensionID
-					)
-					return
-				}
-			} else {
-				logI("Extension is installed, moving on")
+		val extensionEntity = extensions.find { (repoId == null || it.repoID == repoId) && it.id == extensionID }
+		if (extensionEntity == null) {
+			//TODO this should probably be handled
+			notify(
+				getString(R.string.restore_notification_content_extension_not_found) + " $extensionID",
+				notificationId = extensionID
+			)
+			logE("Extension not found")
+			return
+		}
+		// Install the extension
+		if (!extensionsRepo.isExtensionInstalled(extensionEntity)) {
+			logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
+			notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
+			try {
+				installExtension(extensionEntity)
+			} catch (e: InvalidMetaDataException) {
+				notify(
+					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
+					notificationId = extensionID
+				)
+				return
+			} catch (e: Exception) {
+				notify(
+					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
+					notificationId = extensionID
+				)
+				return
 			}
+		} else {
+			logI("Extension is installed, moving on")
+		}
 
-			logI("Restoring extension novels")
-			backupNovels.forEach novelLoop@{ novelEntity ->
-				try {
-					restoreNovel(
-						extensionID,
-						novelEntity,
-						categoryOrderToCategoryIds
-					)
-				} catch (e: Exception) {
-					e.printStackTrace()
-				}
+		logI("Restoring extension novels")
+		backupNovels.forEach novelLoop@{ novelEntity ->
+			try {
+				restoreNovel(
+					extensionID,
+					novelEntity,
+					categoryOrderToCategoryIds
+				)
+			} catch (e: Exception) {
+				e.printStackTrace()
 			}
 		}
 	}
@@ -371,6 +374,12 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				logE("Failed to handle chapters", e)
 			}
 			logI("Inserted new chapters")
+		} else {
+			if (backupNovelEntity.bookmarked) {
+				novelsRepo.getNovel(targetNovelID)
+					?.copy(bookmarked = true)
+					?.let { novelsRepo.update(it) }
+			}
 		}
 
 		// if the ID is still -1, return
@@ -386,7 +395,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 		// get the chapters
 		val repoChapters = chaptersRepo.getChapters(targetNovelID)
-
 
 		val chapterMap = buildMap {
 			bChapters.forEach { backupChapter ->
@@ -544,16 +552,9 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 		private const val MESSAGE_LOG_JSON_OUTDATED = "BACKUP JSON MISMATCH"
 
-
 		/**
-		 * Path / name of file
+		 * URI of the backup file
 		 */
-		const val BACKUP_DATA_KEY = "BACKUP_NAME"
-
-		/**
-		 * If true, the [BACKUP_DATA_KEY] is a full path pointing to a specific file, other wise
-		 * it is an internal path
-		 */
-		const val BACKUP_DIR_KEY = "BACKUP_DIR"
+		const val BACKUP_URI_KEY = "BACKUP_URI"
 	}
 }

@@ -28,17 +28,17 @@ object Destination {
 		@Serializable object Downloads : ShosetsuDestination
 		@Serializable data class AddShare(val url: String?) : ShosetsuDestination
 		@Serializable object Repositories : ShosetsuDestination
-		@Serializable object Backup : ShosetsuDestination
 		@Serializable object History : ShosetsuDestination
 		@Serializable object Analytics : ShosetsuDestination
 		@Serializable object Settings : ShosetsuDestination {
 			@Serializable object Overview : ShosetsuDestination
 			@Serializable object Appearance : ShosetsuDestination
 			@Serializable object Library : ShosetsuDestination
-			@Serializable object Browse : ShosetsuDestination
-			@Serializable object Advanced : ShosetsuDestination
-			@Serializable object Downloads : ShosetsuDestination
 			@Serializable object Reader : ShosetsuDestination
+			@Serializable object Downloads : ShosetsuDestination
+			@Serializable object Browse : ShosetsuDestination
+			@Serializable object Backup : ShosetsuDestination
+			@Serializable object Advanced : ShosetsuDestination
 		}
 		@Serializable data class TextReader(val assetId: Int) : ShosetsuDestination
 	}

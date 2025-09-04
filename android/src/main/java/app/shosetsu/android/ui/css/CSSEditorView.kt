@@ -10,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import app.shosetsu.android.common.enums.AppThemes
+
+import app.shosetsu.android.common.consts.URL_HELP_CSS
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
@@ -58,7 +60,7 @@ fun CSSEditorView(
 			onUndo = { viewModel.undo() },
 			onRedo = { viewModel.redo() },
 			onBack = { onBackPressed() },
-			onHelp = { activity.openInWebView(CSSEditorActivity.HELP_WEBSITE) },
+			onHelp = { activity.openInWebView(URL_HELP_CSS) },
 			onExport = {
 				// TODO Add exporting
 			},

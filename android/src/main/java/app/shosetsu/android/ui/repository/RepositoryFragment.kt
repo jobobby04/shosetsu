@@ -56,7 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
-import app.shosetsu.android.common.consts.REPOSITORY_HELP_URL
+import app.shosetsu.android.common.consts.URL_HELP_REPOSITORY
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.QRCodeShareDialog
@@ -521,7 +521,7 @@ fun RepositoriesContent(
 					NavigateBackButton(onBack)
 				},
 				actions = {
-					HelpButton(REPOSITORY_HELP_URL)
+					HelpButton(URL_HELP_REPOSITORY)
 				},
 			)
 		},

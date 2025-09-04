@@ -34,7 +34,7 @@ data class GenericExtensionEntity(
 	/** Extension ID */
 	val id: Int,
 
-	/** Repository extension belongs too*/
+	/** Repository extension belongs to */
 	val repoID: Int,
 
 	/** Name of the extension, can be changed */

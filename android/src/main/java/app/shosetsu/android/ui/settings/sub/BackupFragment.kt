@@ -1,11 +1,10 @@
-package app.shosetsu.android.ui.backup
+package app.shosetsu.android.ui.settings.sub
 
-import android.net.Uri
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,12 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -27,25 +21,21 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
+import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.RestrictionSelectPreferenceWidget
@@ -108,33 +98,24 @@ fun BackupView(
 		}
 	}
 
-	val selectLocationToExportLauncher = rememberLauncherForActivityResult(
-		CreateDocument("application/octet-stream")
-	) { uri: Uri? ->
-		if (uri == null) {
-			viewModel.logE("Cancelled")
-			viewModel.clearExport()
-			return@rememberLauncherForActivityResult
+	val selectBackupStorageLocationLauncher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.OpenDocumentTree()
+	) { uri ->
+		if (uri != null) {
+			val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+					Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+			try {
+				context.contentResolver.takePersistableUriPermission(uri, flags)
+			} catch (e: SecurityException) {
+				viewModel.logE("File picker failed", e)
+				context.toast(R.string.file_picker_uri_permission_unsupported)
+				return@rememberLauncherForActivityResult
+			}
+
+			launchIO {
+				viewModel.setBackupStorageLocation(context, uri)
+			}
 		}
-
-		viewModel.exportBackup(uri)
-
-		scope.launch {
-			hostState.showSnackbar(context.getString(R.string.view_backup_exporting_start))
-		}
-	}
-
-	var hasNoBackupSelectedForExport by remember { mutableStateOf(false) }
-
-	fun performExportSelection() {
-		val backupFileName = viewModel.getBackupToExport()
-
-		if (backupFileName == null) {
-			hasNoBackupSelectedForExport = true
-			return
-		}
-
-		selectLocationToExportLauncher.launch(backupFileName)
 	}
 
 	BackupSettingsContent(
@@ -142,70 +123,18 @@ fun BackupView(
 		// Stops novel updates while backup is taking place
 		// Starts backing up data
 		backupNow = viewModel::startBackup,
-		restore = viewModel::restore,
-		export = {
-			viewModel.holdBackupToExport(it)
-			performExportSelection()
-		},
 		performFileSelection = {
 			selectBackupToRestoreLauncher.launch(arrayOf("application/octet-stream"))
 		},
-		hasNoBackupSelectedForExport = hasNoBackupSelectedForExport,
+		performBackupStorageLocationSelection = {
+			try {
+				selectBackupStorageLocationLauncher.launch(null)
+			} catch (e: ActivityNotFoundException) {
+				context.toast(R.string.file_picker_error)
+			}
+		},
 		onBack = onBack
 	)
-}
-
-@Composable
-fun BackupSelectionDialog(
-	viewModel: ABackupSettingsViewModel,
-	dismiss: () -> Unit,
-	optionSelected: (String) -> Unit,
-) {
-	val options by viewModel.loadInternalOptions().collectAsState(emptyList())
-	Dialog(
-		onDismissRequest = {
-			dismiss()
-		},
-	) {
-		Card {
-			Column(
-				modifier = Modifier
-					.padding(8.dp),
-			) {
-				Text(
-					stringResource(R.string.settings_backup_alert_select_backup_title),
-					style = MaterialTheme.typography.titleLarge,
-					modifier = Modifier.padding(
-						bottom = 16.dp,
-						top = 8.dp,
-						start = 24.dp,
-						end = 24.dp
-					)
-				)
-
-				LazyColumn(
-					modifier = Modifier
-						.padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
-						.height(200.dp)
-						.fillMaxWidth()
-				) {
-					items(options) { option ->
-						TextButton(onClick = {
-							optionSelected(option)
-							dismiss()
-						}) {
-							Text(
-								remember(option) {
-									option.removePrefix("shosetsu-backup-")
-										.removeSuffix(".$BACKUP_FILE_EXTENSION")
-								}
-							)
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -214,18 +143,10 @@ fun BackupSettingsContent(
 	viewModel: ABackupSettingsViewModel,
 	backupNow: () -> Unit,
 	performFileSelection: () -> Unit,
-	restore: (String) -> Unit,
-	export: (String) -> Unit,
-	hasNoBackupSelectedForExport: Boolean,
+	performBackupStorageLocationSelection: () -> Unit,
 	onBack: () -> Unit
 ) {
 	val snackbarHostState = remember { SnackbarHostState() }
-	val message = stringResource(R.string.fragment_backup_error_unselected)
-
-	LaunchedEffect(hasNoBackupSelectedForExport) {
-		if (hasNoBackupSelectedForExport)
-			snackbarHostState.showSnackbar(message)
-	}
 
 	Scaffold(
 		snackbarHost = {
@@ -248,6 +169,17 @@ fun BackupSettingsContent(
 				.fillMaxSize()
 				.padding(it)
 		) {
+			item {
+				val subtitle by viewModel.settingsRepo
+					.getStringFlow(SettingKey.BackupStorageLocation)
+					.collectAsState("")
+				TextPreferenceWidget(
+					title = stringResource(R.string.settings_backup_location),
+					subtitle = subtitle,
+				) {
+					performBackupStorageLocationSelection()
+				}
+			}
 
 			item {
 				BasePreferenceWidget(
@@ -267,69 +199,16 @@ fun BackupSettingsContent(
 								Text(stringResource(R.string.backup_now))
 							}
 
-							var isDialogShowing: Boolean by remember { mutableStateOf(false) }
-							var isRestoreDialogShowing: Boolean by remember { mutableStateOf(false) }
 							SegmentedButton(
 								modifier = Modifier.fillMaxHeight(),
 								checked = false,
-								onCheckedChange = { isDialogShowing = true },
+								onCheckedChange = { performFileSelection() },
 								shape = SegmentedButtonDefaults.itemShape(1, 2),
 							) {
 								Text(stringResource(R.string.restore_now))
 							}
-
-							if (isRestoreDialogShowing)
-								BackupSelectionDialog(viewModel, { isRestoreDialogShowing = false }, restore)
-
-							if (isDialogShowing)
-								AlertDialog(
-									onDismissRequest = {
-										isDialogShowing = false
-									},
-									confirmButton = {
-										TextButton(onClick = {
-											// Open file selector
-											performFileSelection()
-											isDialogShowing = false
-										}) {
-											Text(stringResource(R.string.settings_backup_alert_location_external))
-										}
-										TextButton(onClick = {
-											isDialogShowing = false
-											isRestoreDialogShowing = true
-										}) {
-											Text(stringResource(R.string.settings_backup_alert_location_internal))
-										}
-									},
-									title = {
-										Text(
-											stringResource(R.string.settings_backup_alert_select_location_title),
-											style = MaterialTheme.typography.titleLarge,
-											modifier = Modifier.padding(
-												bottom = 16.dp,
-												top = 8.dp,
-												start = 24.dp,
-												end = 24.dp
-											)
-										)
-									},
-									modifier = Modifier.padding(8.dp)
-								)
 						}
 					}
-				)
-			}
-
-			item {
-				var isExportShowing: Boolean by remember { mutableStateOf(false) }
-
-				if (isExportShowing) {
-					BackupSelectionDialog(viewModel, { isExportShowing = false }, export)
-				}
-
-				TextPreferenceWidget(
-					title = stringResource(R.string.settings_backup_export),
-					onPreferenceClick = { isExportShowing = true }
 				)
 			}
 

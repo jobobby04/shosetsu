@@ -40,7 +40,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
+import app.shosetsu.android.common.consts.MAX_CONTINUOUS_READING_TIME
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.reader.content.ChapterReaderBottomSheetContent
@@ -127,9 +127,9 @@ fun ChapterReaderView(
 		LaunchedEffect(isReadingTooLong) {
 			while (!isReadingTooLong) {
 				val startTime = System.currentTimeMillis()
-				delay(MAX_CONTINOUS_READING_TIME)
+				delay(MAX_CONTINUOUS_READING_TIME)
 				val currentTime = System.currentTimeMillis()
-				if ((currentTime - startTime) < ((MAX_CONTINOUS_READING_TIME / .25)))
+				if ((currentTime - startTime) < ((MAX_CONTINUOUS_READING_TIME / .25)))
 					viewModel.userIsReadingTooLong()
 			}
 		}

@@ -51,6 +51,5 @@ val fileDataSourceModule: DI.Module = DI.Module("file_data_source") {
 			instance()
 		)
 	}
-	bind<IFileBackupDataSource>() with singleton { FileBackupDataSource(instance()) }
 	bind<IFileCrashDataSource>() with singleton { FileCrashDataSource(instance()) }
 }

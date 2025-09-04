@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted.settings
 
+import android.content.Context
 import android.net.Uri
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.collections.immutable.ImmutableList
@@ -31,36 +32,14 @@ abstract class ABackupSettingsViewModel(iSettingsRepository: ISettingsRepository
 
 	/** Order the app to create a new backup now */
 	abstract fun startBackup()
-	abstract fun loadInternalOptions(): Flow<ImmutableList<String>>
-
-	/**
-	 * Load backup via a path
-	 *
-	 * For internal backups
-	 */
-	abstract fun restore(path: String)
 
 	/**
 	 * Load backup via the uri
-	 *
-	 * For external backups
 	 */
 	abstract fun restore(uri: Uri)
 
 	/**
-	 * The view model will hold the backup to export
+	 * Set the backup storage location
 	 */
-	abstract fun holdBackupToExport(backupToExport: String)
-
-	/**
-	 * @return the backup file to export
-	 */
-	abstract fun getBackupToExport(): String?
-
-	/**
-	 * Cancel export process
-	 */
-	abstract fun clearExport()
-
-	abstract fun exportBackup(uri: Uri)
+	abstract suspend fun setBackupStorageLocation(context: Context, uri: Uri)
 }

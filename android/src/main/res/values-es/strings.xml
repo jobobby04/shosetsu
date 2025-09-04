@@ -161,9 +161,6 @@
     <string name="artists">Artistas</string>
     <string name="unread_status">Estado no leído</string>
     <string name="update_novel">Actualizar novela</string>
-    <string name="settings_backup_alert_select_location_title">Seleccionar ubicación</string>
-    <string name="settings_backup_alert_location_external">Externa</string>
-    <string name="settings_backup_alert_location_internal">Interna</string>
     <string name="restore_notification_content_text_outdated">La copia de seguridad está desactualizada</string>
     <string name="restore_notification_content_missing_key">La copia de seguridad no contiene la clave \'versión\'</string>
     <string name="restore_notification_content_decoding_string">Descodificación</string>
@@ -281,9 +278,6 @@
     <string name="activity_main_backup_in_progress_warning">Evite cambiar los datos</string>
     <string name="settings_update_repo_disable_on_fail_title">Desactivar en caso de fallo</string>
     <string name="settings_update_repo_disable_on_fail_desc">Deshabilite un repositorio si no se actualiza, principalmente para realizar pruebas.</string>
-    <string name="settings_backup_export">Exportar copia de seguridad</string>
-    <string name="export_backup_notification_subtext">Exportar copia de seguridad</string>
-    <string name="export_backup_notification_content_starting">Exportación comenzando</string>
     <string name="logo_desc">Este es el icono de Shosetsu</string>
     <string name="settings_advanced_kill_cycle_workers_title">Matar a los trabajadores del ciclo</string>
     <string name="settings_advanced_kill_cycle_workers_desc">Mata a todos los trabajadores cíclicos para reiniciarlos.</string>

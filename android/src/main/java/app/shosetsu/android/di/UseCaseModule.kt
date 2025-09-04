@@ -46,7 +46,6 @@ import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
 import app.shosetsu.android.domain.usecases.load.LoadBrowseExtensionsUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDownloadsUseCase
-import app.shosetsu.android.domain.usecases.load.LoadInternalBackupNamesUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryFilterSettingsUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
@@ -64,7 +63,6 @@ import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCas
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
-import app.shosetsu.android.domain.usecases.start.StartExportBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
@@ -252,12 +250,9 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<StartBackupWorkerUseCase>() with provider {
 		StartBackupWorkerUseCase(instance(), instance())
 	}
-	bind<LoadInternalBackupNamesUseCase>() with provider {
-		LoadInternalBackupNamesUseCase(instance())
-	}
 
 	bind<StartRestoreWorkerUseCase>() with provider {
-		StartRestoreWorkerUseCase(instance(), instance())
+		StartRestoreWorkerUseCase(instance())
 	}
 
 	bind<AddRepositoryUseCase>() with provider {
@@ -327,13 +322,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<InstallExtensionUseCase>() with provider {
 		InstallExtensionUseCase(
 			instance(),
-			instance(),
-			instance()
-		)
-	}
-
-	bind<StartExportBackupWorkerUseCase>() with provider {
-		StartExportBackupWorkerUseCase(
 			instance(),
 			instance()
 		)

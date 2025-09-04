@@ -154,11 +154,7 @@
 	<string name="artists">Художники</string>
 	<string name="unread_status">Непрочитанный статус</string>
 	<string name="update_novel">Обновление новелл</string>
-	<string name="settings_backup_alert_select_location_title">Выберите местоположение</string>
-	<string name="settings_backup_alert_select_backup_title">Выберите резервное копирование</string>
 	<string name="fragment_backup_settings_label">Настройки резервного копирования</string>
-	<string name="settings_backup_alert_location_external">Внешний</string>
-	<string name="settings_backup_alert_location_internal">Внутренний</string>
 	<string name="restore_notification_content_text_outdated">Резервное копирование устарело</string>
 	<string name="restore_notification_content_missing_key">Резервная копия не содержит \'version\' ключ</string>
 	<string name="restore_notification_content_decoding_string">Декодирование</string>
@@ -291,9 +287,6 @@
 	<string name="activity_main_backup_in_progress_warning">Пожалуйста, избегайте изменения данных</string>
 	<string name="settings_update_repo_disable_on_fail_title">Отключение при сбое</string>
 	<string name="settings_update_repo_disable_on_fail_desc">Отключите репозиторий, если он не обновляется, в основном для тестирования.</string>
-	<string name="settings_backup_export">Экспорт резервной копии</string>
-	<string name="export_backup_notification_subtext">Экспорт резервной копии</string>
-	<string name="export_backup_notification_content_starting">Экспорт начинается</string>
 	<string name="logo_desc">Это икона Shosetsu</string>
 	<string name="settings_advanced_kill_cycle_workers_title">Убить рабочих цикла</string>
 	<string name="settings_advanced_kill_cycle_workers_desc">Убивает всех циклических рабочих, чтобы сбросить их.</string>
@@ -387,9 +380,9 @@
     <string name="backup_restore_print_chapters_title">Печать названий глав при восстановлении</string>
     <string name="backup_restore_print_chapters_desc">Печатать названия глав в журнал во время восстановления.\nПолезно для отладки, не полезно в других случаях.\nНеобходимо установить перед восстановлением.</string>
     <string name="restore_notification_content_novel_fail_io">IOException: %s</string>
-    <string name="fragment_backup_error_unselected">Для экспорта не выбрана резервная копия</string>
 	<string name="export_backup_notification_missing_uri">Не предоставлен URI для экспорта резервной копии</string>
-	<string name="export_backup_notification_invalid_backup">Такой резервной копии не существует</string>
+	<string name="settings_advanced_log_title">Запись в файл</string>
+	<string name="settings_advanced_log_desc">Включение записи журналов в файл, но может привести к замедлению работы.\nТребуется перезагрузка</string>
 	<string name="update_to">Обновление: %s</string>
     <string name="download_chapter_updates_desc">Скачать главы, которые были недавно добавлены в Обновления</string>
     <string name="input_int_range_desc">Пожалуйста, введите целое число в диапазоне от %1$d до %2$d (включительно)</string>

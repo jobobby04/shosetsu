@@ -1,19 +1,21 @@
 package app.shosetsu.android.viewmodel.impl.settings
 
+import android.content.Context
 import android.net.Uri
+import androidx.core.provider.DocumentsContractCompat
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
+import app.shosetsu.android.common.FilePermissionException
+import app.shosetsu.android.common.NullContentResolverException
+import app.shosetsu.android.common.SettingKey
+import app.shosetsu.android.common.enums.ExternalFileDir.APP
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import app.shosetsu.android.domain.usecases.load.LoadInternalBackupNamesUseCase
 import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
-import app.shosetsu.android.domain.usecases.start.StartExportBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
+import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import java.io.FileOutputStream
 
 /*
  * This file is part of shosetsu.
@@ -40,9 +42,8 @@ class BackupSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
 	private val manager: NovelUpdateWorker.Manager,
 	private val startBackupWorkerUseCase: StartBackupWorkerUseCase,
-	private val loadInternalBackupNamesUseCase: LoadInternalBackupNamesUseCase,
 	private val startRestoreWorker: StartRestoreWorkerUseCase,
-	private val startExportWorker: StartExportBackupWorkerUseCase
+	private val iFileSystemProvider: IFileSystemProvider,
 ) : ABackupSettingsViewModel(iSettingsRepository) {
 
 	override fun startBackup() {
@@ -52,36 +53,38 @@ class BackupSettingsViewModel(
 		}
 	}
 
-	override fun loadInternalOptions(): Flow<ImmutableList<String>> = flow {
-		emit(loadInternalBackupNamesUseCase().sorted().toImmutableList())
-	}.onIO()
-
-	override fun restore(path: String) {
-		logV("Restoring: $path ")
-		startRestoreWorker(path)
-	}
-
 	override fun restore(uri: Uri) {
 		logV("Restoring: $uri")
 		startRestoreWorker(uri)
 	}
 
-	private var backupToExport: String? = null
-
-	override fun holdBackupToExport(backupToExport: String) {
-		this.backupToExport = backupToExport
+	override suspend fun setBackupStorageLocation(context: Context, uri: Uri) {
+		val contentResolver = context.applicationContext.contentResolver
+			?: throw NullContentResolverException()
+		for (file in iFileSystemProvider.listFiles(APP, BACKUP_DIRECTORY)) {
+			val data = iFileSystemProvider.readFile(APP, "$BACKUP_DIRECTORY/$file")
+			val docId = DocumentsContractCompat.getTreeDocumentId(uri) ?: continue
+			val parentDocumentUri = DocumentsContractCompat.buildDocumentUriUsingTree(uri, docId) ?: continue
+			val uri = DocumentsContractCompat.createDocument(
+				contentResolver,
+				parentDocumentUri,
+				"application/octet-stream",
+				file
+			) ?: continue
+			contentResolver.openFileDescriptor(uri, "w")?.use { descriptor ->
+				FileOutputStream(descriptor.fileDescriptor).use {
+					it.write(data)
+				}
+			} ?: throw FilePermissionException(
+				uri.path ?: "",
+				FilePermissionException.PermissionType.WRITE
+			)
+			iFileSystemProvider.deleteFile(APP, "$BACKUP_DIRECTORY/$file")
+		}
+		settingsRepo.setString(SettingKey.BackupStorageLocation, uri.toString())
 	}
 
-	override fun getBackupToExport(): String? =
-		if (backupToExport != null) backupToExport!! else null
-
-	override fun clearExport() {
-		backupToExport = null
-	}
-
-	override fun exportBackup(uri: Uri) {
-		if (backupToExport == null) return
-
-		startExportWorker(backupToExport!!, uri)
+	companion object {
+		private const val BACKUP_DIRECTORY = "Backups"
 	}
 }

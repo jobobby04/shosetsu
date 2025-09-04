@@ -33,8 +33,8 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
 import app.shosetsu.android.common.consts.URL_DISCLAIMER
 import app.shosetsu.android.common.consts.URL_DISCORD
-import app.shosetsu.android.common.consts.URL_GITHUB_APP
-import app.shosetsu.android.common.consts.URL_GITHUB_EXTENSIONS
+import app.shosetsu.android.common.consts.URL_APP_REPO
+import app.shosetsu.android.common.consts.URL_EXTENSIONS_REPO
 import app.shosetsu.android.common.consts.URL_KOFI
 import app.shosetsu.android.common.consts.URL_MATRIX
 import app.shosetsu.android.common.consts.URL_PATREON
@@ -85,7 +85,7 @@ fun AboutView(
 		uriHandler.openUri(URL_WEBSITE)
 
 	fun openExtensions() =
-		uriHandler.openUri(URL_GITHUB_EXTENSIONS)
+		uriHandler.openUri(URL_EXTENSIONS_REPO)
 
 	fun openDiscord() =
 		uriHandler.openUri(URL_DISCORD)
@@ -97,7 +97,7 @@ fun AboutView(
 		uriHandler.openUri(URL_PATREON)
 
 	fun openGithub() =
-		uriHandler.openUri(URL_GITHUB_APP)
+		uriHandler.openUri(URL_APP_REPO)
 
 	fun openPrivacy() =
 		uriHandler.openUri(URL_PRIVACY)
@@ -238,14 +238,14 @@ fun AboutContent(
 			item {
 				AboutItem(
 					R.string.github,
-					URL_GITHUB_APP,
+					URL_APP_REPO,
 					onClick = onOpenSource
 				)
 			}
 			item {
 				AboutItem(
 					R.string.extensions,
-					URL_GITHUB_EXTENSIONS,
+					URL_EXTENSIONS_REPO,
 					onClick = onOpenExtensions
 				)
 			}
