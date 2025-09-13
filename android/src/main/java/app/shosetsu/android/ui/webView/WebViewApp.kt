@@ -19,9 +19,20 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.runtime.*
+import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,7 +47,11 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
-import com.google.accompanist.web.*
+import com.google.accompanist.web.AccompanistWebViewClient
+import com.google.accompanist.web.LoadingState
+import com.google.accompanist.web.WebView
+import com.google.accompanist.web.rememberWebViewNavigator
+import com.google.accompanist.web.rememberWebViewState
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -120,7 +135,8 @@ fun WebViewAppView(
 	onClearCookies: (String) -> Unit,
 	viewModel: WebViewViewModel = viewModelDi(),
 ) {
-	ShosetsuTheme {
+	val theme by viewModel.appTheme.collectAsState()
+	ShosetsuTheme(theme) {
 		val userAgent by viewModel.userAgent.collectAsState()
 
 		WebViewScreen(
@@ -145,7 +161,7 @@ fun WebViewScreen(
 	onOpenInBrowser: (String) -> Unit,
 	onClearCookies: (String) -> Unit
 ) {
-	val state = rememberWebViewState(url = url)
+	val state = rememberWebViewState(url = url, additionalHttpHeaders = mapOf("User-Agent" to userAgent))
 	val navigator = rememberWebViewNavigator()
 	var currentUrl by remember { mutableStateOf(url) }
 	Scaffold(
@@ -217,7 +233,7 @@ fun WebViewScreen(
 								}
 							)
 						}
-					}
+					},
 				)
 				when (val loadingState = state.loadingState) {
 					is LoadingState.Initializing -> LinearProgressIndicator(

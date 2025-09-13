@@ -1,7 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.compose.material3.ColorScheme
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @since 22 / 10 / 2021
  * @author Doomsdayrs
  */
-abstract class ACSSEditorViewModel : ShosetsuViewModel() {
+abstract class ACSSEditorViewModel : ShosetsuRootViewModel() {
 	abstract fun undo()
 	abstract fun redo()
 

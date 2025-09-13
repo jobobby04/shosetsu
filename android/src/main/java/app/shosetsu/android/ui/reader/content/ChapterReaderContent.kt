@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -52,49 +53,47 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewChapterReaderContent() {
-	ShosetsuTheme {
-		ChapterReaderContent(
-			isFirstFocusProvider = { false },
-			onFirstFocus = {},
-			isFocused = false,
-			content = {
-				ChapterReaderPagerContent(
-					items = persistentListOf(),
-					isHorizontal = false,
-					onStopTTS = {},
-					markChapterAsCurrent = {},
-					onChapterRead = {},
-					currentPage = 0,
-					onPageChanged = {},
-					isSwipeInverted = false,
-					paddingValues = PaddingValues(),
-					pageJumper = StableHolder(MutableSharedFlow()),
-					createPage = {
-					}
-				)
-			},
-			sheetContent = {
-				ChapterReaderBottomSheetContent(
-					scaffoldState = it,
-					ttsPlayback = TTSPlayback.Stopped,
-					isBookmarked = false,
-					isRotationLocked = false,
-					setting = NovelReaderSettingUI(-1, 0, 0f),
-					toggleRotationLock = {},
-					toggleBookmark = {},
-					exit = {},
-					onPlayTTS = {},
-					onPauseTTS = {},
-					onStopTTS = {},
-					updateSetting = {},
-					lowerSheet = {},
-					toggleFocus = {}
-				) {}
-			},
-			exception = null
-		)
-	}
+fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	ChapterReaderContent(
+		isFirstFocusProvider = { false },
+		onFirstFocus = {},
+		isFocused = false,
+		content = {
+			ChapterReaderPagerContent(
+				items = persistentListOf(),
+				isHorizontal = false,
+				onStopTTS = {},
+				markChapterAsCurrent = {},
+				onChapterRead = {},
+				currentPage = 0,
+				onPageChanged = {},
+				isSwipeInverted = false,
+				paddingValues = PaddingValues(),
+				pageJumper = StableHolder(MutableSharedFlow()),
+				createPage = {
+				}
+			)
+		},
+		sheetContent = {
+			ChapterReaderBottomSheetContent(
+				scaffoldState = it,
+				ttsPlayback = TTSPlayback.Stopped,
+				isBookmarked = false,
+				isRotationLocked = false,
+				setting = NovelReaderSettingUI(-1, 0, 0f),
+				toggleRotationLock = {},
+				toggleBookmark = {},
+				exit = {},
+				onPlayTTS = {},
+				onPauseTTS = {},
+				onStopTTS = {},
+				updateSetting = {},
+				lowerSheet = {},
+				toggleFocus = {}
+			) {}
+		},
+		exception = null
+	)
 }
 
 /**

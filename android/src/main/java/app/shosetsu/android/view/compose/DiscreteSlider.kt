@@ -29,29 +29,28 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
 import kotlin.math.roundToInt
 
 @Preview
 @Composable
-fun PreviewSeekBar() {
+fun PreviewSeekBar() = ShosetsuTheme(AppThemes.LIGHT) {
 	var value by remember { mutableIntStateOf(1) }
-	ShosetsuTheme {
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(16.dp)
-		) {
-			DiscreteSlider(
-				value,
-				"${value}h",
-				{ it, _ ->
-					value = it
-				},
-				StableHolder(0..10),
-			)
-		}
+	Box(
+		modifier = Modifier
+			.fillMaxSize()
+			.padding(16.dp)
+	) {
+		DiscreteSlider(
+			value,
+			"${value}h",
+			{ it, _ ->
+				value = it
+			},
+			StableHolder(0..10),
+		)
 	}
 }
 

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-
+import app.shosetsu.android.common.enums.AppThemes
 
 private val DarkColorScheme = darkColorScheme(
 	primary = Primary,
@@ -42,9 +42,14 @@ val FallbackColorScheme = LightColorScheme
 
 @Composable
 fun ShosetsuTheme(
-	darkTheme: Boolean = isSystemInDarkTheme(),
+	theme: AppThemes,
 	content: @Composable () -> Unit
 ) {
+	val darkTheme = when (theme) {
+		AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+		AppThemes.LIGHT -> false
+		AppThemes.DARK -> true
+	}
 	val colorScheme = when {
 		Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 			val context = LocalContext.current

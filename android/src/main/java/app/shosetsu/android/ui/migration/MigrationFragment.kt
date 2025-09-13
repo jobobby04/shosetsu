@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ImageLoadingError
@@ -170,7 +171,7 @@ fun MigrationExtensionsContent(
 @ExperimentalMaterial3Api
 @Preview
 @Composable
-fun PreviewMigrationExtensionItemContent() {
+fun PreviewMigrationExtensionItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	val item by remember {
 		mutableStateOf(
 			MigrationExtensionUI(
@@ -181,11 +182,9 @@ fun PreviewMigrationExtensionItemContent() {
 			)
 		)
 	}
-	ShosetsuTheme {
-		Box(modifier = Modifier.height(200.dp)) {
-			MigrationExtensionItemContent(item = item) {
-				println("Test")
-			}
+	Box(modifier = Modifier.height(200.dp)) {
+		MigrationExtensionItemContent(item = item) {
+			println("Test")
 		}
 	}
 }
@@ -254,7 +253,7 @@ fun MigrationNovelsContent(
 @ExperimentalMaterial3Api
 @Composable
 @Preview
-fun PreviewMigrationNovelItemRowContent() {
+fun PreviewMigrationNovelItemRowContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	val item by remember {
 		mutableStateOf(
 			MigrationNovelUI(
@@ -265,18 +264,16 @@ fun PreviewMigrationNovelItemRowContent() {
 			)
 		)
 	}
-	ShosetsuTheme {
-		Row(
-			modifier = Modifier
-				.height(200.dp)
-				.width(600.dp)
-		) {
-			MigrationNovelItemContent(item = item) {
-				println("Test")
-			}
-			MigrationNovelItemContent(item = item) {
-				println("Test")
-			}
+	Row(
+		modifier = Modifier
+			.height(200.dp)
+			.width(600.dp)
+	) {
+		MigrationNovelItemContent(item = item) {
+			println("Test")
+		}
+		MigrationNovelItemContent(item = item) {
+			println("Test")
 		}
 	}
 }
@@ -284,7 +281,7 @@ fun PreviewMigrationNovelItemRowContent() {
 @ExperimentalMaterial3Api
 @Composable
 @Preview
-fun PreviewMigrationNovelItemContent() {
+fun PreviewMigrationNovelItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	val item by remember {
 		mutableStateOf(
 			MigrationNovelUI(
@@ -295,11 +292,9 @@ fun PreviewMigrationNovelItemContent() {
 			)
 		)
 	}
-	ShosetsuTheme {
-		Box(modifier = Modifier.height(200.dp)) {
-			MigrationNovelItemContent(item = item) {
-				println("Test")
-			}
+	Box(modifier = Modifier.height(200.dp)) {
+		MigrationNovelItemContent(item = item) {
+			println("Test")
 		}
 	}
 }

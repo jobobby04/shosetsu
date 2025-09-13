@@ -142,7 +142,7 @@ class ChapterReaderViewModel(
 	private val chapterRepository: IChaptersRepository,
 	private val novelRepo: INovelsRepository,
 	private val readerSettingsRepo: INovelReaderSettingsRepository,
-	private var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
+	override var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 	private val loadReaderChaptersUseCase: GetReaderChaptersUseCase,
 	private val loadChapterPassageUseCase: GetChapterPassageUseCase,
 	private val getReaderSettingsUseCase: GetReaderSettingUseCase,
@@ -181,12 +181,6 @@ class ChapterReaderViewModel(
 
 	override fun dismissReadingTooLong() {
 		isReadingTooLong.value = false
-	}
-
-	override val appThemeLiveData: SharedFlow<AppThemes> by lazy {
-		loadLiveAppThemeUseCase()
-			.onIO()
-			.shareIn(viewModelScopeIO, SharingStarted.Lazily, replay = 1)
 	}
 
 	private val isHorizontalPageSwapping by lazy {
