@@ -261,8 +261,7 @@ fun BrowseContent(
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(refresh)
 
-	
-			Scaffold(
+	Scaffold(
 		topBar = {
 			TopAppBar(
 				title = {

@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.StateFlow
 class ExtensionSettingsRepository(
 	private val iFileSettingSystem: IFileSettingsDataSource
 ) : IExtensionSettingsRepository {
-
 	override suspend fun getInt(extensionID: Int, settingID: Int, default: Int): Int = onIO {
 		iFileSettingSystem.getInt("$extensionID", CustomInt("$settingID", default))
 	}

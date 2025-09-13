@@ -684,10 +684,10 @@ class ChapterReaderViewModel(
 
 			deletePrevious(chapter)
 
-            NotificationManagerCompat.from(application).cancel(
-                "update/${novelIDLive.value}/${chapter.id}",
-                10000 + novelIDLive.value
-            )
+			NotificationManagerCompat.from(application).cancel(
+				"update/${novelIDLive.value}/${chapter.id}",
+				10000 + novelIDLive.value
+			)
 		}
 	}
 
@@ -1036,7 +1036,7 @@ class ChapterReaderViewModel(
 		}
 	}
 
-    override val pageJumper: MutableSharedFlow<Int> = MutableSharedFlow<Int>(replay = 0)
+	override val pageJumper: MutableSharedFlow<Int> = MutableSharedFlow<Int>(replay = 0)
 	override val ttsProgress = MutableStateFlow<String?>(null)
 	val ttsDone = MutableStateFlow<String?>(null)
 	override val ttsPlayback = MutableStateFlow<TTSPlayback>(TTSPlayback.Stopped)
@@ -1051,8 +1051,8 @@ class ChapterReaderViewModel(
 	 * Provides a TTS to use
 	 */
 	private val tts = ttsEngine.map { engine ->
-        TTSBuilder(engine, "", "")
-    }.filterNotNull().combine(ttsLanguage) { builder, language ->
+		TTSBuilder(engine, "", "")
+	}.filterNotNull().combine(ttsLanguage) { builder, language ->
 		builder.copy(language = language)
 	}.combine(ttsVoice) { builder, voice ->
 		builder.copy(voice = voice)

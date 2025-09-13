@@ -25,11 +25,12 @@ interface IMemExtLibDataSource {
 	/** Load Library from memory */
 	fun loadLibrary(name: String): String?
 
-
 	/** Put Library in memory */
 	fun setLibrary(name: String, data: String)
 
-
 	/** Remove Library by ID from cache*/
 	fun removeLibrary(name: String)
+
+	/** Clear all libraries from memory */
+	fun clearExtLibs()
 }

@@ -126,7 +126,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun CatalogueView(
 	extensionId: Int,
-	listing: IExtension.Listing?,
+	listing: String?,
 	onOpenNovel: (novelId: Int) -> Unit,
 	onSelectListing: (IExtension.Listing) -> Unit,
 	onBack: () -> Unit
@@ -134,8 +134,7 @@ fun CatalogueView(
 	val viewModel: ACatalogViewModel = viewModelDi()
 
 	LaunchedEffect(extensionId) {
-		viewModel.setExtensionID(extensionId)
-		if (listing != null) viewModel.setSelectedListing(listing)
+		viewModel.setListing(extensionId, listing)
 	}
 
 	val type by viewModel.novelCardTypeLive.collectAsState()
@@ -273,7 +272,7 @@ fun CatalogueView(
 		hostState = hostState,
 		selectedListing = selectedListing?.let { StableHolder(it) },
 		listingOptions = listingOptions,
-		setSelectedListing = onSelectListing
+		setSelectedListing = onSelectListing,
 	)
 	if (categoriesDialogItem != null) {
 		CategoriesDialog(

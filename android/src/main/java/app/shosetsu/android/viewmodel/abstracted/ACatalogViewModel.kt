@@ -83,12 +83,7 @@ abstract class ACatalogViewModel :
 	 *
 	 * This will reset the view completely
 	 */
-	abstract fun setExtensionID(extensionID: Int)
-
-	/**
-	 * Sets the [IExtension.Listing] currently displayed
-	 */
-	abstract fun setSelectedListing(listing: IExtension.Listing)
+	abstract fun setListing(extensionID: Int, link: String?)
 
 	/**
 	 * Apply a query

@@ -80,9 +80,9 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		SearchViewModel(
 			searchBookMarkedNovelsUseCase = instance(),
 			loadSearchRowUIUseCase = instance(),
-			loadCatalogueListingDataUseCase = instance(),
+			loadCatalogueQueryDataUseCase = instance(),
 			getExtensionUseCase = instance(),
-			loadNovelUITypeUseCase = instance()
+			loadNovelUITypeUseCase = instance(),
 		)
 	}
 	bind<AUpdatesViewModel>() with provider {
@@ -119,6 +119,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			getExtensionUseCase = instance(),
 			backgroundAddUseCase = instance(),
 			getCatalogueListingData = instance(),
+			loadCatalogueQueryDataUseCase = instance(),
 
 			loadNovelUITypeUseCase = instance(),
 			loadNovelUIColumnsHUseCase = instance(),

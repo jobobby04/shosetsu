@@ -26,6 +26,7 @@ import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteRepositoryUseCase
 import app.shosetsu.android.domain.usecases.delete.TrueDeleteChapterUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
+import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
@@ -198,6 +199,9 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	}
 	bind<IsOnlineUseCase>() with provider { IsOnlineUseCase(instance()) }
 
+	bind<GetCatalogueQueryDataUseCase>() with provider {
+		GetCatalogueQueryDataUseCase(instance())
+	}
 	bind<LoadSearchRowUIUseCase>() with provider {
 		LoadSearchRowUIUseCase(
 			instance(),

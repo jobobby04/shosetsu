@@ -1,11 +1,9 @@
 package app.shosetsu.android.datasource.remote.impl
 
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
-import app.shosetsu.lib.*
-import app.shosetsu.lib.LISTING_INDEX
-import app.shosetsu.lib.exceptions.HTTPException
+import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Novel
 import org.luaj.vm2.LuaError
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -30,38 +28,35 @@ import java.io.IOException
  * 10 / May / 2020
  */
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
-	@Suppress("DEPRECATION") // todo remove getListing
-	@Throws(HTTPException::class, IOException::class, LuaError::class)
-	override suspend fun list(
+	override suspend fun loadListing(
 		ext: IExtension,
-		query: String,
+		listing: IExtension.Listing.Item,
 		data: Map<Int, Any>,
-		listing: IExtension.Listing.Item?,
+		page: Int,
 	): List<Novel.Info> {
-		return if (query.isEmpty() && listing?.getListing != null) { // old extension, todo remove
-			if (!listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
-				emptyList()
-			} else try {
-				listing.getListing(data).toList()
-			} catch (e: LuaError) {
-				if (e.cause != null)
-					throw e.cause!!
-				else throw e
-			}
-		} else {
-			if (listing != null && !listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
-				emptyList()
-			} else try {
-				ext.getCatalogue(HashMap(data).apply {
-					this[QUERY_INDEX] = query
-					this[LISTING_INDEX] = listing?.link
-				}).toList()
-			} catch (e: LuaError) {
-				if (e.cause != null)
-					throw e.cause!!
-				else throw e
-			}
+		return if (!listing.isIncrementing && page > ext.startIndex) {
+			emptyList()
+		} else try {
+            listing.getListing(data, page).toList()
+		} catch (e: LuaError) {
+			throw e.cause ?: e
+		}
+	}
+
+	override suspend fun search(
+		ext: IExtension,
+		search: IExtension.Listing.Search,
+		query: String?,
+		filters: Map<Int, Any>,
+		page: Int,
+	): List<Novel.Info> {
+		val query = query ?: ""
+		return if (!search.isIncrementing && page > ext.startIndex) {
+			emptyList()
+		} else try {
+			search.getListing(query, filters, page)?.toList() ?: emptyList()
+		} catch (e: LuaError) {
+			throw e.cause ?: e
 		}
 	}
 }
-

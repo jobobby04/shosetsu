@@ -5,10 +5,10 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
 import kotlinx.collections.immutable.toImmutableList
@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.luaj.vm2.LuaError
 import java.io.IOException
-import javax.net.ssl.SSLException
 
 /*
  * This file is part of shosetsu.
@@ -39,14 +38,14 @@ import javax.net.ssl.SSLException
  * shosetsu
  * 15 / 05 / 2020
  */
-class GetCatalogueListingDataUseCase(
+class GetCatalogueQueryDataUseCase(
 	private val novelsRepository: INovelsRepository,
-	private val extSettingsRepo: IExtensionSettingsRepository
 ) {
 	inner class MyPagingSource(
 		val iExtension: IExtension,
-		val data: Map<Int, Any>,
-		private val listing: IExtension.Listing.Item,
+		val query: String,
+		val filters: Map<Int, Any>,
+		private val search: IExtension.Listing.Search,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? {
 			return state.anchorPosition?.let {
@@ -68,12 +67,45 @@ class GetCatalogueListingDataUseCase(
 					// withContext(Dispatcher.IO) { ... } block since Retrofit's Coroutine
 					// CallAdapter dispatches on a worker thread.
 					val response =
-						search(
+						novelsRepository.getCatalogueSearch(
 							iExtension,
-							data,
-							listing,
+							search,
+							query,
+							filters,
 							pageNumber,
-						)
+						).let {
+							val data: List<Novel.Info> = it
+							(data.mapNotNull { novelListing ->
+								val ne = novelListing.convertTo(iExtension)
+								try {
+									novelsRepository.insertReturnStripped(ne)
+										?.let { (id, title, imageURL, bookmarked) ->
+											ACatalogNovelUI(
+												id = id,
+												title = title,
+												imageURL = imageURL,
+												bookmarked = bookmarked,
+												language = novelListing.language,
+												description = novelListing.description,
+												status = novelListing.status,
+												tags = novelListing.tags.asList().toImmutableList(),
+												genres = novelListing.genres.asList().toImmutableList(),
+												authors = novelListing.authors.asList().toImmutableList(),
+												artists = novelListing.artists.asList().toImmutableList(),
+												chapters = novelListing.chapters.asList().toImmutableList(),
+												chapterCount = novelListing.chapterCount,
+												wordCount = novelListing.wordCount,
+												commentCount = novelListing.commentCount,
+												viewCount = novelListing.viewCount,
+												favoriteCount = novelListing.favoriteCount
+											)
+										}
+								} catch (e: SQLiteException) {
+									logE("Failed to load parse novel", e)
+									null
+								}
+							})
+						}
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
 					// be loaded before it.
@@ -94,9 +126,9 @@ class GetCatalogueListingDataUseCase(
 					)
 				} catch (e: IOException) {
 					LoadResult.Error(e)
-				} catch (e: HTTPException) {
-					LoadResult.Error(e)
 				} catch (e: HttpException) {
+					LoadResult.Error(e)
+				} catch (e: HTTPException) {
 					LoadResult.Error(e)
 				} catch (e: LuaError) {
 					LoadResult.Error(e)
@@ -107,57 +139,11 @@ class GetCatalogueListingDataUseCase(
 		}
 	}
 
-	@Throws(SSLException::class, LuaError::class)
+	@Throws(LuaError::class)
 	operator fun invoke(
-		iExtension: IExtension,
-		data: Map<Int, Any>,
-		listing: IExtension.Listing.Item,
-	) = MyPagingSource(iExtension, data, listing)
-
-	@Throws(SSLException::class, LuaError::class)
-	suspend fun search(
-		iExtension: IExtension,
-		data: Map<Int, Any>,
-		listing: IExtension.Listing.Item,
-		page: Int,
-	): List<ACatalogNovelUI> =
-		novelsRepository.getCatalogueData(
-			iExtension,
-			listing,
-			data,
-			page,
-		).let { list ->
-			list.mapNotNull { novelListing ->
-				val ne = novelListing.convertTo(iExtension)
-				// For each, insert and return a stripped card
-				// This operation is to pre-cache URL and ID so loading occurs smoothly
-				try {
-					novelsRepository.insertReturnStripped(ne)
-						?.let { (id, title, imageURL, bookmarked) ->
-							ACatalogNovelUI(
-								id = id,
-								title = title,
-								imageURL = imageURL,
-								bookmarked = bookmarked,
-								language = novelListing.language,
-								description = novelListing.description,
-								status = novelListing.status,
-								tags = novelListing.tags.asList().toImmutableList(),
-								genres = novelListing.genres.asList().toImmutableList(),
-								authors = novelListing.authors.asList().toImmutableList(),
-								artists = novelListing.artists.asList().toImmutableList(),
-								chapters = novelListing.chapters.asList().toImmutableList(),
-								chapterCount = novelListing.chapterCount,
-								wordCount = novelListing.wordCount,
-								commentCount = novelListing.commentCount,
-								viewCount = novelListing.viewCount,
-								favoriteCount = novelListing.favoriteCount
-							)
-						}
-				} catch (e: SQLiteException) {
-					logE("Failed to load parse novel", e)
-					null
-				}
-			}
-		}
+		ext: IExtension,
+		query: String,
+		filters: Map<Int, Any>,
+		search: IExtension.Listing.Search,
+	): MyPagingSource = MyPagingSource(ext, query, filters, search)
 }

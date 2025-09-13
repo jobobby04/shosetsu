@@ -8,19 +8,18 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.filter
 import androidx.paging.map
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.usecases.SearchBookMarkedNovelsUseCase
-import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
+import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.load.LoadSearchRowUIUseCase
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
-import app.shosetsu.lib.Novel
-import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.mapify
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -68,7 +67,7 @@ class SearchViewModel(
 	private val searchBookMarkedNovelsUseCase: SearchBookMarkedNovelsUseCase,
 	private val loadNovelUITypeUseCase: LoadNovelUITypeUseCase,
 	private val loadSearchRowUIUseCase: LoadSearchRowUIUseCase,
-	private val loadCatalogueListingDataUseCase: GetCatalogueListingDataUseCase,
+	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
 	private val getExtensionUseCase: GetExtensionUseCase
 ) : ASearchViewModel() {
 
@@ -87,7 +86,7 @@ class SearchViewModel(
 	override val query: MutableStateFlow<String> = MutableStateFlow("")
 
 	private val searchFlows =
-		HashMap<Int, Flow<PagingData<ACatalogNovelUI>>>()
+		HashMap<Pair<Int, String?>, Flow<PagingData<ACatalogNovelUI>>>()
 
 	private val refreshFlows =
 		HashMap<Int, MutableSharedFlow<Unit>>()
@@ -142,9 +141,9 @@ class SearchViewModel(
 	override fun searchLibrary(): Flow<PagingData<ACatalogNovelUI>> =
 		libraryResultFlow.cachedIn(viewModelScope).onIO()
 
-	override fun searchExtension(extensionId: Int): Flow<PagingData<ACatalogNovelUI>> =
-		searchFlows.getOrPut(extensionId) {
-			loadExtension(extensionId).cachedIn(viewModelScope)
+	override fun searchExtension(extensionId: Int, listing: String?): Flow<PagingData<ACatalogNovelUI>> =
+		searchFlows.getOrPut(extensionId to listing) {
+			loadExtension(extensionId, listing).cachedIn(viewModelScope)
 		}
 
 	override fun getException(id: Int): Flow<Throwable?> =
@@ -237,7 +236,7 @@ class SearchViewModel(
 	 * Creates a flow for an extension query
 	 */
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private fun loadExtension(extensionID: Int): Flow<PagingData<ACatalogNovelUI>> {
+	private fun loadExtension(extensionID: Int, listing: String?): Flow<PagingData<ACatalogNovelUI>> {
 		return flow {
 			val ext = getExtensionUseCase(extensionID)!!
 			val exceptionFlow = getExceptionFlow(extensionID)
@@ -253,14 +252,13 @@ class SearchViewModel(
 								PagingConfig(10)
 							) {
 								runBlocking {
-									loadCatalogueListingDataUseCase(
-										extensionID,
+									val listing = ext.getListing(listing).search
+										?: throw MissingExtensionException(extensionID)
+									loadCatalogueQueryDataUseCase(
+										ext,
 										query,
-										HashMap<Int, Any>().apply {
-											putAll(ext.getCatalogueFilters(null).toList().mapify())
-											this[PAGE_INDEX] = ext.startIndex
-										},
-										null
+										listing.filters.toList().mapify(),
+										listing
 									)
 								}
 							}.flow
