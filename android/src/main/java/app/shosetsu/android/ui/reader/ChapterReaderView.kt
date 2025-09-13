@@ -33,11 +33,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.MAX_CONTINUOUS_READING_TIME
@@ -78,7 +76,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,7 +109,6 @@ fun ChapterReaderView(
 
 	val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
 	val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
-	val owner = LocalLifecycleOwner.current
 
 	val isReadingTooLong by viewModel.isReadingTooLong.collectAsState()
 	val trackLongReading by viewModel.trackLongReading.collectAsState()
@@ -134,9 +130,14 @@ fun ChapterReaderView(
 			}
 		}
 
+	val theme by viewModel.appTheme.collectAsState()
+
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
-	ShosetsuTheme {
-		viewModel.colorScheme.value = MaterialTheme.colorScheme
+	ShosetsuTheme(theme) {
+		val colorScheme = MaterialTheme.colorScheme
+		LaunchedEffect(colorScheme) {
+			viewModel.colorScheme.value = colorScheme
+		}
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
 			isFocused = isFocused,
@@ -174,8 +175,7 @@ fun ChapterReaderView(
 						item {
 							viewModel.EditCSS(
 								openCSS = {
-									ContextCompat.startActivity(
-										context,
+									context.startActivity(
 										Intent(context, CSSEditorActivity::class.java).apply {
 											putExtra(CSSEditorActivity.CSS_ID, -1)
 										},

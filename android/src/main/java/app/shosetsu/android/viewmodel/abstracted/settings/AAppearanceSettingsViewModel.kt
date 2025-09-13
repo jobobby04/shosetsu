@@ -1,8 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted.settings
 
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.coroutines.flow.StateFlow
+import app.shosetsu.android.viewmodel.base.ThemedViewModel
 
 /*
  * This file is part of shosetsu.
@@ -26,6 +25,5 @@ import kotlinx.coroutines.flow.StateFlow
  * 31 / 08 / 2020
  */
 abstract class AAppearanceSettingsViewModel(iSettingsRepository: ISettingsRepository) :
-	ASubSettingsViewModel(iSettingsRepository) {
-	abstract val appTheme: StateFlow<AppThemes>
+	ASubSettingsViewModel(iSettingsRepository), ThemedViewModel {
 }

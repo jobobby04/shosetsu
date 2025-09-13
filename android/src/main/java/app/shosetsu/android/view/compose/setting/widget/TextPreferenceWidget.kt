@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.secondaryItemAlpha
 
@@ -61,22 +62,20 @@ fun TextPreferenceWidget(
 
 @PreviewLightDark
 @Composable
-private fun TextPreferenceWidgetPreview() {
-	ShosetsuTheme {
-		Surface {
-			Column {
-				TextPreferenceWidget(
-					title = "Text preference with icon",
-					subtitle = "Text preference summary",
-					icon = Icons.Filled.Build,
-					onPreferenceClick = {},
-				)
-				TextPreferenceWidget(
-					title = "Text preference",
-					subtitle = "Text preference summary",
-					onPreferenceClick = {},
-				)
-			}
+private fun TextPreferenceWidgetPreview() = ShosetsuTheme(AppThemes.LIGHT) {
+	Surface {
+		Column {
+			TextPreferenceWidget(
+				title = "Text preference with icon",
+				subtitle = "Text preference summary",
+				icon = Icons.Filled.Build,
+				onPreferenceClick = {},
+			)
+			TextPreferenceWidget(
+				title = "Text preference",
+				subtitle = "Text preference summary",
+				onPreferenceClick = {},
+			)
 		}
 	}
 }

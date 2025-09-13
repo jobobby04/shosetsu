@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.StyleEntity
@@ -48,13 +47,8 @@ import java.util.Stack
 class CSSEditorViewModel(
 	private val app: Application,
 	private val settingsRepo: ISettingsRepository,
-	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
+	override var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : ACSSEditorViewModel() {
-	override val appTheme: StateFlow<AppThemes> =
-		loadLiveAppThemeUseCase()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
-
-
 	private val css = object : ShosetsuCssViewModelComponent() {
 		override val settingsRepo: ISettingsRepository
 			get() = this@CSSEditorViewModel.settingsRepo

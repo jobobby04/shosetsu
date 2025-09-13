@@ -40,6 +40,7 @@ import app.shosetsu.android.common.consts.URL_MATRIX
 import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
@@ -124,7 +125,7 @@ fun AboutView(
 @Preview
 @Composable
 fun PreviewAboutContent() {
-	ShosetsuTheme {
+	ShosetsuTheme(AppThemes.LIGHT) {
 		AboutContent(
 			currentVersion = BuildConfig.VERSION_NAME,
 			onOpenWebsite = {},

@@ -136,53 +136,53 @@ fun IntroView(
 		}
 	}
 
-    ShosetsuTheme   {
-        
-                
-                Scaffold(
-                	bottomBar = {
-                		BottomAppBar {
-                		    Row(
-                		    	modifier = Modifier.fillMaxWidth(),
-                		    	horizontalArrangement = Arrangement.SpaceBetween,
-                		    	verticalAlignment = Alignment.CenterVertically
-                		    ) {
-                		        Box {
-                		        	if (state.currentPage > 0) {
-                		        		NavigateBackButton {
-                		        			scope.launch {
-                		        				state.scrollToPage(state.currentPage - 1)
-                		        			}
-                		        		}
-                		        	}
-                		        }
-                		        Box {
-                		            if (
-                		            	state.currentPage != IntroPages.Support.ordinal ||
-                		            	shouldSupportShowNext
-                		            ) {
-                		                SimpleIconButton(
-                		                	if (state.currentPage != IntroPages.End.ordinal)
-                		                		Icons.Default.ArrowForward
-                		                	else Icons.Default.Close,
-                		                    stringResource(
-                		                    	if (state.currentPage != IntroPages.End.ordinal)
-                		                    		R.string.intro_page_next else R.string.intro_close
-                		                    ),
-                		                    onClick = {
-                		                    	nextPage()
-                		                    }
-                		                )
-                		            }
+	val theme by viewModel.appTheme.collectAsState()
 
-                		        }
+	ShosetsuTheme(theme) {
+		Scaffold(
+			bottomBar = {
+				BottomAppBar {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Box {
+							if (state.currentPage > 0) {
+								NavigateBackButton {
+									scope.launch {
+										state.scrollToPage(state.currentPage - 1)
+									}
+								}
+							}
+						}
+						Box {
+							if (
+								state.currentPage != IntroPages.Support.ordinal ||
+								shouldSupportShowNext
+							) {
+								SimpleIconButton(
+									if (state.currentPage != IntroPages.End.ordinal)
+										Icons.Default.ArrowForward
+									else Icons.Default.Close,
+									stringResource(
+										if (state.currentPage != IntroPages.End.ordinal)
+											R.string.intro_page_next else R.string.intro_close
+									),
+									onClick = {
+										nextPage()
+									}
+								)
+							}
+
+						}
 					}
 				}
 			}
-        ) {
-                	IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
-                }
-    }
+		) {
+			IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
+		}
+	}
 }
 
 @Composable

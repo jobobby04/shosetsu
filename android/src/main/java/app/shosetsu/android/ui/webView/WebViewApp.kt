@@ -147,14 +147,7 @@ fun WebViewAppView(
 	viewModel: WebViewViewModel = viewModelDi(),
 ) {
 	val theme by viewModel.appTheme.collectAsState()
-
-	ShosetsuTheme(
-		darkTheme = when (theme) {
-			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
-			AppThemes.LIGHT -> false
-			AppThemes.DARK -> true
-		}
-	) {
+	ShosetsuTheme(theme) {
 		val userAgent by viewModel.userAgent.collectAsState()
 
 		WebViewScreen(

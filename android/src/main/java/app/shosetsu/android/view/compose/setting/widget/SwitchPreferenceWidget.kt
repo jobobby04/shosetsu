@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 @Composable
@@ -41,34 +42,32 @@ fun SwitchPreferenceWidget(
 
 @PreviewLightDark
 @Composable
-private fun SwitchPreferenceWidgetPreview() {
-	ShosetsuTheme {
-		Surface {
-			Column {
-				SwitchPreferenceWidget(
-					title = "Text preference with icon",
-					subtitle = "Text preference summary",
-					icon = Icons.Filled.Preview,
-					checked = true,
-					onCheckedChanged = {},
-				)
-				SwitchPreferenceWidget(
-					title = "Text preference",
-					subtitle = "Text preference summary",
-					checked = false,
-					onCheckedChanged = {},
-				)
-				SwitchPreferenceWidget(
-					title = "Text preference no summary",
-					checked = false,
-					onCheckedChanged = {},
-				)
-				SwitchPreferenceWidget(
-					title = "Another text preference no summary",
-					checked = false,
-					onCheckedChanged = {},
-				)
-			}
-		}
-	}
+private fun SwitchPreferenceWidgetPreview() = ShosetsuTheme(AppThemes.LIGHT) {
+    Surface {
+        Column {
+            SwitchPreferenceWidget(
+                title = "Text preference with icon",
+                subtitle = "Text preference summary",
+                icon = Icons.Filled.Preview,
+                checked = true,
+                onCheckedChanged = {},
+            )
+            SwitchPreferenceWidget(
+                title = "Text preference",
+                subtitle = "Text preference summary",
+                checked = false,
+                onCheckedChanged = {},
+            )
+            SwitchPreferenceWidget(
+                title = "Text preference no summary",
+                checked = false,
+                onCheckedChanged = {},
+            )
+            SwitchPreferenceWidget(
+                title = "Another text preference no summary",
+                checked = false,
+                onCheckedChanged = {},
+            )
+        }
+    }
 }

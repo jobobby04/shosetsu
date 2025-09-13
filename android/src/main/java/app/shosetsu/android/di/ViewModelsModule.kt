@@ -290,7 +290,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	}
 
 	bind<AIntroViewModel>() with provider {
-		IntroViewModel(instance())
+		IntroViewModel(instance(), instance())
 	}
 
 	bind<HistoryViewModel>() with provider {

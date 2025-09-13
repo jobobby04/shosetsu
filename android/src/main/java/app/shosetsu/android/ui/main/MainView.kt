@@ -142,11 +142,7 @@ fun MainView() {
 	}
 
 	ShosetsuTheme(
-		darkTheme = when (theme) {
-			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
-			AppThemes.LIGHT -> false
-			AppThemes.DARK -> true
-		}
+		theme = theme,
 	) {
 		ModalNavigationDrawer(
 			drawerContent = {

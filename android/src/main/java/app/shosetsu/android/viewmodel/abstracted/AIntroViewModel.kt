@@ -1,6 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -26,8 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @since 18 / 09 / 2022
  * @author Doomsdayrs
  */
-abstract class AIntroViewModel : ShosetsuViewModel() {
-
+abstract class AIntroViewModel : ShosetsuRootViewModel() {
 	abstract val shouldSupportShowNext: StateFlow<Boolean>
 
 	abstract fun supportShowNext()

@@ -27,11 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.FilteredLanguages
@@ -168,7 +168,7 @@ fun BrowseControllerLanguagesFilter(
 @Preview
 @Composable
 fun PreviewBrowseControllerLanguages() {
-	ShosetsuTheme {
+	ShosetsuTheme(AppThemes.LIGHT) {
 		BrowseControllerLanguagesContent(
 			languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter).toImmutableList(),
 			state = persistentMapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),

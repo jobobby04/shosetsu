@@ -67,13 +67,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.DownloadStatus.DOWNLOADING
 import app.shosetsu.android.common.enums.DownloadStatus.ERROR
 import app.shosetsu.android.common.enums.DownloadStatus.PAUSED
@@ -435,23 +435,21 @@ fun DownloadsMoreOption(
 
 @Preview
 @Composable
-fun PreviewDownloadContent() {
-	ShosetsuTheme {
-		DownloadContent(
-			DownloadUI(
-				0,
-				0,
-				"aaa",
-				"Chpater",
-				"Novel",
-				0,
-				DOWNLOADING,
-				false
-			),
-			{},
-			{}
-		)
-	}
+fun PreviewDownloadContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	DownloadContent(
+		DownloadUI(
+			0,
+			0,
+			"aaa",
+			"Chpater",
+			"Novel",
+			0,
+			DOWNLOADING,
+			false
+		),
+		{},
+		{}
+	)
 }
 
 @OptIn(ExperimentalFoundationApi::class)

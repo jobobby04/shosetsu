@@ -1,7 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -41,9 +40,9 @@ class MainViewModel(
 	private val isOnlineUseCase: IsOnlineUseCase,
 	loadNavigationStyleUseCase: LoadNavigationStyleUseCase,
 	private val loadRequireDoubleBackUseCase: LoadRequireDoubleBackUseCase,
-	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
+	override val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 	backupRepo: IBackupRepository,
-	private val settingsRepository: ISettingsRepository
+	private val settingsRepository: ISettingsRepository,
 ) : AMainViewModel() {
 
 	override val requireDoubleBackToExit: StateFlow<Boolean> by lazy {
@@ -64,10 +63,6 @@ class MainViewModel(
 
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
-
-	override val appTheme: StateFlow<AppThemes> =
-		loadLiveAppThemeUseCase()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
 
 	override val backupProgressState: StateFlow<IBackupRepository.BackupProgress> =
 		backupRepo.backupProgress

@@ -3,6 +3,7 @@ package app.shosetsu.android.viewmodel.impl
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -30,7 +31,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * @author Doomsdayrs
  */
 class IntroViewModel(
-	private val settingsRepo: ISettingsRepository
+	private val settingsRepo: ISettingsRepository,
+	override var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : AIntroViewModel() {
 	override val isLicenseRead: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
