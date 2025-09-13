@@ -23,14 +23,18 @@ buildscript {
 
 allprojects {
 	repositories {
+		maven("https://gitlab.com/api/v4/groups/12585416/-/packages/maven") {
+			content {
+				includeGroupAndSubgroups("app.shosetsu")
+			}
+		}
 		google()
 		mavenCentral()
-		maven("https://jitpack.io")
 	}
 }
 
-task("clean", Delete::class) {
-	delete(rootProject.buildDir)
+tasks.register<Delete>("clean") {
+	delete(rootProject.layout.buildDirectory)
 }
 
 
