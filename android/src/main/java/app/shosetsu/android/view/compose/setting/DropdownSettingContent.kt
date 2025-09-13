@@ -21,6 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
+import app.shosetsu.android.common.SettingKey
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable
