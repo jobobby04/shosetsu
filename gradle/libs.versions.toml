@@ -1,7 +1,7 @@
 [versions]
 accompanist = "0.36.0"
 acra = "5.11.2"
-activity = "1.10.0"
+activity = "1.11.0"
 annotation = "1.9.1"
 appcompat = "1.7.0"
 bottomsheetdialogCompose = "1.5.0"
