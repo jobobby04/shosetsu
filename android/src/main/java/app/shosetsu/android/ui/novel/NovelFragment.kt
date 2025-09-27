@@ -89,6 +89,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -195,6 +196,7 @@ fun NovelInfoView(
 
 	val hostState = remember { SnackbarHostState() }
 	val context = LocalContext.current
+	val resources = LocalResources.current
 	val scope = rememberCoroutineScope()
 
 	LaunchedEffect(error) {
@@ -382,7 +384,7 @@ fun NovelInfoView(
 				(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
 			val result = hostState.showSnackbar(
 				try {
-					context.resources.getQuantityString(
+					resources.getQuantityString(
 						R.plurals.fragment_novel_toggle_delete_chapters,
 						chaptersToDelete,
 						chaptersToDelete
