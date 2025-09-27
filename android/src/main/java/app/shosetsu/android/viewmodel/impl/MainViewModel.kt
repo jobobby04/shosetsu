@@ -106,9 +106,18 @@ class MainViewModel(
 	override val showIntro: StateFlow<Boolean> by lazy {
 		settingsRepository.getBooleanFlow(SettingKey.FirstTime)
 	}
+	override val showVerificationWarning: StateFlow<Boolean> by lazy {
+		settingsRepository.getBooleanFlow(SettingKey.ShowVerificationWarning)
+	}
 
 	override fun dismissUpdateDialog() {
 		appUpdate.value = null
+	}
+
+	override fun dismissVerificationWarning() {
+		launchIO {
+			settingsRepository.setBoolean(SettingKey.ShowVerificationWarning, false)
+		}
 	}
 
 	init {

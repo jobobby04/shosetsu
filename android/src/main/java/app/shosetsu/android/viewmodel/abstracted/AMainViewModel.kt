@@ -84,7 +84,17 @@ abstract class AMainViewModel : ShosetsuRootViewModel(), IsOnlineCheckViewModel 
 	abstract val showIntro: StateFlow<Boolean>
 
 	/**
+	 * Warning in regards to Google locking down the Android ecosystem.
+	 */
+	abstract val showVerificationWarning: StateFlow<Boolean>
+
+	/**
 	 * Dismiss the update dialog
 	 */
 	abstract fun dismissUpdateDialog()
+
+	/**
+	 * Dismiss the verification warning dialog.
+	 */
+	abstract fun dismissVerificationWarning()
 }

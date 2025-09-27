@@ -6,7 +6,6 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -31,7 +30,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.shosetsu.android.R
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.viewModelDi
@@ -78,6 +76,7 @@ fun MainView() {
 	val context = LocalContext.current
 
 	val showIntro by viewModel.showIntro.collectAsState()
+	val showVerificationWarning by viewModel.showVerificationWarning.collectAsState()
 
 	// Has to happen as soon as possible
 	LaunchedEffect(showIntro) {
@@ -143,6 +142,10 @@ fun MainView() {
 		theme.setAppCompatDelegateThemeMode()
 	}
 
+	if (showVerificationWarning) {
+		VerificationWarning(viewModel::dismissVerificationWarning)
+	}
+
 	ShosetsuTheme(theme) {
 		ModalNavigationDrawer(
 			drawerContent = {
@@ -192,7 +195,7 @@ fun MainView() {
 					NavHost(
 						navController,
 						startDestination = Library
-					)  {
+					) {
 						mainGraph(
 							navController,
 							sizeClass,
@@ -228,4 +231,5 @@ fun MainView() {
 		val userUpdate = updateToOpen ?: return@LaunchedEffect
 		context.openInBrowser(userUpdate.updateURL, userUpdate.pkg)
 	}
+
 }
