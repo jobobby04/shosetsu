@@ -1,6 +1,6 @@
 [versions]
 accompanist = "0.36.0"
-acra = "5.11.2"
+acra = "5.13.1"
 activity = "1.10.0"
 annotation = "1.9.1"
 appcompat = "1.7.0"
