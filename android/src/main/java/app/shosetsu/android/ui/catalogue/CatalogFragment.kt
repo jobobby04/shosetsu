@@ -446,6 +446,7 @@ fun CatalogGrid(
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit
 ) {
+	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
 	val w = LocalConfiguration.current.screenWidthDp
 	val o = LocalConfiguration.current.orientation
 
