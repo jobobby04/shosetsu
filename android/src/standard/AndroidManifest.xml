@@ -6,5 +6,5 @@
         android:name="android.permission.REQUEST_INSTALL_PACKAGES"
         tools:ignore="RequestInstallPackagesPolicy" />
 
-    <application />
+    <application tools:ignore="MissingApplicationIcon" />
 </manifest>
