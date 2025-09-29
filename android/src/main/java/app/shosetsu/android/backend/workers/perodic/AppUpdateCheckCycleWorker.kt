@@ -1,6 +1,7 @@
 package app.shosetsu.android.backend.workers.perodic
 
 import android.content.Context
+import android.os.Build
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -138,7 +139,8 @@ class AppUpdateCheckCycleWorker(
 							setRequiredNetworkType(
 								if (appUpdateOnMetered()) CONNECTED else UNMETERED
 							)
-							setRequiresDeviceIdle(appUpdateOnlyIdle())
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+								setRequiresDeviceIdle(appUpdateOnlyIdle())
 						}.build()
 					).build()
 				)

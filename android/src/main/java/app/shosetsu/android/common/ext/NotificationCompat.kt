@@ -3,9 +3,8 @@ package app.shosetsu.android.common.ext
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationCompat.Action
-import androidx.core.app.NotificationCompat.Builder
-import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
+import android.os.Build
+import androidx.core.app.NotificationCompat.*
 import androidx.core.graphics.drawable.IconCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
@@ -60,7 +59,7 @@ fun Builder.addReportErrorAction(context: Context, notificationId: Int, throwabl
 				context,
 				0,
 				intent,
-				PendingIntent.FLAG_IMMUTABLE
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 			)
 		).build()
 	)

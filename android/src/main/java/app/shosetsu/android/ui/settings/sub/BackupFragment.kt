@@ -2,6 +2,7 @@ package app.shosetsu.android.ui.settings.sub
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -286,7 +287,10 @@ fun BackupSettingsContent(
 					restrictions = mapOf(
 						R.string.backup_restore_low_storage to SettingKey.BackupOnLowStorage,
 						R.string.backup_restore_low_battery to SettingKey.BackupOnLowBattery,
-					) + mapOf(R.string.backup_restore_only_idle to SettingKey.BackupOnlyWhenIdle),
+					) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+						mapOf(R.string.backup_restore_only_idle to SettingKey.BackupOnlyWhenIdle)
+					else
+						emptyMap(),
 					repo = viewModel.settingsRepo,
 				)
 			}

@@ -4,46 +4,26 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteException
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.Constraints
-import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
+import androidx.work.*
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.Operation
-import androidx.work.WorkInfo
-import androidx.work.WorkerParameters
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
-import app.shosetsu.android.common.SettingKey.DownloadExtThreads
-import app.shosetsu.android.common.SettingKey.DownloadNotifyChapters
-import app.shosetsu.android.common.SettingKey.DownloadOnLowBattery
-import app.shosetsu.android.common.SettingKey.DownloadOnLowStorage
-import app.shosetsu.android.common.SettingKey.DownloadOnMeteredConnection
-import app.shosetsu.android.common.SettingKey.DownloadOnlyWhenIdle
-import app.shosetsu.android.common.SettingKey.DownloadThreadPool
-import app.shosetsu.android.common.SettingKey.IsDownloadPaused
+import app.shosetsu.android.common.SettingKey.*
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_DOWNLOAD
 import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_DOWNLOAD
 import app.shosetsu.android.common.consts.WorkerTags.DOWNLOAD_WORK_ID
 import app.shosetsu.android.common.enums.DownloadStatus
-import app.shosetsu.android.common.ext.getString
-import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.logI
-import app.shosetsu.android.common.ext.logV
-import app.shosetsu.android.common.ext.notificationBuilder
-import app.shosetsu.android.common.ext.notificationManager
-import app.shosetsu.android.common.ext.removeProgress
-import app.shosetsu.android.common.ext.setNotOngoing
-import app.shosetsu.android.common.ext.setOngoing
+import app.shosetsu.android.common.ext.*
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.DownloadEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
@@ -105,7 +85,7 @@ class DownloadWorker(
 					action = ACTION_CANCEL_CHAPTER_DOWNLOAD
 					putExtra(EXTRA_NOTIFICATION_ID, defaultNotificationID)
 				},
-				PendingIntent.FLAG_IMMUTABLE
+				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 			)
 		)
 	}
@@ -396,7 +376,8 @@ class DownloadWorker(
 							)
 							setRequiresStorageNotLow(!downloadOnLowStorage())
 							setRequiresBatteryNotLow(!downloadOnLowBattery())
-							setRequiresDeviceIdle(downloadOnlyIdle())
+							if (SDK_INT >= VERSION_CODES.M)
+								setRequiresDeviceIdle(downloadOnlyIdle())
 						}.build())
 						.build()
 				)

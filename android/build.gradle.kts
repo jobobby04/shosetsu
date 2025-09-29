@@ -57,7 +57,7 @@ android {
 	compileSdk = 35
 	defaultConfig {
 		applicationId = "app.shosetsu.android"
-		minSdk = 24
+		minSdk = 22
 		targetSdk = 35
 		versionCode = 45
 		versionName = "2.5.0"

@@ -1,6 +1,7 @@
 package app.shosetsu.android.backend.workers.perodic
 
 import android.content.Context
+import android.os.Build
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -136,7 +137,8 @@ class BackupCycleWorker(
 						TimeUnit.HOURS
 					).setConstraints(
 						Constraints.Builder().apply {
-							setRequiresDeviceIdle(requiresBackupOnIdle())
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+								setRequiresDeviceIdle(requiresBackupOnIdle())
 							setRequiresBatteryNotLow(!allowsBackupOnLowBattery())
 							setRequiresStorageNotLow(!allowsBackupOnLowStorage())
 						}.build()

@@ -1,6 +1,7 @@
 package app.shosetsu.android.datasource.remote.impl.update
 
 import app.shosetsu.android.common.EmptyResponseBodyException
+import app.shosetsu.android.common.ext.decodeSafeFromStream
 import app.shosetsu.android.common.ext.quickie
 import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
@@ -8,7 +9,6 @@ import app.shosetsu.lib.exceptions.HTTPException
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
 import okhttp3.OkHttpClient
 import java.io.IOException
 
@@ -51,7 +51,7 @@ class FDroidAppUpdateDataSource(
 			if (response.isSuccessful) {
 				return response.body?.use { responseBody ->
 					responseBody.byteStream().use { responseStream ->
-						val info = json.decodeFromStream<PackagesInfo>(responseStream)
+						val info = json.decodeSafeFromStream<PackagesInfo>(responseStream)
 						if (info.error != null)
 							throw EmptyResponseBodyException(info.error)
 

@@ -2,6 +2,7 @@ package app.shosetsu.android.datasource.remote.impl.update
 
 import app.shosetsu.android.BuildConfig.DEBUG
 import app.shosetsu.android.common.EmptyResponseBodyException
+import app.shosetsu.android.common.ext.decodeSafeFromStream
 import app.shosetsu.android.common.ext.quickie
 import app.shosetsu.android.common.utils.archURL
 import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
@@ -10,7 +11,6 @@ import app.shosetsu.android.domain.model.remote.AppUpdateDTO
 import app.shosetsu.lib.exceptions.HTTPException
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
 import okhttp3.OkHttpClient
 import java.io.IOException
 import java.io.InputStream
@@ -67,7 +67,7 @@ class GitAppUpdateDataSource(
 				if (gitResponse.isSuccessful) {
 					return gitResponse.body?.use { responseBody ->
 						responseBody.byteStream().use {
-							json.decodeFromStream<AppUpdateDTO>(it).convertTo()
+							json.decodeSafeFromStream<AppUpdateDTO>(it).convertTo()
 						}
 					} ?: throw EmptyResponseBodyException(shosetsuGitUpdateURL)
 				}

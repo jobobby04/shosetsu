@@ -1,8 +1,13 @@
 package app.shosetsu.android.datasource.local.memory
 
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.M
 import app.shosetsu.android.datasource.local.memory.base.IMemChaptersDataSource
 import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
 import app.shosetsu.android.datasource.local.memory.base.IMemExtensionsDataSource
+import app.shosetsu.android.datasource.local.memory.impl.ConcurrentMemChaptersDataSource
+import app.shosetsu.android.datasource.local.memory.impl.ConcurrentMemExtLibDataSource
+import app.shosetsu.android.datasource.local.memory.impl.ConcurrentMemExtensionDataSource
 import app.shosetsu.android.datasource.local.memory.impl.GuavaMemChaptersDataSource
 import app.shosetsu.android.datasource.local.memory.impl.GuavaMemExtLibDataSource
 import app.shosetsu.android.datasource.local.memory.impl.GuavaMemExtensionDataSource
@@ -34,14 +39,27 @@ import org.kodein.di.singleton
  */
 val memoryDataSourceModule: DI.Module = DI.Module("cache_data_source") {
 	bind<IMemChaptersDataSource>() with singleton {
-		GuavaMemChaptersDataSource()
+		if (SDK_INT <= M) {
+			ConcurrentMemChaptersDataSource()
+		} else {
+			GuavaMemChaptersDataSource()
+		}
 	}
 
 	bind<IMemExtensionsDataSource>() with singleton {
-		GuavaMemExtensionDataSource()
+		if (SDK_INT <= M) {
+			ConcurrentMemExtensionDataSource()
+		} else {
+			GuavaMemExtensionDataSource()
+		}
 	}
 
 	bind<IMemExtLibDataSource>() with singleton {
-		GuavaMemExtLibDataSource()
+		if (SDK_INT <= M) {
+			ConcurrentMemExtLibDataSource()
+		} else {
+			GuavaMemExtLibDataSource()
+		}
 	}
+
 }
