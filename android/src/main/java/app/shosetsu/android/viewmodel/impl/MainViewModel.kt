@@ -48,31 +48,14 @@ import kotlinx.coroutines.flow.stateIn
 class MainViewModel(
 	private val appUpdateRepo: IAppUpdatesRepository,
 	private val isOnlineUseCase: IsOnlineUseCase,
-	loadNavigationStyleUseCase: LoadNavigationStyleUseCase,
-	private val loadRequireDoubleBackUseCase: LoadRequireDoubleBackUseCase,
 	override val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 	private val startInstallWorker: StartAppUpdateInstallWorkerUseCase,
-	backupRepo: IBackupRepository,
 	private val settingsRepository: ISettingsRepository,
 ) : AMainViewModel() {
-
-	override val requireDoubleBackToExit: StateFlow<Boolean> by lazy {
-		loadRequireDoubleBackUseCase()
-	}
 
 	override val openUpdate: MutableSharedFlow<UserUpdate> = MutableSharedFlow()
 
 	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
-
-	override val navigationStyle: StateFlow<NavigationStyle> =
-		loadNavigationStyleUseCase().map {
-			if (it) {
-				NavigationStyle.LEGACY
-			} else {
-				NavigationStyle.MATERIAL
-			}
-		}
-			.stateIn(viewModelScopeIO, SharingStarted.Eagerly, NavigationStyle.MATERIAL)
 
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
@@ -99,9 +82,6 @@ class MainViewModel(
 			}
 		}
 	}
-
-	override val backupProgressState: StateFlow<IBackupRepository.BackupProgress> =
-		backupRepo.backupProgress
 
 	override val showIntro: StateFlow<Boolean> by lazy {
 		settingsRepository.getBooleanFlow(SettingKey.FirstTime)

@@ -47,9 +47,8 @@ import app.shosetsu.android.ui.theme.Primary
 
 @Composable
 fun NavigationDrawerContent(
-	destinations: List<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Root) -> Unit
+	onNavigate: (ShosetsuDestination.Primary) -> Unit
 ) {
 	ModalDrawerSheet {
 		Row(
@@ -73,7 +72,7 @@ fun NavigationDrawerContent(
 
 		HorizontalDivider()
 
-		destinations.forEach { destination ->
+		ShosetsuDestination.Primary.all.forEach { destination ->
 			NavigationDrawerItem(
 				selected =
 				currentDestination?.has(destination) == true,

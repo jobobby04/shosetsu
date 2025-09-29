@@ -3,47 +3,23 @@ package app.shosetsu.android.ui.main
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import app.shosetsu.android.R
-import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
 import app.shosetsu.android.ui.intro.IntroductionActivity
-import app.shosetsu.android.ui.main.Destination.Browse
-import app.shosetsu.android.ui.main.Destination.Library
-import app.shosetsu.android.ui.main.Destination.More
-import app.shosetsu.android.ui.main.Destination.Updates
+import app.shosetsu.android.ui.main.Destination.PrimaryWrapper
+import app.shosetsu.android.ui.main.graph.ShosetsuNavController
 import app.shosetsu.android.ui.main.graph.mainGraph
 import app.shosetsu.android.ui.theme.ShosetsuTheme
-import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
-import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -83,46 +59,20 @@ fun MainView() {
 		if (showIntro)
 			context.startActivity(Intent(context, IntroductionActivity::class.java))
 	}
-
-	val backupProgressState by viewModel.backupProgressState.collectAsState()
 	val theme by viewModel.appTheme.collectAsState()
-	val navStyle by viewModel.navigationStyle.collectAsState()
-	val update by viewModel.appUpdate.collectAsState()
 	val updateToOpen by viewModel.openUpdate.collectAsState(null)
-	val protectBack by viewModel.requireDoubleBackToExit.collectAsState(false)
+	val update by viewModel.appUpdate.collectAsState()
 
-	val isMaterial = navStyle == NavigationStyle.MATERIAL
-	val isLegacy = navStyle == NavigationStyle.LEGACY
-
-	val navController = rememberNavController()
-	val navBackStackEntry by navController.currentBackStackEntryAsState()
-	val drawerState = rememberDrawerState(DrawerValue.Closed)
-	val scope = rememberCoroutineScope()
-
-	val destinations = listOf(
-		Library,
-		Updates,
-		Browse,
-		More
-	)
+	val navController = ShosetsuNavController()
 
 	val sizeClass = calculateWindowSizeClass(context as Activity)
-	val isCompact = sizeClass.widthSizeClass == WindowWidthSizeClass.Compact
-	val isBig = sizeClass.widthSizeClass != WindowWidthSizeClass.Compact
-
-	ShosetsuBackHandler(
-		navController = navController,
-		protectBack = protectBack,
-		isDrawerOpen = drawerState.isOpen,
-		onCloseDrawer = drawerState::close
-	)
 
 	fun navigate(route: ShosetsuDestination) {
-		navController.navigate(route) {
+		navController.root.navigate(route) {
 			// Pop up to the start destination of the graph to
 			// avoid building up a large stack of destinations
 			// on the back stack as users select items
-			popUpTo(navController.graph.findStartDestination().id) {
+			popUpTo(navController.root.graph.findStartDestination().id) {
 				saveState = true
 			}
 			// Avoid multiple copies of the same destination when
@@ -142,80 +92,19 @@ fun MainView() {
 		theme.setAppCompatDelegateThemeMode()
 	}
 
-	if (showVerificationWarning) {
-		VerificationWarning(viewModel::dismissVerificationWarning)
-	}
-
 	ShosetsuTheme(theme) {
-		ModalNavigationDrawer(
-			drawerContent = {
-				NavigationDrawerContent(
-					destinations,
-					navBackStackEntry,
-					onNavigate = {
-						navigate(it)
-						scope.launch {
-							drawerState.close()
-						}
-					}
-				)
-			},
-			drawerState = drawerState,
-			gesturesEnabled = isLegacy
-		) {
-			Row(Modifier.fillMaxSize()) {
-				AnimatedVisibility(isBig && isMaterial) {
-					NavigationRail(
-						destinations,
-						navBackStackEntry,
-						onNavigate = ::navigate
-					)
-				}
+		if (showVerificationWarning) {
+			VerificationWarning(viewModel::dismissVerificationWarning)
+		}
 
-				Scaffold(
-					bottomBar = {
-						if (isCompact && isMaterial) {
-							BottomNavigationBar(
-								destinations,
-								navBackStackEntry,
-								::navigate
-							)
-						}
-					},
-					topBar = {
-						AnimatedVisibility(
-							backupProgressState == BackupProgress.IN_PROGRESS,
-							enter = slideInVertically(),
-							exit = slideOutVertically()
-						) {
-							BackupProgressIndicator()
-						}
-					},
-				) { paddingValues ->
-					NavHost(
-						navController,
-						startDestination = Library
-					) {
-						mainGraph(
-							navController,
-							sizeClass,
-							drawerIcon = {
-								if (isLegacy) {
-									SimpleIconButton(
-										Icons.Default.Menu,
-										stringResource(R.string.navigation_drawer_open),
-										onClick = {
-											scope.launch {
-												drawerState.open()
-											}
-										}
-									)
-								}
-							}
-						)
-					}
-				}
-			}
+		NavHost(
+			navController.root,
+			startDestination = PrimaryWrapper
+		) {
+			mainGraph(
+				navController,
+				sizeClass,
+			)
 		}
 
 		update?.let { concrete ->
@@ -231,5 +120,4 @@ fun MainView() {
 		val userUpdate = updateToOpen ?: return@LaunchedEffect
 		context.openInBrowser(userUpdate.updateURL, userUpdate.pkg)
 	}
-
 }

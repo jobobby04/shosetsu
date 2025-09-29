@@ -34,12 +34,11 @@ import androidx.navigation.NavBackStackEntry
  */
 @Composable
 fun NavigationRail(
-	destinations: List<Root>,
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Root) -> Unit
+	onNavigate: (ShosetsuDestination.Primary) -> Unit
 ) {
 	NavigationRail {
-		destinations.forEach { destination ->
+		ShosetsuDestination.Primary.all.forEach { destination ->
 			NavigationRailItem(
 				selected =
 				currentDestination?.has(destination) == true,

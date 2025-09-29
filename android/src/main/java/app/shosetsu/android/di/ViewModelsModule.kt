@@ -9,6 +9,7 @@ import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
+import app.shosetsu.android.viewmodel.abstracted.AHomeViewModel
 import app.shosetsu.android.viewmodel.abstracted.AIntroViewModel
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
@@ -37,6 +38,7 @@ import app.shosetsu.android.viewmodel.impl.CategoriesViewModel
 import app.shosetsu.android.viewmodel.impl.ChapterReaderViewModel
 import app.shosetsu.android.viewmodel.impl.DownloadsViewModel
 import app.shosetsu.android.viewmodel.impl.HistoryViewModelImpl
+import app.shosetsu.android.viewmodel.impl.HomeViewModel
 import app.shosetsu.android.viewmodel.impl.IntroViewModel
 import app.shosetsu.android.viewmodel.impl.LibraryViewModel
 import app.shosetsu.android.viewmodel.impl.MainViewModel
@@ -88,12 +90,18 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<AMainViewModel>() with provider {
 		MainViewModel(
 			isOnlineUseCase = instance(),
-			loadNavigationStyleUseCase = instance(),
 			loadLiveAppThemeUseCase = instance(),
 			startInstallWorker = instance(),
-			loadRequireDoubleBackUseCase = instance(),
 			settingsRepository = instance(),
-			appUpdateRepo = instance(),
+			appUpdateRepo = instance()
+		)
+	}
+
+	// Home
+	bind<AHomeViewModel>() with provider {
+		HomeViewModel(
+			loadNavigationStyleUseCase = instance(),
+			loadRequireDoubleBackUseCase = instance(),
 			backupRepo = instance()
 		)
 	}
@@ -286,7 +294,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<ABackupSettingsViewModel>() with provider {
@@ -309,7 +317,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		ReaderSettingsViewModel(
 			iSettingsRepository = instance(),
 
-            loadReaderThemes = instance()
+			loadReaderThemes = instance()
 		)
 	}
 	bind<ALibrarySettingsViewModel>() with provider {

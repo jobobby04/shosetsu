@@ -1,8 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
-import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import kotlinx.coroutines.flow.Flow
@@ -37,17 +35,6 @@ abstract class AMainViewModel : ShosetsuRootViewModel(), IsOnlineCheckViewModel 
 	abstract val appUpdate: StateFlow<AppUpdateEntity?>
 
 	/**
-	 * If 0, Bottom
-	 * If 1, Drawer
-	 */
-	abstract val navigationStyle: StateFlow<NavigationStyle>
-
-	/**
-	 * The app needs two presses to exit
-	 */
-	abstract val requireDoubleBackToExit: StateFlow<Boolean>
-
-	/**
 	 * Action to take for an update
 	 */
 	abstract val openUpdate: Flow<UserUpdate>
@@ -74,11 +61,6 @@ abstract class AMainViewModel : ShosetsuRootViewModel(), IsOnlineCheckViewModel 
 		val updateURL: String,
 		val pkg: String?
 	)
-
-	/**
-	 *
-	 */
-	abstract val backupProgressState: StateFlow<IBackupRepository.BackupProgress>
 
 	/** If the application should show the show splash screen */
 	abstract val showIntro: StateFlow<Boolean>
