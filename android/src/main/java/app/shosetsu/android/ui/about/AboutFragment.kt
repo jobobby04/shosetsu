@@ -124,24 +124,22 @@ fun AboutView(
 @ExperimentalMaterial3Api
 @Preview
 @Composable
-fun PreviewAboutContent() {
-	ShosetsuTheme(AppThemes.LIGHT) {
-		AboutContent(
-			currentVersion = BuildConfig.VERSION_NAME,
-			onOpenWebsite = {},
-			onOpenSource = {},
-			onOpenExtensions = {},
-			onOpenDiscord = {},
-			onOpenPatreon = {},
-			onOpenLicense = {},
-			onOpenDisclaimer = {},
-			onOpenMatrix = {},
-			onOpenPrivacy = {},
-			onOpenKofi = {
-			},
-			onBack = {}
-		)
-	}
+fun PreviewAboutContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	AboutContent(
+		currentVersion = BuildConfig.VERSION_NAME,
+		onOpenWebsite = {},
+		onOpenSource = {},
+		onOpenExtensions = {},
+		onOpenDiscord = {},
+		onOpenPatreon = {},
+		onOpenLicense = {},
+		onOpenDisclaimer = {},
+		onOpenMatrix = {},
+		onOpenPrivacy = {},
+		onOpenKofi = {
+		},
+		onBack = {}
+	)
 }
 
 @ExperimentalMaterial3Api

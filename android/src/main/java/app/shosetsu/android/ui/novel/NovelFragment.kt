@@ -1,9 +1,9 @@
 package app.shosetsu.android.ui.novel
 
-import android.app.Activity
 import android.content.Intent
 import android.content.res.Resources
 import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -90,7 +90,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -182,7 +182,7 @@ fun NovelInfoView(
 	val itemAt by viewModel.itemIndex.collectAsState()
 	val categories by viewModel.categories.collectAsState()
 	val novelCategories by viewModel.novelCategories.collectAsState()
-	val activity = LocalContext.current as Activity
+	val activity = LocalActivity.current
 	val novelURL by viewModel.novelURL.collectAsState()
 	val isCategoriesDialogVisible by viewModel.isCategoriesDialogVisible.collectAsState()
 	val toggleBookmarkResponse by viewModel.toggleBookmarkResponse.collectAsState()
@@ -198,6 +198,7 @@ fun NovelInfoView(
 
 	val hostState = remember { SnackbarHostState() }
 	val context = LocalContext.current
+	val resources = LocalResources.current
 	val scope = rememberCoroutineScope()
 
 	LaunchedEffect(error) {
@@ -384,7 +385,7 @@ fun NovelInfoView(
 				(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
 			val result = hostState.showSnackbar(
 				try {
-					context.resources.getQuantityString(
+					resources.getQuantityString(
 						R.plurals.fragment_novel_toggle_delete_chapters,
 						chaptersToDelete,
 						chaptersToDelete
@@ -422,7 +423,7 @@ fun NovelInfoView(
 		NovelShareMenu(
 			shareBasicURL = {
 				if (shareInfo != null)
-					activity.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
+					activity?.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
 			},
 			shareQRCode = {
 				viewModel.showQRCodeDialog()
@@ -956,9 +957,9 @@ fun NovelChapterContent(
 			}
 			.combinedClickable(
 				onClick =
-				if (!selectionMode)
-					openChapter
-				else onToggleSelection,
+					if (!selectionMode)
+						openChapter
+					else onToggleSelection,
 				onLongClick = onToggleSelection
 			)
 			.fillMaxWidth(),

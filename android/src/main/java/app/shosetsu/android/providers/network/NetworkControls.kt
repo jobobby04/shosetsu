@@ -1,6 +1,8 @@
 package app.shosetsu.android.providers.network
 
 import android.content.Context
+
+import android.annotation.SuppressLint
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.utils.CloudflareInterceptor
 import app.shosetsu.android.common.utils.CookieJarSync
@@ -110,6 +112,7 @@ fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepositor
 /**
  * Represents the format expected from an HTTP Retry-After response
  */
+@SuppressLint("SimpleDateFormat") // This is an HTTP date, not user facing or dependent.
 val retryAfterDateFormat: SimpleDateFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
 
 /**

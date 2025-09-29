@@ -167,13 +167,11 @@ fun BrowseControllerLanguagesFilter(
 
 @Preview
 @Composable
-fun PreviewBrowseControllerLanguages() {
-	ShosetsuTheme(AppThemes.LIGHT) {
-		BrowseControllerLanguagesContent(
-			languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter).toImmutableList(),
-			state = persistentMapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),
-			onLanguageChecked = { _, _ -> })
-	}
+fun PreviewBrowseControllerLanguages() = ShosetsuTheme(AppThemes.LIGHT) {
+	BrowseControllerLanguagesContent(
+		languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter).toImmutableList(),
+		state = persistentMapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),
+		onLanguageChecked = { _, _ -> })
 }
 
 @Composable

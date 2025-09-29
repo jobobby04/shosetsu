@@ -6,7 +6,6 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -31,7 +30,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import app.shosetsu.android.R
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.viewModelDi
@@ -141,9 +139,7 @@ fun MainView() {
 		theme.setAppCompatDelegateThemeMode()
 	}
 
-	ShosetsuTheme(
-		theme = theme,
-	) {
+	ShosetsuTheme(theme) {
 		ModalNavigationDrawer(
 			drawerContent = {
 				NavigationDrawerContent(
@@ -192,7 +188,7 @@ fun MainView() {
 					NavHost(
 						navController,
 						startDestination = Library
-					)  {
+					) {
 						mainGraph(
 							navController,
 							sizeClass,
@@ -220,4 +216,5 @@ fun MainView() {
 		val userUpdate = updateToOpen ?: return@LaunchedEffect
 		context.openInBrowser(userUpdate.updateURL, userUpdate.pkg)
 	}
+
 }
