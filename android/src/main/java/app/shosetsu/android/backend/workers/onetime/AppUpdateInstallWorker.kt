@@ -4,9 +4,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.IconCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -15,6 +15,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
+import app.shosetsu.android.BuildConfig.APPLICATION_ID
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
@@ -30,7 +31,6 @@ import app.shosetsu.android.common.consts.WorkerTags.APP_UPDATE_INSTALL_WORK_ID
 import app.shosetsu.android.common.ext.actionBuilder
 import app.shosetsu.android.common.ext.addReportErrorAction
 import app.shosetsu.android.common.ext.getString
-import app.shosetsu.android.common.ext.getUriCompat
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.notificationBuilder
@@ -158,7 +158,8 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			return Result.failure()
 		}
 
-		val uri = File(path).getUriCompat(applicationContext)
+		val uri =
+			FileProvider.getUriForFile(applicationContext, "$APPLICATION_ID.provider", File(path))
 
 		notify(R.string.notification_app_update_install) {
 			setNotOngoing()
@@ -193,7 +194,7 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			context,
 			0,
 			intent,
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+			PendingIntent.FLAG_IMMUTABLE
 		)
 	}
 

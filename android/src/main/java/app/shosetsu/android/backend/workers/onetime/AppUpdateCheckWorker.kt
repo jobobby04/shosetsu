@@ -3,7 +3,6 @@ package app.shosetsu.android.backend.workers.onetime
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
@@ -148,7 +147,7 @@ class AppUpdateCheckWorker(
 						applicationContext,
 						0,
 						openAppForUpdateIntent,
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+						PendingIntent.FLAG_IMMUTABLE
 					)
 				)
 			}
@@ -209,8 +208,7 @@ class AppUpdateCheckWorker(
 							setRequiredNetworkType(
 								if (appUpdateOnMetered()) CONNECTED else UNMETERED
 							)
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-								setRequiresDeviceIdle(appUpdateOnlyIdle())
+							setRequiresDeviceIdle(appUpdateOnlyIdle())
 						}.build()
 					).build()
 				)

@@ -5,8 +5,6 @@ import android.app.PendingIntent.FLAG_ONE_SHOT
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
@@ -127,7 +125,7 @@ class NovelUpdateWorker(
 					action = ACTION_CANCEL_NOVEL_UPDATE
 					putExtra(EXTRA_NOTIFICATION_ID, defaultNotificationID)
 				},
-				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+				PendingIntent.FLAG_IMMUTABLE
 			)
 		)
 	}
@@ -432,7 +430,7 @@ class NovelUpdateWorker(
 					)
 				},
 				(
-						if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+						PendingIntent.FLAG_IMMUTABLE
 						) or FLAG_ONE_SHOT
 			)
 		)
@@ -495,8 +493,7 @@ class NovelUpdateWorker(
 							)
 							setRequiresStorageNotLow(!updateOnLowStorage())
 							setRequiresBatteryNotLow(!updateOnLowBattery())
-							if (SDK_INT >= VERSION_CODES.M)
-								setRequiresDeviceIdle(updateOnlyIdle())
+							setRequiresDeviceIdle(updateOnlyIdle())
 						}.build()
 					).setInputData(data).build()
 				)

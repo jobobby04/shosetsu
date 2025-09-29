@@ -1,8 +1,6 @@
 package app.shosetsu.android.backend.workers.perodic
 
 import android.content.Context
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.Data
@@ -27,7 +25,6 @@ import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit.HOURS
-import java.util.concurrent.TimeUnit.MINUTES
 import androidx.work.PeriodicWorkRequestBuilder as PWRB
 
 /*
@@ -67,24 +64,30 @@ class NovelUpdateCycleWorker(
 			WorkInfo.State.ENQUEUED -> {
 				logI("NovelUpdater is waiting to update, ignoring")
 			}
+
 			WorkInfo.State.RUNNING -> {
 				logI("NovelUpdater is running, ignoring")
 			}
+
 			WorkInfo.State.SUCCEEDED -> {
 				logI("NovelUpdater has completed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.FAILED -> {
 				logI("Previous NovelUpdater has failed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.BLOCKED -> {
 				logI("Previous NovelUpdater is blocked, ignoring")
 			}
+
 			WorkInfo.State.CANCELLED -> {
 				logI("Previous NovelUpdater was cancelled, starting again")
 				manager.start()
 			}
+
 			null -> {
 				logI("Previous NovelUpdater is null, starting again")
 				manager.start()
@@ -160,15 +163,16 @@ class NovelUpdateCycleWorker(
 							)
 							setRequiresStorageNotLow(!updateOnLowStorage())
 							setRequiresBatteryNotLow(!updateOnLowBattery())
-							if (SDK_INT >= VERSION_CODES.M)
-								setRequiresDeviceIdle(updateOnlyIdle())
+							setRequiresDeviceIdle(updateOnlyIdle())
 						}.build()
 					)
 						.build()
 				)
-				logI("NovelUpdateCycleWorker State ${
-					workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
-				}")
+				logI(
+					"NovelUpdateCycleWorker State ${
+						workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
+					}"
+				)
 			}
 		}
 

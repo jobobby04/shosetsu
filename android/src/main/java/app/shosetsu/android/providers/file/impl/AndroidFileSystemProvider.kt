@@ -41,11 +41,7 @@ class AndroidFileSystemProvider(
 	private val internalFilesDirPath by lazy { context.filesDir.absolutePath }
 
 	private val internalGenericDirPath by lazy {
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-			context.dataDir.absolutePath
-		} else {
-			context.filesDir.absolutePath
-		}
+		context.dataDir.absolutePath
 	}
 
 	private val externalDirPath by lazy { context.getExternalFilesDir(null) }
