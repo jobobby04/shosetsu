@@ -55,6 +55,10 @@ import kotlin.coroutines.cancellation.CancellationException
 
 private const val TabFadeDuration = 200
 
+private enum class NavigationMode {
+	BOTTOM, DRAWER, RAIL
+}
+
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
@@ -65,9 +69,10 @@ fun HomeView(
 	val scope = rememberCoroutineScope()
 
 	val navStyle by viewModel.navigationStyle.collectAsState()
-	val isLegacy = navStyle == NavigationStyle.LEGACY
-
-	val useNavigationRail = sizeClass.widthSizeClass != WindowWidthSizeClass.Compact || isLegacy
+	val navigationMode = when (navStyle) {
+        NavigationStyle.MATERIAL -> if (sizeClass.widthSizeClass == WindowWidthSizeClass.Compact) NavigationMode.BOTTOM else NavigationMode.RAIL
+        NavigationStyle.LEGACY -> NavigationMode.DRAWER
+    }
 
 	val backupProgressState by viewModel.backupProgressState.collectAsState()
 
@@ -101,7 +106,7 @@ fun HomeView(
 	@Composable
 	fun Content() = Scaffold(
 		bottomBar = {
-			if (!useNavigationRail) {
+			if (navigationMode == NavigationMode.BOTTOM) {
 				BottomNavigationBar(
 					navBackStackEntry,
 					::navigate
@@ -142,7 +147,7 @@ fun HomeView(
 				homeGraph(
 					shosetsuNavController,
 					drawerIcon = {
-						if (isLegacy) {
+						if (navigationMode == NavigationMode.DRAWER) {
 							SimpleIconButton(
 								Icons.Default.Menu,
 								stringResource(R.string.navigation_drawer_open),
@@ -190,32 +195,34 @@ fun HomeView(
 		}
 	}
 
-	if (useNavigationRail) {
-		ModalNavigationDrawer(
-			drawerContent = {
-				NavigationDrawerContent(
-					navBackStackEntry,
-					onNavigate = {
-						navigate(it)
-						scope.launch {
-							drawerState.close()
-						}
-					}
-				)
-			},
-			drawerState = drawerState,
-			gesturesEnabled = isLegacy
-		) {
-			Row(Modifier.fillMaxSize()) {
-				NavigationRail(
-					navBackStackEntry,
-					onNavigate = ::navigate
-				)
+    if (navigationMode == NavigationMode.BOTTOM) {
+        Content()
+    } else {
+        ModalNavigationDrawer(
+            drawerContent = {
+                NavigationDrawerContent(
+                    navBackStackEntry,
+                    onNavigate = {
+                        navigate(it)
+                        scope.launch {
+                            drawerState.close()
+                        }
+                    }
+                )
+            },
+            drawerState = drawerState,
+            gesturesEnabled = navigationMode == NavigationMode.DRAWER
+        ) {
+            Row(Modifier.fillMaxSize()) {
+                if (navigationMode == NavigationMode.RAIL) {
+					NavigationRail(
+						navBackStackEntry,
+						onNavigate = ::navigate
+					)
+				}
 
-				Content()
-			}
-		}
-	} else {
-		Content()
-	}
+                Content()
+            }
+        }
+    }
 }
