@@ -109,6 +109,10 @@ class CatalogViewModel(
 		}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
+	/**
+	 * UnusedFlow warning suppressed, we are just calling the function to add them to the map.
+	 */
+	@Suppress("UnusedFlow")
 	private fun List<Filter<*>>.init() {
 		forEach { filter ->
 			when (filter) {
