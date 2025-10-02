@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.flow
 class GetExtSelectedListingFlowUseCase(
 	private val iExtensionSettingsRepository: IExtensionSettingsRepository
 ) {
-	suspend operator fun invoke(extensionId: Int): Flow<Int> =
+	operator fun invoke(extensionId: Int): Flow<Int> =
 		flow {
 			if (extensionId == -1) {
 				emit(-1)
