@@ -193,7 +193,7 @@ class LibraryViewModel(
 
 	override val hasSelection: StateFlow<Boolean> by lazy {
 		selectedNovels.mapLatest { map ->
-			map.values.any { it.any { it.value } }
+			map.values.any { subMap -> subMap.any { it.value } }
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
@@ -360,8 +360,8 @@ class LibraryViewModel(
 				result = when (inclusionState) {
 					INCLUDE ->
 						result.copy(
-							novels = result.novels.mapValues {
-								it.value.filter { novelUI ->
+							novels = result.novels.mapValues { novel ->
+								novel.value.filter { novelUI ->
 									against(novelUI).any { g ->
 										g.replaceFirstChar {
 											if (it.isLowerCase()) it.titlecase(
@@ -375,8 +375,8 @@ class LibraryViewModel(
 
 					EXCLUDE ->
 						result.copy(
-							novels = result.novels.mapValues {
-								it.value.filterNot { novelUI ->
+							novels = result.novels.mapValues { novel ->
+								novel.value.filterNot { novelUI ->
 									against(novelUI).any { g ->
 										g.replaceFirstChar {
 											if (it.isLowerCase()) it.titlecase(
@@ -425,8 +425,8 @@ class LibraryViewModel(
 			novelResult.let { library ->
 				if (reversed)
 					library.copy(
-						novels = library.novels.mapValues {
-							it.value.sortedBy { !it.pinned }.toImmutableList()
+						novels = library.novels.mapValues { novel ->
+							novel.value.sortedBy { !it.pinned }.toImmutableList()
 						}.toImmutableMap()
 					)
 				else library
@@ -436,8 +436,8 @@ class LibraryViewModel(
 	private fun Flow<LibraryUI>.combineFilter() =
 		combine(queryFlow) { library, query ->
 			library.copy(
-				novels = library.novels.mapValues {
-					it.value.filter { it.title.contains(query, ignoreCase = true) }
+				novels = library.novels.mapValues { novel ->
+					novel.value.filter { it.title.contains(query, ignoreCase = true) }
 						.toImmutableList()
 				}.toImmutableMap()
 			)
@@ -490,14 +490,14 @@ class LibraryViewModel(
 				sortType?.let {
 					when (sortType) {
 						INCLUDE -> list.copy(
-							novels = list.novels.mapValues {
-								it.value.filter { it.unread > 0 }.toImmutableList()
+							novels = list.novels.mapValues { novel ->
+								novel.value.filter { it.unread > 0 }.toImmutableList()
 							}.toImmutableMap()
 						)
 
 						EXCLUDE -> list.copy(
-							novels = list.novels.mapValues {
-								it.value.filterNot { it.unread > 0 }.toImmutableList()
+							novels = list.novels.mapValues { novel ->
+								novel.value.filterNot { it.unread > 0 }.toImmutableList()
 							}.toImmutableMap()
 						)
 					}
@@ -511,14 +511,14 @@ class LibraryViewModel(
 				sortType?.let {
 					when (sortType) {
 						INCLUDE -> list.copy(
-							novels = list.novels.mapValues {
-								it.value.filter { it.downloaded > 0 }.toImmutableList()
+							novels = list.novels.mapValues { novel ->
+								novel.value.filter { it.downloaded > 0 }.toImmutableList()
 							}.toImmutableMap()
 						)
 
 						EXCLUDE -> list.copy(
-							novels = list.novels.mapValues {
-								it.value.filterNot { it.downloaded > 0 }.toImmutableList()
+							novels = list.novels.mapValues { novel ->
+								novel.value.filterNot { it.downloaded > 0 }.toImmutableList()
 							}.toImmutableMap()
 						)
 					}

@@ -175,9 +175,9 @@ class CatalogViewModel(
 	override val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>> by lazy {
 		iExtensionFlow.mapLatest {
 			it?.searchFiltersModel?.toList() ?: emptyList()
-		}.mapLatest {
+		}.mapLatest { filterList ->
 			filterDataState.clear() // Reset filter state so no data conflicts occur
-			it.map { StableHolder(it) }.toImmutableList()
+			filterList.map { StableHolder(it) }.toImmutableList()
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Eagerly, persistentListOf())
 	}
 
