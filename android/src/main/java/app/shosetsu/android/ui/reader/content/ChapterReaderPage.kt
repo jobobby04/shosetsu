@@ -67,7 +67,7 @@ fun ChapterReaderPage(
 	onDoubleClick: () -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
 ) {
-	val html by remember(item) {
+	val html by remember(windowPadding, item) {
 		getHTMLContent(item)
 	}.collectAsState(ChapterPassage.Loading)
 

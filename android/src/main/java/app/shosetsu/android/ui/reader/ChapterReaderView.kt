@@ -184,6 +184,9 @@ fun ChapterReaderView(
 				)
 			},
 			content = { windowPadding, footerPadding ->
+				LaunchedEffect(windowPadding) {
+					viewModel.paddingValues.value = windowPadding
+				}
 				ChapterReaderPager(
 					items = items ?: persistentListOf(),
 					isHorizontal = isHorizontalReading,

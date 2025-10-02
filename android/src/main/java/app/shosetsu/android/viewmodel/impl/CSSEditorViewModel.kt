@@ -1,7 +1,9 @@
 package app.shosetsu.android.viewmodel.impl
 
 import android.app.Application
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.util.Stack
@@ -63,6 +66,7 @@ class CSSEditorViewModel(
 		}
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@CSSEditorViewModel.colorScheme
+		override val paddingValuesFlow: Flow<PaddingValues> = flowOf(PaddingValues(0.dp))
 	}
 
 	private val undoStack by lazy { Stack<String>() }

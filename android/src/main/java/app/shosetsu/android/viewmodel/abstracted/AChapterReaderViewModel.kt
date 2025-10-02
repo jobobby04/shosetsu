@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -185,4 +186,5 @@ abstract class AChapterReaderViewModel :
 	abstract fun onStopTts()
 
 	abstract val colorScheme: MutableStateFlow<ColorScheme>
+	abstract val paddingValues: MutableStateFlow<PaddingValues>
 }

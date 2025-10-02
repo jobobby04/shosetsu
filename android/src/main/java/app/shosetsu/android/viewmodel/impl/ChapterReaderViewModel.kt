@@ -4,7 +4,9 @@ import android.app.Application
 import android.database.sqlite.SQLiteException
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
@@ -159,6 +161,8 @@ class ChapterReaderViewModel(
 			get() = this@ChapterReaderViewModel.paragraphSpacingFlow
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@ChapterReaderViewModel.colorScheme
+		override val paddingValuesFlow: Flow<PaddingValues>
+			get() = this@ChapterReaderViewModel.paddingValues
 	}
 
 	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
@@ -1150,6 +1154,7 @@ class ChapterReaderViewModel(
 	}
 
 	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)
+	override val paddingValues: MutableStateFlow<PaddingValues> = MutableStateFlow(PaddingValues(0.dp))
 
 	override fun onCleared() {
 		tts.value?.stop()

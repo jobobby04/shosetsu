@@ -1,8 +1,11 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import android.graphics.Color
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -35,6 +38,7 @@ abstract class ShosetsuCssViewModelComponent {
 	abstract val indentSizeFlow: Flow<Int>
 	abstract val paragraphSpacingFlow: Flow<Float>
 	abstract val colorSchemeFlow: Flow<ColorScheme>
+	abstract val paddingValuesFlow: Flow<PaddingValues>
 
 	val themeFlow: StateFlow<Pair<Int, Int>> by lazy {
 		settingsRepo.getIntFlow(ReaderTheme).mapLatest { id: Int ->
@@ -85,6 +89,10 @@ abstract class ShosetsuCssViewModelComponent {
 		}.combine(colorSchemeFlow) { builder, colorScheme ->
 			builder.copy(
 				colorScheme = colorScheme
+			)
+		}.combine(paddingValuesFlow) { builder, paddingValues ->
+			builder.copy(
+				paddingValues = paddingValues
 			)
 		}.map {
 			val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
@@ -160,6 +168,13 @@ abstract class ShosetsuCssViewModelComponent {
 				this["--shosetsu-indent-size"] = "${it.indentSize}em"
 				this["--shosetsu-text-size"] = "${it.textSize / HTML_SIZE_DIVISION}pt"
 				this["--shosetsu-paragraph-spacing"] = "${it.paragraphSpacing}em"
+
+				this["--shosetsu-padding-top"] = "${it.paddingValues.calculateTopPadding().value.toLong()}px"
+				this["--shosetsu-padding-bottom"] = "${it.paddingValues.calculateBottomPadding().value.toLong()}px"
+				// at least 0.5em is needed to prevent weird scrolling behavior with some content
+				// (like chapter 1 of "The Perfect Run" from "Royal Road")
+				this["--shosetsu-padding-left"] = "max(0.5em, ${it.paddingValues.calculateLeftPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
+				this["--shosetsu-padding-right"] = "max(0.5em, ${it.paddingValues.calculateRightPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
 			}
 
 			setShosetsuStyle("body") {
@@ -169,7 +184,8 @@ abstract class ShosetsuCssViewModelComponent {
 				this["scroll-behavior"] = "smooth"
 				this["text-indent"] = "var(--shosetsu-indent-size)"
 				this["overflow-wrap"] = "break-word"
-				this["padding"] = "0.5em" // ensure everything stays away from the edge
+				// ensure everything stays away from the edge
+				this["padding"] = "var(--shosetsu-padding-top) var(--shosetsu-padding-right) var(--shosetsu-padding-bottom) var(--shosetsu-padding-left)"
 			}
 
 			setShosetsuStyle("p") {
@@ -208,5 +224,6 @@ abstract class ShosetsuCssViewModelComponent {
 		val tableHackEnabled: Boolean = ReaderTableHack.default,
 		val disableTextSelection: Boolean = ReaderDisableTextSelection.default,
 		val colorScheme: ColorScheme = FallbackColorScheme,
+		val paddingValues: PaddingValues = PaddingValues(0.dp)
 	)
 }
