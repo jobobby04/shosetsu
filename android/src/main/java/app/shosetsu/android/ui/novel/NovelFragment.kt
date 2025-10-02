@@ -292,9 +292,7 @@ fun NovelInfoView(
 		itemAt = itemAt,
 		isRefreshing = isRefreshing,
 		onRefresh = {
-			//	if (viewModel.isOnline())
-			//refresh()
-			//else displayOfflineSnackBar(null)
+			viewModel.refresh()
 		},
 		openWebView = {
 			openInWebView(novelURL ?: return@NovelInfoContent)
