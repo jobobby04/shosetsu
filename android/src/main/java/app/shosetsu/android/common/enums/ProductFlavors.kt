@@ -7,6 +7,6 @@ enum class ProductFlavors(val key: String) {
 	STANDARD("standard");
 
 	companion object {
-		fun fromKey(key: String) = values().find { it.key == key }!!
+		fun fromKey(key: String) = entries.find { it.key == key }!!
 	}
 }
