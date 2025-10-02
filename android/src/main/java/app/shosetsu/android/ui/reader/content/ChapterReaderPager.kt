@@ -55,7 +55,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Suppress("FunctionName", "DEPRECATION")
 @Composable
 fun ChapterReaderPager(
-	paddingValues: PaddingValues,
+	footerPadding: PaddingValues,
 
 	items: ImmutableList<ReaderUIItem>,
 	isHorizontal: Boolean,
@@ -117,7 +117,7 @@ fun ChapterReaderPager(
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(paddingValues),
+				.padding(footerPadding),
 			reverseLayout = isSwipeInverted,
 			pageContent = {
 				createPage(it)
@@ -128,7 +128,7 @@ fun ChapterReaderPager(
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(paddingValues),
+				.padding(footerPadding),
 			pageContent = {
 				createPage(it)
 			}

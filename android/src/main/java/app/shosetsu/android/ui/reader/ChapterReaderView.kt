@@ -183,9 +183,9 @@ fun ChapterReaderView(
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
 				)
 			},
-			content = { paddingValues ->
+			content = { footerPadding ->
 				ChapterReaderPager(
-					paddingValues = paddingValues,
+					footerPadding = footerPadding,
 					items = items ?: persistentListOf(),
 					isHorizontal = isHorizontalReading,
 					isSwipeInverted = isSwipeInverted,

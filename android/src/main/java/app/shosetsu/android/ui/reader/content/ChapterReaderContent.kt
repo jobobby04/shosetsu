@@ -3,6 +3,9 @@ package app.shosetsu.android.ui.reader.content
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
@@ -58,7 +61,7 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		isFirstFocusProvider = { false },
 		onFirstFocus = {},
 		isFocused = false,
-		content = {
+		content = { footerPadding ->
 			ChapterReaderPager(
 				items = persistentListOf(),
 				isHorizontal = false,
@@ -68,7 +71,7 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				currentPage = 0,
 				onPageChanged = {},
 				isSwipeInverted = false,
-				paddingValues = PaddingValues(),
+				footerPadding = PaddingValues(),
 				pageJumper = StableHolder(MutableSharedFlow()),
 				createPage = {
 				}
@@ -106,7 +109,7 @@ fun ChapterReaderContent(
 	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
-	content: @Composable (PaddingValues) -> Unit,
+	content: @Composable (footerPadding: PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
 	exception: String?
 ) {
@@ -121,12 +124,13 @@ fun ChapterReaderContent(
 		}
 	}
 
+	val insets = WindowInsets.safeDrawing.asPaddingValues()
 	BottomSheetScaffold(
 		scaffoldState = scaffoldState,
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocused) BottomSheetDefaults.SheetPeekHeight else 0.dp,
+		sheetPeekHeight = if (isFocused) 0.dp else insets.calculateBottomPadding() + BottomSheetDefaults.SheetPeekHeight,
 		content = { paddingValues ->
 			content(paddingValues)
 		},
@@ -152,5 +156,4 @@ fun ChapterReaderContent(
 			}
 		}
 	}
-
 }
