@@ -39,15 +39,15 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
  */
 @Preview
 @Composable
-fun PreviewDividerPageContent() = ShosetsuTheme(AppThemes.LIGHT) {
-	DividierPageContent(
+fun PreviewDividerPage() = ShosetsuTheme(AppThemes.LIGHT) {
+	DividerPage(
 		"The first",
 		"The second"
 	)
 }
 
 @Composable
-fun DividierPageContent(
+fun DividerPage(
 	previous: String,
 	next: String?
 ) {

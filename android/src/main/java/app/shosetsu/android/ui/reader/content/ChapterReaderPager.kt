@@ -54,7 +54,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("FunctionName", "DEPRECATION")
 @Composable
-fun ChapterReaderPagerContent(
+fun ChapterReaderPager(
 	paddingValues: PaddingValues,
 
 	items: ImmutableList<ReaderUIItem>,

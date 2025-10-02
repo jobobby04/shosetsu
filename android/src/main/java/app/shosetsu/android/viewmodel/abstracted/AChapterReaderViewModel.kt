@@ -10,7 +10,6 @@ import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
 import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
-import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -50,7 +50,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 @Suppress("FunctionName")
 @Composable
-fun ChapterReaderHTMLContent(
+fun ChapterReaderPage(
 	item: ReaderUIItem.ReaderChapterUI,
 	progressFlow: () -> Flow<Double>,
 	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,

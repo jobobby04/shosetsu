@@ -40,9 +40,9 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.reader.content.ChapterReaderBottomSheetContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderContent
-import app.shosetsu.android.ui.reader.content.ChapterReaderHTMLContent
-import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
-import app.shosetsu.android.ui.reader.page.DividierPageContent
+import app.shosetsu.android.ui.reader.content.ChapterReaderPage
+import app.shosetsu.android.ui.reader.content.ChapterReaderPager
+import app.shosetsu.android.ui.reader.page.DividerPage
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
@@ -66,7 +66,6 @@ import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
 import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
-import app.shosetsu.lib.Novel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
@@ -185,7 +184,7 @@ fun ChapterReaderView(
 				)
 			},
 			content = { paddingValues ->
-				ChapterReaderPagerContent(
+				ChapterReaderPager(
 					paddingValues = paddingValues,
 					items = items ?: persistentListOf(),
 					isHorizontal = isHorizontalReading,
@@ -202,7 +201,7 @@ fun ChapterReaderView(
 					createPage = { page ->
 						when (val item = items.orEmpty()[page]) {
 							is ReaderUIItem.ReaderChapterUI -> {
-								ChapterReaderHTMLContent(
+								ChapterReaderPage(
 									item = item,
 									getHTMLContent = viewModel::getChapterPassageHTML,
 									retryChapter = viewModel::retryChapter,
@@ -219,7 +218,7 @@ fun ChapterReaderView(
 							}
 
 							is ReaderUIItem.ReaderDividerUI -> {
-								DividierPageContent(
+								DividerPage(
 									item.prev.title,
 									item.next?.title
 								)

@@ -59,7 +59,7 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		onFirstFocus = {},
 		isFocused = false,
 		content = {
-			ChapterReaderPagerContent(
+			ChapterReaderPager(
 				items = persistentListOf(),
 				isHorizontal = false,
 				onStopTTS = {},
