@@ -92,7 +92,7 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 						) {
 							return PasswordAuthentication(user, pass.toCharArray())
 						}
-						return null;
+						return null
 					}
 				})
 			}
@@ -171,7 +171,7 @@ fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false):
 			return if (isRetry) response else slowRequest(chain, r, isRetry = true)
 		}
 	}
-	return response;
+	return response
 }
 
 /**

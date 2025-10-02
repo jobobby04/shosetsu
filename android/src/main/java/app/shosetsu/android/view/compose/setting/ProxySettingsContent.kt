@@ -36,9 +36,8 @@ import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.utils.ProxyConfig
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
-
 import app.shosetsu.android.view.compose.SimpleIconButton
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 
 @Composable
 fun ProxySettingsContent(
@@ -142,7 +141,7 @@ fun ProxySettingsDialogContent(
 					enabled = enabled,
 					value = config.hostname,
 					onValueChange = {
-						config = config.copy(hostname = it);
+						config = config.copy(hostname = it)
 					},
 					isError = !hostValid,
 					modifier = Modifier.weight(2f),
@@ -186,7 +185,7 @@ fun ProxySettingsDialogContent(
 			TextField(
 				value = config.username,
 				onValueChange = {
-					config = config.copy(username = it);
+					config = config.copy(username = it)
 				},
 				isError = !usernameValid,
 				singleLine = true,
@@ -197,7 +196,7 @@ fun ProxySettingsDialogContent(
 			TextField(
 				value = config.password,
 				onValueChange = {
-					config = config.copy(password = it);
+					config = config.copy(password = it)
 				},
 				singleLine = true,
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
