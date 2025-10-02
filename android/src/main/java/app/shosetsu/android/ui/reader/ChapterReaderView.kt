@@ -204,6 +204,7 @@ fun ChapterReaderView(
 								ChapterReaderPage(
 									item = item,
 									getHTMLContent = viewModel::getChapterPassageHTML,
+									getChapterHTMLStyle = viewModel::cssStyle,
 									retryChapter = viewModel::retryChapter,
 									onScroll = viewModel::onScroll,
 									onClick = viewModel::onReaderClicked,

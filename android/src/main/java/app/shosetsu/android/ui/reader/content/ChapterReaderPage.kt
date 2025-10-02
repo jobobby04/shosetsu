@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import app.shosetsu.android.R
 import app.shosetsu.android.ui.reader.page.HTMLPage
+import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -54,6 +55,7 @@ fun ChapterReaderPage(
 	item: ReaderUIItem.ReaderChapterUI,
 	progressFlow: () -> Flow<Double>,
 	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,
+	getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
 	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
 	onClick: (String?) -> Unit,
@@ -102,6 +104,7 @@ fun ChapterReaderPage(
 				onClick = onClick,
 				onDoubleClick = onDoubleClick,
 				ttsProgress = ttsProgress,
+				getChapterHTMLStyle = getChapterHTMLStyle,
 			)
 		}
 	}

@@ -1,7 +1,7 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.compose.material3.ColorScheme
-import androidx.lifecycle.LiveData
+import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
@@ -72,6 +72,7 @@ abstract class AChapterReaderViewModel :
 	abstract fun retryChapter(item: ReaderChapterUI)
 
 	abstract fun getChapterPassageHTML(item: ReaderChapterUI): Flow<ChapterPassage>
+	abstract val cssStyle: SharedFlow<ShosetsuStyle>
 
 	abstract fun setCurrentPage(page: Int)
 
@@ -127,7 +128,6 @@ abstract class AChapterReaderViewModel :
 	 */
 	abstract val currentChapterID: StateFlow<Int>
 
-
 	/**
 	 * false	-> vertical paging
 	 * true	 -> horizontal paging
@@ -158,11 +158,6 @@ abstract class AChapterReaderViewModel :
 	 * Called when a [chapter] is scrolled
 	 */
 	abstract fun onScroll(chapter: ReaderChapterUI, readingPosition: Double)
-
-	/**
-	 * Loads a [LiveData] reflection of the global custom css
-	 */
-	abstract fun loadChapterCss(): Flow<String>
 
 	/**
 	 * Loads the settings list for the bottom bar

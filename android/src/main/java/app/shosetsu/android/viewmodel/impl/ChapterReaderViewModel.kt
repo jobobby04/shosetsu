@@ -54,6 +54,7 @@ import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.reader.customSpeak
+import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
@@ -357,35 +358,15 @@ class ChapterReaderViewModel(
 						ttsElements.listIterator()
 					)
 
-					emitAll(
-						css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
-							fun update(id: String, css: String) {
-								var style: Element? = document.getElementById(id)
-
-								if (style == null) {
-									style =
-										document.createElement("style") ?: return
-
-									style.id(id)
-									style.attr("type", "text/css")
-
-									document.head().appendChild(style)
-								}
-
-								style.text(css)
-							}
-
-							update("shosetsu-style", shoCSS)
-							update("user-style", useCSS)
-
-							@Suppress("UNCHECKED_CAST")
-							ChapterPassage.Success(
-								document.toString(),
-								// this is fine
-								ttsIterator as RewindableMutableListIterator<TTSText>
-							)
-						}
-					)
+					emitAll(cssStyle.map { cssStyle ->
+						cssStyle.insert(document)
+						@Suppress("UNCHECKED_CAST")
+						ChapterPassage.Success(
+							document.toString(),
+							// this is fine
+							ttsIterator as RewindableMutableListIterator<TTSText>
+						)
+					})
 				}
 				.onIO()
 				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
@@ -400,6 +381,12 @@ class ChapterReaderViewModel(
 		}
 
 		return mutableFlow
+	}
+
+	override val cssStyle: SharedFlow<ShosetsuStyle> by lazy {
+		css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
+			ShosetsuStyle(shoCSS, useCSS)
+		}.onIO().shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
 	override val isCurrentChapterBookmarked: StateFlow<Boolean> by lazy {
@@ -657,9 +644,6 @@ class ChapterReaderViewModel(
 			}
 		}
 	}
-
-	override fun loadChapterCss(): Flow<String> =
-		settingsRepo.getStringFlow(ReaderHtmlCss)
 
 	override fun updateSetting(novelReaderSettingEntity: NovelReaderSettingUI) {
 		launchIO {
