@@ -19,10 +19,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.ImagesearchRoller
-import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -64,12 +63,12 @@ import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.EditCSS
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus

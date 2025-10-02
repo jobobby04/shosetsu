@@ -3,7 +3,6 @@ package app.shosetsu.android.domain.usecases.update
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.serialization.encodeToString
 
 /*
  * This file is part of Shosetsu.

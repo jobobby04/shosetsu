@@ -29,7 +29,6 @@ import app.shosetsu.android.common.SettingKey.ReaderTrackLongReading
 import app.shosetsu.android.common.SettingKey.ReaderVoice
 import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
 import app.shosetsu.android.common.SettingKey.ReadingMarkingType
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.common.enums.MarkingType.ONSCROLL
 import app.shosetsu.android.common.enums.MarkingType.ONVIEW

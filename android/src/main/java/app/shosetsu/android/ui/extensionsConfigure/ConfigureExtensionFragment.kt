@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +39,6 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
-import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SimpleIconButton
@@ -49,6 +46,7 @@ import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.ExtensionType

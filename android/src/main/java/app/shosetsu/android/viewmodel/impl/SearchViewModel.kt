@@ -20,8 +20,6 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
 import app.shosetsu.lib.PAGE_INDEX
-
-import app.shosetsu.lib.Novel
 import app.shosetsu.lib.mapify
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
