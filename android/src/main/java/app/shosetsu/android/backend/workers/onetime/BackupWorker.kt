@@ -379,6 +379,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					setNotOngoing()
 					addReportErrorAction(applicationContext, defaultNotificationID, e)
 				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
 				return Result.failure()
 			} catch (e: FileNotFoundException) {
 				logE("URI is invalid file", e)
@@ -386,6 +387,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					setNotOngoing()
 					addReportErrorAction(applicationContext, defaultNotificationID, e)
 				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
 				return Result.failure()
 			} catch (e: FilePermissionException) {
 				logE("Invalid permission to file", e)
@@ -393,6 +395,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					setNotOngoing()
 					addReportErrorAction(applicationContext, defaultNotificationID, e)
 				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
 				return Result.failure()
 			}
 
