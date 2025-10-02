@@ -183,9 +183,8 @@ fun ChapterReaderView(
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
 				)
 			},
-			content = { footerPadding ->
+			content = { windowPadding, footerPadding ->
 				ChapterReaderPager(
-					footerPadding = footerPadding,
 					items = items ?: persistentListOf(),
 					isHorizontal = isHorizontalReading,
 					isSwipeInverted = isSwipeInverted,
@@ -202,6 +201,8 @@ fun ChapterReaderView(
 						when (val item = items.orEmpty()[page]) {
 							is ReaderUIItem.ReaderChapterUI -> {
 								ChapterReaderPage(
+									windowPadding = windowPadding,
+									footerPadding = footerPadding,
 									item = item,
 									getHTMLContent = viewModel::getChapterPassageHTML,
 									getChapterHTMLStyle = viewModel::cssStyle,

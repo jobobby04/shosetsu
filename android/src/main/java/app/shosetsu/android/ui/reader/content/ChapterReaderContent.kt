@@ -61,7 +61,7 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		isFirstFocusProvider = { false },
 		onFirstFocus = {},
 		isFocused = false,
-		content = { footerPadding ->
+		content = { windowPadding, footerPadding ->
 			ChapterReaderPager(
 				items = persistentListOf(),
 				isHorizontal = false,
@@ -71,7 +71,6 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				currentPage = 0,
 				onPageChanged = {},
 				isSwipeInverted = false,
-				footerPadding = PaddingValues(),
 				pageJumper = StableHolder(MutableSharedFlow()),
 				createPage = {
 				}
@@ -109,7 +108,7 @@ fun ChapterReaderContent(
 	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
-	content: @Composable (footerPadding: PaddingValues) -> Unit,
+	content: @Composable (windowPadding: PaddingValues, footerPadding: PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
 	exception: String?
 ) {
@@ -132,7 +131,7 @@ fun ChapterReaderContent(
 		},
 		sheetPeekHeight = if (isFocused) 0.dp else insets.calculateBottomPadding() + BottomSheetDefaults.SheetPeekHeight,
 		content = { paddingValues ->
-			content(paddingValues)
+			content(WindowInsets.safeDrawing.asPaddingValues(), paddingValues)
 		},
 		sheetShape = RectangleShape,
 		sheetDragHandle = null,

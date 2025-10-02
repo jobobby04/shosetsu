@@ -2,8 +2,11 @@ package app.shosetsu.android.ui.reader.content
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -52,6 +55,8 @@ import kotlinx.coroutines.flow.StateFlow
 @Suppress("FunctionName")
 @Composable
 fun ChapterReaderPage(
+	windowPadding: PaddingValues,
+	footerPadding: PaddingValues,
 	item: ReaderUIItem.ReaderChapterUI,
 	progressFlow: () -> Flow<Double>,
 	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,
@@ -69,21 +74,31 @@ fun ChapterReaderPage(
 	when (html) {
 		is ChapterPassage.Error -> {
 			val throwable = (html as? ChapterPassage.Error)?.throwable
-			ErrorContent(
-				throwable?.message
-					?: "Unknown error",
-				ErrorAction(R.string.retry) {
-					retryChapter(item)
-				},
-				stackTrace = throwable?.stackTraceToString()
-			)
+			Box(
+				Modifier
+					.padding(windowPadding)
+					.consumeWindowInsets(windowPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
+			) {
+				ErrorContent(
+					throwable?.message
+						?: "Unknown error",
+					ErrorAction(R.string.retry) {
+						retryChapter(item)
+					},
+					stackTrace = throwable?.stackTraceToString()
+				)
+			}
 		}
 
 		ChapterPassage.Loading -> {
 			Box(
 				Modifier
-					.background(MaterialTheme.colorScheme.background)
+					.padding(windowPadding)
+					.consumeWindowInsets(windowPadding)
 					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
 			) {
 				LinearProgressIndicator(
 					modifier = Modifier
@@ -95,17 +110,25 @@ fun ChapterReaderPage(
 
 		is ChapterPassage.Success -> {
 			val progress by remember { progressFlow() }.collectAsState(0.0)
-			HTMLPage(
-				html = (html as ChapterPassage.Success).content,
-				progress = progress,
-				onScroll = {
-					onScroll(item, it)
-				},
-				onClick = onClick,
-				onDoubleClick = onDoubleClick,
-				ttsProgress = ttsProgress,
-				getChapterHTMLStyle = getChapterHTMLStyle,
-			)
+
+			Box(
+				Modifier
+					.padding(footerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
+			) {
+				HTMLPage(
+					html = (html as ChapterPassage.Success).content,
+					progress = progress,
+					onScroll = {
+						onScroll(item, it)
+					},
+					onClick = onClick,
+					onDoubleClick = onDoubleClick,
+					ttsProgress = ttsProgress,
+					getChapterHTMLStyle = getChapterHTMLStyle,
+				)
+			}
 		}
 	}
 }

@@ -2,9 +2,7 @@ package app.shosetsu.android.ui.reader.content
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -55,8 +53,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Suppress("FunctionName", "DEPRECATION")
 @Composable
 fun ChapterReaderPager(
-	footerPadding: PaddingValues,
-
 	items: ImmutableList<ReaderUIItem>,
 	isHorizontal: Boolean,
 
@@ -115,9 +111,7 @@ fun ChapterReaderPager(
 	if (isHorizontal) {
 		HorizontalPager(
 			state = pagerState,
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(footerPadding),
+			modifier = Modifier.fillMaxSize(),
 			reverseLayout = isSwipeInverted,
 			pageContent = {
 				createPage(it)
@@ -126,9 +120,7 @@ fun ChapterReaderPager(
 	} else {
 		VerticalPager(
 			state = pagerState,
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(footerPadding),
+			modifier = Modifier.fillMaxSize(),
 			pageContent = {
 				createPage(it)
 			}
