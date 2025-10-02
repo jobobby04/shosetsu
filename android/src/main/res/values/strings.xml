@@ -283,8 +283,6 @@
     <string name="text_alignment_end">End</string>
 
 
-    <string name="settings_reader_title_string_to_html">Convert string to html</string>
-    <string name="settings_reader_desc_string_to_html">All string based extensions are rendered as html</string>
     <string name="settings_reader_title_horizontal_option">Horizontal paging</string>
     <string name="settings_reader_desc_horizontal_option">Swipe left and right to move between chapters</string>
     <string name="settings_reader_title_html_css">Html CSS</string>

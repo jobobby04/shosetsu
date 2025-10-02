@@ -24,7 +24,6 @@ import app.shosetsu.android.common.SettingKey.ReaderNextChapter
 import app.shosetsu.android.common.SettingKey.ReaderPitch
 import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
 import app.shosetsu.android.common.SettingKey.ReaderSpeed
-import app.shosetsu.android.common.SettingKey.ReaderStringToHtml
 import app.shosetsu.android.common.SettingKey.ReaderTrackLongReading
 import app.shosetsu.android.common.SettingKey.ReaderVoice
 import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
@@ -64,8 +63,6 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
-import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
-import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
@@ -85,7 +82,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -108,7 +104,6 @@ import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.Locale
-import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 /*
@@ -317,69 +312,10 @@ class ChapterReaderViewModel(
 
 	private var cleanStringMapJob: Job? = null
 
-	override fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
-		//logV("$item")
+	override fun getChapterPassageHTML(item: ReaderChapterUI): Flow<ChapterPassage> {
 		val mutableFlow = stringMap.getOrPut(item.id) {
 			getRefreshFlow(item)
-				.transformLatest {
-					emit(ChapterPassage.Loading)
-					val bytes = getChapterPassage(item)
-						?: throw Exception("No content received")
-
-					emitAll(
-						indentSizeFlow.combine(
-							paragraphSpacingFlow
-						) { indentSize, paragraphSpacing ->
-							val unformattedText = bytes.decodeToString()
-
-							val replaceSpacing = StringBuilder("\n")
-							// Calculate changes to \n
-							for (x in 0 until paragraphSpacing.toInt())
-								replaceSpacing.append("\n")
-
-							// Calculate changes to \t
-							for (x in 0 until indentSize)
-								replaceSpacing.append("\t")
-
-							// Set new text formatted
-							@Suppress("UNCHECKED_CAST")
-							ChapterPassage.Success(
-								unformattedText.replace(
-									"\n".toRegex(),
-									replaceSpacing.toString()
-								),
-								mutableListOf(
-									StaticTTSText(
-										UUID.randomUUID().toString(),
-										unformattedText,
-									)
-								).listIterator()
-									// this can be cast, don't sweat it
-									.toRewindable() as RewindableMutableListIterator<TTSText>
-							)
-						}
-					)
-				}
-				.catch { emit(ChapterPassage.Error(it)) }
-				.onIO()
-				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
-		}
-
-		if (cleanStringMapJob == null && stringMap.size > 10) {
-			cleanStringMapJob =
-				launchIO {
-					cleanStringMap(stringMap.keys.indexOf(item.id))
-					cleanStringMapJob = null
-				}
-		}
-
-		return mutableFlow
-	}
-
-	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
-		val mutableFlow = stringMap.getOrPut(item.id) {
-			getRefreshFlow(item)
-				.transformCatching<Unit, ChapterPassage>(exceptional = {
+				.transformCatching(exceptional = {
 					emit(
 						ChapterPassage.Error(
 							it
@@ -392,11 +328,9 @@ class ChapterReaderViewModel(
 
 					var result = bytes.decodeToString()
 
-					@Suppress("DEPRECATION")
-					val convert = convertStringToHtml.firstOrNull() ?: false
 					val chapterType = extensionChapterTypeFlow.firstOrNull()
 
-					if (chapterType == Novel.ChapterType.STRING && convert) {
+					if (chapterType == Novel.ChapterType.STRING) {
 						logI("Converting text to HTML")
 						result = asHtml(result, item.title)
 					}
@@ -483,43 +417,10 @@ class ChapterReaderViewModel(
 		}.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
-	private val convertStringToHtml by lazy {
-		settingsRepo.getBooleanFlow(ReaderStringToHtml)
-	}
-
 	private val extensionChapterTypeFlow: SharedFlow<Novel.ChapterType?> by lazy {
 		extFlow.map { it?.chapterType }
 			.onIO()
 			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
-	}
-
-	/**
-	 * Specifies what chapter type the reader should render.
-	 *
-	 * Upon [ReaderStringToHtml] being true, will clear out any previous strings if the prevType was
-	 * not html, causing the content to regenerate.
-	 */
-	override val chapterType: StateFlow<Novel.ChapterType?> by lazy {
-		extensionChapterTypeFlow.filterNotNull().flatMapLatest { type ->
-			var prevType: Novel.ChapterType? = null
-
-			convertStringToHtml.mapLatest { convert ->
-				@Suppress("DEPRECATION")
-				if (convert && type == Novel.ChapterType.STRING) {
-					if (prevType != Novel.ChapterType.HTML)
-						clearMaps()
-
-					prevType = Novel.ChapterType.HTML
-					Novel.ChapterType.HTML
-				} else {
-					if (prevType != type)
-						clearMaps()
-
-					prevType = type
-					type
-				}
-			}
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	private val chaptersFlow: SharedFlow<List<ReaderChapterUI>> by lazy {
@@ -582,18 +483,6 @@ class ChapterReaderViewModel(
 			getReaderSettingsUseCase(it)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingUI(-1))
 	}
-
-	override val textColor: StateFlow<Int> by lazy {
-		css.themeFlow.map { it.first }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.first)
-	}
-
-	override val backgroundColor: StateFlow<Int> by lazy {
-		css.themeFlow.map { it.second }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.second)
-	}
-
-	override val liveTextSize: StateFlow<Float> get() = css.liveTextSize
 
 	override val liveKeepScreenOn: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderKeepScreenOn)
@@ -783,8 +672,6 @@ class ChapterReaderViewModel(
 	override val tapToScroll: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
 	}
-
-	override val disableTextSelection: StateFlow<Boolean> get() = css.disableTextSelection
 
 	private val doubleTapFocus: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus)
@@ -1143,11 +1030,8 @@ class ChapterReaderViewModel(
 					System.gc()
 
 					// Get the text of the chapter
-					val passage = when (chapterType.first { it != null }) {
-						null -> return@coroutineScope
-						Novel.ChapterType.HTML -> getChapterHTMLPassage(item)
-						Novel.ChapterType.STRING -> getChapterStringPassage(item)
-					}.firstOrNull { it is ChapterPassage.Success } as? ChapterPassage.Success
+					val passage = getChapterPassageHTML(item)
+						.firstOrNull { it is ChapterPassage.Success } as? ChapterPassage.Success
 						?: return@coroutineScope
 
 					launch nextChapterTts@{

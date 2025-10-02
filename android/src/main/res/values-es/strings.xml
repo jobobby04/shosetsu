@@ -186,8 +186,6 @@
     <string name="text_alignment_center">Centrar</string>
     <string name="text_alignment_justified">Justificado</string>
     <string name="text_alignment_end">Fin</string>
-    <string name="settings_reader_title_string_to_html">Convertir cadena a html</string>
-    <string name="settings_reader_desc_string_to_html">Todas las extensiones basadas en cadenas se representan como html</string>
     <string name="settings_reader_title_horizontal_option">Paginación horizontal</string>
     <string name="settings_reader_desc_horizontal_option">Desliza el dedo hacia la izquierda y hacia la derecha para moverte entre capítulos</string>
     <string name="settings_reader_title_html_css">CSS HTML</string>

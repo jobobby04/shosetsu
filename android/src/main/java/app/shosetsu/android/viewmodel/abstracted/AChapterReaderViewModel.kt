@@ -72,9 +72,7 @@ abstract class AChapterReaderViewModel :
 
 	abstract fun retryChapter(item: ReaderChapterUI)
 
-	abstract fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage>
-
-	abstract fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage>
+	abstract fun getChapterPassageHTML(item: ReaderChapterUI): Flow<ChapterPassage>
 
 	abstract fun setCurrentPage(page: Int)
 
@@ -89,8 +87,6 @@ abstract class AChapterReaderViewModel :
 
 	abstract val isCurrentChapterBookmarked: StateFlow<Boolean>
 
-	abstract val chapterType: StateFlow<Novel.ChapterType?>
-
 	abstract val ttsSpeed: StateFlow<Float>
 	abstract val ttsPitch: StateFlow<Float>
 
@@ -102,11 +98,6 @@ abstract class AChapterReaderViewModel :
 	 * Is tap to scroll enabled
 	 */
 	abstract val tapToScroll: StateFlow<Boolean>
-
-	/**
-	 * Is text selection disabled?
-	 */
-	abstract val disableTextSelection: StateFlow<Boolean>
 
 	/**
 	 * Double tap required to focus/unfocus the reader
@@ -136,11 +127,6 @@ abstract class AChapterReaderViewModel :
 	 * The current chapter ID that is being read
 	 */
 	abstract val currentChapterID: StateFlow<Int>
-
-	abstract val textColor: StateFlow<Int>
-	abstract val backgroundColor: StateFlow<Int>
-
-	abstract val liveTextSize: StateFlow<Float>
 
 
 	/**

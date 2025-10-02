@@ -42,7 +42,6 @@ import app.shosetsu.android.ui.reader.content.ChapterReaderBottomSheetContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderHTMLContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
-import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
 import app.shosetsu.android.ui.reader.page.DividierPageContent
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
@@ -65,7 +64,6 @@ import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
 import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
-import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
 import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
 import app.shosetsu.lib.Novel
@@ -93,7 +91,6 @@ fun ChapterReaderView(
 	val isFocused by viewModel.isFocused.collectAsState()
 	val enableFullscreen by viewModel.enableFullscreen.collectAsState()
 	val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
-	val chapterType by viewModel.chapterType.collectAsState()
 	val currentChapterID by viewModel.currentChapterID.collectAsState()
 	val ttsPlayback by viewModel.ttsPlayback.collectAsState()
 	val setting by viewModel.getSettings().collectAsState()
@@ -158,7 +155,6 @@ fun ChapterReaderView(
 						item { viewModel.enableFullscreen() }
 						item { viewModel.matchFullscreenToFocus() }
 						item { viewModel.showReaderDivider() }
-						item { viewModel.stringAsHtmlOption() }
 						item { viewModel.doubleTapFocus() }
 						item { viewModel.doubleTapSystem() }
 						item { viewModel.readerTableHackOption() }
@@ -206,45 +202,20 @@ fun ChapterReaderView(
 					createPage = { page ->
 						when (val item = items.orEmpty()[page]) {
 							is ReaderUIItem.ReaderChapterUI -> {
-								when (chapterType) {
-									Novel.ChapterType.STRING -> {
-										ChapterReaderStringContent(
-											item = item,
-											getStringContent = viewModel::getChapterStringPassage,
-											retryChapter = viewModel::retryChapter,
-											textSizeFlow = { viewModel.liveTextSize },
-											textColorFlow = { viewModel.textColor },
-											backgroundColorFlow = { viewModel.backgroundColor },
-											disableTextSelFlow = { viewModel.disableTextSelection },
-											onScroll = viewModel::onScroll,
-											onClick = { viewModel.onReaderClicked(null) },
-											onDoubleClick = viewModel::onReaderDoubleClicked,
-											progressFlow = {
-												viewModel.getChapterProgress(item)
-											}
-										)
+								ChapterReaderHTMLContent(
+									item = item,
+									getHTMLContent = viewModel::getChapterPassageHTML,
+									retryChapter = viewModel::retryChapter,
+									onScroll = viewModel::onScroll,
+									onClick = viewModel::onReaderClicked,
+									onDoubleClick = viewModel::onReaderDoubleClicked,
+									progressFlow = {
+										viewModel.getChapterProgress(item)
+									},
+									ttsProgress = remember {
+										StableHolder(viewModel.ttsProgress)
 									}
-
-									Novel.ChapterType.HTML -> {
-										ChapterReaderHTMLContent(
-											item = item,
-											getHTMLContent = viewModel::getChapterHTMLPassage,
-											retryChapter = viewModel::retryChapter,
-											onScroll = viewModel::onScroll,
-											onClick = viewModel::onReaderClicked,
-											onDoubleClick = viewModel::onReaderDoubleClicked,
-											progressFlow = {
-												viewModel.getChapterProgress(item)
-											},
-											ttsProgress = remember {
-												StableHolder(viewModel.ttsProgress)
-											}
-										)
-									}
-
-									else -> {
-									}
-								}
+								)
 							}
 
 							is ReaderUIItem.ReaderDividerUI -> {

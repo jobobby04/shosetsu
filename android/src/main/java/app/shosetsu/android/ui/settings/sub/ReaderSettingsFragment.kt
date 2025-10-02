@@ -88,7 +88,6 @@ import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
 import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
-import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
 import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
 import kotlinx.collections.immutable.toImmutableList
@@ -286,13 +285,7 @@ fun ReaderSettingsContent(
 				viewModel.EditCSS(openHTMLEditor)
 			}
 
-			item {
-				viewModel.stringAsHtmlOption()
-			}
-
-			item {
-				//viewModel.continuousScrollOption()
-			}
+//			item { viewModel.continuousScrollOption() }
 
 			item {
 				val names = stringArrayResource(R.array.marking_names)

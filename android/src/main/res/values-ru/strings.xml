@@ -193,8 +193,6 @@
     <string name="text_alignment_center">По центру</string>
     <string name="text_alignment_justified">По ширине</string>
     <string name="text_alignment_end">Вправо</string>
-    <string name="settings_reader_title_string_to_html">Преобразование строки в html</string>
-    <string name="settings_reader_desc_string_to_html">Все расширения, основанные на строках, отображаются как html</string>
     <string name="settings_reader_title_horizontal_option">Горизонтальная навигация</string>
     <string name="settings_reader_desc_horizontal_option">Проведите пальцем влево и вправо для перемещения между главами</string>
 	<string name="settings_reader_title_html_css">Html CSS</string>
