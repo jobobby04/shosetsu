@@ -338,8 +338,13 @@ class LibraryViewModel(
 		ArrayList<String>().apply {
 			list.novels.flatMap { it.value }.distinctBy { it.id }.forEach { ui ->
 				strip(ui).forEach { key ->
-					if (!contains(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() }) && key.isNotBlank()) {
-						add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(LGD()) else it.toString() })
+					val modifiedKey = key.replaceFirstChar {
+						if (it.isLowerCase()) {
+							it.titlecase(LGD())
+						} else it.toString()
+					}
+					if (!contains(modifiedKey) && key.isNotBlank()) {
+						add(modifiedKey)
 					}
 				}
 			}
