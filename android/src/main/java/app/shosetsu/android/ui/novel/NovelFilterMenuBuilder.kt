@@ -320,14 +320,12 @@ fun NovelFilterMenuFilterCheckboxItem(
 @Preview
 @Composable
 fun PreviewNovelFilterMenuSortContent() {
-	var type by remember { mutableStateOf(SOURCE) }
 	var reversed by remember { mutableStateOf(false) }
 	NovelFilterMenuSortContent(
 		chapterSortType = SOURCE,
 		isReversed = reversed,
 		isLoading = false,
 		update = { newType, newReversed ->
-			type = newType
 			reversed = newReversed
 		}
 	)
@@ -380,14 +378,13 @@ fun NovelFilterMenuSortContent(
 @Composable
 fun PreviewNovelFilterMenuSortItemContent() {
 	var type by remember { mutableStateOf(SOURCE) }
-	var reversed by remember { mutableStateOf(false) }
 	NovelFilterMenuSortItemContent(
 		name = "Test",
 		state = type,
 		expectedState = SOURCE,
 		reversed = false,
 		isPlaceholder = false,
-		setIsSortReversed = { reversed = it },
+		setIsSortReversed = { },
 		setSortType = { type = it }
 	)
 }
