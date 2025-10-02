@@ -29,6 +29,10 @@ import androidx.work.CoroutineWorker
 
 /**
  * 09 / 02 / 2021
+ *
+ * Used by workers which are capable of sending notifications.
+ * <p>
+ * Defines the required data structures and some utility functions.
  */
 interface NotificationCapable {
 	/**
