@@ -105,7 +105,7 @@ class CSSEditorViewModel(
 		redoStack.add(cssContent.value) // Save currentText as a redo action
 		canRedo.value = true
 		cssContent.value = undoStack.pop()
-		if (undoStack.size == 0) {
+		if (undoStack.isEmpty()) {
 			canUndo.value = false
 		}
 	}
@@ -115,7 +115,7 @@ class CSSEditorViewModel(
 		undoStack.add(cssContent.value)
 		canUndo.value = true
 		cssContent.value = redoStack.pop()
-		if (redoStack.size == 0) {
+		if (redoStack.isEmpty()) {
 			canRedo.value = false
 		}
 	}
