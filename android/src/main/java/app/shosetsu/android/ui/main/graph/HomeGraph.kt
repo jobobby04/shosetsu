@@ -46,7 +46,7 @@ fun NavGraphBuilder.homeGraph(
 	composable<Browse> {
 		BrowseView(
 			openCatalogue = {
-				navController.navigate(Catalog(it))
+				navController.navigate(Catalog(it, null))
 			},
 			openSettings = {
 				navController.navigate(ConfigureExtension(it))
