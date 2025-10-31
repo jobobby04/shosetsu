@@ -58,6 +58,10 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object FirstTime : BooleanKey("first_time3", true)
 
+	/**
+	 * Show the user the verification warning?
+	 */
+	object ShowVerificationWarning : BooleanKey("show_verification_warning", true)
 
 	/**
 	 * Themes that can be edited by the user

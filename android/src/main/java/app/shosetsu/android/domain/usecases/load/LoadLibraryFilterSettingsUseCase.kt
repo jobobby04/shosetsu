@@ -5,7 +5,6 @@ import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.decodeFromString
 
 /*
  * This file is part of Shosetsu.

@@ -38,6 +38,8 @@ class FaukRemoteChaptersDataSource : IRemoteChaptersDataSource {
 		logV("Fauk")
 		// Change the number below and click apply in Android Studio
 		// to change the error that is sent
+		// We suppress the warning for the when statement below, kotlin does not like this ;3.
+		@Suppress("KotlinConstantConditions")
 		when (5) {
 			1 -> throw IOException("Oops")
 			2 -> throw SSLException("Aaa")

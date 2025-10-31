@@ -21,9 +21,6 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -43,8 +40,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -90,6 +87,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.view.BottomSheetDialog
+import app.shosetsu.android.view.compose.AnimatedRefresh
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
@@ -476,7 +474,7 @@ fun BrowseExtensionContent(
 					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
 						var isDropdownVisible by remember { mutableStateOf(false) }
 						SimpleIconButton(
-                            Icons.Outlined.Download,
+                            Icons.Default.Download,
 							null,
 							onClick = {
 								// We can skip to dropdown if there is only 1 install option
@@ -513,7 +511,7 @@ fun BrowseExtensionContent(
 
 					if (item.isUpdateAvailable) {
 						SimpleIconButton(
-							Icons.Outlined.Download,
+							Icons.Default.Download,
 							stringResource(R.string.update),
 							onClick = update,
 							modifier = Modifier.rotate(180f),
@@ -530,16 +528,16 @@ fun BrowseExtensionContent(
 					}
 
 					if (item.isInstalling) {
-						val image = AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
 						SimpleIconButton(
-							rememberAnimatedVectorPainter(image, false),
 							stringResource(R.string.installing),
 							onClick = {},
 							modifier = Modifier.combinedClickable(
 								onClick = {},
 								onLongClick = cancelInstall,
 							)
-						)
+						) {
+							AnimatedRefresh()
+						}
 					}
 				}
 

@@ -31,6 +31,6 @@ enum class ReadingStatus(val key: Int, val status: String) {
 
 
 	companion object {
-		fun fromInt(key: Int): ReadingStatus = values().find { it.key == key } ?: UNKNOWN
+		fun fromInt(key: Int): ReadingStatus = entries.find { it.key == key } ?: UNKNOWN
 	}
 }

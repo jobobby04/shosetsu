@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.StandardDialog
 import com.chargemap.compose.numberpicker.NumberPicker
@@ -64,12 +65,10 @@ fun NovelCustomDownloadDialog(
 
 @Preview
 @Composable
-fun PreviewNovelCustomDownloadDialog() {
-	ShosetsuTheme {
-		NovelCustomDownloadDialog(
-			onDismissRequest = {},
-			chapterCount = 10,
-			onDownload = {}
-		)
-	}
+fun PreviewNovelCustomDownloadDialog() = ShosetsuTheme(AppThemes.LIGHT) {
+	NovelCustomDownloadDialog(
+		onDismissRequest = {},
+		chapterCount = 10,
+		onDownload = {}
+	)
 }

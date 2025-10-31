@@ -53,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +60,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
 import app.shosetsu.android.common.enums.NovelCardType.COZY
@@ -531,6 +531,7 @@ fun CatalogGrid(
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit
 ) {
+	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
 	val w = LocalConfiguration.current.screenWidthDp
 	val o = LocalConfiguration.current.orientation
 
@@ -690,10 +691,8 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
  */
 @Preview
 @Composable
-fun PreviewCatalogContentNoMore() {
-	ShosetsuTheme {
-		CatalogContentNoMore()
-	}
+fun PreviewCatalogContentNoMore() = ShosetsuTheme(AppThemes.LIGHT) {
+    CatalogContentNoMore()
 }
 
 /**

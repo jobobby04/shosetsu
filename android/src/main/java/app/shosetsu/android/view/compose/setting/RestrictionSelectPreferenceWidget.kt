@@ -9,6 +9,10 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.view.compose.setting.widget.MultiSelectListPreferenceWidget
 
+/**
+ * Suppress for call chain, the way it is done is for composable features.
+ */
+@Suppress("SimplifiableCallChain")
 @Composable
 fun RestrictionSelectPreferenceWidget(
 	title: String,

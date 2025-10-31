@@ -1,6 +1,7 @@
 package app.shosetsu.android.viewmodel.impl.extension
 
 import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
+import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,8 @@ import kotlinx.coroutines.flow.stateIn
  * @author Doomsdayrs
  */
 class WebViewViewModelImpl(
-	getUserAgent: GetUserAgentUseCase
+	getUserAgent: GetUserAgentUseCase,
+	override var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : WebViewViewModel() {
 	override val userAgent: StateFlow<String> =
 		getUserAgent.flow().stateIn(viewModelScopeIO, SharingStarted.Eagerly, "")

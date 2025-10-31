@@ -10,7 +10,6 @@ import app.shosetsu.android.datasource.local.file.base.IFileCachedAppUpdateDataS
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.model.remote.AppUpdateDTO
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.io.InputStream

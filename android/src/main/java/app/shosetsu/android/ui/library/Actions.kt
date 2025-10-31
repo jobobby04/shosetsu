@@ -38,7 +38,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import app.shosetsu.android.R
@@ -297,7 +296,7 @@ fun ViewTypeButton(
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 	SimpleIconButton(
-        Icons.Filled.ViewModule,
+        Icons.Default.ViewModule,
 		stringResource(R.string.novel_card_type_selector_title),
 		onClick = {
 			showDropDown = !showDropDown

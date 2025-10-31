@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /*
@@ -102,15 +103,13 @@ fun StandardDialog(
 
 @Preview
 @Composable
-fun PreviewStandardDialog() {
-	ShosetsuTheme {
-		StandardDialog(
-			onDismissRequest = {},
-			title = {
-				Text("Test Title")
-			}
-		) {
-			Box(Modifier.size(100.dp))
+fun PreviewStandardDialog() = ShosetsuTheme(AppThemes.LIGHT) {
+	StandardDialog(
+		onDismissRequest = {},
+		title = {
+			Text("Test Title")
 		}
+	) {
+		Box(Modifier.size(100.dp))
 	}
 }

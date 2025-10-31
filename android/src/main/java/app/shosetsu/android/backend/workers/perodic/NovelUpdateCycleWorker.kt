@@ -27,7 +27,6 @@ import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import org.kodein.di.instance
 import java.util.concurrent.TimeUnit.HOURS
-import java.util.concurrent.TimeUnit.MINUTES
 import androidx.work.PeriodicWorkRequestBuilder as PWRB
 
 /*

@@ -4,6 +4,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.util.Base64
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Restore
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
@@ -83,7 +85,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, Notifications.CHANNEL_BACKUP)
 			.setSubText(getString(R.string.restore_notification_subtitle))
-			.setSmallIcon(R.drawable.restore)
+			.setSmallIcon(Icons.Outlined.Restore)
 			.setOnlyAlertOnce(true)
 			.setOngoing(true)
 

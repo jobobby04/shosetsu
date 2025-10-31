@@ -1,21 +1,17 @@
 package app.shosetsu.android.ui.main.graph
 
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.toRoute
 import app.shosetsu.android.common.ext.openChapter
 import app.shosetsu.android.common.ext.openInWebView
-import app.shosetsu.android.ui.library.LibraryView
-import app.shosetsu.android.ui.main.Destination.Library
 import app.shosetsu.android.ui.main.Destination.Migration
 import app.shosetsu.android.ui.main.Destination.Novel
-import app.shosetsu.android.ui.main.Destination.Updates
+import app.shosetsu.android.ui.main.Destination.PrimaryWrapper
+import app.shosetsu.android.ui.main.HomeView
 import app.shosetsu.android.ui.migration.MigrationView
 import app.shosetsu.android.ui.novel.NovelInfoView
-import app.shosetsu.android.ui.updates.UpdatesView
 
 /**
  * Shosetsu
@@ -25,39 +21,17 @@ import app.shosetsu.android.ui.updates.UpdatesView
  */
 
 fun NavGraphBuilder.mainGraph(
-	navController: NavHostController,
-	sizeClass: WindowSizeClass,
-	drawerIcon: @Composable () -> Unit
+	navController: ShosetsuNavController,
+	sizeClass: WindowSizeClass
 ) {
-	composableMain<Library> {
-		LibraryView(
-			onOpenNovel = { novelId ->
-				navController.navigate(Novel(novelId))
-			},
-			onMigrate = {
-				navController.navigate(Migration(it))
-			},
-			drawerIcon = drawerIcon
+	composableSub<PrimaryWrapper> {
+		HomeView(
+			navController,
+			sizeClass = sizeClass
 		)
 	}
-	browseGraph(
-		navController,
-		drawerIcon = drawerIcon
-	)
-	moreGraph(
-		navController,
-		drawerIcon = drawerIcon
-	)
-	composableMain<Updates> {
-		val context = LocalContext.current
-		UpdatesView(
-			openNovel = { novelId ->
-				navController.navigate(Novel(novelId))
-			},
-			openChapter = context::openChapter,
-			drawerIcon = drawerIcon
-		)
-	}
+	browseGraph(navController)
+	moreGraph(navController)
 	composableMain<Novel> { entry ->
 		val novelId = entry.toRoute<Novel>().novelId
 		val context = LocalContext.current

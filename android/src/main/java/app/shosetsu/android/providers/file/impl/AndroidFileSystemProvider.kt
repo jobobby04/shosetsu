@@ -85,8 +85,7 @@ class AndroidFileSystemProvider(
 	override fun doesFileExist(
 		externalFileDir: ExternalFileDir,
 		path: String
-	): Boolean = if (!File(externalFileDir.path() + path).exists())
-		(false) else (true)
+	): Boolean = File(externalFileDir.path() + path).exists()
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
 	override fun readFile(internalFileDir: InternalFileDir, path: String): ByteArray {

@@ -3,8 +3,6 @@ package app.shosetsu.android.viewmodel.abstracted.settings
 import android.content.Context
 import android.net.Uri
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.

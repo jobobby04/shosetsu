@@ -106,9 +106,9 @@ class ChapterReader
 			viewModel.setCurrentChapterID(intent.getIntExtra(BUNDLE_CHAPTER_ID, -1), true)
 		}
 		runBlocking {
-			setTheme(viewModel.appThemeLiveData.first())
+			setTheme(viewModel.appTheme.first())
 		}
-		viewModel.appThemeLiveData.collectLA(this, catch = {}) {
+		viewModel.appTheme.collectLA(this, catch = {}) {
 			setTheme(it)
 		}
 		super.onCreate(savedInstanceState)

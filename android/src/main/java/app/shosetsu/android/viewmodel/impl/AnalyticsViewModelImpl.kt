@@ -44,7 +44,7 @@ class AnalyticsViewModelImpl(
 	override val novels: Flow<List<AnalyticsNovelUI>> =
 		novelEntities.map { list ->
 			list.map { (id, title, imageURL, _, _, total, chapterCount, unreadChapterCount, readChapterCount, readingChapterCount) ->
-				val days = MILLISECONDS.toDays(total).toInt();
+				val days = MILLISECONDS.toDays(total).toInt()
 				val hours = (MILLISECONDS.toHours(total) - days * 24).toInt()
 				val minutes =
 					(MILLISECONDS.toMinutes(total) - MILLISECONDS.toHours(total) * 60).toInt()

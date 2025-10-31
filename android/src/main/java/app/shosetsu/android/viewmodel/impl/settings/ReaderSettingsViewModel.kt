@@ -23,7 +23,6 @@ import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
 import app.shosetsu.android.common.SettingKey.ReaderEnableFullscreen
 import app.shosetsu.android.common.SettingKey.ReaderEngine
-import app.shosetsu.android.common.SettingKey.ReaderHorizontalPageSwap
 import app.shosetsu.android.common.SettingKey.ReaderIndentSize
 import app.shosetsu.android.common.SettingKey.ReaderIsInvertedSwipe
 import app.shosetsu.android.common.SettingKey.ReaderIsTapToScroll

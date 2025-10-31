@@ -58,7 +58,7 @@ class CategoriesViewModel(
 	override val moveDownCategoryState =
 		MutableStateFlow<CategoryChangeState>(CategoryChangeState.Unknown)
 
-	override fun addCategory(name: String): Unit {
+	override fun addCategory(name: String) {
 		launchIO {
 			try {
 				addCategoryUseCase(name)
@@ -77,7 +77,7 @@ class CategoriesViewModel(
 		}
 	}
 
-	override fun remove(categoryUI: CategoryUI): Unit {
+	override fun remove(categoryUI: CategoryUI) {
 		launchIO {
 			try {
 				deleteCategoryUseCase(categoryUI)

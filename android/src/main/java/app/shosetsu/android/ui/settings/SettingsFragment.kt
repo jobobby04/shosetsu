@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ChromeReaderMode
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.CollectionsBookmark
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
@@ -21,8 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
-import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 
 /*
  * This file is part of shosetsu.
@@ -124,7 +124,7 @@ fun SettingsContent(
 			TextPreferenceWidget(
 				title = stringResource(R.string.downloads),
 				subtitle = stringResource(R.string.downloads_summary),
-				icon = Icons.Outlined.Download,
+				icon = Icons.Filled.Download,
 				onPreferenceClick = navToDownloads
 			)
 

@@ -117,10 +117,7 @@ fun ChapterReaderPagerContent(
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(
-					top = paddingValues.calculateTopPadding(),
-					bottom = paddingValues.calculateBottomPadding()
-				),
+				.padding(paddingValues),
 			reverseLayout = isSwipeInverted,
 			pageContent = {
 				createPage(it)
@@ -131,10 +128,7 @@ fun ChapterReaderPagerContent(
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(
-					top = paddingValues.calculateTopPadding(),
-					bottom = paddingValues.calculateBottomPadding()
-				),
+				.padding(paddingValues),
 			pageContent = {
 				createPage(it)
 			}

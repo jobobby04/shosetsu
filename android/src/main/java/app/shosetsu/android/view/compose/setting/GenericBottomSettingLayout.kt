@@ -7,12 +7,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.secondaryItemAlpha
 import app.shosetsu.android.view.compose.setting.widget.BasePreferenceWidget
@@ -20,14 +19,12 @@ import app.shosetsu.android.view.compose.setting.widget.PrefsHorizontalPadding
 
 @Preview
 @Composable
-fun PreviewGenericBottomSetting() {
-	ShosetsuTheme {
-		GenericBottomSettingLayout(
-			"Test",
-			"Description"
-		) {
+fun PreviewGenericBottomSetting() = ShosetsuTheme(AppThemes.LIGHT) {
+	GenericBottomSettingLayout(
+		"Test",
+		"Description"
+	) {
 
-		}
 	}
 }
 

@@ -28,6 +28,6 @@ import androidx.compose.runtime.Immutable
 data class SearchRowUI(
 	val extensionID: Int,
 	val name: String,
-	val imageURL: String?,
+	val imageURL: String,
 	val hasError: Boolean = false
 )

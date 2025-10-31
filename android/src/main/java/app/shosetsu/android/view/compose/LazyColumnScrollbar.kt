@@ -6,12 +6,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -82,16 +93,19 @@ fun LazyColumnScrollbar(
 	}
 		.coerceAtLeast(thumbMinHeight)
 		.coerceAtMost(2 * thumbMinHeight)
-	
-	fun computeStartOffset() = listState.layoutInfo.let {
-		val items = it.visibleItemsInfo
+
+	fun computeStartOffset() = listState.layoutInfo.let { layoutInfo ->
+		val items = layoutInfo.visibleItemsInfo
 		if (items.isEmpty()) return@let 0f
 		val estimatedSize = items.fastSumBy { it.size }.toFloat() / items.size
-		val totalSize = estimatedSize * it.totalItemsCount
-		val viewportSize = it.viewportSize.height - it.beforeContentPadding - it.afterContentPadding
-		items.fastFirstOrNull { (it.key as? String)?.startsWith(STICKY_HEADER_KEY_PREFIX)?.not() ?: true }
+		val totalSize = estimatedSize * layoutInfo.totalItemsCount
+		val viewportSize =
+			layoutInfo.viewportSize.height - layoutInfo.beforeContentPadding - layoutInfo.afterContentPadding
+		items.fastFirstOrNull {
+			(it.key as? String)?.startsWith(STICKY_HEADER_KEY_PREFIX)?.not() ?: true
+		}
 			?.run {
-				it.beforeContentPadding + (estimatedSize * index - offset) / totalSize * viewportSize
+				layoutInfo.beforeContentPadding + (estimatedSize * index - offset) / totalSize * viewportSize
 			}
 			?: 0f
 	}

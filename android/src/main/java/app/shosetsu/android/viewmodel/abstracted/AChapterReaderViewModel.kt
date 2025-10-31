@@ -2,14 +2,13 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.compose.material3.ColorScheme
 import androidx.lifecycle.LiveData
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
@@ -41,7 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class AChapterReaderViewModel :
 	SubscribeViewModel<ImmutableList<ReaderUIItem>?>,
-	ShosetsuViewModel(),
+	ShosetsuRootViewModel(),
 	ExposedSettingsRepoViewModel {
 
 	/**
@@ -70,8 +69,6 @@ abstract class AChapterReaderViewModel :
 	 * Dismiss reading for too long
 	 */
 	abstract fun dismissReadingTooLong()
-
-	abstract val appThemeLiveData: SharedFlow<AppThemes>
 
 	abstract fun retryChapter(item: ReaderChapterUI)
 

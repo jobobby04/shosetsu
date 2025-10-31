@@ -710,5 +710,7 @@
     <string name="settings_backup_location">Storage location</string>
     <string name="file_picker_error">No file picker app found</string>
     <string name="restore_notification_content_extension_not_found">Extension referenced in the backup was not found:</string>
+    <string name="android_verification_warning_desc">Google has announced that, starting in 2026/2027, all apps on certified Android devices will require the developer to submit personal identity details directly to Google.\nSince the developers of this app do not agree to this requirement, there is no guarantee that this App will be accessible..</string>
+    <string name="android_verification_warning_title">Android Verification Warning</string>
 
 </resources>
