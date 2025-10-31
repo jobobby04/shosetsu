@@ -1,17 +1,24 @@
 package app.shosetsu.android.ui.main
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.Crossfade
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CollectionsBookmark
+import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.CollectionsBookmark
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Update
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import app.shosetsu.android.R
 import kotlinx.serialization.Serializable
+import androidx.compose.material3.Icon as MIcon
 
 sealed interface ShosetsuDestination {
 	interface Primary : ShosetsuDestination {
@@ -74,6 +81,38 @@ object Destination {
 	@Serializable object Library : ShosetsuDestination.Primary {
 		override val icon: ImageVector = Icons.Outlined.CollectionsBookmark
 		override val name: Int = R.string.library
+	}
+}
+
+@Composable
+fun DestinationIcon(destination: ShosetsuDestination.Primary, isSelected: Boolean) = when (destination) {
+	is Destination.Browse -> {
+		Crossfade(isSelected) {
+			MIcon(
+				rememberVectorPainter(
+					if (it) Icons.Filled.Explore
+					else Icons.Outlined.Explore
+				),
+				stringResource(destination.name)
+			)
+		}
+	}
+	is Destination.Library -> {
+		Crossfade(isSelected) {
+			MIcon(
+				rememberVectorPainter(
+					if (it) Icons.Filled.CollectionsBookmark
+					else Icons.Outlined.CollectionsBookmark
+				),
+				stringResource(destination.name)
+			)
+		}
+	}
+	else -> {
+		MIcon(
+			rememberVectorPainter(destination.icon),
+			stringResource(destination.name)
+		)
 	}
 }
 

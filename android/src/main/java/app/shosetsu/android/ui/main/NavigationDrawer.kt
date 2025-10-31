@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -73,18 +72,11 @@ fun NavigationDrawerContent(
 		HorizontalDivider()
 
 		ShosetsuDestination.Primary.all.forEach { destination ->
+			val isSelected = currentDestination?.has(destination) == true
 			NavigationDrawerItem(
-				selected =
-				currentDestination?.has(destination) == true,
-				icon = {
-					Icon(
-						destination.icon,
-						destination::class.simpleName
-					)
-				},
-				label = {
-					Text(stringResource(destination.name))
-				},
+				selected = isSelected,
+				icon = { DestinationIcon(destination, isSelected) },
+				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
 				}

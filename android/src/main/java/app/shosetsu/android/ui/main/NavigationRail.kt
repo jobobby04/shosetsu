@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.main
 
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
@@ -38,18 +37,11 @@ fun NavigationRail(
 ) {
 	NavigationRail {
 		ShosetsuDestination.Primary.all.forEach { destination ->
+			val isSelected = currentDestination?.has(destination) == true
 			NavigationRailItem(
-				selected =
-				currentDestination?.has(destination) == true,
-				icon = {
-					Icon(
-						destination.icon,
-						destination::class.simpleName
-					)
-				},
-				label = {
-					Text(stringResource(destination.name))
-				},
+				selected = isSelected,
+				icon = { DestinationIcon(destination, isSelected) },
+				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
 				}
