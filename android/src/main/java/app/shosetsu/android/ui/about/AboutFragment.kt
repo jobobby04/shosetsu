@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.about
 
+import android.content.ClipData
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -21,23 +22,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.common.consts.URL_APP_REPO
 import app.shosetsu.android.common.consts.URL_DISCLAIMER
 import app.shosetsu.android.common.consts.URL_DISCORD
-import app.shosetsu.android.common.consts.URL_APP_REPO
 import app.shosetsu.android.common.consts.URL_EXTENSIONS_REPO
 import app.shosetsu.android.common.consts.URL_KOFI
 import app.shosetsu.android.common.consts.URL_MATRIX
@@ -49,6 +51,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
+import kotlinx.coroutines.launch
 import org.acra.util.Installation
 
 /*
@@ -240,7 +243,8 @@ fun AboutContent(
 			}
 			item {
 				val context = LocalContext.current
-				val clipboard = LocalClipboardManager.current
+				val clipboard = LocalClipboard.current
+				val scope = rememberCoroutineScope()
 
 				val id = remember { Installation.id(context) }
 
@@ -248,7 +252,7 @@ fun AboutContent(
 					R.string.fragment_about_acra_id,
 					description = id,
 					onClick = {
-						clipboard.setText(AnnotatedString(id))
+						scope.launch { clipboard.setClipEntry(ClipData.newPlainText("text", id).toClipEntry()) }
 					}
 				)
 			}
