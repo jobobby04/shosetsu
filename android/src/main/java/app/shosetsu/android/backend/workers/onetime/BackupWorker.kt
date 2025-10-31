@@ -4,6 +4,8 @@ import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
@@ -39,6 +41,7 @@ import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.notificationBuilder
 import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
@@ -123,7 +126,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_BACKUP)
-			.setSmallIcon(R.drawable.backup_icon)
+			.setSmallIcon(Icons.Default.Backup)
 			.setSubText("Backup")
 			.setOnlyAlertOnce(true)
 			.setOngoing(true)

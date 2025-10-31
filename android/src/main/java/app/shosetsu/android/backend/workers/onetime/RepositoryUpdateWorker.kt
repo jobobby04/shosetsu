@@ -1,6 +1,8 @@
 package app.shosetsu.android.backend.workers.onetime
 
 import android.content.Context
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
@@ -12,7 +14,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.SettingKey
@@ -29,6 +30,7 @@ import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.common.ext.setOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.domain.model.local.GenericExtensionEntity
@@ -344,7 +346,7 @@ class RepositoryUpdateWorker(
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_REPOSITORY_UPDATE)
-			.setSmallIcon(R.drawable.downloads)
+			.setSmallIcon(Icons.Default.Download)
 			.setContentTitle("Repository Update")
 			.setPriority(NotificationCompat.PRIORITY_DEFAULT)
 			.setOngoing(true)

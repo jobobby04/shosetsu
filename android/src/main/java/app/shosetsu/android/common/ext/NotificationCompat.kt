@@ -3,9 +3,12 @@ package app.shosetsu.android.common.ext
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.app.NotificationCompat.*
-import androidx.core.graphics.drawable.IconCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 
@@ -53,13 +56,13 @@ fun Builder.addReportErrorAction(context: Context, notificationId: Int, throwabl
 
 	addAction(
 		actionBuilder(
-			IconCompat.createWithResource(context, R.drawable.error_outline),
+			Icons.Outlined.ErrorOutline,
 			context.getString(R.string.report_bug),
 			PendingIntent.getBroadcast(
 				context,
 				0,
 				intent,
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 			)
 		).build()
 	)
@@ -67,6 +70,9 @@ fun Builder.addReportErrorAction(context: Context, notificationId: Int, throwabl
 
 fun notificationBuilder(context: Context, channel: String): Builder = Builder(context, channel)
 
+fun actionBuilder(icon: ImageVector, title: CharSequence?, intent: PendingIntent?): Action.Builder =
+	Action.Builder(if (SDK_INT >= VERSION_CODES.M) icon.toIcon() else null, title, intent)
 
-fun actionBuilder(icon: IconCompat?, title: CharSequence?, intent: PendingIntent?): Action.Builder =
-	Action.Builder(icon, title, intent)
+fun Builder.setSmallIcon(icon: ImageVector): Builder = if (SDK_INT >= VERSION_CODES.M) {
+    setSmallIcon(icon.toIcon())
+} else this

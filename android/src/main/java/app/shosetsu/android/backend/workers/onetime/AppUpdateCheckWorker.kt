@@ -4,6 +4,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SystemUpdateAlt
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Constraints
@@ -27,12 +29,14 @@ import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.ID_APP_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.APP_UPDATE_WORK_ID
+import app.shosetsu.android.common.ext.actionBuilder
 import app.shosetsu.android.common.ext.addReportErrorAction
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.notificationBuilder
 import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.lib.exceptions.HTTPException
@@ -85,7 +89,7 @@ class AppUpdateCheckWorker(
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, Notifications.CHANNEL_APP_UPDATE)
 			.setSubText(applicationContext.getString(R.string.notification_app_update_check))
-			.setSmallIcon(R.drawable.app_update)
+			.setSmallIcon(Icons.Default.SystemUpdateAlt)
 			.setOnlyAlertOnce(true)
 			.setOngoing(true)
 
@@ -141,8 +145,8 @@ class AppUpdateCheckWorker(
 				)
 			) {
 				setOngoing(false)
-				addAction(
-					R.drawable.app_update,
+				addAction(actionBuilder(
+					Icons.Default.SystemUpdateAlt,
 					"",
 					PendingIntent.getActivity(
 						applicationContext,
@@ -150,7 +154,7 @@ class AppUpdateCheckWorker(
 						openAppForUpdateIntent,
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 					)
-				)
+				).build())
 			}
 		}
 		return Result.success()
