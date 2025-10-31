@@ -21,9 +21,6 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -90,6 +87,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.view.BottomSheetDialog
+import app.shosetsu.android.view.compose.AnimatedRefresh
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
@@ -530,16 +528,16 @@ fun BrowseExtensionContent(
 					}
 
 					if (item.isInstalling) {
-						val image = AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
 						SimpleIconButton(
-							rememberAnimatedVectorPainter(image, false),
 							stringResource(R.string.installing),
 							onClick = {},
 							modifier = Modifier.combinedClickable(
 								onClick = {},
 								onLongClick = cancelInstall,
 							)
-						)
+						) {
+							AnimatedRefresh()
+						}
 					}
 				}
 

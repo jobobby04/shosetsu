@@ -1,9 +1,6 @@
 package app.shosetsu.android.view
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
+import app.shosetsu.android.view.compose.AnimatedRefresh
 import app.shosetsu.android.view.uimodels.model.QRCodeData
 
 /*
@@ -116,13 +114,7 @@ fun QRCodeShareDialog(
 								.fillMaxSize()
 						)
 					} else {
-						val image =
-							AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
-
-						Image(
-							rememberAnimatedVectorPainter(image, false),
-							stringResource(R.string.loading),
-						)
+						AnimatedRefresh()
 					}
 				}
 
