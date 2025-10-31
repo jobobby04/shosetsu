@@ -1,7 +1,12 @@
 package app.shosetsu.android.ui.main
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.outlined.CollectionsBookmark
+import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Update
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -10,7 +15,7 @@ import kotlinx.serialization.Serializable
 
 sealed interface ShosetsuDestination {
 	interface Primary : ShosetsuDestination {
-		@get:DrawableRes val icon: Int
+		val icon: ImageVector
 		@get:StringRes val name: Int
 
 		companion object {
@@ -30,7 +35,7 @@ object Destination {
 	@Serializable object PrimaryWrapper : ShosetsuDestination.Root
 
 	@Serializable object More : ShosetsuDestination.Primary {
-		override val icon: Int = R.drawable.ic_baseline_more_horiz_24
+		override val icon: ImageVector = Icons.Default.MoreHoriz
 		override val name: Int = R.string.more
 
 		@Serializable object About : ShosetsuDestination.Root
@@ -53,21 +58,21 @@ object Destination {
 		@Serializable data class TextReader(val assetId: Int) : ShosetsuDestination.Root
 	}
 	@Serializable object Updates : ShosetsuDestination.Primary {
-		override val icon: Int = R.drawable.update
+		override val icon: ImageVector = Icons.Outlined.Update
 		override val name: Int = R.string.updates
 	}
 	@Serializable data class Novel(val novelId: Int) : ShosetsuDestination.Root
 	@Serializable data class Search(val query: String?) : ShosetsuDestination.Root
 	@Serializable data class Migration(val novelId: List<Int>) : ShosetsuDestination.Root
 	@Serializable object Browse : ShosetsuDestination.Primary {
-		override val icon: Int = R.drawable.navigation_arrow
+		override val icon: ImageVector = Icons.Outlined.Explore
 		override val name: Int = R.string.browse
 
 		@Serializable data class Catalog(val extensionId: Int) : ShosetsuDestination.Root
 		@Serializable data class ConfigureExtension(val extensionId: Int) : ShosetsuDestination.Root
 	}
 	@Serializable object Library : ShosetsuDestination.Primary {
-		override val icon: Int = R.drawable.library
+		override val icon: ImageVector = Icons.Outlined.CollectionsBookmark
 		override val name: Int = R.string.library
 	}
 }

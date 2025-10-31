@@ -296,7 +296,7 @@ fun ViewTypeButton(
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 	SimpleIconButton(
-        Icons.Filled.ViewModule,
+        Icons.Default.ViewModule,
 		stringResource(R.string.novel_card_type_selector_title),
 		onClick = {
 			showDropDown = !showDropDown

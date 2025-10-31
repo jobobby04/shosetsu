@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.HistoryEdu
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Link
@@ -165,7 +165,7 @@ fun MoreContent(
 				HorizontalDivider()
 			}
 			item {
-				MoreItemContent(R.string.downloads, Icons.Outlined.Download, onNavToDownloads)
+				MoreItemContent(R.string.downloads, Icons.Default.Download, onNavToDownloads)
 			}
 
 			item {

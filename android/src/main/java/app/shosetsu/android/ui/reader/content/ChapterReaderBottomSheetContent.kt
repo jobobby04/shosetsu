@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Audiotrack
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -68,7 +68,7 @@ fun ChapterReaderBottomSheetContent(
 		horizontalArrangement = Arrangement.SpaceBetween,
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		SimpleIconButton(Icons.Filled.ArrowBack, null, onClick = exit)
+		SimpleIconButton(Icons.AutoMirrored.Filled.ArrowBack, null, onClick = exit)
 
 		Row {
 			SimpleIconButton(

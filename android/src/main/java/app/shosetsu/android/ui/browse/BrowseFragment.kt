@@ -43,8 +43,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -476,7 +476,7 @@ fun BrowseExtensionContent(
 					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
 						var isDropdownVisible by remember { mutableStateOf(false) }
 						SimpleIconButton(
-                            Icons.Outlined.Download,
+                            Icons.Default.Download,
 							null,
 							onClick = {
 								// We can skip to dropdown if there is only 1 install option
@@ -513,7 +513,7 @@ fun BrowseExtensionContent(
 
 					if (item.isUpdateAvailable) {
 						SimpleIconButton(
-							Icons.Outlined.Download,
+							Icons.Default.Download,
 							stringResource(R.string.update),
 							onClick = update,
 							modifier = Modifier.rotate(180f),

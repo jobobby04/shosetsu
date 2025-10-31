@@ -78,9 +78,7 @@ fun NavigationDrawerContent(
 				currentDestination?.has(destination) == true,
 				icon = {
 					Icon(
-						painterResource(
-							destination.icon
-						),
+						destination.icon,
 						destination::class.simpleName
 					)
 				},

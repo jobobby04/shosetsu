@@ -337,7 +337,7 @@ fun CategoriesContent(
 										)
 								}
 								SimpleIconButton(
-									Icons.Filled.Delete,
+									Icons.Default.Delete,
 									description = null,
 									onClick = { onRemove(item) }
 								)

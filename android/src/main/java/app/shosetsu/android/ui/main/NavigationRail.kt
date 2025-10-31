@@ -5,7 +5,6 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
 
@@ -44,7 +43,7 @@ fun NavigationRail(
 				currentDestination?.has(destination) == true,
 				icon = {
 					Icon(
-						painterResource(destination.icon),
+						destination.icon,
 						destination::class.simpleName
 					)
 				},

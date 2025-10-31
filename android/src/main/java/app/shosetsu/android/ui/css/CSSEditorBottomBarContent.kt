@@ -126,7 +126,7 @@ fun CSSEditorBottomBarContent(
 					contentColor = colorResource(android.R.color.white)
 				) {
 					Icon(
-						Icons.Filled.Save,
+						Icons.Default.Save,
 						stringResource(R.string.activity_css_save)
 					)
 				}
@@ -135,7 +135,7 @@ fun CSSEditorBottomBarContent(
 					verticalAlignment = Alignment.CenterVertically,
 				) {
 					SimpleIconButton(
-						Icons.Filled.SaveAlt,
+						Icons.Default.SaveAlt,
 						stringResource(R.string.activity_css_export),
 						onClick = onExport, enabled = false,
 						modifier = Modifier.padding(end = 8.dp)

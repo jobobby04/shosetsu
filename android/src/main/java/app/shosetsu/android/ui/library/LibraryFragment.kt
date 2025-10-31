@@ -547,7 +547,7 @@ fun LibraryCategory(
 							containerColor = MaterialTheme.colorScheme.secondaryContainer
 						) {
 							Icon(
-								Icons.Filled.PushPin,
+								Icons.Default.PushPin,
 								stringResource(R.string.pin_on_top),
 								modifier = Modifier.size(16.dp)
 							)

@@ -367,7 +367,7 @@ fun ConfigureExtensionHeaderContent(
 			}
 
 			SimpleIconButton(
-				Icons.Filled.Delete,
+				Icons.Default.Delete,
 				stringResource(R.string.uninstall),
 				onClick = onUninstall,
 			)
