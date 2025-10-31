@@ -4,30 +4,68 @@ import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.core.provider.DocumentsContractCompat
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.NullContentResolverException
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.BackupOnLowBattery
+import app.shosetsu.android.common.SettingKey.BackupOnLowStorage
+import app.shosetsu.android.common.SettingKey.BackupOnlyWhenIdle
+import app.shosetsu.android.common.SettingKey.BackupStorageLocation
+import app.shosetsu.android.common.SettingKey.ShouldBackupChapters
+import app.shosetsu.android.common.SettingKey.ShouldBackupSettings
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_WORK_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
 import app.shosetsu.android.domain.model.local.NovelEntity
-import app.shosetsu.android.domain.model.local.backup.*
-import app.shosetsu.android.domain.repository.base.*
+import app.shosetsu.android.domain.model.local.backup.BackupCategoryEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupExtensionEntity
+import app.shosetsu.android.domain.model.local.backup.BackupNovelEntity
+import app.shosetsu.android.domain.model.local.backup.BackupNovelSettingEntity
+import app.shosetsu.android.domain.model.local.backup.BackupRepositoryEntity
+import app.shosetsu.android.domain.model.local.backup.FleshedBackupEntity
+import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
+import app.shosetsu.android.domain.repository.base.ICategoryRepository
+import app.shosetsu.android.domain.repository.base.IChaptersRepository
+import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
+import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
+import app.shosetsu.android.domain.repository.base.INovelPinsRepository
+import app.shosetsu.android.domain.repository.base.INovelSettingsRepository
+import app.shosetsu.android.domain.repository.base.INovelsRepository
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.encodeToStream
@@ -87,7 +125,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_BACKUP)
-			.setSmallIcon(R.drawable.backup_icon)
+			.setSmallIcon(Icons.Default.Backup)
 			.setSubText("Backup")
 			.setOnlyAlertOnce(true)
 			.setOngoing(true)
@@ -103,7 +141,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		iSettingsRepository.getBoolean(ShouldBackupSettings)
 
 	private suspend fun backupStorageLocation() =
-		iSettingsRepository.getString(BackupStorageLocation).toUri()
+		iSettingsRepository.getString(BackupStorageLocation).takeIf { it.isNotEmpty() }?.toUri()
 
 	@Throws(IOException::class)
 	inline fun gzip(block: (GZIPOutputStream) -> Unit): ByteArray {
@@ -172,7 +210,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 	}
 
 	@OptIn(ExperimentalSerializationApi::class)
-    @Throws(IOException::class)
+	@Throws(IOException::class)
 	override suspend fun doWork(): Result {
 		// Load novels
 		logV(LogConstants.SERVICE_EXECUTE)
@@ -319,9 +357,14 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					}
 					return Result.failure()
 				}
-				val directoryUri = backupStorageLocation()
-				val docId = DocumentsContractCompat.getTreeDocumentId(directoryUri) ?: return missing()
-				val parentDocumentUri = DocumentsContractCompat.buildDocumentUriUsingTree(directoryUri, docId) ?: return missing()
+
+				val directoryUri = backupStorageLocation() ?: return missing()
+				// If the directory URI is not provided, we can
+				val docId =
+					DocumentsContractCompat.getTreeDocumentId(directoryUri) ?: return missing()
+				val parentDocumentUri =
+					DocumentsContractCompat.buildDocumentUriUsingTree(directoryUri, docId)
+						?: return missing()
 				val uri = DocumentsContractCompat.createDocument(
 					applicationContext.contentResolver,
 					parentDocumentUri,
@@ -335,6 +378,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					setNotOngoing()
 					addReportErrorAction(applicationContext, defaultNotificationID, e)
 				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
 				return Result.failure()
 			} catch (e: FileNotFoundException) {
 				logE("URI is invalid file", e)
@@ -342,6 +386,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					setNotOngoing()
 					addReportErrorAction(applicationContext, defaultNotificationID, e)
 				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
 				return Result.failure()
 			} catch (e: FilePermissionException) {
 				logE("Invalid permission to file", e)
@@ -349,6 +394,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					setNotOngoing()
 					addReportErrorAction(applicationContext, defaultNotificationID, e)
 				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
 				return Result.failure()
 			}
 

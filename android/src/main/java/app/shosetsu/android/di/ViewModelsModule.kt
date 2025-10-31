@@ -39,10 +39,16 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<AMainViewModel>() with provider {
 		MainViewModel(
 			isOnlineUseCase = instance(),
-			loadNavigationStyleUseCase = instance(),
 			loadLiveAppThemeUseCase = instance(),
-			loadRequireDoubleBackUseCase = instance(),
 			settingsRepository = instance(),
+		)
+	}
+
+	// Home
+	bind<AHomeViewModel>() with provider {
+		HomeViewModel(
+			loadNavigationStyleUseCase = instance(),
+			loadRequireDoubleBackUseCase = instance(),
 			backupRepo = instance()
 		)
 	}
@@ -230,7 +236,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			purgeNovelCacheUseCase = instance(),
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<ABackupSettingsViewModel>() with provider {
@@ -253,7 +259,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		ReaderSettingsViewModel(
 			iSettingsRepository = instance(),
 
-            loadReaderThemes = instance()
+			loadReaderThemes = instance()
 		)
 	}
 	bind<ALibrarySettingsViewModel>() with provider {

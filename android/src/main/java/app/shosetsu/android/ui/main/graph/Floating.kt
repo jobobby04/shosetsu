@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.main.graph
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
 import app.shosetsu.android.ui.main.Destination.More.TextReader
@@ -29,7 +28,7 @@ import app.shosetsu.android.ui.settings.sub.TextAssetReaderView
  * @since 25 / 12 / 2023
  * @author Doomsdayrs
  */
-fun NavGraphBuilder.assetReader(navController: NavController) {
+fun NavGraphBuilder.assetReader(navController: ShosetsuNavController) {
 	composableSub<TextReader> { entry ->
 		val assetId = entry.toRoute<TextReader>().assetId
 

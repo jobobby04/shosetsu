@@ -125,6 +125,10 @@ class CatalogViewModel(
 		.catch { exceptionFlow.emit(it) }
 		.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
+	/**
+	 * UnusedFlow warning suppressed, we are just calling the function to add them to the map.
+	 */
+	@Suppress("UnusedFlow")
 	private fun List<Filter<*>>.init(map: ConcurrentHashMap<Int, MutableStateFlow<Any>>): ConcurrentHashMap<Int, MutableStateFlow<Any>> {
 		forEach { filter ->
 			when (filter) {

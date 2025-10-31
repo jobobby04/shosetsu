@@ -1,9 +1,7 @@
 package app.shosetsu.android.view
 
+import android.content.ClipData
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,17 +16,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import app.shosetsu.android.R
+import app.shosetsu.android.view.compose.AnimatedRefresh
 import app.shosetsu.android.view.uimodels.model.QRCodeData
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -97,7 +97,8 @@ fun QRCodeShareDialog(
 			) {
 				if (title != null)
 					Text(title, style = MaterialTheme.typography.titleLarge)
-				val clipboard = LocalClipboardManager.current
+				val clipboard = LocalClipboard.current
+				val scope = rememberCoroutineScope()
 
 				Box(
 					modifier = Modifier
@@ -116,19 +117,13 @@ fun QRCodeShareDialog(
 								.fillMaxSize()
 						)
 					} else {
-						val image =
-							AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
-
-						Image(
-							rememberAnimatedVectorPainter(image, false),
-							stringResource(R.string.loading),
-						)
+						AnimatedRefresh()
 					}
 				}
 
 				TextButton(
 					onClick = {
-						clipboard.setText(AnnotatedString(qrCodeData!!.data))
+						scope.launch { clipboard.setClipEntry(ClipData.newPlainText("text", qrCodeData!!.data).toClipEntry()) }
 					},
 					enabled = qrCodeData != null
 				) {

@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ChromeReaderMode
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.CollectionsBookmark
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Palette
@@ -124,7 +124,7 @@ fun SettingsContent(
 			TextPreferenceWidget(
 				title = stringResource(R.string.downloads),
 				subtitle = stringResource(R.string.downloads_summary),
-				icon = Icons.Outlined.Download,
+				icon = Icons.Filled.Download,
 				onPreferenceClick = navToDownloads
 			)
 

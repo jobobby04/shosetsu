@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
  */
 abstract class ADownloadSettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
-	data object Request;
+	data object Request
 
 	abstract val notifyRestartWorker: Flow<Request>
 	abstract fun restartDownloadWorker()

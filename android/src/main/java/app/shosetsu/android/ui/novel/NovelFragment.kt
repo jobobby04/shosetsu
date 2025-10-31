@@ -35,17 +35,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LibraryAddCheck
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.BookmarkRemove
-import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.LibraryAddCheck
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -296,7 +296,9 @@ fun NovelInfoView(
 		selectedChaptersState = selectedChaptersState,
 		itemAt = itemAt,
 		isRefreshing = isRefreshing,
-		onRefresh = viewModel::refresh,
+		onRefresh = {
+			viewModel.refresh()
+		},
 		openWebView = {
 			openInWebView(novelURL ?: return@NovelInfoContent)
 		},
@@ -873,13 +875,13 @@ fun BoxScope.ChapterSelectionBar(
 	) {
 		Row {
 			SimpleIconButton(
-				Icons.Outlined.Download,
+				Icons.Filled.Download,
 				stringResource(R.string.fragment_novel_selected_download),
 				onClick = downloadSelected,
 				enabled = selectedChaptersState.showDownload
 			)
 			SimpleIconButton(
-				Icons.Filled.Delete,
+				Icons.Outlined.Delete,
 				stringResource(R.string.fragment_novel_selected_delete),
 				onClick = deleteSelected,
 				enabled = selectedChaptersState.showDelete
@@ -897,7 +899,7 @@ fun BoxScope.ChapterSelectionBar(
 				enabled = selectedChaptersState.showMarkAsUnread
 			)
 			SimpleIconButton(
-				Icons.Outlined.BookmarkAdd,
+				Icons.Filled.BookmarkAdd,
 				stringResource(R.string.fragment_novel_selected_bookmark),
 				onClick = bookmarkSelected,
 				enabled = selectedChaptersState.showBookmark
@@ -1234,7 +1236,7 @@ fun NovelInfoHeaderContent(
 								if (novelInfo.bookmarked) {
 									Icons.Filled.Favorite
 								} else {
-									Icons.Filled.FavoriteBorder
+									Icons.Outlined.FavoriteBorder
 								},
 								null,
 								tint = if (novelInfo.bookmarked)

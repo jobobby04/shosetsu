@@ -104,7 +104,7 @@ class CSSEditorViewModel(
 		redoStack.add(cssContent.value) // Save currentText as a redo action
 		canRedo.value = true
 		cssContent.value = undoStack.pop()
-		if (undoStack.size == 0) {
+		if (undoStack.isEmpty()) {
 			canUndo.value = false
 		}
 	}
@@ -114,14 +114,14 @@ class CSSEditorViewModel(
 		undoStack.add(cssContent.value)
 		canUndo.value = true
 		cssContent.value = redoStack.pop()
-		if (redoStack.size == 0) {
+		if (redoStack.isEmpty()) {
 			canRedo.value = false
 		}
 	}
 
 	override fun write(content: String) {
 		launchIO {
-			if (undoStack.size > 0 && undoStack.peek() == content) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == content) return@launchIO // ignore if nothing changed
 			undoStack.add(cssContent.value)
 			canUndo.value = true
 			redoStack.clear()
@@ -141,7 +141,7 @@ class CSSEditorViewModel(
 		val combined = value + pasteContent
 		if (value == combined) return // ignore paste if the old value equals paste
 		launchIO {
-			if (undoStack.size > 0 && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
 			undoStack.add(value)
 			canUndo.value = true
 			redoStack.clear()

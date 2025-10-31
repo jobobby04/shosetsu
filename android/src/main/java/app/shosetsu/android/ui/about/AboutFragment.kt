@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,9 +32,9 @@ import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.common.consts.URL_APP_REPO
 import app.shosetsu.android.common.consts.URL_DISCLAIMER
 import app.shosetsu.android.common.consts.URL_DISCORD
-import app.shosetsu.android.common.consts.URL_APP_REPO
 import app.shosetsu.android.common.consts.URL_EXTENSIONS_REPO
 import app.shosetsu.android.common.consts.URL_KOFI
 import app.shosetsu.android.common.consts.URL_MATRIX
@@ -45,6 +46,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of shosetsu.
@@ -208,7 +210,7 @@ fun AboutContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				},
+				}
 			)
 		}
 	) { paddingValues ->

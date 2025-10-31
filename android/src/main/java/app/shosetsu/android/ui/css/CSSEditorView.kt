@@ -6,12 +6,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalClipboard
 import app.shosetsu.android.common.consts.URL_HELP_CSS
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun CSSEditorView(
@@ -26,7 +31,6 @@ fun CSSEditorView(
 
 	val cssTitle by viewModel.cssTitle.collectAsState()
 	val cssContent by viewModel.cssContent.collectAsState()
-	val clipboardManager = LocalClipboardManager.current
 
 	val shosetsuCss by viewModel.shosetsuCss.collectAsState()
 
@@ -44,6 +48,12 @@ fun CSSEditorView(
 		LaunchedEffect(colorScheme) {
 			viewModel.colorScheme.value = colorScheme
 		}
+		val clipboard = LocalClipboard.current
+		val scope = rememberCoroutineScope()
+		var hasPaste by remember { mutableStateOf(false) }
+		LaunchedEffect(clipboard) {
+			hasPaste = clipboard.getClipEntry() != null
+		}
 		CSSEditorPagerContent(
 			cssTitle = cssTitle,
 			cssContent = cssContent,
@@ -59,14 +69,16 @@ fun CSSEditorView(
 			},
 			onNewText = viewModel::write,
 			onPaste = {
-				val text = clipboardManager.getText()
-				if (text == null) {
-					// TODO Handle no paste content
-				} else {
-					viewModel.appendText(text.toString())
+				scope.launch {
+					val text = clipboard.getClipEntry()
+					if (text == null) {
+						// TODO Handle no paste content
+					} else {
+						viewModel.appendText(text.clipData.toString())
+					}
 				}
 			},
-			hasPaste = clipboardManager.getText() != null,
+			hasPaste = hasPaste,
 			canRedo = canRedo,
 			canUndo = canUndo
 		) {
@@ -74,4 +86,3 @@ fun CSSEditorView(
 		}
 	}
 }
-

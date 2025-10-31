@@ -74,9 +74,9 @@ class LoadReaderThemes(
 						-0x1,
 						-0x1000000
 					)
-				).also {
+				).also { choices ->
 					launchIO {
-						it.map { it.toString() }.toSet().let {
+						choices.map { it.toString() }.toSet().let {
 							iSettingsRepository.setStringSet(SettingKey.ReaderUserThemes, it)
 						}
 					}

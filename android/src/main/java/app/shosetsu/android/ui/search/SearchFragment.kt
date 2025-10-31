@@ -129,12 +129,12 @@ fun SearchView(
 @Composable
 fun PreviewSearchContent() {
 	SearchContent(
-		rows = persistentListOf(SearchRowUI(-1, "Library", null)).addAll(
+		rows = persistentListOf(SearchRowUI(-1, "Library", "")).addAll(
 			List(5) {
 				SearchRowUI(
 					it,
 					"Test",
-					null
+					""
 				)
 			}
 		),
@@ -321,7 +321,7 @@ fun PreviewSearchRowContent() {
 		SearchRowUI(
 			extensionID = 0,
 			name = "Name",
-			imageURL = null
+			imageURL = ""
 		), loadingBar = {}, items = {}, exception = {})
 }
 
@@ -341,20 +341,24 @@ fun SearchRowContent(
 			modifier = Modifier.padding(8.dp),
 			verticalAlignment = Alignment.CenterVertically
 		) {
-			SubcomposeAsyncImage(
-				ImageRequest.Builder(LocalContext.current)
-					.data(if (!row.imageURL.isNullOrEmpty()) row.imageURL else R.drawable.library)
-					.crossfade(true)
-					.build(),
-				contentDescription = row.name,
-				modifier = Modifier.size(32.dp),
-				error = {
-					ImageLoadingError()
-				},
-				loading = {
-					Box(Modifier.placeholder(true))
-				}
-			)
+			if (row.imageURL.isNotEmpty()) {
+				SubcomposeAsyncImage(
+					ImageRequest.Builder(LocalContext.current)
+						.data(row.imageURL)
+						.crossfade(true)
+						.build(),
+					contentDescription = row.name,
+					modifier = Modifier.size(32.dp),
+					error = {
+						ImageLoadingError()
+					},
+					loading = {
+						Box(Modifier.placeholder(true))
+					}
+				)
+			} else {
+				ImageLoadingError(Modifier.size(32.dp))
+			}
 			Text(row.name, modifier = Modifier.padding(start = 8.dp))
 		}
 		loadingBar()

@@ -1,19 +1,12 @@
 package app.shosetsu.android.viewmodel.impl
 
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.enums.NavigationStyle
-import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
-import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
-import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCase
 import app.shosetsu.android.viewmodel.abstracted.AMainViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of shosetsu.
@@ -38,34 +31,13 @@ import kotlinx.coroutines.flow.stateIn
  */
 class MainViewModel(
 	private val isOnlineUseCase: IsOnlineUseCase,
-	loadNavigationStyleUseCase: LoadNavigationStyleUseCase,
-	private val loadRequireDoubleBackUseCase: LoadRequireDoubleBackUseCase,
 	override val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
-	backupRepo: IBackupRepository,
 	private val settingsRepository: ISettingsRepository,
 ) : AMainViewModel() {
 
-	override val requireDoubleBackToExit: StateFlow<Boolean> by lazy {
-		loadRequireDoubleBackUseCase()
-	}
-
 	override val openUpdate: MutableSharedFlow<UserUpdate> = MutableSharedFlow()
 
-	override val navigationStyle: StateFlow<NavigationStyle> =
-		loadNavigationStyleUseCase().map {
-			if (it) {
-				NavigationStyle.LEGACY
-			} else {
-				NavigationStyle.MATERIAL
-			}
-		}
-			.stateIn(viewModelScopeIO, SharingStarted.Eagerly, NavigationStyle.MATERIAL)
-
-
 	override fun isOnline(): Boolean = isOnlineUseCase()
-
-	override val backupProgressState: StateFlow<IBackupRepository.BackupProgress> =
-		backupRepo.backupProgress
 
 	override val showIntro: StateFlow<Boolean> by lazy {
 		settingsRepository.getBooleanFlow(SettingKey.FirstTime)

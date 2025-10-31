@@ -8,6 +8,9 @@ import android.graphics.Bitmap
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Refresh
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
@@ -45,6 +48,7 @@ import app.shosetsu.android.common.consts.LogConstants.SERVICE_EXECUTE
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_UPDATE
 import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.UPDATE_WORK_ID
+import app.shosetsu.android.common.ext.actionBuilder
 import app.shosetsu.android.common.ext.addReportErrorAction
 import app.shosetsu.android.common.ext.getString
 import app.shosetsu.android.common.ext.intent
@@ -58,6 +62,7 @@ import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.common.ext.setOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.LibraryNovelEntity
@@ -118,8 +123,8 @@ class NovelUpdateWorker(
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 
 	private fun NotificationCompat.Builder.addCancelAction() {
-		addAction(
-			R.drawable.ic_baseline_cancel_24, getString(android.R.string.cancel),
+		addAction(actionBuilder(
+			Icons.Default.Cancel, getString(android.R.string.cancel),
 			PendingIntent.getBroadcast(
 				applicationContext,
 				0,
@@ -129,12 +134,12 @@ class NovelUpdateWorker(
 				},
 				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 			)
-		)
+		).build())
 	}
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_UPDATE)
-			.setSmallIcon(R.drawable.refresh)
+			.setSmallIcon(Icons.Default.Refresh)
 			.setSubText(applicationContext.getString(R.string.update_novel))
 			.setContentText("Update in progress")
 			.setOnlyAlertOnce(true)

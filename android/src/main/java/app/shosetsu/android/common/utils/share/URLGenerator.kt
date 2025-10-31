@@ -23,7 +23,7 @@ import java.net.URLEncoder
  * @since 06 / 03 / 2022
  * @author Doomsdayrs
  */
-val BASE_SHARE_URL: String = "https://share.shosetsu.app"
+const val BASE_SHARE_URL: String = "https://share.shosetsu.app"
 
 fun String.urlEncode(): String {
 	@Suppress("CheckedExceptionsKotlin") // utf-8 likely wont be deprecated

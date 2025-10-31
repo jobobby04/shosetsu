@@ -221,8 +221,8 @@ fun BackupSettingsContent(
 					title = stringResource(R.string.settings_backup_cycle_title),
 					description = stringResource(R.string.settings_backup_cycle_desc),
 					valueRange = remember { StableHolder(1..168) },
-					parseValue = {
-						when (it) {
+					parseValue = { value ->
+						when (value) {
 							12 -> "Bi Daily"
 							24 -> "Daily"
 							48 -> "2 Days"
@@ -231,14 +231,14 @@ fun BackupSettingsContent(
 							120 -> "5 Days"
 							144 -> "6 Days"
 							168 -> "Weekly"
-							else -> "$it Hour(s)"
+							else -> "$value Hour(s)"
 						}
 					},
 					repo = viewModel.settingsRepo,
 					key = SettingKey.BackupCycle,
 					haveSteps = false,
-					manipulateUpdate = {
-						when (it) {
+					manipulateUpdate = { value ->
+						when (value) {
 							in 24..35 -> 24
 							in 36..48 -> 48
 							in 48..59 -> 48
@@ -251,7 +251,7 @@ fun BackupSettingsContent(
 							in 132..144 -> 144
 							in 144..156 -> 144
 							in 157..168 -> 168
-							else -> it
+							else -> value
 						}
 					},
 					maxHeaderSize = 80.dp

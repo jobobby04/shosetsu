@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
 import app.shosetsu.android.ui.css.CSSEditorActivity
@@ -37,7 +36,7 @@ import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-fun NavGraphBuilder.settingsGraph(navController: NavController) {
+fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 	navigation<Settings>(Overview) {
 		composableSub<Overview> {
 			SettingsView(

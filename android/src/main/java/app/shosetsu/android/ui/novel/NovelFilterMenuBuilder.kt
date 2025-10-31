@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -321,14 +320,12 @@ fun NovelFilterMenuFilterCheckboxItem(
 @Preview
 @Composable
 fun PreviewNovelFilterMenuSortContent() {
-	var type by remember { mutableStateOf(SOURCE) }
 	var reversed by remember { mutableStateOf(false) }
 	NovelFilterMenuSortContent(
 		chapterSortType = SOURCE,
 		isReversed = reversed,
 		isLoading = false,
 		update = { newType, newReversed ->
-			type = newType
 			reversed = newReversed
 		}
 	)
@@ -381,14 +378,13 @@ fun NovelFilterMenuSortContent(
 @Composable
 fun PreviewNovelFilterMenuSortItemContent() {
 	var type by remember { mutableStateOf(SOURCE) }
-	var reversed by remember { mutableStateOf(false) }
 	NovelFilterMenuSortItemContent(
 		name = "Test",
 		state = type,
 		expectedState = SOURCE,
 		reversed = false,
 		isPlaceholder = false,
-		setIsSortReversed = { reversed = it },
+		setIsSortReversed = { },
 		setSortType = { type = it }
 	)
 }

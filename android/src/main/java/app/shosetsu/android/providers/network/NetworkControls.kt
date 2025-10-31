@@ -97,7 +97,7 @@ fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepositor
 						) {
 							return PasswordAuthentication(user, pass.toCharArray())
 						}
-						return null;
+						return null
 					}
 				})
 			}

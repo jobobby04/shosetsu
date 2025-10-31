@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.StringSetKey
@@ -172,7 +171,7 @@ fun LibrarySettingsContent(
 						R.string.settings_update_novel_on_metered_title to SettingKey.NovelUpdateOnMeteredConnection,
 						R.string.settings_update_novel_on_low_bat_title to SettingKey.NovelUpdateOnLowBattery,
 						R.string.settings_update_novel_on_low_sto_title to SettingKey.NovelUpdateOnLowStorage,
-					) + if (BuildConfig.VERSION_CODE > Build.VERSION_CODES.M) {
+					) + if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
 						mapOf(R.string.settings_update_novel_only_idle_title to SettingKey.NovelUpdateOnlyWhenIdle)
 					} else {
 						emptyMap()

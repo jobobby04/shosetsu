@@ -1,9 +1,9 @@
 package app.shosetsu.android.ui.novel
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
 import app.shosetsu.android.view.compose.SimpleIconButton
@@ -82,7 +81,7 @@ fun NovelDownloadButton(
 	var showDropDown by remember { mutableStateOf(false) }
 
 	SimpleIconButton(
-		Icons.Outlined.Download,
+		Icons.Default.Download,
 		stringResource(R.string.downloads),
 		onClick = {
 			showDropDown = true

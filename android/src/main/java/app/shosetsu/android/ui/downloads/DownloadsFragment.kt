@@ -262,7 +262,7 @@ fun DownloadsContent(
 								enabled = selectedDownloadState.restartVisible
 							)
 							SimpleIconButton(
-								Icons.Filled.Delete,
+								Icons.Default.Delete,
 								stringResource(R.string.delete),
 								onClick = deleteSelected,
 								enabled = selectedDownloadState.deleteVisible
