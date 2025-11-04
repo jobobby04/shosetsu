@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -38,11 +39,15 @@ import kotlin.time.Duration.Companion.seconds
 val LocalPreferenceHighlighted = compositionLocalOf(structuralEqualityPolicy()) { false }
 val LocalPreferenceMinHeight = compositionLocalOf(structuralEqualityPolicy()) { 56.dp }
 
+/**
+ * @param sideComponent appears to the end of the title.
+ */
 @Composable
 internal fun BasePreferenceWidget(
 	modifier: Modifier = Modifier,
 	title: String? = null,
 	subcomponent: @Composable (ColumnScope.() -> Unit)? = null,
+	sideComponent: @Composable (RowScope.() -> Unit)? = null,
 	icon: @Composable (() -> Unit)? = null,
 	onClick: (() -> Unit)? = null,
 	widget: @Composable (() -> Unit)? = null,
@@ -69,14 +74,18 @@ internal fun BasePreferenceWidget(
 				.padding(vertical = PrefsVerticalPadding),
 		) {
 			if (!title.isNullOrBlank()) {
-				Text(
-					modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
-					text = title,
-					overflow = TextOverflow.Ellipsis,
-					maxLines = 2,
-					style = MaterialTheme.typography.titleLarge,
-					fontSize = TitleFontSize,
-				)
+				Row(verticalAlignment = Alignment.CenterVertically) {
+					Text(
+						modifier = Modifier.padding(horizontal = PrefsHorizontalPadding),
+						text = title,
+						overflow = TextOverflow.Ellipsis,
+						maxLines = 2,
+						style = MaterialTheme.typography.titleLarge,
+						fontSize = TitleFontSize,
+					)
+
+					sideComponent?.invoke(this)
+				}
 			}
 			subcomponent?.invoke(this)
 		}

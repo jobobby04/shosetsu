@@ -141,7 +141,10 @@ fun ConfigureExtensionContent(
 					val choices = extensionListingResult!!.choices
 					ListPreferenceWidget(
 						title = stringResource(R.string.listings),
-						subtitle = stringResource(R.string.fragment_configure_extension_listing_desc, choices[selection]),
+						subtitle = stringResource(
+							R.string.fragment_configure_extension_listing_desc,
+							choices[selection]
+						),
 						icon = null,
 						value = selection,
 						entries = choices.withIndex().associate { it.index to it.value },
