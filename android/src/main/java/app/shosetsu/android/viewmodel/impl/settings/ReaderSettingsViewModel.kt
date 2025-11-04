@@ -411,7 +411,7 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 	}
 	val languages = remember(isInitialized, tts) {
 		if (isInitialized) {
-			tts.availableLanguages.toList().sortedBy { it.displayName }
+			(tts.availableLanguages ?: emptySet()).toList().sortedBy { it.displayName }
 		} else {
 			emptyList()
 		}
@@ -429,7 +429,8 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 	}
 	val actualSelection = remember(engine, selection, languages) {
 		languages.indexOfFirst { it.toLanguageTag() == selection }.takeUnless { it < 0 }
-			?: languages.indexOfFirst { it.toLanguageTag() == Locale.getDefault().toLanguageTag() }.takeUnless { it < 0 }
+			?: languages.indexOfFirst { it.toLanguageTag() == Locale.getDefault().toLanguageTag() }
+				.takeUnless { it < 0 }
 			?: 0
 	}
 	ListPreferenceWidget(
@@ -474,7 +475,7 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 	val voices = remember(isInitialized, language) {
 		if (isInitialized) {
 			val locale = language.ifEmpty { Locale.getDefault().toLanguageTag() }
-			tts.voices.filter { it.locale.toLanguageTag() == locale }.toList()
+			(tts.voices ?: emptySet()).filter { it.locale.toLanguageTag() == locale }.toList()
 		} else {
 			emptyList()
 		}
