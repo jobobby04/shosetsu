@@ -42,10 +42,10 @@ import app.shosetsu.android.view.compose.setting.RestrictionSelectPreferenceWidg
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
 import app.shosetsu.android.view.compose.setting.widget.BasePreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.HighlightPreference
 import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.setting.widget.PrefsHorizontalPadding
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
-import app.shosetsu.android.view.compose.setting.widget.highlightBackground
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
 import kotlinx.coroutines.launch
@@ -178,13 +178,14 @@ fun BackupSettingsContent(
 					.getStringFlow(SettingKey.BackupStorageLocation)
 					.collectAsState("")
 
-				TextPreferenceWidget(
-					title = stringResource(R.string.settings_backup_location),
-					subtitle = subtitle,
-					modifier = Modifier.highlightBackground(highlightBackupFolder)
-				) {
-					performBackupStorageLocationSelection()
-				}
+                HighlightPreference(highlightBackupFolder) {
+                    TextPreferenceWidget(
+                        title = stringResource(R.string.settings_backup_location),
+                        subtitle = subtitle,
+                    ) {
+                        performBackupStorageLocationSelection()
+                    }
+                }
 			}
 
 			item {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -38,6 +39,9 @@ import kotlin.time.Duration.Companion.seconds
 
 val LocalPreferenceHighlighted = compositionLocalOf(structuralEqualityPolicy()) { false }
 val LocalPreferenceMinHeight = compositionLocalOf(structuralEqualityPolicy()) { 56.dp }
+
+@Composable
+fun HighlightPreference(highlighted: Boolean = true, content: @Composable () -> Unit) = CompositionLocalProvider(LocalPreferenceHighlighted provides highlighted, content = content)
 
 /**
  * @param sideComponent appears to the end of the title.
