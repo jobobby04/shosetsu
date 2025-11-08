@@ -45,6 +45,7 @@ import app.shosetsu.android.view.compose.setting.widget.BasePreferenceWidget
 import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.compose.setting.widget.PrefsHorizontalPadding
 import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.highlightBackground
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
 import kotlinx.coroutines.launch
@@ -73,6 +74,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BackupView(
+	highlightBackupFolder: Boolean,
 	onBack: () -> Unit
 ) {
 	val viewModel: ABackupSettingsViewModel = viewModelDi()
@@ -133,6 +135,7 @@ fun BackupView(
 				context.toast(R.string.file_picker_error)
 			}
 		},
+		highlightBackupFolder = highlightBackupFolder,
 		onBack = onBack
 	)
 }
@@ -141,6 +144,7 @@ fun BackupView(
 @Composable
 fun BackupSettingsContent(
 	viewModel: ABackupSettingsViewModel,
+	highlightBackupFolder: Boolean,
 	backupNow: () -> Unit,
 	performFileSelection: () -> Unit,
 	performBackupStorageLocationSelection: () -> Unit,
@@ -173,9 +177,11 @@ fun BackupSettingsContent(
 				val subtitle by viewModel.settingsRepo
 					.getStringFlow(SettingKey.BackupStorageLocation)
 					.collectAsState("")
+
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_backup_location),
 					subtitle = subtitle,
+					modifier = Modifier.highlightBackground(highlightBackupFolder)
 				) {
 					performBackupStorageLocationSelection()
 				}
