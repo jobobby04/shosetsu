@@ -386,6 +386,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 							).build()
 						)
 					}
+					backupRepository.updateProgress(BackupProgress.FAILURE)
 					return Result.failure()
 				}
 
