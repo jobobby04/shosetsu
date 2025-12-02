@@ -13,8 +13,11 @@ import app.shosetsu.android.common.consts.ACTION_OPEN_CATALOGUE
 import app.shosetsu.android.common.consts.ACTION_OPEN_LIBRARY
 import app.shosetsu.android.common.consts.ACTION_OPEN_SEARCH
 import app.shosetsu.android.common.consts.ACTION_OPEN_UPDATES
+import app.shosetsu.android.common.consts.ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logW
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -49,8 +52,17 @@ private fun handleIntentAction(
 			} else intent.logE("View action data null")
 		}
 
+		ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER -> {
+			intent.logI("Navigating to backup settings...")
+			onNavigate(
+				Destination.More.Settings.Backup(true)
+			)
+		}
+
 		Intent.ACTION_MAIN -> {}
-		else -> {}
+		else -> {
+			intent.logW("Cannot handle this intent.")
+		}
 	}
 }
 

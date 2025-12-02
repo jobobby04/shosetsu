@@ -1,11 +1,16 @@
 package app.shosetsu.android.backend.workers.onetime
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
@@ -19,6 +24,7 @@ import androidx.work.Operation
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import app.shosetsu.android.R
+import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
 import app.shosetsu.android.common.FilePermissionException
@@ -29,11 +35,14 @@ import app.shosetsu.android.common.SettingKey.BackupOnlyWhenIdle
 import app.shosetsu.android.common.SettingKey.BackupStorageLocation
 import app.shosetsu.android.common.SettingKey.ShouldBackupChapters
 import app.shosetsu.android.common.SettingKey.ShouldBackupSettings
+import app.shosetsu.android.common.consts.ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_WORK_ID
+import app.shosetsu.android.common.ext.actionBuilder
 import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.getString
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
@@ -105,6 +114,12 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 ), DIAware, NotificationCapable {
 
 	override val di: DI by closestDI(appContext)
+
+	private val openAppToSetBackupDirectory: Intent
+		get() = Intent(applicationContext, MainActivity::class.java).apply {
+			action = ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER
+		}
+
 	private val novelRepository by instance<INovelsRepository>()
 	private val novelPinRepository by instance<INovelPinsRepository>()
 	private val iSettingsRepository by instance<ISettingsRepository>()
@@ -354,7 +369,20 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					logE("Failed to create document")
 					notify(R.string.export_backup_notification_missing_uri) {
 						setNotOngoing()
+						addAction(
+							actionBuilder(
+								Icons.Default.Settings,
+								getString(R.string.worker_backup_set_folder),
+								PendingIntent.getActivity(
+									applicationContext,
+									0,
+									openAppToSetBackupDirectory,
+									if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+								)
+							).build()
+						)
 					}
+					backupRepository.updateProgress(BackupProgress.FAILURE)
 					return Result.failure()
 				}
 

@@ -283,8 +283,6 @@
     <string name="text_alignment_end">End</string>
 
 
-    <string name="settings_reader_title_string_to_html">Convert string to html</string>
-    <string name="settings_reader_desc_string_to_html">All string based extensions are rendered as html</string>
     <string name="settings_reader_title_horizontal_option">Horizontal paging</string>
     <string name="settings_reader_desc_horizontal_option">Swipe left and right to move between chapters</string>
     <string name="settings_reader_title_html_css">Html CSS</string>
@@ -484,7 +482,7 @@
     <string name="backup_restore_print_chapters_title">Print chapter names during restore</string>
     <string name="backup_restore_print_chapters_desc">Print chapter names to log during restore.\nUseful for debugging, not useful otherwise.\nMust be set before restoring</string>
     <string name="restore_notification_content_novel_fail_io">IOException: %s</string>
-    <string name="export_backup_notification_missing_uri">URI not provided to export backup to</string>
+    <string name="export_backup_notification_missing_uri">Backup folder not set</string>
     <string name="settings_advanced_log_title">Log to file</string>
     <string name="settings_advanced_log_desc">Enabling logs to a file, but may cause slow downs.\nRequires a restart</string>
     <string name="update_to">Update: %s</string>
@@ -720,5 +718,7 @@
     <string name="restore_notification_content_extension_not_found">Extension referenced in the backup was not found:</string>
     <string name="android_verification_warning_desc">Google has announced that, starting in 2026/2027, all apps on certified Android devices will require the developer to submit personal identity details directly to Google.\nSince the developers of this app do not agree to this requirement, there is no guarantee that this App will be accessible..</string>
     <string name="android_verification_warning_title">Android Verification Warning</string>
+    <string name="fragment_catalogue_listing_selection_title">Selected Listing:</string>
+    <string name="worker_backup_set_folder">Set Folder</string>
 
 </resources>

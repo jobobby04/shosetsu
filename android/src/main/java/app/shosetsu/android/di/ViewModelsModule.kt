@@ -132,7 +132,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			loadNovelUIColumnsPUseCase = instance(),
 			setNovelUIType = instance(),
 			getCategoriesUseCase = instance(),
-			setNovelCategoriesUseCase = instance()
+			setNovelCategoriesUseCase = instance(),
 		)
 	}
 

@@ -37,6 +37,7 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -67,6 +68,7 @@ fun HTMLPage(
 	onClick: (String?) -> Unit,
 	onDoubleClick: () -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
+	getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
 	openUri: (String) -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
@@ -149,8 +151,9 @@ fun HTMLPage(
 				openURI = {
 					uriToOpen = it
 				},
-				scope,
-				ttsProgress.item
+				scope = scope,
+				ttsState = ttsProgress.item,
+				getChapterHTMLStyle = getChapterHTMLStyle,
 			),
 			chromeClient = ShosetsuAccompanistWebChromeClient(),
 			navigator = navigator,

@@ -59,6 +59,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
@@ -92,8 +93,11 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.lua.MutableLuaListingItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.emptyFlow
 
 /*
  * This file is part of Shosetsu.
@@ -353,8 +357,47 @@ fun ListingsContent(
 	}
 }
 
+@Preview
+@Composable
+fun PreviewCatalogContent() {
+	var listingSelectionData: StableHolder<IExtension.Listing> by
+	remember {
+		mutableStateOf(
+            StableHolder(MutableLuaListingItem())
+		)
+	}
+
+
+	CatalogContent(
+		"Meow",
+		"",
+		{},
+		emptyFlow<PagingData<ACatalogNovelUI>>().collectAsLazyPagingItems(),
+		NORMAL,
+		{},
+		2,
+		4,
+		{},
+		{},
+		true,
+		{},
+		{},
+		{},
+		{},
+		false,
+		remember { SnackbarHostState() },
+		listingSelectionData,
+        listOf<IExtension.Listing>().toImmutableList(),
+		{
+			listingSelectionData = StableHolder(it)
+		}
+	)
+}
+
 /**
  * Content of [CatalogueView]
+ * @param listingSelectionData Data of what listing the user selected
+ * @param setListing Function to update the listing
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -745,7 +788,7 @@ fun LazyListScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
 @Preview
 @Composable
 fun PreviewCatalogContentNoMore() = ShosetsuTheme(AppThemes.LIGHT) {
-    CatalogContentNoMore()
+	CatalogContentNoMore()
 }
 
 /**

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
@@ -61,8 +61,8 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		isFirstFocusProvider = { false },
 		onFirstFocus = {},
 		isFocused = false,
-		content = {
-			ChapterReaderPagerContent(
+		content = { windowPadding, footerPadding ->
+			ChapterReaderPager(
 				items = persistentListOf(),
 				isHorizontal = false,
 				onStopTTS = {},
@@ -71,7 +71,6 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				currentPage = 0,
 				onPageChanged = {},
 				isSwipeInverted = false,
-				paddingValues = PaddingValues(),
 				pageJumper = StableHolder(MutableSharedFlow()),
 				createPage = {
 				}
@@ -109,7 +108,7 @@ fun ChapterReaderContent(
 	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
-	content: @Composable (PaddingValues) -> Unit,
+	content: @Composable (windowPadding: PaddingValues, footerPadding: PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
 	exception: String?
 ) {
@@ -124,16 +123,15 @@ fun ChapterReaderContent(
 		}
 	}
 
+	val insets = WindowInsets.safeDrawing.asPaddingValues()
 	BottomSheetScaffold(
 		scaffoldState = scaffoldState,
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocused) WindowInsets.safeContent.asPaddingValues().calculateBottomPadding().plus(
-			BottomSheetDefaults.SheetPeekHeight
-		) else 0.dp,
+		sheetPeekHeight = if (isFocused) 0.dp else insets.calculateBottomPadding() + BottomSheetDefaults.SheetPeekHeight,
 		content = { paddingValues ->
-			content(paddingValues)
+			content(WindowInsets.safeDrawing.asPaddingValues(), paddingValues)
 		},
 		sheetShape = RectangleShape,
 		sheetDragHandle = null,
@@ -157,5 +155,4 @@ fun ChapterReaderContent(
 			}
 		}
 	}
-
 }

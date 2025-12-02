@@ -34,7 +34,6 @@ import app.shosetsu.android.common.SettingKey.ReaderParagraphSpacing
 import app.shosetsu.android.common.SettingKey.ReaderPitch
 import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
 import app.shosetsu.android.common.SettingKey.ReaderSpeed
-import app.shosetsu.android.common.SettingKey.ReaderStringToHtml
 import app.shosetsu.android.common.SettingKey.ReaderTableHack
 import app.shosetsu.android.common.SettingKey.ReaderTextSize
 import app.shosetsu.android.common.SettingKey.ReaderTheme
@@ -90,18 +89,6 @@ class ReaderSettingsViewModel(
 			a.map { if (it.id == b.toLong()) it.copy(isSelected = true) else it }
 		}.onIO()
 
-}
-
-@SuppressLint("ComposableNaming")
-@Composable
-fun ExposedSettingsRepoViewModel.stringAsHtmlOption() {
-	SwitchSettingContent(
-		stringResource(R.string.settings_reader_title_string_to_html),
-		stringResource(R.string.settings_reader_desc_string_to_html),
-		settingsRepo,
-		ReaderStringToHtml, modifier = Modifier
-			.fillMaxWidth()
-	)
 }
 
 @SuppressLint("ComposableNaming")
@@ -424,7 +411,7 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 	}
 	val languages = remember(isInitialized, tts) {
 		if (isInitialized) {
-			tts.availableLanguages.toList().sortedBy { it.displayName }
+			(tts.availableLanguages ?: emptySet()).toList().sortedBy { it.displayName }
 		} else {
 			emptyList()
 		}
@@ -489,7 +476,7 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 	val voices = remember(isInitialized, language) {
 		if (isInitialized) {
 			val locale = language.ifEmpty { Locale.getDefault().toLanguageTag() }
-			tts.voices.filter { it.locale.toLanguageTag() == locale }.toList()
+			(tts.voices ?: emptySet()).filter { it.locale.toLanguageTag() == locale }.toList()
 		} else {
 			emptyList()
 		}

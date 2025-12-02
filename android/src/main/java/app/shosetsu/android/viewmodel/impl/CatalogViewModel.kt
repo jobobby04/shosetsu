@@ -86,7 +86,7 @@ class CatalogViewModel(
 	private val loadNovelUIColumnsPUseCase: LoadNovelUIColumnsPUseCase,
 	private val setNovelUIType: SetNovelUITypeUseCase,
 	private val getCategoriesUseCase: GetCategoriesUseCase,
-	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
+	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -241,6 +241,27 @@ class CatalogViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, "")
 	}
 
+//	/**
+//	 * Listing selection data for the UI to render.
+//	 */
+//	override val listingSelectionData: StateFlow<ListingSelectionData?> by lazy {
+//		extensionIDFlow.flatMapLatest { extensionID ->
+//			val listingNames = getExtListNames(extensionID).toImmutableList()
+//			getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
+//				ListingSelectionData(listingNames, selectedListing)
+//			}
+//				// Do not display the listing selection data if a query is being executed.
+//				.combine(queryFlow) { listingSelectionData, query ->
+//					if (query.isEmpty()) {
+//						listingSelectionData
+//					} else {
+//						null
+//					}
+//				}
+//		}.onIO()
+//			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+//	}
+
 	override val baseURL: StateFlow<String?> =
 		iExtensionFlow.map { it?.baseURL }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
@@ -271,7 +292,7 @@ class CatalogViewModel(
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = ""
-			applyFilters()
+            _applyFilter()
 		}
 	}
 
@@ -299,13 +320,14 @@ class CatalogViewModel(
 				backgroundAddState.emit(BackgroundNovelAddProgress.Failure(e))
 				return@launchIO
 			}
-			backgroundAddState.emit(BackgroundNovelAddProgress.Added(
-				item.title.let {
-					if (it.length > 20)
-						it.substring(0, 20) + "..."
-					else it
-				}
-			))
+			backgroundAddState.emit(
+				BackgroundNovelAddProgress.Added(
+					item.title.let {
+						if (it.length > 20)
+							it.substring(0, 20) + "..."
+						else it
+					}
+				))
 			delay(100)
 			backgroundAddState.emit(BackgroundNovelAddProgress.Unknown)
 		}
@@ -315,21 +337,25 @@ class CatalogViewModel(
 		MutableStateFlow<BackgroundNovelAddProgress>(BackgroundNovelAddProgress.Unknown)
 
 	private val filterMutex = Mutex()
+
+    /**
+     * Locks the filter data flow mutex and sets the new value.
+     */
+    private fun _applyFilter() {
+        if (filterMutex.tryLock()) {
+            try {
+                filterDataFlow.value.clear()
+                filterDataFlow.value.putAll(filterDataState.value.mapValues { it.value.value })
+            } finally {
+                filterMutex.unlock()
+            }
+        }
+    }
+
 	override fun applyFilter() {
 		launchIO {
-			applyFilters()
+            _applyFilter()
 			filtersApplied.update { it.copy(it.id + 1, true) }
-		}
-	}
-
-	private fun applyFilters() {
-		if (filterMutex.tryLock()) {
-			try {
-				filterDataFlow.value.clear()
-				filterDataFlow.value.putAll(filterDataState.value.mapValues { it.value.value })
-			} finally {
-				filterMutex.unlock()
-			}
 		}
 	}
 
@@ -375,7 +401,7 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-			applyFilters()
+            _applyFilter()
 			filtersApplied.update { it.copy(value = false) }
 		}
 	}

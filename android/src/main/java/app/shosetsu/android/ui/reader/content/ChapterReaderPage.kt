@@ -2,22 +2,25 @@ package app.shosetsu.android.ui.reader.content
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import app.shosetsu.android.R
-import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.ui.reader.page.StringPageContent
+import app.shosetsu.android.ui.reader.page.HTMLPage
+import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import kotlinx.coroutines.flow.Flow
@@ -47,49 +50,56 @@ import kotlinx.coroutines.flow.StateFlow
  * @author Doomsdayrs
  */
 /**
- * Creates the string page
+ * Creates the HTML page
  */
 @Suppress("FunctionName")
 @Composable
-fun ChapterReaderStringContent(
+fun ChapterReaderPage(
+	windowPadding: PaddingValues,
+	footerPadding: PaddingValues,
 	item: ReaderUIItem.ReaderChapterUI,
-
-	getStringContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,
-	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	progressFlow: () -> Flow<Double>,
-	textSizeFlow: () -> Flow<Float>,
-	textColorFlow: () -> Flow<Int>,
-	backgroundColorFlow: () -> Flow<Int>,
-	disableTextSelFlow: () -> StateFlow<Boolean>,
+	getHTMLContent: (item: ReaderUIItem.ReaderChapterUI) -> Flow<ChapterPassage>,
+	getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
+	retryChapter: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	onScroll: (item: ReaderUIItem.ReaderChapterUI, perc: Double) -> Unit,
-	onClick: () -> Unit,
-	onDoubleClick: () -> Unit
+	onClick: (String?) -> Unit,
+	onDoubleClick: () -> Unit,
+	ttsProgress: StableHolder<StateFlow<String?>>,
+	openUri: (String) -> Unit
 ) {
-	val content by remember(item) {
-		getStringContent(item)
+	val html by remember(windowPadding, item) {
+		getHTMLContent(item)
 	}.collectAsState(ChapterPassage.Loading)
 
-	when (content) {
+	when (html) {
 		is ChapterPassage.Error -> {
-			val throwable = (content as? ChapterPassage.Error)?.throwable
-			ErrorContent(
-				throwable?.message
-					?: "Unknown error",
-				ErrorAction(R.string.retry) {
-					retryChapter(item)
-				},
-				stackTrace = throwable?.stackTraceToString()
-			)
-		}
-		is ChapterPassage.Loading -> {
-			val backgroundColor by backgroundColorFlow().collectAsState(
-				Color.Gray.toArgb()
-			)
-
+			val throwable = (html as? ChapterPassage.Error)?.throwable
 			Box(
 				Modifier
-					.background(Color(backgroundColor))
+					.padding(windowPadding)
+					.consumeWindowInsets(windowPadding)
 					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
+			) {
+				ErrorContent(
+					throwable?.message
+						?: "Unknown error",
+					ErrorAction(R.string.retry) {
+						retryChapter(item)
+					},
+					stackTrace = throwable?.stackTraceToString()
+				)
+			}
+		}
+
+		ChapterPassage.Loading -> {
+			Box(
+				Modifier
+					.padding(windowPadding)
+					.consumeWindowInsets(windowPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
 			) {
 				LinearProgressIndicator(
 					modifier = Modifier
@@ -98,31 +108,29 @@ fun ChapterReaderStringContent(
 				)
 			}
 		}
+
 		is ChapterPassage.Success -> {
-			val textSize by remember { textSizeFlow() }.collectAsState(SettingKey.ReaderTextSize.default)
-			val textColor by remember { textColorFlow() }.collectAsState(Color.White.toArgb())
 			val progress by remember { progressFlow() }.collectAsState(0.0)
-			val backgroundColor by remember { backgroundColorFlow() }.collectAsState(
-				Color.Gray.toArgb()
-			)
-			val disableTextSel by remember { disableTextSelFlow() }.collectAsState()
 
-
-			StringPageContent(
-				(content as? ChapterPassage.Success)?.content ?: "",
-				progress,
-				textSize = textSize,
-				onScroll = {
-					onScroll(item, it)
-				},
-				textColor = textColor,
-				backgroundColor = backgroundColor,
-				disableTextSelection = disableTextSel,
-				onClick = onClick,
-				onDoubleClick = onDoubleClick
-				//	isTapToScroll=isTapToScroll
-			)
+			Box(
+				Modifier
+					.padding(footerPadding)
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
+			) {
+				HTMLPage(
+					html = (html as ChapterPassage.Success).content,
+					progress = progress,
+					onScroll = {
+						onScroll(item, it)
+					},
+					onClick = onClick,
+					onDoubleClick = onDoubleClick,
+					ttsProgress = ttsProgress,
+					getChapterHTMLStyle = getChapterHTMLStyle,
+                    openUri = openUri,
+				)
+			}
 		}
-
 	}
 }
