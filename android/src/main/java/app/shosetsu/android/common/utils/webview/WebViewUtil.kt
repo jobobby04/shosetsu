@@ -63,8 +63,10 @@ object WebViewUtil {
      *   Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.3
      */
     fun getInferredUserAgent(context: Context): String {
-        return WebView(context)
-            .getDefaultUserAgentString()
+        val webView = WebView(context)
+        val webViewUserAgent = webView.getDefaultUserAgentString()
+        webView.destroy()
+        return webViewUserAgent
             .replace("; Android .*?\\)".toRegex(), "; Android 10; K)")
             .replace("Version/.* Chrome/".toRegex(), "Chrome/")
     }
