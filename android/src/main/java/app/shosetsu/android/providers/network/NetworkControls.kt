@@ -8,6 +8,7 @@ import app.shosetsu.android.common.utils.CloudflareInterceptor
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
 import app.shosetsu.lib.ShosetsuSharedLib
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -44,7 +45,11 @@ import java.util.logging.Logger
  * 04 / 05 / 2020
  */
 
-fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepository): OkHttpClient {
+fun createOkHttpClient(
+    context: Context,
+    iSettingsRepository: ISettingsRepository,
+    getUserAgentUseCase: GetUserAgentUseCase,
+): OkHttpClient {
 
 	val useProxy = runBlocking {
 		iSettingsRepository.getBoolean(SettingKey.UseProxy)
@@ -58,7 +63,7 @@ fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepositor
 				context = context,
 				cookieManager = CookieJarSync,
 				defaultUserAgentProvider = {
-					runBlocking { iSettingsRepository.getString(SettingKey.UserAgent) }
+					runBlocking { getUserAgentUseCase() }
 				},
 			)
 		)
