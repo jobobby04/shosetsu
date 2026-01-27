@@ -712,5 +712,13 @@
     <string name="android_verification_warning_title">Android Verification Warning</string>
     <string name="fragment_catalogue_listing_selection_title">Selected Listing:</string>
     <string name="worker_backup_set_folder">Set Folder</string>
+    <string name="migrate_backup_subtitle">Migrating out of internal directory.</string>
+    <string name="settings_backup_dialog_migration_title">Migrate backups</string>
+    <string name="settings_backup_dialog_migration_desc">This is a mandatory action!\\nBackups must be migrated out of Shosetsu to your selected directory.\\nConfirm to start the migration.</string>
+    <string name="notification_starting_with_trailer">Starting…</string>
+    <string name="notification_migration_migrating">Migrating: %s…</string>
+    <string name="notification_migration_failure">Failed to migrate (%s): %s</string>
+    <string name="settings_backup_start_migration_title">Migrate Backups</string>
+    <string name="settings_backup_start_migration_desc">A manual override to migrate backups out of Shosetsu.</string>
 
 </resources>

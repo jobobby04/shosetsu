@@ -66,6 +66,7 @@ import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadRequireDoubleBackUseCase
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.start.StartAppUpdateInstallWorkerUseCase
+import app.shosetsu.android.domain.usecases.start.StartBackupMigrationWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartDownloadWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
@@ -130,7 +131,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 
 	bind<RequestInstallExtensionUseCase>() with provider {
 		RequestInstallExtensionUseCase(
-            instance(),
+			instance(),
 			instance()
 		)
 	}
@@ -261,6 +262,10 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 
 	bind<StartBackupWorkerUseCase>() with provider {
 		StartBackupWorkerUseCase(instance(), instance())
+	}
+
+	bind<StartBackupMigrationWorkerUseCase>() with provider {
+		StartBackupMigrationWorkerUseCase(instance(), instance(), instance())
 	}
 
 	bind<StartRestoreWorkerUseCase>() with provider {

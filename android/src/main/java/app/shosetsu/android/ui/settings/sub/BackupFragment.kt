@@ -5,8 +5,11 @@ import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,19 +24,21 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
@@ -78,6 +83,7 @@ fun BackupView(
 	onBack: () -> Unit
 ) {
 	val viewModel: ABackupSettingsViewModel = viewModelDi()
+	val promptMigration by viewModel.promptMigration.collectAsState()
 
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
@@ -114,9 +120,7 @@ fun BackupView(
 				return@rememberLauncherForActivityResult
 			}
 
-			launchIO {
-				viewModel.setBackupStorageLocation(context, uri)
-			}
+			viewModel.setBackupStorageLocation(uri)
 		}
 	}
 
@@ -138,6 +142,35 @@ fun BackupView(
 		highlightBackupFolder = highlightBackupFolder,
 		onBack = onBack
 	)
+
+	// If we need to show a dialog, show it.
+	if (promptMigration) {
+		BackupMigrationDialog(viewModel)
+	}
+}
+
+/**
+ * Migration dialog to get the user to migrate their backups.
+ */
+@Composable
+fun BackupMigrationDialog(viewModel: ABackupSettingsViewModel) {
+	Dialog({}) {
+		Column {
+			Text(stringResource(R.string.settings_backup_dialog_migration_title))
+
+			Text(stringResource(R.string.settings_backup_dialog_migration_desc))
+
+			Row(horizontalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.End)) {
+				TextButton(viewModel::dismissMigration) {
+					Text("Dismiss")
+				}
+
+				TextButton(viewModel::startMigration) {
+					Text("Start")
+				}
+			}
+		}
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -178,14 +211,14 @@ fun BackupSettingsContent(
 					.getStringFlow(SettingKey.BackupStorageLocation)
 					.collectAsState("")
 
-                HighlightPreference(highlightBackupFolder) {
-                    TextPreferenceWidget(
-                        title = stringResource(R.string.settings_backup_location),
-                        subtitle = subtitle,
-                    ) {
-                        performBackupStorageLocationSelection()
-                    }
-                }
+				HighlightPreference(highlightBackupFolder) {
+					TextPreferenceWidget(
+						title = stringResource(R.string.settings_backup_location),
+						subtitle = subtitle,
+					) {
+						performBackupStorageLocationSelection()
+					}
+				}
 			}
 
 			item {
@@ -299,6 +332,14 @@ fun BackupSettingsContent(
 					else
 						emptyMap(),
 					repo = viewModel.settingsRepo,
+				)
+			}
+
+			item {
+				TextPreferenceWidget(
+					title = stringResource(R.string.settings_backup_start_migration_title),
+					subtitle = stringResource(R.string.settings_backup_start_migration_desc),
+					onPreferenceClick = viewModel::startMigration
 				)
 			}
 		}
