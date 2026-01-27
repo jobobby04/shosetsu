@@ -1,5 +1,9 @@
 package app.shosetsu.android.domain.usecases.get
 
+import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.android.common.MissingExtensionException
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
+
 /*
  * This file is part of Shosetsu.
  *
@@ -26,6 +30,11 @@ class GetExtListingNamesUseCase(
 	private val getExt: GetExtensionUseCase
 ) {
 
+	@Throws(
+		IncompatibleExtensionException::class,
+		InvalidMetaDataException::class,
+		MissingExtensionException::class
+	)
 	suspend operator fun invoke(extensionId: Int): List<String> {
 		if (extensionId == -1)
 			return emptyList()

@@ -19,6 +19,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
@@ -27,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -107,8 +110,20 @@ fun ConfigureExtensionContent(
 	val extensionUIResult by viewModel.liveData.collectAsState()
 	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
+	val errors by viewModel.errors.collectAsState(null)
+
+	// for snackbars
+	val hostState = remember { SnackbarHostState() }
+
+	// If there is an error, display it as a snackbar
+	LaunchedEffect(errors) {
+		if (errors != null) {
+			hostState.showSnackbar(errors?.message ?: "Unknown Error")
+		}
+	}
 
 	Scaffold(
+		snackbarHost = { SnackbarHost(hostState) },
 		topBar = {
 			TopAppBar(
 				title = {
