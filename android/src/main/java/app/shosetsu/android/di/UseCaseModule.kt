@@ -107,7 +107,7 @@ import org.kodein.di.provider
  * 01 / 05 / 2020
  */
 val useCaseModule: DI.Module = DI.Module("useCase") {
-	bind<GetUserAgentUseCase>() with provider { GetUserAgentUseCase(instance(), instance()) }
+	bind<GetUserAgentUseCase>() with provider { GetUserAgentUseCase(instance()) }
 	bind<LoadDownloadsUseCase>() with provider { LoadDownloadsUseCase(instance()) }
 
 	bind<LoadLibraryUseCase>() with provider { LoadLibraryUseCase(instance(), instance()) }
