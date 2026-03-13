@@ -1,6 +1,12 @@
 package app.shosetsu.android.di
 
-import app.shosetsu.android.backend.workers.onetime.*
+import app.shosetsu.android.backend.workers.onetime.BackupWorker
+import app.shosetsu.android.backend.workers.onetime.DownloadWorker
+import app.shosetsu.android.backend.workers.onetime.ExtensionInstallWorker
+import app.shosetsu.android.backend.workers.onetime.MigrateBackupWorker
+import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
+import app.shosetsu.android.backend.workers.onetime.RepositoryUpdateWorker
+import app.shosetsu.android.backend.workers.onetime.RestoreBackupWorker
 import app.shosetsu.android.backend.workers.perodic.BackupCycleWorker
 import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import org.kodein.di.DI
@@ -38,6 +44,7 @@ internal val othersModule = DI.Module("others") {
 	bind<NovelUpdateWorker.Manager>() with singleton { NovelUpdateWorker.Manager(instance()) }
 	bind<BackupWorker.Manager>() with singleton { BackupWorker.Manager(instance()) }
 	bind<RestoreBackupWorker.Manager>() with singleton { RestoreBackupWorker.Manager(instance()) }
+	bind<MigrateBackupWorker.Manager>() with singleton { MigrateBackupWorker.Manager(instance()) }
 	bind<RepositoryUpdateWorker.Manager>() with singleton { RepositoryUpdateWorker.Manager(instance()) }
 	bind<ExtensionInstallWorker.Manager>() with singleton { ExtensionInstallWorker.Manager(instance()) }
 

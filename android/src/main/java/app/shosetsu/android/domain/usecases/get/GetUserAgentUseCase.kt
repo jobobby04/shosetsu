@@ -1,14 +1,10 @@
 package app.shosetsu.android.domain.usecases.get
 
-import android.content.Context
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.consts.SHOSETSU_USER_AGENT
-import app.shosetsu.android.common.utils.webview.WebViewUtil
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 
 /*
@@ -36,13 +32,12 @@ import kotlinx.coroutines.flow.transform
  */
 class GetUserAgentUseCase(
     private val settingsRepo: ISettingsRepository,
-    private val context: Context,
 ) {
 	suspend operator fun invoke(): String =
 		if (settingsRepo.getBoolean(SettingKey.UseShosetsuAgent)) {
 			SHOSETSU_USER_AGENT
 		} else {
-			settingsRepo.getString(SettingKey.UserAgent).let(::map)
+			settingsRepo.getString(SettingKey.UserAgent)
 		}
 
 	fun flow(): Flow<String> =
@@ -50,10 +45,7 @@ class GetUserAgentUseCase(
 			if (useShosetsu) {
 				emit(SHOSETSU_USER_AGENT)
 			} else {
-				emitAll(settingsRepo.getStringFlow(SettingKey.UserAgent).map(::map))
+				emitAll(settingsRepo.getStringFlow(SettingKey.UserAgent))
 			}
 		}
-
-    private val inferredAgent by lazy { WebViewUtil.getInferredUserAgent(context) }
-    private fun map(ua: String) = if (ua == DEFAULT_USER_AGENT) inferredAgent else ua
 }

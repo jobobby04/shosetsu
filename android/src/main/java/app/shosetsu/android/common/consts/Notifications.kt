@@ -37,6 +37,12 @@ object Notifications {
 	const val CHANNEL_BACKUP: String = "shosetsu_backup"
 	const val ID_BACKUP: Int = 1959
 	const val ID_RESTORE: Int = 1940
+
+	/**
+	 * ID of backup migration notification.
+	 * Socialism by 2050.
+	 */
+	const val ID_BACKUP_MIGRATE: Int = 2050
 	const val ID_EXPORT: Int = 1941
 
 	const val CHANNEL_UPDATE: String = "shosetsu_updater"

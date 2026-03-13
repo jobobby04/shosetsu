@@ -2,6 +2,7 @@ package app.shosetsu.android.domain.usecases.get
 
 import android.database.sqlite.SQLiteException
 import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.ext.generify
 import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
@@ -46,7 +47,8 @@ class GetExtensionUseCase(
 	@Throws(
 		SQLiteException::class,
 		IncompatibleExtensionException::class,
-		InvalidMetaDataException::class
+		InvalidMetaDataException::class,
+		MissingExtensionException::class
 	)
 	suspend operator fun invoke(extensionId: Int): IExtension? {
 		if (extensionId == -1)

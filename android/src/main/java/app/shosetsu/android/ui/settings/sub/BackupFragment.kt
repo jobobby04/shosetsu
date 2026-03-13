@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.Scaffold
@@ -33,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
@@ -78,6 +79,7 @@ fun BackupView(
 	onBack: () -> Unit
 ) {
 	val viewModel: ABackupSettingsViewModel = viewModelDi()
+	val promptMigration by viewModel.promptMigration.collectAsState()
 
 	val context = LocalContext.current
 	val scope = rememberCoroutineScope()
@@ -114,9 +116,7 @@ fun BackupView(
 				return@rememberLauncherForActivityResult
 			}
 
-			launchIO {
-				viewModel.setBackupStorageLocation(context, uri)
-			}
+			viewModel.setBackupStorageLocation(uri)
 		}
 	}
 
@@ -137,6 +137,37 @@ fun BackupView(
 		},
 		highlightBackupFolder = highlightBackupFolder,
 		onBack = onBack
+	)
+
+	// If we need to show a dialog, show it.
+	if (promptMigration) {
+		BackupMigrationDialog(viewModel)
+	}
+}
+
+/**
+ * Migration dialog to get the user to migrate their backups.
+ */
+@Composable
+fun BackupMigrationDialog(viewModel: ABackupSettingsViewModel) {
+	AlertDialog(
+		onDismissRequest = {},
+		title = {
+			Text(stringResource(R.string.settings_backup_dialog_migration_title))
+		},
+		text = {
+			Text(stringResource(R.string.settings_backup_dialog_migration_desc))
+		},
+		dismissButton = {
+			Button(onClick = viewModel::dismissMigration) {
+				Text(stringResource(R.string.settings_backup_migration_dismiss))
+			}
+		},
+		confirmButton = {
+			Button(onClick = viewModel::startMigration) {
+				Text(stringResource(R.string.settings_backup_migration_start))
+			}
+		},
 	)
 }
 
@@ -178,14 +209,14 @@ fun BackupSettingsContent(
 					.getStringFlow(SettingKey.BackupStorageLocation)
 					.collectAsState("")
 
-                HighlightPreference(highlightBackupFolder) {
-                    TextPreferenceWidget(
-                        title = stringResource(R.string.settings_backup_location),
-                        subtitle = subtitle,
-                    ) {
-                        performBackupStorageLocationSelection()
-                    }
-                }
+				HighlightPreference(highlightBackupFolder) {
+					TextPreferenceWidget(
+						title = stringResource(R.string.settings_backup_location),
+						subtitle = subtitle,
+					) {
+						performBackupStorageLocationSelection()
+					}
+				}
 			}
 
 			item {
@@ -299,6 +330,14 @@ fun BackupSettingsContent(
 					else
 						emptyMap(),
 					repo = viewModel.settingsRepo,
+				)
+			}
+
+			item {
+				TextPreferenceWidget(
+					title = stringResource(R.string.settings_backup_start_migration_title),
+					subtitle = stringResource(R.string.settings_backup_start_migration_desc),
+					onPreferenceClick = viewModel::startMigration
 				)
 			}
 		}

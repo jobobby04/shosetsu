@@ -25,7 +25,6 @@ import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -33,12 +32,12 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlin.getValue
 
@@ -74,6 +73,8 @@ class ExtensionConfigureViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
+	override val errors: MutableSharedFlow<Throwable> = MutableSharedFlow()
+
 	override fun setExtensionID(id: Int) {
 		logV("Setting extension id = $id")
 		launchIO {
@@ -82,10 +83,12 @@ class ExtensionConfigureViewModel(
 					this@ExtensionConfigureViewModel.logI("id is the same, ignoring")
 					return@launchIO
 				}
+
 				extensionIdFlow.value != id -> {
 					this@ExtensionConfigureViewModel.logI("id is different, resetting")
 					destroy()
 				}
+
 				extensionIdFlow.value == -1 -> {
 					this@ExtensionConfigureViewModel.logI("id is new, setting")
 				}
