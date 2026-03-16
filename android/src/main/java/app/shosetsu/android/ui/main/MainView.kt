@@ -88,13 +88,7 @@ fun MainView() {
 		onUpdate = viewModel::update
 	)
 
-	ShosetsuTheme(
-		darkTheme = when (theme) {
-			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
-			AppThemes.LIGHT -> false
-			AppThemes.DARK -> true
-		}
-	) {
+	ShosetsuTheme(theme) {
 
 		NavHost(
 			navController.root,

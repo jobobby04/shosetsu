@@ -31,5 +31,5 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class WebViewViewModel : ShosetsuRootViewModel() {
 	abstract val userAgent: StateFlow<String>
-	abstract val appTheme: StateFlow<AppThemes>
+	abstract override val appTheme: StateFlow<AppThemes>
 }

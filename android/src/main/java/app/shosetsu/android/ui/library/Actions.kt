@@ -337,21 +337,20 @@ fun ViewTypeButton(
 			onSetType
 		)
 
+		ViewTypeItem(
+			stringResource(R.string.cozy),
+			NovelCardType.COZY,
+			selectedType,
+			onSetType
+		)
+
+		if (showExtended) {
 			ViewTypeItem(
-				stringResource(R.string.cozy),
-				NovelCardType.COZY,
+				stringResource(R.string.extended),
+				NovelCardType.EXTENDED,
 				selectedType,
 				onSetType
 			)
-
-			if (showExtended) {
-				ViewTypeItem(
-					stringResource(R.string.extended),
-					NovelCardType.EXTENDED,
-					selectedType,
-					onSetType
-				)
-			}
 		}
 	}
 }

@@ -1,8 +1,6 @@
 package app.shosetsu.android.ui.css
 
 import androidx.activity.compose.LocalActivity
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,7 +11,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalClipboard
 import app.shosetsu.android.common.consts.URL_HELP_CSS
-import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
@@ -45,13 +42,7 @@ fun CSSEditorView(
 
 	val theme by viewModel.appTheme.collectAsState()
 
-	ShosetsuTheme(
-		darkTheme = when (theme) {
-			AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
-			AppThemes.LIGHT -> false
-			AppThemes.DARK -> true
-		}
-	) {
+	ShosetsuTheme(theme) {
 		val clipboard = LocalClipboard.current
 		val scope = rememberCoroutineScope()
 		var hasPaste by remember { mutableStateOf(false) }

@@ -1,7 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import app.shosetsu.android.domain.model.local.FilterEntity
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel

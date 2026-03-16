@@ -97,7 +97,6 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.lib.IExtension
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.emptyFlow
 import org.acra.ACRA
 
@@ -163,7 +162,6 @@ fun CatalogueView(
 
 	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
-	val listingSelectionData by viewModel.listingSelectionData.collectAsState()
 
 	val context = LocalContext.current
 	val hostState = remember { SnackbarHostState() }
@@ -319,15 +317,6 @@ fun CatalogueView(
 @Preview
 @Composable
 fun PreviewCatalogContent() {
-	var listingSelectionData by
-	remember {
-		mutableStateOf(
-			ListingSelectionData(
-				listOf("A", "B", "C").toImmutableList(),
-				0
-			)
-		)
-	}
 
 	CatalogContent(
 		"Meow",
@@ -347,10 +336,9 @@ fun PreviewCatalogContent() {
 		{},
 		false,
 		remember { SnackbarHostState() },
-//		listingSelectionData,
-//		{
-//			listingSelectionData = listingSelectionData.copy(selection = it)
-//		}
+		null,
+		persistentListOf(),
+		{}
 	)
 }
 
@@ -586,8 +574,6 @@ fun CatalogGrid(
 	cardType: NovelCardType,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit
 ) {
 	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
 	val w = LocalConfiguration.current.screenWidthDp
@@ -603,7 +589,6 @@ fun CatalogGrid(
 		LazyColumn(
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			catalogListingSelection(listingSelectionData, setListing)
 
 			itemsIndexed(
 				items,
@@ -643,7 +628,6 @@ fun CatalogGrid(
 			horizontalArrangement = Arrangement.spacedBy(4.dp),
 			verticalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			catalogListingSelection(listingSelectionData, setListing)
 
 			itemsIndexed(
 				items,
@@ -658,54 +642,6 @@ fun CatalogGrid(
 			}
 			appendBar(items)
 			noMoreBar(items)
-		}
-	}
-}
-
-
-/**
- * Selection so the user can quickly change the listing in UI.
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
- */
-fun LazyGridScope.catalogListingSelection(
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit
-) {
-	item(span = { GridItemSpan(maxLineSpan) }) {
-		AnimatedVisibility(listingSelectionData?.choices?.isNotEmpty() ?: false) {
-			if (listingSelectionData != null)
-				ListPreferenceWidget(
-					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-					subtitle = listingSelectionData.choices[listingSelectionData.selection],
-					icon = null,
-					value = listingSelectionData.selection,
-					entries = listingSelectionData.choices.withIndex()
-						.associate { it.index to it.value },
-					onValueChange = setListing,
-					isSubtitleTheValue = true
-				)
-		}
-	}
-}
-
-fun LazyListScope.catalogListingSelection(
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit
-) {
-	item {
-		AnimatedVisibility(listingSelectionData?.choices?.isNotEmpty() ?: false) {
-			if (listingSelectionData != null)
-				ListPreferenceWidget(
-					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-					subtitle = listingSelectionData.choices[listingSelectionData.selection],
-					icon = null,
-					value = listingSelectionData.selection,
-					entries = listingSelectionData.choices.withIndex()
-						.associate { it.index to it.value },
-					onValueChange = setListing,
-					isSubtitleTheValue = true
-				)
 		}
 	}
 }

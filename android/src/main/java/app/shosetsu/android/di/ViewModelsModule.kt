@@ -187,9 +187,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			setNovelUIType = instance(),
 			getCategoriesUseCase = instance(),
 			setNovelCategoriesUseCase = instance(),
-			getExtListNames = instance(),
-			getExtSelectedListingFlow = instance(),
-			updateExtSelectedListing = instance()
+
 		)
 	}
 
@@ -270,7 +268,6 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance()
 		)
 	}
 	bind<ARepositoryViewModel>() with provider {

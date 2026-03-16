@@ -18,15 +18,11 @@ import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsPUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
@@ -88,9 +84,6 @@ class CatalogViewModel(
 	private val setNovelUIType: SetNovelUITypeUseCase,
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
-	private val getExtListNames: GetExtListingNamesUseCase,
-	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
-	private val updateExtSelectedListing: UpdateExtSelectedListing,
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 	private val filtersApplied: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -250,27 +243,6 @@ class CatalogViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, "")
 	}
 
-	/**
-	 * Listing selection data for the UI to render.
-	 */
-	override val listingSelectionData: StateFlow<ListingSelectionData?> by lazy {
-		extensionIDFlow.flatMapLatest { extensionID ->
-			val listingNames = getExtListNames(extensionID).toImmutableList()
-			getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
-				ListingSelectionData(listingNames, selectedListing)
-			}
-				// Do not display the listing selection data if a query is being executed.
-				.combine(queryFlow) { listingSelectionData, query ->
-					if (query.isEmpty()) {
-						listingSelectionData
-					} else {
-						null
-					}
-				}
-		}.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
-	}
-
 	override val baseURL: StateFlow<String?> =
 		iExtensionFlow.map { it?.baseURL }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
@@ -304,7 +276,7 @@ class CatalogViewModel(
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = ""
-			applyFilters()
+			_applyFilter()
 		}
 	}
 
@@ -515,12 +487,6 @@ class CatalogViewModel(
 
 	override fun hideFilterMenu() {
 		isFilterMenuVisible.value = false
-	}
-
-	override fun setSelectedListing(value: Int) {
-		launchIO {
-			updateExtSelectedListing(extensionIDFlow.value, value)
-		}
 	}
 }
 

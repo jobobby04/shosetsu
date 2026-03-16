@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @author Doomsdayrs
  */
 abstract class ACSSEditorViewModel : ShosetsuRootViewModel() {
-	abstract val appTheme: StateFlow<AppThemes>
+	abstract override val appTheme: StateFlow<AppThemes>
 
 	abstract fun undo()
 	abstract fun redo()

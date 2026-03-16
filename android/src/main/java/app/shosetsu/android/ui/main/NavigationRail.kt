@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.main
 
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -10,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
-import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of shosetsu.
@@ -37,7 +35,6 @@ import kotlinx.collections.immutable.ImmutableList
  */
 @Composable
 fun NavigationRail(
-	destinations: ImmutableList<Root>,
 	currentDestination: NavBackStackEntry?,
 	onNavigate: (ShosetsuDestination.Primary) -> Unit
 ) {

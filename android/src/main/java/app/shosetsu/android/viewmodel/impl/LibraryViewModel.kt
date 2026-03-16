@@ -54,14 +54,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import java.util.Locale.getDefault as LGD
+import java.util.Locale
 
 /**
  * shosetsu
@@ -197,20 +199,24 @@ class LibraryViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val genresFlow: Flow<ImmutableList<String>> by lazy {
+	override val genresFlow: SharedFlow<ImmutableList<String>> by lazy {
 		stripOutList { it.genres }
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
-	override val tagsFlow: Flow<ImmutableList<String>> by lazy {
+	override val tagsFlow: SharedFlow<ImmutableList<String>> by lazy {
 		stripOutList { it.tags }
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
-	override val authorsFlow: Flow<ImmutableList<String>> by lazy {
+	override val authorsFlow: SharedFlow<ImmutableList<String>> by lazy {
 		stripOutList { it.authors }
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
-	override val artistsFlow: Flow<ImmutableList<String>> by lazy {
+	override val artistsFlow: SharedFlow<ImmutableList<String>> by lazy {
 		stripOutList { it.artists }
+			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
 	override val novelCardTypeFlow: StateFlow<NovelCardType> by lazy {
@@ -335,12 +341,12 @@ class LibraryViewModel(
 	private fun stripOutList(
 		strip: (LibraryNovelUI) -> List<String>
 	): Flow<ImmutableList<String>> = librarySourceFlow.mapLatest { list ->
-		ArrayList<String>().apply {
+		mutableSetOf<String>().apply {
 			list.novels.flatMap { it.value }.distinctBy { it.id }.forEach { ui ->
 				strip(ui).forEach { key ->
 					val modifiedKey = key.replaceFirstChar {
 						if (it.isLowerCase()) {
-							it.titlecase(LGD())
+							it.titlecase(Locale.getDefault())
 						} else it.toString()
 					}
 					if (!contains(modifiedKey) && key.isNotBlank()) {
@@ -348,7 +354,7 @@ class LibraryViewModel(
 					}
 				}
 			}
-		}.toImmutableList()
+		}.toList().sortedWith(String.CASE_INSENSITIVE_ORDER).distinctBy { it.lowercase() }.toImmutableList()
 	}.onIO()
 
 	/**
@@ -368,11 +374,7 @@ class LibraryViewModel(
 							novels = result.novels.mapValues { novel ->
 								novel.value.filter { novelUI ->
 									against(novelUI).any { g ->
-										g.replaceFirstChar {
-											if (it.isLowerCase()) it.titlecase(
-												LGD()
-											) else it.toString()
-										} == s
+										g.equals(s, ignoreCase = true)
 									}
 								}.toImmutableList()
 							}.toImmutableMap()
@@ -383,11 +385,7 @@ class LibraryViewModel(
 							novels = result.novels.mapValues { novel ->
 								novel.value.filterNot { novelUI ->
 									against(novelUI).any { g ->
-										g.replaceFirstChar {
-											if (it.isLowerCase()) it.titlecase(
-												LGD()
-											) else it.toString()
-										} == s
+										g.equals(s, ignoreCase = true)
 									}
 								}.toImmutableList()
 							}.toImmutableMap()

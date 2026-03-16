@@ -46,7 +46,6 @@ import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -455,94 +454,96 @@ fun BrowseExtensionContent(
 								fontSize = TextUnit(14f, TextUnitType.Sp)
 							)
 
-							if (item.isUpdateAvailable && item.updateVersion != null) {
-								if (item.updateVersion != Version(-9, -9, -9))
-									Text(
-										stringResource(
-											R.string.update_to,
-											item.updateVersion.toString()
-										),
-										modifier = Modifier.padding(start = 8.dp),
-										fontSize = TextUnit(14f, TextUnitType.Sp),
-										color = MaterialTheme.colorScheme.tertiary
-									)
-							}
-						}
-					}
-				}
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.End
-				) {
-					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
-						var isDropdownVisible by remember { mutableStateOf(false) }
-						SimpleIconButton(
-                            Icons.Default.Download,
-							null,
-							onClick = {
-								// We can skip to dropdown if there is only 1 install option
-								if (item.installOptions.size != 1)
-									isDropdownVisible = true
-								else install(item.installOptions[0])
-							}
-						)
-						DropdownMenu(
-							expanded = isDropdownVisible,
-							onDismissRequest = { isDropdownVisible = false },
-						) {
-							item.installOptions.forEach { s ->
-								DropdownMenuItem(
-									onClick = {
-										install(s)
-										isDropdownVisible = false
-									},
-									text = {
-										Column {
-											Text(
-												text = AnnotatedString(s.repoName)
-											)
-											Text(
-												text = AnnotatedString(s.version.toString()),
-												modifier = Modifier.padding(start = 8.dp)
-											)
-										}
-									}
+						if (item.isUpdateAvailable && item.updateVersion != null) {
+							if (item.updateVersion != Version(-9, -9, -9))
+								Text(
+									stringResource(
+										R.string.update_to,
+										item.updateVersion.toString()
+									),
+									modifier = Modifier.padding(start = 8.dp),
+									fontSize = TextUnit(14f, TextUnitType.Sp),
+									color = MaterialTheme.colorScheme.tertiary
 								)
-							}
-						}
-					}
-
-					if (item.isUpdateAvailable) {
-						SimpleIconButton(
-							Icons.Default.Download,
-							stringResource(R.string.update),
-							onClick = update,
-							modifier = Modifier.rotate(180f),
-							tint = MaterialTheme.colorScheme.tertiary
-						)
-					}
-
-					if (item.isInstalled) {
-						SimpleIconButton(
-							Icons.Outlined.Settings,
-							stringResource(R.string.settings),
-							onClick = openSettings
-						)
-					}
-
-					if (item.isInstalling) {
-						SimpleIconButton(
-							stringResource(R.string.installing),
-							onClick = {},
-							modifier = Modifier.combinedClickable(
-								onClick = {},
-								onLongClick = cancelInstall,
-							)
-						) {
-							AnimatedRefresh()
 						}
 					}
 				}
+			}
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.End
+			) {
+				if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
+					var isDropdownVisible by remember { mutableStateOf(false) }
+					SimpleIconButton(
+						Icons.Default.Download,
+						null,
+						onClick = {
+							// We can skip to dropdown if there is only 1 install option
+							if (item.installOptions.size != 1)
+								isDropdownVisible = true
+							else install(item.installOptions[0])
+						}
+					)
+					DropdownMenu(
+						expanded = isDropdownVisible,
+						onDismissRequest = { isDropdownVisible = false },
+					) {
+						item.installOptions.forEach { s ->
+							DropdownMenuItem(
+								onClick = {
+									install(s)
+									isDropdownVisible = false
+								},
+								text = {
+									Column {
+										Text(
+											text = AnnotatedString(s.repoName)
+										)
+										Text(
+											text = AnnotatedString(s.version.toString()),
+											modifier = Modifier.padding(start = 8.dp)
+										)
+									}
+								}
+							)
+						}
+					}
+				}
+
+				if (item.isUpdateAvailable) {
+					SimpleIconButton(
+						Icons.Default.Download,
+						stringResource(R.string.update),
+						onClick = update,
+						modifier = Modifier.rotate(180f),
+						tint = MaterialTheme.colorScheme.tertiary
+					)
+				}
+
+				if (item.isInstalled) {
+					SimpleIconButton(
+						Icons.Outlined.Settings,
+						stringResource(R.string.settings),
+						onClick = openSettings
+					)
+				}
+
+				if (item.isInstalling) {
+					SimpleIconButton(
+						stringResource(R.string.installing),
+						onClick = {},
+						modifier = Modifier.combinedClickable(
+							onClick = {},
+							onLongClick = cancelInstall,
+						)
+					) {
+						AnimatedRefresh()
+					}
+				}
+			}
+		}
+
 
 		if (item.isUpdateAvailable && item.updateVersion != null) {
 			if (item.updateVersion == Version(-9, -9, -9)) {
