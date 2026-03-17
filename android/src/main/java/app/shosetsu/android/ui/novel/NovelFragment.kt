@@ -169,8 +169,9 @@ fun NovelInfoView(
 ) {
 	val viewModel: ANovelViewModel = viewModelDi()
 
-	LaunchedEffect(novelId) {
+	DisposableEffect(novelId) {
 		viewModel.setNovelID(novelId)
+		onDispose {}
 	}
 
 	val novelInfo by viewModel.novelLive.collectAsState()
@@ -279,14 +280,6 @@ fun NovelInfoView(
 
 			null -> {}
 		}
-	}
-
-	// If the data is not present, loads it
-	DisposableEffect(novelInfo?.novelURL) {
-		if (novelInfo != null && !novelInfo!!.loaded) {
-			viewModel.refresh()
-		}
-		onDispose {}
 	}
 
 	NovelInfoContent(

@@ -66,12 +66,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import qrcode.QRCode
-import kotlin.collections.set
 
 /*
  * This file is part of shosetsu.
@@ -246,6 +246,10 @@ class NovelViewModel(
 	override val novelLive: StateFlow<NovelUI?> by lazy {
 		novelIDLive.flatMapLatest {
 			loadNovelUIUseCase(it)
+		}.onEach {
+			if (it != null && !it.loaded) {
+				refresh()
+			}
 		}.catch {
 			error.emit(NovelLoadException(it))
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
