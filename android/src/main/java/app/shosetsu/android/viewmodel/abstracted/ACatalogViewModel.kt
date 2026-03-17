@@ -2,7 +2,6 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.paging.PagingData
 import app.shosetsu.android.common.enums.NovelCardType
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
@@ -47,6 +46,13 @@ abstract class ACatalogViewModel :
 	abstract val exceptionFlow: Flow<Throwable>
 
 	/**
+	 * Displayed listings from the extension
+	 */
+	abstract val selectedListing: StateFlow<IExtension.Listing?>
+
+	abstract val listingOptions: StateFlow<ImmutableList<IExtension.Listing>>
+
+	/**
 	 * The list of items that will be presented as the filter menu
 	 */
 	abstract val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>>
@@ -63,11 +69,6 @@ abstract class ACatalogViewModel :
 	abstract val extensionName: StateFlow<String>
 
 	/**
-	 * Provides the selection data for which listing is shown
-	 */
-	abstract val listingSelectionData: StateFlow<ListingSelectionData?>
-
-	/**
 	 * What type of card to display
 	 */
 	abstract val novelCardTypeLive: StateFlow<NovelCardType>
@@ -82,7 +83,7 @@ abstract class ACatalogViewModel :
 	 *
 	 * This will reset the view completely
 	 */
-	abstract fun setExtensionID(extensionID: Int)
+	abstract fun setListing(extensionID: Int, link: String?)
 
 	/**
 	 * Apply a query
@@ -156,9 +157,4 @@ abstract class ACatalogViewModel :
 	abstract fun hideFilterMenu()
 	abstract val queryFlow: StateFlow<String>
 
-	/**
-	 * Set the selected listing to use and display
-	 * @param value Selection as per [listingSelectionData].
-	 */
-	abstract fun setSelectedListing(value: Int)
 }

@@ -124,7 +124,7 @@ numberpicker = { module = "com.chargemap.compose:numberpicker", version.ref = "n
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
 qrcode = { module = "io.github.g0dkar:qrcode-kotlin-android", version.ref = "qrcodeKotlinAndroid" }
-shosetsuorg-klib = { module = "app.shosetsu.lib:kotlin-lib", version.ref = "kotlinLib" }
+shosetsuorg-klib = "com.gitlab.JFronny:shosetsu-kotlin-lib:b19572d0e3"
 
 [plugins]
 android-application = { id = "com.android.application" }

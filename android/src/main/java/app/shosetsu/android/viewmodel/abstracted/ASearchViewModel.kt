@@ -72,7 +72,7 @@ abstract class ASearchViewModel : ShosetsuViewModel() {
 	/**
 	 * Gets the search flow of an extension
 	 */
-	abstract fun searchExtension(extensionId: Int): Flow<PagingData<ACatalogNovelUI>>
+	abstract fun searchExtension(extensionId: Int, listing: String?): Flow<PagingData<ACatalogNovelUI>>
 
 	/**
 	 * Refresh all rows

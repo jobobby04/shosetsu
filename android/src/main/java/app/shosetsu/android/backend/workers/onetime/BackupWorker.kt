@@ -492,16 +492,16 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 				workerManager.enqueueUniqueWork(
 					BACKUP_WORK_ID,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<BackupWorker>(
-					).setConstraints(
-						Constraints.Builder().apply {
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-								setRequiresDeviceIdle(requiresBackupOnIdle())
+					OneTimeWorkRequestBuilder<BackupWorker>().setInputData(data)
+						.setConstraints(
+							Constraints.Builder().apply {
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+									setRequiresDeviceIdle(requiresBackupOnIdle())
 
-							setRequiresStorageNotLow(!allowsBackupOnLowStorage())
-							setRequiresBatteryNotLow(!allowsBackupOnLowBattery())
-						}.build()
-					).build()
+								setRequiresStorageNotLow(!allowsBackupOnLowStorage())
+								setRequiresBatteryNotLow(!allowsBackupOnLowBattery())
+							}.build()
+						).build()
 				)
 				logI(
 					"Worker State ${

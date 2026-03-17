@@ -108,7 +108,6 @@ fun ConfigureExtensionContent(
 	onBack: () -> Unit
 ) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
-	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
 	val errors by viewModel.errors.collectAsState(null)
 
@@ -147,24 +146,6 @@ fun ConfigureExtensionContent(
 						viewModel.uninstall(extensionUIResult!!)
 						onBack()
 					}
-				}
-			}
-
-			if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
-				item {
-					val selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0
-					val choices = extensionListingResult!!.choices
-					ListPreferenceWidget(
-						title = stringResource(R.string.listings),
-						subtitle = stringResource(
-							R.string.fragment_configure_extension_listing_desc,
-							choices[selection]
-						),
-						icon = null,
-						value = selection,
-						entries = choices.withIndex().associate { it.index to it.value },
-						onValueChange = { viewModel.setSelectedListing(it) }
-					)
 				}
 			}
 

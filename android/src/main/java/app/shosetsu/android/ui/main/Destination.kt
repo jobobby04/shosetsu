@@ -122,7 +122,7 @@ object Destination {
 		override val name: Int = R.string.browse
 
 		@Serializable
-		data class Catalog(val extensionId: Int) : ShosetsuDestination.Root
+		data class Catalog(val extensionId: Int, val listing: String?) : ShosetsuDestination.Root
 
 		@Serializable
 		data class ConfigureExtension(val extensionId: Int) : ShosetsuDestination.Root
