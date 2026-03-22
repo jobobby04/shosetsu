@@ -16,6 +16,7 @@
  */
 package app.shosetsu.android.ui.reader
 
+import android.app.SearchManager
 import android.content.Intent
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -218,7 +219,13 @@ fun ChapterReaderView(
 									},
 									ttsProgress = remember {
 										StableHolder(viewModel.ttsProgress)
-									}
+									},
+									onSearchQuery = {
+										val intent = Intent(Intent.ACTION_WEB_SEARCH).apply {
+											putExtra(SearchManager.QUERY, it)
+										}
+										context.startActivity(intent)
+									},
 								)
 							}
 

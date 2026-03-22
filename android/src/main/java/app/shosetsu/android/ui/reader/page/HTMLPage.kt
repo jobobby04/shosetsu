@@ -70,6 +70,7 @@ fun HTMLPage(
 	onDoubleClick: () -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
 	getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
+	onSearchQuery: (String) -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
@@ -117,6 +118,8 @@ fun HTMLPage(
 			state = state,
 			captureBackPresses = false,
 			onCreated = { webView ->
+				(webView as? ChapterReaderWebview)?.searchInBrowser = onSearchQuery
+
 				webView.setBackgroundColor(backgroundColor.toArgb())
 				webView.settings.apply {
 					@SuppressLint("SetJavaScriptEnabled")
@@ -158,6 +161,9 @@ fun HTMLPage(
 			),
 			chromeClient = ShosetsuAccompanistWebChromeClient(),
 			navigator = navigator,
+			factory = {
+				ChapterReaderWebview(it)
+			}
 		)
 	}
 
