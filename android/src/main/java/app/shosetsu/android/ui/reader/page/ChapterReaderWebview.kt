@@ -27,6 +27,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.WebView
+import app.shosetsu.android.R
 
 class ChapterReaderWebview(
 	context: Context,
@@ -50,7 +51,7 @@ class ChapterReaderWebview(
 				callback?.onCreateActionMode(mode, menu)
 
 				// Add custom "Search" item
-				menu?.add(0, 1001, 0, "Search")
+				menu?.add(0, 1001, 0, R.string.search)
 				return true
 			}
 
