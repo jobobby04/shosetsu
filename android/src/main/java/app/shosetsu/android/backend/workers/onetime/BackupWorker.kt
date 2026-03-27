@@ -324,7 +324,9 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 										it.sortType,
 										it.showOnlyReadingStatusOf,
 										it.showOnlyBookmarked,
-										it.showOnlyDownloaded
+										it.showOnlyDownloaded,
+										it.showOnlyString,
+										it.reverseOrder,
 									)
 								} ?: BackupNovelSettingEntity()
 

@@ -133,7 +133,7 @@ class NovelViewModel(
 	override val chaptersLive: StateFlow<ImmutableList<ChapterUI>> by lazy {
 		novelIDLive.flatMapLatest { id: Int ->
 			getChapterUIsUseCase(id).shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
-				.combineBookmarked().combineDownloaded().combineStatus().combineSort()
+				.combineBookmarked().combineDownloaded().combineStatus().combineString().combineSort()
 				.combineReverse().combineSelection().map { it.toImmutableList() }
 		}.catch {
 			error.emit(ChapterLoadException(it))
@@ -272,6 +272,9 @@ class NovelViewModel(
 	private val _onlyBookmarkedFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.showOnlyBookmarked ?: false }
 
+	private val _onlyStringFlow: Flow<String?> =
+		novelSettingFlow.mapLatest { it?.showOnlyString }
+
 	private val _sortTypeFlow: Flow<ChapterSortType> =
 		novelSettingFlow.mapLatest { it?.sortType ?: ChapterSortType.SOURCE }
 
@@ -287,6 +290,12 @@ class NovelViewModel(
 	private fun Flow<List<ChapterUI>>.combineDownloaded(): Flow<List<ChapterUI>> =
 		combine(_onlyDownloadedFlow) { result, onlyDownloaded ->
 			if (onlyDownloaded) result.filter { it.isSaved }
+			else result
+		}
+
+	private fun Flow<List<ChapterUI>>.combineString(): Flow<List<ChapterUI>> =
+		combine(_onlyStringFlow) { result, onlyString ->
+			if (!onlyString.isNullOrBlank()) result.filter { it.title.contains(onlyString, ignoreCase = true) }
 			else result
 		}
 

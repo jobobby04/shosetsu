@@ -1,8 +1,8 @@
-package app.shosetsu.android.domain.model.local.backup
+package app.shosetsu.android.providers.database.migrations
 
-import app.shosetsu.android.common.enums.ChapterSortType
-import app.shosetsu.android.common.enums.ReadingStatus
-import kotlinx.serialization.Serializable
+import android.database.SQLException
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 /*
  * This file is part of shosetsu.
@@ -24,15 +24,12 @@ import kotlinx.serialization.Serializable
 /**
  * Shosetsu
  *
- * @since 05 / 07 / 2021
- * @author Doomsdayrs
+ * @since 08 / 08 / 2022
  */
-@Serializable
-data class BackupNovelSettingEntity(
-	val sortType: ChapterSortType = ChapterSortType.SOURCE,
-	val showOnlyReadingStatusOf: ReadingStatus? = null,
-	val showOnlyBookmarked: Boolean = false,
-	val showOnlyDownloaded: Boolean = false,
-	val showOnlyString: String? = null,
-	val reverseOrder: Boolean = false,
-)
+object Migration9to10 : Migration(9, 10) {
+
+	@Throws(SQLException::class)
+	override fun migrate(db: SupportSQLiteDatabase) {
+		db.execSQL("ALTER TABLE `novel_settings` ADD COLUMN `showOnlyString` TEXT;")
+	}
+}
