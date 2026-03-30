@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 abstract class ShosetsuRootViewModel : ShosetsuViewModel(), ThemedViewModel {
-    protected abstract val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase
+	protected abstract val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase
 
-    /**
-     * Theme to use
-     */
-    override val appTheme: StateFlow<AppThemes> by lazy {
-        loadLiveAppThemeUseCase()
-            .stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
-    }
+	/**
+	 * Theme to use
+	 */
+	override val appTheme: StateFlow<AppThemes> by lazy {
+		loadLiveAppThemeUseCase()
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, AppThemes.FOLLOW_SYSTEM)
+	}
 }

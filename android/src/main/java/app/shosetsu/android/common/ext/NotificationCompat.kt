@@ -74,5 +74,5 @@ fun actionBuilder(icon: ImageVector, title: CharSequence?, intent: PendingIntent
 	Action.Builder(if (SDK_INT >= VERSION_CODES.M) icon.toIcon() else null, title, intent)
 
 fun Builder.setSmallIcon(icon: ImageVector): Builder = if (SDK_INT >= VERSION_CODES.M) {
-    setSmallIcon(icon.toIcon())
+	setSmallIcon(icon.toIcon())
 } else this

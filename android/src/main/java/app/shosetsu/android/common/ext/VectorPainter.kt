@@ -16,54 +16,54 @@ import app.shosetsu.android.common.utils.VectorPainterUtil
 import kotlin.math.roundToInt
 
 fun ImageVector.toIcon(
-    density: Density = Density(1.0f),
-    layoutDirection: LayoutDirection = LayoutDirection.Ltr,
-    size: Size? = null,
-    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
+	density: Density = Density(1.0f),
+	layoutDirection: LayoutDirection = LayoutDirection.Ltr,
+	size: Size? = null,
+	config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
 ): IconCompat = IconCompat.createWithBitmap(toImageBitmap(
-    density = density,
-    layoutDirection = layoutDirection,
-    size = size,
-    config = config,
+	density = density,
+	layoutDirection = layoutDirection,
+	size = size,
+	config = config,
 ).asAndroidBitmap())
 
 fun ImageVector.toImageBitmap(
-    density: Density,
-    layoutDirection: LayoutDirection,
-    size: Size? = null,
-    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
+	density: Density,
+	layoutDirection: LayoutDirection,
+	size: Size? = null,
+	config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
 ): ImageBitmap {
-    val painter = createVectorPainter(this, density)
-    return painter.toImageBitmap(
-        density = density,
-        layoutDirection = layoutDirection,
-        size = size,
-        config = config,
-    )
+	val painter = createVectorPainter(this, density)
+	return painter.toImageBitmap(
+		density = density,
+		layoutDirection = layoutDirection,
+		size = size,
+		config = config,
+	)
 }
 
 /**
  * @see androidx.compose.ui.graphics.vector.rememberVectorPainter(ImageVector)
  */
 private fun createVectorPainter(image: ImageVector, density: Density): VectorPainter =
-    VectorPainterUtil.createVectorPainterFromImageVector(
-        density,
-        image,
-        VectorPainterUtil.createGroupComponent(VectorPainterUtil.createGroupComponent(), image.root)
-    )
+	VectorPainterUtil.createVectorPainterFromImageVector(
+		density,
+		image,
+		VectorPainterUtil.createGroupComponent(VectorPainterUtil.createGroupComponent(), image.root)
+	)
 
 fun Painter.toImageBitmap(
-    density: Density,
-    layoutDirection: LayoutDirection,
-    size: Size? = null,
-    config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
+	density: Density,
+	layoutDirection: LayoutDirection,
+	size: Size? = null,
+	config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
 ): ImageBitmap {
-    val size = (size ?: (intrinsicSize * 2f))
-        .let { if (it == Size.Unspecified) Size(16f, 16f) else it }
-    val image = ImageBitmap(width = size.width.roundToInt(), height = size.height.roundToInt(), config = config)
-    val canvas = Canvas(image)
-    CanvasDrawScope().draw(density = density, layoutDirection = layoutDirection, canvas = canvas, size = size) {
-        draw(size = this.size)
-    }
-    return image
+	val size = (size ?: (intrinsicSize * 2f))
+		.let { if (it == Size.Unspecified) Size(16f, 16f) else it }
+	val image = ImageBitmap(width = size.width.roundToInt(), height = size.height.roundToInt(), config = config)
+	val canvas = Canvas(image)
+	CanvasDrawScope().draw(density = density, layoutDirection = layoutDirection, canvas = canvas, size = size) {
+		draw(size = this.size)
+	}
+	return image
 }

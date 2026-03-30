@@ -70,9 +70,9 @@ fun HomeView(
 
 	val navStyle by viewModel.navigationStyle.collectAsState()
 	val navigationMode = when (navStyle) {
-        NavigationStyle.MATERIAL -> if (sizeClass.widthSizeClass == WindowWidthSizeClass.Compact) NavigationMode.BOTTOM else NavigationMode.RAIL
-        NavigationStyle.LEGACY -> NavigationMode.DRAWER
-    }
+		NavigationStyle.MATERIAL -> if (sizeClass.widthSizeClass == WindowWidthSizeClass.Compact) NavigationMode.BOTTOM else NavigationMode.RAIL
+		NavigationStyle.LEGACY -> NavigationMode.DRAWER
+	}
 
 	val backupProgressState by viewModel.backupProgressState.collectAsState()
 
@@ -195,34 +195,34 @@ fun HomeView(
 		}
 	}
 
-    if (navigationMode == NavigationMode.BOTTOM) {
-        Content()
-    } else {
-        ModalNavigationDrawer(
-            drawerContent = {
-                NavigationDrawerContent(
-                    navBackStackEntry,
-                    onNavigate = {
-                        navigate(it)
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }
-                )
-            },
-            drawerState = drawerState,
-            gesturesEnabled = navigationMode == NavigationMode.DRAWER
-        ) {
-            Row(Modifier.fillMaxSize()) {
-                if (navigationMode == NavigationMode.RAIL) {
+	if (navigationMode == NavigationMode.BOTTOM) {
+		Content()
+	} else {
+		ModalNavigationDrawer(
+			drawerContent = {
+				NavigationDrawerContent(
+					navBackStackEntry,
+					onNavigate = {
+						navigate(it)
+						scope.launch {
+							drawerState.close()
+						}
+					}
+				)
+			},
+			drawerState = drawerState,
+			gesturesEnabled = navigationMode == NavigationMode.DRAWER
+		) {
+			Row(Modifier.fillMaxSize()) {
+				if (navigationMode == NavigationMode.RAIL) {
 					NavigationRail(
 						navBackStackEntry,
 						onNavigate = ::navigate
 					)
 				}
 
-                Content()
-            }
-        }
-    }
+				Content()
+			}
+		}
+	}
 }

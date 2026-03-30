@@ -84,7 +84,7 @@ fun SelectAllButton(
 	onClick: () -> Unit
 ) {
 	SimpleIconButton(
-        Icons.Outlined.SelectAll,
+		Icons.Outlined.SelectAll,
 		stringResource(R.string.select_all),
 		onClick = onClick
 	)
@@ -121,7 +121,7 @@ fun SelectBetweenButton(
 	onClick: () -> Unit
 ) {
 	SimpleIconButton(
-        Icons.Outlined.UnfoldLess,
+		Icons.Outlined.UnfoldLess,
 		stringResource(R.string.select_between),
 		onClick = onClick
 	)
@@ -296,7 +296,7 @@ fun ViewTypeButton(
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 	SimpleIconButton(
-        Icons.Default.ViewModule,
+		Icons.Default.ViewModule,
 		stringResource(R.string.novel_card_type_selector_title),
 		onClick = {
 			showDropDown = !showDropDown
