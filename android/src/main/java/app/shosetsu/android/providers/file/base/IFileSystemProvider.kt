@@ -4,6 +4,7 @@ import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.enums.ExternalFileDir
 import app.shosetsu.android.common.enums.InternalFileDir
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 
@@ -59,6 +60,12 @@ interface IFileSystemProvider {
 	@Throws(FilePermissionException::class, FileNotFoundException::class)
 	fun readFile(externalFileDir: ExternalFileDir, path: String): ByteArray
 
+	/**
+	 * Copies a files (determined by the [externalFileDir] & [path])
+	 * binary contents to a given [output].
+	 */
+	@Throws(FilePermissionException::class, FileNotFoundException::class)
+	fun copyFileTo(externalFileDir: ExternalFileDir, path: String, output: FileOutputStream)
 
 	/**
 	 * Reads a file directly

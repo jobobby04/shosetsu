@@ -17,6 +17,9 @@ import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.secondaryItemAlpha
 
+/**
+ * @param isCompact If you want to compact the UI, this will make the subtitle appear to the left of the text instead.
+ */
 @Composable
 fun TextPreferenceWidget(
 	modifier: Modifier = Modifier,
@@ -24,13 +27,14 @@ fun TextPreferenceWidget(
 	subtitle: String? = null,
 	icon: ImageVector? = null,
 	iconTint: Color = MaterialTheme.colorScheme.primary,
+	isCompact: Boolean = false,
 	widget: @Composable (() -> Unit)? = null,
 	onPreferenceClick: (() -> Unit)? = null,
 ) {
 	BasePreferenceWidget(
 		modifier = modifier,
 		title = title,
-		subcomponent = if (!subtitle.isNullOrBlank()) {
+		subcomponent = if (!subtitle.isNullOrBlank() && !isCompact) {
 			{
 				Text(
 					text = subtitle,
@@ -38,6 +42,20 @@ fun TextPreferenceWidget(
 						.padding(horizontal = PrefsHorizontalPadding)
 						.secondaryItemAlpha(),
 					style = MaterialTheme.typography.bodySmall,
+					maxLines = 10,
+				)
+			}
+		} else {
+			null
+		},
+		sideComponent = if (!subtitle.isNullOrBlank() && isCompact) {
+			{
+				Text(
+					text = subtitle,
+					modifier = Modifier
+						.padding(horizontal = PrefsHorizontalPadding)
+						.secondaryItemAlpha(),
+					style = MaterialTheme.typography.bodyMedium,
 					maxLines = 10,
 				)
 			}
@@ -74,6 +92,12 @@ private fun TextPreferenceWidgetPreview() = ShosetsuTheme(AppThemes.LIGHT) {
 			TextPreferenceWidget(
 				title = "Text preference",
 				subtitle = "Text preference summary",
+				onPreferenceClick = {},
+			)
+			TextPreferenceWidget(
+				title = "Compact Text preference",
+				subtitle = "Text preference summary",
+				isCompact = true,
 				onPreferenceClick = {},
 			)
 		}

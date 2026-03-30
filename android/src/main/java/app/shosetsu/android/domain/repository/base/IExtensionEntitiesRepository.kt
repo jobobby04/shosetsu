@@ -2,8 +2,10 @@ package app.shosetsu.android.domain.repository.base
 
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import java.io.IOException
 
 /*
@@ -35,7 +37,11 @@ interface IExtensionEntitiesRepository {
 	/**
 	 * Gets an [IExtension] via it's [extensionEntity]
 	 */
-	@Throws(IncompatibleExtensionException::class)
+	@Throws(
+		IncompatibleExtensionException::class,
+		InvalidMetaDataException::class,
+		MissingExtensionException::class
+	)
 	suspend fun get(extensionEntity: GenericExtensionEntity): IExtension
 
 	suspend fun uninstall(extensionEntity: GenericExtensionEntity)

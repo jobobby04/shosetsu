@@ -10,6 +10,7 @@ import app.shosetsu.android.common.enums.ExternalFileDir
 import app.shosetsu.android.common.enums.InternalFileDir
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 
@@ -109,6 +110,29 @@ class AndroidFileSystemProvider(
 		if (!file.canRead()) throw FilePermissionException(file.path, PermissionType.READ)
 		return file.readBytes()
 	}
+
+	override fun copyFileTo(
+		externalFileDir: ExternalFileDir,
+		path: String,
+		output: FileOutputStream
+	) {
+		/// First we create our file object
+		val file = File(externalFileDir.path() + path)
+
+		//logV("Reading $path in ${externalFileDir.path()} to $file")
+
+		// make sure it exists
+		if (!file.exists()) throw FileNotFoundException("$path does not exist")
+
+		// make sure we can read it
+		if (!file.canRead()) throw FilePermissionException(file.path, PermissionType.READ)
+
+		// And start the transfer!
+		file.inputStream().use { inputStream ->
+			inputStream.copyTo(output)
+		}
+	}
+
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
 	override fun readFile(path: String): ByteArray {

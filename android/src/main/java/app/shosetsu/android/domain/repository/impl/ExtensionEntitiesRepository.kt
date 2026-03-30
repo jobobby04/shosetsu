@@ -1,7 +1,9 @@
 package app.shosetsu.android.domain.repository.impl
 
+import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.file.base.IFileExtensionDataSource
@@ -11,7 +13,6 @@ import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import java.io.IOException
 
 /*
@@ -43,18 +44,29 @@ class ExtensionEntitiesRepository(
 	private val settingsSource: IFileSettingsDataSource
 ) : IExtensionEntitiesRepository {
 
-	@Throws(IncompatibleExtensionException::class, InvalidMetaDataException::class)
 	override suspend fun get(extensionEntity: GenericExtensionEntity): IExtension = onIO {
 		try {
 			memorySource.loadExtensionFromMemory(extensionEntity.id)!!
-		} catch (e: Exception) {
-			val it = fileSource.loadExtension(extensionEntity)
-			if (!it.exMetaData.libVersion.isCompatible())
-				throw IncompatibleExtensionException(extensionEntity, it.exMetaData.libVersion)
+		} catch (_: Exception) {
 
-			setSettings(it, it.settingsModel.toList())
-			memorySource.putExtensionInMemory(it)
-			it
+			val extension: IExtension
+
+			// If the file is not found, we have to handle this professionally...
+			try {
+				extension = fileSource.loadExtension(extensionEntity)
+			} catch (e: FileNotFoundException) {
+				throw MissingExtensionException(extensionEntity.id, e)
+			}
+
+			if (!extension.exMetaData.libVersion.isCompatible())
+				throw IncompatibleExtensionException(
+					extensionEntity,
+					extension.exMetaData.libVersion
+				)
+
+			setSettings(extension, extension.settingsModel.toList())
+			memorySource.putExtensionInMemory(extension)
+			extension
 		}
 	}
 
@@ -111,42 +123,50 @@ class ExtensionEntitiesRepository(
 						getString(extension.formatterID, filter.id, filter.state)
 					)
 				}
+
 				is Filter.Switch -> {
 					extension.updateSetting(
 						filter.id,
 						getBoolean(extension.formatterID, filter.id, filter.state)
 					)
 				}
+
 				is Filter.Checkbox -> {
 					extension.updateSetting(
 						filter.id,
 						getBoolean(extension.formatterID, filter.id, filter.state)
 					)
 				}
+
 				is Filter.TriState -> {
 					extension.updateSetting(
 						filter.id,
 						getInt(extension.formatterID, filter.id, filter.state)
 					)
 				}
+
 				is Filter.Dropdown -> {
 					extension.updateSetting(
 						filter.id,
 						getInt(extension.formatterID, filter.id, filter.state)
 					)
 				}
+
 				is Filter.RadioGroup -> {
 					extension.updateSetting(
 						filter.id,
 						getInt(extension.formatterID, filter.id, filter.state)
 					)
 				}
+
 				is Filter.FList -> {
 					setSettings(extension, filter.filters)
 				}
+
 				is Filter.Group<*> -> {
 					setSettings(extension, filter.filters)
 				}
+
 				else -> {
 				}
 			}

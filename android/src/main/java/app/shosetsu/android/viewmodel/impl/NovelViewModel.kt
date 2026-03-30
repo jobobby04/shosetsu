@@ -60,18 +60,21 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import qrcode.QRCode
-import kotlin.collections.set
 
 /*
  * This file is part of shosetsu.
@@ -249,8 +252,16 @@ class NovelViewModel(
 		}.catch {
 			error.emit(NovelLoadException(it))
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+			.also {
+				it.distinctUntilChangedBy { it?.novelURL }
+					.filter { it?.loaded == false }
+					.onEach {
+						refresh()
+					}
+					.onIO()
+					.launchIn(viewModelScopeIO)
+			}
 	}
-
 
 	private val _showOnlyStatusOfFlow: Flow<ReadingStatus?> =
 		novelSettingFlow.mapLatest { it?.showOnlyReadingStatusOf }

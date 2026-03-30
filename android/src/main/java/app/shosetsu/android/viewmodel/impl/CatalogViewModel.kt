@@ -271,7 +271,7 @@ class CatalogViewModel(
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = ""
-			applyFilter()
+            _applyFilter()
 		}
 	}
 
@@ -299,13 +299,14 @@ class CatalogViewModel(
 				backgroundAddState.emit(BackgroundNovelAddProgress.Failure(e))
 				return@launchIO
 			}
-			backgroundAddState.emit(BackgroundNovelAddProgress.Added(
-				item.title.let {
-					if (it.length > 20)
-						it.substring(0, 20) + "..."
-					else it
-				}
-			))
+			backgroundAddState.emit(
+				BackgroundNovelAddProgress.Added(
+					item.title.let {
+						if (it.length > 20)
+							it.substring(0, 20) + "..."
+						else it
+					}
+				))
 			delay(100)
 			backgroundAddState.emit(BackgroundNovelAddProgress.Unknown)
 		}
@@ -315,21 +316,25 @@ class CatalogViewModel(
 		MutableStateFlow<BackgroundNovelAddProgress>(BackgroundNovelAddProgress.Unknown)
 
 	private val filterMutex = Mutex()
+
+    /**
+     * Locks the filter data flow mutex and sets the new value.
+     */
+    private fun _applyFilter() {
+        if (filterMutex.tryLock()) {
+            try {
+                filterDataFlow.value.clear()
+                filterDataFlow.value.putAll(filterDataState.value.mapValues { it.value.value })
+            } finally {
+                filterMutex.unlock()
+            }
+        }
+    }
+
 	override fun applyFilter() {
 		launchIO {
-			applyFilters()
-			filtersApplied.update { it.copy(it.id + 1, true) }
-		}
-	}
-
-	private fun applyFilters() {
-		if (filterMutex.tryLock()) {
-			try {
-				filterDataFlow.value.clear()
-				filterDataFlow.value.putAll(filterDataState.value.mapValues { it.value.value })
-			} finally {
-				filterMutex.unlock()
-			}
+            _applyFilter()
+			filtersApplied.update { it.copy(id = it.id + 1, value = true) }
 		}
 	}
 
@@ -375,7 +380,7 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-			applyFilters()
+            _applyFilter()
 			filtersApplied.update { it.copy(value = false) }
 		}
 	}

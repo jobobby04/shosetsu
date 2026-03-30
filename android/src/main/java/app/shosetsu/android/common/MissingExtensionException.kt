@@ -23,4 +23,5 @@ package app.shosetsu.android.common
  * @since 16 / 05 / 2022
  * @author Doomsdayrs
  */
-class MissingExtensionException(id: Int) : Exception("Extension $id is missing")
+data class MissingExtensionException(val id: Int, override val cause: Throwable? = null) :
+	Exception("Extension $id is missing")

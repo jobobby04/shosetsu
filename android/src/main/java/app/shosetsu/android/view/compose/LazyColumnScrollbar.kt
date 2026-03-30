@@ -84,7 +84,7 @@ fun LazyColumnScrollbar(
 	var dragOffset by remember { mutableFloatStateOf(0f) }
 
 	fun normalizedThumbSize() = listState.layoutInfo.let {
-		if (it.totalItemsCount == 0) return@let 0f
+		if (it.totalItemsCount == 0 || it.visibleItemsInfo.isEmpty()) return@let 0f
 		val firstPartial = it.visibleItemsInfo.first().run { -offset.toFloat() / size.toFloat() }
 		val lastPartial = it.visibleItemsInfo.last()
 			.run { 1f - (it.viewportEndOffset - offset).toFloat() / size.toFloat() }

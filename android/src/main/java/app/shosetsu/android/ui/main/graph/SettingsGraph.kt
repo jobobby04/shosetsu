@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.main.Destination.More
 import app.shosetsu.android.ui.main.Destination.More.Settings
@@ -57,7 +58,7 @@ fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 					navController.navigate(Settings.Browse)
 				},
 				navToBackup = {
-					navController.navigate(Settings.Backup)
+					navController.navigate(Settings.Backup())
 				},
 				navToAdvanced = {
 					navController.navigate(Settings.Advanced)
@@ -111,8 +112,9 @@ fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 				}
 			)
 		}
-		composableSub<Settings.Backup> {
+		composableSub<Settings.Backup> { entry ->
 			BackupView(
+				highlightBackupFolder = entry.toRoute<Settings.Backup>().highlightBackupFolder,
 				onBack = navController::popBackStack
 			)
 		}

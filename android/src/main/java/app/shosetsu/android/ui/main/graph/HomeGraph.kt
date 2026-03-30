@@ -80,7 +80,7 @@ fun NavGraphBuilder.homeGraph(
 				navController.navigate(Downloads)
 			},
 			onNavToBackup = {
-				navController.navigate(Settings.Backup)
+				navController.navigate(Settings.Backup())
 			},
 			onNavToCategories = {
 				navController.navigate(Categories)

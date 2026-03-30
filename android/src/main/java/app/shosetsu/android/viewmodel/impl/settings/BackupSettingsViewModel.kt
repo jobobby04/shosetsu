@@ -1,21 +1,16 @@
 package app.shosetsu.android.viewmodel.impl.settings
 
-import android.content.Context
 import android.net.Uri
-import androidx.core.provider.DocumentsContractCompat
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
-import app.shosetsu.android.common.FilePermissionException
-import app.shosetsu.android.common.NullContentResolverException
 import app.shosetsu.android.common.SettingKey
-import app.shosetsu.android.common.enums.ExternalFileDir.APP
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.domain.usecases.start.StartBackupMigrationWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
-import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
-import java.io.FileOutputStream
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /*
  * This file is part of shosetsu.
@@ -43,8 +38,9 @@ class BackupSettingsViewModel(
 	private val manager: NovelUpdateWorker.Manager,
 	private val startBackupWorkerUseCase: StartBackupWorkerUseCase,
 	private val startRestoreWorker: StartRestoreWorkerUseCase,
-	private val iFileSystemProvider: IFileSystemProvider,
+	private val startBackupMigrationWorker: StartBackupMigrationWorkerUseCase,
 ) : ABackupSettingsViewModel(iSettingsRepository) {
+	override val promptMigration = MutableStateFlow(false)
 
 	override fun startBackup() {
 		launchIO {
@@ -58,33 +54,29 @@ class BackupSettingsViewModel(
 		startRestoreWorker(uri)
 	}
 
-	override suspend fun setBackupStorageLocation(context: Context, uri: Uri) {
-		val contentResolver = context.applicationContext.contentResolver
-			?: throw NullContentResolverException()
-		for (file in iFileSystemProvider.listFiles(APP, BACKUP_DIRECTORY)) {
-			val data = iFileSystemProvider.readFile(APP, "$BACKUP_DIRECTORY/$file")
-			val docId = DocumentsContractCompat.getTreeDocumentId(uri) ?: continue
-			val parentDocumentUri = DocumentsContractCompat.buildDocumentUriUsingTree(uri, docId) ?: continue
-			val uri = DocumentsContractCompat.createDocument(
-				contentResolver,
-				parentDocumentUri,
-				"application/octet-stream",
-				file
-			) ?: continue
-			contentResolver.openFileDescriptor(uri, "w")?.use { descriptor ->
-				FileOutputStream(descriptor.fileDescriptor).use {
-					it.write(data)
-				}
-			} ?: throw FilePermissionException(
-				uri.path ?: "",
-				FilePermissionException.PermissionType.WRITE
-			)
-			iFileSystemProvider.deleteFile(APP, "$BACKUP_DIRECTORY/$file")
+	override fun setBackupStorageLocation(uri: Uri) {
+		launchIO {
+			// Get the current uri for next behaviors
+			val currentUri = settingsRepo.getString(SettingKey.BackupStorageLocation)
+
+			// set the new backup directory
+			settingsRepo.setString(SettingKey.BackupStorageLocation, uri.toString())
+
+			// If the current URI is empty, we can assume that this is the users first time setting their backup directory
+			if (currentUri.isEmpty())
+				promptMigration.emit(true)
 		}
-		settingsRepo.setString(SettingKey.BackupStorageLocation, uri.toString())
 	}
 
-	companion object {
-		private const val BACKUP_DIRECTORY = "Backups"
+	override fun dismissMigration() {
+		promptMigration.tryEmit(false)
+	}
+
+	override fun startMigration() {
+		launchIO {
+			startBackupMigrationWorker()
+			// dismiss *after* the worker starts.
+			promptMigration.emit(false)
+		}
 	}
 }

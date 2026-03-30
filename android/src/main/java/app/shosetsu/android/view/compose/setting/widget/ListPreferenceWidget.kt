@@ -32,6 +32,7 @@ fun <T> ListPreferenceWidget(
 	title: String,
 	subtitle: String?,
 	icon: ImageVector?,
+	isSubtitleTheValue: Boolean = false,
 	entries: Map<out T, String>,
 	onValueChange: (T) -> Unit,
 ) {
@@ -42,6 +43,7 @@ fun <T> ListPreferenceWidget(
 		subtitle = subtitle,
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
+		isCompact = isSubtitleTheValue
 	)
 
 	if (isDialogShown) {
@@ -66,10 +68,16 @@ fun <T> ListPreferenceWidget(
 							}
 						}
 					}
-					if (state.canScrollBackward) HorizontalDivider(modifier = Modifier.align(
-						Alignment.TopCenter))
-					if (state.canScrollForward) HorizontalDivider(modifier = Modifier.align(
-						Alignment.BottomCenter))
+					if (state.canScrollBackward) HorizontalDivider(
+						modifier = Modifier.align(
+							Alignment.TopCenter
+						)
+					)
+					if (state.canScrollForward) HorizontalDivider(
+						modifier = Modifier.align(
+							Alignment.BottomCenter
+						)
+					)
 				}
 			},
 			confirmButton = {

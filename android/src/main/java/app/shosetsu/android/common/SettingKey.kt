@@ -100,10 +100,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ReaderIsInvertedSwipe : BooleanKey("invertedSwipe", false)
 	object ReadingMarkingType : StringKey("readingMarkingType", MarkingType.ONVIEW.name)
 
-	/**
-	 * Should the application convert string returns from an extension to an Html page
-	 */
-	object ReaderStringToHtml : BooleanKey("convertStringToHtml", false)
 	object ReaderIsFirstFocus : BooleanKey("reader_first_focus", true)
 	object ReaderDoubleTapFocus : BooleanKey("reader_double_tap_focus", false)
 	object ReaderDoubleTapSystem : BooleanKey("reader_double_tap_system", false)

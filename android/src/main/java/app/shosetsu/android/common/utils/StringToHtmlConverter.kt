@@ -1,5 +1,7 @@
 package app.shosetsu.android.common.utils
 
+import com.google.common.html.HtmlEscapers
+
 /*
  * This file is part of Shosetsu.
  *
@@ -34,8 +36,10 @@ fun asHtml(
 		</header>
 		<body>
 			${
-		passage.split("\n").joinToString(separator = separator) { "<p>$it</p>" }
-	}
+				passage.split("\n")
+					.map { HtmlEscapers.htmlEscaper().escape(it) }
+					.joinToString(separator = separator) { "<p>$it</p>" }
+			}
 		</body>
 	</html> 
 	"""

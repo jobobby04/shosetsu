@@ -4,7 +4,9 @@ import android.app.Application
 import android.database.sqlite.SQLiteException
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
@@ -24,7 +26,6 @@ import app.shosetsu.android.common.SettingKey.ReaderNextChapter
 import app.shosetsu.android.common.SettingKey.ReaderPitch
 import app.shosetsu.android.common.SettingKey.ReaderShowChapterDivider
 import app.shosetsu.android.common.SettingKey.ReaderSpeed
-import app.shosetsu.android.common.SettingKey.ReaderStringToHtml
 import app.shosetsu.android.common.SettingKey.ReaderTrackLongReading
 import app.shosetsu.android.common.SettingKey.ReaderVoice
 import app.shosetsu.android.common.SettingKey.ReaderVolumeScroll
@@ -55,6 +56,7 @@ import app.shosetsu.android.domain.usecases.get.GetReaderSettingUseCase
 import app.shosetsu.android.domain.usecases.load.LoadDeletePreviousChapterUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.reader.customSpeak
+import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
@@ -64,8 +66,6 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
-import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator.Companion.toRewindable
-import app.shosetsu.android.view.uimodels.model.reader.StaticTTSText
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
@@ -85,7 +85,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -108,7 +107,6 @@ import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.util.Locale
-import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 /*
@@ -163,6 +161,8 @@ class ChapterReaderViewModel(
 			get() = this@ChapterReaderViewModel.paragraphSpacingFlow
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@ChapterReaderViewModel.colorScheme
+		override val paddingValuesFlow: Flow<PaddingValues>
+			get() = this@ChapterReaderViewModel.paddingValues
 	}
 
 	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
@@ -317,69 +317,10 @@ class ChapterReaderViewModel(
 
 	private var cleanStringMapJob: Job? = null
 
-	override fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
-		//logV("$item")
+	override fun getChapterPassageHTML(item: ReaderChapterUI): Flow<ChapterPassage> {
 		val mutableFlow = stringMap.getOrPut(item.id) {
 			getRefreshFlow(item)
-				.transformLatest {
-					emit(ChapterPassage.Loading)
-					val bytes = getChapterPassage(item)
-						?: throw Exception("No content received")
-
-					emitAll(
-						indentSizeFlow.combine(
-							paragraphSpacingFlow
-						) { indentSize, paragraphSpacing ->
-							val unformattedText = bytes.decodeToString()
-
-							val replaceSpacing = StringBuilder("\n")
-							// Calculate changes to \n
-							for (x in 0 until paragraphSpacing.toInt())
-								replaceSpacing.append("\n")
-
-							// Calculate changes to \t
-							for (x in 0 until indentSize)
-								replaceSpacing.append("\t")
-
-							// Set new text formatted
-							@Suppress("UNCHECKED_CAST")
-							ChapterPassage.Success(
-								unformattedText.replace(
-									"\n".toRegex(),
-									replaceSpacing.toString()
-								),
-								mutableListOf(
-									StaticTTSText(
-										UUID.randomUUID().toString(),
-										unformattedText,
-									)
-								).listIterator()
-									// this can be cast, don't sweat it
-									.toRewindable() as RewindableMutableListIterator<TTSText>
-							)
-						}
-					)
-				}
-				.catch { emit(ChapterPassage.Error(it)) }
-				.onIO()
-				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
-		}
-
-		if (cleanStringMapJob == null && stringMap.size > 10) {
-			cleanStringMapJob =
-				launchIO {
-					cleanStringMap(stringMap.keys.indexOf(item.id))
-					cleanStringMapJob = null
-				}
-		}
-
-		return mutableFlow
-	}
-
-	override fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage> {
-		val mutableFlow = stringMap.getOrPut(item.id) {
-			getRefreshFlow(item)
-				.transformCatching<Unit, ChapterPassage>(exceptional = {
+				.transformCatching(exceptional = {
 					emit(
 						ChapterPassage.Error(
 							it
@@ -392,11 +333,9 @@ class ChapterReaderViewModel(
 
 					var result = bytes.decodeToString()
 
-					@Suppress("DEPRECATION")
-					val convert = convertStringToHtml.firstOrNull() ?: false
 					val chapterType = extensionChapterTypeFlow.firstOrNull()
 
-					if (chapterType == Novel.ChapterType.STRING && convert) {
+					if (chapterType == Novel.ChapterType.STRING) {
 						logI("Converting text to HTML")
 						result = asHtml(result, item.title)
 					}
@@ -423,35 +362,15 @@ class ChapterReaderViewModel(
 						ttsElements.listIterator()
 					)
 
-					emitAll(
-						css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
-							fun update(id: String, css: String) {
-								var style: Element? = document.getElementById(id)
-
-								if (style == null) {
-									style =
-										document.createElement("style") ?: return
-
-									style.id(id)
-									style.attr("type", "text/css")
-
-									document.head().appendChild(style)
-								}
-
-								style.text(css)
-							}
-
-							update("shosetsu-style", shoCSS)
-							update("user-style", useCSS)
-
-							@Suppress("UNCHECKED_CAST")
-							ChapterPassage.Success(
-								document.toString(),
-								// this is fine
-								ttsIterator as RewindableMutableListIterator<TTSText>
-							)
-						}
-					)
+					emitAll(cssStyle.map { cssStyle ->
+						cssStyle.insert(document)
+						@Suppress("UNCHECKED_CAST")
+						ChapterPassage.Success(
+							document.toString(),
+							// this is fine
+							ttsIterator as RewindableMutableListIterator<TTSText>
+						)
+					})
 				}
 				.onIO()
 				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
@@ -466,6 +385,12 @@ class ChapterReaderViewModel(
 		}
 
 		return mutableFlow
+	}
+
+	override val cssStyle: SharedFlow<ShosetsuStyle> by lazy {
+		css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
+			ShosetsuStyle(shoCSS, useCSS)
+		}.onIO().shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
 	override val isCurrentChapterBookmarked: StateFlow<Boolean> by lazy {
@@ -483,43 +408,10 @@ class ChapterReaderViewModel(
 		}.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 	}
 
-	private val convertStringToHtml by lazy {
-		settingsRepo.getBooleanFlow(ReaderStringToHtml)
-	}
-
 	private val extensionChapterTypeFlow: SharedFlow<Novel.ChapterType?> by lazy {
 		extFlow.map { it?.chapterType }
 			.onIO()
 			.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
-	}
-
-	/**
-	 * Specifies what chapter type the reader should render.
-	 *
-	 * Upon [ReaderStringToHtml] being true, will clear out any previous strings if the prevType was
-	 * not html, causing the content to regenerate.
-	 */
-	override val chapterType: StateFlow<Novel.ChapterType?> by lazy {
-		extensionChapterTypeFlow.filterNotNull().flatMapLatest { type ->
-			var prevType: Novel.ChapterType? = null
-
-			convertStringToHtml.mapLatest { convert ->
-				@Suppress("DEPRECATION")
-				if (convert && type == Novel.ChapterType.STRING) {
-					if (prevType != Novel.ChapterType.HTML)
-						clearMaps()
-
-					prevType = Novel.ChapterType.HTML
-					Novel.ChapterType.HTML
-				} else {
-					if (prevType != type)
-						clearMaps()
-
-					prevType = type
-					type
-				}
-			}
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
 	private val chaptersFlow: SharedFlow<List<ReaderChapterUI>> by lazy {
@@ -582,18 +474,6 @@ class ChapterReaderViewModel(
 			getReaderSettingsUseCase(it)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelReaderSettingUI(-1))
 	}
-
-	override val textColor: StateFlow<Int> by lazy {
-		css.themeFlow.map { it.first }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.first)
-	}
-
-	override val backgroundColor: StateFlow<Int> by lazy {
-		css.themeFlow.map { it.second }.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, css.themeFlow.value.second)
-	}
-
-	override val liveTextSize: StateFlow<Float> get() = css.liveTextSize
 
 	override val liveKeepScreenOn: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderKeepScreenOn)
@@ -769,9 +649,6 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	override fun loadChapterCss(): Flow<String> =
-		settingsRepo.getStringFlow(ReaderHtmlCss)
-
 	override fun updateSetting(novelReaderSettingEntity: NovelReaderSettingUI) {
 		launchIO {
 			readerSettingsRepo.update(novelReaderSettingEntity.convertTo())
@@ -783,8 +660,6 @@ class ChapterReaderViewModel(
 	override val tapToScroll: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderIsTapToScroll)
 	}
-
-	override val disableTextSelection: StateFlow<Boolean> get() = css.disableTextSelection
 
 	private val doubleTapFocus: StateFlow<Boolean> by lazy {
 		settingsRepo.getBooleanFlow(ReaderDoubleTapFocus)
@@ -1143,11 +1018,8 @@ class ChapterReaderViewModel(
 					System.gc()
 
 					// Get the text of the chapter
-					val passage = when (chapterType.first { it != null }) {
-						null -> return@coroutineScope
-						Novel.ChapterType.HTML -> getChapterHTMLPassage(item)
-						Novel.ChapterType.STRING -> getChapterStringPassage(item)
-					}.firstOrNull { it is ChapterPassage.Success } as? ChapterPassage.Success
+					val passage = getChapterPassageHTML(item)
+						.firstOrNull { it is ChapterPassage.Success } as? ChapterPassage.Success
 						?: return@coroutineScope
 
 					launch nextChapterTts@{
@@ -1282,6 +1154,7 @@ class ChapterReaderViewModel(
 	}
 
 	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)
+	override val paddingValues: MutableStateFlow<PaddingValues> = MutableStateFlow(PaddingValues(0.dp))
 
 	override fun onCleared() {
 		tts.value?.stop()

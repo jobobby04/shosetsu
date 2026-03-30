@@ -73,6 +73,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -168,8 +169,9 @@ fun NovelInfoView(
 ) {
 	val viewModel: ANovelViewModel = viewModelDi()
 
-	LaunchedEffect(novelId) {
+	DisposableEffect(novelId) {
 		viewModel.setNovelID(novelId)
+		onDispose {}
 	}
 
 	val novelInfo by viewModel.novelLive.collectAsState()
@@ -278,11 +280,6 @@ fun NovelInfoView(
 
 			null -> {}
 		}
-	}
-
-	// If the data is not present, loads it
-	if (novelInfo != null && !novelInfo!!.loaded) {
-		viewModel.refresh()
 	}
 
 	NovelInfoContent(
