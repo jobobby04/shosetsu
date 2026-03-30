@@ -9,7 +9,13 @@ import androidx.compose.material.icons.outlined.Restore
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
@@ -19,12 +25,40 @@ import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.ID_RESTORE
 import app.shosetsu.android.common.consts.VERSION_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.RESTORE_WORK_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.decodeSafeFromStream
+import app.shosetsu.android.common.ext.getString
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.removeProgress
+import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
-import app.shosetsu.android.domain.model.local.*
-import app.shosetsu.android.domain.model.local.backup.*
-import app.shosetsu.android.domain.repository.base.*
+import app.shosetsu.android.domain.model.local.BackupEntity
+import app.shosetsu.android.domain.model.local.GenericExtensionEntity
+import app.shosetsu.android.domain.model.local.NovelCategoryEntity
+import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.domain.model.local.NovelPinEntity
+import app.shosetsu.android.domain.model.local.NovelSettingEntity
+import app.shosetsu.android.domain.model.local.backup.BackupExtensionEntity
+import app.shosetsu.android.domain.model.local.backup.BackupNovelEntity
+import app.shosetsu.android.domain.model.local.backup.FleshedBackupEntity
+import app.shosetsu.android.domain.model.local.backup.MetaBackupEntity
+import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.IBackupRepository
+import app.shosetsu.android.domain.repository.base.ICategoryRepository
+import app.shosetsu.android.domain.repository.base.IChaptersRepository
+import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
+import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
+import app.shosetsu.android.domain.repository.base.INovelPinsRepository
+import app.shosetsu.android.domain.repository.base.INovelSettingsRepository
+import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.domain.usecases.AddCategoryUseCase
 import app.shosetsu.android.domain.usecases.InstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
@@ -435,6 +469,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					showOnlyReadingStatusOf = bSettings.showOnlyReadingStatusOf,
 					showOnlyBookmarked = bSettings.showOnlyBookmarked,
 					showOnlyDownloaded = bSettings.showOnlyDownloaded,
+					showOnlyString = bSettings.showOnlyString,
 					reverseOrder = bSettings.reverseOrder,
 				)
 			)
@@ -445,6 +480,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					showOnlyReadingStatusOf = bSettings.showOnlyReadingStatusOf,
 					showOnlyBookmarked = bSettings.showOnlyBookmarked,
 					showOnlyDownloaded = bSettings.showOnlyDownloaded,
+					showOnlyString = bSettings.showOnlyString,
 					reverseOrder = bSettings.reverseOrder,
 				)
 			)

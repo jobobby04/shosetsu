@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -228,6 +229,26 @@ fun NovelFilterMenuFilterContent(
 					)
 				)
 			},
+		)
+
+		var onlyString by remember { mutableStateOf(settings.showOnlyString) }
+		OutlinedTextField(
+			onlyString.orEmpty(),
+			onValueChange = {
+				onlyString = it
+				updateNovelSetting(
+					settings.copy(
+						showOnlyString = it.takeIf { it.isNotBlank() }?.trim()
+					)
+				)
+			},
+			label = {
+				Text(stringResource(R.string.text_filter))
+			},
+			singleLine = true,
+			modifier = Modifier
+				.padding(horizontal = 32.dp, vertical = 8.dp)
+				.fillMaxWidth(),
 		)
 	}
 }

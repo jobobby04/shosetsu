@@ -52,7 +52,8 @@ class DBNovelSettingsDataSource(
 			showOnlyReadingStatusOf,
 			showOnlyBookmarked,
 			showOnlyDownloaded,
-			reverseOrder
+			reverseOrder,
+			showOnlyString,
 		)
 }
 
