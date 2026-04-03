@@ -1,10 +1,4 @@
-import com.google.common.collect.ImmutableMultimap
-import com.google.common.collect.Multimap
 import org.eclipse.jgit.api.Git
-import org.jetbrains.kotlin.com.google.gson.stream.JsonWriter
-import org.jetbrains.kotlin.konan.properties.Properties
-import java.io.FileInputStream
-import java.io.IOException
 
 plugins {
 	id("com.android.application")
@@ -13,114 +7,10 @@ plugins {
 	id("com.google.devtools.ksp")
 }
 
-/**
- * Associations between different usernames.
- */
-private val knownLinks = bidiMultimapOf(
-	"clocks" to "doomsdayrs"
-)
-
-/**
- * Association between a name and an image url.
- *
- * Name can be preferred name.
- */
-private val knownImages = mapOf(
-	"clocks" to "https://gitlab.com/uploads/-/system/user/avatar/3931112/avatar.png?width=256"
-)
-
-/**
- * Association between preferred names.
- *
- * For example, "doomsdayrs" should be mapped to "Clocks".
- */
-private val preferredNames = mapOf(
-	"doomsdayrs" to "Clocks"
-)
-
-/**
- * Association between a name and a website.
- *
- * Name can be preferred name.
- */
-private val websites = mapOf(
-	"clocks" to "https://doomsdayrs.page"
-)
-
-@Throws(IOException::class)
-fun getCommitCount(): Int = Git.open(rootProject.projectDir).use { it.log().all().call().count() }
 
 tasks {
-	data class Contributor(
-		val name: String,
-		val email: String,
-		var commits: Int,
-		val website: String? = websites[name.lowercase()],
-		val image: String? = knownImages[name.lowercase()]
-	)
-
-	val generateContributors by registering {
-		doLast {
-			val encountered = mutableMapOf<String, Contributor>()
-			Git.open(rootProject.projectDir).use {
-				it.log().all().call().forEach { commit ->
-					val possibleAuthors = commit.authorIdent.name.let { knownLinks[it].plus(it) }
-					val name = possibleAuthors.firstOrNull { preferredNames.containsKey(it) }?.let { preferredNames[it] }
-						?: possibleAuthors.firstOrNull { encountered.containsKey(it) }
-						?: possibleAuthors.first()
-					val contributor = encountered.getOrPut(name) { Contributor(name, commit.authorIdent.emailAddress, 0) }
-					contributor.commits++
-				}
-			}
-			val contributors = encountered.values.sortedByDescending { it.commits }
-			val file = project.file("build/generated/assets/contributors.json")
-			file.parentFile.mkdirs()
-			JsonWriter(file.writer()).use { it.run {
-				beginArray()
-				contributors.forEach {
-					beginObject()
-					name("name").value(it.name)
-					name("email").value(it.email)
-					name("commits").value(it.commits)
-					it.website?.let { name("website").value(it) }
-					it.image?.let { name("image").value(it) }
-					endObject()
-				}
-				endArray()
-			} }
-		}
-	}
-	preBuild { dependsOn(generateContributors) }
-}
-
-fun <K> bidiMultimapOf(vararg pairs: Pair<K & Any, K & Any>): Multimap<K, K> {
-	val builder = ImmutableMultimap.builder<K, K>()
-	pairs.forEach {
-		builder.put(it.first, it.second)
-		builder.put(it.second, it.first)
-	}
-	return builder.build()
-}
-
-fun loadSProperties(name: String): Properties {
-	var properties = try {
-		extra.get(name) as? Properties
-	} catch (e: ExtraPropertiesExtension.UnknownPropertyException) {
-		null
-	}
-
-	if (properties != null)
-		return properties
-
-	val acraPropertiesFile = rootProject.file("$name.properties")
-	properties = Properties()
-
-	if (acraPropertiesFile.exists())
-		properties.load(FileInputStream(acraPropertiesFile))
-
-	ext.set(name, properties)
-
-	return properties
+    val generateContributors by registering(GenerateContributorsTask::class)
+    preBuild { dependsOn(generateContributors) }
 }
 
 val CI_MODE = System.getenv("CI_MODE") == "true" || true
@@ -186,7 +76,7 @@ android {
 			multiDexEnabled = true
 		}
 		named("debug") {
-			versionNameSuffix = "-${getCommitCount()}"
+			versionNameSuffix = Git.open(rootProject.projectDir.resolve(".git")).use { "-${it.getCommitCount()}" }
 			applicationIdSuffix = ".debug"
 			isDebuggable = true
 			isMinifyEnabled = !CI_MODE
