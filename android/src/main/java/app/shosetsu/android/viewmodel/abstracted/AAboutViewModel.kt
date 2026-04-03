@@ -2,7 +2,7 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import app.shosetsu.android.domain.model.local.Contributor
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.collections.immutable.ImmutableList
 
 /*
  * This file is part of Shosetsu.
@@ -29,5 +29,5 @@ abstract class AAboutViewModel : ShosetsuViewModel() {
 	/** Run an app update check */
 	abstract fun appUpdateCheck()
 
-	abstract val contributors: StateFlow<List<Contributor>>
+	abstract val contributors: ImmutableList<Contributor>
 }

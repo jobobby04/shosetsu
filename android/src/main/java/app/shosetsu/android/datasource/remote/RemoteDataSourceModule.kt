@@ -56,8 +56,4 @@ val remoteDataSouceModule: DI.Module = DI.Module("remote_data_source") {
 			ProductFlavors.STANDARD -> GitAppUpdateDataSource(instance())
 		}
 	}
-
-	bind<RemoteGitlabContributorsDataSource>() with singleton {
-		RemoteGitlabContributorsDataSourceImpl(instance())
-	}
 }

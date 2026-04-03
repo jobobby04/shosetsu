@@ -22,6 +22,7 @@ junitVersion = "1.2.1"
 kodein = "7.26.1"
 kotlin = "2.1.0"
 kotlinLib = "1.4.1"
+kotlinpoet = "2.1.0"
 kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.8.0"
@@ -113,6 +114,7 @@ kodein-di-jvm = { module = "org.kodein.di:kodein-di-jvm", version.ref = "kodein"
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlinxCoroutines" }

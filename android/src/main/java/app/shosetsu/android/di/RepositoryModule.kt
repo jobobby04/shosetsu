@@ -135,6 +135,6 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 	bind<ChapterHistoryRepository>() with singleton { ChapterHistoryRepositoryImpl(instance()) }
 
 	bind<ContributorsRepository>() with singleton {
-		ContributorsRepositoryImpl(instance())
+		ContributorsRepositoryImpl()
 	}
 }

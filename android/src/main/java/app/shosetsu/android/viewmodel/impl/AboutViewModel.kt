@@ -1,15 +1,12 @@
 package app.shosetsu.android.viewmodel.impl
 
-import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.backend.workers.onetime.AppUpdateCheckWorker
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.domain.model.local.Contributor
 import app.shosetsu.android.domain.repository.base.ContributorsRepository
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 /*
  * This file is part of Shosetsu.
@@ -37,12 +34,6 @@ class AboutViewModel(
 	private val contributorRepo: ContributorsRepository
 ) : AAboutViewModel() {
 
-	init {
-		viewModelScope.launch {
-			contributorRepo.refresh()
-		}
-	}
-
 	override fun appUpdateCheck() {
 		launchIO {
 			if (!manager.isRunning())
@@ -50,7 +41,6 @@ class AboutViewModel(
 		}
 	}
 
-	override val contributors: StateFlow<List<Contributor>> =
-		contributorRepo.getAll()
-			.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+	override val contributors: ImmutableList<Contributor> =
+		contributorRepo.getAll().toImmutableList()
 }

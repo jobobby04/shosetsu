@@ -8,10 +8,8 @@ plugins {
 	alias(libs.plugins.kotlin.compose)
 }
 
-tasks {
-    val generateContributors by registering(GenerateContributorsTask::class)
-    preBuild { dependsOn(generateContributors) }
-}
+val generateContributors by tasks.registering(GenerateContributorsTask::class)
+tasks.preBuild { dependsOn(generateContributors) }
 
 val CI_MODE = System.getenv("CI_MODE") == "true"
 
@@ -160,7 +158,7 @@ android {
 	}
 	sourceSets {
 		named("main") {
-			assets.srcDir("build/generated/assets")
+			kotlin.srcDir(generateContributors.map { it.generatedKotlinDir })
 		}
 	}
 }

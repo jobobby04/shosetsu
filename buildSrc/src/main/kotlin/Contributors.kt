@@ -6,7 +6,7 @@ object Contributors {
      * Associations between different usernames.
      */
     val knownLinks = bidiMultimapOf(
-        "clocks" to "doomsdayrs"
+        "clocks" to "doomsdayrs",
     )
 
     /**
@@ -15,7 +15,8 @@ object Contributors {
      * Name can be preferred name.
      */
     val knownImages = mapOf(
-        "clocks" to "https://gitlab.com/uploads/-/system/user/avatar/3931112/avatar.png?width=256"
+        "clocks" to "https://gitlab.com/uploads/-/system/user/avatar/3931112/avatar.png?width=256",
+        "jfronny" to "https://gitlab.com/uploads/-/system/user/avatar/6260391/avatar.png?width=256",
     )
 
     /**
@@ -24,7 +25,8 @@ object Contributors {
      * For example, "doomsdayrs" should be mapped to "Clocks".
      */
     val preferredNames = mapOf(
-        "doomsdayrs" to "Clocks"
+        "doomsdayrs" to "Clocks",
+        "j. jfronny" to "JFronny",
     )
 
     /**
@@ -33,7 +35,8 @@ object Contributors {
      * Name can be preferred name.
      */
     val websites = mapOf(
-        "clocks" to "https://doomsdayrs.page"
+        "clocks" to "https://doomsdayrs.page",
+        "jfronny" to "https://jfronny.gitlab.io",
     )
 
 

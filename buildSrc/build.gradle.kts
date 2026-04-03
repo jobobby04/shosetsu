@@ -15,4 +15,5 @@ dependencies {
 	implementation(libs.kotlin.gradle.plugin)
 	implementation(libs.kotlin.serialization)
 	implementation(libs.kotlinx.serialization.json)
+	implementation(libs.kotlinpoet)
 }

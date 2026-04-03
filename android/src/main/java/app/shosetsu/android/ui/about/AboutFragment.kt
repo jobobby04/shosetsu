@@ -101,7 +101,6 @@ fun AboutView(
 	onBack: () -> Unit
 ) {
 	val viewModel: AAboutViewModel = viewModelDi()
-	val contributors by viewModel.contributors.collectAsState()
 
 	val uriHandler = LocalUriHandler.current
 
@@ -146,7 +145,7 @@ fun AboutView(
 			uriHandler.openUri(URL_KOFI)
 		},
 		onBack = onBack,
-		contributors = contributors
+		contributors = viewModel.contributors
 	)
 }
 
@@ -169,7 +168,13 @@ fun PreviewAboutContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		onOpenKofi = {
 		},
 		onBack = {},
-			contributors = listOf(Contributor("Clocks", "doomsdayrs.page", ""))
+			contributors = listOf(Contributor(
+				"Clocks",
+				"doomsdayrs.page",
+				0,
+				null,
+				null,
+			))
 		)
 
 }
@@ -182,10 +187,10 @@ fun ContributorItem(
 
 	NovelCardCozyContent(
 		contributor.name,
-		contributor.imageURL ?: "",
+		contributor.image ?: "",
 		onClick =  {
-			if (contributor.link.isNotBlank())
-				uriHandler.openUri(contributor.link)
+			if (!contributor.website.isNullOrBlank())
+				uriHandler.openUri(contributor.website)
 		},
 		onLongClick = {}
 	)
