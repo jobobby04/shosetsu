@@ -3,13 +3,6 @@ import com.google.common.collect.Multimap
 
 object Contributors {
     /**
-     * Associations between different usernames.
-     */
-    val knownLinks = bidiMultimapOf(
-        "clocks" to "doomsdayrs",
-    )
-
-    /**
      * Association between a name and an image url.
      *
      * Name can be preferred name.
@@ -26,7 +19,18 @@ object Contributors {
      */
     val preferredNames = mapOf(
         "doomsdayrs" to "Clocks",
-        "j. jfronny" to "JFronny",
+        "j. fronny" to "JFronny",
+        "jobobby04" to "Jobobby04",
+        "suhan-paradkar" to "Suhan G Paradkar",
+        "wasu-code" to "wasu",
+        "wasu dev" to "wasu",
+    )
+
+    /**
+     * Associations between different usernames.
+     */
+    val knownLinks = bidiMultimapOf(
+        *preferredNames.map { it.key.lowercase() to it.value.lowercase() }.toTypedArray(),
     )
 
     /**
