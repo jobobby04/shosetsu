@@ -10,35 +10,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -66,8 +56,6 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
-import coil.compose.AsyncImage
-import coil.imageLoader
 import kotlinx.coroutines.launch
 import org.acra.util.Installation
 
@@ -185,15 +173,17 @@ fun ContributorItem(
 ) {
 	val uriHandler = LocalUriHandler.current
 
-	NovelCardCozyContent(
-		contributor.name,
-		contributor.image ?: "",
-		onClick =  {
-			if (!contributor.website.isNullOrBlank())
-				uriHandler.openUri(contributor.website)
-		},
-		onLongClick = {}
-	)
+	Box(Modifier.requiredWidthIn(max = 60.dp)) {
+		NovelCardCozyContent(
+			contributor.name,
+			contributor.image ?: "",
+			onClick =  {
+				if (!contributor.website.isNullOrBlank())
+					uriHandler.openUri(contributor.website)
+			},
+			onLongClick = {},
+		)
+	}
 }
 
 @ExperimentalMaterial3Api
