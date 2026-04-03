@@ -29,6 +29,10 @@ import androidx.work.CoroutineWorker
 
 /**
  * 09 / 02 / 2021
+ *
+ * Used by workers which are capable of sending notifications.
+ * <p>
+ * Defines the required data structures and some utility functions.
  */
 interface NotificationCapable {
 	/**
@@ -55,13 +59,15 @@ interface NotificationCapable {
 	fun CoroutineWorker.notify(
 		@StringRes messageId: Int,
 		notificationId: Int = defaultNotificationID,
-		action: Builder.() -> Unit = {}
-	) = notify(notifyContext.getText(messageId), notificationId, action)
+		tag: String? = null,
+		action: Builder.() -> Unit = {},
+	) = notify(notifyContext.getText(messageId), notificationId, tag, action)
 
 	fun CoroutineWorker.notify(
 		contentText: CharSequence? = null,
 		notificationId: Int = defaultNotificationID,
-		action: Builder.() -> Unit = {}
+		tag: String? = null,
+		action: Builder.() -> Unit = {},
 	) {
 		if (
 			ActivityCompat.checkSelfPermission(
@@ -72,6 +78,7 @@ interface NotificationCapable {
 			return
 		}
 		notificationManager.notify(
+			tag,
 			notificationId,
 			baseNotificationBuilder.apply {
 				setContentText(contentText)

@@ -12,13 +12,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
@@ -27,11 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,10 +44,12 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
-import app.shosetsu.android.view.compose.setting.SwitchSettingContent
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
+import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.ExtensionType
@@ -106,8 +110,20 @@ fun ConfigureExtensionContent(
 	val extensionUIResult by viewModel.liveData.collectAsState()
 	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
+	val errors by viewModel.errors.collectAsState(null)
+
+	// for snackbars
+	val hostState = remember { SnackbarHostState() }
+
+	// If there is an error, display it as a snackbar
+	LaunchedEffect(errors) {
+		if (errors != null) {
+			hostState.showSnackbar(errors?.message ?: "Unknown Error")
+		}
+	}
 
 	Scaffold(
+		snackbarHost = { SnackbarHost(hostState) },
 		topBar = {
 			TopAppBar(
 				title = {
@@ -121,7 +137,6 @@ fun ConfigureExtensionContent(
 		}
 	) { paddingValues ->
 		LazyColumn(
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			state = rememberLazyListState(),
 			contentPadding = PaddingValues(bottom = 8.dp),
 			modifier = Modifier.padding(paddingValues)
@@ -137,17 +152,18 @@ fun ConfigureExtensionContent(
 
 			if (extensionListingResult != null && extensionListingResult!!.choices.size > 1) {
 				item {
-					DropdownSettingContent(
+					val selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0
+					val choices = extensionListingResult!!.choices
+					ListPreferenceWidget(
 						title = stringResource(R.string.listings),
-						description = stringResource(R.string.fragment_configure_extension_listing_desc),
-						choices = extensionListingResult!!.choices,
-						selection = extensionListingResult!!.selection.takeIf { it != -1 } ?: 0,
-						onSelection = { index ->
-							viewModel.setSelectedListing(index)
-						},
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(top = 8.dp, start = 16.dp, end = 16.dp)
+						subtitle = stringResource(
+							R.string.fragment_configure_extension_listing_desc,
+							choices[selection]
+						),
+						icon = null,
+						value = selection,
+						entries = choices.withIndex().associate { it.index to it.value },
+						onValueChange = { viewModel.setSelectedListing(it) }
 					)
 				}
 			}
@@ -171,14 +187,14 @@ fun SettingsItemAsCompose(
 						modifier = Modifier.fillMaxWidth()
 					) {
 						Text(data.name)
-						Divider()
+						HorizontalDivider()
 					}
 				}
 			}
 
 			is FilterEntity.Separator -> {
 				column.item(Random.nextInt() + 1000000) {
-					Divider()
+					HorizontalDivider()
 				}
 			}
 
@@ -198,14 +214,14 @@ fun SettingsItemAsCompose(
 
 			is FilterEntity.Switch -> {
 				column.item(data.id) {
-					SwitchSettingContent(
-						data.name,
-						"",
-						isChecked = data.state,
-						onCheckChange = { newValue ->
+					SwitchPreferenceWidget(
+						title = data.name,
+						subtitle = "",
+						checked = data.state,
+						modifier = Modifier.fillMaxWidth(),
+						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						},
-						modifier = Modifier.fillMaxWidth()
+						}
 					)
 				}
 			}
@@ -253,7 +269,7 @@ fun SettingsItemAsCompose(
 							.fillMaxWidth()
 					) {
 						Text(data.name)
-						Divider()
+						HorizontalDivider()
 					}
 				}
 				SettingsItemAsCompose(column, viewModel, data.filters.toList())
@@ -265,14 +281,14 @@ fun SettingsItemAsCompose(
 
 			is FilterEntity.Checkbox -> {
 				column.item(data.id) {
-					SwitchSettingContent(
-						data.name,
-						"",
-						isChecked = data.state,
-						onCheckChange = { newValue ->
+					SwitchPreferenceWidget(
+						title = data.name,
+						subtitle = "",
+						checked = data.state,
+						modifier = Modifier.fillMaxWidth(),
+						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						},
-						modifier = Modifier.fillMaxWidth()
+						}
 					)
 				}
 			}
@@ -368,14 +384,11 @@ fun ConfigureExtensionHeaderContent(
 				}
 			}
 
-			IconButton(
+			SimpleIconButton(
+				Icons.Default.Delete,
+				stringResource(R.string.uninstall),
 				onClick = onUninstall,
-			) {
-				Icon(
-					painterResource(R.drawable.trash),
-					stringResource(R.string.uninstall)
-				)
-			}
+			)
 		}
 	}
 }

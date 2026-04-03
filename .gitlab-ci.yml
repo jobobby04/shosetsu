@@ -1,4 +1,4 @@
-image: openjdk:17-jdk
+image: eclipse-temurin:17-noble
 
 variables:
 
@@ -20,7 +20,7 @@ variables:
 # Packages installation before running script
 before_script:
   - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1 git
   - export ANDROID_HOME="${PWD}/android-home"
   - export PATH=$PATH:${ANDROID_HOME}/cmdline-tools/tools/bin/
   - export GRADLE_USER_HOME=`pwd`/.gradle

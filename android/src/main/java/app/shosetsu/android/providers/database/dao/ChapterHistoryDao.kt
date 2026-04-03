@@ -108,15 +108,16 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 			if (history != null) {
 				update(
 					history.copy(
-						startedReadingAt = time
+						startedReadingAt = time,
+						endedReadingAt = null,
 					)
 				)
 			} else {
 				insert(
 					novelId,
 					chapterId,
-					System.currentTimeMillis(),
-					null
+					startedReadingAt = time,
+					endedReadingAt = null,
 				)
 			}
 		}

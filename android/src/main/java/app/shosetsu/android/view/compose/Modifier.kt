@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
@@ -31,6 +32,10 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.DpSize
 import kotlin.math.roundToInt
+
+const val SECONDARY_ALPHA = .78f
+
+fun Modifier.secondaryItemAlpha(): Modifier = this.alpha(SECONDARY_ALPHA)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("ModifierInspectorInfo")

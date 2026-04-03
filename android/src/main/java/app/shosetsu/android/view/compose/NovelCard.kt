@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
@@ -76,15 +77,13 @@ fun PlaceholderNovelCardNormalContent() {
 
 @Preview
 @Composable
-fun PreviewNovelCardNormalContent() {
-	ShosetsuTheme {
-		NovelCardNormalContent(
-			"Test",
-			"",
-			onClick = {},
-			onLongClick = {}
-		)
-	}
+fun PreviewNovelCardNormalContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	NovelCardNormalContent(
+		"Test",
+		"",
+		onClick = {},
+		onLongClick = {}
+	)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -121,7 +120,7 @@ fun NovelCardNormalContent(
 					.placeholder(visible = isPlaceholder),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(title)
 				}
 			)
 
@@ -184,15 +183,13 @@ fun PlaceholderNovelCardCozyContent() {
 
 @Preview
 @Composable
-fun PreviewNovelCardCozyContent() {
-	ShosetsuTheme {
-		NovelCardCozyContent(
-			"Test",
-			"",
-			onClick = {},
-			onLongClick = {}
-		)
-	}
+fun PreviewNovelCardCozyContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	NovelCardCozyContent(
+		"Test",
+		"",
+		onClick = {},
+		onLongClick = {}
+	)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -232,7 +229,7 @@ fun NovelCardCozyContent(
 						.placeholder(visible = isPlaceholder),
 					contentScale = ContentScale.Crop,
 					error = {
-						ImageLoadingError()
+						ImageLoadingError(title)
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
@@ -267,15 +264,13 @@ fun NovelCardCozyContent(
 
 @Preview
 @Composable
-fun PreviewNovelCardCompressedContent() {
-	ShosetsuTheme {
-		NovelCardCompressedContent(
-			"Test",
-			"",
-			onClick = {},
-			onLongClick = {}
-		)
-	}
+fun PreviewNovelCardCompressedContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	NovelCardCompressedContent(
+		"Test",
+		"",
+		onClick = {},
+		onLongClick = {}
+	)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -322,7 +317,7 @@ fun NovelCardCompressedContent(
 							.aspectRatio(1.0f),
 						contentScale = ContentScale.Crop,
 						error = {
-							ImageLoadingError()
+							ImageLoadingError(title)
 						},
 						loading = {
 							Box(Modifier.placeholder(true))

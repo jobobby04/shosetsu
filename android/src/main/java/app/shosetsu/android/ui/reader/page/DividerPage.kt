@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /*
@@ -38,17 +39,15 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
  */
 @Preview
 @Composable
-fun PreviewDividerPageContent() {
-	ShosetsuTheme {
-		DividierPageContent(
-			"The first",
-			"The second"
-		)
-	}
+fun PreviewDividerPage() = ShosetsuTheme(AppThemes.LIGHT) {
+	DividerPage(
+		"The first",
+		"The second"
+	)
 }
 
 @Composable
-fun DividierPageContent(
+fun DividerPage(
 	previous: String,
 	next: String?
 ) {

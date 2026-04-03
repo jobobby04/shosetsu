@@ -1,11 +1,9 @@
 package app.shosetsu.android.ui.main
 
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
 
@@ -33,25 +31,17 @@ import androidx.navigation.NavBackStackEntry
  * @author Doomsdayrs
  */
 @Composable
-fun <T> NavigationRail(
-	destinations: List<T>,
+fun NavigationRail(
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
+	onNavigate: (ShosetsuDestination.Primary) -> Unit
+) {
 	NavigationRail {
-		destinations.forEach { destination ->
+		ShosetsuDestination.Primary.all.forEach { destination ->
+			val isSelected = currentDestination?.has(destination) == true
 			NavigationRailItem(
-				selected =
-				currentDestination?.destination?.route == destination.route,
-				icon = {
-					Icon(
-						painterResource(destination.icon),
-						destination.route
-					)
-				},
-				label = {
-					Text(stringResource(destination.name))
-				},
+				selected = isSelected,
+				icon = { DestinationIcon(destination, isSelected) },
+				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
 				}

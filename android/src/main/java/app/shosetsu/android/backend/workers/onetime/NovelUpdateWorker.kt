@@ -8,6 +8,9 @@ import android.graphics.Bitmap
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Refresh
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
@@ -27,6 +30,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.DownloadNewNovelChapters
 import app.shosetsu.android.common.SettingKey.ExcludedCategoriesInUpdate
 import app.shosetsu.android.common.SettingKey.IncludeCategoriesInUpdate
@@ -44,6 +48,7 @@ import app.shosetsu.android.common.consts.LogConstants.SERVICE_EXECUTE
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_UPDATE
 import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_UPDATE
 import app.shosetsu.android.common.consts.WorkerTags.UPDATE_WORK_ID
+import app.shosetsu.android.common.ext.actionBuilder
 import app.shosetsu.android.common.ext.addReportErrorAction
 import app.shosetsu.android.common.ext.getString
 import app.shosetsu.android.common.ext.intent
@@ -57,6 +62,7 @@ import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.common.ext.setOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.LibraryNovelEntity
@@ -77,6 +83,7 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
 import java.io.IOException
+import java.time.Instant
 import kotlin.coroutines.cancellation.CancellationException
 
 /*
@@ -101,7 +108,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * 07 / 02 / 2020
  *
  * <p>
- *     Handles update requests for the entire application
+ *	 Handles update requests for the entire application
  * </p>
  */
 class NovelUpdateWorker(
@@ -116,8 +123,8 @@ class NovelUpdateWorker(
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 
 	private fun NotificationCompat.Builder.addCancelAction() {
-		addAction(
-			R.drawable.ic_baseline_cancel_24, getString(android.R.string.cancel),
+		addAction(actionBuilder(
+			Icons.Default.Cancel, getString(android.R.string.cancel),
 			PendingIntent.getBroadcast(
 				applicationContext,
 				0,
@@ -127,12 +134,12 @@ class NovelUpdateWorker(
 				},
 				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 			)
-		)
+		).build())
 	}
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_UPDATE)
-			.setSmallIcon(R.drawable.refresh)
+			.setSmallIcon(Icons.Default.Refresh)
 			.setSubText(applicationContext.getString(R.string.update_novel))
 			.setContentText("Update in progress")
 			.setOnlyAlertOnce(true)
@@ -165,6 +172,9 @@ class NovelUpdateWorker(
 	private suspend fun classicFinale(): Boolean =
 		iSettingsRepository.getBoolean(NovelUpdateClassicFinish)
 
+	private suspend fun setLastUpdatedTimestamp(value: Long) =
+		iSettingsRepository.setLong(SettingKey.NovelUpdateLastTimestamp, value)
+
 	override suspend fun doWork(): Result {
 		// Log that the worker is executing
 		logI(SERVICE_EXECUTE)
@@ -181,8 +191,8 @@ class NovelUpdateWorker(
 		/** Collect updated chapters to be used */
 		val updatedChapters = arrayListOf<ChapterEntity>()
 
+		val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 		iNovelsRepository.loadLibraryNovelEntities().first().let { list ->
-			val categoryID = inputData.getInt(KEY_CATEGORY, -1)
 			if (categoryID >= 0) {
 				list.filter { it.category == categoryID }
 			} else {
@@ -331,6 +341,8 @@ class NovelUpdateWorker(
 				progress++
 			}
 
+			if (categoryID < 0) setLastUpdatedTimestamp(Instant.now().toEpochMilli())
+
 			notify(R.string.update_complete) {
 				setNotOngoing()
 				removeProgress()
@@ -353,7 +365,7 @@ class NovelUpdateWorker(
 			}
 
 		// Will update only if downloadOnUpdate is enabled and there have been chapters
-		if (downloadOnUpdate() && updateNovels.size > 0 && updatedChapters.size > 0)
+		if (downloadOnUpdate() && updateNovels.isNotEmpty() && updatedChapters.isNotEmpty())
 			startDownloadWorker(updatedChapters)
 
 		return Result.success()
@@ -371,6 +383,7 @@ class NovelUpdateWorker(
 	) {
 		val chapterSize: Int = chapters.size
 		val firstChapterId = chapters.minByOrNull { it.order }?.id
+		val lastChapterId = chapters.maxByOrNull { it.order }?.id
 		val bitmap: Bitmap? =
 			applicationContext.imageLoader.execute(
 				ImageRequest.Builder(applicationContext).data(novel.imageURL)
@@ -383,7 +396,8 @@ class NovelUpdateWorker(
 				chapterSize,
 				chapterSize
 			),
-			notificationId = 10000 + novel.id
+			notificationId = 10000 + novel.id,
+			tag = lastChapterId?.let { ch -> "update/${novel.id}/$ch" },
 		) {
 			setContentTitle(
 				getString(
@@ -506,10 +520,7 @@ class NovelUpdateWorker(
 
 	companion object {
 		const val ACTION_CANCEL_NOVEL_UPDATE = "shosetsu_action_cancel_novel_update"
-		const val KEY_TARGET: String = "Target"
-		const val KEY_CHAPTERS: String = "Novels"
 
-		const val KEY_NOVELS: Int = 0x00
 		const val KEY_CATEGORY: String = "category"
 	}
 }

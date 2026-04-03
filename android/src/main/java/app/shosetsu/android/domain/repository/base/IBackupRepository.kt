@@ -1,10 +1,6 @@
 package app.shosetsu.android.domain.repository.base
 
-import app.shosetsu.android.common.FileNotFoundException
-import app.shosetsu.android.common.FilePermissionException
-import app.shosetsu.android.domain.model.local.BackupEntity
 import kotlinx.coroutines.flow.StateFlow
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -45,27 +41,4 @@ interface IBackupRepository {
 	 * Will cause emission of [backupProgress]
 	 */
 	fun updateProgress(result: BackupProgress)
-
-	/**
-	 * Reads the backup directory
-	 *
-	 * @return a list of filenames to select from
-	 */
-	suspend fun loadBackups(): List<String>
-
-
-	/**
-	 * Loads a backup via its name
-	 * @param path File name / Direct Path of a backup
-	 * @param isExternal, if true then [path] is a direct path
-	 */
-	@Throws(FilePermissionException::class, FileNotFoundException::class)
-	suspend fun loadBackup(path: String, isExternal: Boolean = false): BackupEntity?
-
-
-	/**
-	 * @return Path of new backup
-	 */
-	@Throws(FilePermissionException::class, IOException::class)
-	suspend fun saveBackup(backupEntity: BackupEntity): String
 }

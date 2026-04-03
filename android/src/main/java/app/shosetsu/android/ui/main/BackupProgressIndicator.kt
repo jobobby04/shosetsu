@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /*
@@ -69,8 +70,6 @@ fun BackupProgressIndicator() {
 
 @Preview
 @Composable
-fun PreviewBackupProgressIndicator() {
-	ShosetsuTheme {
-		BackupProgressIndicator()
-	}
+fun PreviewBackupProgressIndicator() = ShosetsuTheme(AppThemes.LIGHT) {
+	BackupProgressIndicator()
 }

@@ -106,7 +106,7 @@ abstract class ANovelViewModel
 	/**
 	 * Set the categories of the novel
 	 */
-	abstract fun setNovelCategories(categories: IntArray): Unit
+	abstract fun setNovelCategories(categories: IntArray)
 
 	/**
 	 * Toggles the bookmark of this ui

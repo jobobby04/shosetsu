@@ -1,9 +1,9 @@
 package app.shosetsu.android.ui.novel
 
-import android.app.Activity
 import android.content.Intent
 import android.content.res.Resources
 import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,7 +34,20 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LibraryAddCheck
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.BookmarkRemove
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.LibraryAddCheck
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -47,7 +58,6 @@ import androidx.compose.material3.ElevatedSuggestionChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -63,6 +73,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,7 +90,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -104,6 +115,7 @@ import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.LongClickTextButton
 import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.NovelSettingUI
@@ -153,13 +165,13 @@ fun NovelInfoView(
 	onMigrate: (novelId: Int) -> Unit,
 	openInWebView: (String) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
-	onBack: () -> Unit,
-	drawerIcon: @Composable () -> Unit
+	onBack: () -> Unit
 ) {
 	val viewModel: ANovelViewModel = viewModelDi()
 
-	LaunchedEffect(novelId) {
+	DisposableEffect(novelId) {
 		viewModel.setNovelID(novelId)
+		onDispose {}
 	}
 
 	val novelInfo by viewModel.novelLive.collectAsState()
@@ -170,7 +182,7 @@ fun NovelInfoView(
 	val itemAt by viewModel.itemIndex.collectAsState()
 	val categories by viewModel.categories.collectAsState()
 	val novelCategories by viewModel.novelCategories.collectAsState()
-	val activity = LocalContext.current as Activity
+	val activity = LocalActivity.current
 	val novelURL by viewModel.novelURL.collectAsState()
 	val isCategoriesDialogVisible by viewModel.isCategoriesDialogVisible.collectAsState()
 	val toggleBookmarkResponse by viewModel.toggleBookmarkResponse.collectAsState()
@@ -186,6 +198,7 @@ fun NovelInfoView(
 
 	val hostState = remember { SnackbarHostState() }
 	val context = LocalContext.current
+	val resources = LocalResources.current
 	val scope = rememberCoroutineScope()
 
 	LaunchedEffect(error) {
@@ -269,13 +282,6 @@ fun NovelInfoView(
 		}
 	}
 
-	val state = LazyListState(0)
-
-	// If the data is not present, loads it
-	if (novelInfo != null && !novelInfo!!.loaded) {
-		viewModel.refresh()
-	}
-
 	NovelInfoContent(
 		novelInfo = novelInfo,
 		chapters = chapters,
@@ -283,9 +289,7 @@ fun NovelInfoView(
 		itemAt = itemAt,
 		isRefreshing = isRefreshing,
 		onRefresh = {
-			//	if (viewModel.isOnline())
-			//refresh()
-			//else displayOfflineSnackBar(null)
+			viewModel.refresh()
 		},
 		openWebView = {
 			openInWebView(novelURL ?: return@NovelInfoContent)
@@ -322,7 +326,6 @@ fun NovelInfoView(
 		bookmarkSelected = viewModel::bookmarkSelected,
 		unbookmarkSelected = viewModel::removeBookmarkFromSelected,
 		hasSelected = hasSelected,
-		state = state,
 		windowSize = windowSize,
 		onSelectAll = viewModel::selectAll,
 		onSelectBetween = viewModel::selectBetween,
@@ -376,7 +379,7 @@ fun NovelInfoView(
 				(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
 			val result = hostState.showSnackbar(
 				try {
-					context.resources.getQuantityString(
+					resources.getQuantityString(
 						R.plurals.fragment_novel_toggle_delete_chapters,
 						chaptersToDelete,
 						chaptersToDelete
@@ -414,7 +417,7 @@ fun NovelInfoView(
 		NovelShareMenu(
 			shareBasicURL = {
 				if (shareInfo != null)
-					activity.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
+					activity?.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
 			},
 			shareQRCode = {
 				viewModel.showQRCodeDialog()
@@ -616,7 +619,6 @@ fun PreviewNovelInfoContent() {
 			bookmarkSelected = {},
 			unbookmarkSelected = {},
 			hasSelected = false,
-			state = rememberLazyListState(0),
 			windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height)),
 			onSelectAll = {},
 			onSelectBetween = {},
@@ -663,7 +665,6 @@ fun NovelInfoContent(
 	bookmarkSelected: () -> Unit,
 	unbookmarkSelected: () -> Unit,
 	hasSelected: Boolean,
-	state: LazyListState,
 	windowSize: WindowSizeClass,
 	onSelectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
@@ -760,11 +761,8 @@ fun NovelInfoContent(
 				}
 
 				Box(Modifier.fillMaxSize()) {
-					LazyColumnScrollbar(
-						listState = state,
-						thumbColor = MaterialTheme.colorScheme.primary,
-						thumbSelectedColor = Color.Gray,
-					) {
+					val state = rememberLazyListState()
+					LazyColumnScrollbar(listState = state) {
 						LazyColumn(
 							modifier = Modifier.fillMaxSize(),
 							state = state,
@@ -783,7 +781,7 @@ fun NovelInfoContent(
 								}
 							}
 
-							stickyHeader {
+							stickyHeader(key = "sticky:chapter") {
 								Surface(tonalElevation = 1.dp) {
 									NovelChapterBar(
 										chapters?.size ?: 0,
@@ -793,11 +791,7 @@ fun NovelInfoContent(
 								}
 							}
 
-							if (chapters != null)
-								NovelInfoChaptersContent(
-									chapters,
-									chapterContent
-								)
+							if (chapters != null) items(chapters) { chapterContent(it) }
 						}
 					}
 
@@ -872,60 +866,42 @@ fun BoxScope.ChapterSelectionBar(
 			.align(BiasAlignment(0f, 0.7f))
 	) {
 		Row {
-			IconButton(
+			SimpleIconButton(
+				Icons.Filled.Download,
+				stringResource(R.string.fragment_novel_selected_download),
 				onClick = downloadSelected,
 				enabled = selectedChaptersState.showDownload
-			) {
-				Icon(
-					painterResource(R.drawable.download),
-					stringResource(R.string.fragment_novel_selected_download)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Outlined.Delete,
+				stringResource(R.string.fragment_novel_selected_delete),
 				onClick = deleteSelected,
 				enabled = selectedChaptersState.showDelete
-			) {
-				Icon(
-					painterResource(R.drawable.trash),
-					stringResource(R.string.fragment_novel_selected_delete)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Filled.LibraryAddCheck,
+				stringResource(R.string.fragment_novel_selected_read),
 				onClick = markSelectedAsRead,
 				enabled = selectedChaptersState.showMarkAsRead
-			) {
-				Icon(
-					painterResource(R.drawable.read_mark),
-					stringResource(R.string.fragment_novel_selected_read)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Outlined.LibraryAddCheck,
+				stringResource(R.string.fragment_novel_selected_unread),
 				onClick = markSelectedAsUnread,
 				enabled = selectedChaptersState.showMarkAsUnread
-			) {
-				Icon(
-					painterResource(R.drawable.unread_mark),
-					stringResource(R.string.fragment_novel_selected_unread)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Filled.BookmarkAdd,
+				stringResource(R.string.fragment_novel_selected_bookmark),
 				onClick = bookmarkSelected,
 				enabled = selectedChaptersState.showBookmark
-			) {
-				Icon(
-					painterResource(R.drawable.ic_outline_bookmark_add_24),
-					stringResource(R.string.fragment_novel_selected_bookmark)
-				)
-			}
-			IconButton(
+			)
+			SimpleIconButton(
+				Icons.Outlined.BookmarkRemove,
+				stringResource(R.string.fragment_novel_selected_unbookmark),
 				onClick = unbookmarkSelected,
 				enabled = selectedChaptersState.showRemoveBookmark
-			) {
-				Icon(
-					painterResource(R.drawable.ic_baseline_bookmark_remove_24),
-					stringResource(R.string.fragment_novel_selected_unbookmark)
-				)
-			}
+			)
 		}
 	}
 }
@@ -957,13 +933,6 @@ fun PreviewChapterContent() {
 	}
 }
 
-fun LazyListScope.NovelInfoChaptersContent(
-	chapters: List<ChapterUI>,
-	chapterContent: @Composable (ChapterUI) -> Unit
-) {
-	items(chapters) { chapterContent(it) }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NovelChapterContent(
@@ -982,9 +951,9 @@ fun NovelChapterContent(
 			}
 			.combinedClickable(
 				onClick =
-				if (!selectionMode)
-					openChapter
-				else onToggleSelection,
+					if (!selectionMode)
+						openChapter
+					else onToggleSelection,
 				onLongClick = onToggleSelection
 			)
 			.fillMaxWidth(),
@@ -1070,6 +1039,7 @@ fun PreviewHeaderContent() {
 
 @Composable
 fun NovelInfoCoverContent(
+	title: String,
 	imageURL: String,
 	modifier: Modifier = Modifier,
 	contentScale: ContentScale = ContentScale.Fit,
@@ -1085,7 +1055,7 @@ fun NovelInfoCoverContent(
 			.clickable(onClick = onClick),
 		contentScale = contentScale,
 		error = {
-			ImageLoadingError()
+			ImageLoadingError(title)
 		},
 		loading = {
 			Box(Modifier.placeholder(true))
@@ -1093,7 +1063,6 @@ fun NovelInfoCoverContent(
 	)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NovelInfoHeaderContent(
 	novelInfo: NovelUI,
@@ -1106,6 +1075,7 @@ fun NovelInfoHeaderContent(
 	if (isCoverClicked)
 		Dialog(onDismissRequest = { isCoverClicked = false }) {
 			NovelInfoCoverContent(
+				novelInfo.title,
 				novelInfo.imageURL,
 				modifier = Modifier.fillMaxWidth()
 			) {
@@ -1131,7 +1101,7 @@ fun NovelInfoHeaderContent(
 					.alpha(.10f),
 				contentScale = ContentScale.Crop,
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(novelInfo.title)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
@@ -1149,6 +1119,7 @@ fun NovelInfoHeaderContent(
 						verticalAlignment = Alignment.CenterVertically
 					) {
 						NovelInfoCoverContent(
+							novelInfo.title,
 							novelInfo.imageURL,
 							modifier = Modifier
 								.fillMaxWidth(.35f)
@@ -1255,9 +1226,9 @@ fun NovelInfoHeaderContent(
 						) {
 							Icon(
 								if (novelInfo.bookmarked) {
-									painterResource(R.drawable.ic_heart_svg_filled)
+									Icons.Filled.Favorite
 								} else {
-									painterResource(R.drawable.ic_heart_svg)
+									Icons.Outlined.FavoriteBorder
 								},
 								null,
 								tint = if (novelInfo.bookmarked)
@@ -1299,7 +1270,7 @@ fun NovelInfoHeaderContent(
 								horizontalAlignment = Alignment.CenterHorizontally
 							) {
 								Icon(
-									painterResource(R.drawable.ic_baseline_label_24),
+									Icons.AutoMirrored.Outlined.Label,
 									stringResource(R.string.categories),
 									modifier = Modifier.size(20.dp),
 									tint = MaterialTheme.colorScheme.onSurface
@@ -1323,7 +1294,7 @@ fun NovelInfoHeaderContent(
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
 							Icon(
-								painterResource(R.drawable.open_in_browser),
+								Icons.Default.OpenInBrowser,
 								stringResource(R.string.action_open_in_webview),
 								modifier = Modifier.size(20.dp),
 								tint = MaterialTheme.colorScheme.onSurface
@@ -1416,10 +1387,7 @@ fun NovelChapterBar(
 						.padding(horizontal = 4.dp),
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					Icon(
-						painterResource(R.drawable.filter),
-						null,
-					)
+					Icon(Icons.Outlined.FilterList, null)
 					Text(stringResource(R.string.filter))
 				}
 			}
@@ -1458,36 +1426,39 @@ fun ExpandedText(
 			modifier = Modifier.padding(start = 8.dp, end = 8.dp)
 		)
 
-		if (!isExpanded) {
-			LazyRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-				contentPadding = PaddingValues(horizontal = 8.dp)
-			) {
-				items(genre) {
-					NovelGenre(it)
+		if (genre.isNotEmpty()) {
+			if (!isExpanded) {
+				LazyRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+					contentPadding = PaddingValues(horizontal = 8.dp)
+				) {
+					items(genre) {
+						NovelGenre(it)
+					}
 				}
-			}
-		} else {
-			FlowRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				genre.forEach {
-					NovelGenre(it)
+			} else {
+				FlowRow(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(vertical = 8.dp),
+					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+					verticalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					genre.forEach {
+						NovelGenre(it)
+					}
 				}
 			}
 		}
+
 		Icon(
-			painter = if (!isExpanded) {
-				painterResource(R.drawable.expand_more)
+			imageVector = if (!isExpanded) {
+				Icons.Outlined.ExpandMore
 			} else {
-				painterResource(R.drawable.expand_less)
+				Icons.Outlined.ExpandLess
 			},
 			contentDescription = if (!isExpanded) {
 				stringResource(R.string.more)
@@ -1499,7 +1470,6 @@ fun ExpandedText(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NovelGenre(
 	text: String

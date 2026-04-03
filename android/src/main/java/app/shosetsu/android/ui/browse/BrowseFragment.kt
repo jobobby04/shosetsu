@@ -21,9 +21,6 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -42,7 +39,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ManageSearch
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Card
@@ -51,7 +52,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -74,8 +74,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,15 +82,17 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
-import app.shosetsu.android.common.consts.BROWSE_HELP_URL
+import app.shosetsu.android.common.consts.URL_HELP_BROWSE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.view.BottomSheetDialog
+import app.shosetsu.android.view.compose.AnimatedRefresh
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
@@ -271,17 +271,10 @@ fun BrowseContent(
 					SearchAction(
 						query = query,
 						onSearch = onSetQuery,
-						icon = {
-							Icon(
-								painterResource(R.drawable.baseline_manage_search_24),
-								stringResource(R.string.search)
-							)
-						}
+						icon = Icons.AutoMirrored.Outlined.ManageSearch
 					)
-					IconButton(onOpenSearch) {
-						Icon(Icons.Default.Search, stringResource(R.string.global_search))
-					}
-					HelpButton(BROWSE_HELP_URL)
+					SimpleIconButton(Icons.Default.Search, stringResource(R.string.global_search), onOpenSearch)
+					HelpButton(URL_HELP_BROWSE)
 				},
 				navigationIcon = drawerIcon
 			)
@@ -295,7 +288,7 @@ fun BrowseContent(
 					Text(stringResource(R.string.filter))
 				},
 				icon = {
-					Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+					Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 				},
 				onClick = onOpenFilter
 			)
@@ -480,16 +473,16 @@ fun BrowseExtensionContent(
 				) {
 					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
 						var isDropdownVisible by remember { mutableStateOf(false) }
-						IconButton(
+						SimpleIconButton(
+							Icons.Default.Download,
+							null,
 							onClick = {
 								// We can skip to dropdown if there is only 1 install option
 								if (item.installOptions.size != 1)
 									isDropdownVisible = true
 								else install(item.installOptions[0])
 							}
-						) {
-							Icon(painterResource(R.drawable.download), null)
-						}
+						)
 						DropdownMenu(
 							expanded = isDropdownVisible,
 							onDismissRequest = { isDropdownVisible = false },
@@ -517,44 +510,33 @@ fun BrowseExtensionContent(
 					}
 
 					if (item.isUpdateAvailable) {
-						IconButton(
-							onClick = update
-						) {
-							Icon(
-								painterResource(R.drawable.download),
-								stringResource(R.string.update),
-								modifier = Modifier.rotate(180f),
-								tint = MaterialTheme.colorScheme.tertiary
-							)
-						}
+						SimpleIconButton(
+							Icons.Default.Download,
+							stringResource(R.string.update),
+							onClick = update,
+							modifier = Modifier.rotate(180f),
+							tint = MaterialTheme.colorScheme.tertiary
+						)
 					}
 
 					if (item.isInstalled) {
-						IconButton(
+						SimpleIconButton(
+							Icons.Outlined.Settings,
+							stringResource(R.string.settings),
 							onClick = openSettings
-						) {
-							Icon(
-								painterResource(R.drawable.settings),
-								stringResource(R.string.settings)
-							)
-						}
+						)
 					}
 
 					if (item.isInstalling) {
-						IconButton(
+						SimpleIconButton(
+							stringResource(R.string.installing),
 							onClick = {},
 							modifier = Modifier.combinedClickable(
 								onClick = {},
 								onLongClick = cancelInstall,
 							)
 						) {
-							val image =
-								AnimatedImageVector.animatedVectorResource(R.drawable.animated_refresh)
-
-							Icon(
-								rememberAnimatedVectorPainter(image, false),
-								stringResource(R.string.installing)
-							)
+							AnimatedRefresh()
 						}
 					}
 				}
@@ -570,7 +552,7 @@ fun BrowseExtensionContent(
 					) {
 						Text(
 							stringResource(R.string.obsolete_extension),
-							color = colorResource(com.google.android.material.R.color.design_default_color_on_primary),
+							color = MaterialTheme.colorScheme.onPrimary,
 							modifier = Modifier
 								.padding(8.dp)
 								.align(Alignment.Center)

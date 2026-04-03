@@ -33,6 +33,6 @@ enum class DownloadStatus(val key: Int) {
 	COMPLETE(4);
 
 	companion object {
-		fun fromInt(key: Int) = values().find { it.key == key } ?: ERROR
+		fun fromInt(key: Int) = entries.find { it.key == key } ?: ERROR
 	}
 }

@@ -1,19 +1,12 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.webkit.CookieManager
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,12 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey.ACRAEnabled
-import app.shosetsu.android.common.SettingKey.AppTheme
 import app.shosetsu.android.common.SettingKey.AutoBookmarkFromQR
 import app.shosetsu.android.common.SettingKey.ExposeTrueChapterDelete
 import app.shosetsu.android.common.SettingKey.LogToFile
@@ -50,26 +41,21 @@ import app.shosetsu.android.common.SettingKey.UseProxy
 import app.shosetsu.android.common.SettingKey.UseShosetsuAgent
 import app.shosetsu.android.common.SettingKey.UserAgent
 import app.shosetsu.android.common.SettingKey.VerifyCheckSum
-import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
-import app.shosetsu.android.common.ext.ComposeView
-import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.common.utils.webview.WebViewUtil
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.ButtonSettingContent
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.setting.ProxySettingsContent
 import app.shosetsu.android.view.compose.setting.SliderSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAdvancedSettingsViewModel
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-
 
 /*
  * This file is part of Shosetsu.
@@ -87,26 +73,6 @@ import kotlinx.coroutines.runBlocking
  * You should have received a copy of the GNU General Public License
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-/**
- * Shosetsu
- * 13 / 07 / 2019
- */
-@Deprecated("Composed")
-class AdvancedSettingsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.settings_advanced
-
-	/***/
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
 
 @Composable
 fun AdvancedSettingsView(
@@ -150,24 +116,6 @@ fun AdvancedSettingsView(
 		}
 	}
 
-
-	fun themeSelected(position: Int) {
-		scope.launch {
-			val result = hostState.showSnackbar(
-				context.getString(R.string.fragment_settings_advanced_snackbar_ui_change),
-				actionLabel = context.getString(R.string.apply),
-				duration = SnackbarDuration.Indefinite,
-			)
-
-			if (result == SnackbarResult.ActionPerformed) {
-				onBack()
-				launchIO {
-					viewModel.settingsRepo.setInt(AppTheme, position)
-				}
-			}
-		}
-	}
-
 	LaunchedEffect(workerState) {
 		when (workerState) {
 			AAdvancedSettingsViewModel.RestartResult.RESTARTED -> {
@@ -192,15 +140,10 @@ fun AdvancedSettingsView(
 		}
 	}
 
-	fun killCycleWorkers() {
-		viewModel.killCycleWorkers()
-	}
-
 	AdvancedSettingsContent(
 		viewModel,
-		onThemeSelected = ::themeSelected,
 		onPurgeNovelCache = viewModel::purgeUselessData,
-		onKillCycleWorkers = ::killCycleWorkers,
+		onKillCycleWorkers = viewModel::killCycleWorkers,
 		onClearCookies = {
 			viewModel.logV("Clearing cookies")
 			CookieManager.getInstance().removeAllCookies {
@@ -231,7 +174,6 @@ fun AdvancedSettingsView(
 @Composable
 fun AdvancedSettingsContent(
 	viewModel: AAdvancedSettingsViewModel,
-	onThemeSelected: (Int) -> Unit,
 	onPurgeNovelCache: () -> Unit,
 	onKillCycleWorkers: () -> Unit,
 	onForceRepoSync: () -> Unit,
@@ -245,7 +187,7 @@ fun AdvancedSettingsContent(
 		topBar = {
 			TopAppBar(
 				title = {
-					Text(stringResource(R.string.settings_advanced))
+					Text(stringResource(R.string.advanced))
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
@@ -261,34 +203,14 @@ fun AdvancedSettingsContent(
 				top = 16.dp,
 				bottom = 64.dp
 			),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
-			item {
-				val choice by viewModel.settingsRepo.getIntFlow(AppTheme)
-					.collectAsState()
-
-				DropdownSettingContent(
-					title = stringResource(R.string.theme),
-					description = stringResource(R.string.settings_advanced_theme_desc),
-					choices = stringArrayResource(R.array.application_themes)
-						.toList()
-						.toImmutableList(),
-					modifier = Modifier
-						.fillMaxWidth(),
-					selection = choice,
-					onSelection = onThemeSelected
-				)
-			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.remove_novel_cache),
-					description = stringResource(R.string.settings_advanced_purge_novel_cache),
-					buttonText = stringResource(R.string.settings_advanced_purge_button),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onPurgeNovelCache
+					subtitle = stringResource(R.string.settings_advanced_purge_novel_cache),
+					onPreferenceClick = onPurgeNovelCache
 				)
 			}
 
@@ -296,8 +218,6 @@ fun AdvancedSettingsContent(
 				SwitchSettingContent(
 					title = stringResource(R.string.settings_advanced_verify_checksum_title),
 					description = stringResource(R.string.settings_advanced_verify_checksum_desc),
-					modifier = Modifier
-						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
 					key = VerifyCheckSum
 				)
@@ -307,43 +227,32 @@ fun AdvancedSettingsContent(
 				SwitchSettingContent(
 					title = stringResource(R.string.settings_advanced_require_double_back_title),
 					description = stringResource(R.string.settings_advanced_require_double_back_desc),
-					modifier = Modifier
-						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
 					key = RequireDoubleBackToExit
 				)
 			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_kill_cycle_workers_title),
-					description = stringResource(R.string.settings_advanced_kill_cycle_workers_desc),
-					buttonText = stringResource(R.string.settings_advanced_kill_cycle_workers_button),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onKillCycleWorkers
+					subtitle = stringResource(R.string.settings_advanced_kill_cycle_workers_desc),
+					onPreferenceClick = onKillCycleWorkers
 				)
 			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_force_repo_update_title),
-					description = stringResource(R.string.settings_advanced_force_repo_update_desc),
-					buttonText = stringResource(R.string.force),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onForceRepoSync
+					subtitle = stringResource(R.string.settings_advanced_force_repo_update_desc),
+					onPreferenceClick = onForceRepoSync
 				)
 			}
 
 			item {
-				ButtonSettingContent(
+				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_clear_cookies_title),
-					description = stringResource(R.string.settings_advanced_clear_cookies_desc),
-					buttonText = stringResource(R.string.settings_advanced_clear_cookies_button),
-					modifier = Modifier
-						.fillMaxWidth(),
-					onClick = onClearCookies
+					subtitle = stringResource(R.string.settings_advanced_clear_cookies_desc),
+					onPreferenceClick = onClearCookies
 				)
 			}
 
@@ -431,16 +340,16 @@ fun AdvancedSettingsContent(
 						key = UserAgent,
 						enabled = !useShosetsuAgent
 					)
-					IconButton(
+                    val context = LocalContext.current
+					SimpleIconButton(
+						Icons.Default.Refresh, stringResource(R.string.reset),
 						onClick = {
 							runBlocking {
-								viewModel.settingsRepo.setString(UserAgent, DEFAULT_USER_AGENT)
+								viewModel.settingsRepo.setString(UserAgent, WebViewUtil.getInferredUserAgent(context))
 							}
 						},
 						enabled = !useShosetsuAgent
-					) {
-						Icon(Icons.Default.Refresh, stringResource(R.string.reset))
-					}
+					)
 				}
 			}
 

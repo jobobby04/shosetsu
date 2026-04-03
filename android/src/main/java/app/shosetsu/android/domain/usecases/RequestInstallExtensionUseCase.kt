@@ -7,7 +7,6 @@ import app.shosetsu.android.backend.workers.onetime.ExtensionInstallWorker.Compa
 import app.shosetsu.android.common.enums.DownloadStatus
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.domain.repository.base.IExtensionDownloadRepository
-import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 
 /*
@@ -32,7 +31,6 @@ import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
  * 13 / 05 / 2020
  */
 class RequestInstallExtensionUseCase(
-	private val extRepo: IExtensionsRepository,
 	private val repo: IExtensionDownloadRepository,
 	private val manager: ExtensionInstallWorker.Manager
 ) {

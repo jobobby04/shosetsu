@@ -5,9 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SystemUpdateAlt
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -38,6 +39,7 @@ import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.common.ext.setOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.exceptions.HTTPException
 import kotlinx.coroutines.flow.first
@@ -86,7 +88,7 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_APP_UPDATE)
 			.setSubText(applicationContext.getString(R.string.notification_app_update_install_title))
-			.setSmallIcon(R.drawable.app_update)
+			.setSmallIcon(Icons.Default.SystemUpdateAlt)
 			.setProgress(0, 0, true)
 
 
@@ -163,16 +165,11 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 		notify(R.string.notification_app_update_install) {
 			setNotOngoing()
 			removeProgress()
-			addAction(
-				actionBuilder(
-					IconCompat.createWithResource(
-						applicationContext,
-						R.drawable.app_update
-					),
-					applicationContext.getString(R.string.install),
-					installApkPendingActivity(applicationContext, uri)
-				).build()
-			)
+			addAction(actionBuilder(
+				Icons.Default.SystemUpdateAlt,
+				applicationContext.getString(R.string.install),
+				installApkPendingActivity(applicationContext, uri)
+			).build())
 		}
 
 		return Result.success()

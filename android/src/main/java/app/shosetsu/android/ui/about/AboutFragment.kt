@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.about
 
+import android.content.ClipData
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -31,32 +32,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.common.consts.URL_APP_REPO
 import app.shosetsu.android.common.consts.URL_DISCLAIMER
 import app.shosetsu.android.common.consts.URL_DISCORD
-import app.shosetsu.android.common.consts.URL_GITHUB_APP
-import app.shosetsu.android.common.consts.URL_GITHUB_EXTENSIONS
+import app.shosetsu.android.common.consts.URL_EXTENSIONS_REPO
 import app.shosetsu.android.common.consts.URL_KOFI
 import app.shosetsu.android.common.consts.URL_MATRIX
 import app.shosetsu.android.common.consts.URL_PATREON
 import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.Contributor
 import app.shosetsu.android.ui.theme.ShosetsuTheme
@@ -65,6 +68,7 @@ import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
 import coil.compose.AsyncImage
 import coil.imageLoader
+import kotlinx.coroutines.launch
 import org.acra.util.Installation
 
 /*
@@ -109,7 +113,7 @@ fun AboutView(
 		uriHandler.openUri(URL_WEBSITE)
 
 	fun openExtensions() =
-		uriHandler.openUri(URL_GITHUB_EXTENSIONS)
+		uriHandler.openUri(URL_EXTENSIONS_REPO)
 
 	fun openDiscord() =
 		uriHandler.openUri(URL_DISCORD)
@@ -121,7 +125,7 @@ fun AboutView(
 		uriHandler.openUri(URL_PATREON)
 
 	fun openGithub() =
-		uriHandler.openUri(URL_GITHUB_APP)
+		uriHandler.openUri(URL_APP_REPO)
 
 	fun openPrivacy() =
 		uriHandler.openUri(URL_PRIVACY)
@@ -149,26 +153,25 @@ fun AboutView(
 @ExperimentalMaterial3Api
 @Preview
 @Composable
-fun PreviewAboutContent() {
-	ShosetsuTheme {
-		AboutContent(
-			currentVersion = BuildConfig.VERSION_NAME,
-			onCheckForAppUpdate = {},
-			onOpenWebsite = {},
-			onOpenSource = {},
-			onOpenExtensions = {},
-			onOpenDiscord = {},
-			onOpenPatreon = {},
-			onOpenLicense = {},
-			onOpenDisclaimer = {},
-			onOpenMatrix = {},
-			onOpenPrivacy = {},
-			onOpenKofi = {
-			},
-			onBack = {},
+fun PreviewAboutContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	AboutContent(
+		currentVersion = BuildConfig.VERSION_NAME,
+		onCheckForAppUpdate = {},
+		onOpenWebsite = {},
+		onOpenSource = {},
+		onOpenExtensions = {},
+		onOpenDiscord = {},
+		onOpenPatreon = {},
+		onOpenLicense = {},
+		onOpenDisclaimer = {},
+		onOpenMatrix = {},
+		onOpenPrivacy = {},
+		onOpenKofi = {
+		},
+		onBack = {},
 			contributors = listOf(Contributor("Clocks", "doomsdayrs.page", ""))
 		)
-	}
+
 }
 
 @Composable
@@ -280,7 +283,8 @@ fun AboutContent(
 			}
 			item {
 				val context = LocalContext.current
-				val clipboard = LocalClipboardManager.current
+				val clipboard = LocalClipboard.current
+				val scope = rememberCoroutineScope()
 
 				val id = remember { Installation.id(context) }
 
@@ -288,7 +292,7 @@ fun AboutContent(
 					R.string.fragment_about_acra_id,
 					description = id,
 					onClick = {
-						clipboard.setText(AnnotatedString(id))
+						scope.launch { clipboard.setClipEntry(ClipData.newPlainText("text", id).toClipEntry()) }
 					}
 				)
 			}
@@ -315,14 +319,14 @@ fun AboutContent(
 			item {
 				AboutItem(
 					R.string.github,
-					URL_GITHUB_APP,
+					URL_APP_REPO,
 					onClick = onOpenSource
 				)
 			}
 			item {
 				AboutItem(
 					R.string.extensions,
-					URL_GITHUB_EXTENSIONS,
+					URL_EXTENSIONS_REPO,
 					onClick = onOpenExtensions
 				)
 			}

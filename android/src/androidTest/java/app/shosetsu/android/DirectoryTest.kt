@@ -42,11 +42,11 @@ class DirectoryTest : DIAware {
 
 	@Test
 	fun test() {
-		InternalFileDir.values().forEach {
+		InternalFileDir.entries.forEach {
 			println("### Internal Path: " + iFileSystemProvider.retrievePath(it, ""))
 		}
 
-		ExternalFileDir.values().forEach {
+		ExternalFileDir.entries.forEach {
 			println("### External Path: " + iFileSystemProvider.retrievePath(it, ""))
 		}
 	}

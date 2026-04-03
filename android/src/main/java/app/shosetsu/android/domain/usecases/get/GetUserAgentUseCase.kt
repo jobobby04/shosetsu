@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.transform
  * @author Doomsdayrs
  */
 class GetUserAgentUseCase(
-	private val settingsRepo: ISettingsRepository
+	private val settingsRepo: ISettingsRepository,
 ) {
 	suspend operator fun invoke(): String =
 		if (settingsRepo.getBoolean(SettingKey.UseShosetsuAgent)) {

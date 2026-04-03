@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
@@ -46,11 +45,10 @@ import app.shosetsu.android.ui.theme.Primary
  */
 
 @Composable
-fun <T> NavigationDrawerContent(
-	destinations: List<T>,
+fun NavigationDrawerContent(
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
+	onNavigate: (ShosetsuDestination.Primary) -> Unit
+) {
 	ModalDrawerSheet {
 		Row(
 			verticalAlignment = Alignment.Bottom
@@ -71,23 +69,14 @@ fun <T> NavigationDrawerContent(
 			}
 		}
 
-		Divider()
+		HorizontalDivider()
 
-		destinations.forEach { destination ->
+		ShosetsuDestination.Primary.all.forEach { destination ->
+			val isSelected = currentDestination?.has(destination) == true
 			NavigationDrawerItem(
-				selected =
-				currentDestination?.destination?.route == destination.route,
-				icon = {
-					Icon(
-						painterResource(
-							destination.icon
-						),
-						destination.route
-					)
-				},
-				label = {
-					Text(stringResource(destination.name))
-				},
+				selected = isSelected,
+				icon = { DestinationIcon(destination, isSelected) },
+				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
 				}

@@ -14,38 +14,29 @@ import app.shosetsu.android.common.consts.ACTION_OPEN_CATALOGUE
 import app.shosetsu.android.common.consts.ACTION_OPEN_LIBRARY
 import app.shosetsu.android.common.consts.ACTION_OPEN_SEARCH
 import app.shosetsu.android.common.consts.ACTION_OPEN_UPDATES
+import app.shosetsu.android.common.consts.ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logW
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 
-fun handleIntentAction(
+private fun handleIntentAction(
 	intent: Intent,
-	onNavigate: (String) -> Unit,
+	onNavigate: (ShosetsuDestination) -> Unit,
 	onUpdate: () -> Unit
 ) {
 	intent.logD("Intent received was ${intent.action}")
 	when (intent.action) {
-		ACTION_OPEN_CATALOGUE -> onNavigate(Destination.BROWSE.route)
+		ACTION_OPEN_CATALOGUE -> onNavigate(Destination.Browse)
+		ACTION_OPEN_UPDATES -> onNavigate(Destination.Updates)
+		ACTION_OPEN_LIBRARY -> onNavigate(Destination.Library)
 
-		ACTION_OPEN_UPDATES -> onNavigate(Destination.UPDATES.route)
-
-		ACTION_OPEN_LIBRARY -> onNavigate(Destination.LIBRARY.route)
-
-		Intent.ACTION_SEARCH -> {
+		Intent.ACTION_SEARCH, ACTION_OPEN_SEARCH -> {
 			onNavigate(
-				Destination.SEARCH.routeWith(
-					query = intent.getStringExtra(
-						SearchManager.QUERY
-					)
-				)
-			)
-		}
-
-		ACTION_OPEN_SEARCH -> {
-			onNavigate(
-				Destination.SEARCH.routeWith(
+				Destination.Search(
 					query = intent.getStringExtra(SearchManager.QUERY) ?: ""
 				)
 			)
@@ -59,29 +50,37 @@ fun handleIntentAction(
 			if (intent.data != null) {
 				if (intent.data!!.scheme != null) {
 					onNavigate(
-						Destination.ADD_SHARE.routeWith(
-							intent.data!!.scheme + "://" + intent.data!!.host
+						Destination.More.AddShare(
+							intent.data.toString()
 						)
 					)
 				} else intent.logE("Scheme was null")
 			} else intent.logE("View action data null")
 		}
 
+		ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER -> {
+			intent.logI("Navigating to backup settings...")
+			onNavigate(
+				Destination.More.Settings.Backup(true)
+			)
+		}
+
 		Intent.ACTION_MAIN -> {}
-		else -> {}
+		else -> {
+			intent.logW("Cannot handle this intent.")
+		}
 	}
 }
 
 @Composable
 fun IntentHandler(
-	onNavigate: (String) -> Unit,
+	onNavigate: (ShosetsuDestination) -> Unit,
 	onUpdate: () -> Unit
 ) {
 	val context = LocalContext.current
 
-
 	LaunchedEffect(Unit) {
-		callbackFlow<Intent> {
+		callbackFlow {
 			val activity = context as ComponentActivity
 			val consumer = Consumer<Intent> { trySend(it) }
 			consumer.accept(activity.intent)

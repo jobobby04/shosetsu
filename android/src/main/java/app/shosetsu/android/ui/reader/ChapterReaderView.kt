@@ -16,6 +16,7 @@
  */
 package app.shosetsu.android.ui.reader
 
+import android.app.SearchManager
 import android.content.Intent
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,21 +32,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import app.shosetsu.android.R
-import app.shosetsu.android.common.consts.MAX_CONTINOUS_READING_TIME
+import app.shosetsu.android.common.consts.MAX_CONTINUOUS_READING_TIME
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.css.CSSEditorActivity
 import app.shosetsu.android.ui.reader.content.ChapterReaderBottomSheetContent
 import app.shosetsu.android.ui.reader.content.ChapterReaderContent
-import app.shosetsu.android.ui.reader.content.ChapterReaderHTMLContent
-import app.shosetsu.android.ui.reader.content.ChapterReaderPagerContent
-import app.shosetsu.android.ui.reader.content.ChapterReaderStringContent
-import app.shosetsu.android.ui.reader.page.DividierPageContent
+import app.shosetsu.android.ui.reader.content.ChapterReaderPage
+import app.shosetsu.android.ui.reader.content.ChapterReaderPager
+import app.shosetsu.android.ui.reader.page.DividerPage
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
@@ -67,10 +65,8 @@ import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
 import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
-import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
 import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
-import app.shosetsu.lib.Novel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
@@ -95,7 +91,6 @@ fun ChapterReaderView(
 	val isFocused by viewModel.isFocused.collectAsState()
 	val enableFullscreen by viewModel.enableFullscreen.collectAsState()
 	val matchFullscreenToFocus by viewModel.matchFullscreenToFocus.collectAsState()
-	val chapterType by viewModel.chapterType.collectAsState()
 	val currentChapterID by viewModel.currentChapterID.collectAsState()
 	val ttsPlayback by viewModel.ttsPlayback.collectAsState()
 	val setting by viewModel.getSettings().collectAsState()
@@ -103,10 +98,11 @@ fun ChapterReaderView(
 
 	val isFirstFocus by viewModel.isFirstFocusFlow.collectAsState()
 	val isSwipeInverted by viewModel.isSwipeInverted.collectAsState()
-	val owner = LocalLifecycleOwner.current
 
 	val isReadingTooLong by viewModel.isReadingTooLong.collectAsState()
 	val trackLongReading by viewModel.trackLongReading.collectAsState()
+
+	val exception by viewModel.exceptions.collectAsState(null)
 
 	val context = LocalContext.current
 
@@ -114,16 +110,21 @@ fun ChapterReaderView(
 		LaunchedEffect(isReadingTooLong) {
 			while (!isReadingTooLong) {
 				val startTime = System.currentTimeMillis()
-				delay(MAX_CONTINOUS_READING_TIME)
+				delay(MAX_CONTINUOUS_READING_TIME)
 				val currentTime = System.currentTimeMillis()
-				if ((currentTime - startTime) < ((MAX_CONTINOUS_READING_TIME / .25)))
+				if ((currentTime - startTime) < ((MAX_CONTINUOUS_READING_TIME / .25)))
 					viewModel.userIsReadingTooLong()
 			}
 		}
 
+	val theme by viewModel.appTheme.collectAsState()
+
 	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
-	ShosetsuTheme {
-		viewModel.colorScheme.value = MaterialTheme.colorScheme
+	ShosetsuTheme(theme) {
+		val colorScheme = MaterialTheme.colorScheme
+		LaunchedEffect(colorScheme) {
+			viewModel.colorScheme.value = colorScheme
+		}
 		ChapterReaderContent(
 			isFirstFocusProvider = { isFirstFocus },
 			isFocused = isFocused,
@@ -154,15 +155,13 @@ fun ChapterReaderView(
 						item { viewModel.enableFullscreen() }
 						item { viewModel.matchFullscreenToFocus() }
 						item { viewModel.showReaderDivider() }
-						item { viewModel.stringAsHtmlOption() }
 						item { viewModel.doubleTapFocus() }
 						item { viewModel.doubleTapSystem() }
 						item { viewModel.readerTableHackOption() }
 						item {
 							viewModel.EditCSS(
 								openCSS = {
-									ContextCompat.startActivity(
-										context,
+									context.startActivity(
 										Intent(context, CSSEditorActivity::class.java).apply {
 											putExtra(CSSEditorActivity.CSS_ID, -1)
 										},
@@ -185,9 +184,11 @@ fun ChapterReaderView(
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
 				)
 			},
-			content = { paddingValues ->
-				ChapterReaderPagerContent(
-					paddingValues = paddingValues,
+			content = { windowPadding, footerPadding ->
+				LaunchedEffect(windowPadding) {
+					viewModel.paddingValues.value = windowPadding
+				}
+				ChapterReaderPager(
 					items = items ?: persistentListOf(),
 					isHorizontal = isHorizontalReading,
 					isSwipeInverted = isSwipeInverted,
@@ -203,49 +204,33 @@ fun ChapterReaderView(
 					createPage = { page ->
 						when (val item = items.orEmpty()[page]) {
 							is ReaderUIItem.ReaderChapterUI -> {
-								when (chapterType) {
-									Novel.ChapterType.STRING -> {
-										ChapterReaderStringContent(
-											item = item,
-											getStringContent = viewModel::getChapterStringPassage,
-											retryChapter = viewModel::retryChapter,
-											textSizeFlow = { viewModel.liveTextSize },
-											textColorFlow = { viewModel.textColor },
-											backgroundColorFlow = { viewModel.backgroundColor },
-											disableTextSelFlow = { viewModel.disableTextSelection },
-											onScroll = viewModel::onScroll,
-											onClick = { viewModel.onReaderClicked(null) },
-											onDoubleClick = viewModel::onReaderDoubleClicked,
-											progressFlow = {
-												viewModel.getChapterProgress(item)
-											}
-										)
-									}
-
-									Novel.ChapterType.HTML -> {
-										ChapterReaderHTMLContent(
-											item = item,
-											getHTMLContent = viewModel::getChapterHTMLPassage,
-											retryChapter = viewModel::retryChapter,
-											onScroll = viewModel::onScroll,
-											onClick = viewModel::onReaderClicked,
-											onDoubleClick = viewModel::onReaderDoubleClicked,
-											progressFlow = {
-												viewModel.getChapterProgress(item)
-											},
-											ttsProgress = remember {
-												StableHolder(viewModel.ttsProgress)
-											}
-										)
-									}
-
-									else -> {
-									}
-								}
+								ChapterReaderPage(
+									windowPadding = windowPadding,
+									footerPadding = footerPadding,
+									item = item,
+									getHTMLContent = viewModel::getChapterPassageHTML,
+									getChapterHTMLStyle = viewModel::cssStyle,
+									retryChapter = viewModel::retryChapter,
+									onScroll = viewModel::onScroll,
+									onClick = viewModel::onReaderClicked,
+									onDoubleClick = viewModel::onReaderDoubleClicked,
+									progressFlow = {
+										viewModel.getChapterProgress(item)
+									},
+									ttsProgress = remember {
+										StableHolder(viewModel.ttsProgress)
+									},
+									onSearchQuery = {
+										val intent = Intent(Intent.ACTION_WEB_SEARCH).apply {
+											putExtra(SearchManager.QUERY, it)
+										}
+										context.startActivity(intent)
+									},
+								)
 							}
 
 							is ReaderUIItem.ReaderDividerUI -> {
-								DividierPageContent(
+								DividerPage(
 									item.prev.title,
 									item.next?.title
 								)
@@ -255,6 +240,7 @@ fun ChapterReaderView(
 				)
 			},
 			//isTapToScroll = isTapToScroll
+			exception = exception
 		)
 		if (isReadingTooLong) {
 			AlertDialog(

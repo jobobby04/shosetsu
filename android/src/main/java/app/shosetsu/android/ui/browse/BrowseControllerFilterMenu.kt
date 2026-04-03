@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -24,11 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel.FilteredLanguages
@@ -140,9 +143,9 @@ fun BrowseControllerLanguagesFilter(
 				checked = hidden,
 			) {
 				if (hidden)
-					Icon(painterResource(R.drawable.expand_more), "")
+					Icon(Icons.Outlined.ExpandMore, "")
 				else
-					Icon(painterResource(R.drawable.expand_less), "")
+					Icon(Icons.Outlined.ExpandLess, "")
 			}
 		}
 
@@ -164,13 +167,11 @@ fun BrowseControllerLanguagesFilter(
 
 @Preview
 @Composable
-fun PreviewBrowseControllerLanguages() {
-	ShosetsuTheme {
-		BrowseControllerLanguagesContent(
-			languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter).toImmutableList(),
-			state = persistentMapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),
-			onLanguageChecked = { _, _ -> })
-	}
+fun PreviewBrowseControllerLanguages() = ShosetsuTheme(AppThemes.LIGHT) {
+	BrowseControllerLanguagesContent(
+		languages = listOf("en", "ch", "ru", "fr").map(::LanguageFilter).toImmutableList(),
+		state = persistentMapOf("en" to false, "ch" to false, "ru" to true, "fr" to false),
+		onLanguageChecked = { _, _ -> })
 }
 
 @Composable

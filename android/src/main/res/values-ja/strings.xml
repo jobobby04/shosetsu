@@ -8,7 +8,6 @@
     <string name="default_reader">デフォルト</string>
     <string name="deselect_all">選択解除</string>
     <string name="disclaimer">免責事項</string>
-    <string name="download">ダウンロード</string>
     <string name="download_chapter_updates">章の更新をダウンロードする</string>
     <string name="download_custom_chapters">カスタムをダウンロード</string>
     <string name="download_next_10_chapters">次の10章をダウンロードする</string>
@@ -52,7 +51,7 @@
     <string name="settings_reader_tap_to_scroll_title">これらのスクリプトは疑わしいと思われるため、アクションを確認してください。キャンセルするとすべてがアンインストールされます</string>
     <string name="text_size">文字サイズ</string>
     <string name="todo">テーマ：</string>
-    <string name="theme">テーマ：</string>
+    <string name="theme">テーマ</string>
     <string name="uninstall">やること</string>
     <string name="unknown">不明</string>
     <string name="unread">未読</string>
@@ -69,7 +68,7 @@
     <string name="updates">更新</string>
     <string name="yesterday">昨日</string>
     <string name="backup">バックアップ</string>
-    <string name="view">見ます</string>
+    <string name="appearance">見ます</string>
     <string name="advanced">詳細</string>
     <string name="regret">この機能は、時間の制約によりまだ導入されていません</string>
 </resources>

@@ -1,5 +1,7 @@
 package app.shosetsu.android.common.enums
 
+import androidx.appcompat.app.AppCompatDelegate
+
 /*
  * This file is part of Shosetsu.
  *
@@ -21,12 +23,14 @@ package app.shosetsu.android.common.enums
  * shosetsu
  * 22 / 11 / 2020
  */
-enum class AppThemes(val key: Int) {
-	FOLLOW_SYSTEM(0),
-	LIGHT(1),
-	DARK(2);
+enum class AppThemes(val key: Int, private val appCompatId: Int) {
+	FOLLOW_SYSTEM(0, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
+	LIGHT(1, AppCompatDelegate.MODE_NIGHT_NO),
+	DARK(2, AppCompatDelegate.MODE_NIGHT_YES);
 
 	companion object {
-		fun fromKey(key: Int): AppThemes = values().find { it.key == key } ?: FOLLOW_SYSTEM
+		fun fromKey(key: Int): AppThemes = entries.find { it.key == key } ?: FOLLOW_SYSTEM
 	}
+
+	fun setAppCompatDelegateThemeMode() = AppCompatDelegate.setDefaultNightMode(appCompatId)
 }

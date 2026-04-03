@@ -7,7 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import app.shosetsu.android.common.consts.BundleKeys
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
@@ -53,7 +53,7 @@ fun Context.openInBrowser(url: Uri, pkg: String? = null) {
 }
 
 fun Context.openInBrowser(url: String, pkg: String? = null): Unit =
-	openInBrowser(Uri.parse(url), pkg)
+	openInBrowser(url.toUri(), pkg)
 
 fun Context.openInWebView(url: String) {
 	logI("Opening in web view: $url")
@@ -117,17 +117,5 @@ fun Context.readAsset(name: String): String {
 
 fun AppCompatActivity.setTheme(theme: AppThemes) {
 	logI("Setting theme to $theme")
-	when (theme) {
-		AppThemes.FOLLOW_SYSTEM -> {
-			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-		}
-
-		AppThemes.LIGHT -> {
-			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_NO
-		}
-
-		AppThemes.DARK -> {
-			delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
-		}
-	}
+	theme.setAppCompatDelegateThemeMode()
 }

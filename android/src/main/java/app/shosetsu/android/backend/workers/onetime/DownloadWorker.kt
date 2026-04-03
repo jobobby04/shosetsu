@@ -6,6 +6,9 @@ import android.content.Intent
 import android.database.sqlite.SQLiteException
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Download
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import androidx.core.app.NotificationManagerCompat
@@ -24,6 +27,7 @@ import app.shosetsu.android.common.consts.Notifications.ID_CHAPTER_DOWNLOAD
 import app.shosetsu.android.common.consts.WorkerTags.DOWNLOAD_WORK_ID
 import app.shosetsu.android.common.enums.DownloadStatus
 import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.model.local.DownloadEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository
@@ -75,8 +79,8 @@ class DownloadWorker(
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 
 	private fun NotificationCompat.Builder.addCancelAction() {
-		addAction(
-			R.drawable.ic_baseline_cancel_24, getString(android.R.string.cancel),
+		addAction(actionBuilder(
+			Icons.Default.Cancel, getString(android.R.string.cancel),
 			PendingIntent.getBroadcast(
 				applicationContext,
 				0,
@@ -86,12 +90,12 @@ class DownloadWorker(
 				},
 				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 			)
-		)
+		).build())
 	}
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_DOWNLOAD)
-			.setSmallIcon(R.drawable.download)
+			.setSmallIcon(Icons.Default.Download)
 			.setContentTitle("Downloader")
 			.setPriority(NotificationCompat.PRIORITY_HIGH)
 			.setOngoing(true)

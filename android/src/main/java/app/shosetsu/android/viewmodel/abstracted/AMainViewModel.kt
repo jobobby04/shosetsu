@@ -1,11 +1,8 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import app.shosetsu.android.common.enums.AppThemes
-import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
-import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.viewmodel.base.IsOnlineCheckViewModel
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -30,28 +27,12 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 20 / 06 / 2020
  */
-abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
+abstract class AMainViewModel : ShosetsuRootViewModel(), IsOnlineCheckViewModel {
 
 	/**
 	 * App update, if any
 	 */
 	abstract val appUpdate: StateFlow<AppUpdateEntity?>
-
-	/**
-	 * If 0, Bottom
-	 * If 1, Drawer
-	 */
-	abstract val navigationStyle: StateFlow<NavigationStyle>
-
-	/**
-	 * Theme to use
-	 */
-	abstract val appTheme: StateFlow<AppThemes>
-
-	/**
-	 * The app needs two presses to exit
-	 */
-	abstract val requireDoubleBackToExit: StateFlow<Boolean>
 
 	/**
 	 * Action to take for an update
@@ -81,16 +62,21 @@ abstract class AMainViewModel : ShosetsuViewModel(), IsOnlineCheckViewModel {
 		val pkg: String?
 	)
 
-	/**
-	 *
-	 */
-	abstract val backupProgressState: StateFlow<IBackupRepository.BackupProgress>
-
 	/** If the application should show the show splash screen */
 	abstract val showIntro: StateFlow<Boolean>
+
+	/**
+	 * Warning in regards to Google locking down the Android ecosystem.
+	 */
+	abstract val showVerificationWarning: StateFlow<Boolean>
 
 	/**
 	 * Dismiss the update dialog
 	 */
 	abstract fun dismissUpdateDialog()
+
+	/**
+	 * Dismiss the verification warning dialog.
+	 */
+	abstract fun dismissVerificationWarning()
 }

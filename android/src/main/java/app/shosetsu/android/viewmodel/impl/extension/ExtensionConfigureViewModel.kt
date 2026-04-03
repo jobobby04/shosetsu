@@ -28,13 +28,23 @@ import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
+import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * shosetsu
@@ -67,6 +77,9 @@ class ExtensionConfigureViewModel(
 			getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
 				ListingSelectionData(listingNames, selectedListing)
 			}
+		}.catch {
+			// Safely pass on exceptions
+			errors.emit(it)
 		}
 	}
 
@@ -81,6 +94,8 @@ class ExtensionConfigureViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
+	override val errors: MutableSharedFlow<Throwable> = MutableSharedFlow()
+
 	override val extensionListing: StateFlow<ListingSelectionData?> by lazy {
 		extListNamesFlow.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
@@ -94,10 +109,12 @@ class ExtensionConfigureViewModel(
 					this@ExtensionConfigureViewModel.logI("id is the same, ignoring")
 					return@launchIO
 				}
+
 				extensionIdFlow.value != id -> {
 					this@ExtensionConfigureViewModel.logI("id is different, resetting")
 					destroy()
 				}
+
 				extensionIdFlow.value == -1 -> {
 					this@ExtensionConfigureViewModel.logI("id is new, setting")
 				}

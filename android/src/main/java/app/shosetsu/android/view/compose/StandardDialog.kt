@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -15,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 
 /*
@@ -64,13 +69,22 @@ fun StandardDialog(
 	content: @Composable () -> Unit,
 ) {
 	Dialog(onDismissRequest, dialogProperties) {
-		Card {
+		Card(
+			modifier = Modifier.fillMaxWidth()
+				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+		) {
 			Column(
-				Modifier.padding(16.dp)
+				modifier = Modifier.fillMaxWidth()
+					.padding(16.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
-				ProvideTextStyle(MaterialTheme.typography.titleLarge) {
+				ProvideTextStyle(MaterialTheme.typography.titleLarge
+					.copy(textAlign = TextAlign.Center)
+				) {
 					title()
 				}
+
+				Spacer(Modifier.height(8.dp))
 
 				content()
 
@@ -89,15 +103,13 @@ fun StandardDialog(
 
 @Preview
 @Composable
-fun PreviewStandardDialog() {
-	ShosetsuTheme {
-		StandardDialog(
-			onDismissRequest = {},
-			title = {
-				Text("Test Title")
-			}
-		) {
-			Box(Modifier.size(100.dp))
+fun PreviewStandardDialog() = ShosetsuTheme(AppThemes.LIGHT) {
+	StandardDialog(
+		onDismissRequest = {},
+		title = {
+			Text("Test Title")
 		}
+	) {
+		Box(Modifier.size(100.dp))
 	}
 }

@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-
+import app.shosetsu.android.common.enums.AppThemes
 
 private val DarkColorScheme = darkColorScheme(
 	primary = Primary,
@@ -28,23 +28,28 @@ private val LightColorScheme = lightColorScheme(
 	tertiary = Tertiary
 
 	/* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+	background = Color(0xFFFFFBFE),
+	surface = Color(0xFFFFFBFE),
+	onPrimary = Color.White,
+	onSecondary = Color.White,
+	onTertiary = Color.White,
+	onBackground = Color(0xFF1C1B1F),
+	onSurface = Color(0xFF1C1B1F),
+	*/
 )
 
 val FallbackColorScheme = LightColorScheme
 
 @Composable
 fun ShosetsuTheme(
-	darkTheme: Boolean = isSystemInDarkTheme(),
+	theme: AppThemes,
 	content: @Composable () -> Unit
 ) {
+	val darkTheme = when (theme) {
+		AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
+		AppThemes.LIGHT -> false
+		AppThemes.DARK -> true
+	}
 	val colorScheme = when {
 		Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 			val context = LocalContext.current
@@ -59,7 +64,7 @@ fun ShosetsuTheme(
 		SideEffect {
 			val window = (view.context as Activity).window
 			window.statusBarColor = colorScheme.primary.toArgb()
-			WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+			WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
 		}
 	}
 

@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -186,9 +188,8 @@ fun ErrorContent(
 					}
 				) {
 					Icon(
-						painter = if (!isStacktraceVisible)
-							painterResource(R.drawable.expand_more)
-						else painterResource(R.drawable.expand_less),
+						imageVector = if (!isStacktraceVisible) Icons.Outlined.ExpandMore
+						else Icons.Outlined.ExpandLess,
 						contentDescription = if (!isStacktraceVisible)
 							stringResource(R.string.more)
 						else stringResource(R.string.less)

@@ -27,7 +27,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -57,7 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
-import app.shosetsu.android.common.consts.REPOSITORY_HELP_URL
+import app.shosetsu.android.common.consts.URL_HELP_REPOSITORY
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.QRCodeShareDialog
@@ -65,6 +64,7 @@ import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
@@ -523,7 +523,7 @@ fun RepositoriesContent(
 					NavigateBackButton(onBack)
 				},
 				actions = {
-					HelpButton(REPOSITORY_HELP_URL)
+					HelpButton(URL_HELP_REPOSITORY)
 				}
 			)
 		},
@@ -679,16 +679,13 @@ fun RepositoryContent(
 					)
 				}
 
-				IconButton(
+				SimpleIconButton(
+					Icons.Default.MoreVert,
+					description = stringResource(R.string.more),
 					onClick = {
 						visible = true
 					}
-				) {
-					Icon(
-						Icons.Default.MoreVert,
-						contentDescription = stringResource(R.string.more)
-					)
-				}
+				)
 
 				Switch(
 					checked = item.isRepoEnabled,

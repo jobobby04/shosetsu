@@ -1,11 +1,7 @@
 package app.shosetsu.android.ui.settings.sub
 
-import android.os.Bundle
 import android.speech.tts.Voice
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -22,6 +18,11 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.ImagesearchRoller
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -61,15 +61,14 @@ import app.shosetsu.android.common.SettingKey.ReaderTheme
 import app.shosetsu.android.common.SettingKey.ReadingMarkingType
 import app.shosetsu.android.common.consts.SELECTED_STROKE_WIDTH
 import app.shosetsu.android.common.enums.MarkingType
-import app.shosetsu.android.common.ext.ComposeView
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
-import app.shosetsu.android.view.compose.setting.GenericRightSettingLayout
+import app.shosetsu.android.view.compose.setting.ListPreferenceSettingContent
+import app.shosetsu.android.view.compose.setting.StringListPreferenceSettingContent
 import app.shosetsu.android.view.compose.setting.SwitchSettingContent
-import app.shosetsu.android.view.controller.ShosetsuFragment
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.impl.settings.EditCSS
 import app.shosetsu.android.viewmodel.impl.settings.doubleTapFocus
@@ -89,7 +88,6 @@ import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTextSelectionToggle
 import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
-import app.shosetsu.android.viewmodel.impl.settings.stringAsHtmlOption
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
 import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
 import kotlinx.collections.immutable.toImmutableList
@@ -113,29 +111,9 @@ import java.util.Locale
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
- * Shosetsu
- *
- * @since 04 / 10 / 2021
- * @author Doomsdayrs
- */
-@Deprecated("Composed")
-class ReaderSettingsFragment : ShosetsuFragment() {
-	override val viewTitleRes: Int = R.string.settings_reader
-
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedViewState: Bundle?
-	): View {
-		setViewTitle()
-		return ComposeView {
-		}
-	}
-}
-
 @Composable
 fun ReaderSettingsView(
+	hostState: SnackbarHostState,
 	onBack: () -> Unit,
 	openCSS: () -> Unit
 ) {
@@ -143,8 +121,6 @@ fun ReaderSettingsView(
 
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
-
-	val hostState = remember { SnackbarHostState() }
 
 	ReaderSettingsContent(
 		viewModel = viewModel,
@@ -172,7 +148,7 @@ fun ReaderSettingsContent(
 		topBar = {
 			TopAppBar(
 				title = {
-					Text(stringResource(R.string.settings_reader))
+					Text(stringResource(R.string.reader))
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
@@ -185,26 +161,21 @@ fun ReaderSettingsContent(
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
 			modifier = Modifier.padding(paddingValues)
 		) {
 			//TODO Text Preview at top
 
 			item {
-				viewModel.paragraphSpacingOption()
+				StringListPreferenceSettingContent(
+					title = stringResource(R.string.settings_reader_text_alignment_title),
+					choices = stringArrayResource(R.array.text_alignments).toList(),
+					repo = viewModel.settingsRepo,
+					key = ReaderTextAlignment,
+				)
 			}
 
 			item {
-				DropdownSettingContent(
-					title = stringResource(R.string.settings_reader_text_alignment_title),
-					description = stringResource(R.string.settings_reader_text_alignment_desc),
-					choices = stringArrayResource(R.array.text_alignments).toList()
-						.toImmutableList(),
-					modifier = Modifier
-						.fillMaxWidth(),
-					repo = viewModel.settingsRepo,
-					ReaderTextAlignment
-				)
+				viewModel.paragraphSpacingOption()
 			}
 
 			item {
@@ -217,8 +188,8 @@ fun ReaderSettingsContent(
 
 			item {
 				GenericBottomSettingLayout(
-					stringResource(R.string.theme),
-					""
+					title = stringResource(R.string.theme),
+					description = ""
 				) {
 					val themes by viewModel.getReaderThemes().collectAsState(emptyList())
 
@@ -268,20 +239,26 @@ fun ReaderSettingsContent(
 									contentAlignment = Alignment.Center
 								) {
 									Image(
-										painterResource(R.drawable.add_circle_outline),
+										Icons.Outlined.AddCircle,
 										stringResource(R.string.style_add),
 										modifier = Modifier
 											.size(64.dp)
 											.padding(8.dp)
 									)
 								}
-
 							}
 						}
 					}
 				}
 			}
 
+			item {
+				TextPreferenceWidget(
+					title = stringResource(R.string.styles),
+					icon = Icons.Outlined.ImagesearchRoller,
+					onPreferenceClick = showStyleAddSnackBar
+				)
+			}
 
 			item {
 				viewModel.invertChapterSwipeOption()
@@ -308,30 +285,18 @@ fun ReaderSettingsContent(
 				viewModel.EditCSS(openHTMLEditor)
 			}
 
-			item {
-				viewModel.stringAsHtmlOption()
-			}
+//			item { viewModel.continuousScrollOption() }
 
 			item {
-				//viewModel.continuousScrollOption()
-			}
-
-			item {
-				DropdownSettingContent(
-					stringResource(R.string.marking_mode),
-					stringResource(R.string.settings_reader_marking_mode_desc),
-					choices = stringArrayResource(R.array.marking_names)
-						.toList()
-						.toImmutableList(),
+				val names = stringArrayResource(R.array.marking_names)
+					.toList()
+					.toImmutableList()
+				ListPreferenceSettingContent(
+					title = stringResource(R.string.marking_mode),
+					choices = listOf(0, 1),
 					repo = viewModel.settingsRepo,
 					key = ReadingMarkingType,
-					stringToInt = {
-						when (MarkingType.valueOf(it)) {
-							MarkingType.ONSCROLL -> 1
-							MarkingType.ONVIEW -> 0
-						}
-					},
-					intToString = {
+					toKey = {
 						when (it) {
 							0 -> MarkingType.ONVIEW.name
 							1 -> MarkingType.ONSCROLL.name
@@ -341,8 +306,15 @@ fun ReaderSettingsContent(
 							}
 						}
 					},
-					modifier = Modifier
-						.fillMaxWidth()
+					fromKey = {
+						when (MarkingType.valueOf(it)) {
+							MarkingType.ONSCROLL -> 1
+							MarkingType.ONVIEW -> 0
+						}
+					},
+					stringify = {
+						names[it]
+					}
 				)
 			}
 
@@ -407,24 +379,25 @@ fun ReaderSettingsVoiceOption(
 	var expanded by remember { mutableStateOf(false) }
 
 	Column {
-		GenericRightSettingLayout(
+		TextPreferenceWidget(
 			title = stringResource(R.string.settings_reader_voice_title),
-			description = stringResource(R.string.settings_reader_voice_desc),
-			onClick = { expanded = !expanded }
-		) {
-			IconToggleButton(
-				onCheckedChange = {
-					expanded = it
-				},
-				checked = expanded,
-				modifier = Modifier.wrapContentWidth()
-			) {
-				if (expanded)
-					Icon(painterResource(R.drawable.expand_less), "")
-				else
-					Icon(painterResource(R.drawable.expand_more), "")
-			}
-		}
+			subtitle = stringResource(R.string.settings_reader_voice_desc),
+			widget = {
+				IconToggleButton(
+					onCheckedChange = {
+						expanded = it
+					},
+					checked = expanded,
+					modifier = Modifier.wrapContentWidth()
+				) {
+					if (expanded)
+						Icon(Icons.Outlined.ExpandLess, "")
+					else
+						Icon(Icons.Outlined.ExpandMore, "")
+				}
+			},
+			onPreferenceClick = { expanded = !expanded }
+		)
 
 		val sortedVoices by remember { derivedStateOf { voices.sortedByDescending { it.quality } } }
 

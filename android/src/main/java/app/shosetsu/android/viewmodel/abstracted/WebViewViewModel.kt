@@ -1,6 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -28,6 +28,6 @@ import kotlinx.coroutines.flow.StateFlow
  * @since 12 / 02 / 2023
  * @author Doomsdayrs
  */
-abstract class WebViewViewModel : ShosetsuViewModel() {
+abstract class WebViewViewModel : ShosetsuRootViewModel() {
 	abstract val userAgent: StateFlow<String>
 }

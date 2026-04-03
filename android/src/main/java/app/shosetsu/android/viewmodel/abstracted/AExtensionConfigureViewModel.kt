@@ -1,11 +1,12 @@
 package app.shosetsu.android.viewmodel.abstracted
 
-import androidx.compose.runtime.Immutable
 import app.shosetsu.android.domain.model.local.FilterEntity
+import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -39,12 +40,10 @@ abstract class AExtensionConfigureViewModel
 	abstract val extensionListing: StateFlow<ListingSelectionData?>
 	abstract val extensionSettings: StateFlow<ImmutableList<FilterEntity>>
 
-	@Immutable
-	data class ListingSelectionData(
-		val choices: ImmutableList<String>,
-		val selection: Int
-	)
-
+	/**
+	 * The latest exception, if any exists.
+	 */
+	abstract val errors: SharedFlow<Throwable>
 
 	/** Set the extension ID to use */
 	abstract fun setExtensionID(id: Int)

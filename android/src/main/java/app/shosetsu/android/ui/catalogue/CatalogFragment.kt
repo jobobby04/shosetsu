@@ -15,12 +15,14 @@ import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -39,14 +41,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelCardType.COMPRESSED
 import app.shosetsu.android.common.enums.NovelCardType.COZY
@@ -64,13 +67,18 @@ import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
+import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
+import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.emptyFlow
 import org.acra.ACRA
 
 /*
@@ -132,6 +140,7 @@ fun CatalogueView(
 
 	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
+	val listingSelectionData by viewModel.listingSelectionData.collectAsState()
 
 	val context = LocalContext.current
 	val hostState = remember { SnackbarHostState() }
@@ -204,7 +213,7 @@ fun CatalogueView(
 		}
 	}
 
-	val append = items.loadState.prepend
+	val append = items.loadState.append
 	LaunchedEffect(append) {
 		if (append is LoadState.Error) {
 			val result = hostState.showSnackbar(
@@ -247,7 +256,9 @@ fun CatalogueView(
 		onSetCardType = viewModel::setViewType,
 		onBack = onBack,
 		hasSearch = hasSearch,
-		hostState = hostState
+		hostState = hostState,
+		listingSelectionData = listingSelectionData,
+		setListing = viewModel::setSelectedListing
 	)
 	if (categoriesDialogItem != null) {
 		CategoriesDialog(
@@ -281,8 +292,48 @@ fun CatalogueView(
 	}
 }
 
+@Preview
+@Composable
+fun PreviewCatalogContent() {
+	var listingSelectionData by
+	remember {
+		mutableStateOf(
+			ListingSelectionData(
+				listOf("A", "B", "C").toImmutableList(),
+				0
+			)
+		)
+	}
+
+	CatalogContent(
+		"Meow",
+		"",
+		{},
+		emptyFlow<PagingData<ACatalogNovelUI>>().collectAsLazyPagingItems(),
+		NORMAL,
+		{},
+		2,
+		4,
+		{},
+		{},
+		true,
+		{},
+		{},
+		{},
+		{},
+		false,
+		remember { SnackbarHostState() },
+		listingSelectionData,
+		{
+			listingSelectionData = listingSelectionData.copy(selection = it)
+		}
+	)
+}
+
 /**
  * Content of [CatalogueView]
+ * @param listingSelectionData Data of what listing the user selected
+ * @param setListing Function to update the listing
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -303,7 +354,9 @@ fun CatalogContent(
 	onShowFilterMenu: () -> Unit,
 	onBack: () -> Unit,
 	hasSearch: Boolean,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
+	listingSelectionData: ListingSelectionData?,
+	setListing: (selection: Int) -> Unit
 ) {
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -348,7 +401,11 @@ fun CatalogContent(
 						.pullRefresh(pullRefreshState)
 						.padding(padding)
 				) {
-					CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
+					CatalogGrid(
+						items, columnsInH, columnsInV, cardType, onClick, onLongClick,
+						listingSelectionData,
+						setListing
+					)
 				}
 			}
 		}
@@ -377,7 +434,7 @@ fun CatalogFloatingActionButton(hasFilters: Boolean, onShowFilterMenu: () -> Uni
 				Text(stringResource(R.string.filter))
 			},
 			icon = {
-				Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
+				Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 			},
 			onClick = onShowFilterMenu
 		)
@@ -422,20 +479,19 @@ fun CatalogTopBar(
 				onSetCardType
 			)
 
-			IconButton(
+			SimpleIconButton(
+				Icons.Default.OpenInBrowser,
+				stringResource(R.string.action_open_in_webview),
 				onClick = openWebView
-			) {
-				Icon(
-					painterResource(R.drawable.open_in_browser),
-					stringResource(R.string.action_open_in_webview)
-				)
-			}
+			)
 		}
 	)
 }
 
 /**
  * Main content, the grid of items
+ * @param listingSelectionData Data of what listing the user selected
+ * @param setListing Function to update the listing
  */
 @Composable
 fun CatalogGrid(
@@ -444,8 +500,11 @@ fun CatalogGrid(
 	columnsInV: Int,
 	cardType: NovelCardType,
 	onClick: (ACatalogNovelUI) -> Unit,
-	onLongClick: (ACatalogNovelUI) -> Unit
+	onLongClick: (ACatalogNovelUI) -> Unit,
+	listingSelectionData: ListingSelectionData?,
+	setListing: (selection: Int) -> Unit
 ) {
+	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
 	val w = LocalConfiguration.current.screenWidthDp
 	val o = LocalConfiguration.current.orientation
 
@@ -470,6 +529,8 @@ fun CatalogGrid(
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
 		verticalArrangement = Arrangement.spacedBy(4.dp)
 	) {
+		catalogListingSelection(listingSelectionData, setListing)
+
 		itemsIndexed(
 			items,
 			key = { index, item -> item.hashCode() + index }
@@ -482,6 +543,33 @@ fun CatalogGrid(
 		}
 		appendBar(items)
 		noMoreBar(items)
+	}
+}
+
+
+/**
+ * Selection so the user can quickly change the listing in UI.
+ * @param listingSelectionData Data of what listing the user selected
+ * @param setListing Function to update the listing
+ */
+fun LazyGridScope.catalogListingSelection(
+	listingSelectionData: ListingSelectionData?,
+	setListing: (selection: Int) -> Unit
+) {
+	item(span = { GridItemSpan(maxLineSpan) }) {
+		AnimatedVisibility(listingSelectionData?.choices?.isNotEmpty() ?: false) {
+			if (listingSelectionData != null)
+				ListPreferenceWidget(
+					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
+					subtitle = listingSelectionData.choices[listingSelectionData.selection],
+					icon = null,
+					value = listingSelectionData.selection,
+					entries = listingSelectionData.choices.withIndex()
+						.associate { it.index to it.value },
+					onValueChange = setListing,
+					isSubtitleTheValue = true
+				)
+		}
 	}
 }
 
@@ -605,10 +693,8 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
  */
 @Preview
 @Composable
-fun PreviewCatalogContentNoMore() {
-	ShosetsuTheme {
-		CatalogContentNoMore()
-	}
+fun PreviewCatalogContentNoMore() = ShosetsuTheme(AppThemes.LIGHT) {
+	CatalogContentNoMore()
 }
 
 /**

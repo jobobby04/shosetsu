@@ -1,4 +1,7 @@
-import com.google.gson.stream.JsonWriter
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToStream
 import org.eclipse.jgit.api.Git
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
@@ -8,6 +11,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 abstract class GenerateContributorsTask : DefaultTask() {
+    @Serializable
     private data class Contributor(
         val name: String,
         val email: String,
@@ -27,6 +31,7 @@ abstract class GenerateContributorsTask : DefaultTask() {
         outputFile.convention(project.layout.projectDirectory.file("build/generated/assets/contributors.json"))
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     @TaskAction
     fun main() {
         val encountered = mutableMapOf<String, Contributor>()
@@ -43,18 +48,6 @@ abstract class GenerateContributorsTask : DefaultTask() {
         val contributors = encountered.values.sortedByDescending { it.commits }
         val file = outputFile.get().asFile
         file.parentFile.mkdirs()
-        JsonWriter(file.writer()).use { it.run {
-            beginArray()
-            contributors.forEach {
-                beginObject()
-                name("name").value(it.name)
-                name("email").value(it.email)
-                name("commits").value(it.commits)
-                it.website?.let { name("website").value(it) }
-                it.image?.let { name("image").value(it) }
-                endObject()
-            }
-            endArray()
-        } }
+        file.outputStream().use { Json.encodeToStream(contributors, it) }
     }
 }

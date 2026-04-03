@@ -2,6 +2,7 @@ package app.shosetsu.android.ui.reader.page
 
 import android.webkit.JavascriptInterface
 import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.logI as pLogI
 
 /*
  * This file is part of shosetsu.
@@ -55,5 +56,14 @@ class ShosetsuScript(
 		launchUI {
 			onDClickMethod()
 		}
+	}
+
+	/**
+	 * JavaScript function for [logI], passes event to UI thread.
+	 */
+	@Suppress("unused")
+	@JavascriptInterface
+	fun logI(text: String) {
+		pLogI(text)
 	}
 }

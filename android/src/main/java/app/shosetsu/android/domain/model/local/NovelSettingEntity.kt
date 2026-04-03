@@ -31,5 +31,6 @@ data class NovelSettingEntity(
 	var showOnlyReadingStatusOf: ReadingStatus? = null,
 	var showOnlyBookmarked: Boolean = false,
 	var showOnlyDownloaded: Boolean = false,
+	var showOnlyString: String? = null,
 	var reverseOrder: Boolean = false,
 )

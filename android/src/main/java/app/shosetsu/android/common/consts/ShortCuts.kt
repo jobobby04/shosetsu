@@ -2,11 +2,14 @@ package app.shosetsu.android.common.consts
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.core.content.pm.ShortcutInfoCompat.Builder
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.graphics.drawable.IconCompat.createWithResource
 import app.shosetsu.android.R
 import app.shosetsu.android.activity.MainActivity
+import app.shosetsu.android.common.ext.toIcon
+import app.shosetsu.android.ui.main.Destination
 
 /*
  * This file is part of shosetsu.
@@ -35,7 +38,7 @@ object ShortCuts {
 		ShortcutManagerCompat.addDynamicShortcuts(
 			context, listOf(
 				Builder(context, "Library")
-					.setIcon(createWithResource(context, R.drawable.library))
+					.setIcon(Destination.Library.icon.toIcon())
 					.setLongLabel(context.getString(R.string.library))
 					.setShortLabel(context.getString(R.string.library))
 					.setIntent(Intent(context, MainActivity::class.java).apply {
@@ -43,7 +46,7 @@ object ShortCuts {
 					})
 					.build(),
 				Builder(context, "Browse")
-					.setIcon(createWithResource(context, R.drawable.view_module))
+					.setIcon(Destination.Browse.icon.toIcon())
 					.setLongLabel(context.getString(R.string.browse))
 					.setShortLabel(context.getString(R.string.browse))
 					.setIntent(Intent(context, MainActivity::class.java).apply {
@@ -51,7 +54,7 @@ object ShortCuts {
 					})
 					.build(),
 				Builder(context, "Updates")
-					.setIcon(createWithResource(context, R.drawable.update))
+					.setIcon(Destination.Updates.icon.toIcon())
 					.setLongLabel(context.getString(R.string.updates))
 					.setShortLabel(context.getString(R.string.updates))
 					.setIntent(Intent(context, MainActivity::class.java).apply {
@@ -59,7 +62,7 @@ object ShortCuts {
 					})
 					.build(),
 				Builder(context, "Search")
-					.setIcon(createWithResource(context, R.drawable.search))
+					.setIcon(Icons.Default.Search.toIcon())
 					.setLongLabel(context.getString(R.string.search))
 					.setShortLabel(context.getString(R.string.search))
 					.setIntent(Intent(context, MainActivity::class.java).apply {

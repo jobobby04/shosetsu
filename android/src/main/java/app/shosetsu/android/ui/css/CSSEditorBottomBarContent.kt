@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Redo
+import androidx.compose.material.icons.automirrored.outlined.Undo
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.SUB_TEXT_SIZE
+import app.shosetsu.android.view.compose.SimpleIconButton
 
 @Preview
 @Composable
@@ -96,22 +101,19 @@ fun CSSEditorBottomBarContent(
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					IconButton(onClick = onUndo, enabled = canUndo) {
-						Icon(
-							painterResource(R.drawable.ic_baseline_undo_24),
-							stringResource(R.string.activity_css_undo)
-						)
-					}
+					SimpleIconButton(
+						Icons.AutoMirrored.Outlined.Undo,
+						stringResource(R.string.activity_css_undo),
+						onClick = onUndo,
+						enabled = canUndo
+					)
 
-					IconButton(
+					SimpleIconButton(
+						painterResource(androidx.appcompat.R.drawable.abc_ic_menu_paste_mtrl_am_alpha),
+						stringResource(R.string.activity_css_paste),
 						onClick = onPaste, enabled = hasPaste,
 						modifier = Modifier.padding(start = 8.dp)
-					) {
-						Icon(
-							painterResource(androidx.appcompat.R.drawable.abc_ic_menu_paste_mtrl_am_alpha),
-							stringResource(R.string.activity_css_paste)
-						)
-					}
+					)
 				}
 
 				val shapes = MaterialTheme.shapes
@@ -124,7 +126,7 @@ fun CSSEditorBottomBarContent(
 					contentColor = colorResource(android.R.color.white)
 				) {
 					Icon(
-						painterResource(R.drawable.ic_baseline_save_24),
+						Icons.Default.Save,
 						stringResource(R.string.activity_css_save)
 					)
 				}
@@ -132,21 +134,17 @@ fun CSSEditorBottomBarContent(
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 				) {
-					IconButton(
+					SimpleIconButton(
+						Icons.Default.SaveAlt,
+						stringResource(R.string.activity_css_export),
 						onClick = onExport, enabled = false,
 						modifier = Modifier.padding(end = 8.dp)
-					) {
-						Icon(
-							painterResource(R.drawable.ic_baseline_save_alt_24),
-							stringResource(R.string.activity_css_export)
-						)
-					}
-					IconButton(onClick = onRedo, enabled = canRedo) {
-						Icon(
-							painterResource(R.drawable.ic_baseline_redo_24),
-							stringResource(R.string.activity_css_redo)
-						)
-					}
+					)
+					SimpleIconButton(
+						Icons.AutoMirrored.Outlined.Redo,
+						stringResource(R.string.activity_css_redo),
+						onClick = onRedo, enabled = canRedo
+					)
 				}
 			}
 		}

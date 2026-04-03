@@ -18,8 +18,6 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,6 +48,7 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
@@ -226,13 +225,12 @@ fun HistoryMoreOption(
 	var showDropDown by remember { mutableStateOf(false) }
 
 	Box {
-		IconButton(
+		SimpleIconButton(
+			Icons.Default.Delete, stringResource(R.string.clear),
 			onClick = {
 				showDropDown = true
 			}
-		) {
-			Icon(Icons.Default.Delete, stringResource(R.string.clear))
-		}
+		)
 
 		DropdownMenu(
 			showDropDown,
@@ -296,13 +294,14 @@ fun HistoryItemContent(
 					.aspectRatio(coverRatio)
 					.clickable(onClick = openNovel),
 				error = {
-					ImageLoadingError()
+					ImageLoadingError(updateUI.novelTitle)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
 				})
 		} else {
 			ImageLoadingError(
+				updateUI?.novelTitle,
 				Modifier
 					.aspectRatio(coverRatio)
 					.placeholder(updateUI == null)

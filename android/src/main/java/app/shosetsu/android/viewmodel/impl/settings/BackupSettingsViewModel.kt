@@ -2,18 +2,15 @@ package app.shosetsu.android.viewmodel.impl.settings
 
 import android.net.Uri
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import app.shosetsu.android.domain.usecases.load.LoadInternalBackupNamesUseCase
+import app.shosetsu.android.domain.usecases.start.StartBackupMigrationWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartBackupWorkerUseCase
-import app.shosetsu.android.domain.usecases.start.StartExportBackupWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
 import app.shosetsu.android.viewmodel.abstracted.settings.ABackupSettingsViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /*
  * This file is part of shosetsu.
@@ -40,10 +37,10 @@ class BackupSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
 	private val manager: NovelUpdateWorker.Manager,
 	private val startBackupWorkerUseCase: StartBackupWorkerUseCase,
-	private val loadInternalBackupNamesUseCase: LoadInternalBackupNamesUseCase,
 	private val startRestoreWorker: StartRestoreWorkerUseCase,
-	private val startExportWorker: StartExportBackupWorkerUseCase
+	private val startBackupMigrationWorker: StartBackupMigrationWorkerUseCase,
 ) : ABackupSettingsViewModel(iSettingsRepository) {
+	override val promptMigration = MutableStateFlow(false)
 
 	override fun startBackup() {
 		launchIO {
@@ -52,36 +49,34 @@ class BackupSettingsViewModel(
 		}
 	}
 
-	override fun loadInternalOptions(): Flow<ImmutableList<String>> = flow {
-		emit(loadInternalBackupNamesUseCase().sorted().toImmutableList())
-	}.onIO()
-
-	override fun restore(path: String) {
-		logV("Restoring: $path ")
-		startRestoreWorker(path)
-	}
-
 	override fun restore(uri: Uri) {
 		logV("Restoring: $uri")
 		startRestoreWorker(uri)
 	}
 
-	private var backupToExport: String? = null
+	override fun setBackupStorageLocation(uri: Uri) {
+		launchIO {
+			// Get the current uri for next behaviors
+			val currentUri = settingsRepo.getString(SettingKey.BackupStorageLocation)
 
-	override fun holdBackupToExport(backupToExport: String) {
-		this.backupToExport = backupToExport
+			// set the new backup directory
+			settingsRepo.setString(SettingKey.BackupStorageLocation, uri.toString())
+
+			// If the current URI is empty, we can assume that this is the users first time setting their backup directory
+			if (currentUri.isEmpty())
+				promptMigration.emit(true)
+		}
 	}
 
-	override fun getBackupToExport(): String? =
-		if (backupToExport != null) backupToExport!! else null
-
-	override fun clearExport() {
-		backupToExport = null
+	override fun dismissMigration() {
+		promptMigration.tryEmit(false)
 	}
 
-	override fun exportBackup(uri: Uri) {
-		if (backupToExport == null) return
-
-		startExportWorker(backupToExport!!, uri)
+	override fun startMigration() {
+		launchIO {
+			startBackupMigrationWorker()
+			// dismiss *after* the worker starts.
+			promptMigration.emit(false)
+		}
 	}
 }

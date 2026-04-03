@@ -3,24 +3,58 @@ package app.shosetsu.android.ui.library
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.state.ToggleableState.Off
 import androidx.compose.ui.state.ToggleableState.On
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.enums.NovelSortType
-import app.shosetsu.android.common.enums.NovelSortType.*
+import app.shosetsu.android.common.enums.NovelSortType.BY_ID
+import app.shosetsu.android.common.enums.NovelSortType.BY_READ_TIME
+import app.shosetsu.android.common.enums.NovelSortType.BY_TITLE
+import app.shosetsu.android.common.enums.NovelSortType.BY_UNREAD_COUNT
+import app.shosetsu.android.common.enums.NovelSortType.BY_UPDATED
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -50,13 +84,13 @@ import kotlinx.coroutines.launch
  * 22 / 11 / 2020
  */
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun LibraryFilterMenuView(
 	viewModel: ALibraryViewModel
 ) {
 	val pages =
-		listOf(stringResource(R.string.filter), stringResource(R.string.sort))
+		listOf(stringResource(R.string.filter), stringResource(R.string.sort), stringResource(R.string.display))
 	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
 
@@ -84,24 +118,26 @@ fun LibraryFilterMenuView(
 				)
 			}
 		}
+		val horizontalPadding = 24.dp
+		val verticalPadding = 10.dp
 		Surface {
 			HorizontalPager(state = pagerState) {
 				when (it) {
 					0 -> {
 						val genres by viewModel.genresFlow.collectAsState(persistentListOf())
-						val genresIsNotEmpty by derivedStateOf { genres.isNotEmpty() }
+						val genresIsNotEmpty by remember(genres) { derivedStateOf { genres.isNotEmpty() } }
 						var genresIsExpanded by remember { mutableStateOf(false) }
 
 						val tags by viewModel.tagsFlow.collectAsState(persistentListOf())
-						val tagsIsNotEmpty by derivedStateOf { tags.isNotEmpty() }
+						val tagsIsNotEmpty by remember(tags) { derivedStateOf { tags.isNotEmpty() } }
 						var tagsIsExpanded by remember { mutableStateOf(false) }
 
 						val authors by viewModel.authorsFlow.collectAsState(persistentListOf())
-						val authorsIsNotEmpty by derivedStateOf { authors.isNotEmpty() }
+						val authorsIsNotEmpty by remember(authors) { derivedStateOf { authors.isNotEmpty() } }
 						var authorsIsExpanded by remember { mutableStateOf(false) }
 
 						val artists by viewModel.artistsFlow.collectAsState(persistentListOf())
-						val artistsIsNotEmpty by derivedStateOf { artists.isNotEmpty() }
+						val artistsIsNotEmpty by remember(artists) { derivedStateOf { artists.isNotEmpty() } }
 						var artistsIsExpanded by remember { mutableStateOf(false) }
 						val unreadStatusFilterState by viewModel.getUnreadFilter()
 							.collectAsState(Off)
@@ -112,26 +148,26 @@ fun LibraryFilterMenuView(
 							genres,
 							genresIsNotEmpty,
 							genresIsExpanded,
-							{
-								genresIsExpanded = it
+							{ value ->
+								genresIsExpanded = value
 							},
 							tags,
 							tagsIsNotEmpty,
 							tagsIsExpanded,
-							{
-								tagsIsExpanded = it
+							{ value ->
+								tagsIsExpanded = value
 							},
 							authors,
 							authorsIsNotEmpty,
 							authorsIsExpanded,
-							{
-								authorsIsExpanded = it
+							{ value ->
+								authorsIsExpanded = value
 							},
 							artists,
 							artistsIsNotEmpty,
 							artistsIsExpanded,
-							{
-								artistsIsExpanded = it
+							{ value ->
+								artistsIsExpanded = value
 							},
 							getFilterGenreState = viewModel::getFilterGenreState,
 							cycleFilterGenreState = viewModel::cycleFilterGenreState,
@@ -162,6 +198,33 @@ fun LibraryFilterMenuView(
 							pinOnTopState,
 							viewModel::setPinnedOnTop
 						)
+					}
+
+					2 -> {
+						val type by viewModel.novelCardTypeFlow.collectAsState()
+						FlowRow(
+							modifier = Modifier
+								.padding(
+									start = horizontalPadding,
+									top = 0.dp,
+									end = horizontalPadding,
+									bottom = verticalPadding,
+								)
+								.fillMaxHeight(),
+							horizontalArrangement = Arrangement.spacedBy(8.dp)
+						) {
+							mapOf(
+								R.string.normal to NovelCardType.NORMAL,
+								R.string.compressed to NovelCardType.COMPRESSED,
+								R.string.cozy to NovelCardType.COZY
+							).forEach { (s, kind) ->
+								FilterChip(
+									selected = type == kind,
+									onClick = { viewModel.setViewType(kind) },
+									label = { Text(stringResource(s)) }
+								)
+							}
+						}
 					}
 				}
 			}
@@ -363,13 +426,7 @@ fun LibraryFilterMenuSortItemContent(
 			Box(modifier = Modifier.size(32.dp)) {
 				if (isExpected)
 					Icon(
-						painterResource(
-							if (reversed) {
-								R.drawable.expand_less
-							} else {
-								R.drawable.expand_more
-							}
-						),
+						if (reversed) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 						null,
 						modifier = Modifier.align(Alignment.Center)
 					)
@@ -464,7 +521,7 @@ fun ColumnScope.FilterContent(
 				.padding(8.dp)
 		) {
 			Icon(
-				painterResource(if (isExpanded) R.drawable.expand_less else R.drawable.expand_more),
+				if (isExpanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 				null
 			)
 			Text(stringResource(name), modifier = Modifier.padding(start = 8.dp))

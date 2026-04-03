@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,12 +37,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ImageLoadingError
@@ -140,7 +141,7 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 		Text(text = "To")
 
 		Icon(
-			painter = painterResource(id = R.drawable.expand_more),
+			imageVector = Icons.Outlined.ExpandMore,
 			contentDescription = "The above will transfer to the below"
 		)
 
@@ -150,11 +151,6 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 			Text(text = "This is under construction, Try again in another release :D")
 		}
 	}
-}
-
-@Composable
-fun MigrationExtensionsLoadingContent() {
-	LinearProgressIndicator()
 }
 
 @Composable
@@ -175,7 +171,7 @@ fun MigrationExtensionsContent(
 @ExperimentalMaterial3Api
 @Preview
 @Composable
-fun PreviewMigrationExtensionItemContent() {
+fun PreviewMigrationExtensionItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	val item by remember {
 		mutableStateOf(
 			MigrationExtensionUI(
@@ -186,16 +182,13 @@ fun PreviewMigrationExtensionItemContent() {
 			)
 		)
 	}
-	ShosetsuTheme {
-		Box(modifier = Modifier.height(200.dp)) {
-			MigrationExtensionItemContent(item = item) {
-				println("Test")
-			}
+	Box(modifier = Modifier.height(200.dp)) {
+		MigrationExtensionItemContent(item = item) {
+			println("Test")
 		}
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MigrationExtensionItemContent(
 	item: MigrationExtensionUI,
@@ -243,11 +236,6 @@ fun MigrationExtensionItemContent(
 }
 
 @Composable
-fun MigrationNovelsLoadingContent() {
-	LinearProgressIndicator()
-}
-
-@Composable
 fun MigrationNovelsContent(
 	list: ImmutableList<MigrationNovelUI>,
 	onClick: (MigrationNovelUI) -> Unit
@@ -265,7 +253,7 @@ fun MigrationNovelsContent(
 @ExperimentalMaterial3Api
 @Composable
 @Preview
-fun PreviewMigrationNovelItemRowContent() {
+fun PreviewMigrationNovelItemRowContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	val item by remember {
 		mutableStateOf(
 			MigrationNovelUI(
@@ -276,18 +264,16 @@ fun PreviewMigrationNovelItemRowContent() {
 			)
 		)
 	}
-	ShosetsuTheme {
-		Row(
-			modifier = Modifier
-				.height(200.dp)
-				.width(600.dp)
-		) {
-			MigrationNovelItemContent(item = item) {
-				println("Test")
-			}
-			MigrationNovelItemContent(item = item) {
-				println("Test")
-			}
+	Row(
+		modifier = Modifier
+			.height(200.dp)
+			.width(600.dp)
+	) {
+		MigrationNovelItemContent(item = item) {
+			println("Test")
+		}
+		MigrationNovelItemContent(item = item) {
+			println("Test")
 		}
 	}
 }
@@ -295,7 +281,7 @@ fun PreviewMigrationNovelItemRowContent() {
 @ExperimentalMaterial3Api
 @Composable
 @Preview
-fun PreviewMigrationNovelItemContent() {
+fun PreviewMigrationNovelItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	val item by remember {
 		mutableStateOf(
 			MigrationNovelUI(
@@ -306,16 +292,13 @@ fun PreviewMigrationNovelItemContent() {
 			)
 		)
 	}
-	ShosetsuTheme {
-		Box(modifier = Modifier.height(200.dp)) {
-			MigrationNovelItemContent(item = item) {
-				println("Test")
-			}
+	Box(modifier = Modifier.height(200.dp)) {
+		MigrationNovelItemContent(item = item) {
+			println("Test")
 		}
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI) -> Unit) {
 	Card(
@@ -352,14 +335,14 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 					contentDescription = null,
 					modifier = modifier,
 					error = {
-						ImageLoadingError()
+						ImageLoadingError(item.title)
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
 					}
 				)
 			} else {
-				ImageLoadingError(modifier)
+				ImageLoadingError(item.title, modifier)
 			}
 
 			Text(

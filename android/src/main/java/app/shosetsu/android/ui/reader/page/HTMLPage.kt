@@ -38,6 +38,7 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -68,6 +69,8 @@ fun HTMLPage(
 	onClick: (String?) -> Unit,
 	onDoubleClick: () -> Unit,
 	ttsProgress: StableHolder<StateFlow<String?>>,
+	getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
+	onSearchQuery: (String) -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
@@ -115,6 +118,8 @@ fun HTMLPage(
 			state = state,
 			captureBackPresses = false,
 			onCreated = { webView ->
+				(webView as? ChapterReaderWebview)?.searchInBrowser = onSearchQuery
+
 				webView.setBackgroundColor(backgroundColor.toArgb())
 				webView.settings.apply {
 					@SuppressLint("SetJavaScriptEnabled")
@@ -150,11 +155,15 @@ fun HTMLPage(
 				openURI = {
 					uriToOpen = it
 				},
-				scope,
-				ttsProgress.item
+				scope = scope,
+				ttsState = ttsProgress.item,
+				getChapterHTMLStyle = getChapterHTMLStyle,
 			),
 			chromeClient = ShosetsuAccompanistWebChromeClient(),
 			navigator = navigator,
+			factory = {
+				ChapterReaderWebview(it)
+			}
 		)
 	}
 

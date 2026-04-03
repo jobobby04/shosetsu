@@ -1,15 +1,9 @@
 package app.shosetsu.android.ui.main
 
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
 
@@ -37,40 +31,21 @@ import androidx.navigation.NavBackStackEntry
  * @author Doomsdayrs
  */
 @Composable
-fun <T> BottomNavigationBar(
-	destinations: List<T>,
+fun BottomNavigationBar(
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (Destination) -> Unit
-) where T : Destination, T : Root {
-	var isVisible by remember { mutableStateOf(true) }
-
-	isVisible = destinations.any { destination ->
-		currentDestination?.destination?.route == destination.route ||
-				currentDestination?.destination?.route == "main"
-	}
-
-	if (isVisible) {
-		NavigationBar {
-			destinations.forEach { destination ->
-				NavigationBarItem(
-					selected =
-					currentDestination?.destination?.route == destination.route,
-					icon = {
-						Icon(
-							painterResource(
-								destination.icon
-							),
-							destination.route
-						)
-					},
-					label = {
-						Text(stringResource(destination.name))
-					},
-					onClick = {
-						onNavigate(destination)
-					}
-				)
-			}
+	onNavigate: (ShosetsuDestination.Primary) -> Unit
+) {
+	NavigationBar {
+		ShosetsuDestination.Primary.all.forEach { destination ->
+			val isSelected = currentDestination?.has(destination) == true
+			NavigationBarItem(
+				selected = isSelected,
+				icon = { DestinationIcon(destination, isSelected) },
+				label = { Text(stringResource(destination.name)) },
+				onClick = {
+					onNavigate(destination)
+				}
+			)
 		}
 	}
 }

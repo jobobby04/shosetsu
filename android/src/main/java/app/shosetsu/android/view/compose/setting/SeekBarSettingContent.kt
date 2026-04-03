@@ -28,9 +28,9 @@ fun SliderSettingContent(
 	val choice by repo.getIntFlow(key).collectAsState()
 
 	GenericBottomSettingLayout(
-		title,
-		description,
-		modifier,
+		title = title,
+		description = description,
+		modifier = modifier,
 	) {
 		DiscreteSlider(
 			choice,
@@ -66,9 +66,9 @@ fun FloatSliderSettingContent(
 	val choice by repo.getFloatFlow(key).collectAsState()
 
 	GenericBottomSettingLayout(
-		title,
-		description,
-		modifier,
+		title = title,
+		description = description,
+		modifier = modifier,
 	) {
 		DiscreteSlider(
 			choice,

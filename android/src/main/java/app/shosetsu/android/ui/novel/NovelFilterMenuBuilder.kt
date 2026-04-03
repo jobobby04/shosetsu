@@ -14,8 +14,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -29,7 +33,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -227,6 +230,26 @@ fun NovelFilterMenuFilterContent(
 				)
 			},
 		)
+
+		var onlyString by remember { mutableStateOf(settings.showOnlyString) }
+		OutlinedTextField(
+			onlyString.orEmpty(),
+			onValueChange = {
+				onlyString = it
+				updateNovelSetting(
+					settings.copy(
+						showOnlyString = it.takeIf { it.isNotBlank() }?.trim()
+					)
+				)
+			},
+			label = {
+				Text(stringResource(R.string.text_filter))
+			},
+			singleLine = true,
+			modifier = Modifier
+				.padding(horizontal = 32.dp, vertical = 8.dp)
+				.fillMaxWidth(),
+		)
 	}
 }
 
@@ -318,14 +341,12 @@ fun NovelFilterMenuFilterCheckboxItem(
 @Preview
 @Composable
 fun PreviewNovelFilterMenuSortContent() {
-	var type by remember { mutableStateOf(SOURCE) }
 	var reversed by remember { mutableStateOf(false) }
 	NovelFilterMenuSortContent(
 		chapterSortType = SOURCE,
 		isReversed = reversed,
 		isLoading = false,
 		update = { newType, newReversed ->
-			type = newType
 			reversed = newReversed
 		}
 	)
@@ -378,14 +399,13 @@ fun NovelFilterMenuSortContent(
 @Composable
 fun PreviewNovelFilterMenuSortItemContent() {
 	var type by remember { mutableStateOf(SOURCE) }
-	var reversed by remember { mutableStateOf(false) }
 	NovelFilterMenuSortItemContent(
 		name = "Test",
 		state = type,
 		expectedState = SOURCE,
 		reversed = false,
 		isPlaceholder = false,
-		setIsSortReversed = { reversed = it },
+		setIsSortReversed = { },
 		setSortType = { type = it }
 	)
 }
@@ -420,13 +440,7 @@ fun NovelFilterMenuSortItemContent(
 			Box(modifier = Modifier.size(32.dp)) {
 				if (isExpected)
 					Icon(
-						painterResource(
-							if (reversed) {
-								R.drawable.expand_less
-							} else {
-								R.drawable.expand_more
-							}
-						),
+						if (reversed) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 						null,
 						modifier = Modifier.align(Alignment.Center)
 					)

@@ -1,5 +1,6 @@
 package app.shosetsu.android.providers.network
 
+import android.annotation.SuppressLint
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
@@ -91,7 +92,7 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 						) {
 							return PasswordAuthentication(user, pass.toCharArray())
 						}
-						return null;
+						return null
 					}
 				})
 			}
@@ -106,6 +107,7 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 /**
  * Represents the format expected from an HTTP Retry-After response
  */
+@SuppressLint("SimpleDateFormat") // This is an HTTP date, not user facing or dependent.
 val retryAfterDateFormat: SimpleDateFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz")
 
 /**
@@ -169,7 +171,7 @@ fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false):
 			return if (isRetry) response else slowRequest(chain, r, isRetry = true)
 		}
 	}
-	return response;
+	return response
 }
 
 /**

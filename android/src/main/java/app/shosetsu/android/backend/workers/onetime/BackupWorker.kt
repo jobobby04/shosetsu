@@ -1,28 +1,82 @@
 package app.shosetsu.android.backend.workers.onetime
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.database.sqlite.SQLiteException
+import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.*
+import androidx.core.net.toUri
+import androidx.core.provider.DocumentsContractCompat
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkInfo
+import androidx.work.WorkerParameters
 import app.shosetsu.android.R
+import app.shosetsu.android.activity.MainActivity
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
 import app.shosetsu.android.backend.workers.NotificationCapable
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.FilePermissionException
+import app.shosetsu.android.common.NullContentResolverException
+import app.shosetsu.android.common.SettingKey.BackupOnLowBattery
+import app.shosetsu.android.common.SettingKey.BackupOnLowStorage
+import app.shosetsu.android.common.SettingKey.BackupOnlyWhenIdle
+import app.shosetsu.android.common.SettingKey.BackupStorageLocation
+import app.shosetsu.android.common.SettingKey.ShouldBackupChapters
+import app.shosetsu.android.common.SettingKey.ShouldBackupSettings
+import app.shosetsu.android.common.consts.ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER
 import app.shosetsu.android.common.consts.LogConstants
 import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.Notifications.CHANNEL_BACKUP
 import app.shosetsu.android.common.consts.WorkerTags.BACKUP_WORK_ID
-import app.shosetsu.android.common.ext.*
+import app.shosetsu.android.common.ext.actionBuilder
+import app.shosetsu.android.common.ext.addReportErrorAction
+import app.shosetsu.android.common.ext.getString
+import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
+import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.notificationBuilder
+import app.shosetsu.android.common.ext.notificationManager
+import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
+import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.common.utils.backupJSON
 import app.shosetsu.android.domain.model.local.BackupEntity
 import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
 import app.shosetsu.android.domain.model.local.NovelEntity
-import app.shosetsu.android.domain.model.local.backup.*
-import app.shosetsu.android.domain.repository.base.*
+import app.shosetsu.android.domain.model.local.backup.BackupCategoryEntity
+import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
+import app.shosetsu.android.domain.model.local.backup.BackupExtensionEntity
+import app.shosetsu.android.domain.model.local.backup.BackupNovelEntity
+import app.shosetsu.android.domain.model.local.backup.BackupNovelSettingEntity
+import app.shosetsu.android.domain.model.local.backup.BackupRepositoryEntity
+import app.shosetsu.android.domain.model.local.backup.FleshedBackupEntity
+import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
+import app.shosetsu.android.domain.repository.base.IBackupRepository
 import app.shosetsu.android.domain.repository.base.IBackupRepository.BackupProgress
+import app.shosetsu.android.domain.repository.base.ICategoryRepository
+import app.shosetsu.android.domain.repository.base.IChaptersRepository
+import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
+import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
+import app.shosetsu.android.domain.repository.base.INovelPinsRepository
+import app.shosetsu.android.domain.repository.base.INovelSettingsRepository
+import app.shosetsu.android.domain.repository.base.INovelsRepository
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import kotlinx.coroutines.delay
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.encodeToStream
 import org.acra.ACRA
 import org.kodein.di.DI
@@ -30,6 +84,8 @@ import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import java.io.ByteArrayOutputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
 import java.util.zip.GZIPOutputStream
 
@@ -59,6 +115,12 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 ), DIAware, NotificationCapable {
 
 	override val di: DI by closestDI(appContext)
+
+	private val openAppToSetBackupDirectory: Intent
+		get() = Intent(applicationContext, MainActivity::class.java).apply {
+			action = ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER
+		}
+
 	private val novelRepository by instance<INovelsRepository>()
 	private val novelPinRepository by instance<INovelPinsRepository>()
 	private val iSettingsRepository by instance<ISettingsRepository>()
@@ -79,7 +141,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, CHANNEL_BACKUP)
-			.setSmallIcon(R.drawable.backup_icon)
+			.setSmallIcon(Icons.Default.Backup)
 			.setSubText("Backup")
 			.setOnlyAlertOnce(true)
 			.setOngoing(true)
@@ -93,6 +155,9 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 	private suspend fun backupSettings() =
 		iSettingsRepository.getBoolean(ShouldBackupSettings)
+
+	private suspend fun backupStorageLocation() =
+		iSettingsRepository.getString(BackupStorageLocation).takeIf { it.isNotEmpty() }?.toUri()
 
 	@Throws(IOException::class)
 	inline fun gzip(block: (GZIPOutputStream) -> Unit): ByteArray {
@@ -138,7 +203,29 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		}
 	}
 
+	/**
+	 * Loads a backup via the [Uri] provided by Androids file selection
+	 */
+	@Throws(
+		FileNotFoundException::class,
+		FilePermissionException::class,
+		NullContentResolverException::class
+	)
+	private fun writeToUri(uri: Uri, backupEntity: BackupEntity) {
+		val contentResolver = applicationContext.contentResolver
+			?: throw NullContentResolverException()
 
+		contentResolver.openFileDescriptor(uri, "w")?.use { descriptor ->
+			FileOutputStream(descriptor.fileDescriptor).use {
+				it.write(backupEntity.content)
+			}
+		} ?: throw FilePermissionException(
+			uri.path ?: "",
+			FilePermissionException.PermissionType.WRITE
+		)
+	}
+
+	@OptIn(ExperimentalSerializationApi::class)
 	@Throws(IOException::class)
 	override suspend fun doWork(): Result {
 		// Load novels
@@ -146,7 +233,6 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		notify("Starting...")
 		backupRepository.updateProgress(BackupProgress.IN_PROGRESS)
 		val backupSettings = backupSettings()
-
 
 		lateinit var novelsToChapters: List<Pair<NovelEntity, List<BackupChapterEntity>>>
 		lateinit var extensions: List<InstalledExtensionEntity>
@@ -211,8 +297,8 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 						extensions.any { extensionEntity ->
 							extensionEntity.repoID == repositoryEntity.id
 						}
-					}.map { (_, url, name) ->
-						BackupRepositoryEntity(url, name)
+					}.map { (id, url, name) ->
+						BackupRepositoryEntity(id, url, name)
 					}
 
 			val zippedBytes = gzip { gzip ->
@@ -224,6 +310,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					extensions = extensions.map { extensionEntity ->
 						BackupExtensionEntity(
 							extensionEntity.id,
+							extensionEntity.repoID,
 							novelsToChapters.filter { (novel, _) ->
 								novel.extensionID == extensionEntity.id
 							}.map { (novel, chapters) ->
@@ -237,7 +324,9 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 										it.sortType,
 										it.showOnlyReadingStatusOf,
 										it.showOnlyBookmarked,
-										it.showOnlyDownloaded
+										it.showOnlyDownloaded,
+										it.showOnlyString,
+										it.reverseOrder,
 									)
 								} ?: BackupNovelSettingEntity()
 
@@ -279,22 +368,79 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 			logI("Saving to file")
 			notify("Saving to file")
-			val pathResult = backupRepository.saveBackup(
-				BackupEntity(
-					zippedBytes
-				)
-			)
-			pathResult.let {
-				notify(R.string.worker_backup_complete) {
-					setOngoing(false)
+			val backupEntity = BackupEntity(zippedBytes)
+
+			try {
+				fun missing(): Result {
+					logE("Failed to create document")
+					notify(R.string.export_backup_notification_missing_uri) {
+						setNotOngoing()
+						addAction(
+							actionBuilder(
+								Icons.Default.Settings,
+								getString(R.string.worker_backup_set_folder),
+								PendingIntent.getActivity(
+									applicationContext,
+									0,
+									openAppToSetBackupDirectory,
+									if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+								)
+							).build()
+						)
+					}
+					backupRepository.updateProgress(BackupProgress.FAILURE)
+					return Result.failure()
 				}
 
-				// Call GC to clean up the bulky resources
-				System.gc()
-				delay(500)
-				backupRepository.updateProgress(BackupProgress.COMPLETE)
-				return Result.success()
+				val directoryUri = backupStorageLocation() ?: return missing()
+				// If the directory URI is not provided, we can
+				val docId =
+					DocumentsContractCompat.getTreeDocumentId(directoryUri) ?: return missing()
+				val parentDocumentUri =
+					DocumentsContractCompat.buildDocumentUriUsingTree(directoryUri, docId)
+						?: return missing()
+				val uri = DocumentsContractCompat.createDocument(
+					applicationContext.contentResolver,
+					parentDocumentUri,
+					"application/octet-stream",
+					backupEntity.fileName
+				) ?: return missing()
+				writeToUri(uri, backupEntity)
+			} catch (e: NullContentResolverException) {
+				logE("Failed to write to URI", e)
+				notify(R.string.worker_export_backup_null_resolver) {
+					setNotOngoing()
+					addReportErrorAction(applicationContext, defaultNotificationID, e)
+				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
+				return Result.failure()
+			} catch (e: FileNotFoundException) {
+				logE("URI is invalid file", e)
+				notify(R.string.worker_export_backup_file_missing) {
+					setNotOngoing()
+					addReportErrorAction(applicationContext, defaultNotificationID, e)
+				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
+				return Result.failure()
+			} catch (e: FilePermissionException) {
+				logE("Invalid permission to file", e)
+				notify(R.string.worker_export_backup_missing_perm) {
+					setNotOngoing()
+					addReportErrorAction(applicationContext, defaultNotificationID, e)
+				}
+				backupRepository.updateProgress(BackupProgress.FAILURE)
+				return Result.failure()
 			}
+
+			notify(R.string.worker_backup_complete) {
+				setOngoing(false)
+			}
+
+			// Call GC to clean up the bulky resources
+			System.gc()
+			delay(500)
+			backupRepository.updateProgress(BackupProgress.COMPLETE)
+			return Result.success()
 		}
 
 		backupRepository.updateProgress(BackupProgress.FAILURE)

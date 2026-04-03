@@ -24,11 +24,14 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
@@ -56,7 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
@@ -73,6 +76,7 @@ import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
@@ -162,6 +166,7 @@ fun LibraryView(
 		}
 	}
 
+	val resources = LocalResources.current
 	LibraryContent(
 		items = items,
 		isEmpty = isEmpty,
@@ -177,7 +182,7 @@ fun LibraryView(
 			{ item ->
 				scope.launch {
 					hostState.showSnackbar(
-						context.resources.getQuantityString(
+						resources.getQuantityString(
 							R.plurals.toast_unread_count,
 							item.unread,
 							item.unread
@@ -199,8 +204,6 @@ fun LibraryView(
 		onSelectBetween = viewModel::selectBetween,
 		query = query,
 		onSearch = viewModel::setQuery,
-		selectedType = type,
-		onSetType = viewModel::setViewType,
 		hostState = hostState,
 		onShowFilterMenu = viewModel::showFilterMenu,
 		drawerIcon = drawerIcon
@@ -249,8 +252,6 @@ fun LibraryContent(
 	onSelectBetween: () -> Unit,
 	query: String,
 	onSearch: (String) -> Unit,
-	selectedType: NovelCardType,
-	onSetType: (NovelCardType) -> Unit,
 	hostState: SnackbarHostState,
 	onShowFilterMenu: () -> Unit,
 	drawerIcon: @Composable () -> Unit
@@ -269,8 +270,7 @@ fun LibraryContent(
 				onSelectBetween = onSelectBetween,
 				query = query,
 				onSearch = onSearch,
-				selectedType = selectedType,
-				onSetType = onSetType,
+				onShowFilterMenu = onShowFilterMenu,
 				onRefresh = {
 					onRefresh(-1) // default, TODO maybe make better?
 				},
@@ -281,20 +281,6 @@ fun LibraryContent(
 		snackbarHost = {
 			SnackbarHost(hostState)
 		},
-		floatingActionButton = {
-			// TODO Collapsible
-			AnimatedVisibility(!isEmpty) {
-				ExtendedFloatingActionButton(
-					text = {
-						Text(stringResource(R.string.filter))
-					},
-					icon = {
-						Icon(painterResource(R.drawable.filter), stringResource(R.string.filter))
-					},
-					onClick = onShowFilterMenu
-				)
-			}
-		}
 	) { paddingValues ->
 		if (!isEmpty) {
 			if (items == null) {
@@ -350,8 +336,7 @@ fun LibraryAppBar(
 	onSelectBetween: () -> Unit,
 	query: String,
 	onSearch: (String) -> Unit,
-	selectedType: NovelCardType,
-	onSetType: (NovelCardType) -> Unit,
+	onShowFilterMenu: () -> Unit,
 	onRefresh: () -> Unit,
 	isEmpty: Boolean,
 	drawerIcon: @Composable () -> Unit
@@ -385,7 +370,7 @@ fun LibraryAppBar(
 				AnimatedVisibility(!isEmpty) {
 					Row {
 						SearchAction(query, onSearch, immediateSearch = true)
-						ViewTypeButton(selectedType, onSetType)
+						SimpleIconButton(Icons.Outlined.FilterList, stringResource(R.string.filter), onClick = onShowFilterMenu)
 						RefreshButton(onRefresh)
 					}
 				}
@@ -433,8 +418,9 @@ fun LibraryPager(
 						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
 					)
 				},
-				containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1F),
+				containerColor = MaterialTheme.colorScheme.background,
 				edgePadding = 0.dp,
+				divider = { }, // replaced with our own divider that stretches to the full width
 			) {
 				library.categories.forEachIndexed { index, category ->
 					Tab(
@@ -448,14 +434,13 @@ fun LibraryPager(
 					)
 				}
 			}
+			HorizontalDivider()
 		}
 		HorizontalPager(
 			state = categoryPagerState,
 			modifier = Modifier.fillMaxSize()
 		) {
-			val id by derivedStateOf {
-				library.categories[it].id
-			}
+			val id by remember(library) { derivedStateOf { library.categories[it].id } }
 			val items by produceState(persistentListOf(), library, it, id) {
 				value = onIO {
 					library.novels[id] ?: persistentListOf()
@@ -562,7 +547,7 @@ fun LibraryCategory(
 							containerColor = MaterialTheme.colorScheme.secondaryContainer
 						) {
 							Icon(
-								painterResource(R.drawable.ic_baseline_push_pin_24),
+								Icons.Default.PushPin,
 								stringResource(R.string.pin_on_top),
 								modifier = Modifier.size(16.dp)
 							)

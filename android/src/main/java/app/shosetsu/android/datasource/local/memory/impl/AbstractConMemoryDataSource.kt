@@ -83,7 +83,7 @@ abstract class AbstractConMemoryDataSource<K : Any, V : Any> {
 	}
 
 	fun contains(key: K): Boolean {
-		if (_hashMap.size <= 0) return false
+		if (_hashMap.isEmpty()) return false
 
 		val keys = _hashMap.keys.reversed()
 		for (i in keys) {

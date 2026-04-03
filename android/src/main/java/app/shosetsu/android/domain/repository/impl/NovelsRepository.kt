@@ -96,6 +96,8 @@ class NovelsRepository(
 		onIO {
 			database.update(
 				novelEntity.copy(
+					// Pass the URL so extensions can rewrite novel URLs
+					url = novelInfo.link.ifBlank { novelEntity.url },
 					title = novelInfo.title,
 					imageURL = novelInfo.imageURL,
 					language = novelInfo.language,

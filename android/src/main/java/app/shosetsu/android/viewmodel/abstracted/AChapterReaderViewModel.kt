@@ -1,17 +1,16 @@
 package app.shosetsu.android.viewmodel.abstracted
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
-import androidx.lifecycle.LiveData
-import app.shosetsu.android.common.enums.AppThemes
+import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
+import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
-import app.shosetsu.android.view.uimodels.model.reader.TTSText
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
-import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.android.viewmodel.base.ShosetsuRootViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
-import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,8 +40,13 @@ import kotlinx.coroutines.flow.StateFlow
  */
 abstract class AChapterReaderViewModel :
 	SubscribeViewModel<ImmutableList<ReaderUIItem>?>,
-	ShosetsuViewModel(),
+	ShosetsuRootViewModel(),
 	ExposedSettingsRepoViewModel {
+
+	/**
+	 * Exceptions from various processes internal to the view model to show to the user.
+	 */
+	abstract val exceptions: SharedFlow<String>
 
 	/**
 	 * Has the user been reading for too long?
@@ -66,19 +70,10 @@ abstract class AChapterReaderViewModel :
 	 */
 	abstract fun dismissReadingTooLong()
 
-	abstract val appThemeLiveData: SharedFlow<AppThemes>
-
 	abstract fun retryChapter(item: ReaderChapterUI)
 
-	sealed class ChapterPassage {
-		data object Loading : ChapterPassage()
-		data class Error(val throwable: Throwable?) : ChapterPassage()
-		data class Success(val content: String, val ttsElements: List<TTSText>) : ChapterPassage()
-	}
-
-	abstract fun getChapterStringPassage(item: ReaderChapterUI): Flow<ChapterPassage>
-
-	abstract fun getChapterHTMLPassage(item: ReaderChapterUI): Flow<ChapterPassage>
+	abstract fun getChapterPassageHTML(item: ReaderChapterUI): Flow<ChapterPassage>
+	abstract val cssStyle: SharedFlow<ShosetsuStyle>
 
 	abstract fun setCurrentPage(page: Int)
 
@@ -93,8 +88,6 @@ abstract class AChapterReaderViewModel :
 
 	abstract val isCurrentChapterBookmarked: StateFlow<Boolean>
 
-	abstract val chapterType: StateFlow<Novel.ChapterType?>
-
 	abstract val ttsSpeed: StateFlow<Float>
 	abstract val ttsPitch: StateFlow<Float>
 
@@ -106,11 +99,6 @@ abstract class AChapterReaderViewModel :
 	 * Is tap to scroll enabled
 	 */
 	abstract val tapToScroll: StateFlow<Boolean>
-
-	/**
-	 * Is text selection disabled?
-	 */
-	abstract val disableTextSelection: StateFlow<Boolean>
 
 	/**
 	 * Double tap required to focus/unfocus the reader
@@ -141,15 +129,9 @@ abstract class AChapterReaderViewModel :
 	 */
 	abstract val currentChapterID: StateFlow<Int>
 
-	abstract val textColor: StateFlow<Int>
-	abstract val backgroundColor: StateFlow<Int>
-
-	abstract val liveTextSize: StateFlow<Float>
-
-
 	/**
-	 * false    -> vertical paging
-	 * true     -> horizontal paging
+	 * false	-> vertical paging
+	 * true	 -> horizontal paging
 	 */
 	abstract val isHorizontalReading: StateFlow<Boolean>
 
@@ -179,11 +161,6 @@ abstract class AChapterReaderViewModel :
 	abstract fun onScroll(chapter: ReaderChapterUI, readingPosition: Double)
 
 	/**
-	 * Loads a [LiveData] reflection of the global custom css
-	 */
-	abstract fun loadChapterCss(): Flow<String>
-
-	/**
 	 * Loads the settings list for the bottom bar
 	 */
 	abstract fun getSettings(): StateFlow<NovelReaderSettingUI>
@@ -209,4 +186,5 @@ abstract class AChapterReaderViewModel :
 	abstract fun onStopTts()
 
 	abstract val colorScheme: MutableStateFlow<ColorScheme>
+	abstract val paddingValues: MutableStateFlow<PaddingValues>
 }

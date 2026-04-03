@@ -1,8 +1,12 @@
 package app.shosetsu.android.view.compose.setting
 
 import androidx.compose.foundation.clickable
-import app.shosetsu.android.common.utils.ProxyConfig
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Info
@@ -10,13 +14,16 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -27,7 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.utils.ProxyConfig
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.view.compose.SimpleIconButton
+import app.shosetsu.android.view.compose.setting.widget.TextPreferenceWidget
 
 @Composable
 fun ProxySettingsContent(
@@ -37,13 +47,12 @@ fun ProxySettingsContent(
 	usedKey: SettingKey<Boolean>,
 	settingKey: SettingKey<String>,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
 ) {
 	val isUsed by repo.getBooleanFlow(usedKey).collectAsState()
 	val proxySetting by repo.getStringFlow(settingKey).collectAsState()
 
 	ProxySettingsContent(
-		title, description, isUsed, proxySetting, modifier, enabled
+		title, description, isUsed, proxySetting, modifier
 	) { used, settings ->
 		launchIO {
 			repo.setBoolean(usedKey, used)
@@ -59,23 +68,22 @@ fun ProxySettingsContent(
 	proxyEnabled: Boolean,
 	proxyString: String,
 	modifier: Modifier = Modifier,
-	enabled: Boolean = true,
 	onValueChanged: (newEnabled: Boolean, newSetting: String) -> Unit
 ) {
 	var openDialog by remember { mutableStateOf(false) }
 
-	GenericRightSettingLayout(
-		title,
-		description,
-		modifier,
-		enabled = enabled,
-		onClick = { openDialog = !openDialog }
-	) {
+	TextPreferenceWidget(
+		title = title,
+		subtitle = description,
+		modifier = modifier,
+		widget = {
 		Text(
 			color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
 			text = if (proxyEnabled) "On" else "Off"
 		)
-	}
+	},
+		onPreferenceClick = { openDialog = !openDialog }
+	)
 	Text(
 		color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
 		text = if (proxyEnabled) "On" else "Off"
@@ -120,18 +128,20 @@ fun ProxySettingsDialogContent(
 			modifier = Modifier.padding(16.dp),
 			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
-			GenericRightSettingLayout(
-				title,
-				description,
-				onClick = { enabled = !enabled }) {
-				Switch( enabled,  null )
-			}
-			Row() {
+			TextPreferenceWidget(
+				title = title,
+				subtitle = description,
+				widget = {
+						Switch( enabled,  null )
+					},
+				onPreferenceClick = { enabled = !enabled }
+			)
+			Row {
 				TextField(
 					enabled = enabled,
 					value = config.hostname,
 					onValueChange = {
-						config = config.copy(hostname = it);
+						config = config.copy(hostname = it)
 					},
 					isError = !hostValid,
 					modifier = Modifier.weight(2f),
@@ -160,7 +170,7 @@ fun ProxySettingsDialogContent(
 					checked = config.authUsed,
 					onCheckedChange = {
 						config = config.copy(authUsed=it)
-				    },
+					},
 				)
 				Text(
 					text = "use authentication",
@@ -175,7 +185,7 @@ fun ProxySettingsDialogContent(
 			TextField(
 				value = config.username,
 				onValueChange = {
-					config = config.copy(username = it);
+					config = config.copy(username = it)
 				},
 				isError = !usernameValid,
 				singleLine = true,
@@ -186,7 +196,7 @@ fun ProxySettingsDialogContent(
 			TextField(
 				value = config.password,
 				onValueChange = {
-					config = config.copy(password = it);
+					config = config.copy(password = it)
 				},
 				singleLine = true,
 				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -194,9 +204,7 @@ fun ProxySettingsDialogContent(
 				enabled = enabled and config.authUsed,
 				trailingIcon = {
 					val icon = if (passwordVisible) Icons.Outlined.Info else Icons.Filled.Info
-					IconButton(onClick = { passwordVisible = !passwordVisible} ) {
-						Icon(imageVector = icon, "")
-					}
+					SimpleIconButton(icon, description = null, onClick = { passwordVisible = !passwordVisible} )
 				}
 			)
 			Button(

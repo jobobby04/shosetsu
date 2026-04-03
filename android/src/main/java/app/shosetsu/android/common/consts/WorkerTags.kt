@@ -27,8 +27,8 @@ object WorkerTags {
 	const val APP_UPDATE_WORK_ID: String = "shosetsu_app_update"
 
 	const val BACKUP_WORK_ID: String = "shosetsu_app_backup"
+	const val BACKUP_MIGRATE_WORK_ID: String = "shosetsu_app_backup_migrate"
 	const val RESTORE_WORK_ID: String = "shosetsu_app_restore"
-	const val EXPORT_BACKUP_WORK_ID: String = "shosetsu_app_export_backup"
 
 	const val REPOSITORY_UPDATE_TAG: String = "shosetsu_repository_update"
 	const val EXTENSION_INSTALL_WORK_ID: String = "shosetsu_extension_installer"

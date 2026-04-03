@@ -3,7 +3,6 @@ package app.shosetsu.android.common
 import app.shosetsu.android.common.consts.DEFAULT_USER_AGENT
 import app.shosetsu.android.common.enums.MarkingType
 import app.shosetsu.android.domain.model.local.LibraryFilterState
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /*
@@ -30,6 +29,7 @@ import kotlinx.serialization.json.Json
 
 
 typealias IntKey = SettingKey<Int>
+typealias LongKey = SettingKey<Long>
 typealias BooleanKey = SettingKey<Boolean>
 typealias FloatKey = SettingKey<Float>
 typealias StringKey = SettingKey<String>
@@ -58,6 +58,10 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object FirstTime : BooleanKey("first_time3", true)
 
+	/**
+	 * Show the user the verification warning?
+	 */
+	object ShowVerificationWarning : BooleanKey("show_verification_warning", true)
 
 	/**
 	 * Themes that can be edited by the user
@@ -96,10 +100,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ReaderIsInvertedSwipe : BooleanKey("invertedSwipe", false)
 	object ReadingMarkingType : StringKey("readingMarkingType", MarkingType.ONVIEW.name)
 
-	/**
-	 * Should the application convert string returns from an extension to an Html page
-	 */
-	object ReaderStringToHtml : BooleanKey("convertStringToHtml", false)
 	object ReaderIsFirstFocus : BooleanKey("reader_first_focus", true)
 	object ReaderDoubleTapFocus : BooleanKey("reader_double_tap_focus", false)
 	object ReaderDoubleTapSystem : BooleanKey("reader_double_tap_system", false)
@@ -203,6 +203,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object NovelUpdateShowProgress : BooleanKey("novelUpdateShowProgress", true)
 	object NovelUpdateClassicFinish : BooleanKey("novelUpdateClassicFinish", false)
 	object NovelUpdateDateMDY : BooleanKey("novelUpdateDateMDY", false)
+	object NovelUpdateLastTimestamp : LongKey("novelUpdateLastTimestamp", 0L)
 
 	object RepoUpdateOnLowStorage : BooleanKey("repoUpdateLowStorage", true)
 	object RepoUpdateOnLowBattery : BooleanKey("repoUpdateLowBattery", true)
@@ -226,6 +227,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object NavStyle : BooleanKey("legacy_navigation", false)
 
 	// Backup Options
+	object BackupStorageLocation : StringKey("backupStorageLocation", "")
 	object ShouldBackupChapters : BooleanKey("backupChapters", true)
 	object ShouldBackupSettings : BooleanKey("backupSettings", false)
 	object BackupCycle : IntKey("backupCycle", 12)

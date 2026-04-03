@@ -3,6 +3,9 @@ package app.shosetsu.android.ui.reader.content
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
@@ -18,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
@@ -52,48 +56,46 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewChapterReaderContent() {
-	ShosetsuTheme {
-		ChapterReaderContent(
-			isFirstFocusProvider = { false },
-			onFirstFocus = {},
-			isFocused = false,
-			content = {
-				ChapterReaderPagerContent(
-					items = persistentListOf(),
-					isHorizontal = false,
-					onStopTTS = {},
-					markChapterAsCurrent = {},
-					onChapterRead = {},
-					currentPage = 0,
-					onPageChanged = {},
-					isSwipeInverted = false,
-					paddingValues = PaddingValues(),
-					pageJumper = StableHolder(MutableSharedFlow()),
-					createPage = {
-					}
-				)
-			},
-			sheetContent = {
-				ChapterReaderBottomSheetContent(
-					scaffoldState = it,
-					ttsPlayback = TTSPlayback.Stopped,
-					isBookmarked = false,
-					isRotationLocked = false,
-					setting = NovelReaderSettingUI(-1, 0, 0f),
-					toggleRotationLock = {},
-					toggleBookmark = {},
-					exit = {},
-					onPlayTTS = {},
-					onPauseTTS = {},
-					onStopTTS = {},
-					updateSetting = {},
-					lowerSheet = {},
-					toggleFocus = {}
-				) {}
-			}
-		)
-	}
+fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	ChapterReaderContent(
+		isFirstFocusProvider = { false },
+		onFirstFocus = {},
+		isFocused = false,
+		content = { windowPadding, footerPadding ->
+			ChapterReaderPager(
+				items = persistentListOf(),
+				isHorizontal = false,
+				onStopTTS = {},
+				markChapterAsCurrent = {},
+				onChapterRead = {},
+				currentPage = 0,
+				onPageChanged = {},
+				isSwipeInverted = false,
+				pageJumper = StableHolder(MutableSharedFlow()),
+				createPage = {
+				}
+			)
+		},
+		sheetContent = {
+			ChapterReaderBottomSheetContent(
+				scaffoldState = it,
+				ttsPlayback = TTSPlayback.Stopped,
+				isBookmarked = false,
+				isRotationLocked = false,
+				setting = NovelReaderSettingUI(-1, 0, 0f),
+				toggleRotationLock = {},
+				toggleBookmark = {},
+				exit = {},
+				onPlayTTS = {},
+				onPauseTTS = {},
+				onStopTTS = {},
+				updateSetting = {},
+				lowerSheet = {},
+				toggleFocus = {}
+			) {}
+		},
+		exception = null
+	)
 }
 
 /**
@@ -106,8 +108,9 @@ fun ChapterReaderContent(
 	isFirstFocusProvider: () -> Boolean,
 
 	onFirstFocus: () -> Unit,
-	content: @Composable (PaddingValues) -> Unit,
-	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit
+	content: @Composable (windowPadding: PaddingValues, footerPadding: PaddingValues) -> Unit,
+	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
+	exception: String?
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
@@ -120,18 +123,25 @@ fun ChapterReaderContent(
 		}
 	}
 
+	val insets = WindowInsets.safeDrawing.asPaddingValues()
 	BottomSheetScaffold(
 		scaffoldState = scaffoldState,
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (!isFocused) BottomSheetDefaults.SheetPeekHeight else 0.dp,
+		sheetPeekHeight = if (isFocused) 0.dp else insets.calculateBottomPadding() + BottomSheetDefaults.SheetPeekHeight,
 		content = { paddingValues ->
-			content(paddingValues)
+			content(WindowInsets.safeDrawing.asPaddingValues(), paddingValues)
 		},
 		sheetShape = RectangleShape,
 		sheetDragHandle = null,
 	)
+
+	LaunchedEffect(exception) {
+		if (exception != null) {
+			scaffoldState.snackbarHostState.showSnackbar(exception)
+		}
+	}
 
 	if (isFocused && isFirstFocusProvider()) {
 		val string = stringResource(R.string.reader_first_focus)
@@ -145,5 +155,4 @@ fun ChapterReaderContent(
 			}
 		}
 	}
-
 }

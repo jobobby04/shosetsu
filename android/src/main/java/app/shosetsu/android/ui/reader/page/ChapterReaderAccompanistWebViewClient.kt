@@ -3,8 +3,11 @@ package app.shosetsu.android.ui.reader.page
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import app.shosetsu.android.common.ext.logV
 import com.google.accompanist.web.AccompanistWebViewClient
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -35,9 +38,9 @@ class ChapterReaderAccompanistWebViewClient(
 	private val openURI: (Uri) -> Unit,
 	private val scope: CoroutineScope,
 	private val ttsState: StateFlow<String?>,
+	private val getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
 ) : AccompanistWebViewClient() {
-	private var applied = false
-
+	private var lastJob: Job? = null
 	/**
 	 * Block redirects by clicking links
 	 *
@@ -56,49 +59,59 @@ class ChapterReaderAccompanistWebViewClient(
 	 */
 	override fun onPageFinished(view: WebView, url: String?) {
 		super.onPageFinished(view, url)
-		if (!applied) {
-			view.evaluateJavascript(
-				"""
-				window.addEventListener("click",(event)=>{ shosetsuScript.onClick(null); });
-				window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
-				var elements = document.querySelectorAll('[id]');
-            	elements.forEach(function(element) {
-                	element.addEventListener('click', function(event) {
-				        event.stopPropagation();
-                   		shosetsuScript.onClick(element.id);
-                	});
-            	});
+		view.evaluateJavascript(
+			"""
+				if (!window._shosetsuListenersAdded) {
+					window.addEventListener("click",(event)=>{ shosetsuScript.onClick(null); });
+					window.addEventListener("dblclick",(event)=>{ shosetsuScript.onDClick(); });
+					window._shosetsuListenersAdded = true;
+				}
+				document.querySelectorAll('[id]').forEach(function(element) {
+					if (!element._shosetsuListenersAdded) {
+						element.addEventListener('click', function(event) {
+							event.stopPropagation();
+							shosetsuScript.onClick(element.id);
+						});
+						element._shosetsuListenersAdded = true;
+					}
+				});
 				""".trimIndent(), null
-			)
-			scope.launch {
-				var oldTtsElement: String? = null
-				ttsState.collect { id ->
-					if (id != null) {
-						view.evaluateJavascript(
-							"""
+		)
+		lastJob?.cancel()
+		lastJob = scope.launch {
+			getChapterHTMLStyle().collect { style ->
+				view.evaluateJavascript(style.toJs(), null)
+			}
+
+			var oldTtsElement: String? = null
+			ttsState.collect { id ->
+				if (id != null) {
+					logV("Moving TTS highlight to $id")
+					view.evaluateJavascript(
+						"""
 							var element = document.getElementById("textElement$id");
 							element.classList.add("tts-border-style");
 							""".trimIndent() + if (oldTtsElement != null) {
-								"""
+							logV("Removing old TTS highlight from $oldTtsElement")
+							"""
 								var element2 = document.getElementById("textElement$oldTtsElement");
 								element2.classList.remove("tts-border-style");
 								""".trimIndent()
-							} else "",
-							null,
-						)
-					} else if (oldTtsElement != null) {
-						view.evaluateJavascript(
-							"""
+						} else "",
+						null,
+					)
+				} else if (oldTtsElement != null) {
+					logV("TTS Stopped? Removing old TTS highlight from $oldTtsElement")
+					view.evaluateJavascript(
+						"""
 							var element2 = document.getElementById("textElement$oldTtsElement");
 							element2.classList.remove("tts-border-style");
 							""".trimIndent(),
-							null,
-						)
-					}
-					oldTtsElement = id
+						null,
+					)
 				}
+				oldTtsElement = id
 			}
-			applied = true
 		}
 	}
 }

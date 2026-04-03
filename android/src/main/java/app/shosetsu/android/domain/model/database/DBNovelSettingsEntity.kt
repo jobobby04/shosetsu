@@ -62,7 +62,9 @@ data class DBNovelSettingsEntity(
 
 	var showOnlyDownloaded: Boolean = false,
 
-	var reverseOrder: Boolean = false
+	var reverseOrder: Boolean = false,
+
+	var showOnlyString: String? = null,
 ) : Convertible<NovelSettingEntity> {
 	override fun convertTo(): NovelSettingEntity = NovelSettingEntity(
 		novelID,
@@ -70,6 +72,7 @@ data class DBNovelSettingsEntity(
 		showOnlyReadingStatusOf,
 		showOnlyBookmarked,
 		showOnlyDownloaded,
+		showOnlyString,
 		reverseOrder,
 	)
 }

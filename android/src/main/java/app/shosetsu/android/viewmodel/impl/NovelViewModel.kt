@@ -60,18 +60,21 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import qrcode.QRCode
-import kotlin.collections.set
 
 /*
  * This file is part of shosetsu.
@@ -130,7 +133,7 @@ class NovelViewModel(
 	override val chaptersLive: StateFlow<ImmutableList<ChapterUI>> by lazy {
 		novelIDLive.flatMapLatest { id: Int ->
 			getChapterUIsUseCase(id).shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
-				.combineBookmarked().combineDownloaded().combineStatus().combineSort()
+				.combineBookmarked().combineDownloaded().combineStatus().combineString().combineSort()
 				.combineReverse().combineSelection().map { it.toImmutableList() }
 		}.catch {
 			error.emit(ChapterLoadException(it))
@@ -249,8 +252,16 @@ class NovelViewModel(
 		}.catch {
 			error.emit(NovelLoadException(it))
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+			.also {
+				it.distinctUntilChangedBy { it?.novelURL }
+					.filter { it?.loaded == false }
+					.onEach {
+						refresh()
+					}
+					.onIO()
+					.launchIn(viewModelScopeIO)
+			}
 	}
-
 
 	private val _showOnlyStatusOfFlow: Flow<ReadingStatus?> =
 		novelSettingFlow.mapLatest { it?.showOnlyReadingStatusOf }
@@ -260,6 +271,9 @@ class NovelViewModel(
 
 	private val _onlyBookmarkedFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.showOnlyBookmarked ?: false }
+
+	private val _onlyStringFlow: Flow<String?> =
+		novelSettingFlow.mapLatest { it?.showOnlyString }
 
 	private val _sortTypeFlow: Flow<ChapterSortType> =
 		novelSettingFlow.mapLatest { it?.sortType ?: ChapterSortType.SOURCE }
@@ -276,6 +290,12 @@ class NovelViewModel(
 	private fun Flow<List<ChapterUI>>.combineDownloaded(): Flow<List<ChapterUI>> =
 		combine(_onlyDownloadedFlow) { result, onlyDownloaded ->
 			if (onlyDownloaded) result.filter { it.isSaved }
+			else result
+		}
+
+	private fun Flow<List<ChapterUI>>.combineString(): Flow<List<ChapterUI>> =
+		combine(_onlyStringFlow) { result, onlyString ->
+			if (!onlyString.isNullOrBlank()) result.filter { it.title.contains(onlyString, ignoreCase = true) }
 			else result
 		}
 

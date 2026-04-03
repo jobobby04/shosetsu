@@ -1,18 +1,15 @@
 package app.shosetsu.android.ui.main
 
-import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavHostController
 import app.shosetsu.android.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,20 +39,16 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun ShosetsuBackHandler(
-	navController: NavHostController,
-	protectBack: Boolean,
+	requireDoubleBackToExit: Boolean,
 	isDrawerOpen: Boolean,
 	onCloseDrawer: suspend () -> Unit
 ) {
-	@SuppressLint("RestrictedApi") // fuck u google devs
-	val backStack by navController.currentBackStack.collectAsState()
-
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 
 	var protect by remember { mutableStateOf(true) }
 
-	BackHandler(isDrawerOpen || protectBack && protect && backStack.size == 2) {
+	BackHandler(isDrawerOpen || requireDoubleBackToExit && protect) {
 		// If drawer is open, close it
 		if (isDrawerOpen) {
 			scope.launch {
@@ -64,7 +57,7 @@ fun ShosetsuBackHandler(
 			return@BackHandler
 		}
 
-		if (protectBack) {
+		if (requireDoubleBackToExit) {
 			protect = false
 
 			val toast = Toast.makeText(

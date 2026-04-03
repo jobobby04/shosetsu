@@ -1,25 +1,24 @@
 package app.shosetsu.android.ui.main.graph
 
 import android.content.Intent
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import app.shosetsu.android.ui.css.CSSEditorActivity
-import app.shosetsu.android.ui.main.Destination.SETTINGS
-import app.shosetsu.android.ui.main.Destination.SETTINGS_ADVANCED
-import app.shosetsu.android.ui.main.Destination.SETTINGS_DOWNLOAD
-import app.shosetsu.android.ui.main.Destination.SETTINGS_READER
-import app.shosetsu.android.ui.main.Destination.SETTINGS_UPDATE
-import app.shosetsu.android.ui.main.Destination.SETTINGS_VIEW
+import app.shosetsu.android.ui.main.Destination.More
+import app.shosetsu.android.ui.main.Destination.More.Settings
+import app.shosetsu.android.ui.main.Destination.More.Settings.Overview
 import app.shosetsu.android.ui.settings.SettingsView
 import app.shosetsu.android.ui.settings.sub.AdvancedSettingsView
-import app.shosetsu.android.ui.settings.sub.DownloadSettingsView
+import app.shosetsu.android.ui.settings.sub.AppearanceSettingsView
+import app.shosetsu.android.ui.settings.sub.BackupView
+import app.shosetsu.android.ui.settings.sub.BrowseSettingsView
+import app.shosetsu.android.ui.settings.sub.DownloadsSettingsView
+import app.shosetsu.android.ui.settings.sub.LibrarySettingsView
 import app.shosetsu.android.ui.settings.sub.ReaderSettingsView
-import app.shosetsu.android.ui.settings.sub.UpdateSettingsView
-import app.shosetsu.android.ui.settings.sub.ViewSettingsView
 
 /*
  * This file is part of shosetsu.
@@ -38,62 +37,90 @@ import app.shosetsu.android.ui.settings.sub.ViewSettingsView
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-fun NavGraphBuilder.settingsGraph(navController: NavController) {
-	navigation(startDestination = "overview", SETTINGS.route) {
-		composable("overview") {
+fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
+	navigation<Settings>(Overview) {
+		composableSub<Overview> {
 			SettingsView(
 				onBack = navController::popBackStack,
-				navToAdvanced = {
-					navController.navigate(SETTINGS_ADVANCED.route)
+				navToAppearance = {
+					navController.navigate(Settings.Appearance)
 				},
-				navToView = {
-					navController.navigate(SETTINGS_VIEW.route)
+				navToLibrary = {
+					navController.navigate(Settings.Library)
 				},
-				navToDownload = {
-					navController.navigate(SETTINGS_DOWNLOAD.route)
+				navToDownloads = {
+					navController.navigate(Settings.Downloads)
 				},
 				navToReader = {
-					navController.navigate(SETTINGS_READER.route)
+					navController.navigate(Settings.Reader)
 				},
-				navToUpdate = {
-					navController.navigate(SETTINGS_UPDATE.route)
+				navToBrowse = {
+					navController.navigate(Settings.Browse)
+				},
+				navToBackup = {
+					navController.navigate(Settings.Backup())
+				},
+				navToAdvanced = {
+					navController.navigate(Settings.Advanced)
+				},
+				navToAbout = {
+					navController.navigate(More.About)
 				}
 			)
 		}
 
-		composable(SETTINGS_VIEW.route) {
-			ViewSettingsView(
+		composableSub<Settings.Appearance> {
+			AppearanceSettingsView(
 				onBack = navController::popBackStack
 			)
 		}
-		composable(SETTINGS_UPDATE.route) {
-			UpdateSettingsView(
-				onBack = navController::popBackStack
+		composableSub<Settings.Library> {
+			LibrarySettingsView(
+				onBack = navController::popBackStack,
+				onNavToCategories = {
+					navController.navigate(More.Categories)
+				}
 			)
 		}
-		composable(SETTINGS_ADVANCED.route) {
-			AdvancedSettingsView(
-				onBack = navController::popBackStack
-			)
-		}
-		composable(SETTINGS_DOWNLOAD.route) {
-			DownloadSettingsView(
-				onBack = navController::popBackStack
-			)
-		}
-		composable(SETTINGS_READER.route) {
+		composableSub<Settings.Reader> {
 			val context = LocalContext.current
+			val hostState = remember { SnackbarHostState() }
+
 			ReaderSettingsView(
+				hostState = hostState,
 				onBack = navController::popBackStack,
 				openCSS = {
-					ContextCompat.startActivity(
-						context,
+					context.startActivity(
 						Intent(context, CSSEditorActivity::class.java).apply {
 							putExtra(CSSEditorActivity.CSS_ID, -1)
 						},
 						null
 					)
 				}
+			)
+		}
+		composableSub<Settings.Downloads> {
+			DownloadsSettingsView(
+				onBack = navController::popBackStack
+			)
+		}
+		composableSub<Settings.Browse> {
+			BrowseSettingsView(
+				onBack = navController::popBackStack,
+				onNavToRepositories = {
+					navController.navigate(More.Repositories)
+				}
+			)
+		}
+		composableSub<Settings.Backup> { entry ->
+			BackupView(
+				highlightBackupFolder = entry.toRoute<Settings.Backup>().highlightBackupFolder,
+				onBack = navController::popBackStack
+			)
+		}
+		composableSub<Settings.Advanced> {
+			AdvancedSettingsView(
+				onBack = navController::popBackStack
 			)
 		}
 	}

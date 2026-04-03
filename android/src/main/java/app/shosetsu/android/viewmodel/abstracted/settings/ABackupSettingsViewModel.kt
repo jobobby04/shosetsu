@@ -2,8 +2,7 @@ package app.shosetsu.android.viewmodel.abstracted.settings
 
 import android.net.Uri
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of shosetsu.
@@ -29,38 +28,31 @@ import kotlinx.coroutines.flow.Flow
 abstract class ABackupSettingsViewModel(iSettingsRepository: ISettingsRepository) :
 	ASubSettingsViewModel(iSettingsRepository) {
 
+	/**
+	 * If the UI is expected to show the user a prompt to migrate their backups
+	 */
+	abstract val promptMigration: StateFlow<Boolean>
+
 	/** Order the app to create a new backup now */
 	abstract fun startBackup()
-	abstract fun loadInternalOptions(): Flow<ImmutableList<String>>
-
-	/**
-	 * Load backup via a path
-	 *
-	 * For internal backups
-	 */
-	abstract fun restore(path: String)
 
 	/**
 	 * Load backup via the uri
-	 *
-	 * For external backups
 	 */
 	abstract fun restore(uri: Uri)
 
 	/**
-	 * The view model will hold the backup to export
+	 * Set the backup storage location
 	 */
-	abstract fun holdBackupToExport(backupToExport: String)
+	abstract fun setBackupStorageLocation(uri: Uri)
 
 	/**
-	 * @return the backup file to export
+	 * Dismiss the migration pop-up
 	 */
-	abstract fun getBackupToExport(): String?
+	abstract fun dismissMigration()
 
 	/**
-	 * Cancel export process
+	 * Start the migration of backups, and dismiss the dialog.
 	 */
-	abstract fun clearExport()
-
-	abstract fun exportBackup(uri: Uri)
+	abstract fun startMigration()
 }

@@ -1,19 +1,28 @@
 package app.shosetsu.android.viewmodel.impl
 
 import android.app.Application
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.model.local.StyleEntity
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import java.util.Stack
 
 /*
  * This file is part of shosetsu.
@@ -40,7 +49,8 @@ import java.util.*
  */
 class CSSEditorViewModel(
 	private val app: Application,
-	private val settingsRepo: ISettingsRepository
+	private val settingsRepo: ISettingsRepository,
+	override var loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : ACSSEditorViewModel() {
 
 	private val css = object : ShosetsuCssViewModelComponent() {
@@ -56,6 +66,7 @@ class CSSEditorViewModel(
 		}
 		override val colorSchemeFlow: Flow<ColorScheme>
 			get() = this@CSSEditorViewModel.colorScheme
+		override val paddingValuesFlow: Flow<PaddingValues> = flowOf(PaddingValues(0.dp))
 	}
 
 	private val undoStack by lazy { Stack<String>() }
@@ -98,7 +109,7 @@ class CSSEditorViewModel(
 		redoStack.add(cssContent.value) // Save currentText as a redo action
 		canRedo.value = true
 		cssContent.value = undoStack.pop()
-		if (undoStack.size == 0) {
+		if (undoStack.isEmpty()) {
 			canUndo.value = false
 		}
 	}
@@ -108,14 +119,14 @@ class CSSEditorViewModel(
 		undoStack.add(cssContent.value)
 		canUndo.value = true
 		cssContent.value = redoStack.pop()
-		if (redoStack.size == 0) {
+		if (redoStack.isEmpty()) {
 			canRedo.value = false
 		}
 	}
 
 	override fun write(content: String) {
 		launchIO {
-			if (undoStack.size > 0 && undoStack.peek() == content) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == content) return@launchIO // ignore if nothing changed
 			undoStack.add(cssContent.value)
 			canUndo.value = true
 			redoStack.clear()
@@ -135,7 +146,7 @@ class CSSEditorViewModel(
 		val combined = value + pasteContent
 		if (value == combined) return // ignore paste if the old value equals paste
 		launchIO {
-			if (undoStack.size > 0 && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
 			undoStack.add(value)
 			canUndo.value = true
 			redoStack.clear()

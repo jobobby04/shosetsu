@@ -1,28 +1,17 @@
 plugins {
-	id("com.google.devtools.ksp") version "1.9.21-1.0.16"
-	id("org.jetbrains.kotlin.android") version "1.9.0" apply false
-}
-
-buildscript {
-	val kotlinVersion: String by extra("1.9.21")
-
-	repositories {
-		google()
-		mavenCentral()
-	}
-
-	dependencies {
-		classpath("com.android.tools.build:gradle:8.7.2")
-		classpath(kotlin("gradle-plugin", version = kotlinVersion))
-		classpath(kotlin("serialization", version = kotlinVersion))
-	}
+	alias(libs.plugins.google.ksp)
+	alias(libs.plugins.kotlin.compose) apply false
 }
 
 allprojects {
 	repositories {
+		maven("https://gitlab.com/api/v4/groups/12585416/-/packages/maven") {
+			content {
+				includeGroupAndSubgroups("app.shosetsu")
+			}
+		}
 		google()
 		mavenCentral()
-		maven("https://jitpack.io")
 	}
 }
 

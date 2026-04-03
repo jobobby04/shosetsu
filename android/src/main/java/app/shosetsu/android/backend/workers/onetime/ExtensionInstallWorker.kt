@@ -3,6 +3,8 @@ package app.shosetsu.android.backend.workers.onetime
 import android.content.Context
 import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -32,6 +34,7 @@ import app.shosetsu.android.common.ext.notificationBuilder
 import app.shosetsu.android.common.ext.notificationManager
 import app.shosetsu.android.common.ext.removeProgress
 import app.shosetsu.android.common.ext.setNotOngoing
+import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IExtensionDownloadRepository
@@ -365,7 +368,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
 		get() = notificationBuilder(applicationContext, Notifications.CHANNEL_DOWNLOAD)
-			.setSmallIcon(R.drawable.download)
+			.setSmallIcon(Icons.Default.Download)
 			.setContentTitle(extensionDownloaderString)
 			.setPriority(NotificationCompat.PRIORITY_HIGH)
 			.setOngoing(true)
