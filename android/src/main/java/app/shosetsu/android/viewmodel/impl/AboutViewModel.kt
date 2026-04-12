@@ -2,7 +2,11 @@ package app.shosetsu.android.viewmodel.impl
 
 import app.shosetsu.android.backend.workers.onetime.AppUpdateCheckWorker
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.domain.model.local.Contributor
+import app.shosetsu.android.domain.repository.base.ContributorsRepository
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 /*
  * This file is part of Shosetsu.
@@ -27,6 +31,7 @@ import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
  */
 class AboutViewModel(
 	private val manager: AppUpdateCheckWorker.Manager,
+	private val contributorRepo: ContributorsRepository
 ) : AAboutViewModel() {
 
 	override fun appUpdateCheck() {
@@ -35,4 +40,7 @@ class AboutViewModel(
 				manager.start()
 		}
 	}
+
+	override val contributors: ImmutableList<Contributor> =
+		contributorRepo.getAll().toImmutableList()
 }

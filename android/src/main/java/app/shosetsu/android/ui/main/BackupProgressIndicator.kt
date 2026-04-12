@@ -71,5 +71,5 @@ fun BackupProgressIndicator() {
 @Preview
 @Composable
 fun PreviewBackupProgressIndicator() = ShosetsuTheme(AppThemes.LIGHT) {
-    BackupProgressIndicator()
+	BackupProgressIndicator()
 }

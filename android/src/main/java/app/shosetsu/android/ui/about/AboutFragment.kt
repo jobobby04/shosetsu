@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -48,8 +51,10 @@ import app.shosetsu.android.common.consts.URL_PRIVACY
 import app.shosetsu.android.common.consts.URL_WEBSITE
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.domain.model.local.Contributor
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.viewmodel.abstracted.AAboutViewModel
 import kotlinx.coroutines.launch
 import org.acra.util.Installation
@@ -84,6 +89,7 @@ fun AboutView(
 	onBack: () -> Unit
 ) {
 	val viewModel: AAboutViewModel = viewModelDi()
+
 	val uriHandler = LocalUriHandler.current
 
 	fun onClickDisclaimer() {
@@ -126,7 +132,8 @@ fun AboutView(
 		onOpenKofi = {
 			uriHandler.openUri(URL_KOFI)
 		},
-		onBack = onBack
+		onBack = onBack,
+		contributors = viewModel.contributors
 	)
 }
 
@@ -148,8 +155,35 @@ fun PreviewAboutContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		onOpenPrivacy = {},
 		onOpenKofi = {
 		},
-		onBack = {}
-	)
+		onBack = {},
+			contributors = listOf(Contributor(
+				"Clocks",
+				"doomsdayrs.page",
+				0,
+				null,
+				null,
+			))
+		)
+
+}
+
+@Composable
+fun ContributorItem(
+	contributor: Contributor
+) {
+	val uriHandler = LocalUriHandler.current
+
+	Box(Modifier.requiredWidthIn(max = 60.dp)) {
+		NovelCardCozyContent(
+			contributor.name,
+			contributor.image ?: "",
+			onClick =  {
+				if (!contributor.website.isNullOrBlank())
+					uriHandler.openUri(contributor.website)
+			},
+			onLongClick = {},
+		)
+	}
 }
 
 @ExperimentalMaterial3Api
@@ -209,7 +243,8 @@ fun AboutContent(
 	onOpenDisclaimer: () -> Unit,
 	onOpenMatrix: () -> Unit,
 	onOpenPrivacy: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
+	contributors: List<Contributor>
 ) {
 	Scaffold(
 		topBar = {
@@ -258,6 +293,16 @@ fun AboutContent(
 			}
 			item {
 				HorizontalDivider()
+			}
+			item {
+				LazyRow(
+					contentPadding = PaddingValues(8.dp),
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					items(contributors) {
+						ContributorItem(it)
+					}
+				}
 			}
 			item {
 				AboutItem(

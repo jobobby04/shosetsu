@@ -474,7 +474,7 @@ fun BrowseExtensionContent(
 					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
 						var isDropdownVisible by remember { mutableStateOf(false) }
 						SimpleIconButton(
-                            Icons.Default.Download,
+							Icons.Default.Download,
 							null,
 							onClick = {
 								// We can skip to dropdown if there is only 1 install option

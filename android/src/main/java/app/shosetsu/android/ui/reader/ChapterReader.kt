@@ -3,11 +3,14 @@ package app.shosetsu.android.ui.reader
 import android.content.ComponentCallbacks2
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.ext.collectLA
@@ -112,6 +115,15 @@ class ChapterReader
 			setTheme(it)
 		}
 		super.onCreate(savedInstanceState)
+
+		// Tell the window to extend into the cutout area
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			window.attributes.layoutInDisplayCutoutMode =
+				WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+		}
+
+		// Make the window edge-to-edge
+		WindowCompat.setDecorFitsSystemWindows(window, false)
 
 		setContent {
 			ChapterReaderView(

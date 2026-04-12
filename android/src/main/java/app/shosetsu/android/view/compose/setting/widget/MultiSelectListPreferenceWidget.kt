@@ -17,13 +17,13 @@ import app.shosetsu.android.view.compose.LabeledCheckbox
 
 @Composable
 inline fun <reified T> MultiSelectListPreferenceWidget(
-    title: String,
-    subtitle: String,
-    icon: ImageVector? = null,
-    possibleValues: List<T>,
-    selectedValues: Set<T>,
-    crossinline stringify: @Composable (T) -> String,
-    crossinline onValuesChange: (Set<T>) -> Unit,
+	title: String,
+	subtitle: String,
+	icon: ImageVector? = null,
+	possibleValues: List<T>,
+	selectedValues: Set<T>,
+	crossinline stringify: @Composable (T) -> String,
+	crossinline onValuesChange: (Set<T>) -> Unit,
 ) {
 	var isDialogShown by remember { mutableStateOf(false) }
 
