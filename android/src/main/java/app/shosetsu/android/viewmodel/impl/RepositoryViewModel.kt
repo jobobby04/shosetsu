@@ -110,7 +110,7 @@ class RepositoryViewModel(
 		isAddDialogVisible.value = false
 	}
 
-	private val qrCodeMap: Cache<Int, QRCodeData?> =
+	private val qrCodeMap: Cache<Int, QRCodeData> =
 		CacheBuilder
 			.newBuilder()
 			.expireAfterAccess(1, TimeUnit.MINUTES)
