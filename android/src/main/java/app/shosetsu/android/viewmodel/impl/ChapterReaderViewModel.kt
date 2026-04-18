@@ -105,7 +105,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.acra.ACRA
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 

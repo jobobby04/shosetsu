@@ -39,7 +39,7 @@ abstract class ADownloadsViewModel :
 	abstract val error: Flow<Throwable>
 	abstract val selectedDownloadState: StateFlow<SelectedDownloadsState>
 	abstract val isDownloadPaused: StateFlow<Boolean>
-	abstract val hasSelectedFlow: StateFlow<Boolean>
+	abstract val selectedCountFlow: StateFlow<Int>
 
 	/**
 	 * Used to toggle FAB

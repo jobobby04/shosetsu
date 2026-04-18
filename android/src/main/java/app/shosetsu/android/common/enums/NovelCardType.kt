@@ -31,6 +31,6 @@ enum class NovelCardType(
 	fun toInt(): Int = code
 
 	companion object {
-		fun valueOf(code: Int): NovelCardType = entries.find { it.code == code }!!
+		fun valueOf(code: Int): NovelCardType = entries.find { it.code == code } ?: NORMAL
 	}
 }

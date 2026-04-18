@@ -191,10 +191,10 @@ class LibraryViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
-	override val hasSelection: StateFlow<Boolean> by lazy {
+	override val selectionCount: StateFlow<Int> by lazy {
 		selectedNovels.mapLatest { map ->
-			map.values.any { subMap -> subMap.any { it.value } }
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
+			map.values.sumOf { subMap -> subMap.count { it.value } }
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, 0)
 	}
 
 	override val genresFlow: Flow<ImmutableList<String>> by lazy {

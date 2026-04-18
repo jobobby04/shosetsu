@@ -1,14 +1,11 @@
 package app.shosetsu.android.ui.css
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -68,24 +65,18 @@ fun CSSEditorPagerContent(
 		},
 		modifier = Modifier.imePadding()
 	) {
-		Column(
-			Modifier
-				.padding(it)
-				.verticalScroll(rememberScrollState())
-		) {
-			HorizontalPager(
-				state = pagerState,
-				modifier = Modifier.fillMaxSize(),
-				userScrollEnabled = false
-			) { page ->
-				when (page) {
-					0 -> {
-						CSSEditorContent(cssContent, onNewText)
-					}
+		HorizontalPager(
+			state = pagerState,
+			modifier = Modifier.fillMaxSize().padding(it),
+			userScrollEnabled = false
+		) { page ->
+			when (page) {
+				0 -> {
+					CSSEditorContent(cssContent, onNewText)
+				}
 
-					else -> {
-						CSSPreviewContent(cssContent, shosetsuCss)
-					}
+				else -> {
+					CSSPreviewContent(cssContent, shosetsuCss)
 				}
 			}
 		}

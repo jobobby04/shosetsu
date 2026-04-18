@@ -195,17 +195,9 @@ class SearchViewModel(
 						) {
 							searchBookMarkedNovelsUseCase(query)
 						}.flow.map { data ->
-							val ids = arrayListOf<Int>()
-							data.filter {
-								if (ids.contains(it.id)) {
-									false
-								} else {
-									ids.add(it.id)
-									true
-								}
-							}.map { (id, title, imageURL) ->
-								ACatalogNovelUI(id, title, imageURL, false)
-							}
+							val ids = HashSet<Int>()
+							data.filter { ids.add(it.id) }
+								.map { ACatalogNovelUI(it) }
 						}
 					)
 				} catch (e: SQLiteException) {

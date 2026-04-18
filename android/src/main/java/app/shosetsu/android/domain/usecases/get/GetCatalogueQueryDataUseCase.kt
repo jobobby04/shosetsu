@@ -74,14 +74,10 @@ class GetCatalogueQueryDataUseCase(
 							pageNumber,
 						).let {
 							val data: List<Novel.Info> = it
-							(data.map { novelListing ->
-								novelListing.convertTo(iExtension)
-							}.mapNotNull { ne ->
+							(data.mapNotNull { novelListing ->
 								try {
-									novelsRepository.insertReturnStripped(ne)
-										?.let { (id, title, imageURL, bookmarked) ->
-											ACatalogNovelUI(id, title, imageURL, bookmarked)
-										}
+									novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension))
+										?.let { ACatalogNovelUI(it, novelListing) }
 								} catch (e: SQLiteException) {
 									logE("Failed to load parse novel", e)
 									null

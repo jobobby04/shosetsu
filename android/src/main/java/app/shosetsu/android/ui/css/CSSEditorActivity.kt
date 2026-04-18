@@ -23,6 +23,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -44,7 +45,7 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 		super.onCreate(savedInstanceState)
 		supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			window.setDecorFitsSystemWindows(false)
+			WindowCompat.setDecorFitsSystemWindows(window, false)
 		} else {
 			@Suppress("DEPRECATION")
 			window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)

@@ -36,10 +36,10 @@ class LazyTTSText(val element: Element) : TTSText {
 		// Finds the "actual" element
 		var actualElement = element
 		var parent = element.parent()
-		if (parent?.hasOwnText?.not() ?: false) parent = parent!!.parent()
+		if (parent?.hasOwnText?.not() ?: false) parent = parent.parent()
 		// traverse upwards to find our parent
 		while (parent?.hasOwnText ?: false) {
-			actualElement = parent!!
+			actualElement = parent
 			parent = actualElement.parent()
 		}
 		actualElement

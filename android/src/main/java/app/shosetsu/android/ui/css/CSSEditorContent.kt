@@ -17,7 +17,7 @@ fun CSSEditorContent(cssContent: String, onNewText: (String) -> Unit) {
 		onValueChange = onNewText,
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(bottom = 92.dp, start = 16.dp, top = 8.dp, end = 16.dp),
+			.padding(bottom = 8.dp, start = 16.dp, top = 8.dp, end = 16.dp),
 		cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
 		textStyle = MaterialTheme.typography.bodyMedium.copy(color = LocalContentColor.current),
 	)

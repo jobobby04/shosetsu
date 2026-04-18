@@ -62,11 +62,8 @@ abstract class GenerateContributorsTask : DefaultTask() {
         }
         val contributors = encountered.values.sortedByDescending { it.commits }
 
-        val repositoryFile = generatedKotlinDir.get().asFile
-            .resolve(className.packageName.replace('.', '/'))
-            .resolve("${className.simpleName}.kt")
-
         FileSpec.builder(className)
+            .indent("\t")
             .addType(TypeSpec.classBuilder(className)
                 .addSuperinterface(superinterface)
                 .primaryConstructor(FunSpec.constructorBuilder().build())
@@ -90,11 +87,11 @@ abstract class GenerateContributorsTask : DefaultTask() {
                             add(")")
                         }
                         unindent()
-                        add(")\n")
+                        add("\n)\n")
                     }.build()).build()
                 ).build()
             ).build()
-            .writeTo(repositoryFile)
+            .writeTo(generatedKotlinDir.get().asFile)
     }
 
     private fun CodeBlock.Builder.addNullableString(value: String?) =

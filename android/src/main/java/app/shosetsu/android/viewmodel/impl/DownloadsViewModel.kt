@@ -133,10 +133,10 @@ class DownloadsViewModel(
 	override val isDownloadPaused: StateFlow<Boolean> by lazy {
 		settings.getBooleanFlow(IsDownloadPaused)
 	}
-	override val hasSelectedFlow: StateFlow<Boolean> by lazy {
+	override val selectedCountFlow: StateFlow<Int> by lazy {
 		selectedDownloads.mapLatest { map ->
-			map.values.any { it }
-		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
+			map.values.count { it }
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, 0)
 	}
 
 	override val showFAB: Flow<Boolean> by lazy {

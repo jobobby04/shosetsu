@@ -32,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowInsetsControllerCompat
@@ -105,6 +106,7 @@ fun ChapterReaderView(
 	val exception by viewModel.exceptions.collectAsState(null)
 
 	val context = LocalContext.current
+	val uriHandler = LocalUriHandler.current
 
 	if (trackLongReading)
 		LaunchedEffect(isReadingTooLong) {
@@ -225,6 +227,9 @@ fun ChapterReaderView(
 											putExtra(SearchManager.QUERY, it)
 										}
 										context.startActivity(intent)
+									},
+									openUri = {
+										uriHandler.openUri(it)
 									},
 								)
 							}

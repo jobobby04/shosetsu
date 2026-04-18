@@ -24,7 +24,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.BuildConfig
@@ -41,7 +40,7 @@ import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-/*
+/**
  * This file is part of shosetsu.
  *
  * shosetsu is free software: you can redistribute it and/or modify
@@ -71,19 +70,19 @@ fun HTMLPage(
 	ttsProgress: StableHolder<StateFlow<String?>>,
 	getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
 	onSearchQuery: (String) -> Unit,
+	openUri: (String) -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	val scrollState = rememberScrollState()
 	val state = rememberWebViewStateWithHTMLData(html)
 	val navigator = rememberWebViewNavigator(scope)
-	val uriHandler = LocalUriHandler.current
 	var uriToOpen: Uri? by remember { mutableStateOf(null) }
 
 	if (uriToOpen != null) {
 		HTMLPageUriDialog(
 			uriToOpen!!,
 			open = {
-				uriHandler.openUri(uriToOpen.toString())
+				openUri(uriToOpen.toString())
 			},
 			reset = {
 				uriToOpen = null

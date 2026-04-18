@@ -63,7 +63,7 @@ abstract class ALibraryViewModel :
 	abstract fun hideCategoryDialog()
 
 	abstract val isEmptyFlow: StateFlow<Boolean>
-	abstract val hasSelection: StateFlow<Boolean>
+	abstract val selectionCount: StateFlow<Int>
 
 	/** All genres from all [LibraryNovelUI] combined*/
 	abstract val genresFlow: Flow<ImmutableList<String>>

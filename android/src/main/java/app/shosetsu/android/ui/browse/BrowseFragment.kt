@@ -23,6 +23,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ManageSearch
@@ -46,7 +46,6 @@ import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -306,8 +305,6 @@ fun BrowseContent(
 					contentPadding = PaddingValues(
 						bottom = 198.dp,
 						top = 4.dp,
-						start = 8.dp,
-						end = 8.dp
 					),
 					state = state,
 					verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -393,171 +390,168 @@ fun BrowseExtensionContent(
 	openSettings: () -> Unit,
 	cancelInstall: () -> Unit
 ) {
-	Card(
-		onClick = openCatalogue,
-		shape = RoundedCornerShape(16.dp)
+	Column(
+		Modifier.clickable(onClick = openCatalogue)
+			.padding(horizontal = 8.dp)
 	) {
-		Column {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(end = 8.dp),
+			horizontalArrangement = Arrangement.SpaceBetween,
+			verticalAlignment = Alignment.CenterVertically
+		) {
 			Row(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(end = 8.dp),
-				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
 			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-				) {
-					if (item.imageURL.isNotEmpty()) {
-						SubcomposeAsyncImage(
-							ImageRequest.Builder(LocalContext.current)
-								.data(item.imageURL)
-								.crossfade(true)
-								.build(),
-							contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
-							modifier = Modifier.size(64.dp),
-							error = {
-								Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-									ImageLoadingError(
-										Modifier
-											.size(52.dp)
-											.clip(MaterialTheme.shapes.extraSmall)
-									)
-								}
-							},
-							loading = {
-								Box(Modifier.placeholder(true))
+				if (item.imageURL.isNotEmpty()) {
+					SubcomposeAsyncImage(
+						ImageRequest.Builder(LocalContext.current)
+							.data(item.imageURL)
+							.crossfade(true)
+							.build(),
+						contentDescription = stringResource(R.string.fragment_browse_ext_icon_desc),
+						modifier = Modifier.size(64.dp),
+						error = {
+							Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+								ImageLoadingError(
+									Modifier
+										.size(52.dp)
+										.clip(MaterialTheme.shapes.extraSmall)
+								)
 							}
-						)
-					} else {
-						Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
-							ImageLoadingError(
-								Modifier
-									.size(52.dp)
-									.clip(MaterialTheme.shapes.extraSmall)
-							)
+						},
+						loading = {
+							Box(Modifier.placeholder(true))
 						}
+					)
+				} else {
+					Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
+						ImageLoadingError(
+							Modifier
+								.size(52.dp)
+								.clip(MaterialTheme.shapes.extraSmall)
+						)
 					}
-					Column(
-						modifier = Modifier.padding(start = 8.dp)
-					) {
-						Text(item.name)
-						Row {
-							Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
+				}
+				Column(
+					modifier = Modifier.padding(start = 8.dp)
+				) {
+					Text(item.name)
+					Row {
+						Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
 
-							if (item.isInstalled && item.installedVersion != null)
+						if (item.isInstalled && item.installedVersion != null)
+							Text(
+								item.installedVersion.toString(),
+								modifier = Modifier.padding(start = 8.dp),
+								fontSize = TextUnit(14f, TextUnitType.Sp)
+							)
+
+						if (item.isUpdateAvailable && item.updateVersion != null) {
+							if (item.updateVersion != Version(-9, -9, -9))
 								Text(
-									item.installedVersion.toString(),
+									stringResource(
+										R.string.update_to,
+										item.updateVersion.toString()
+									),
 									modifier = Modifier.padding(start = 8.dp),
-									fontSize = TextUnit(14f, TextUnitType.Sp)
+									fontSize = TextUnit(14f, TextUnitType.Sp),
+									color = MaterialTheme.colorScheme.tertiary
 								)
-
-							if (item.isUpdateAvailable && item.updateVersion != null) {
-								if (item.updateVersion != Version(-9, -9, -9))
-									Text(
-										stringResource(
-											R.string.update_to,
-											item.updateVersion.toString()
-										),
-										modifier = Modifier.padding(start = 8.dp),
-										fontSize = TextUnit(14f, TextUnitType.Sp),
-										color = MaterialTheme.colorScheme.tertiary
-									)
-							}
 						}
 					}
 				}
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.End
-				) {
-					if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
-						var isDropdownVisible by remember { mutableStateOf(false) }
-						SimpleIconButton(
-							Icons.Default.Download,
-							null,
-							onClick = {
-								// We can skip to dropdown if there is only 1 install option
-								if (item.installOptions.size != 1)
-									isDropdownVisible = true
-								else install(item.installOptions[0])
-							}
-						)
-						DropdownMenu(
-							expanded = isDropdownVisible,
-							onDismissRequest = { isDropdownVisible = false },
-						) {
-							item.installOptions.forEach { s ->
-								DropdownMenuItem(
-									onClick = {
-										install(s)
-										isDropdownVisible = false
-									},
-									text = {
-										Column {
-											Text(
-												text = AnnotatedString(s.repoName)
-											)
-											Text(
-												text = AnnotatedString(s.version.toString()),
-												modifier = Modifier.padding(start = 8.dp)
-											)
-										}
-									}
-								)
-							}
-						}
-					}
-
-					if (item.isUpdateAvailable) {
-						SimpleIconButton(
-							Icons.Default.Download,
-							stringResource(R.string.update),
-							onClick = update,
-							modifier = Modifier.rotate(180f),
-							tint = MaterialTheme.colorScheme.tertiary
-						)
-					}
-
-					if (item.isInstalled) {
-						SimpleIconButton(
-							Icons.Outlined.Settings,
-							stringResource(R.string.settings),
-							onClick = openSettings
-						)
-					}
-
-					if (item.isInstalling) {
-						SimpleIconButton(
-							stringResource(R.string.installing),
-							onClick = {},
-							modifier = Modifier.combinedClickable(
-								onClick = {},
-								onLongClick = cancelInstall,
-							)
-						) {
-							AnimatedRefresh()
-						}
-					}
-				}
-
 			}
-
-			if (item.isUpdateAvailable && item.updateVersion != null) {
-				if (item.updateVersion == Version(-9, -9, -9)) {
-					Box(
-						modifier = Modifier
-							.background(MaterialTheme.colorScheme.tertiary)
-							.fillMaxWidth()
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.End
+			) {
+				if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
+					var isDropdownVisible by remember { mutableStateOf(false) }
+					SimpleIconButton(
+						Icons.Default.Download,
+						null,
+						onClick = {
+							// We can skip to dropdown if there is only 1 install option
+							if (item.installOptions.size != 1)
+								isDropdownVisible = true
+							else install(item.installOptions[0])
+						}
+					)
+					DropdownMenu(
+						expanded = isDropdownVisible,
+						onDismissRequest = { isDropdownVisible = false },
 					) {
-						Text(
-							stringResource(R.string.obsolete_extension),
-							color = MaterialTheme.colorScheme.onPrimary,
-							modifier = Modifier
-								.padding(8.dp)
-								.align(Alignment.Center)
-						)
+						item.installOptions.forEach { s ->
+							DropdownMenuItem(
+								onClick = {
+									install(s)
+									isDropdownVisible = false
+								},
+								text = {
+									Column {
+										Text(
+											text = AnnotatedString(s.repoName)
+										)
+										Text(
+											text = AnnotatedString(s.version.toString()),
+											modifier = Modifier.padding(start = 8.dp)
+										)
+									}
+								}
+							)
+						}
 					}
+				}
+
+				if (item.isUpdateAvailable) {
+					SimpleIconButton(
+						Icons.Default.Download,
+						stringResource(R.string.update),
+						onClick = update,
+						modifier = Modifier.rotate(180f),
+						tint = MaterialTheme.colorScheme.tertiary
+					)
+				}
+
+				if (item.isInstalled) {
+					SimpleIconButton(
+						Icons.Outlined.Settings,
+						stringResource(R.string.settings),
+						onClick = openSettings
+					)
+				}
+
+				if (item.isInstalling) {
+					SimpleIconButton(
+						stringResource(R.string.installing),
+						onClick = {},
+						modifier = Modifier.combinedClickable(
+							onClick = {},
+							onLongClick = cancelInstall,
+						)
+					) {
+						AnimatedRefresh()
+					}
+				}
+			}
+		}
+
+		if (item.isUpdateAvailable && item.updateVersion != null) {
+			if (item.updateVersion == Version(-9, -9, -9)) {
+				Box(
+					modifier = Modifier
+						.background(MaterialTheme.colorScheme.tertiary)
+						.fillMaxWidth()
+				) {
+					Text(
+						stringResource(R.string.obsolete_extension),
+						color = MaterialTheme.colorScheme.onPrimary,
+						modifier = Modifier
+							.padding(8.dp)
+							.align(Alignment.Center)
+					)
 				}
 			}
 		}

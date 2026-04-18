@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ViewModule
-import androidx.compose.material.icons.outlined.Deselect
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.FlipToBack
 import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material.icons.outlined.UnfoldLess
@@ -110,7 +110,7 @@ fun DeselectAllButton(
 	onClick: () -> Unit
 ) {
 	SimpleIconButton(
-		Icons.Outlined.Deselect,
+		Icons.Outlined.Close,
 		stringResource(R.string.deselect_all),
 		onClick = onClick
 	)

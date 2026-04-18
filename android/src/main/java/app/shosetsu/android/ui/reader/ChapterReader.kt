@@ -54,7 +54,7 @@ class ChapterReader
 		super.onTrimMemory(level)
 		// Determine which lifecycle or system event was raised.
 		when (level) {
-			ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN -> {
+			TRIM_MEMORY_UI_HIDDEN -> {
 				/*
 				   Release any UI objects that currently hold memory.
 
@@ -62,9 +62,9 @@ class ChapterReader
 				*/
 			}
 
-			ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE,
-			ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW,
-			ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL -> {
+			TRIM_MEMORY_RUNNING_MODERATE,
+			TRIM_MEMORY_RUNNING_LOW,
+			TRIM_MEMORY_RUNNING_CRITICAL -> {
 				/*
 				   Release any memory that your app doesn't need to run.
 
@@ -75,9 +75,9 @@ class ChapterReader
 				*/
 			}
 
-			ComponentCallbacks2.TRIM_MEMORY_BACKGROUND,
-			ComponentCallbacks2.TRIM_MEMORY_MODERATE,
-			ComponentCallbacks2.TRIM_MEMORY_COMPLETE -> {
+			TRIM_MEMORY_BACKGROUND,
+			TRIM_MEMORY_MODERATE,
+			TRIM_MEMORY_COMPLETE -> {
 				/*
 				   Release as much memory as the process can.
 
@@ -103,7 +103,6 @@ class ChapterReader
 
 	/** On Create */
 	public override fun onCreate(savedInstanceState: Bundle?) {
-		logV("")
 		viewModel.apply {
 			setNovelID(intent.getIntExtra(BUNDLE_NOVEL_ID, -1))
 			viewModel.setCurrentChapterID(intent.getIntExtra(BUNDLE_CHAPTER_ID, -1), true)

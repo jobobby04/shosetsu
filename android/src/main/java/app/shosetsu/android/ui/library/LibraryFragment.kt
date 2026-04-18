@@ -33,7 +33,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,7 +45,9 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -123,7 +124,7 @@ fun LibraryView(
 
 	val items by viewModel.liveData.collectAsState()
 	val isEmpty by viewModel.isEmptyFlow.collectAsState()
-	val hasSelected by viewModel.hasSelection.collectAsState()
+	val selectedCount by viewModel.selectionCount.collectAsState()
 	val type by viewModel.novelCardTypeFlow.collectAsState()
 	val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
 
@@ -135,7 +136,7 @@ fun LibraryView(
 	val error by viewModel.error.collectAsState(null)
 	val selectedIds by viewModel.selectedIds.collectAsState()
 
-	BackHandler(hasSelected) {
+	BackHandler(selectedCount > 0) {
 		viewModel.deselectAll()
 	}
 
@@ -174,7 +175,7 @@ fun LibraryView(
 		cardType = type,
 		columnsInV = columnsInV,
 		columnsInH = columnsInH,
-		hasSelected = hasSelected,
+		selectedCount = selectedCount,
 		onRefresh = viewModel::startUpdateManager,
 		onOpen = { (id) -> onOpenNovel(id) },
 		toggleSelection = viewModel::toggleSelection,
@@ -237,7 +238,7 @@ fun LibraryContent(
 	cardType: NovelCardType,
 	columnsInV: Int,
 	columnsInH: Int,
-	hasSelected: Boolean,
+	selectedCount: Int,
 	onRefresh: (Int) -> Unit,
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
@@ -259,7 +260,7 @@ fun LibraryContent(
 	Scaffold(
 		topBar = {
 			LibraryAppBar(
-				hasSelected = hasSelected,
+				selectedCount = selectedCount,
 				onInverseSelection = onInverseSelection,
 				onSelectAll = onSelectAll,
 				onRemove = onRemove,
@@ -303,7 +304,7 @@ fun LibraryContent(
 					cardType = cardType,
 					columnsInV = columnsInV,
 					columnsInH = columnsInH,
-					hasSelected = hasSelected,
+					hasSelected = selectedCount > 0,
 					onRefresh = onRefresh,
 					onOpen = onOpen,
 					toggleSelection = toggleSelection,
@@ -325,7 +326,7 @@ fun LibraryContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryAppBar(
-	hasSelected: Boolean,
+	selectedCount: Int,
 	onInverseSelection: () -> Unit,
 	onSelectAll: () -> Unit,
 	onRemove: () -> Unit,
@@ -341,30 +342,29 @@ fun LibraryAppBar(
 	isEmpty: Boolean,
 	drawerIcon: @Composable () -> Unit
 ) {
-	@Composable
-	fun title() {
-		Text(stringResource(R.string.library))
-	}
-
 	val behavior = enterAlwaysScrollBehavior()
 
-	if (hasSelected) {
-		LargeTopAppBar(
-			title = { title() },
+	if (selectedCount > 0) {
+		TopAppBar(
+			title = { Text("$selectedCount") },
 			scrollBehavior = behavior,
 			actions = {
 				InverseSelectionButton(onInverseSelection)
 				SelectAllButton(onSelectAll)
 				SelectBetweenButton(onSelectBetween)
-				DeselectAllButton(onDeselectAll)
 				RemoveAllButton(onRemove)
 				LibrarySelectedMoreButton(onMigrate, onTogglePin, onSetCategories)
 			},
-			navigationIcon = drawerIcon
+			colors = TopAppBarDefaults.topAppBarColors(
+				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+			),
+			navigationIcon = {
+				DeselectAllButton(onClick = onDeselectAll)
+			},
 		)
 	} else {
 		TopAppBar(
-			title = { title() },
+			title = { Text(stringResource(R.string.library)) },
 			scrollBehavior = behavior,
 			actions = {
 				AnimatedVisibility(!isEmpty) {
@@ -375,11 +375,10 @@ fun LibraryAppBar(
 					}
 				}
 			},
-			navigationIcon = drawerIcon
+			navigationIcon = drawerIcon,
 		)
 	}
 }
-
 
 /**
  * Pager for categories

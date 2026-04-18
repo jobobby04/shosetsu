@@ -126,16 +126,12 @@ class GetCatalogueListingDataUseCase(
 			data,
 			page,
 		).let { list ->
-			list.map { novelListing ->
-				novelListing.convertTo(iExtension)
-			}.mapNotNull { ne ->
+			list.mapNotNull { novelListing ->
 				// For each, insert and return a stripped card
 				// This operation is to pre-cache URL and ID so loading occurs smoothly
 				try {
-					novelsRepository.insertReturnStripped(ne)
-						?.let { (id, title, imageURL, bookmarked) ->
-							ACatalogNovelUI(id, title, imageURL, bookmarked)
-						}
+					novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension))
+						?.let { ACatalogNovelUI(it, novelListing) }
 				} catch (e: SQLiteException) {
 					logE("Failed to load parse novel", e)
 					null

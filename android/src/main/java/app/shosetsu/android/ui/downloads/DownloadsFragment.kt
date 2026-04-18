@@ -45,7 +45,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -55,7 +54,9 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -112,7 +113,7 @@ fun DownloadsView(
 
 	val items by viewModel.liveData.collectAsState()
 	val selectedDownloadState by viewModel.selectedDownloadState.collectAsState()
-	val hasSelected by viewModel.hasSelectedFlow.collectAsState()
+	val selectedCount by viewModel.selectedCountFlow.collectAsState()
 	val isPaused by viewModel.isDownloadPaused.collectAsState()
 	val error by viewModel.error.collectAsState(null)
 
@@ -145,7 +146,7 @@ fun DownloadsView(
 	DownloadsContent(
 		items = items,
 		selectedDownloadState = selectedDownloadState,
-		hasSelected = hasSelected,
+		selectedCount = selectedCount,
 		pauseSelection = viewModel::pauseSelection,
 		startSelection = viewModel::startSelection,
 		startFailedSelection = viewModel::restartSelection,
@@ -170,7 +171,7 @@ fun DownloadsView(
 fun DownloadsContent(
 	items: ImmutableList<DownloadUI>,
 	selectedDownloadState: SelectedDownloadsState,
-	hasSelected: Boolean,
+	selectedCount: Int,
 	pauseSelection: () -> Unit,
 	startSelection: () -> Unit,
 	startFailedSelection: () -> Unit,
@@ -189,7 +190,7 @@ fun DownloadsContent(
 	Scaffold(
 		topBar = {
 			DownloadsAppBar(
-				hasSelected,
+				selectedCount,
 				onInverseSelection,
 				onSelectAll,
 				onDeselectAll,
@@ -226,7 +227,7 @@ fun DownloadsContent(
 							DownloadContent(
 								it,
 								onClick = {
-									if (hasSelected)
+									if (selectedCount > 0)
 										toggleSelection(it)
 								},
 								onLongClick = {
@@ -237,7 +238,7 @@ fun DownloadsContent(
 					}
 				}
 
-				if (hasSelected) {
+				if (selectedCount > 0) {
 					Card(
 						modifier = Modifier
 							.align(BiasAlignment(0f, 0.7f))
@@ -333,7 +334,7 @@ fun DownloadsFAB(
 fun PreviewDownloadsAppBar() {
 	Surface {
 		DownloadsAppBar(
-			hasSelected = false,
+			selectedCount = 0,
 			onInverseSelection = {},
 			onSelectAll = {},
 			onDeselectAll = {},
@@ -351,7 +352,7 @@ fun PreviewDownloadsAppBar() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadsAppBar(
-	hasSelected: Boolean,
+	selectedCount: Int,
 	onInverseSelection: () -> Unit,
 	onSelectAll: () -> Unit,
 	onDeselectAll: () -> Unit,
@@ -367,18 +368,20 @@ fun DownloadsAppBar(
 
 	val behavior = enterAlwaysScrollBehavior()
 
-	if (hasSelected) {
-		LargeTopAppBar(
-			title = { title() },
+	if (selectedCount > 0) {
+		TopAppBar(
+			title = { Text("$selectedCount") },
 			scrollBehavior = behavior,
 			actions = {
 				InverseSelectionButton(onInverseSelection)
 				SelectAllButton(onSelectAll)
 				SelectBetweenButton(onSelectBetween)
-				DeselectAllButton(onDeselectAll)
 			},
+			colors = TopAppBarDefaults.topAppBarColors(
+				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+			),
 			navigationIcon = {
-				NavigateBackButton(onBack)
+				DeselectAllButton(onClick = onDeselectAll)
 			}
 		)
 	} else {
