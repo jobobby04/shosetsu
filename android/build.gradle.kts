@@ -15,12 +15,14 @@ tasks.preBuild { dependsOn(generateContributors) }
 val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
-	compileSdk = 35
+	// keep these in sync with .gitlab-ci.yml
+	compileSdk = 37
+	buildToolsVersion = "37.0.0"
 	defaultConfig {
 		applicationId = "app.shosetsu.android"
 		minSdk = 22
-		targetSdk = 35
-		versionCode = 46
+		targetSdk = 37
+		versionCode = 48
 		versionName = "2.5.0"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
@@ -36,7 +38,9 @@ android {
 			loadSProperties("acra")["password"]?.toString() ?: "\"\""
 		)
 
-		setProperty("archivesBaseName", rootProject.name)
+		// Hopefully this results in the beloved shosetsu-... apks
+		base.archivesName.set(rootProject.name)
+
 		vectorDrawables {
 			useSupportLibrary = true
 		}
@@ -78,8 +82,8 @@ android {
 			versionNameSuffix = Git.open(rootProject.projectDir.resolve(".git")).use { "-${it.getCommitCount()}" }
 			applicationIdSuffix = ".debug"
 			isDebuggable = true
-			isMinifyEnabled = false
-			isShrinkResources = false
+			isMinifyEnabled = !CI_MODE
+			isShrinkResources = !CI_MODE
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"

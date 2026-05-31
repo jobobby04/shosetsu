@@ -32,16 +32,16 @@ fun String.urlEncode(): String {
 
 fun NovelLink.toURL(): String =
 	"$BASE_SHARE_URL/novel" +
-			"?name=${name.urlEncode()}" +
-			"&url=${url.urlEncode()}" +
-			"&imageURL=${imageURL.urlEncode()}" +
-			"&extID=${extensionQRCode.id}" +
-			"&extURL=${extensionQRCode.imageURL.urlEncode()}" +
-			"&extName=${extensionQRCode.name.urlEncode()}" +
-			"&repoName=${extensionQRCode.repo.name.urlEncode()}" +
-			"&repoURL=${extensionQRCode.repo.url.urlEncode()}"
+		"?name=${name.urlEncode()}" +
+		"&url=${url.urlEncode()}" +
+		"&imageURL=${imageURL.urlEncode()}" +
+		"&extID=${extensionQRCode.id}" +
+		"&extURL=${extensionQRCode.imageURL.urlEncode()}" +
+		"&extName=${extensionQRCode.name.urlEncode()}" +
+		"&repoName=${extensionQRCode.repo.name.urlEncode()}" +
+		"&repoURL=${extensionQRCode.repo.url.urlEncode()}"
 
 fun RepositoryLink.toURL(): String =
 	"$BASE_SHARE_URL/repository" +
-			"?name=${name.urlEncode()}" +
-			"&url=${url.urlEncode()}"
+		"?name=${name.urlEncode()}" +
+		"&url=${url.urlEncode()}"

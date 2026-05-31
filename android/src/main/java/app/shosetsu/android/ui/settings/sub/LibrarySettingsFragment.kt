@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
@@ -84,21 +85,36 @@ fun LibrarySettingsContent(
 			}
 
 			item {
+				SwitchSettingContent(
+					stringResource(R.string.settings_update_novel_on_boot_title),
+					stringResource(R.string.settings_update_novel_on_boot_desc),
+					viewModel.settingsRepo,
+					SettingKey.UpdateNovelsOnStartup,
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
+
+			item {
 				SliderSettingContent(
 					title = stringResource(R.string.settings_update_novel_frequency_title),
 					description = stringResource(R.string.settings_update_novel_frequency_desc),
-					valueRange = remember { StableHolder(1..168) },
+					valueRange = remember { StableHolder(0..168) },
 					parseValue = {
 						when (it) {
-							12 -> "Bi Daily"
-							24 -> "Daily"
-							48 -> "2 Days"
-							72 -> "3 Days"
-							96 -> "4 Days"
-							120 -> "5 Days"
-							144 -> "6 Days"
-							168 -> "Weekly"
-							else -> "$it Hour(s)"
+							12 -> stringResource(R.string.cycle_bidaily)
+							24 -> stringResource(R.string.cycle_daily)
+							48 -> stringResource(R.string.cycle_2_days)
+							72 -> stringResource(R.string.cycle_3_days)
+							96 -> stringResource(R.string.cycle_4_days)
+							120 -> stringResource(R.string.cycle_5_days)
+							144 -> stringResource(R.string.cycle_6_days)
+							168 -> stringResource(R.string.cycle_weekly)
+							else -> if (it == 0) {
+								stringResource(R.string.cycle_disabled)
+							} else {
+								pluralStringResource(R.plurals.cycle_hourly, it, it)
+							}
 						}
 					},
 					repo = viewModel.settingsRepo,
@@ -244,7 +260,16 @@ private fun ALibrarySettingsViewModel.LibraryUpdateCategories(
 	}.collectAsState(persistentListOf())
 
 	val context = LocalContext.current
-	val description by remember { derivedStateOf { getCategorySelectDescription(context, categories, includedCategoryIds, excludedCategoryIds) } }
+	val description by remember {
+		derivedStateOf {
+			getCategorySelectDescription(
+				context,
+				categories,
+				includedCategoryIds,
+				excludedCategoryIds
+			)
+		}
+	}
 	TriStateListPreferenceWidget(
 		title = title,
 		subtitle = description,

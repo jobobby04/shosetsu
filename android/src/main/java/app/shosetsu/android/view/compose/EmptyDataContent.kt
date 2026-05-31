@@ -98,7 +98,13 @@ fun getRandomErrorFace(): String {
 	return ERROR_FACES[Random.nextInt(ERROR_FACES.size)]
 }
 
-data class ErrorAction(val id: Int, val onClick: () -> Unit)
+/**
+ * Represents a given error action visible on the error page.
+ *
+ * @param id The string resource id
+ * @param onClick Called when the action is selected
+ */
+data class ErrorAction(@param:StringRes val id: Int, val onClick: () -> Unit)
 
 @Composable
 fun ErrorContent(

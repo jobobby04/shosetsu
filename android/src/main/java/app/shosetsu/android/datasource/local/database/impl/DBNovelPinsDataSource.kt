@@ -32,8 +32,8 @@ class DBNovelPinsDataSource(
 	private val dao: NovelPinsDao
 ) : IDBNovelPinsDataSource {
 	@Throws(SQLiteException::class)
-	override suspend fun togglePin(ids: List<Int>) {
-		dao.togglePin(ids)
+	override suspend fun setPinned(ids: List<Int>, pinned: Boolean) {
+		dao.setPinned(ids, pinned)
 	}
 
 	@Throws(SQLiteException::class)

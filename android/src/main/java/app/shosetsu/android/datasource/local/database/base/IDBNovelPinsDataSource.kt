@@ -32,7 +32,7 @@ interface IDBNovelPinsDataSource {
 	 * Toggle the pin state of the following novel ids
 	 */
 	@Throws(SQLiteException::class)
-	suspend fun togglePin(ids: List<Int>)
+	suspend fun setPinned(ids: List<Int>, pinned: Boolean)
 
 	@Throws(SQLiteException::class)
 	suspend fun isPinned(id: Int): Boolean

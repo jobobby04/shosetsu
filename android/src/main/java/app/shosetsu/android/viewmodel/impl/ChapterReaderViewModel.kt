@@ -533,7 +533,14 @@ class ChapterReaderViewModel(
 
 	override fun updateChapterAsRead(chapter: ReaderChapterUI) {
 		launchIO {
-			recordChapterIsRead(chapter)
+			try {
+				recordChapterIsRead(chapter)
+			} catch (e: Exception) {
+				logE("Failed to record chapter as read.", e)
+				ACRA.errorReporter.handleSilentException(e)
+				exceptions.emit(application.getString(R.string.reader_error_chapter_read))
+			}
+
 			try {
 				chapterRepository.getChapter(chapter.id)?.let {
 					chapterRepository.updateChapter(
@@ -579,7 +586,13 @@ class ChapterReaderViewModel(
 				 */
 				if (readingMarkingTypeFlow.first() != ONVIEW) return@launchIO
 
-				recordChapterIsReading(chapter)
+				try {
+					recordChapterIsReading(chapter)
+				} catch (e: Exception) {
+					logE("Failed to record chapter as being read.", e)
+					ACRA.errorReporter.handleSilentException(e)
+					exceptions.emit(application.getString(R.string.reader_error_chapter_reading))
+				}
 
 				chapterRepository.updateChapter(
 					chapterEntity.copy(readingStatus = READING)
@@ -611,7 +624,13 @@ class ChapterReaderViewModel(
 							 */
 					val markingType = readingMarkingTypeFlow.first()
 					if (markingType == ONSCROLL) {
-						recordChapterIsReading(chapter)
+						try {
+							recordChapterIsReading(chapter)
+						} catch (e: Exception) {
+							logE("Failed to record chapter as being read.", e)
+							ACRA.errorReporter.handleSilentException(e)
+							exceptions.emit(application.getString(R.string.reader_error_chapter_reading))
+						}
 					}
 
 					// Remove temp progress
@@ -631,7 +650,13 @@ class ChapterReaderViewModel(
 			} else {
 				// User probably sees everything at this point
 
-				recordChapterIsRead(chapter)
+				try {
+					recordChapterIsRead(chapter)
+				} catch (e: Exception) {
+					logE("Failed to record chapter as read.", e)
+					ACRA.errorReporter.handleSilentException(e)
+					exceptions.emit(application.getString(R.string.reader_error_chapter_read))
+				}
 
 				// Temp remember the progress
 				progressMapFlow.value = progressMapFlow.value.copy().apply {
@@ -1012,7 +1037,7 @@ class ChapterReaderViewModel(
 					// Find the current chapter
 					val item = liveData.first { it != null }
 						?.find { (it as? ReaderChapterUI)?.id == chapterId }
-							as? ReaderChapterUI ?: return@coroutineScope
+						as? ReaderChapterUI ?: return@coroutineScope
 
 					System.gc()
 

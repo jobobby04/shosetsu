@@ -66,24 +66,30 @@ class NovelUpdateCycleWorker(
 			WorkInfo.State.ENQUEUED -> {
 				logI("NovelUpdater is waiting to update, ignoring")
 			}
+
 			WorkInfo.State.RUNNING -> {
 				logI("NovelUpdater is running, ignoring")
 			}
+
 			WorkInfo.State.SUCCEEDED -> {
 				logI("NovelUpdater has completed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.FAILED -> {
 				logI("Previous NovelUpdater has failed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.BLOCKED -> {
 				logI("Previous NovelUpdater is blocked, ignoring")
 			}
+
 			WorkInfo.State.CANCELLED -> {
 				logI("Previous NovelUpdater was cancelled, starting again")
 				manager.start()
 			}
+
 			null -> {
 				logI("Previous NovelUpdater is null, starting again")
 				manager.start()
@@ -144,6 +150,10 @@ class NovelUpdateCycleWorker(
 		override fun start(data: Data) {
 			launchIO {
 				logI(LogConstants.SERVICE_NEW)
+				if (updateCycle() == 0L) {
+					logI("Novel update cycle is disabled.")
+					return@launchIO
+				}
 				workerManager.enqueueUniquePeriodicWork(
 					UPDATE_CYCLE_WORK_ID,
 					ExistingPeriodicWorkPolicy.UPDATE,
@@ -165,9 +175,11 @@ class NovelUpdateCycleWorker(
 					)
 						.build()
 				)
-				logI("NovelUpdateCycleWorker State ${
-					workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
-				}")
+				logI(
+					"NovelUpdateCycleWorker State ${
+						workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
+					}"
+				)
 			}
 		}
 

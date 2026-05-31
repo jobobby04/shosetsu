@@ -20,12 +20,14 @@ fun ImageVector.toIcon(
 	layoutDirection: LayoutDirection = LayoutDirection.Ltr,
 	size: Size? = null,
 	config: ImageBitmapConfig = ImageBitmapConfig.Argb8888,
-): IconCompat = IconCompat.createWithBitmap(toImageBitmap(
-	density = density,
-	layoutDirection = layoutDirection,
-	size = size,
-	config = config,
-).asAndroidBitmap())
+): IconCompat = IconCompat.createWithBitmap(
+	toImageBitmap(
+		density = density,
+		layoutDirection = layoutDirection,
+		size = size,
+		config = config,
+	).asAndroidBitmap()
+)
 
 fun ImageVector.toImageBitmap(
 	density: Density,

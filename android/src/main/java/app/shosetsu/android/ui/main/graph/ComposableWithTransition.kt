@@ -124,18 +124,30 @@ inline fun <reified T : Any> NavGraphBuilder.composableSub(
 	typeMap = typeMap,
 	deepLinks = deepLinks,
 	content = content,
-	enterTransition = { slideInHorizontally(animationSpec = tween(
-		durationMillis = 300
-	)) { it / 20 } + fadeIn(animationSpec = tween(
-		durationMillis = 195,
-		easing = LinearOutSlowInEasing
-	)) },
-	exitTransition = { slideOutHorizontally(animationSpec = tween(
-		durationMillis = 300
-	)) { it / 20 } + fadeOut(animationSpec = tween(
-		durationMillis = 195,
-		easing = FastOutLinearInEasing
-	)) },
+	enterTransition = {
+		slideInHorizontally(
+			animationSpec = tween(
+				durationMillis = 300
+			)
+		) { it / 20 } + fadeIn(
+			animationSpec = tween(
+				durationMillis = 195,
+				easing = LinearOutSlowInEasing
+			)
+		)
+	},
+	exitTransition = {
+		slideOutHorizontally(
+			animationSpec = tween(
+				durationMillis = 300
+			)
+		) { it / 20 } + fadeOut(
+			animationSpec = tween(
+				durationMillis = 195,
+				easing = FastOutLinearInEasing
+			)
+		)
+	},
 	popEnterTransition = { fadeInX() },
 )
 

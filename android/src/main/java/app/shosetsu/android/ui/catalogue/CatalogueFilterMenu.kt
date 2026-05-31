@@ -473,7 +473,8 @@ fun CatalogFilterMenuSwitchContent(
 @Preview
 @Composable
 fun PreviewCatalogFilterMenuCheckboxContent() = ShosetsuTheme(AppThemes.LIGHT) {
-	CatalogFilterMenuCheckboxContent(filterHolder = StableHolder(Filter.Checkbox(0, "Checkbox")),
+	CatalogFilterMenuCheckboxContent(
+		filterHolder = StableHolder(Filter.Checkbox(0, "Checkbox")),
 		{ MutableStateFlow(false) },
 		{ _, _ -> })
 }
@@ -508,7 +509,8 @@ fun CatalogFilterMenuCheckboxContent(
 @Preview
 @Composable
 fun PreviewCatalogFilterMenuTriStateContent() = ShosetsuTheme(AppThemes.LIGHT) {
-	CatalogFilterMenuTriStateContent(filterHolder = StableHolder(Filter.TriState(0, "Tristate")),
+	CatalogFilterMenuTriStateContent(
+		filterHolder = StableHolder(Filter.TriState(0, "Tristate")),
 		{ MutableStateFlow(1) },
 		{ _, _ -> })
 }

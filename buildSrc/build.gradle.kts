@@ -10,7 +10,6 @@ repositories {
 
 dependencies {
 	implementation(libs.jgit)
-	implementation(libs.google.guava) // temporarily here - remove after merge
 	implementation(libs.gradle)
 	implementation(libs.kotlin.gradle.plugin)
 	implementation(libs.kotlin.serialization)

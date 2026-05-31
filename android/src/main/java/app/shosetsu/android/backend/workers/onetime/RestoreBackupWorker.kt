@@ -185,7 +185,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			}
 		}
 
-        // Decode encrypted string to bytes via Base64
+		// Decode encrypted string to bytes via Base64
 		notify(R.string.restore_notification_content_decoding_string)
 		val decodedBytes: ByteArray = if (isBase64Encoded(backupEntity.content.inputStream())) {
 			Base64.decode(backupEntity.content, Base64.DEFAULT)

@@ -88,7 +88,7 @@ object SiteProtector {
 					// This ensures that two awaits never occur at the same time
 					delay(
 						(getDelay(host) / Random.nextInt(1, 10)) +
-								delayedCount * 100
+							delayedCount * 100
 					)
 					if (delayedCount < 10) delayedCount++
 

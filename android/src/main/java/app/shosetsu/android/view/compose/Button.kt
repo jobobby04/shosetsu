@@ -34,13 +34,17 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -59,9 +63,12 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -69,8 +76,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import app.shosetsu.android.R
 
 @Composable
 fun LongClickTextButton(
@@ -262,21 +271,27 @@ class ButtonElevation internal constructor(
 					is HoverInteraction.Enter -> {
 						interactions.add(interaction)
 					}
+
 					is HoverInteraction.Exit -> {
 						interactions.remove(interaction.enter)
 					}
+
 					is FocusInteraction.Focus -> {
 						interactions.add(interaction)
 					}
+
 					is FocusInteraction.Unfocus -> {
 						interactions.remove(interaction.focus)
 					}
+
 					is PressInteraction.Press -> {
 						interactions.add(interaction)
 					}
+
 					is PressInteraction.Release -> {
 						interactions.remove(interaction.press)
 					}
+
 					is PressInteraction.Cancel -> {
 						interactions.remove(interaction.press)
 					}
@@ -493,9 +508,10 @@ object ButtonDefaults2 {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleIconButton(icon: ImageVector, description: String?,
-					 onClick: () -> Unit,
-					 modifier: Modifier = Modifier, enabled: Boolean = true, tint: Color = LocalContentColor.current
+fun SimpleIconButton(
+	icon: ImageVector, description: String?,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier, enabled: Boolean = true, tint: Color = LocalContentColor.current
 ) {
 	SimpleIconButton(description = description, enabled = enabled, onClick = onClick, modifier = modifier) {
 		Icon(
@@ -508,9 +524,10 @@ fun SimpleIconButton(icon: ImageVector, description: String?,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleIconButton(painter: Painter, description: String?,
-					 onClick: () -> Unit,
-					 modifier: Modifier = Modifier, enabled: Boolean = true, tint: Color = LocalContentColor.current
+fun SimpleIconButton(
+	painter: Painter, description: String?,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier, enabled: Boolean = true, tint: Color = LocalContentColor.current
 ) {
 	SimpleIconButton(description = description, enabled = enabled, onClick = onClick, modifier = modifier) {
 		Icon(
@@ -523,7 +540,13 @@ fun SimpleIconButton(painter: Painter, description: String?,
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimpleIconButton(description: String?, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, content: @Composable (() -> Unit)) {
+fun SimpleIconButton(
+	description: String?,
+	onClick: () -> Unit,
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
+	content: @Composable (() -> Unit)
+) {
 	if (description == null) {
 		IconButton(
 			onClick = onClick,
@@ -550,5 +573,26 @@ fun SimpleIconButton(description: String?, onClick: () -> Unit, modifier: Modifi
 				content()
 			}
 		}
+	}
+}
+
+@Composable
+fun MoreIconButton(content: @Composable ColumnScope.(onDismissRequest: () -> Unit) -> Unit) {
+	var showDropDown by remember { mutableStateOf(false) }
+
+	SimpleIconButton(
+		Icons.Default.MoreVert,
+		stringResource(R.string.more),
+		onClick = {
+			showDropDown = true
+		}
+	)
+
+	val onDismissRequest = { showDropDown = false }
+	DropdownMenu(
+		expanded = showDropDown,
+		onDismissRequest = onDismissRequest,
+	) {
+		content(onDismissRequest)
 	}
 }

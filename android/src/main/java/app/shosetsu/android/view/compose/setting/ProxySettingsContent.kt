@@ -77,11 +77,11 @@ fun ProxySettingsContent(
 		subtitle = description,
 		modifier = modifier,
 		widget = {
-		Text(
-			color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-			text = if (proxyEnabled) "On" else "Off"
-		)
-	},
+			Text(
+				color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+				text = if (proxyEnabled) "On" else "Off"
+			)
+		},
 		onPreferenceClick = { openDialog = !openDialog }
 	)
 	Text(
@@ -132,8 +132,8 @@ fun ProxySettingsDialogContent(
 				title = title,
 				subtitle = description,
 				widget = {
-						Switch( enabled,  null )
-					},
+					Switch(enabled, null)
+				},
 				onPreferenceClick = { enabled = !enabled }
 			)
 			Row {
@@ -153,7 +153,7 @@ fun ProxySettingsDialogContent(
 					modifier = Modifier.weight(1f),
 					value = if (config.port > 0) config.port.toString() else "",
 					onValueChange = {
-						config = config.copy(port=it.toIntOrNull() ?: -1)
+						config = config.copy(port = it.toIntOrNull() ?: -1)
 					},
 					isError = !portValid,
 					singleLine = true,
@@ -169,14 +169,15 @@ fun ProxySettingsDialogContent(
 					enabled = enabled,
 					checked = config.authUsed,
 					onCheckedChange = {
-						config = config.copy(authUsed=it)
+						config = config.copy(authUsed = it)
 					},
 				)
 				Text(
 					text = "use authentication",
-					modifier=Modifier.clickable(enabled,
+					modifier = Modifier.clickable(
+						enabled,
 						onClick = {
-							config = config.copy(authUsed=!config.authUsed)
+							config = config.copy(authUsed = !config.authUsed)
 						}
 					)
 				)
@@ -204,7 +205,7 @@ fun ProxySettingsDialogContent(
 				enabled = enabled and config.authUsed,
 				trailingIcon = {
 					val icon = if (passwordVisible) Icons.Outlined.Info else Icons.Filled.Info
-					SimpleIconButton(icon, description = null, onClick = { passwordVisible = !passwordVisible} )
+					SimpleIconButton(icon, description = null, onClick = { passwordVisible = !passwordVisible })
 				}
 			)
 			Button(
@@ -232,7 +233,7 @@ fun ProxySettingsDialogFilledContent() {
 			description = "description",
 			proxyEnabled = true,
 			proxyString = "user:pass@longhostnameislong:8080"
-		) { _,_ -> }
+		) { _, _ -> }
 	}
 }
 
@@ -245,7 +246,7 @@ fun ProxySettingsDialogEmptyContent() {
 			description = "description",
 			proxyEnabled = false,
 			proxyString = "ab:pwd@"
-		) { _,_ -> }
+		) { _, _ -> }
 	}
 }
 
@@ -257,7 +258,7 @@ fun PreviewProxySettingsDisabled() {
 		description = "description",
 		proxyEnabled = false,
 		proxyString = "",
-	) { _,_ -> }
+	) { _, _ -> }
 }
 
 @Preview
@@ -268,5 +269,5 @@ fun PreviewProxySettingsEnabled() {
 		description = "description",
 		proxyEnabled = true,
 		proxyString = "",
-	) { _,_ -> }
+	) { _, _ -> }
 }

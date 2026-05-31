@@ -1,6 +1,6 @@
 package app.shosetsu.android.common.ext
 
-import android.util.Log.*
+import android.util.Log
 import java.io.PrintStream
 
 /*
@@ -43,7 +43,7 @@ inline fun <reified T> T.logI(message: String?, t: Throwable? = null): Int {
 
 	writeT(t)
 
-	return i(tag, msg, t)
+	return Log.i(tag, msg, t)
 }
 
 @Suppress("unused")
@@ -56,7 +56,7 @@ inline fun <reified T> T.logD(message: String?, t: Throwable? = null): Int {
 
 	writeT(t)
 
-	return d(tag, msg, t)
+	return Log.d(tag, msg, t)
 }
 
 @Suppress("unused")
@@ -69,7 +69,7 @@ inline fun <reified T> T.logE(message: String?, t: Throwable? = null): Int {
 
 	writeT(t)
 
-	return e(tag, msg, t)
+	return Log.e(tag, msg, t)
 }
 
 @Suppress("unused")
@@ -82,7 +82,7 @@ inline fun <reified T> T.logW(message: String?, t: Throwable? = null): Int {
 
 	writeT(t)
 
-	return w(tag, msg, t)
+	return Log.w(tag, msg, t)
 }
 
 @Suppress("unused")
@@ -95,7 +95,7 @@ inline fun <reified T> T.logV(message: String?, t: Throwable? = null): Int {
 
 	writeT(t)
 
-	return v(tag, msg, t)
+	return Log.v(tag, msg, t)
 }
 
 @Suppress("unused")
@@ -108,5 +108,5 @@ inline fun <reified T> T.logWTF(message: String?, t: Throwable? = null): Int {
 
 	writeT(t)
 
-	return wtf(tag, msg, t)
+	return Log.wtf(tag, msg, t)
 }

@@ -185,7 +185,7 @@ class CatalogViewModel(
 								}
 							}
 						if (query.isEmpty() && listing is IExtension.Listing.Item) {
-                            page { data ->
+							page { data ->
 								getCatalogueListingData(ext, data, listing)
 							}
 						} else {
@@ -271,7 +271,7 @@ class CatalogViewModel(
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = ""
-            _applyFilter()
+			_applyFilter()
 		}
 	}
 
@@ -317,23 +317,23 @@ class CatalogViewModel(
 
 	private val filterMutex = Mutex()
 
-    /**
-     * Locks the filter data flow mutex and sets the new value.
-     */
-    private fun _applyFilter() {
-        if (filterMutex.tryLock()) {
-            try {
-                filterDataFlow.value.clear()
-                filterDataFlow.value.putAll(filterDataState.value.mapValues { it.value.value })
-            } finally {
-                filterMutex.unlock()
-            }
-        }
-    }
+	/**
+	 * Locks the filter data flow mutex and sets the new value.
+	 */
+	private fun _applyFilter() {
+		if (filterMutex.tryLock()) {
+			try {
+				filterDataFlow.value.clear()
+				filterDataFlow.value.putAll(filterDataState.value.mapValues { it.value.value })
+			} finally {
+				filterMutex.unlock()
+			}
+		}
+	}
 
 	override fun applyFilter() {
 		launchIO {
-            _applyFilter()
+			_applyFilter()
 			filtersApplied.update { it.copy(id = it.id + 1, value = true) }
 		}
 	}
@@ -380,7 +380,7 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-            _applyFilter()
+			_applyFilter()
 			filtersApplied.update { it.copy(value = false) }
 		}
 	}

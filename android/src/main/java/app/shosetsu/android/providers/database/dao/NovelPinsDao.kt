@@ -42,14 +42,14 @@ interface NovelPinsDao : BaseDao<DBNovelPinEntity> {
 	 */
 	@Throws(SQLiteException::class)
 	@Transaction
-	suspend fun togglePin(ids: List<Int>) {
+	suspend fun setPinned(ids: List<Int>, pinned: Boolean) {
 		ids.forEach { id ->
 			val item = get(id)
-			if (item != null)
-				update(item.copy(pinned = !item.pinned))
+			if (item != null && item.pinned != pinned)
+				update(item.copy(pinned = pinned))
 			else {
 				// Insert as true, as we are assuming null = false
-				insertIgnore(DBNovelPinEntity(id, true))
+				insertIgnore(DBNovelPinEntity(id, pinned))
 			}
 		}
 	}

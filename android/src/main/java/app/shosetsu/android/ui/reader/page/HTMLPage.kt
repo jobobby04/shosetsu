@@ -224,5 +224,5 @@ fun HTMLPageUriDialog(uri: Uri, open: () -> Unit, reset: () -> Unit) {
 
 val WebViewState.sIsLoading: Boolean
 	get() = (loadingState is LoadingState.Loading &&
-			(loadingState as LoadingState.Loading).progress != 1f) ||
-			loadingState is LoadingState.Initializing
+		(loadingState as LoadingState.Loading).progress != 1f) ||
+		loadingState is LoadingState.Initializing

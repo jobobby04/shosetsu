@@ -25,11 +25,15 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.Badge
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -45,9 +49,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
-import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -73,10 +75,14 @@ import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.ui.novel.CategoriesDialog
 import app.shosetsu.android.view.BottomSheetDialog
+import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
+import app.shosetsu.android.view.compose.MoreIconButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
+import app.shosetsu.android.view.compose.SelectionBar
+import app.shosetsu.android.view.compose.SelectionTopAppBar
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.pagerTabIndicatorOffset
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
@@ -119,12 +125,14 @@ fun LibraryView(
 	onOpenNovel: (novelId: Int) -> Unit,
 	onMigrate: (ids: List<Int>) -> Unit,
 	drawerIcon: @Composable () -> Unit,
+	onGoToBrowse: () -> Unit
 ) {
 	val viewModel = viewModelDi<ALibraryViewModel>()
 
 	val items by viewModel.liveData.collectAsState()
 	val isEmpty by viewModel.isEmptyFlow.collectAsState()
 	val selectedCount by viewModel.selectionCount.collectAsState()
+	val selectedPinCount by viewModel.selectedPinCount.collectAsState()
 	val type by viewModel.novelCardTypeFlow.collectAsState()
 	val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
 
@@ -176,6 +184,7 @@ fun LibraryView(
 		columnsInV = columnsInV,
 		columnsInH = columnsInH,
 		selectedCount = selectedCount,
+		selectedPinCount = selectedPinCount,
 		onRefresh = viewModel::startUpdateManager,
 		onOpen = { (id) -> onOpenNovel(id) },
 		toggleSelection = viewModel::toggleSelection,
@@ -199,7 +208,8 @@ fun LibraryView(
 			viewModel.deselectAll()
 			onMigrate(selectedIds)
 		},
-		onTogglePin = viewModel::togglePinSelected,
+		onPin = viewModel::pinSelected,
+		onUnpin = viewModel::unpinSelected,
 		onSetCategories = viewModel::showCategoryDialog,
 		onDeselectAll = viewModel::deselectAll,
 		onSelectBetween = viewModel::selectBetween,
@@ -207,7 +217,8 @@ fun LibraryView(
 		onSearch = viewModel::setQuery,
 		hostState = hostState,
 		onShowFilterMenu = viewModel::showFilterMenu,
-		drawerIcon = drawerIcon
+		drawerIcon = drawerIcon,
+		onGoToBrowse = onGoToBrowse
 	)
 	if (isCategoriesDialogOpen) {
 		CategoriesDialog(
@@ -239,6 +250,7 @@ fun LibraryContent(
 	columnsInV: Int,
 	columnsInH: Int,
 	selectedCount: Int,
+	selectedPinCount: Int,
 	onRefresh: (Int) -> Unit,
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
@@ -247,7 +259,8 @@ fun LibraryContent(
 	onSelectAll: () -> Unit,
 	onRemove: () -> Unit,
 	onMigrate: () -> Unit,
-	onTogglePin: () -> Unit,
+	onPin: () -> Unit,
+	onUnpin: () -> Unit,
 	onSetCategories: () -> Unit,
 	onDeselectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
@@ -255,7 +268,8 @@ fun LibraryContent(
 	onSearch: (String) -> Unit,
 	hostState: SnackbarHostState,
 	onShowFilterMenu: () -> Unit,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
+	onGoToBrowse: () -> Unit
 ) {
 	Scaffold(
 		topBar = {
@@ -263,10 +277,6 @@ fun LibraryContent(
 				selectedCount = selectedCount,
 				onInverseSelection = onInverseSelection,
 				onSelectAll = onSelectAll,
-				onRemove = onRemove,
-				onMigrate = onMigrate,
-				onTogglePin = onTogglePin,
-				onSetCategories = onSetCategories,
 				onDeselectAll = onDeselectAll,
 				onSelectBetween = onSelectBetween,
 				query = query,
@@ -305,16 +315,24 @@ fun LibraryContent(
 					columnsInV = columnsInV,
 					columnsInH = columnsInH,
 					hasSelected = selectedCount > 0,
+					hasPinnedSelected = selectedPinCount > 0,
+					hasUnpinnedSelected = selectedCount > selectedPinCount,
 					onRefresh = onRefresh,
 					onOpen = onOpen,
 					toggleSelection = toggleSelection,
 					toastNovel = toastNovel,
+					onRemove = onRemove,
+					onMigrate = onMigrate,
+					onPin = onPin,
+					onUnpin = onUnpin,
+					onSetCategories = onSetCategories,
 				)
 			}
 		} else {
 			ErrorContent(
 				stringResource(R.string.empty_library_message),
-				modifier = Modifier.padding(paddingValues)
+				modifier = Modifier.padding(paddingValues),
+				actions = ErrorAction(R.string.empty_library_message_go_to_browse, onGoToBrowse)
 			)
 		}
 	}
@@ -329,10 +347,6 @@ fun LibraryAppBar(
 	selectedCount: Int,
 	onInverseSelection: () -> Unit,
 	onSelectAll: () -> Unit,
-	onRemove: () -> Unit,
-	onMigrate: () -> Unit,
-	onTogglePin: () -> Unit,
-	onSetCategories: () -> Unit,
 	onDeselectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
 	query: String,
@@ -342,25 +356,16 @@ fun LibraryAppBar(
 	isEmpty: Boolean,
 	drawerIcon: @Composable () -> Unit
 ) {
-	val behavior = enterAlwaysScrollBehavior()
+	val behavior = pinnedScrollBehavior()
 
 	if (selectedCount > 0) {
-		TopAppBar(
-			title = { Text("$selectedCount") },
+		SelectionTopAppBar(
 			scrollBehavior = behavior,
-			actions = {
-				InverseSelectionButton(onInverseSelection)
-				SelectAllButton(onSelectAll)
-				SelectBetweenButton(onSelectBetween)
-				RemoveAllButton(onRemove)
-				LibrarySelectedMoreButton(onMigrate, onTogglePin, onSetCategories)
-			},
-			colors = TopAppBarDefaults.topAppBarColors(
-				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-			),
-			navigationIcon = {
-				DeselectAllButton(onClick = onDeselectAll)
-			},
+			selectedCount = selectedCount,
+			onSelectAll = onSelectAll,
+			onInverseSelection = onInverseSelection,
+			onSelectBetween = onSelectBetween,
+			onDeselectAll = onDeselectAll,
 		)
 	} else {
 		TopAppBar(
@@ -370,7 +375,11 @@ fun LibraryAppBar(
 				AnimatedVisibility(!isEmpty) {
 					Row {
 						SearchAction(query, onSearch, immediateSearch = true)
-						SimpleIconButton(Icons.Outlined.FilterList, stringResource(R.string.filter), onClick = onShowFilterMenu)
+						SimpleIconButton(
+							Icons.Outlined.FilterList,
+							stringResource(R.string.filter),
+							onClick = onShowFilterMenu
+						)
 						RefreshButton(onRefresh)
 					}
 				}
@@ -393,11 +402,19 @@ fun LibraryPager(
 	columnsInV: Int,
 	columnsInH: Int,
 	hasSelected: Boolean,
+	hasPinnedSelected: Boolean,
+	hasUnpinnedSelected: Boolean,
 	onRefresh: (Int) -> Unit,
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
-	toastNovel: ((LibraryNovelUI) -> Unit)?
-) {
+	toastNovel: ((LibraryNovelUI) -> Unit)?,
+
+	onRemove: () -> Unit,
+	onMigrate: () -> Unit,
+	onPin: () -> Unit,
+	onUnpin: () -> Unit,
+	onSetCategories: () -> Unit,
+) = Box {
 	val scope = rememberCoroutineScope()
 	val categoryPagerState = rememberPagerState { library.categories.size }
 	LaunchedEffect(categoryPagerState.currentPage) {
@@ -456,6 +473,44 @@ fun LibraryPager(
 				toggleSelection = toggleSelection,
 				toastNovel = toastNovel,
 			)
+		}
+	}
+
+	if (hasSelected) {
+		SelectionBar {
+			SimpleIconButton(
+				Icons.AutoMirrored.Outlined.Label,
+				stringResource(R.string.set_categories),
+				onClick = onSetCategories
+			)
+			AnimatedVisibility(hasUnpinnedSelected) {
+				SimpleIconButton(
+					Icons.Default.PushPin,
+					stringResource(R.string.pin_on_top),
+					onClick = onPin
+				)
+			}
+			AnimatedVisibility(hasPinnedSelected) {
+				SimpleIconButton(
+					Icons.Outlined.PushPin,
+					stringResource(R.string.unpin_from_top),
+					onClick = onUnpin
+				)
+			}
+			SimpleIconButton(
+				Icons.Default.Delete,
+				stringResource(R.string.remove),
+				onClick = onRemove
+			)
+
+			MoreIconButton {
+				DropdownMenuItem(
+					text = {
+						Text(stringResource(R.string.migrate_sources))
+					},
+					onClick = onMigrate
+				)
+			}
 		}
 	}
 }

@@ -123,7 +123,11 @@ fun QRCodeShareDialog(
 
 				TextButton(
 					onClick = {
-						scope.launch { clipboard.setClipEntry(ClipData.newPlainText("text", qrCodeData!!.data).toClipEntry()) }
+						scope.launch {
+							clipboard.setClipEntry(
+								ClipData.newPlainText("text", qrCodeData!!.data).toClipEntry()
+							)
+						}
 					},
 					enabled = qrCodeData != null
 				) {

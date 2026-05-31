@@ -77,15 +77,15 @@ fun ChapterReaderBottomSheetContent(
 				onClick = toggleFocus
 			)
 			SimpleIconButton(
-					if (!isBookmarked) Icons.Outlined.BookmarkBorder
-					else Icons.Outlined.Bookmark,
+				if (!isBookmarked) Icons.Outlined.BookmarkBorder
+				else Icons.Outlined.Bookmark,
 				null,
 				onClick = toggleBookmark
 			)
 
 			SimpleIconButton(
-					if (!isRotationLocked) Icons.Outlined.ScreenRotation
-					else Icons.Outlined.ScreenLockRotation,
+				if (!isRotationLocked) Icons.Outlined.ScreenRotation
+				else Icons.Outlined.ScreenLockRotation,
 				null,
 				onClick = toggleRotationLock
 			)
@@ -122,20 +122,20 @@ fun ChapterReaderBottomSheetContent(
 
 		SimpleIconButton(
 			if (scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded) {
-                Icons.Outlined.ExpandMore
+				Icons.Outlined.ExpandMore
 			} else {
-                Icons.Outlined.ExpandLess
+				Icons.Outlined.ExpandLess
 			},
 			null,
 			onClick = {
-			coroutineScope.launch {
-				if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
-					scaffoldState.bottomSheetState.expand()
-				} else {
-					scaffoldState.bottomSheetState.partialExpand()
+				coroutineScope.launch {
+					if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
+						scaffoldState.bottomSheetState.expand()
+					} else {
+						scaffoldState.bottomSheetState.partialExpand()
+					}
 				}
-			}
-		})
+			})
 	}
 
 	LazyColumn(

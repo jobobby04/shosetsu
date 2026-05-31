@@ -20,7 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.BottomAppBar
@@ -163,7 +163,7 @@ fun IntroView(
 							) {
 								SimpleIconButton(
 									if (state.currentPage != IntroPages.End.ordinal)
-										Icons.Default.ArrowForward
+										Icons.AutoMirrored.Filled.ArrowForward
 									else Icons.Default.Close,
 									stringResource(
 										if (state.currentPage != IntroPages.End.ordinal)

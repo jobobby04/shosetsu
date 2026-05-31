@@ -28,5 +28,5 @@ class FilePermissionException(message: String) : Exception(message) {
 	enum class PermissionType { WRITE, READ }
 
 	constructor(path: String, type: PermissionType) :
-			this("Missing '${type.name}' permission to file: $path")
+		this("Missing '${type.name}' permission to file: $path")
 }

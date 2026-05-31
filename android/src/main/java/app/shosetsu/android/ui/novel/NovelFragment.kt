@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Resources
 import android.provider.Settings
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -24,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -83,7 +83,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -115,6 +114,7 @@ import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.LongClickTextButton
 import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.SelectionBar
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
@@ -178,7 +178,6 @@ fun NovelInfoView(
 	val chapters by viewModel.chaptersLive.collectAsState()
 	val isRefreshing by viewModel.isRefreshing.collectAsState()
 	val selectedChaptersState by viewModel.selectedChaptersState.collectAsState()
-	val hasSelected by viewModel.hasSelected.collectAsState()
 	val itemAt by viewModel.itemIndex.collectAsState()
 	val categories by viewModel.categories.collectAsState()
 	val novelCategories by viewModel.novelCategories.collectAsState()
@@ -312,7 +311,7 @@ fun NovelInfoView(
 				onToggleSelection = {
 					viewModel.toggleSelection(it)
 				},
-				selectionMode = hasSelected
+				selectionMode = selectedChaptersState.count > 0
 			)
 		},
 		downloadSelected = viewModel::downloadSelected,
@@ -325,9 +324,9 @@ fun NovelInfoView(
 		},
 		bookmarkSelected = viewModel::bookmarkSelected,
 		unbookmarkSelected = viewModel::removeBookmarkFromSelected,
-		hasSelected = hasSelected,
 		windowSize = windowSize,
 		onSelectAll = viewModel::selectAll,
+		onDeselectAll = viewModel::deselectAll,
 		onSelectBetween = viewModel::selectBetween,
 		onInverseSelection = viewModel::invertSelection,
 		showTrueDelete = showTrueDelete,
@@ -618,9 +617,9 @@ fun PreviewNovelInfoContent() {
 			markSelectedAsUnread = {},
 			bookmarkSelected = {},
 			unbookmarkSelected = {},
-			hasSelected = false,
 			windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height)),
 			onSelectAll = {},
+			onDeselectAll = {},
 			onSelectBetween = {},
 			onInverseSelection = {},
 			showTrueDelete = false,
@@ -664,9 +663,9 @@ fun NovelInfoContent(
 	markSelectedAsUnread: () -> Unit,
 	bookmarkSelected: () -> Unit,
 	unbookmarkSelected: () -> Unit,
-	hasSelected: Boolean,
 	windowSize: WindowSizeClass,
 	onSelectAll: () -> Unit,
+	onDeselectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
 	onInverseSelection: () -> Unit,
 	showTrueDelete: Boolean,
@@ -706,12 +705,11 @@ fun NovelInfoContent(
 		topBar = {
 			NovelAppBar(
 				onBack = onBack,
-				hasSelected = hasSelected,
+				selectedCount = selectedChaptersState.count,
 				onSelectAll = onSelectAll,
+				onDeselectAll = onDeselectAll,
 				onSelectBetween = onSelectBetween,
 				onInverseSelection = onInverseSelection,
-				showTrueDelete = showTrueDelete,
-				onTrueDelete = onTrueDelete,
 				canMigrate = canMigrate,
 				onMigrate = onMigrate,
 				onJump = openChapterJump,
@@ -762,37 +760,31 @@ fun NovelInfoContent(
 
 				Box(Modifier.fillMaxSize()) {
 					val state = rememberLazyListState()
-					LazyColumnScrollbar(listState = state) {
-						LazyColumn(
-							modifier = Modifier.fillMaxSize(),
-							state = state,
-							contentPadding = PaddingValues(bottom = 256.dp)
-						) {
-							if (novelInfo != null) {
-								if (!splitColumn)
-									item {
-										header(novelInfo)
-									}
-							} else {
+					LazyColumnScrollbar(state = state, contentPadding = PaddingValues(bottom = 140.dp)) {
+						if (novelInfo != null) {
+							if (!splitColumn)
 								item {
-									LinearProgressIndicator(
-										modifier = Modifier.fillMaxWidth()
-									)
+									header(novelInfo)
 								}
+						} else {
+							item {
+								LinearProgressIndicator(
+									modifier = Modifier.fillMaxWidth()
+								)
 							}
-
-							stickyHeader(key = "sticky:chapter") {
-								Surface(tonalElevation = 1.dp) {
-									NovelChapterBar(
-										chapters?.size ?: 0,
-										openChapterJump,
-										openFilter
-									)
-								}
-							}
-
-							if (chapters != null) items(chapters) { chapterContent(it) }
 						}
+
+						stickyHeader(key = "sticky:chapter") {
+							Surface(tonalElevation = 1.dp) {
+								NovelChapterBar(
+									chapters?.size ?: 0,
+									openChapterJump,
+									openFilter
+								)
+							}
+						}
+
+						if (chapters != null) items(chapters) { chapterContent(it) }
 					}
 
 					// Do not save progress when there is nothing being displayed
@@ -814,15 +806,17 @@ fun NovelInfoContent(
 			)
 
 			// Chapter Selection Bar
-			if (chapters != null && hasSelected) {
+			if (chapters != null && selectedChaptersState.count > 0) {
 				ChapterSelectionBar(
-					selectedChaptersState,
-					downloadSelected,
-					deleteSelected,
-					markSelectedAsRead,
-					markSelectedAsUnread,
-					bookmarkSelected,
-					unbookmarkSelected
+					selectedChaptersState = selectedChaptersState,
+					downloadSelected = downloadSelected,
+					deleteSelected = deleteSelected,
+					markSelectedAsRead = markSelectedAsRead,
+					markSelectedAsUnread = markSelectedAsUnread,
+					bookmarkSelected = bookmarkSelected,
+					unbookmarkSelected = unbookmarkSelected,
+					showTrueDelete = showTrueDelete,
+					onTrueDelete = onTrueDelete,
 				)
 			}
 
@@ -847,6 +841,8 @@ fun PreviewChapterSelectionBar() {
 			{},
 			{},
 			{},
+			true,
+			{}
 		)
 	}
 }
@@ -860,49 +856,63 @@ fun BoxScope.ChapterSelectionBar(
 	markSelectedAsUnread: () -> Unit,
 	bookmarkSelected: () -> Unit,
 	unbookmarkSelected: () -> Unit,
-) {
-	Card(
-		modifier = Modifier
-			.align(BiasAlignment(0f, 0.7f))
-	) {
-		Row {
-			SimpleIconButton(
-				Icons.Filled.Download,
-				stringResource(R.string.fragment_novel_selected_download),
-				onClick = downloadSelected,
-				enabled = selectedChaptersState.showDownload
-			)
-			SimpleIconButton(
-				Icons.Outlined.Delete,
-				stringResource(R.string.fragment_novel_selected_delete),
-				onClick = deleteSelected,
-				enabled = selectedChaptersState.showDelete
-			)
-			SimpleIconButton(
-				Icons.Filled.LibraryAddCheck,
-				stringResource(R.string.fragment_novel_selected_read),
-				onClick = markSelectedAsRead,
-				enabled = selectedChaptersState.showMarkAsRead
-			)
-			SimpleIconButton(
-				Icons.Outlined.LibraryAddCheck,
-				stringResource(R.string.fragment_novel_selected_unread),
-				onClick = markSelectedAsUnread,
-				enabled = selectedChaptersState.showMarkAsUnread
-			)
-			SimpleIconButton(
-				Icons.Filled.BookmarkAdd,
-				stringResource(R.string.fragment_novel_selected_bookmark),
-				onClick = bookmarkSelected,
-				enabled = selectedChaptersState.showBookmark
-			)
-			SimpleIconButton(
-				Icons.Outlined.BookmarkRemove,
-				stringResource(R.string.fragment_novel_selected_unbookmark),
-				onClick = unbookmarkSelected,
-				enabled = selectedChaptersState.showRemoveBookmark
-			)
-		}
+
+	showTrueDelete: Boolean,
+	onTrueDelete: () -> Unit,
+) = SelectionBar {
+	AnimatedVisibility(selectedChaptersState.showDownload) {
+		SimpleIconButton(
+			Icons.Filled.Download,
+			stringResource(R.string.fragment_novel_selected_download),
+			onClick = downloadSelected,
+			enabled = selectedChaptersState.showDownload
+		)
+	}
+	AnimatedVisibility(selectedChaptersState.showDelete) {
+		SimpleIconButton(
+			Icons.Outlined.Delete,
+			stringResource(R.string.fragment_novel_selected_delete),
+			onClick = deleteSelected,
+			enabled = selectedChaptersState.showDelete
+		)
+	}
+	AnimatedVisibility(selectedChaptersState.showMarkAsRead) {
+		SimpleIconButton(
+			Icons.Filled.LibraryAddCheck,
+			stringResource(R.string.fragment_novel_selected_read),
+			onClick = markSelectedAsRead,
+			enabled = selectedChaptersState.showMarkAsRead
+		)
+	}
+	AnimatedVisibility(selectedChaptersState.showMarkAsUnread) {
+		SimpleIconButton(
+			Icons.Outlined.LibraryAddCheck,
+			stringResource(R.string.fragment_novel_selected_unread),
+			onClick = markSelectedAsUnread,
+			enabled = selectedChaptersState.showMarkAsUnread
+		)
+	}
+	AnimatedVisibility(selectedChaptersState.showBookmark) {
+		SimpleIconButton(
+			Icons.Filled.BookmarkAdd,
+			stringResource(R.string.fragment_novel_selected_bookmark),
+			onClick = bookmarkSelected,
+			enabled = selectedChaptersState.showBookmark
+		)
+	}
+	AnimatedVisibility(selectedChaptersState.showRemoveBookmark) {
+		SimpleIconButton(
+			Icons.Outlined.BookmarkRemove,
+			stringResource(R.string.fragment_novel_selected_unbookmark),
+			onClick = unbookmarkSelected,
+			enabled = selectedChaptersState.showRemoveBookmark
+		)
+	}
+	AnimatedVisibility(showTrueDelete) {
+		NovelSelectedMoreButton(
+			true,
+			onTrueDelete
+		)
 	}
 }
 
@@ -1007,8 +1017,8 @@ fun NovelChapterContent(
 
 @Preview
 @Composable
-fun PreviewHeaderContent() {
-	val info = NovelUI(
+fun PreviewHeaderContent(
+	info: NovelUI = NovelUI(
 		id = 0,
 		novelURL = "",
 		extID = 1,
@@ -1025,7 +1035,7 @@ fun PreviewHeaderContent() {
 		tags = listOf("A", "B", "C"),
 		status = Novel.Status.COMPLETED
 	)
-
+) {
 	Surface {
 		NovelInfoHeaderContent(
 			info,
@@ -1035,6 +1045,78 @@ fun PreviewHeaderContent() {
 			{}
 		)
 	}
+}
+
+@Preview
+@Composable
+fun PreviewHeaderWithNoDescriptionContent() {
+	PreviewHeaderContent(
+		NovelUI(
+			id = 0,
+			novelURL = "",
+			extID = 1,
+			extName = "Test",
+			bookmarked = false,
+			title = "Title",
+			imageURL = "",
+			description = "",
+			loaded = true,
+			language = "eng",
+			genres = listOf("A", "B", "C"),
+			authors = listOf("A", "B", "C"),
+			artists = listOf("A", "B", "C"),
+			tags = listOf("A", "B", "C"),
+			status = Novel.Status.COMPLETED
+		)
+	)
+}
+
+@Preview
+@Composable
+fun PreviewHeaderWithNoGenresContent() {
+	PreviewHeaderContent(
+		NovelUI(
+			id = 0,
+			novelURL = "",
+			extID = 1,
+			extName = "Test",
+			bookmarked = false,
+			title = "Title",
+			imageURL = "",
+			description = "laaaaaaaaaaaaaaaaaaaaaaaaaa\nlaaaaaaaaaaaaaaaaaaa\nklaaaaaaaaaaaaa",
+			loaded = true,
+			language = "eng",
+			genres = listOf(),
+			authors = listOf("A", "B", "C"),
+			artists = listOf("A", "B", "C"),
+			tags = listOf("A", "B", "C"),
+			status = Novel.Status.COMPLETED
+		)
+	)
+}
+
+@Preview
+@Composable
+fun PreviewHeaderWithNoDescriptionOrGenresContent() {
+	PreviewHeaderContent(
+		NovelUI(
+			id = 0,
+			novelURL = "",
+			extID = 1,
+			extName = "Test",
+			bookmarked = false,
+			title = "Title",
+			imageURL = "",
+			description = "",
+			loaded = true,
+			language = "eng",
+			genres = listOf(),
+			authors = listOf("A", "B", "C"),
+			artists = listOf("A", "B", "C"),
+			tags = listOf("A", "B", "C"),
+			status = Novel.Status.COMPLETED
+		)
+	)
 }
 
 @Composable
@@ -1312,15 +1394,18 @@ fun NovelInfoHeaderContent(
 			}
 		}
 
-		// Description
-		SelectionContainer {
-			ExpandedText(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(top = 8.dp),
-				text = novelInfo.description,
-				genre = novelInfo.displayGenre
-			)
+		// Only show if there is either text or genres.
+		if (novelInfo.description.isNotBlank() || novelInfo.displayGenre.isNotEmpty()) {
+			// Serves as the description section
+			SelectionContainer {
+				ExpandedText(
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(top = 8.dp),
+					text = novelInfo.description,
+					genre = novelInfo.displayGenre
+				)
+			}
 		}
 	}
 }
@@ -1412,19 +1497,21 @@ fun ExpandedText(
 			interactionSource = remember { MutableInteractionSource() }
 		)
 	) {
-		Text(
-			if (isExpanded) {
-				text
-			} else {
-				text.let {
-					if (it.length > 200)
-						it.substring(0, 200) + "..."
-					else it
-				}
-			},
-			style = MaterialTheme.typography.bodyMedium,
-			modifier = Modifier.padding(start = 8.dp, end = 8.dp)
-		)
+		if (text.isNotBlank()) {
+			Text(
+				if (isExpanded) {
+					text
+				} else {
+					text.let {
+						if (it.length > 200)
+							it.substring(0, 200) + "..."
+						else it
+					}
+				},
+				style = MaterialTheme.typography.bodyMedium,
+				modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+			)
+		}
 
 		if (genre.isNotEmpty()) {
 			if (!isExpanded) {
@@ -1454,19 +1541,21 @@ fun ExpandedText(
 			}
 		}
 
-		Icon(
-			imageVector = if (!isExpanded) {
-				Icons.Outlined.ExpandMore
-			} else {
-				Icons.Outlined.ExpandLess
-			},
-			contentDescription = if (!isExpanded) {
-				stringResource(R.string.more)
-			} else {
-				stringResource(R.string.less)
-			},
-			modifier = Modifier.padding(bottom = 8.dp)
-		)
+		if (text.isNotBlank()) {
+			Icon(
+				imageVector = if (!isExpanded) {
+					Icons.Outlined.ExpandMore
+				} else {
+					Icons.Outlined.ExpandLess
+				},
+				contentDescription = if (!isExpanded) {
+					stringResource(R.string.more)
+				} else {
+					stringResource(R.string.less)
+				},
+				modifier = Modifier.padding(bottom = 8.dp)
+			)
+		}
 	}
 }
 

@@ -70,16 +70,19 @@ fun StandardDialog(
 ) {
 	Dialog(onDismissRequest, dialogProperties) {
 		Card(
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier
+				.fillMaxWidth()
 				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
 		) {
 			Column(
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier
+					.fillMaxWidth()
 					.padding(16.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
-				ProvideTextStyle(MaterialTheme.typography.titleLarge
-					.copy(textAlign = TextAlign.Center)
+				ProvideTextStyle(
+					MaterialTheme.typography.titleLarge
+						.copy(textAlign = TextAlign.Center)
 				) {
 					title()
 				}

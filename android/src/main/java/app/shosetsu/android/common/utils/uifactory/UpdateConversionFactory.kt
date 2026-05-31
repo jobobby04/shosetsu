@@ -36,6 +36,7 @@ class UpdateConversionFactory(data: UpdateCompleteEntity) :
 		chapterName = chapterName,
 		novelName = novelName,
 		novelImageURL = novelImageURL,
+		readingStatus = readingStatus,
 	)
 }
 

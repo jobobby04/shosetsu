@@ -340,7 +340,7 @@ fun AdvancedSettingsContent(
 						key = UserAgent,
 						enabled = !useShosetsuAgent
 					)
-                    val context = LocalContext.current
+					val context = LocalContext.current
 					SimpleIconButton(
 						Icons.Default.Refresh, stringResource(R.string.reset),
 						onClick = {

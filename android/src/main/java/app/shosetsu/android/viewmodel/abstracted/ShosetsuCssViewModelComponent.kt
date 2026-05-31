@@ -173,8 +173,10 @@ abstract class ShosetsuCssViewModelComponent {
 				this["--shosetsu-padding-bottom"] = "${it.paddingValues.calculateBottomPadding().value.toLong()}px"
 				// at least 0.5em is needed to prevent weird scrolling behavior with some content
 				// (like chapter 1 of "The Perfect Run" from "Royal Road")
-				this["--shosetsu-padding-left"] = "max(0.5em, ${it.paddingValues.calculateLeftPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
-				this["--shosetsu-padding-right"] = "max(0.5em, ${it.paddingValues.calculateRightPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
+				this["--shosetsu-padding-left"] =
+					"max(0.5em, ${it.paddingValues.calculateLeftPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
+				this["--shosetsu-padding-right"] =
+					"max(0.5em, ${it.paddingValues.calculateRightPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
 			}
 
 			setShosetsuStyle("body") {
@@ -185,7 +187,8 @@ abstract class ShosetsuCssViewModelComponent {
 				this["text-indent"] = "var(--shosetsu-indent-size)"
 				this["overflow-wrap"] = "break-word"
 				// ensure everything stays away from the edge
-				this["padding"] = "var(--shosetsu-padding-top) var(--shosetsu-padding-right) var(--shosetsu-padding-bottom) var(--shosetsu-padding-left)"
+				this["padding"] =
+					"var(--shosetsu-padding-top) var(--shosetsu-padding-right) var(--shosetsu-padding-bottom) var(--shosetsu-padding-left)"
 			}
 
 			setShosetsuStyle("p") {

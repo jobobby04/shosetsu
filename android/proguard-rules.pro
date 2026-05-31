@@ -46,6 +46,10 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+# Some transitive dependency probably?
+-dontwarn com.google.re2j.Matcher
+-dontwarn com.google.re2j.Pattern
+
 # Ignore java packages as included by qrcode BufferedImageCanvas
 -dontwarn java.awt.Color
 -dontwarn java.awt.Graphics2D
@@ -127,6 +131,9 @@
 -dontwarn org.apache.bcel.generic.ReturnInstruction
 -dontwarn org.apache.bcel.generic.StackInstruction
 -dontwarn org.apache.bcel.generic.Type
+
+# Kodein is complaining about fingerprint manager, meh
+-dontwarn android.hardware.fingerprint.FingerprintManager
 
 # Kodein
 -keep, allowobfuscation, allowoptimization class org.kodein.type.TypeReference

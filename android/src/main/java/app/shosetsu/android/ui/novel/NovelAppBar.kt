@@ -1,14 +1,11 @@
 package app.shosetsu.android.ui.novel
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import app.shosetsu.android.ui.library.InverseSelectionButton
-import app.shosetsu.android.ui.library.SelectAllButton
-import app.shosetsu.android.ui.library.SelectBetweenButton
 import app.shosetsu.android.view.compose.NavigateBackButton
+import app.shosetsu.android.view.compose.SelectionTopAppBar
 
 /*
  * This file is part of shosetsu.
@@ -37,14 +34,12 @@ import app.shosetsu.android.view.compose.NavigateBackButton
 @Composable
 fun NovelAppBar(
 	onBack: () -> Unit,
-	hasSelected: Boolean,
+	selectedCount: Int,
 
+	onDeselectAll: () -> Unit,
 	onSelectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
 	onInverseSelection: () -> Unit,
-
-	showTrueDelete: Boolean,
-	onTrueDelete: () -> Unit,
 
 	canMigrate: Boolean,
 	onMigrate: () -> Unit,
@@ -63,28 +58,25 @@ fun NovelAppBar(
 	onOpenShareMenu: () -> Unit
 ) {
 
-	val behavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+	val behavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-
-	TopAppBar(
-		title = {},
-		scrollBehavior = behavior,
-		navigationIcon = {
-			NavigateBackButton(onBack)
-		},
-		actions = {
-			if (hasSelected) {
-				SelectAllButton(onSelectAll)
-				SelectBetweenButton(onSelectBetween)
-				InverseSelectionButton(onInverseSelection)
-
-				AnimatedVisibility(showTrueDelete) {
-					NovelSelectedMoreButton(
-						true,
-						onTrueDelete
-					)
-				}
-			} else {
+	if (selectedCount > 0) {
+		SelectionTopAppBar(
+			scrollBehavior = behavior,
+			selectedCount = selectedCount,
+			onSelectAll = onSelectAll,
+			onInverseSelection = onInverseSelection,
+			onSelectBetween = onSelectBetween,
+			onDeselectAll = onDeselectAll,
+		)
+	} else {
+		TopAppBar(
+			title = {},
+			scrollBehavior = behavior,
+			navigationIcon = {
+				NavigateBackButton(onBack)
+			},
+			actions = {
 				NovelShareButton(onOpenShareMenu)
 				NovelDownloadButton(
 					onDownloadNext = onDownloadNext,
@@ -101,7 +93,7 @@ fun NovelAppBar(
 					hasCategories = hasCategories,
 					onSetCategories = onSetCategories
 				)
-			}
-		},
-	)
+			},
+		)
+	}
 }

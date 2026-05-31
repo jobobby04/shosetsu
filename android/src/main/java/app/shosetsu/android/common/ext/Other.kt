@@ -41,7 +41,7 @@ import org.kodein.di.instance
  * @author github.com/doomsdayrs
  */
 inline fun <reified VM : ViewModel, T> T.viewModel()
-		: Lazy<VM> where T : DIAware, T : ViewModelStoreOwner =
+	: Lazy<VM> where T : DIAware, T : ViewModelStoreOwner =
 	lazy(LazyThreadSafetyMode.NONE) {
 		ViewModelProvider(
 			this,

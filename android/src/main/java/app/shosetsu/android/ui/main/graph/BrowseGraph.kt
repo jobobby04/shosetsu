@@ -12,18 +12,18 @@ import app.shosetsu.android.ui.search.SearchView
 
 fun NavGraphBuilder.browseGraph(navController: ShosetsuNavController) {
 	composableSub<Catalog> { entry ->
-        val route = entry.toRoute<Catalog>()
-        CatalogueView(
-            extensionId = route.extensionId,
-            listing = route.listing,
-            onOpenNovel = {
-                navController.navigate(Novel(it))
-            },
-            onBack = navController::popBackStack,
-            onSelectListing = {
-                navController.navigate(Catalog(route.extensionId, it.link))
-            }
-        )
+		val route = entry.toRoute<Catalog>()
+		CatalogueView(
+			extensionId = route.extensionId,
+			listing = route.listing,
+			onOpenNovel = {
+				navController.navigate(Novel(it))
+			},
+			onBack = navController::popBackStack,
+			onSelectListing = {
+				navController.navigate(Catalog(route.extensionId, it.link))
+			}
+		)
 	}
 
 	composableSub<ConfigureExtension> { entry ->

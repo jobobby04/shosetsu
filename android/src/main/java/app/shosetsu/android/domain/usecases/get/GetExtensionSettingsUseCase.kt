@@ -80,12 +80,15 @@ class GetExtensionSettingsUseCase(
 						filter.copy(state = state)
 					}
 				}
+
 				is FilterEntity.Switch -> {
 					asSettingItem(extensionID, filter)
 				}
+
 				is FilterEntity.Checkbox -> {
 					asSettingItem(extensionID, filter)
 				}
+
 				is FilterEntity.TriState -> {
 					extSettingsRepository.getStringFlow(
 						extensionID,
@@ -95,6 +98,7 @@ class GetExtensionSettingsUseCase(
 						filter.copy(state = TriStateState.valueOf(newState))
 					}
 				}
+
 				is FilterEntity.Dropdown -> {
 					extSettingsRepository.getIntFlow(
 						extensionID,
@@ -104,6 +108,7 @@ class GetExtensionSettingsUseCase(
 						filter.copy(selected = state)
 					}
 				}
+
 				is FilterEntity.RadioGroup -> {
 					extSettingsRepository.getIntFlow(
 						extensionID,
@@ -114,16 +119,19 @@ class GetExtensionSettingsUseCase(
 						filter.copy(selected = state)
 					}
 				}
+
 				is FilterEntity.FList -> {
 					filter.filters.convert(extensionID).combine().mapLatest { subList ->
 						filter.copy(filters = subList)
 					}
 				}
+
 				is FilterEntity.Group -> {
 					filter.filters.convert(extensionID).combine().mapLatest { subList ->
 						filter.copy(filters = subList)
 					}
 				}
+
 				is FilterEntity.Header -> flowOf(filter)
 				is FilterEntity.Separator -> flowOf(filter)
 			}

@@ -145,16 +145,18 @@ class AppUpdateCheckWorker(
 				)
 			) {
 				setOngoing(false)
-				addAction(actionBuilder(
-					Icons.Default.SystemUpdateAlt,
-					"",
-					PendingIntent.getActivity(
-						applicationContext,
-						0,
-						openAppForUpdateIntent,
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-					)
-				).build())
+				addAction(
+					actionBuilder(
+						Icons.Default.SystemUpdateAlt,
+						"",
+						PendingIntent.getActivity(
+							applicationContext,
+							0,
+							openAppForUpdateIntent,
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+						)
+					).build()
+				)
 			}
 		}
 		return Result.success()

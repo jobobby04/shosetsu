@@ -57,7 +57,7 @@ class StartDownloadWorkerAfterUpdateUseCase(
 						val categories =
 							getNovelCategoriesUseCase(novelID).first().ifEmpty { listOf(0) }
 						categories.any { includedToDownload.isEmpty() || it in includedToDownload } &&
-								categories.none { it in excludedToDownload }
+							categories.none { it in excludedToDownload }
 					}
 					.values
 					.flatten()

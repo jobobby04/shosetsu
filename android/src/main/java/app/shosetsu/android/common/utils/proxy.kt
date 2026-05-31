@@ -10,7 +10,7 @@ data class ProxyConfig(
 	companion object {
 		fun fromString(proxyString: String): ProxyConfig {
 			val (auth, hostname) = if (proxyString.contains('@')) {
-				val (auth_, host_) = proxyString.split('@', limit=2)
+				val (auth_, host_) = proxyString.split('@', limit = 2)
 				Pair(auth_, host_)
 			} else Pair("", proxyString)
 			val (username, password) = if (auth.isNotEmpty()) {
@@ -27,7 +27,7 @@ data class ProxyConfig(
 			} else Pair("", "")
 
 			val (host, port) = if (hostname.contains(':')) {
-				val (host_, port_) = hostname.split(':', limit=2)
+				val (host_, port_) = hostname.split(':', limit = 2)
 				Pair(host_, port_.toIntOrNull() ?: -1)
 			} else Pair(hostname, -1)
 

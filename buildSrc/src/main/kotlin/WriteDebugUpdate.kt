@@ -46,14 +46,14 @@ abstract class WriteDebugUpdate : DefaultTask() {
 
 	/** Task of this task */
 	@OptIn(ExperimentalSerializationApi::class)
-    @Throws(IOException::class)
+	@Throws(IOException::class)
 	@TaskAction
 	fun main() {
 		val file = outputFile.get().asFile
 
-		val update: DebugUpdate = Git.open(gitDir.get().asFile).use {
+		val update: DebugUpdate = Git.open(gitDir.get().asFile).use { git ->
 			// up the commit by one for when shosetsu-preview builds
-			val commitCount = it.getCommitCount().toInt()
+			val commitCount = git.getCommitCount()
 			// the last file contains the commit count since the last generation
 			val lastFile = lastFile.get().asFile
 			// get the previous commit count
@@ -61,16 +61,17 @@ abstract class WriteDebugUpdate : DefaultTask() {
 			// save the new commit count
 			lastFile.writeText(commitCount.toString())
 
-			val releaseNotes = it.getLatestCommitMsg(current = commitCount, since = prevCommitCount)
-				.map { it
-					// Format it so it goes well into the json
-					//.replace("\n", "\",\n\t\t\t\t\"-")
-					.split("\n")
-					.map { it.trim() }
-					.filter { it.isNotBlank() }
-					.map { it.replace("\"", "'") }
-					.joinToString("\n\t\t\t\t") { "\"- $it\"," }
-					.removeSuffix(",")
+			val releaseNotes = git.getLatestCommitMsg(current = commitCount, since = prevCommitCount)
+				.map { commitMessage ->
+					commitMessage
+						// Format it so it goes well into the json
+						//.replace("\n", "\",\n\t\t\t\t\"-")
+						.split("\n")
+						.map { it.trim() }
+						.filter { it.isNotBlank() }
+						.map { it.replace("\"", "'") }
+						.joinToString("\n\t\t\t\t") { "- $it," }
+						.removeSuffix(",")
 				}
 
 			DebugUpdate(

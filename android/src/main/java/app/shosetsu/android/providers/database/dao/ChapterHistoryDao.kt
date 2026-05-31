@@ -101,25 +101,24 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 		)
 	}
 
+	@Transaction
 	@Throws(SQLiteException::class)
 	suspend fun markChapterAsReading(chapterId: Int, novelId: Int, time: Long) {
-		onIO {
-			val history = get(chapterId)
-			if (history != null) {
-				update(
-					history.copy(
-						startedReadingAt = time,
-						endedReadingAt = null,
-					)
-				)
-			} else {
-				insert(
-					novelId,
-					chapterId,
+		val history = get(chapterId)
+		if (history != null) {
+			update(
+				history.copy(
 					startedReadingAt = time,
 					endedReadingAt = null,
 				)
-			}
+			)
+		} else {
+			insert(
+				novelId,
+				chapterId,
+				startedReadingAt = time,
+				endedReadingAt = null,
+			)
 		}
 	}
 

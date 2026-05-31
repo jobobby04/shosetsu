@@ -193,8 +193,8 @@ fun DiscreteSliderDialog(
 		},
 		validateInput = { newValue ->
 			newValue.matches(Regex("(^[0-9]+$)|(^[0-9]+\\.[0-9]*$)")) &&
-					newValue.toFloat()
-						.let { valueRange.item.first <= it && it <= valueRange.item.last }
+				newValue.toFloat()
+					.let { valueRange.item.first <= it && it <= valueRange.item.last }
 		},
 		updateValue
 	)

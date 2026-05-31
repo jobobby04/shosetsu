@@ -17,12 +17,10 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -63,8 +61,8 @@ import app.shosetsu.android.view.QRCodeShareDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
+import app.shosetsu.android.view.compose.MoreIconButton
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
@@ -650,20 +648,13 @@ fun RepositoryContent(
 			}
 
 			Row {
-				var visible by remember { mutableStateOf(false) }
-
-				DropdownMenu(
-					visible,
-					onDismissRequest = {
-						visible = false
-					}
-				) {
+				MoreIconButton { onDismissRequest ->
 					DropdownMenuItem(
 						text = {
 							Text(stringResource(R.string.remove))
 						},
 						onClick = {
-							visible = false
+							onDismissRequest()
 							onRemove()
 						}
 					)
@@ -673,19 +664,11 @@ fun RepositoryContent(
 							Text(stringResource(R.string.share))
 						},
 						onClick = {
-							visible = false
+							onDismissRequest()
 							onShowShare()
 						}
 					)
 				}
-
-				SimpleIconButton(
-					Icons.Default.MoreVert,
-					description = stringResource(R.string.more),
-					onClick = {
-						visible = true
-					}
-				)
 
 				Switch(
 					checked = item.isRepoEnabled,

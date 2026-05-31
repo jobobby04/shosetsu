@@ -63,6 +63,28 @@ private enum class NavigationMode {
 	BOTTOM, DRAWER, RAIL
 }
 
+/**
+ * Allows the caller to change the UI focus to the main view, assuming ofc they have the nav controller.
+ *
+ * @param shosetsuNavController The applications nav controller
+ * @param route The primary destination to go to
+ */
+fun navigateToMainView(shosetsuNavController: ShosetsuNavController, route: ShosetsuDestination.Primary) {
+	shosetsuNavController.home.navigate(route) {
+		// Pop up to the start destination of the graph to
+		// avoid building up a large stack of destinations
+		// on the back stack as users select items
+		popUpTo(shosetsuNavController.home.graph.findStartDestination().id) {
+			saveState = true
+		}
+		// Avoid multiple copies of the same destination when
+		// reselecting the same item
+		launchSingleTop = true
+		// Restore state when reselecting a previously selected item
+		restoreState = true
+	}
+}
+
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(
@@ -91,21 +113,7 @@ fun HomeView(
 		onCloseDrawer = drawerState::close
 	)
 
-	fun navigate(route: ShosetsuDestination.Primary) {
-		shosetsuNavController.home.navigate(route) {
-			// Pop up to the start destination of the graph to
-			// avoid building up a large stack of destinations
-			// on the back stack as users select items
-			popUpTo(shosetsuNavController.home.graph.findStartDestination().id) {
-				saveState = true
-			}
-			// Avoid multiple copies of the same destination when
-			// reselecting the same item
-			launchSingleTop = true
-			// Restore state when reselecting a previously selected item
-			restoreState = true
-		}
-	}
+
 
 	@Composable
 	fun Content() = Scaffold(
@@ -113,7 +121,7 @@ fun HomeView(
 			if (navigationMode == NavigationMode.BOTTOM) {
 				BottomNavigationBar(
 					navBackStackEntry,
-					::navigate
+					{ navigateToMainView(shosetsuNavController, it) }
 				)
 			}
 		},
@@ -182,11 +190,14 @@ fun HomeView(
 			try {
 				progress.collect { backEvent ->
 					scale = lerp(1f, 0.92f, PredictiveBack.transform(backEvent.progress))
-					navigate(if (backEvent.progress > 0.25f) Destination.Library else currentTab)
+					navigateToMainView(
+						shosetsuNavController,
+						if (backEvent.progress > 0.25f) Destination.Library else currentTab
+					)
 				}
-				navigate(Destination.Library)
+				navigateToMainView(shosetsuNavController, Destination.Library)
 			} catch (_: CancellationException) {
-				navigate(currentTab)
+				navigateToMainView(shosetsuNavController, currentTab)
 			} finally {
 				animate(
 					initialValue = scale,
@@ -208,7 +219,7 @@ fun HomeView(
 				NavigationDrawerContent(
 					navBackStackEntry,
 					onNavigate = {
-						navigate(it)
+						navigateToMainView(shosetsuNavController, it)
 						scope.launch {
 							drawerState.close()
 						}
@@ -222,7 +233,9 @@ fun HomeView(
 				if (navigationMode == NavigationMode.RAIL) {
 					NavigationRail(
 						navBackStackEntry,
-						onNavigate = ::navigate
+						onNavigate = {
+							navigateToMainView(shosetsuNavController, it)
+						}
 					)
 				}
 

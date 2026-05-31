@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
@@ -107,7 +108,7 @@ fun BackupView(
 	) { uri ->
 		if (uri != null) {
 			val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-					Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+				Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 			try {
 				context.contentResolver.takePersistableUriPermission(uri, flags)
 			} catch (e: SecurityException) {
@@ -258,18 +259,22 @@ fun BackupSettingsContent(
 				SliderSettingContent(
 					title = stringResource(R.string.settings_backup_cycle_title),
 					description = stringResource(R.string.settings_backup_cycle_desc),
-					valueRange = remember { StableHolder(1..168) },
+					valueRange = remember { StableHolder(0..168) },
 					parseValue = { value ->
 						when (value) {
-							12 -> "Bi Daily"
-							24 -> "Daily"
-							48 -> "2 Days"
-							72 -> "3 Days"
-							96 -> "4 Days"
-							120 -> "5 Days"
-							144 -> "6 Days"
-							168 -> "Weekly"
-							else -> "$value Hour(s)"
+							12 -> stringResource(R.string.cycle_bidaily)
+							24 -> stringResource(R.string.cycle_daily)
+							48 -> stringResource(R.string.cycle_2_days)
+							72 -> stringResource(R.string.cycle_3_days)
+							96 -> stringResource(R.string.cycle_4_days)
+							120 -> stringResource(R.string.cycle_5_days)
+							144 -> stringResource(R.string.cycle_6_days)
+							168 -> stringResource(R.string.cycle_weekly)
+							else -> if (value == 0) {
+								stringResource(R.string.cycle_disabled)
+							} else {
+								pluralStringResource(R.plurals.cycle_hourly, value, value)
+							}
 						}
 					},
 					repo = viewModel.settingsRepo,

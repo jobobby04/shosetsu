@@ -366,7 +366,7 @@ class AddShareViewModel(
 				if (novelEntity == null)
 					novelEntity = novelRepo.loadNovels().find {
 						getContentURL(it)?.toHttpUrl()?.toUri()?.normalize() ==
-								link.url.toHttpUrl().toUri().normalize()
+							link.url.toHttpUrl().toUri().normalize()
 					}
 
 				try {

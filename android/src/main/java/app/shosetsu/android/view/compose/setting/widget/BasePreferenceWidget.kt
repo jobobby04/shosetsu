@@ -41,7 +41,8 @@ val LocalPreferenceHighlighted = compositionLocalOf(structuralEqualityPolicy()) 
 val LocalPreferenceMinHeight = compositionLocalOf(structuralEqualityPolicy()) { 56.dp }
 
 @Composable
-fun HighlightPreference(highlighted: Boolean = true, content: @Composable () -> Unit) = CompositionLocalProvider(LocalPreferenceHighlighted provides highlighted, content = content)
+fun HighlightPreference(highlighted: Boolean = true, content: @Composable () -> Unit) =
+	CompositionLocalProvider(LocalPreferenceHighlighted provides highlighted, content = content)
 
 /**
  * @param sideComponent appears to the end of the title.

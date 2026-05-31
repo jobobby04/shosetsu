@@ -81,10 +81,13 @@ class ChapterReaderWebview(
 			object : ActionMode.Callback2() {
 				override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean =
 					actionMode.onCreateActionMode(mode, menu)
+
 				override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean =
 					actionMode.onPrepareActionMode(mode, menu)
+
 				override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean =
 					actionMode.onActionItemClicked(mode, item)
+
 				override fun onDestroyActionMode(mode: ActionMode?): Unit = actionMode.onDestroyActionMode(mode)
 				override fun onGetContentRect(mode: ActionMode?, view: View?, outRect: Rect?) {
 					callback.onGetContentRect(mode, view, outRect)

@@ -76,7 +76,8 @@ fun ShosetsuTheme(
 		typography = Typography,
 		content = {
 			CompositionLocalProvider(
-				LocalTextStyle provides MaterialTheme.typography.bodySmall,
+				// this breaks relative font sizes in the browse screen
+//				LocalTextStyle provides MaterialTheme.typography.bodyLarge,
 				LocalContentColor provides MaterialTheme.colorScheme.onBackground,
 				content = content
 			)

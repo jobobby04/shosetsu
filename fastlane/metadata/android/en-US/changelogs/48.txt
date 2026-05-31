@@ -1,0 +1,14 @@
+# v2.5.0
+
+After 3 years, Shosetsu gets a new update!
+
+This update does not contain all promised features,
+but was done so that a healthy release cycle can occur again.
+
+Noteworthy features:
+- Complete rewrite of navigation
+- 3 years of effort and development by JFronny, Syer, Wasu, Andreww, Markus, Mikalai and more. Thank you all.
+- Somewhat better crash handling!
+- Performance improvements!
+- New features left and right
+- Etc

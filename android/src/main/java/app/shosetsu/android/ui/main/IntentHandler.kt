@@ -65,6 +65,11 @@ private fun handleIntentAction(
 			)
 		}
 
+		Intent.ACTION_APPLICATION_PREFERENCES -> {
+			intent.logI("Navigating to settings...")
+			onNavigate(Destination.More.Settings)
+		}
+
 		Intent.ACTION_MAIN -> {}
 		else -> {
 			intent.logW("Cannot handle this intent.")

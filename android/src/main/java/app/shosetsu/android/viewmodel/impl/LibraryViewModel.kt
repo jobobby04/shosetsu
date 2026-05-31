@@ -32,7 +32,7 @@ import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.model.local.LibraryFilterState
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
-import app.shosetsu.android.domain.usecases.ToggleNovelPinUseCase
+import app.shosetsu.android.domain.usecases.SetNovelPinUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryFilterSettingsUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIBadgeToastUseCase
@@ -81,7 +81,7 @@ class LibraryViewModel(
 	private val loadNovelUIBadgeToast: LoadNovelUIBadgeToastUseCase,
 	private val setNovelUITypeUseCase: SetNovelUITypeUseCase,
 	private val setNovelsCategoriesUseCase: SetNovelsCategoriesUseCase,
-	private val toggleNovelPin: ToggleNovelPinUseCase,
+	private val setNovelPin: SetNovelPinUseCase,
 	private val loadLibraryFilterSettings: LoadLibraryFilterSettingsUseCase,
 	private val _updateLibraryFilterState: UpdateLibraryFilterStateUseCase
 ) : ALibraryViewModel() {
@@ -194,6 +194,16 @@ class LibraryViewModel(
 	override val selectionCount: StateFlow<Int> by lazy {
 		selectedNovels.mapLatest { map ->
 			map.values.sumOf { subMap -> subMap.count { it.value } }
+		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, 0)
+	}
+
+	override val selectedPinCount: StateFlow<Int> by lazy {
+		liveData.mapLatest { ui ->
+			ui?.novels
+				.orEmpty()
+				.flatMap { it.value }
+				.distinctBy { it.id }
+				.count { it.isSelected && it.pinned }
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, 0)
 	}
 
@@ -752,7 +762,7 @@ class LibraryViewModel(
 		activeCategory.value = category
 	}
 
-	override fun togglePinSelected() {
+	override fun pinSelected() {
 		launchIO {
 			val selected = liveData.value?.novels
 				.orEmpty()
@@ -761,7 +771,20 @@ class LibraryViewModel(
 				.filter { it.isSelected }
 
 			clearSelected()
-			toggleNovelPin(selected)
+			setNovelPin(selected, true)
+		}
+	}
+
+	override fun unpinSelected() {
+		launchIO {
+			val selected = liveData.value?.novels
+				.orEmpty()
+				.flatMap { it.value }
+				.distinctBy { it.id }
+				.filter { it.isSelected }
+
+			clearSelected()
+			setNovelPin(selected, false)
 		}
 	}
 

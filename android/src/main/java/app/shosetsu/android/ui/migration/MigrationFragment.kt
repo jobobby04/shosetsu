@@ -198,11 +198,11 @@ fun MigrationExtensionItemContent(
 		modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
 		shape = RoundedCornerShape(16.dp),
 		border =
-		if (item.isSelected) {
-			BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-		} else {
-			null
-		},
+			if (item.isSelected) {
+				BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+			} else {
+				null
+			},
 
 		onClick = { onClick(item) },
 	) {
@@ -304,11 +304,11 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 	Card(
 		onClick = { onClick(item) },
 		border =
-		if (item.isSelected) {
-			BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-		} else {
-			null
-		},
+			if (item.isSelected) {
+				BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+			} else {
+				null
+			},
 		modifier = Modifier.aspectRatio(.70f)
 	) {
 		val blackTrans = colorResource(id = R.color.black_trans)

@@ -1,5 +1,7 @@
 package app.shosetsu.android.domain.model.local
 
+import app.shosetsu.android.common.enums.ReadingStatus
+
 /*
  * This file is part of shosetsu.
  *
@@ -37,4 +39,5 @@ data class UpdateCompleteEntity(
 	val chapterName: String,
 	val novelName: String,
 	val novelImageURL: String,
+	val readingStatus: ReadingStatus,
 )

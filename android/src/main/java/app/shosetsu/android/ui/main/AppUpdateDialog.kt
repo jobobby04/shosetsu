@@ -60,7 +60,7 @@ fun AppUpdateDialog(
 		text = {
 			Text(
 				"${update.version}\t${update.versionCode}\n" +
-						update.notes.joinToString("\n")
+					update.notes.joinToString("\n")
 			)
 		}
 	)

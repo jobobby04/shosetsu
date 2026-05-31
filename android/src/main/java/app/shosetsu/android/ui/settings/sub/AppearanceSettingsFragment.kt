@@ -130,7 +130,9 @@ fun AppearanceSettingsContent(
 				val context = LocalContext.current
 				val langs = remember { getLangs(context) }
 				var currentLanguage by remember {
-					mutableStateOf(AppCompatDelegate.getApplicationLocales().get(0)?.toLanguage() ?: context.defaultLanguage)
+					mutableStateOf(
+						AppCompatDelegate.getApplicationLocales().get(0)?.toLanguage() ?: context.defaultLanguage
+					)
 				}
 
 				LaunchedEffect(currentLanguage) {
@@ -235,8 +237,10 @@ private fun getLangs(context: Context): ImmutableList<Language> {
 
 private fun Locale.toLanguage(): Language =
 	Language(toLanguageTag(), displayName, getDisplayName(this))
-private val Context.defaultLanguage: Language get() =
-	Language("", getString(R.string.app_language_default), null)
+
+private val Context.defaultLanguage: Language
+	get() =
+		Language("", getString(R.string.app_language_default), null)
 
 private data class Language(
 	val langTag: String,

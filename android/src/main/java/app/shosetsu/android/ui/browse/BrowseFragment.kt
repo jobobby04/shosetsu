@@ -59,7 +59,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
+import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -210,21 +210,21 @@ fun PreviewBrowseContent() {
 		query = "",
 		onSetQuery = {},
 		entities =
-		List(10) {
-			BrowseExtensionUI(
-				it,
-				"Fake a b c",
-				"",
-				"en",
-				installOptions = null,
-				isInstalled = true,
-				installedVersion = Version(1, 1, 1),
-				installedRepo = 1,
-				isUpdateAvailable = false,
-				updateVersion = Version(1, 2, 1),
-				isInstalling = false
-			)
-		}.toImmutableList(),
+			List(10) {
+				BrowseExtensionUI(
+					it,
+					"Fake a b c",
+					"",
+					"en",
+					installOptions = null,
+					isInstalled = true,
+					installedVersion = Version(1, 1, 1),
+					installedRepo = 1,
+					isUpdateAvailable = false,
+					updateVersion = Version(1, 2, 1),
+					isInstalling = false
+				)
+			}.toImmutableList(),
 		{},
 		{},
 		{ _, _ -> },
@@ -265,7 +265,7 @@ fun BrowseContent(
 				title = {
 					Text(stringResource(R.string.browse))
 				},
-				scrollBehavior = enterAlwaysScrollBehavior(),
+				scrollBehavior = pinnedScrollBehavior(),
 				actions = {
 					SearchAction(
 						query = query,
@@ -391,7 +391,8 @@ fun BrowseExtensionContent(
 	cancelInstall: () -> Unit
 ) {
 	Column(
-		Modifier.clickable(onClick = openCatalogue)
+		Modifier
+			.clickable(onClick = openCatalogue)
 			.padding(horizontal = 8.dp)
 	) {
 		Row(

@@ -1,11 +1,13 @@
 package app.shosetsu.android.providers.network
 
 import android.annotation.SuppressLint
+import android.content.Context
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logW
+import app.shosetsu.android.common.utils.CloudflareInterceptor
 import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -47,7 +49,7 @@ import java.util.logging.Logger
  * 04 / 05 / 2020
  */
 
-fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
+fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepository): OkHttpClient {
 
 	val useProxy = runBlocking {
 		iSettingsRepository.getBoolean(SettingKey.UseProxy)
@@ -57,7 +59,17 @@ fun createOkHttpClient(iSettingsRepository: ISettingsRepository): OkHttpClient {
 		.cookieJar(CookieJarSync)
 		.addInterceptor { chain ->
 			return@addInterceptor slowRequest(chain, chain.request())
-		}.addNetworkInterceptor {
+		}
+		.addInterceptor(
+			CloudflareInterceptor(
+				context = context,
+				cookieManager = CookieJarSync,
+				defaultUserAgentProvider = {
+					runBlocking { iSettingsRepository.getString(SettingKey.UserAgent) }
+				},
+			)
+		)
+		.addNetworkInterceptor {
 			val request = it.request().newBuilder()
 			ShosetsuSharedLib.shosetsuHeaders.forEach { (name, value) ->
 				request.header(name, value)

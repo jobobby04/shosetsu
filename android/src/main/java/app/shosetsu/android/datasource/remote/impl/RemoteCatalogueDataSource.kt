@@ -37,7 +37,7 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 		return if (!listing.isIncrementing && page > ext.startIndex) {
 			emptyList()
 		} else try {
-            listing.getListing(data, page).toList()
+			listing.getListing(data, page).toList()
 		} catch (e: LuaError) {
 			throw e.cause ?: e
 		}

@@ -29,18 +29,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Pause
-import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -54,18 +49,13 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarDefaults.enterAlwaysScrollBehavior
-import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -81,15 +71,14 @@ import app.shosetsu.android.common.enums.DownloadStatus.PAUSED
 import app.shosetsu.android.common.enums.DownloadStatus.PENDING
 import app.shosetsu.android.common.enums.DownloadStatus.WAITING
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.ui.library.DeselectAllButton
-import app.shosetsu.android.ui.library.InverseSelectionButton
-import app.shosetsu.android.ui.library.SelectAllButton
-import app.shosetsu.android.ui.library.SelectBetweenButton
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
+import app.shosetsu.android.view.compose.MoreIconButton
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SelectableBox
+import app.shosetsu.android.view.compose.SelectionBar
+import app.shosetsu.android.view.compose.SelectionTopAppBar
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
@@ -215,60 +204,47 @@ fun DownloadsContent(
 					.fillMaxSize()
 					.padding(padding)
 			) {
-				val state = rememberLazyListState()
-
-				LazyColumnScrollbar(listState = state) {
-					LazyColumn(
-						modifier = Modifier.fillMaxSize(),
-						contentPadding = PaddingValues(bottom = 140.dp),
-						state = state
-					) {
-						items(items, key = { it.chapterID }) {
-							DownloadContent(
-								it,
-								onClick = {
-									if (selectedCount > 0)
-										toggleSelection(it)
-								},
-								onLongClick = {
+				LazyColumnScrollbar(contentPadding = PaddingValues(bottom = 140.dp)) {
+					items(items, key = { it.chapterID }) {
+						DownloadContent(
+							it,
+							onClick = {
+								if (selectedCount > 0)
 									toggleSelection(it)
-								}
-							)
-						}
+							},
+							onLongClick = {
+								toggleSelection(it)
+							}
+						)
 					}
 				}
 
 				if (selectedCount > 0) {
-					Card(
-						modifier = Modifier
-							.align(BiasAlignment(0f, 0.7f))
-					) {
-						Row {
-							SimpleIconButton(
-								Icons.Outlined.Pause,
-								stringResource(R.string.pause),
-								onClick = pauseSelection,
-								enabled = selectedDownloadState.pauseVisible
-							)
-							SimpleIconButton(
-								Icons.Default.PlayArrow,
-								stringResource(R.string.start),
-								onClick = startSelection,
-								enabled = selectedDownloadState.startVisible
-							)
-							SimpleIconButton(
-								Icons.Default.Refresh,
-								stringResource(R.string.restart),
-								onClick = startFailedSelection,
-								enabled = selectedDownloadState.restartVisible
-							)
-							SimpleIconButton(
-								Icons.Default.Delete,
-								stringResource(R.string.delete),
-								onClick = deleteSelected,
-								enabled = selectedDownloadState.deleteVisible
-							)
-						}
+					SelectionBar {
+						SimpleIconButton(
+							Icons.Outlined.Pause,
+							stringResource(R.string.pause),
+							onClick = pauseSelection,
+							enabled = selectedDownloadState.pauseVisible
+						)
+						SimpleIconButton(
+							Icons.Default.PlayArrow,
+							stringResource(R.string.start),
+							onClick = startSelection,
+							enabled = selectedDownloadState.startVisible
+						)
+						SimpleIconButton(
+							Icons.Default.Refresh,
+							stringResource(R.string.restart),
+							onClick = startFailedSelection,
+							enabled = selectedDownloadState.restartVisible
+						)
+						SimpleIconButton(
+							Icons.Default.Delete,
+							stringResource(R.string.delete),
+							onClick = deleteSelected,
+							enabled = selectedDownloadState.deleteVisible
+						)
 					}
 				}
 			}
@@ -366,23 +342,16 @@ fun DownloadsAppBar(
 		Text(stringResource(R.string.downloads))
 	}
 
-	val behavior = enterAlwaysScrollBehavior()
+	val behavior = pinnedScrollBehavior()
 
 	if (selectedCount > 0) {
-		TopAppBar(
-			title = { Text("$selectedCount") },
+		SelectionTopAppBar(
 			scrollBehavior = behavior,
-			actions = {
-				InverseSelectionButton(onInverseSelection)
-				SelectAllButton(onSelectAll)
-				SelectBetweenButton(onSelectBetween)
-			},
-			colors = TopAppBarDefaults.topAppBarColors(
-				containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-			),
-			navigationIcon = {
-				DeselectAllButton(onClick = onDeselectAll)
-			}
+			selectedCount = selectedCount,
+			onSelectAll = onSelectAll,
+			onInverseSelection = onInverseSelection,
+			onSelectBetween = onSelectBetween,
+			onDeselectAll = onDeselectAll,
 		)
 	} else {
 		TopAppBar(
@@ -402,38 +371,20 @@ fun DownloadsAppBar(
 fun DownloadsMoreOption(
 	onDeleteAll: () -> Unit,
 	onSetAllPending: () -> Unit
-) {
-	var showDropDown by remember { mutableStateOf(false) }
+) = MoreIconButton {
+	DropdownMenuItem(
+		text = {
+			Text(stringResource(R.string.fragment_downloads_set_all_pending_title))
+		},
+		onClick = onSetAllPending
+	)
 
-	Box {
-		SimpleIconButton(
-			Icons.Default.MoreVert, stringResource(R.string.more),
-			onClick = {
-				showDropDown = true
-			}
-		)
-
-		DropdownMenu(
-			showDropDown,
-			onDismissRequest = {
-				showDropDown = false
-			}
-		) {
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.fragment_downloads_set_all_pending_title))
-				},
-				onClick = onSetAllPending
-			)
-
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.fragment_downloads_delete_all_title))
-				},
-				onClick = onDeleteAll
-			)
-		}
-	}
+	DropdownMenuItem(
+		text = {
+			Text(stringResource(R.string.fragment_downloads_delete_all_title))
+		},
+		onClick = onDeleteAll
+	)
 }
 
 @Preview
@@ -495,7 +446,7 @@ fun DownloadContent(
 				if (status == DOWNLOADING || status == WAITING) {
 					LinearProgressIndicator(modifier = Modifier.fillMaxWidth(.7f))
 				} else {
-					LinearProgressIndicator(0.0f, modifier = Modifier.fillMaxWidth(.7f))
+					LinearProgressIndicator(progress = { 0.0f }, modifier = Modifier.fillMaxWidth(.7f))
 				}
 
 				Text(

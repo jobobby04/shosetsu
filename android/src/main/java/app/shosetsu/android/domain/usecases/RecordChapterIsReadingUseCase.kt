@@ -35,6 +35,7 @@ class RecordChapterIsReadingUseCase(
 	private val iChapterHistoryRepository: ChapterHistoryRepository,
 	private val iChapterRepository: IChaptersRepository
 ) {
+	@Throws(SQLiteException::class)
 	suspend operator fun invoke(chapter: ChapterEntity) {
 		iChapterHistoryRepository.markChapterAsReading(chapter)
 	}
@@ -43,6 +44,8 @@ class RecordChapterIsReadingUseCase(
 	suspend operator fun invoke(readerChapter: ReaderChapterEntity) =
 		iChapterRepository.getChapter(readerChapter.id)?.let { invoke(it) }
 
+
+	@Throws(SQLiteException::class)
 	suspend operator fun invoke(chapter: ChapterUI) {
 		invoke(chapter.convertTo())
 	}

@@ -51,7 +51,7 @@ fun NumberPickerSettingContent(
 	TextPreferenceWidget(
 		modifier = modifier,
 		title = title,
-		subtitle =  description,
+		subtitle = description,
 		widget = {
 			Text("$value", color = MaterialTheme.colorScheme.tertiary)
 		},

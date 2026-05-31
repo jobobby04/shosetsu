@@ -24,6 +24,7 @@ import app.shosetsu.android.ui.main.Destination.More.Settings
 import app.shosetsu.android.ui.main.Destination.Novel
 import app.shosetsu.android.ui.main.Destination.Search
 import app.shosetsu.android.ui.main.Destination.Updates
+import app.shosetsu.android.ui.main.navigateToMainView
 import app.shosetsu.android.ui.more.MoreView
 import app.shosetsu.android.ui.updates.UpdatesView
 
@@ -39,7 +40,10 @@ fun NavGraphBuilder.homeGraph(
 			onMigrate = {
 				navController.navigate(Migration(it))
 			},
-			drawerIcon = drawerIcon
+			drawerIcon = drawerIcon,
+			onGoToBrowse = {
+				navigateToMainView(navController, Browse)
+			}
 		)
 	}
 
@@ -81,6 +85,9 @@ fun NavGraphBuilder.homeGraph(
 			},
 			onNavToBackup = {
 				navController.navigate(Settings.Backup())
+			},
+			onNavToRepositories = {
+				navController.navigate(Repositories)
 			},
 			onNavToCategories = {
 				navController.navigate(Categories)

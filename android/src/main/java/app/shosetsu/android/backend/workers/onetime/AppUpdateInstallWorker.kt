@@ -165,11 +165,13 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 		notify(R.string.notification_app_update_install) {
 			setNotOngoing()
 			removeProgress()
-			addAction(actionBuilder(
-				Icons.Default.SystemUpdateAlt,
-				applicationContext.getString(R.string.install),
-				installApkPendingActivity(applicationContext, uri)
-			).build())
+			addAction(
+				actionBuilder(
+					Icons.Default.SystemUpdateAlt,
+					applicationContext.getString(R.string.install),
+					installApkPendingActivity(applicationContext, uri)
+				).build()
+			)
 		}
 
 		return Result.success()

@@ -36,10 +36,10 @@ fun asHtml(
 		</header>
 		<body>
 			${
-				passage.split("\n")
-					.map { HtmlEscapers.htmlEscaper().escape(it) }
-					.joinToString(separator = separator) { "<p>$it</p>" }
-			}
+		passage.split("\n")
+			.map { HtmlEscapers.htmlEscaper().escape(it) }
+			.joinToString(separator = separator) { "<p>$it</p>" }
+	}
 		</body>
-	</html> 
+	</html>
 	"""

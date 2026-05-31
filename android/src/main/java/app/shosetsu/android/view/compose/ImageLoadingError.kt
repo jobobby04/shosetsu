@@ -69,10 +69,13 @@ fun ImageLoadingError(text: String?, modifier: Modifier = Modifier) {
 		return
 	}
 	val hue = remember(text) { (0..360).random(Random(text.hashCode())).toFloat() }
-	fun gradient(saturation: Float, value: Float) = Brush.horizontalGradient(listOf(
-		Color.hsv(hue, saturation, value),
-		Color.hsv((hue + 35) % 360, saturation, value)
-	))
+	fun gradient(saturation: Float, value: Float) = Brush.horizontalGradient(
+		listOf(
+			Color.hsv(hue, saturation, value),
+			Color.hsv((hue + 35) % 360, saturation, value)
+		)
+	)
+
 	val foreground = remember(hue) { gradient(0.7f, 0.7f) }
 	val background = remember(hue) { gradient(0.5f, 0.1f) }
 	val density = LocalDensity.current

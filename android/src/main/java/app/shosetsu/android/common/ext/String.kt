@@ -34,7 +34,7 @@ import java.security.NoSuchAlgorithmException
  * Deserialize a string to the object
  *
  * @return Object from string
- * @throws IOException			exception
+ * @throws IOException            exception
  * @throws ClassNotFoundException exception
  */
 @Throws(IOException::class, ClassNotFoundException::class)

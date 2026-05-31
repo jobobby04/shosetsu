@@ -41,6 +41,7 @@ class ChapterReaderAccompanistWebViewClient(
 	private val getChapterHTMLStyle: () -> Flow<ShosetsuStyle>,
 ) : AccompanistWebViewClient() {
 	private var lastJob: Job? = null
+
 	/**
 	 * Block redirects by clicking links
 	 *

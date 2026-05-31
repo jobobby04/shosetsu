@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="black_trans">#BF000000</color>
+	<color name="black_trans">#BF000000</color>
 
-    <color name="colorPrimary">#A80000</color>
+	<color name="colorPrimary">#A80000</color>
 
-    <color name="colorAccent">#D50000</color>
+	<color name="colorAccent">#D50000</color>
 
-    <color name="wheat">#F5DEB3</color>
+	<color name="wheat">#F5DEB3</color>
 
-    <color name="grey_B_10">#191919</color>
-    <color name="grey_B_15">#262626</color>
+	<color name="grey_B_10">#191919</color>
+	<color name="grey_B_15">#262626</color>
 
 </resources>

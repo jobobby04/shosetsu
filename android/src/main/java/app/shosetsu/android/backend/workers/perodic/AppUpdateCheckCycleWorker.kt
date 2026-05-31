@@ -59,24 +59,30 @@ class AppUpdateCheckCycleWorker(
 			WorkInfo.State.ENQUEUED -> {
 				logI("AppUpdaterCheck is waiting to check, ignoring")
 			}
+
 			WorkInfo.State.RUNNING -> {
 				logI("AppUpdaterCheck is running, ignoring")
 			}
+
 			WorkInfo.State.SUCCEEDED -> {
 				logI("AppUpdaterCheck has completed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.FAILED -> {
 				logI("Previous AppUpdaterCheck has failed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.BLOCKED -> {
 				logI("Previous AppUpdaterCheck is blocked, ignoring")
 			}
+
 			WorkInfo.State.CANCELLED -> {
 				logI("Previous AppUpdaterCheck was cancelled, starting again")
 				manager.start()
 			}
+
 			null -> {
 				logI("Previous AppUpdaterCheck is null, starting again")
 				manager.start()

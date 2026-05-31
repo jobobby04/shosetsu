@@ -7,6 +7,7 @@ data class ShosetsuStyle(private val shoCSS: String, private val useCSS: String)
 		inject(document, SHOSETSU_STYLE, shoCSS)
 		inject(document, USER_STYLE, useCSS)
 	}
+
 	fun toJs() = inject(SHOSETSU_STYLE, shoCSS) + inject(USER_STYLE, useCSS)
 
 	companion object {
@@ -17,7 +18,7 @@ data class ShosetsuStyle(private val shoCSS: String, private val useCSS: String)
 			.replace("\\", "\\\\")
 			.replace("`", "\\`")
 			.replace("\${", "\\\${") + "`"
-		
+
 		private fun inject(id: String, style: String) = """
 			var styleElement = document.getElementById(${id.jsString()});
 			if (styleElement) {
@@ -31,6 +32,7 @@ data class ShosetsuStyle(private val shoCSS: String, private val useCSS: String)
 				document.head.appendChild(styleElement);
 			}
 		""".trimIndent()
+
 		private fun inject(document: Document, id: String, style: String) {
 			val styleElement = document.getElementById(id) ?: document.createElement("style").apply {
 				id(id)

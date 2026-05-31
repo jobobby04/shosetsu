@@ -130,7 +130,7 @@ fun ChapterReaderPage(
 					ttsProgress = ttsProgress,
 					getChapterHTMLStyle = getChapterHTMLStyle,
 					onSearchQuery = onSearchQuery,
-                    openUri = openUri,
+					openUri = openUri,
 				)
 			}
 		}

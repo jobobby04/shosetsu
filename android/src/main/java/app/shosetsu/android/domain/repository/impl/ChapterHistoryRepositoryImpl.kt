@@ -38,12 +38,16 @@ class ChapterHistoryRepositoryImpl(
 ) : ChapterHistoryRepository {
 	@Throws(SQLiteException::class)
 	override suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long) {
-		chapterHistoryDatabase.markChapterAsRead(chapter, time)
+		onIO {
+			chapterHistoryDatabase.markChapterAsRead(chapter, time)
+		}
 	}
 
 	@Throws(SQLiteException::class)
 	override suspend fun markChapterAsReading(chapter: ChapterEntity, time: Long) {
-		chapterHistoryDatabase.markChapterAsReading(chapter, time)
+		onIO {
+			chapterHistoryDatabase.markChapterAsReading(chapter, time)
+		}
 	}
 
 	@Throws(SQLiteException::class)

@@ -319,37 +319,31 @@ fun ListingsContent(
 ) {
 	Crossfade(items, label = "listing_items") {
 		key(it) {
-			val listState = rememberLazyListState()
-			LazyColumnScrollbar(listState = listState) {
-				LazyColumn(
-					state = listState,
-					modifier = Modifier.fillMaxSize()
-				) {
-					items(items) {
-						Row(
-							Modifier
-								.fillMaxWidth()
-								.clickable { onSelectListing(it) }
-								.padding(horizontal = 8.dp, vertical = 16.dp),
-							verticalAlignment = Alignment.CenterVertically
-						) {
-							when (it) {
-								is IExtension.Listing.Item -> {
-									Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
-									Spacer(modifier = Modifier.width(16.dp))
-									Text(
-										text = it.name,
-										style = MaterialTheme.typography.bodyLarge
-									)
-								}
-								is IExtension.Listing.List -> {
-									Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "list")
-									Spacer(modifier = Modifier.width(16.dp))
-									Text(
-										text = it.name,
-										style = MaterialTheme.typography.bodyLarge
-									)
-								}
+			LazyColumnScrollbar(modifier = Modifier.fillMaxSize()) {
+				items(items) {
+					Row(
+						Modifier
+							.fillMaxWidth()
+							.clickable { onSelectListing(it) }
+							.padding(horizontal = 8.dp, vertical = 16.dp),
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						when (it) {
+							is IExtension.Listing.Item -> {
+								Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
+								Spacer(modifier = Modifier.width(16.dp))
+								Text(
+									text = it.name,
+									style = MaterialTheme.typography.bodyLarge
+								)
+							}
+							is IExtension.Listing.List -> {
+								Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "list")
+								Spacer(modifier = Modifier.width(16.dp))
+								Text(
+									text = it.name,
+									style = MaterialTheme.typography.bodyLarge
+								)
 							}
 						}
 					}
@@ -365,7 +359,7 @@ fun PreviewCatalogContent() {
 	var listingSelectionData: StableHolder<IExtension.Listing> by
 	remember {
 		mutableStateOf(
-            StableHolder(MutableLuaListingItem())
+			StableHolder(MutableLuaListingItem())
 		)
 	}
 
@@ -389,7 +383,7 @@ fun PreviewCatalogContent() {
 		false,
 		remember { SnackbarHostState() },
 		listingSelectionData,
-        listOf<IExtension.Listing>().toImmutableList(),
+		listOf<IExtension.Listing>().toImmutableList(),
 		{
 			listingSelectionData = StableHolder(it)
 		}

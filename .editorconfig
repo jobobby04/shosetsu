@@ -1,0 +1,15 @@
+root = true
+
+[*]
+charset = utf-8
+indent_size = 4
+indent_style = tab
+trim_trailing_whitespace = true
+
+[*.yml]
+indent_size = 2
+indent_style = space
+
+# noinspection EditorConfigKeyCorrectness
+[*.{kt,kts}]
+max_line_length = 120

@@ -5,10 +5,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.viewModelScope
 import app.shosetsu.android.R
 import app.shosetsu.android.common.OfflineException
-import app.shosetsu.android.common.ext.get
 import app.shosetsu.android.common.ext.launchIO
-import app.shosetsu.android.common.ext.set
 import app.shosetsu.android.common.utils.share.toURL
+import app.shosetsu.android.datasource.local.memory.base.ICache
 import app.shosetsu.android.domain.usecases.AddRepositoryUseCase
 import app.shosetsu.android.domain.usecases.ForceInsertRepositoryUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
@@ -20,8 +19,6 @@ import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
 import app.shosetsu.lib.share.RepositoryLink
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -34,7 +31,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import qrcode.QRCode
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.minutes
 
 /*
  * This file is part of Shosetsu.
@@ -64,7 +61,8 @@ class RepositoryViewModel(
 	private val updateRepositoryUseCase: UpdateRepositoryUseCase,
 	private val startRepositoryUpdateManagerUseCase: StartRepositoryUpdateManagerUseCase,
 	private val forceInsertRepositoryUseCase: ForceInsertRepositoryUseCase,
-	private val isOnlineUseCase: IsOnlineUseCase
+	isOnlineUseCase: IsOnlineUseCase,
+	cacheFactory: ICache.Factory,
 ) : ARepositoryViewModel() {
 
 	override val liveData: StateFlow<ImmutableList<RepositoryUI>> by lazy {
@@ -110,11 +108,7 @@ class RepositoryViewModel(
 		isAddDialogVisible.value = false
 	}
 
-	private val qrCodeMap: Cache<Int, QRCodeData> =
-		CacheBuilder
-			.newBuilder()
-			.expireAfterAccess(1, TimeUnit.MINUTES)
-			.build()
+	private val qrCodeMap = cacheFactory.create<Int, QRCodeData>(1.minutes, maxSize = 20)
 
 	override val currentShare = MutableStateFlow<RepositoryUI?>(null)
 

@@ -121,9 +121,9 @@ class DownloadsViewModel(
 				},
 				deleteVisible = selectedDownloads.any {
 					it.status == DownloadStatus.PAUSED ||
-							it.status == DownloadStatus.PENDING ||
-							it.status == DownloadStatus.ERROR ||
-							(isDownloadPaused.first() && it.status == DownloadStatus.DOWNLOADING)
+						it.status == DownloadStatus.PENDING ||
+						it.status == DownloadStatus.ERROR ||
+						(isDownloadPaused.first() && it.status == DownloadStatus.DOWNLOADING)
 				}
 			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, SelectedDownloadsState())

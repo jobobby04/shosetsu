@@ -32,10 +32,10 @@ import app.shosetsu.android.domain.repository.base.INovelPinsRepository
 class NovelPinsRepository(
 	private val db: IDBNovelPinsDataSource
 ) : INovelPinsRepository {
-	override suspend fun togglePin(ids: List<Int>) {
+	override suspend fun setPinned(ids: List<Int>, pinned: Boolean) {
 		try {
 			onIO {
-				db.togglePin(ids)
+				db.setPinned(ids, pinned)
 			}
 		} catch (ignored: SQLiteException) {
 			ignored.printStackTrace()

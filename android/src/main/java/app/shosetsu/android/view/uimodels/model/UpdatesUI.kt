@@ -2,6 +2,7 @@ package app.shosetsu.android.view.uimodels.model
 
 import android.text.format.DateFormat
 import androidx.compose.runtime.Immutable
+import app.shosetsu.android.common.enums.ReadingStatus
 import java.util.*
 
 /*
@@ -28,6 +29,7 @@ data class UpdatesUI(
 	val novelID: Int,
 	val time: Long,
 	val chapterName: String,
+	val readingStatus: ReadingStatus,
 	val novelName: String,
 	val novelImageURL: String,
 ) {

@@ -58,24 +58,30 @@ class BackupCycleWorker(
 			WorkInfo.State.ENQUEUED -> {
 				logI("BackupWorker is waiting to backup, ignoring")
 			}
+
 			WorkInfo.State.RUNNING -> {
 				logI("BackupWorker is running, ignoring")
 			}
+
 			WorkInfo.State.SUCCEEDED -> {
 				logI("BackupWorker has completed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.FAILED -> {
 				logI("Previous BackupWorker has failed, starting again")
 				manager.start()
 			}
+
 			WorkInfo.State.BLOCKED -> {
 				logI("Previous BackupWorker is blocked, ignoring")
 			}
+
 			WorkInfo.State.CANCELLED -> {
 				logI("Previous BackupWorker was cancelled, starting again")
 				manager.start()
 			}
+
 			null -> {
 				logI("Previous BackupWorker is null, starting again")
 				manager.start()
@@ -129,6 +135,10 @@ class BackupCycleWorker(
 		override fun start(data: Data) {
 			launchIO {
 				logI(LogConstants.SERVICE_NEW)
+				if (backupCycle() == 0L) {
+					logI("Backup cycle is disabled")
+					return@launchIO
+				}
 				workerManager.enqueueUniquePeriodicWork(
 					BACKUP_CYCLE_WORK_ID,
 					ExistingPeriodicWorkPolicy.UPDATE,

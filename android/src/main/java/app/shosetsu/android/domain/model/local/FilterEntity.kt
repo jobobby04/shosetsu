@@ -113,18 +113,21 @@ sealed class FilterEntity {
 						else -> TriStateState.IGNORED
 					}
 				)
+
 				is Filter.Dropdown -> Dropdown(
 					filter.id,
 					filter.name,
 					filter.choices.toList(),
 					filter.state
 				)
+
 				is Filter.RadioGroup -> RadioGroup(
 					filter.id,
 					filter.name,
 					filter.choices.toList(),
 					filter.state
 				)
+
 				is Filter.FList -> FList(filter.name, filter.filters.map { fromFilter(it) })
 				is Filter.Group<*> -> Group(filter.name, filter.filters.map { fromFilter(it) })
 				is Filter.Password -> Text(filter.id, filter.name, filter.state)

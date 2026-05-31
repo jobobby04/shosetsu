@@ -54,7 +54,7 @@ class UpdatesViewModel(
 ) : AUpdatesViewModel() {
 	override val liveData: StateFlow<ImmutableMap<DateTime, List<UpdatesUI>>> by lazy {
 		updatesRepository.getCompleteUpdatesFlow().mapLatest { list ->
-			list.map { (chapterID, novelID, time, chapterName, novelName, novelImageURL) ->
+			list.map { (chapterID, novelID, time, chapterName, novelName, novelImageURL, readingStatus) ->
 				UpdatesUI(
 					chapterID = chapterID,
 					novelID = novelID,
@@ -62,6 +62,7 @@ class UpdatesViewModel(
 					chapterName = chapterName,
 					novelName = novelName,
 					novelImageURL = novelImageURL,
+					readingStatus = readingStatus,
 				)
 			}
 				.ifEmpty { emptyList() }

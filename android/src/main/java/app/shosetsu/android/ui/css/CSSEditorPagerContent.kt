@@ -67,7 +67,9 @@ fun CSSEditorPagerContent(
 	) {
 		HorizontalPager(
 			state = pagerState,
-			modifier = Modifier.fillMaxSize().padding(it),
+			modifier = Modifier
+				.fillMaxSize()
+				.padding(it),
 			userScrollEnabled = false
 		) { page ->
 			when (page) {

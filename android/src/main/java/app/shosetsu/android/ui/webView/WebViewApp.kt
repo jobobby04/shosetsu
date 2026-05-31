@@ -10,19 +10,22 @@ import android.webkit.WebView
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,7 +47,9 @@ import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_URL
 import app.shosetsu.android.common.ext.openInBrowser
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.common.utils.webview.setDefaultSettings
 import app.shosetsu.android.ui.theme.ShosetsuTheme
+import app.shosetsu.android.view.compose.MoreIconButton
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.WebViewViewModel
 import com.google.accompanist.web.AccompanistWebViewClient
@@ -169,18 +174,29 @@ fun WebViewScreen(
 			Box {
 				TopAppBar(
 					title = {
-						Text(
-							text = state.pageTitle ?: stringResource(R.string.app_name),
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis
-						)
+						Column {
+							Text(
+								text = state.pageTitle ?: stringResource(R.string.app_name),
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis
+							)
+							Text(
+								text = currentUrl,
+								style = MaterialTheme.typography.bodyMedium,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								modifier = Modifier.basicMarquee(
+									repeatDelayMillis = 2_000,
+								),
+							)
+						}
 					},
 					navigationIcon = {
 						SimpleIconButton(Icons.Default.Close, description = null, onClick = onUp)
 					},
 					actions = {
 						SimpleIconButton(
-							Icons.Default.ArrowBack,
+							Icons.AutoMirrored.Filled.ArrowBack,
 							description = stringResource(R.string.action_webview_back),
 							onClick = {
 								if (navigator.canGoBack) {
@@ -190,7 +206,7 @@ fun WebViewScreen(
 							enabled = navigator.canGoBack,
 						)
 						SimpleIconButton(
-							Icons.Default.ArrowForward,
+							Icons.AutoMirrored.Filled.ArrowForward,
 							description = stringResource(R.string.action_webview_forward),
 							onClick = {
 								if (navigator.canGoForward) {
@@ -199,35 +215,33 @@ fun WebViewScreen(
 							},
 							enabled = navigator.canGoForward,
 						)
-						var overflow by remember { mutableStateOf(false) }
-						SimpleIconButton(
-							Icons.Default.MoreVert,
-							description = stringResource(R.string.more),
-							onClick = { overflow = !overflow }
-						)
-						DropdownMenu(expanded = overflow, onDismissRequest = { overflow = false }) {
-							DropdownMenuItem(onClick = { navigator.reload(); overflow = false },
+						MoreIconButton { onDismissRequest ->
+							DropdownMenuItem(
+								onClick = { navigator.reload(); onDismissRequest() },
 								text = {
 									Text(text = stringResource(R.string.action_webview_refresh))
 								}
 							)
-							DropdownMenuItem(onClick = {
-								onShare(currentUrl); overflow = false
-							},
+							DropdownMenuItem(
+								onClick = {
+									onShare(currentUrl); onDismissRequest()
+								},
 								text = {
 									Text(text = stringResource(R.string.share))
 								}
 							)
-							DropdownMenuItem(onClick = {
-								onOpenInBrowser(currentUrl); overflow = false
-							},
+							DropdownMenuItem(
+								onClick = {
+									onOpenInBrowser(currentUrl); onDismissRequest()
+								},
 								text = {
 									Text(text = stringResource(R.string.open_in_browser))
 								}
 							)
-							DropdownMenuItem(onClick = {
-								onClearCookies(currentUrl); overflow = false
-							},
+							DropdownMenuItem(
+								onClick = {
+									onClearCookies(currentUrl); onDismissRequest()
+								},
 								text = {
 									Text(text = stringResource(R.string.action_webview_clear_cookies))
 								}
@@ -244,7 +258,7 @@ fun WebViewScreen(
 
 					is LoadingState.Loading -> {
 						val animatedProgress by animateFloatAsState(
-							(loadingState as? LoadingState.Loading)?.progress ?: 1f,
+							loadingState.progress,
 							animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
 						)
 						LinearProgressIndicator(
@@ -290,12 +304,10 @@ fun WebViewScreen(
 				.padding(contentPadding),
 			navigator = navigator,
 			onCreated = { webView ->
+				webView.setDefaultSettings()
 				webView.settings.apply {
 					userAgentString = userAgent
-					javaScriptEnabled = true
 				}
-
-				CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true)
 
 				// Debug mode (chrome://inspect/#devices)
 				if (BuildConfig.DEBUG &&

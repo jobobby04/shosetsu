@@ -12,19 +12,19 @@ import androidx.compose.ui.unit.Density;
  * This is significantly easier doing the grunt work for a composition to use rememberVectorPainter.
  */
 public class VectorPainterUtil {
-    public static VectorPainter createVectorPainterFromImageVector(Density density, ImageVector imageVector, GroupComponent root) {
-        return VectorPainterKt.createVectorPainterFromImageVector(
-                density,
-                imageVector,
-                root
-        );
-    }
+	public static VectorPainter createVectorPainterFromImageVector(Density density, ImageVector imageVector, GroupComponent root) {
+		return VectorPainterKt.createVectorPainterFromImageVector(
+			density,
+			imageVector,
+			root
+		);
+	}
 
-    public static GroupComponent createGroupComponent(GroupComponent self, VectorGroup currentGroup) {
-        return VectorPainterKt.createGroupComponent(self, currentGroup);
-    }
+	public static GroupComponent createGroupComponent(GroupComponent self, VectorGroup currentGroup) {
+		return VectorPainterKt.createGroupComponent(self, currentGroup);
+	}
 
-    public static GroupComponent createGroupComponent() {
-        return new GroupComponent();
-    }
+	public static GroupComponent createGroupComponent() {
+		return new GroupComponent();
+	}
 }

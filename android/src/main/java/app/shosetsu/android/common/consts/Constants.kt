@@ -27,14 +27,14 @@ import app.shosetsu.android.BuildConfig
  * A default user agent string, should not be used
  */
 const val DEFAULT_USER_AGENT =
-	"Mozilla/5.0 (Linux, Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36"
+	"Mozilla/5.0 (Linux; Android 14; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.50 Mobile Safari/537.36"
 
 /**
  * User agent for when we want to be soft and cuddly to sites.
  */
 val SHOSETSU_USER_AGENT =
 	"Shosetsu/${BuildConfig.VERSION_NAME} " +
-			"(Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL})"
+		"(Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL})"
 
 const val SELECTED_STROKE_WIDTH: Int = 4
 

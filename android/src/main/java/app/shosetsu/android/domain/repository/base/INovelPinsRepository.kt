@@ -31,7 +31,7 @@ interface INovelPinsRepository {
 	/**
 	 * Toggle the pin state of the following novel ids
 	 */
-	suspend fun togglePin(ids: List<Int>)
+	suspend fun setPinned(ids: List<Int>, pinned: Boolean)
 
 	/**
 	 * Update or insert a novel pin, this is useful for backup / restore

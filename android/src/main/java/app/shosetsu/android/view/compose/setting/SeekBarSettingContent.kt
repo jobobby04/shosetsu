@@ -17,7 +17,7 @@ fun SliderSettingContent(
 	title: String,
 	description: String,
 	valueRange: StableHolder<IntRange>,
-	parseValue: (Int) -> String,
+	parseValue: @Composable (Int) -> String,
 	repo: ISettingsRepository,
 	key: SettingKey<Int>,
 	modifier: Modifier = Modifier,

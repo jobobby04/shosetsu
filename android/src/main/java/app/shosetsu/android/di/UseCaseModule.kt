@@ -20,7 +20,7 @@ import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
 import app.shosetsu.android.domain.usecases.StartDownloadWorkerAfterUpdateUseCase
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
-import app.shosetsu.android.domain.usecases.ToggleNovelPinUseCase
+import app.shosetsu.android.domain.usecases.SetNovelPinUseCase
 import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteRepositoryUseCase
@@ -109,7 +109,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<LoadLibraryUseCase>() with provider { LoadLibraryUseCase(instance(), instance()) }
 
 	bind<SearchBookMarkedNovelsUseCase>() with provider { SearchBookMarkedNovelsUseCase(instance()) }
-	bind<ToggleNovelPinUseCase>() with provider { ToggleNovelPinUseCase(instance()) }
+	bind<SetNovelPinUseCase>() with provider { SetNovelPinUseCase(instance()) }
 
 
 	bind<LoadBrowseExtensionsUseCase>() with provider {

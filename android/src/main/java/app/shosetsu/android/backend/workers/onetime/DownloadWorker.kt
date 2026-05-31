@@ -79,18 +79,20 @@ class DownloadWorker(
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 
 	private fun NotificationCompat.Builder.addCancelAction() {
-		addAction(actionBuilder(
-			Icons.Default.Cancel, getString(android.R.string.cancel),
-			PendingIntent.getBroadcast(
-				applicationContext,
-				0,
-				Intent(applicationContext, NotificationBroadcastReceiver::class.java).apply {
-					action = ACTION_CANCEL_CHAPTER_DOWNLOAD
-					putExtra(EXTRA_NOTIFICATION_ID, defaultNotificationID)
-				},
-				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-			)
-		).build())
+		addAction(
+			actionBuilder(
+				Icons.Default.Cancel, getString(android.R.string.cancel),
+				PendingIntent.getBroadcast(
+					applicationContext,
+					0,
+					Intent(applicationContext, NotificationBroadcastReceiver::class.java).apply {
+						action = ACTION_CANCEL_CHAPTER_DOWNLOAD
+						putExtra(EXTRA_NOTIFICATION_ID, defaultNotificationID)
+					},
+					if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+				)
+			).build()
+		)
 	}
 
 	override val baseNotificationBuilder: NotificationCompat.Builder
@@ -193,6 +195,7 @@ class DownloadWorker(
 					DownloadStatus.DOWNLOADING -> {
 						setProgress(1, 0, true)
 					}
+
 					else -> {
 						removeProgress()
 					}

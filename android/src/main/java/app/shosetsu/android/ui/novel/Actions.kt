@@ -2,7 +2,6 @@ package app.shosetsu.android.ui.novel
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -14,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
+import app.shosetsu.android.view.compose.MoreIconButton
 import app.shosetsu.android.view.compose.SimpleIconButton
 
 /*
@@ -44,29 +44,15 @@ import app.shosetsu.android.view.compose.SimpleIconButton
 fun NovelSelectedMoreButton(
 	showTrueDelete: Boolean,
 	onTrueDelete: () -> Unit
-) {
-	var showDropDown by remember { mutableStateOf(false) }
-
-	SimpleIconButton(
-		Icons.Default.MoreVert,
-		stringResource(R.string.more),
-		onClick = {
-			showDropDown = true
-		}
-	)
-
-	if (showTrueDelete)
-		DropdownMenu(
-			expanded = showDropDown,
-			onDismissRequest = { showDropDown = false },
-		) {
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.fragment_novel_true_delete))
-				},
-				onClick = onTrueDelete
-			)
-		}
+) = MoreIconButton {
+	if (showTrueDelete) {
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.fragment_novel_true_delete))
+			},
+			onClick = onTrueDelete
+		)
+	}
 }
 
 @Composable
@@ -79,6 +65,7 @@ fun NovelDownloadButton(
 	onDownloadAll: () -> Unit
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
+	val onDismissRequest = { showDropDown = false }
 
 	SimpleIconButton(
 		Icons.Default.Download,
@@ -88,48 +75,65 @@ fun NovelDownloadButton(
 		}
 	)
 
-	DropdownMenu(showDropDown,
-		onDismissRequest = { showDropDown = false }) {
+	DropdownMenu(showDropDown, onDismissRequest = onDismissRequest) {
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.download_next_chapter))
 			},
-			onClick = onDownloadNext
+			onClick = {
+				onDismissRequest()
+				onDownloadNext()
+			}
 		)
 
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.download_next_5_chapters))
 			},
-			onClick = onDownloadNext5
+			onClick = {
+				onDismissRequest()
+				onDownloadNext5()
+			}
 		)
 
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.download_next_10_chapters))
 			},
-			onClick = onDownloadNext10
+			onClick = {
+				onDismissRequest()
+				onDownloadNext10()
+			}
 		)
 
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.download_custom_chapters))
 			},
-			onClick = onDownloadCustom
+			onClick = {
+				onDismissRequest()
+				onDownloadCustom()
+			}
 		)
 
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.unread))
 			},
-			onClick = onDownloadUnread
+			onClick = {
+				onDismissRequest()
+				onDownloadUnread()
+			}
 		)
 
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.all))
 			},
-			onClick = onDownloadAll
+			onClick = {
+				onDismissRequest()
+				onDownloadAll()
+			}
 		)
 	}
 }
@@ -141,42 +145,38 @@ fun NovelMoreButton(
 	onSetCategories: () -> Unit,
 	canMigrate: Boolean,
 	hasCategories: Boolean
-) {
-	var showDropDown by remember { mutableStateOf(false) }
+) = MoreIconButton { onDismissRequest ->
+	if (canMigrate)
+		DropdownMenuItem(
+			text = {
+				Text(stringResource(R.string.migrate_source))
+			},
+			onClick = {
+				onDismissRequest()
+				onMigrate()
+			}
+		)
 
-	SimpleIconButton(
-		Icons.Default.MoreVert,
-		stringResource(R.string.more),
+	DropdownMenuItem(
+		text = {
+			Text(stringResource(R.string.jump_to_chapter))
+		},
 		onClick = {
-			showDropDown = true
+			onDismissRequest()
+			onJump()
 		}
 	)
 
-	DropdownMenu(showDropDown,
-		onDismissRequest = { showDropDown = false }) {
-		if (canMigrate)
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.migrate_source))
-				},
-				onClick = onMigrate
-			)
-
+	if (hasCategories)
 		DropdownMenuItem(
 			text = {
-				Text(stringResource(R.string.jump_to_chapter))
+				Text(stringResource(R.string.set_categories))
 			},
-			onClick = onJump
+			onClick = {
+				onDismissRequest()
+				onSetCategories()
+			}
 		)
-
-		if (hasCategories)
-			DropdownMenuItem(
-				text = {
-					Text(stringResource(R.string.set_categories))
-				},
-				onClick = onSetCategories
-			)
-	}
 }
 
 

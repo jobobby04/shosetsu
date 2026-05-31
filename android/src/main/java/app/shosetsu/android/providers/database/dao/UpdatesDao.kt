@@ -44,17 +44,22 @@ interface UpdatesDao : BaseDao<DBUpdate> {
 
 	@Throws(SQLiteException::class)
 	@Query(
-		"""SELECT 
-						updates.chapterID, 
-						updates.novelID, 
+		"""SELECT
+						updates.chapterID,
+						updates.novelID,
 						updates.time,
-						( 
+						(
 							SELECT
 								title
 							FROM chapters WHERE id = updates.chapterID
-						) AS chapterName, 
-						( 
-							SELECT 
+						) AS chapterName,
+						(
+							SELECT
+								readingStatus
+							FROM chapters WHERE id = updates.chapterID
+						) AS readingStatus,
+						(
+							SELECT
 								title
 							FROM novels WHERE id = updates.novelID
 						) AS novelName,
@@ -63,11 +68,11 @@ interface UpdatesDao : BaseDao<DBUpdate> {
 								imageURL
 							FROM novels WHERE id = updates.novelID
 						) AS novelImageURL
-					FROM updates 
-					WHERE 
+					FROM updates
+					WHERE
 						(
-							SELECT 
-								bookmarked 
+							SELECT
+								bookmarked
 							FROM novels WHERE id = updates.novelID
 						) = 1
 				"""

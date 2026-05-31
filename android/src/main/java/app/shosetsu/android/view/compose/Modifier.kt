@@ -43,7 +43,7 @@ fun Modifier.minimumTouchTargetSize(): Modifier = composed(
 	inspectorInfo = debugInspectorInfo {
 		name = "minimumTouchTargetSize"
 		properties["README"] = "Adds outer padding to measure at least 48.dp (default) in " +
-				"size to disambiguate touch interactions if the element would measure smaller"
+			"size to disambiguate touch interactions if the element would measure smaller"
 	},
 ) {
 	if (LocalMinimumInteractiveComponentEnforcement.current) {
