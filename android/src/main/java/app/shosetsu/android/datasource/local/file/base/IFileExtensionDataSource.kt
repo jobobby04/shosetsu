@@ -29,7 +29,7 @@ import java.io.IOException
  */
 interface IFileExtensionDataSource {
 	/** Loads the formatter from file system */
-	@Throws(FileNotFoundException::class, FilePermissionException::class)
+	@Throws(FileNotFoundException::class, FilePermissionException::class, IOException::class)
 	suspend fun loadExtension(entity: GenericExtensionEntity): IExtension
 
 	@Throws(FilePermissionException::class, IOException::class)

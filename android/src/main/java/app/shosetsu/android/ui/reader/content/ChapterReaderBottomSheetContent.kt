@@ -145,6 +145,7 @@ fun ChapterReaderBottomSheetContent(
 			GenericBottomSettingLayout(
 				stringResource(R.string.paragraph_spacing),
 				"",
+				iconDescription = null // No icon
 			) {
 				DiscreteSlider(
 					setting.paragraphSpacingSize,
@@ -167,6 +168,7 @@ fun ChapterReaderBottomSheetContent(
 			GenericBottomSettingLayout(
 				stringResource(R.string.paragraph_indent),
 				"",
+				iconDescription = null // No icon
 			) {
 				DiscreteSlider(
 					setting.paragraphIndentSize,

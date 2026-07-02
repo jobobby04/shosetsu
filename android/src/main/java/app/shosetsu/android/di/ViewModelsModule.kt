@@ -121,7 +121,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			loadNovelUIBadgeToast = instance(),
 			setNovelPin = instance(),
 			loadLibraryFilterSettings = instance(),
-			_updateLibraryFilterState = instance()
+			_updateLibraryFilterState = instance(),
+			settingsRepository = instance()
 		)
 	}
 
@@ -135,15 +136,19 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			downloadsRepository = instance()
 		)
 	}
+
 	bind<ASearchViewModel>() with provider {
 		SearchViewModel(
 			searchBookMarkedNovelsUseCase = instance(),
-			loadSearchRowUIUseCase = instance(),
 			loadCatalogueQueryDataUseCase = instance(),
 			getExtensionUseCase = instance(),
 			loadNovelUITypeUseCase = instance(),
+			context = instance(),
+			iExtensionsRepository = instance(),
+			extEntitiesRepo = instance(),
 		)
 	}
+
 	bind<AUpdatesViewModel>() with provider {
 		UpdatesViewModel(
 			startUpdateWorkerUseCase = instance(),
@@ -189,6 +194,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			setNovelUIType = instance(),
 			getCategoriesUseCase = instance(),
 			setNovelCategoriesUseCase = instance(),
+			settingsRepository = instance()
 		)
 	}
 

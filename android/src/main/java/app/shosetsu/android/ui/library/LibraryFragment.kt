@@ -134,6 +134,7 @@ fun LibraryView(
 	val selectedCount by viewModel.selectionCount.collectAsState()
 	val selectedPinCount by viewModel.selectedPinCount.collectAsState()
 	val type by viewModel.novelCardTypeFlow.collectAsState()
+	val showImages by viewModel.showImages.collectAsState()
 	val badgeToast by viewModel.badgeUnreadToastFlow.collectAsState()
 
 	val columnsInV by viewModel.columnsInV.collectAsState()
@@ -218,7 +219,8 @@ fun LibraryView(
 		hostState = hostState,
 		onShowFilterMenu = viewModel::showFilterMenu,
 		drawerIcon = drawerIcon,
-		onGoToBrowse = onGoToBrowse
+		onGoToBrowse = onGoToBrowse,
+		showImages = showImages
 	)
 	if (isCategoriesDialogOpen) {
 		CategoriesDialog(
@@ -269,7 +271,8 @@ fun LibraryContent(
 	hostState: SnackbarHostState,
 	onShowFilterMenu: () -> Unit,
 	drawerIcon: @Composable () -> Unit,
-	onGoToBrowse: () -> Unit
+	onGoToBrowse: () -> Unit,
+	showImages: Boolean
 ) {
 	Scaffold(
 		topBar = {
@@ -326,6 +329,7 @@ fun LibraryContent(
 					onPin = onPin,
 					onUnpin = onUnpin,
 					onSetCategories = onSetCategories,
+					showImages = showImages
 				)
 			}
 		} else {
@@ -414,6 +418,7 @@ fun LibraryPager(
 	onPin: () -> Unit,
 	onUnpin: () -> Unit,
 	onSetCategories: () -> Unit,
+	showImages: Boolean
 ) = Box {
 	val scope = rememberCoroutineScope()
 	val categoryPagerState = rememberPagerState { library.categories.size }
@@ -472,6 +477,7 @@ fun LibraryPager(
 				onOpen = onOpen,
 				toggleSelection = toggleSelection,
 				toastNovel = toastNovel,
+				showImages = showImages
 			)
 		}
 	}
@@ -532,6 +538,7 @@ fun LibraryCategory(
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
+	showImages: Boolean
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Box(Modifier.pullRefresh(pullRefreshState)) {
@@ -653,7 +660,8 @@ fun LibraryCategory(
 								pin()
 								badge()
 							},
-							isSelected = item.isSelected
+							isSelected = item.isSelected,
+							showImages = showImages
 						)
 					}
 

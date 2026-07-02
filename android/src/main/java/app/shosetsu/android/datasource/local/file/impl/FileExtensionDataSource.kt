@@ -3,9 +3,9 @@ package app.shosetsu.android.datasource.local.file.impl
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.consts.FILE_SCRIPT_DIR
-import app.shosetsu.android.common.consts.FILE_SOURCE_DIR
 import app.shosetsu.android.common.enums.InternalFileDir.FILES
 import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.common.ext.logW
 import app.shosetsu.android.common.utils.asIEntity
 import app.shosetsu.android.common.utils.fileExtension
 import app.shosetsu.android.datasource.local.file.base.IFileExtensionDataSource
@@ -41,36 +41,60 @@ class FileExtensionDataSource(
 	init {
 		logV("Creating required directories")
 		try {
-			iFileSystemProvider.createDirectory(FILES, MERGED_DIR)
+			iFileSystemProvider.createDirectory(FILES, FILE_SCRIPT_DIR)
 			logV("Created required directories")
 		} catch (e: Exception) {
-			logV("Error on creation of directories `$MERGED_DIR`", e)
+			logV("Error on creation of directories `$FILE_SCRIPT_DIR`", e)
 		}
 	}
 
-	private fun makeExtensionFileURL(entity: GenericExtensionEntity): String =
-		"$MERGED_DIR${entity.fileName}.${entity.type.fileExtension}"
+	/**
+	 * The old directory style, kept for sanity
+	 */
+	private fun makeOldExtensionFilePath(entity: GenericExtensionEntity): String =
+		"$FILE_SCRIPT_DIR${entity.fileName}.${entity.type.fileExtension}"
 
+	/**
+	 * The new directory style, using the repo id to prevent file collisions
+	 */
+	private fun makeRepoExtensionFilePath(entity: GenericExtensionEntity): String =
+		"$FILE_SCRIPT_DIR/${entity.repoID}/${entity.fileName}.${entity.type.fileExtension}"
 
-	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun loadExtension(entity: GenericExtensionEntity): IExtension =
-		entity.asIEntity(iFileSystemProvider.readFile(FILES, makeExtensionFileURL(entity)))
+	@Throws(FileNotFoundException::class, FilePermissionException::class, IOException::class)
+	override suspend fun loadExtension(entity: GenericExtensionEntity): IExtension {
+		// Create new repo path
+		val repoPath = makeRepoExtensionFilePath(entity)
+
+		// Try to read the extension
+		if (iFileSystemProvider.doesFileExist(FILES, repoPath)) {
+			return entity.asIEntity(iFileSystemProvider.readFile(FILES, repoPath))
+		} else {
+			// the repo file does not exist, lets do some work here...
+			logW("Extension not found via repo sub directory, checking old dir...")
+
+			// Create the old path
+			val oldPath = makeOldExtensionFilePath(entity)
+
+			// Try it again! Throwing if we do not find it
+			return entity.asIEntity(iFileSystemProvider.readFile(FILES, oldPath))
+		}
+	}
 
 	@Throws(FilePermissionException::class, IOException::class)
-	override suspend fun writeExtension(entity: GenericExtensionEntity, data: ByteArray) =
+	override suspend fun writeExtension(entity: GenericExtensionEntity, data: ByteArray) {
+		// Create the repository subdirectory
+		iFileSystemProvider.createDirectory(FILES, FILE_SCRIPT_DIR + "/${entity.repoID}/")
+
 		iFileSystemProvider.writeFile(
 			FILES,
-			makeExtensionFileURL(entity),
+			makeRepoExtensionFilePath(entity),
 			data
 		)
+	}
 
 
 	@Throws(FilePermissionException::class)
 	override suspend fun deleteExtension(entity: GenericExtensionEntity) {
-		iFileSystemProvider.deleteFile(FILES, makeExtensionFileURL(entity))
-	}
-
-	companion object {
-		const val MERGED_DIR = "$FILE_SOURCE_DIR$FILE_SCRIPT_DIR"
+		iFileSystemProvider.deleteFile(FILES, makeRepoExtensionFilePath(entity))
 	}
 }

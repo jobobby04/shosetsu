@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
+import android.app.Application
 import android.database.sqlite.SQLiteException
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -10,16 +11,23 @@ import androidx.paging.filter
 import androidx.paging.map
 import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.enums.NovelCardType
+import app.shosetsu.android.common.ext.generify
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
+import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
+import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
+import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.usecases.SearchBookMarkedNovelsUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
-import app.shosetsu.android.domain.usecases.load.LoadSearchRowUIUseCase
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
+import app.shosetsu.android.R
+import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.lib.exceptions.MissingOrInvalidKeysException
 import app.shosetsu.lib.mapify
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -37,10 +45,13 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerializationException
+import org.acra.ACRA
 
 /*
  * This file is part of shosetsu.
@@ -64,9 +75,11 @@ import kotlinx.coroutines.runBlocking
  * 01 / 05 / 2020
  */
 class SearchViewModel(
+	private val context: Application,
 	private val searchBookMarkedNovelsUseCase: SearchBookMarkedNovelsUseCase,
 	private val loadNovelUITypeUseCase: LoadNovelUITypeUseCase,
-	private val loadSearchRowUIUseCase: LoadSearchRowUIUseCase,
+	private val iExtensionsRepository: IExtensionsRepository,
+	private val extEntitiesRepo: IExtensionEntitiesRepository,
 	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
 	private val getExtensionUseCase: GetExtensionUseCase
 ) : ASearchViewModel() {
@@ -84,6 +97,7 @@ class SearchViewModel(
 	 * Used to save user input
 	 */
 	override val query: MutableStateFlow<String> = MutableStateFlow("")
+	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
 
 	private val searchFlows =
 		HashMap<Pair<Int, String?>, Flow<PagingData<ACatalogNovelUI>>>()
@@ -95,8 +109,72 @@ class SearchViewModel(
 		HashMap<Int, MutableStateFlow<Throwable?>>()
 
 	@OptIn(ExperimentalCoroutinesApi::class)
+	private val searchRows: Flow<List<SearchRowUI>> = iExtensionsRepository.loadExtensionsFLow()
+		.transformLatest { result ->
+			emit(
+				result.let { list ->
+					list.mapNotNull { extension ->
+						try {
+							extEntitiesRepo.get(extension.generify()).let { entity ->
+								if (entity.getListing(null).search != null) {
+									return@mapNotNull extension
+								}
+							}
+						} catch (e: SerializationException) {
+							logE("Broken extension, ignoring", e)
+							exceptions.emit(
+								context.getString(
+									R.string.search_error_ext_broken,
+									extension.name,
+									extension.id
+								)
+							)
+						} catch (e: IncompatibleExtensionException) {
+							logE("Incompatible extension, ignoring", e)
+							exceptions.emit(
+								context.getString(
+									R.string.search_error_ext_incompatible,
+									extension.name,
+									extension.id
+								)
+							)
+						} catch (e: MissingOrInvalidKeysException) {
+							logE("Extension is missing keys, ignoring", e)
+							exceptions.emit(
+								context.getString(
+									R.string.search_error_ext_incomplete,
+									extension.name,
+									extension.id
+								)
+							)
+						} catch (e: Exception) {
+							logE("Unhandled exception, reporting!")
+							exceptions.emit(
+								context.getString(
+									R.string.search_error_ext_generic,
+									extension.name,
+									extension.id
+								)
+							)
+							ACRA.errorReporter.handleSilentException(e)
+						}
+						return@mapNotNull null
+					}.map { (id, _, name, _, imageURL, _, _, _, _, _, _) ->
+						SearchRowUI(id, name, imageURL)
+					}
+				}
+			)
+		}
+		.mapLatest { list ->
+			ArrayList(list).apply {
+				add(0, SearchRowUI(-1, "My Library", ""))
+				sortBy { (_, name, _, _) -> name }
+			}
+		}
+
+	@OptIn(ExperimentalCoroutinesApi::class)
 	override val listings: StateFlow<ImmutableList<SearchRowUI>> by lazy {
-		loadSearchRowUIUseCase().flatMapLatest { ogList ->
+		searchRows.flatMapLatest { ogList ->
 			combine(ogList.map { rowUI ->
 				getExceptionFlow(rowUI.extensionID).map {
 					if (it != null)

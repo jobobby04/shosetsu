@@ -3,6 +3,7 @@ package app.shosetsu.android.viewmodel.abstracted
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
 import app.shosetsu.android.ui.reader.page.ShosetsuStyle
+import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
@@ -46,7 +47,7 @@ abstract class AChapterReaderViewModel :
 	/**
 	 * Exceptions from various processes internal to the view model to show to the user.
 	 */
-	abstract val exceptions: SharedFlow<String>
+	abstract val exceptions: SharedFlow<ExceptionSnackbarModel>
 
 	/**
 	 * Has the user been reading for too long?

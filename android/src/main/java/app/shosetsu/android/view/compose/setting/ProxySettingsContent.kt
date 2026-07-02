@@ -82,7 +82,8 @@ fun ProxySettingsContent(
 				text = if (proxyEnabled) "On" else "Off"
 			)
 		},
-		onPreferenceClick = { openDialog = !openDialog }
+		onPreferenceClick = { openDialog = !openDialog },
+		iconDescription = null
 	)
 	Text(
 		color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
@@ -134,7 +135,8 @@ fun ProxySettingsDialogContent(
 				widget = {
 					Switch(enabled, null)
 				},
-				onPreferenceClick = { enabled = !enabled }
+				onPreferenceClick = { enabled = !enabled },
+				iconDescription = null
 			)
 			Row {
 				TextField(

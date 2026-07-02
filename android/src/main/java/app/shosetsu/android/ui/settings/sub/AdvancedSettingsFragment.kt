@@ -210,7 +210,8 @@ fun AdvancedSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.remove_novel_cache),
 					subtitle = stringResource(R.string.settings_advanced_purge_novel_cache),
-					onPreferenceClick = onPurgeNovelCache
+					onPreferenceClick = onPurgeNovelCache,
+					iconDescription = null
 				)
 			}
 
@@ -236,7 +237,8 @@ fun AdvancedSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_kill_cycle_workers_title),
 					subtitle = stringResource(R.string.settings_advanced_kill_cycle_workers_desc),
-					onPreferenceClick = onKillCycleWorkers
+					onPreferenceClick = onKillCycleWorkers,
+					iconDescription = null
 				)
 			}
 
@@ -244,7 +246,8 @@ fun AdvancedSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_force_repo_update_title),
 					subtitle = stringResource(R.string.settings_advanced_force_repo_update_desc),
-					onPreferenceClick = onForceRepoSync
+					onPreferenceClick = onForceRepoSync,
+					iconDescription = null
 				)
 			}
 
@@ -252,7 +255,8 @@ fun AdvancedSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_advanced_clear_cookies_title),
 					subtitle = stringResource(R.string.settings_advanced_clear_cookies_desc),
-					onPreferenceClick = onClearCookies
+					onPreferenceClick = onClearCookies,
+					iconDescription = null
 				)
 			}
 

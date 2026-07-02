@@ -75,6 +75,7 @@ import org.kodein.di.instance
 import java.io.BufferedInputStream
 import java.io.IOException
 import java.io.InputStream
+import java.net.SocketTimeoutException
 import java.util.zip.GZIPInputStream
 
 /*
@@ -289,11 +290,15 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		return Result.success()
 	}
 
+	/**
+	 * @param isRetry If this is a recurssion
+	 */
 	private suspend fun restoreExtension(
 		repoId: Int?,
 		extensions: List<GenericExtensionEntity>,
 		backupExtensionEntity: BackupExtensionEntity,
-		categoryOrderToCategoryIds: Map<Int, Int>
+		categoryOrderToCategoryIds: Map<Int, Int>,
+		isRetry: Boolean = false
 	) {
 		val extensionID = backupExtensionEntity.id
 		val backupNovels = backupExtensionEntity.novels
@@ -319,6 +324,28 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
 					notificationId = extensionID
 				)
+				return
+			} catch (e: SocketTimeoutException) {
+				notify(
+					getString(
+						// change string if this is a retry or not
+						if (isRetry) {
+							R.string.worker_extension_install_error_network_retried
+						} else {
+							R.string.worker_extension_install_error_network
+						},
+						e.message ?: e.javaClass.simpleName,
+						extensionEntity.id,
+						extensionEntity.name
+					),
+					notificationId = extensionID
+				)
+
+				// Only retry once
+				if (!isRetry) {
+					restoreExtension(repoId, extensions, backupExtensionEntity, categoryOrderToCategoryIds, true)
+				}
+
 				return
 			} catch (e: Exception) {
 				notify(

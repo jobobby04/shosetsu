@@ -59,4 +59,11 @@ interface IExtensionLibrariesRepository {
 	 */
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
 	suspend fun loadExtLibrary(name: String): String
+
+	/**
+	 * Update the [entity], used primarily for depriortiziation
+	 *
+	 * @param entity
+	 */
+	suspend fun update(entity: ExtLibEntity)
 }

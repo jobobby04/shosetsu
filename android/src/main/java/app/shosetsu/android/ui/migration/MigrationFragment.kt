@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -215,7 +216,7 @@ fun MigrationExtensionItemContent(
 						.data(item.imageURL)
 						.crossfade(true)
 						.build(),
-					contentDescription = null,
+					contentDescription = stringResource(R.string.novel_image_content_description, item.name),
 					modifier = Modifier.size(64.dp),
 					error = {
 						ImageLoadingError()
@@ -332,7 +333,7 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 						.data(item.imageURL)
 						.crossfade(true)
 						.build(),
-					contentDescription = null,
+					contentDescription = stringResource(R.string.novel_image_content_description, item.title),
 					modifier = modifier,
 					error = {
 						ImageLoadingError(item.title)

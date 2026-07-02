@@ -1,16 +1,26 @@
 package app.shosetsu.android.domain.repository.impl
 
 import android.database.sqlite.SQLiteException
+import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.database.base.IDBExtRepoDataSource
 import app.shosetsu.android.datasource.local.database.base.IDBInstalledExtensionsDataSource
 import app.shosetsu.android.datasource.local.database.base.IDBRepositoryExtensionsDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteExtensionDataSource
-import app.shosetsu.android.domain.model.local.*
+import app.shosetsu.android.domain.model.local.BrowseExtensionEntity
+import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
+import app.shosetsu.android.domain.model.local.GenericExtensionEntity
+import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
+import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -78,7 +88,7 @@ class ExtensionsRepository(
 								matchingExtensions.find { it.repoID == installedExt.repoID }?.version
 
 							if (repoVersion != null) {
-								installedExt.version < repoVersion
+								installedExt.version < repoVersion || repoVersion == Version(-9, -9, -9)
 							} else false
 						} else false,
 						updateVersion = matchingExtensions.find { it.repoID == installedExt?.repoID }?.version,
@@ -140,8 +150,10 @@ class ExtensionsRepository(
 	}
 
 	@Throws(SQLiteException::class)
-	override suspend fun insert(extensionEntity: GenericExtensionEntity): Long =
-		onIO { repoDBSource.insert(extensionEntity) }
+	override suspend fun insert(extensionEntity: GenericExtensionEntity): Long {
+		logV("Arguments: $extensionEntity")
+		return onIO { repoDBSource.insert(extensionEntity) }
+	}
 
 	@Throws(SQLiteException::class)
 	override suspend fun insert(extensionEntity: InstalledExtensionEntity): Long =

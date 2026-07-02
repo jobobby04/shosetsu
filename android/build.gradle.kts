@@ -16,14 +16,14 @@ val CI_MODE = System.getenv("CI_MODE") == "true"
 
 android {
 	// keep these in sync with .gitlab-ci.yml
-	compileSdk = 37
+	compileSdk = 36
 	buildToolsVersion = "37.0.0"
 	defaultConfig {
 		applicationId = "app.shosetsu.android"
 		minSdk = 22
-		targetSdk = 37
-		versionCode = 48
-		versionName = "2.5.0"
+		targetSdk = 36
+		versionCode = 49
+		versionName = "2.5.1"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 

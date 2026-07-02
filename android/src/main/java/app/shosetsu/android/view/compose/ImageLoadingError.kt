@@ -21,11 +21,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.shosetsu.android.R
 import kotlin.random.Random
 
 /*
@@ -46,16 +48,18 @@ import kotlin.random.Random
  */
 
 @Composable
-fun ImageLoadingError(modifier: Modifier = Modifier) {
+fun ImageLoadingError(
+	modifier: Modifier = Modifier
+		.fillMaxSize()
+) {
 	Box(
 		modifier = modifier then Modifier
-			.fillMaxSize()
 			.background(Color(0x1F888888)),
 		contentAlignment = Alignment.Center
 	) {
 		Icon(
 			Icons.Filled.BrokenImage,
-			contentDescription = null,
+			contentDescription = stringResource(R.string.image_description_broken),
 			tint = Color(0x1F888888),
 			modifier = Modifier.size(24.dp)
 		)
@@ -63,7 +67,10 @@ fun ImageLoadingError(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ImageLoadingError(text: String?, modifier: Modifier = Modifier) {
+fun ImageLoadingError(
+	text: String?, modifier: Modifier = Modifier
+		.fillMaxSize()
+) {
 	if (text.isNullOrBlank()) {
 		ImageLoadingError(modifier)
 		return
@@ -82,7 +89,6 @@ fun ImageLoadingError(text: String?, modifier: Modifier = Modifier) {
 	var boxSize by remember { mutableStateOf(IntSize.Zero) }
 	Box(
 		modifier = modifier then Modifier
-			.fillMaxSize()
 			.background(background)
 			.onSizeChanged { boxSize = it }
 			.padding(horizontal = 2.dp),

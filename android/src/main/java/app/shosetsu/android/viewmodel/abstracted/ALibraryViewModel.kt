@@ -80,6 +80,11 @@ abstract class ALibraryViewModel :
 
 	abstract val novelCardTypeFlow: StateFlow<NovelCardType>
 
+	/**
+	 * If images are to be shown or not
+	 */
+	abstract val showImages: StateFlow<Boolean>
+
 	abstract val columnsInH: StateFlow<Int>
 	abstract val columnsInV: StateFlow<Int>
 	abstract val badgeUnreadToastFlow: StateFlow<Boolean>

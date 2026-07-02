@@ -287,7 +287,7 @@ fun HistoryItemContent(
 			SubcomposeAsyncImage(
 				ImageRequest.Builder(LocalContext.current)
 					.data(updateUI.novelImageURL).crossfade(true).build(),
-				contentDescription = null,
+				contentDescription = stringResource(R.string.novel_image_content_description, updateUI.novelTitle),
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.clip(MaterialTheme.shapes.medium)

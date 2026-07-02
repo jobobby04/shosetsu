@@ -17,10 +17,10 @@ import app.shosetsu.android.domain.usecases.RemoveExtensionEntityUseCase
 import app.shosetsu.android.domain.usecases.RequestInstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.SearchBookMarkedNovelsUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
+import app.shosetsu.android.domain.usecases.SetNovelPinUseCase
 import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
 import app.shosetsu.android.domain.usecases.StartDownloadWorkerAfterUpdateUseCase
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
-import app.shosetsu.android.domain.usecases.SetNovelPinUseCase
 import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.delete.DeleteRepositoryUseCase
@@ -56,7 +56,6 @@ import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsPUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.load.LoadReaderThemes
 import app.shosetsu.android.domain.usecases.load.LoadRepositoriesUseCase
-import app.shosetsu.android.domain.usecases.load.LoadSearchRowUIUseCase
 import app.shosetsu.android.domain.usecases.load.LoadUpdatesUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadChaptersResumeFirstUnreadUseCase
 import app.shosetsu.android.domain.usecases.settings.LoadNavigationStyleUseCase
@@ -181,7 +180,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 		StartDownloadWorkerUseCase(instance(), instance())
 	}
 	bind<StartUpdateWorkerUseCase>() with provider {
-		StartUpdateWorkerUseCase(instance(), instance())
+		StartUpdateWorkerUseCase(instance())
 	}
 
 	bind<UpdateBookmarkedNovelUseCase>() with provider { UpdateBookmarkedNovelUseCase(instance()) }
@@ -204,12 +203,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<GetCatalogueQueryDataUseCase>() with provider {
 		GetCatalogueQueryDataUseCase(instance())
 	}
-	bind<LoadSearchRowUIUseCase>() with provider {
-		LoadSearchRowUIUseCase(
-			instance(),
-			instance()
-		)
-	}
+
 	bind<GetExtensionSettingsUseCase>() with provider {
 		GetExtensionSettingsUseCase(
 			instance(),

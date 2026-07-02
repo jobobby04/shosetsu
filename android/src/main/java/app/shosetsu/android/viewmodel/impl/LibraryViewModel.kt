@@ -30,9 +30,10 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.utils.copy
 import app.shosetsu.android.domain.model.local.LibraryFilterState
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
-import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
 import app.shosetsu.android.domain.usecases.SetNovelPinUseCase
+import app.shosetsu.android.domain.usecases.SetNovelsCategoriesUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryFilterSettingsUseCase
 import app.shosetsu.android.domain.usecases.load.LoadLibraryUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIBadgeToastUseCase
@@ -83,7 +84,8 @@ class LibraryViewModel(
 	private val setNovelsCategoriesUseCase: SetNovelsCategoriesUseCase,
 	private val setNovelPin: SetNovelPinUseCase,
 	private val loadLibraryFilterSettings: LoadLibraryFilterSettingsUseCase,
-	private val _updateLibraryFilterState: UpdateLibraryFilterStateUseCase
+	private val _updateLibraryFilterState: UpdateLibraryFilterStateUseCase,
+	private val settingsRepository: ISettingsRepository
 ) : ALibraryViewModel() {
 
 	private val selectedNovels = MutableStateFlow<Map<Int, Map<Int, Boolean>>>(emptyMap())
@@ -228,6 +230,14 @@ class LibraryViewModel(
 			.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelCardType.NORMAL)
 	}
+
+	override val showImages: StateFlow<Boolean> =
+		settingsRepository.getBooleanFlow(SettingKey.NoImages)
+			.map { !it }
+			.stateIn(
+				viewModelScopeIO,
+				SharingStarted.Lazily, true
+			)
 
 	private val libraryMemory: StateFlow<LibraryFilterState> by lazy {
 		loadLibraryFilterSettings()

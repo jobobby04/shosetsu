@@ -1,5 +1,7 @@
 package app.shosetsu.android.datasource.local.memory.base
 
+import app.shosetsu.android.domain.model.local.ExtLibEntity
+
 /*
  * This file is part of shosetsu.
  *
@@ -23,13 +25,13 @@ package app.shosetsu.android.datasource.local.memory.base
  */
 interface IMemExtLibDataSource {
 	/** Load Library from memory */
-	fun loadLibrary(name: String): String?
+	fun loadLibrary(entity: ExtLibEntity): String?
 
 	/** Put Library in memory */
-	fun setLibrary(name: String, data: String)
+	fun setLibrary(entity: ExtLibEntity, data: String)
 
 	/** Remove Library by ID from cache*/
-	fun removeLibrary(name: String)
+	fun removeLibrary(entity: ExtLibEntity)
 
 	/** Clear all libraries from memory */
 	fun clearExtLibs()

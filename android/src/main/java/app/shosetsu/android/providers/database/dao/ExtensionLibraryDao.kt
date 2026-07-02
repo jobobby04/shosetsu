@@ -1,7 +1,12 @@
 package app.shosetsu.android.providers.database.dao
 
 import android.database.sqlite.SQLiteException
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Ignore
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import app.shosetsu.android.domain.model.database.DBExtLibEntity
 import app.shosetsu.android.providers.database.dao.base.BaseDao
 
@@ -33,27 +38,29 @@ import app.shosetsu.android.providers.database.dao.base.BaseDao
 interface ExtensionLibraryDao : BaseDao<DBExtLibEntity> {
 	@Throws(SQLiteException::class)
 	@Insert(onConflict = OnConflictStrategy.IGNORE, entity = DBExtLibEntity::class)
-	fun insertScriptLib(extLibEntityEntity: DBExtLibEntity)
+	suspend fun insertScriptLib(extLibEntityEntity: DBExtLibEntity)
 
 	@Throws(SQLiteException::class)
 	@Query("SELECT * FROM libs WHERE repoID = :repositoryID")
-	fun loadLibByRepoID(repositoryID: Int): List<DBExtLibEntity>
+	suspend fun loadLibByRepoID(repositoryID: Int): List<DBExtLibEntity>
 
 
 	@Throws(SQLiteException::class)
 	@Query("SELECT COUNT(*) FROM libs WHERE scriptName = :name")
-	fun scriptLibCountFromName(name: String): Int
+	suspend fun scriptLibCountFromName(name: String): Int
 
 	@Throws(SQLiteException::class)
 	@Ignore
-	fun doesRepositoryExist(url: String): Boolean = scriptLibCountFromName(url) > 0
+	suspend fun doesRepositoryExist(url: String): Boolean = scriptLibCountFromName(url) > 0
 
 	@Throws(SQLiteException::class)
 	@Transaction
-	fun insertOrUpdateScriptLib(extLibEntityEntity: DBExtLibEntity) {
+	suspend fun insertOrUpdateScriptLib(extLibEntityEntity: DBExtLibEntity) {
 		if (scriptLibCountFromName(extLibEntityEntity.scriptName) > 0) {
 			blockingUpdate(extLibEntityEntity)
 		} else insertScriptLib(extLibEntityEntity)
 	}
 
+	@Query("SELECT * FROM libs WHERE scriptName = :name ORDER BY repoID DESC")
+	suspend fun getExtLibsMatchingName(name: String): List<DBExtLibEntity>
 }

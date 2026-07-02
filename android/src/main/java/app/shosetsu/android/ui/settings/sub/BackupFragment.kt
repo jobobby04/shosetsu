@@ -214,6 +214,7 @@ fun BackupSettingsContent(
 					TextPreferenceWidget(
 						title = stringResource(R.string.settings_backup_location),
 						subtitle = subtitle,
+						iconDescription = null
 					) {
 						performBackupStorageLocationSelection()
 					}
@@ -342,7 +343,8 @@ fun BackupSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_backup_start_migration_title),
 					subtitle = stringResource(R.string.settings_backup_start_migration_desc),
-					onPreferenceClick = viewModel::startMigration
+					onPreferenceClick = viewModel::startMigration,
+					iconDescription = null
 				)
 			}
 		}

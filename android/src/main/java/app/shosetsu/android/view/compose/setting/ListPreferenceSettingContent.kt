@@ -32,6 +32,7 @@ fun <T> ListPreferenceSettingContent(
 		onValueChange = {
 			launchIO { repo.setString(key, toKey(it)) }
 		},
+		iconDescription = null
 	)
 }
 
@@ -40,6 +41,7 @@ fun StringListPreferenceSettingContent(
 	title: String,
 	choices: List<String>,
 	icon: ImageVector? = null,
+	iconDescription: String?,
 	repo: ISettingsRepository,
 	key: SettingKey<Int>,
 ) {
@@ -54,5 +56,6 @@ fun StringListPreferenceSettingContent(
 		onValueChange = {
 			launchIO { repo.setInt(key, choices.indexOf(it)) }
 		},
+		iconDescription = iconDescription
 	)
 }

@@ -31,6 +31,7 @@ fun SliderSettingContent(
 		title = title,
 		description = description,
 		modifier = modifier,
+		iconDescription = null // No icon
 	) {
 		DiscreteSlider(
 			choice,
@@ -69,6 +70,7 @@ fun FloatSliderSettingContent(
 		title = title,
 		description = description,
 		modifier = modifier,
+		iconDescription = null // No icon
 	) {
 		DiscreteSlider(
 			choice,

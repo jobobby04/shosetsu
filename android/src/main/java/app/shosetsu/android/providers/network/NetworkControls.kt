@@ -180,7 +180,12 @@ fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false):
 			SiteProtector.setRetryAfter(r.url.host, delay)
 
 			// Do not infinitely repeat the request
-			return if (isRetry) response else slowRequest(chain, r, isRetry = true)
+			return if (isRetry) {
+				response
+			} else {
+				response.close()
+				slowRequest(chain, r, isRetry = true)
+			}
 		}
 	}
 	return response

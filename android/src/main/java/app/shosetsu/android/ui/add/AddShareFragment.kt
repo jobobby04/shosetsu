@@ -369,7 +369,10 @@ fun AddShareContent(
 													.data(novelLink.imageURL)
 													.crossfade(true)
 													.build(),
-												contentDescription = null,
+												contentDescription = stringResource(
+													R.string.novel_image_content_description,
+													novelLink.name
+												),
 												modifier = Modifier
 													.heightIn(max = 128.dp)
 													.aspectRatio(coverRatio),

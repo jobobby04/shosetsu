@@ -30,18 +30,26 @@ import java.util.UUID
 
 val validBreaks = listOf(".\n\n", ".\n", "\n\n", ",\n", ". ", ", ", " ")
 
-fun customSpeak(tts: TextToSpeech, text: String, utteranceId: String, flush: Boolean = false) {
+fun customSpeak(
+	tts: TextToSpeech,
+	text: String,
+	utteranceId: String,
+	handleResult: (Int) -> Unit,
+	flush: Boolean = false
+) {
 	val trimmed = text.replace("\r\n", "\n")
 		.replace("\t", " ")
 		.trim()
 	val max = TextToSpeech.getMaxSpeechInputLength()
 	if (trimmed.length <= max) {
-		tts.speak(
+		val result = tts.speak(
 			trimmed,
 			if (flush) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,
 			null,
 			utteranceId
 		)
+
+		handleResult(result)
 	} else {
 		var ind = -1
 		for (br in validBreaks) {
@@ -52,12 +60,14 @@ fun customSpeak(tts: TextToSpeech, text: String, utteranceId: String, flush: Boo
 			tts,
 			trimmed.substring(0, ind + 1),
 			utteranceId,
+			handleResult,
 			flush,
 		)
 		customSpeak(
 			tts,
 			trimmed.substring(ind + 1),
 			utteranceId.substringBefore('|') + UUID.randomUUID(),
+			handleResult,
 			false
 		)
 	}

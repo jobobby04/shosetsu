@@ -1,5 +1,6 @@
 package app.shosetsu.android.ui.main.graph
 
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
@@ -30,7 +31,8 @@ import app.shosetsu.android.ui.updates.UpdatesView
 
 fun NavGraphBuilder.homeGraph(
 	navController: ShosetsuNavController,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
+	windowSize: WindowSizeClass
 ) {
 	composable<Library> {
 		LibraryView(
@@ -72,7 +74,8 @@ fun NavGraphBuilder.homeGraph(
 				navController.navigate(Novel(novelId))
 			},
 			openChapter = context::openChapter,
-			drawerIcon = drawerIcon
+			drawerIcon = drawerIcon,
+			windowSize = windowSize
 		)
 	}
 	composable<More> {

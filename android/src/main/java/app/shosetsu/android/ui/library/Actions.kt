@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.NovelCardType
@@ -192,6 +194,7 @@ fun SearchAction(
 				modifier = Modifier
 					.fillMaxWidth()
 					.focusRequester(focusRequester),
+				keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
 				keyboardActions = KeyboardActions {
 					onSearch(searchQuery)
 					focusManager.clearFocus()

@@ -80,7 +80,8 @@ fun LibrarySettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_library_categories_title),
 					subtitle = stringResource(R.string.settings_library_categories_desc, categories.size),
-					onPreferenceClick = onNavToCategories
+					onPreferenceClick = onNavToCategories,
+					iconDescription = null
 				)
 			}
 
@@ -288,7 +289,8 @@ private fun ALibrarySettingsViewModel.LibraryUpdateCategories(
 					newExcluded.map { it.id.toString() }.toSet()
 				)
 			}
-		}
+		},
+		iconDescription = null
 	)
 }
 

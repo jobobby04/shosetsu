@@ -11,6 +11,7 @@ import app.shosetsu.android.datasource.remote.base.IRemoteExtLibDataSource
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.domain.repository.base.IExtensionLibrariesRepository
 import app.shosetsu.lib.exceptions.HTTPException
+import app.shosetsu.lib.exceptions.MissingExtensionLibrary
 import app.shosetsu.lib.lua.LuaLibrary
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -61,13 +62,27 @@ class ExtensionLibrariesRepository(
 		val data = LuaLibrary(remoteSource.downloadLibrary(repoURL, extLibEntity))
 		extLibEntity.version = data.libMetaData.version
 		databaseSource.updateOrInsert(extLibEntity)
-		memSource.setLibrary(extLibEntity.scriptName, data.content)
-		fileSource.writeExtLib(extLibEntity.scriptName, data.content)
+		memSource.setLibrary(extLibEntity, data.content)
+		fileSource.writeExtLib(extLibEntity, data.content)
 	}
 
-	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun loadExtLibrary(name: String): String =
-		memSource.loadLibrary(name) ?: fileSource.loadExtLib(name).also {
-			memSource.setLibrary(name, it)
+	@Throws(FileNotFoundException::class, FilePermissionException::class, MissingExtensionLibrary::class)
+	override suspend fun loadExtLibrary(name: String): String {
+		val extLib = databaseSource.getExtLibsMatchingName(name).maxByOrNull { it.version }
+			?: throw MissingExtensionLibrary(name)
+
+		var data = memSource.loadLibrary(extLib)
+
+		if (data != null) {
+			return data
+		} else {
+			data = fileSource.loadExtLib(extLib)
+			memSource.setLibrary(extLib, data)
+			return data
 		}
+	}
+
+	override suspend fun update(entity: ExtLibEntity) {
+		databaseSource.updateOrInsert(entity)
+	}
 }

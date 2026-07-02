@@ -139,6 +139,7 @@ fun CatalogueView(
 	}
 
 	val type by viewModel.novelCardTypeLive.collectAsState()
+	val showImages by viewModel.showImages.collectAsState()
 
 	val query by viewModel.queryFlow.collectAsState()
 	val baseURL by viewModel.baseURL.collectAsState()
@@ -276,6 +277,7 @@ fun CatalogueView(
 		onBack = onBack,
 		hasSearch = hasSearch,
 		hostState = hostState,
+		showImages = showImages,
 		selectedListing = selectedListing?.let { StableHolder(it) },
 		listingOptions = listingOptions,
 		setSelectedListing = onSelectListing,
@@ -382,11 +384,12 @@ fun PreviewCatalogContent() {
 		{},
 		false,
 		remember { SnackbarHostState() },
-		listingSelectionData,
-		listOf<IExtension.Listing>().toImmutableList(),
-		{
+		selectedListing = listingSelectionData,
+		listingOptions = listOf<IExtension.Listing>().toImmutableList(),
+		setSelectedListing = {
 			listingSelectionData = StableHolder(it)
-		}
+		},
+		showImages = true
 	)
 }
 
@@ -415,6 +418,7 @@ fun CatalogContent(
 	onBack: () -> Unit,
 	hasSearch: Boolean,
 	hostState: SnackbarHostState,
+	showImages: Boolean,
 	selectedListing: StableHolder<IExtension.Listing>?,
 	listingOptions: ImmutableList<IExtension.Listing>,
 	setSelectedListing: (IExtension.Listing) -> Unit,
@@ -472,7 +476,15 @@ fun CatalogContent(
 							setSelectedListing
 						)
 					} else {
-						CatalogGrid(items, columnsInH, columnsInV, cardType, onClick, onLongClick)
+						CatalogGrid(
+							items,
+							columnsInH,
+							columnsInV,
+							cardType,
+							onClick,
+							onLongClick,
+							showImages = showImages
+						)
 					}
 				}
 			}
@@ -567,6 +579,7 @@ fun CatalogGrid(
 	cardType: NovelCardType,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
+	showImages: Boolean,
 ) {
 	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
 	val w = LocalConfiguration.current.screenWidthDp
@@ -599,7 +612,7 @@ fun CatalogGrid(
 		) { _, item ->
 			when (cardType) {
 				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
-				COMPRESSED -> CatalogCompressedCard(item, onClick, onLongClick)
+				COMPRESSED -> CatalogCompressedCard(item, onClick, onLongClick, showImages)
 				COZY -> CatalogCozyCard(item, onClick, onLongClick)
 			}
 		}
@@ -638,7 +651,8 @@ fun CatalogNormalCard(
 fun CatalogCompressedCard(
 	item: ACatalogNovelUI?,
 	onClick: (ACatalogNovelUI) -> Unit,
-	onLongClick: (ACatalogNovelUI) -> Unit
+	onLongClick: (ACatalogNovelUI) -> Unit,
+	showImages: Boolean
 ) {
 	if (item != null)
 		NovelCardCompressedContent(
@@ -650,7 +664,8 @@ fun CatalogCompressedCard(
 			onLongClick = {
 				onLongClick(item)
 			},
-			isBookmarked = item.bookmarked
+			isBookmarked = item.bookmarked,
+			showImages = showImages
 		)
 }
 

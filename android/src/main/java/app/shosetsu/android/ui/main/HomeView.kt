@@ -171,7 +171,8 @@ fun HomeView(
 								}
 							)
 						}
-					}
+					},
+					windowSize = sizeClass
 				)
 			}
 		}

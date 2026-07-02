@@ -6,6 +6,7 @@ import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /*
@@ -38,6 +39,11 @@ abstract class ASearchViewModel : ShosetsuViewModel() {
 	 * Query that is currently typed in by the user
 	 */
 	abstract val query: StateFlow<String>
+
+	/**
+	 * Global errors when loading the search view
+	 */
+	abstract val exceptions: SharedFlow<String>
 
 	/**
 	 * The listings to showcase

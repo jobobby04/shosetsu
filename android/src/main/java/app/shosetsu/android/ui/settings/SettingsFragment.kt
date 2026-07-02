@@ -104,56 +104,64 @@ fun SettingsContent(
 				title = stringResource(R.string.appearance),
 				subtitle = stringResource(R.string.appearance_summary),
 				icon = Icons.Outlined.Palette,
-				onPreferenceClick = navToAppearance
+				onPreferenceClick = navToAppearance,
+				iconDescription = stringResource(R.string.icon_desc_palette)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.library),
 				subtitle = stringResource(R.string.library_summary),
 				icon = Icons.Outlined.CollectionsBookmark,
-				onPreferenceClick = navToLibrary
+				onPreferenceClick = navToLibrary,
+				iconDescription = stringResource(R.string.icon_desc_collections_bookmark)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.reader),
 				subtitle = stringResource(R.string.reader_summary),
 				icon = Icons.AutoMirrored.Outlined.ChromeReaderMode,
-				onPreferenceClick = navToReader
+				onPreferenceClick = navToReader,
+				iconDescription = stringResource(R.string.icon_desc_chrome_reader_mode)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.downloads),
 				subtitle = stringResource(R.string.downloads_summary),
 				icon = Icons.Filled.Download,
-				onPreferenceClick = navToDownloads
+				onPreferenceClick = navToDownloads,
+				iconDescription = stringResource(R.string.icon_desc_download)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.browse),
 				subtitle = stringResource(R.string.browse_summary),
 				icon = Icons.Outlined.Explore,
-				onPreferenceClick = navToBrowse
+				onPreferenceClick = navToBrowse,
+				iconDescription = stringResource(R.string.icon_desc_explore)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.backup),
 				subtitle = stringResource(R.string.backup_summary),
 				icon = Icons.Outlined.Restore,
-				onPreferenceClick = navToBackup
+				onPreferenceClick = navToBackup,
+				iconDescription = stringResource(R.string.icon_desc_restore)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.advanced),
 				subtitle = stringResource(R.string.advanced_summary),
 				icon = Icons.Outlined.Code,
-				onPreferenceClick = navToAdvanced
+				onPreferenceClick = navToAdvanced,
+				iconDescription = stringResource(R.string.icon_desc_code)
 			)
 
 			TextPreferenceWidget(
 				title = stringResource(R.string.about),
 				subtitle = stringResource(R.string.about_summary, BuildConfig.VERSION_NAME),
 				icon = Icons.Outlined.Info,
-				onPreferenceClick = navToAbout
+				onPreferenceClick = navToAbout,
+				iconDescription = stringResource(R.string.icon_desc_info)
 			)
 		}
 	}

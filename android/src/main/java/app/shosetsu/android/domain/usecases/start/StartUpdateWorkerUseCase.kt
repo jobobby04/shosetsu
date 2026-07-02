@@ -3,7 +3,6 @@ package app.shosetsu.android.domain.usecases.start
 import androidx.work.Data
 import androidx.work.await
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
-import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import app.shosetsu.android.common.ext.launchIO
 
 /*
@@ -28,30 +27,36 @@ import app.shosetsu.android.common.ext.launchIO
  * 23 / 06 / 2020
  */
 class StartUpdateWorkerUseCase(
-	private val manager: NovelUpdateWorker.Manager,
-	private val cycleManager: NovelUpdateCycleWorker.Manager
+	private val manager: NovelUpdateWorker.Manager
 ) {
 	/**
 	 * Starts the update worker
+	 *
+	 * @param categoryID The category to update, if -1 will update all
 	 * @param override if true then will override the current update loop
 	 */
 	operator fun invoke(categoryID: Int, override: Boolean = false) {
 		launchIO {
+			// Check if the update worker is running
 			if (manager.isRunning())
+			// Check if we can override it
 				if (override)
+				// Kill the old one since we can
 					manager.stop().await()
 				else
 					return@launchIO
 
+			// Was a category given?
 			if (categoryID >= 0) {
+				// Pass category over
 				manager.start(
 					Data.Builder()
 						.putInt(NovelUpdateWorker.KEY_CATEGORY, categoryID)
 						.build()
 				)
 			} else {
-				cycleManager.stop()
-				cycleManager.start()
+				// Update all categories
+				manager.start()
 			}
 		}
 	}

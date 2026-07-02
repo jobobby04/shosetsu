@@ -27,6 +27,7 @@ fun TextPreferenceWidget(
 	subtitle: String? = null,
 	icon: ImageVector? = null,
 	iconTint: Color = MaterialTheme.colorScheme.primary,
+	iconDescription: String?,
 	isCompact: Boolean = false,
 	widget: @Composable (() -> Unit)? = null,
 	onPreferenceClick: (() -> Unit)? = null,
@@ -67,7 +68,7 @@ fun TextPreferenceWidget(
 				Icon(
 					imageVector = icon,
 					tint = iconTint,
-					contentDescription = null,
+					contentDescription = iconDescription,
 				)
 			}
 		} else {
@@ -88,17 +89,20 @@ private fun TextPreferenceWidgetPreview() = ShosetsuTheme(AppThemes.LIGHT) {
 				subtitle = "Text preference summary",
 				icon = Icons.Filled.Build,
 				onPreferenceClick = {},
+				iconDescription = null
 			)
 			TextPreferenceWidget(
 				title = "Text preference",
 				subtitle = "Text preference summary",
 				onPreferenceClick = {},
+				iconDescription = null
 			)
 			TextPreferenceWidget(
 				title = "Compact Text preference",
 				subtitle = "Text preference summary",
 				isCompact = true,
 				onPreferenceClick = {},
+				iconDescription = null
 			)
 		}
 	}

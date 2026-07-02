@@ -4,11 +4,13 @@ import android.app.Application
 import android.database.sqlite.SQLiteException
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import app.shosetsu.android.R
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapSystem
 import app.shosetsu.android.common.SettingKey.ReaderEnableFullscreen
@@ -36,6 +38,8 @@ import app.shosetsu.android.common.enums.MarkingType.ONVIEW
 import app.shosetsu.android.common.enums.ReadingStatus.READ
 import app.shosetsu.android.common.enums.ReadingStatus.READING
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.logD
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
@@ -58,6 +62,7 @@ import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.reader.customSpeak
 import app.shosetsu.android.ui.reader.page.ShosetsuStyle
 import app.shosetsu.android.ui.theme.FallbackColorScheme
+import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
@@ -74,6 +79,7 @@ import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -85,6 +91,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -105,6 +112,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.acra.ACRA
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
@@ -143,7 +151,7 @@ class ChapterReaderViewModel(
 	private val loadChapterPassageUseCase: GetChapterPassageUseCase,
 	private val getReaderSettingsUseCase: GetReaderSettingUseCase,
 	private val recordChapterIsReading: RecordChapterIsReadingUseCase,
-	private val recordChapterIsRead: RecordChapterIsReadUseCase,
+	private val recordChapterAsRead: RecordChapterIsReadUseCase,
 	private val getExt: GetExtensionUseCase,
 	private val loadDeletePreviousChapterUseCase: LoadDeletePreviousChapterUseCase,
 	private val deleteChapterPassageUseCase: DeleteChapterPassageUseCase,
@@ -164,7 +172,7 @@ class ChapterReaderViewModel(
 			get() = this@ChapterReaderViewModel.paddingValues
 	}
 
-	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
+	override val exceptions: MutableSharedFlow<ExceptionSnackbarModel> = MutableSharedFlow()
 
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
@@ -316,6 +324,36 @@ class ChapterReaderViewModel(
 
 	private var cleanStringMapJob: Job? = null
 
+	/**
+	 * Try to deduplicate titles in the given [document]
+	 *
+	 * @param document The document to process
+	 */
+	private suspend fun tryToDedupTitles(document: Document) {
+		if (settingsRepo.getBoolean(SettingKey.ReaderDeDupChapterTitle)) {
+			logD("Trying to remove duplicate titles...")
+			try {
+				val titles = document.select("h1");
+				if (titles.size > 1) {
+					// Remove duplicate titles, in reverse
+					for (title in titles.subList(1, titles.size).reversed()) {
+						title.remove()
+					}
+				}
+			} catch (e: Exception) {
+				logE("Failed to remove duplicate titles", e)
+				exceptions.emit(
+					ExceptionSnackbarModel(
+						application.getString(
+							R.string.reader_error_dedup_titles,
+							e.message ?: "unknown"
+						)
+					)
+				)
+			}
+		}
+	}
+
 	override fun getChapterPassageHTML(item: ReaderChapterUI): Flow<ChapterPassage> {
 		val mutableFlow = stringMap.getOrPut(item.id) {
 			getRefreshFlow(item)
@@ -341,6 +379,8 @@ class ChapterReaderViewModel(
 
 					val document = Jsoup.parse(result)
 
+					tryToDedupTitles(document)
+
 					val ttsElements = document.body().select("*:not(:has(*)):not(br)")
 
 					// we need to generate the ids here
@@ -357,9 +397,9 @@ class ChapterReaderViewModel(
 
 					// keep a single backing store of the iterator,
 					//  as to prevent it from being recreated
-					val ttsIterator = ElementToTTSTextIterator(
+					val ttsIterator = ElementToTTSTextIterator {
 						ttsElements.listIterator()
-					)
+					}
 
 					emitAll(cssStyle.map { cssStyle ->
 						cssStyle.insert(document)
@@ -383,8 +423,16 @@ class ChapterReaderViewModel(
 				}
 		}
 
-		return mutableFlow
+		return mutableFlow.catch { e ->
+			exceptions.emit(createGenericExceptionModel(e))
+		}
 	}
+
+	private fun createGenericExceptionModel(e: Throwable) =
+		ExceptionSnackbarModel(
+			e.message ?: application.getString(R.string.reader_error_unknown),
+			e
+		)
 
 	override val cssStyle: SharedFlow<ShosetsuStyle> by lazy {
 		css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
@@ -432,6 +480,7 @@ class ChapterReaderViewModel(
 		chaptersFlow
 			.combineDividers() // Add dividers
 			.map { it.toImmutableList() }
+			.catch { createGenericExceptionModel(it) }
 			.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
@@ -533,13 +582,7 @@ class ChapterReaderViewModel(
 
 	override fun updateChapterAsRead(chapter: ReaderChapterUI) {
 		launchIO {
-			try {
-				recordChapterIsRead(chapter)
-			} catch (e: Exception) {
-				logE("Failed to record chapter as read.", e)
-				ACRA.errorReporter.handleSilentException(e)
-				exceptions.emit(application.getString(R.string.reader_error_chapter_read))
-			}
+			_recordChapterAsRead(chapter)
 
 			try {
 				chapterRepository.getChapter(chapter.id)?.let {
@@ -570,6 +613,40 @@ class ChapterReaderViewModel(
 		}
 	}
 
+	/**
+	 * Wrapper of [recordChapterIsReading] for exceptions.
+	 */
+	private suspend fun _recordChapterIsReading(chapter: ReaderChapterUI) {
+		try {
+			recordChapterIsReading(chapter)
+		} catch (e: CancellationException) {
+			logE("Job to record chapter as being read was cancelled...", e)
+			// We do not want to report the error in this case, its a common on.
+			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_reading_cancelled)))
+		} catch (e: Exception) {
+			logE("Failed to record chapter as being read.", e)
+			ACRA.errorReporter.handleSilentException(e)
+			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_reading)))
+		}
+	}
+
+	/**
+	 * Wrapper of [recordChapterAsRead] for exceptions.
+	 */
+	private suspend fun _recordChapterAsRead(chapter: ReaderChapterUI) {
+		try {
+			recordChapterAsRead(chapter)
+		} catch (e: CancellationException) {
+			logE("Job to record chapter as read was cancelled...", e)
+			// We do not want to report the error in this case, its a common on.
+			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_read_cancelled)))
+		} catch (e: Exception) {
+			logE("Failed to record chapter as read.", e)
+			ACRA.errorReporter.handleSilentException(e)
+			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_read)))
+		}
+	}
+
 	override fun onViewed(chapter: ReaderChapterUI) {
 		//logV("$chapter")
 		launchIO {
@@ -586,13 +663,7 @@ class ChapterReaderViewModel(
 				 */
 				if (readingMarkingTypeFlow.first() != ONVIEW) return@launchIO
 
-				try {
-					recordChapterIsReading(chapter)
-				} catch (e: Exception) {
-					logE("Failed to record chapter as being read.", e)
-					ACRA.errorReporter.handleSilentException(e)
-					exceptions.emit(application.getString(R.string.reader_error_chapter_reading))
-				}
+				_recordChapterIsReading(chapter)
 
 				chapterRepository.updateChapter(
 					chapterEntity.copy(readingStatus = READING)
@@ -624,13 +695,7 @@ class ChapterReaderViewModel(
 							 */
 					val markingType = readingMarkingTypeFlow.first()
 					if (markingType == ONSCROLL) {
-						try {
-							recordChapterIsReading(chapter)
-						} catch (e: Exception) {
-							logE("Failed to record chapter as being read.", e)
-							ACRA.errorReporter.handleSilentException(e)
-							exceptions.emit(application.getString(R.string.reader_error_chapter_reading))
-						}
+						_recordChapterIsReading(chapter)
 					}
 
 					// Remove temp progress
@@ -650,13 +715,7 @@ class ChapterReaderViewModel(
 			} else {
 				// User probably sees everything at this point
 
-				try {
-					recordChapterIsRead(chapter)
-				} catch (e: Exception) {
-					logE("Failed to record chapter as read.", e)
-					ACRA.errorReporter.handleSilentException(e)
-					exceptions.emit(application.getString(R.string.reader_error_chapter_read))
-				}
+				_recordChapterAsRead(chapter)
 
 				// Temp remember the progress
 				progressMapFlow.value = progressMapFlow.value.copy().apply {
@@ -907,10 +966,10 @@ class ChapterReaderViewModel(
 		}
 
 		// Wait for the TTS to initialize
-		when (ttsResult.await()) {
+		when (val result = ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
 			else -> {
-				exceptions.emit(application.getString(R.string.reader_test_invalid_engine))
+				handleTTSError(result, R.string.reader_test_invalid_engine)
 				null
 			}
 		}
@@ -952,7 +1011,7 @@ class ChapterReaderViewModel(
 
 			// Do not continue if a language has not been set successfully
 			if (!languageSuccess) {
-				exceptions.emit(application.getString(R.string.reader_test_invalid_language))
+				exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_test_invalid_language)))
 				return@filter false
 			}
 
@@ -969,7 +1028,10 @@ class ChapterReaderViewModel(
 					val result = tts.setVoice(ttsVoice)
 					voiceSuccess = when (result) {
 						TextToSpeech.SUCCESS -> true
-						else -> false
+						else -> {
+							handleTTSError(result)
+							false
+						}
 					}
 				} else {
 					voiceSuccess = false
@@ -981,7 +1043,7 @@ class ChapterReaderViewModel(
 
 			// do not proceed if voice was not successful
 			if (!voiceSuccess) {
-				exceptions.emit(application.getString(R.string.reader_test_invalid_voice))
+				exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_test_invalid_voice)))
 				return@filter false
 			}
 			true
@@ -992,8 +1054,8 @@ class ChapterReaderViewModel(
 				.distinctUntilChanged()
 		) { (tts, _), (pitch, speed) ->
 			tts.apply {
-				setPitch(pitch / 10)
-				setSpeechRate(speed / 10)
+				setPitch(pitch / 10).let(::launchHandleTTSError)
+				setSpeechRate(speed / 10).let(::launchHandleTTSError)
 			}
 		}
 		.distinctUntilChanged()
@@ -1020,7 +1082,7 @@ class ChapterReaderViewModel(
 						ttsPlayback.value = TTSPlayback.Paused
 					}
 				}
-			)
+			).let(::launchHandleTTSError)
 		}
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
 
@@ -1031,7 +1093,7 @@ class ChapterReaderViewModel(
 				// Child scope is cancelled when the chapter is changed
 				coroutineScope {
 					// Clear out old TTS
-					oldTts?.stop()
+					oldTts?.stop() // we ignore error codes here, its going away
 					oldTts = null
 
 					// Find the current chapter
@@ -1039,6 +1101,7 @@ class ChapterReaderViewModel(
 						?.find { (it as? ReaderChapterUI)?.id == chapterId }
 						as? ReaderChapterUI ?: return@coroutineScope
 
+					// Clean up memory asap
 					System.gc()
 
 					// Get the text of the chapter
@@ -1099,19 +1162,19 @@ class ChapterReaderViewModel(
 
 					tts.collectLatest { tts ->
 						if (tts == null) {
-							oldTts?.stop()
+							oldTts?.stop() // ignore result
 							oldTts = null
 							@Suppress("LABEL_NAME_CLASH")
 							return@collectLatest
 						}
-						oldTts?.stop()
+						oldTts?.stop() // ignore result
 						oldTts = tts
 
 						// Are we playing TTS?
 						ttsPlayback.collectLatest { playback ->
 							// if we are not playing, make sure the TTS is stopped
 							if (playback != TTSPlayback.Playing) {
-								tts.stop()
+								tts.stop().let(::launchHandleTTSError)
 								@Suppress("LABEL_NAME_CLASH")
 								return@collectLatest
 							}
@@ -1125,7 +1188,8 @@ class ChapterReaderViewModel(
 										customSpeak(
 											tts,
 											it.text,
-											it.id
+											it.id,
+											::launchHandleTTSError
 										)
 								}
 							}
@@ -1136,11 +1200,12 @@ class ChapterReaderViewModel(
 		}
 	}
 
+	@Throws(NoSuchElementException::class)
 	private fun syncTTSIterator(ttsElements: RewindableMutableListIterator<TTSText>) {
 		val ttsState = ttsProgress.value
 
-		// rewind
-		ttsElements.rewind()
+		// Recreate!
+		ttsElements.recreate()
 
 		// check if the tts was playing something
 		if (ttsState != null) {
@@ -1151,7 +1216,15 @@ class ChapterReaderViewModel(
 
 			while (ttsElements.hasNext()) {
 				if (ttsElements.next().id == ttsState) {
-					ttsElements.previous() // make current next
+					val currentIndex = ttsElements.nextIndex()
+					try {
+						ttsElements.previous() // make current next
+					} catch (_: NoSuchElementException) {
+						if (currentIndex == 0) {
+							logD("We are at the first element, Recreating the iterator-")
+						}
+						ttsElements.recreate()
+					}
 					found = true
 					break
 				}
@@ -1181,7 +1254,44 @@ class ChapterReaderViewModel(
 	override val paddingValues: MutableStateFlow<PaddingValues> = MutableStateFlow(PaddingValues(0.dp))
 
 	override fun onCleared() {
-		tts.value?.stop()
+		tts.value?.stop()?.let(::launchHandleTTSError)
+	}
+
+	/**
+	 * Performs [handleTTSError] on a new UI coroutine
+	 *
+	 * @param result The result code.
+	 * @param genericMessage The generic message to display
+	 */
+	private fun launchHandleTTSError(
+		result: Int,
+		@StringRes genericMessage: Int = R.string.reader_error_tts_generic
+	) {
+		launchUI {
+			handleTTSError(result, genericMessage)
+		}
+	}
+
+	/**
+	 * Run over returned result codes from TTS to display appropriate errors.
+	 *
+	 * @param result The result code.
+	 * @param genericMessage The generic message to display
+	 */
+	private suspend fun handleTTSError(
+		result: Int,
+		@StringRes genericMessage: Int = R.string.reader_error_tts_generic
+	) {
+		when (result) {
+			TextToSpeech.ERROR_SYNTHESIS -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_synthesis)))
+			TextToSpeech.ERROR_SERVICE -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_service)))
+			TextToSpeech.ERROR_OUTPUT -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_output)))
+			TextToSpeech.ERROR_NOT_INSTALLED_YET -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_not_installed)))
+			TextToSpeech.ERROR_NETWORK_TIMEOUT -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_network_timeout)))
+			TextToSpeech.ERROR_NETWORK -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_network)))
+			TextToSpeech.ERROR_INVALID_REQUEST -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_invalid_request)))
+			TextToSpeech.ERROR -> exceptions.emit(ExceptionSnackbarModel(application.getString(genericMessage)))
+		}
 	}
 
 	companion object {

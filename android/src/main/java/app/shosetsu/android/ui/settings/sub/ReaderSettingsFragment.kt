@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.shosetsu.android.R
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ChaptersResumeFirstUnread
 import app.shosetsu.android.common.SettingKey.ReaderKeepScreenOn
 import app.shosetsu.android.common.SettingKey.ReaderMarkReadAsReading
@@ -171,6 +172,7 @@ fun ReaderSettingsContent(
 					choices = stringArrayResource(R.array.text_alignments).toList(),
 					repo = viewModel.settingsRepo,
 					key = ReaderTextAlignment,
+					iconDescription = null
 				)
 			}
 
@@ -189,7 +191,8 @@ fun ReaderSettingsContent(
 			item {
 				GenericBottomSettingLayout(
 					title = stringResource(R.string.theme),
-					description = ""
+					description = "",
+					iconDescription = null // No icon
 				) {
 					val themes by viewModel.getReaderThemes().collectAsState(emptyList())
 
@@ -256,7 +259,8 @@ fun ReaderSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.styles),
 					icon = Icons.Outlined.ImagesearchRoller,
-					onPreferenceClick = showStyleAddSnackBar
+					onPreferenceClick = showStyleAddSnackBar,
+					iconDescription = stringResource(R.string.icon_desc_image_search_roller)
 				)
 			}
 
@@ -340,6 +344,17 @@ fun ReaderSettingsContent(
 				)
 			}
 
+			item {
+				SwitchSettingContent(
+					stringResource(R.string.settings_reader_dedup_titles),
+					stringResource(R.string.settings_reader_dedup_titles_desc),
+					viewModel.settingsRepo,
+					SettingKey.ReaderDeDupChapterTitle,
+					modifier = Modifier
+						.fillMaxWidth()
+				)
+			}
+
 			item { viewModel.enableFullscreen() }
 
 			item { viewModel.readerTextSelectionToggle() }
@@ -396,7 +411,8 @@ fun ReaderSettingsVoiceOption(
 						Icon(Icons.Outlined.ExpandMore, "")
 				}
 			},
-			onPreferenceClick = { expanded = !expanded }
+			onPreferenceClick = { expanded = !expanded },
+			iconDescription = null
 		)
 
 		val sortedVoices by remember { derivedStateOf { voices.sortedByDescending { it.quality } } }

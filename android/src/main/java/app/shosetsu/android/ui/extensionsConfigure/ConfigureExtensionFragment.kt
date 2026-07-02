@@ -201,7 +201,8 @@ fun SettingsItemAsCompose(
 						modifier = Modifier.fillMaxWidth(),
 						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						}
+						},
+						iconDescription = null
 					)
 				}
 			}
@@ -268,7 +269,8 @@ fun SettingsItemAsCompose(
 						modifier = Modifier.fillMaxWidth(),
 						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
-						}
+						},
+						iconDescription = null
 					)
 				}
 			}

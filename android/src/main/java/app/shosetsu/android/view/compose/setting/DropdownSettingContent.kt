@@ -80,6 +80,7 @@ fun DropdownSettingContent(
 					}
 				}
 			}
-		}
+		},
+		iconDescription = null
 	)
 }

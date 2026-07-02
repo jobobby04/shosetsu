@@ -32,6 +32,7 @@ fun <T> ListPreferenceWidget(
 	title: String,
 	subtitle: String?,
 	icon: ImageVector?,
+	iconDescription: String?,
 	isSubtitleTheValue: Boolean = false,
 	entries: Map<out T, String>,
 	onValueChange: (T) -> Unit,
@@ -43,7 +44,8 @@ fun <T> ListPreferenceWidget(
 		subtitle = subtitle,
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
-		isCompact = isSubtitleTheValue
+		isCompact = isSubtitleTheValue,
+		iconDescription = iconDescription
 	)
 
 	if (isDialogShown) {

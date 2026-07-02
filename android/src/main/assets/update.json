@@ -1,18 +1,21 @@
 {
 	"latestVersion": "2.5.0",
-	"versionCode": 47,
+	"versionCode": 48,
 	"url": "https://cdn.shosetsu.app/v2.5.0/shosetsu-v2.5.0.apk",
 	"releaseNotes": [
 		"# v2.5.0",
 		"",
-		"Long awaited, but not as grand.",
+		"After 3 years, Shosetsu gets a new update!",
 		"",
-		"This features a complete rewrite of the entire applications navigation handling.",
+		"This update does not contain all promised features,",
+		"but was done so that a healthy release cycle can occur again.",
 		"",
-		"It incorporates a lot of dedicated developers works over the last two years.",
-		"",
-		"Nearly every bit has been tweaked in some way.",
-		"",
-		"Things may not work as expected in some places, further smaller updates will improve on this."
+		"Noteworthy features:",
+		"- Complete rewrite of navigation",
+		"- 3 years of effort and development by JFronny, Syer, Wasu, Andreww, Markus, Mikalai and more. Thank you all.",
+		"- Somewhat better crash handling!",
+		"- Performance improvements!",
+		"- New features left and right",
+		"- Etc"
 	]
 }

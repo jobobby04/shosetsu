@@ -46,19 +46,20 @@ val SUB_TEXT_SIZE: TextStyle
 	get() = MaterialTheme.typography.bodySmall
 
 /**
+ * File system directory for source files
+ */
+private const val FILE_SOURCE_DIR: String = "src/"
+
+/**
  * File system directory for extension scripts
  */
-const val FILE_SCRIPT_DIR: String = "/scripts/"
+const val FILE_SCRIPT_DIR: String = "$FILE_SOURCE_DIR/scripts/"
 
 /**
  * File system directory for library scripts
  */
-const val FILE_LIBRARY_DIR: String = "/libraries/"
+const val FILE_LIBRARY_DIR: String = "$FILE_SOURCE_DIR/libraries/"
 
-/**
- * File system directory for source files
- */
-const val FILE_SOURCE_DIR: String = "/src/"
 
 /**
  * Directory on the repository that contains the extensions,

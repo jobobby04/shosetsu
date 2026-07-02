@@ -2,6 +2,7 @@ package app.shosetsu.android.datasource.local.file.base
 
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
+import app.shosetsu.android.domain.model.local.ExtLibEntity
 import java.io.IOException
 
 /*
@@ -28,11 +29,11 @@ import java.io.IOException
 interface IFileExtLibDataSource {
 
 	@Throws(FilePermissionException::class, IOException::class)
-	suspend fun writeExtLib(fileName: String, data: String)
+	suspend fun writeExtLib(entity: ExtLibEntity, data: String)
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	suspend fun loadExtLib(fileName: String): String
+	suspend fun loadExtLib(entity: ExtLibEntity): String
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	suspend fun deleteExtLib(fileName: String)
+	suspend fun deleteExtLib(entity: ExtLibEntity)
 }

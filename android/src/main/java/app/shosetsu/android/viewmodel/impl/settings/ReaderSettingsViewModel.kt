@@ -366,6 +366,7 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 		TextPreferenceWidget(
 			title = stringResource(R.string.reader_engine),
 			subtitle = stringResource(R.string.loading),
+			iconDescription = null
 		)
 		return
 	}
@@ -386,7 +387,8 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 				settingsRepo.setString(ReaderLanguage, "")
 				settingsRepo.setString(ReaderVoice, "")
 			}
-		}
+		},
+		iconDescription = null
 	)
 }
 
@@ -424,6 +426,7 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 		TextPreferenceWidget(
 			title = stringResource(R.string.reader_language),
 			subtitle = stringResource(R.string.loading),
+			iconDescription = null
 		)
 		return
 	}
@@ -446,7 +449,8 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 				settingsRepo.setString(ReaderLanguage, languages[it].toLanguageTag())
 				settingsRepo.setString(ReaderVoice, "")
 			}
-		}
+		},
+		iconDescription = null
 	)
 }
 
@@ -489,6 +493,7 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 		TextPreferenceWidget(
 			title = stringResource(R.string.reader_voice),
 			subtitle = stringResource(R.string.loading),
+			iconDescription = null
 		)
 		return
 	}
@@ -509,7 +514,8 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 			scope.launch {
 				settingsRepo.setString(ReaderVoice, voices[it].name)
 			}
-		}
+		},
+		iconDescription = null
 	)
 }
 
@@ -614,7 +620,8 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 			}
 		},
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxWidth(),
+		iconDescription = null
 	)
 }
 
@@ -636,5 +643,6 @@ fun ExposedSettingsRepoViewModel.EditCSS(openCSS: () -> Unit) {
 		title = stringResource(R.string.settings_reader_title_html_css),
 		subtitle = stringResource(R.string.settings_reader_desc_html_css),
 		onPreferenceClick = openCSS,
+		iconDescription = null
 	)
 }

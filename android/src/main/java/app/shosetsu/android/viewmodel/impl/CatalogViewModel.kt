@@ -15,6 +15,7 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetCatalogueListingDataUseCase
@@ -86,7 +87,8 @@ class CatalogViewModel(
 	private val loadNovelUIColumnsPUseCase: LoadNovelUIColumnsPUseCase,
 	private val setNovelUIType: SetNovelUITypeUseCase,
 	private val getCategoriesUseCase: GetCategoriesUseCase,
-	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
+	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
+	private val settingsRepository: ISettingsRepository
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -231,18 +233,24 @@ class CatalogViewModel(
 
 	override val hasSearchLive: StateFlow<Boolean> by lazy {
 		selectedListing.mapLatest { it?.search != null }
-			.onIO()
+			.catch {
+				exceptionFlow.emit(it)
+			}.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
 	}
 
 	override val extensionName: StateFlow<String> by lazy {
 		iExtensionFlow.mapLatest { it?.name ?: "" }
-			.onIO()
+			.catch {
+				exceptionFlow.emit(it)
+			}.onIO()
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, "")
 	}
 
 	override val baseURL: StateFlow<String?> =
-		iExtensionFlow.map { it?.baseURL }
+		iExtensionFlow.map { it?.baseURL }.catch {
+			exceptionFlow.emit(it)
+		}
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 
 	override fun setListing(extensionID: Int, link: String?) {
@@ -284,21 +292,38 @@ class CatalogViewModel(
 		categories: IntArray
 	) {
 		launchIO {
+			// fyi, the function handles exceptions
+			_backgroundNovelAdd(item, categories)
+		}
+	}
+
+	/**
+	 * @see [ACatalogViewModel.backgroundNovelAdd]
+	 */
+	@Suppress("KDocMissingDocumentation", "FunctionName")
+	private suspend fun _backgroundNovelAdd(
+		item: ACatalogNovelUI,
+		categories: IntArray
+	) {
+		try {
 			logI("Adding novel to library in background: $item")
 			if (item.bookmarked) {
 				logI("Ignoring, already bookmarked: $item")
-				return@launchIO
+				return
 			}
 
+			// Notify that the novel is currently being added.
 			backgroundAddState.emit(BackgroundNovelAddProgress.Adding)
+
 			try {
 				backgroundAddUseCase(item.id)
 				if (categories.isNotEmpty())
 					setNovelCategoriesUseCase(item.id, categories)
 			} catch (e: Exception) {
 				backgroundAddState.emit(BackgroundNovelAddProgress.Failure(e))
-				return@launchIO
+				return
 			}
+
 			backgroundAddState.emit(
 				BackgroundNovelAddProgress.Added(
 					item.title.let {
@@ -309,11 +334,13 @@ class CatalogViewModel(
 				))
 			delay(100)
 			backgroundAddState.emit(BackgroundNovelAddProgress.Unknown)
+		} catch (e: Exception) {
+			exceptionFlow.emit(e)
 		}
 	}
 
-	override val backgroundAddState =
-		MutableStateFlow<BackgroundNovelAddProgress>(BackgroundNovelAddProgress.Unknown)
+	override val backgroundAddState: MutableStateFlow<BackgroundNovelAddProgress> =
+		MutableStateFlow(BackgroundNovelAddProgress.Unknown)
 
 	private val filterMutex = Mutex()
 
@@ -394,6 +421,14 @@ class CatalogViewModel(
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, NovelCardType.NORMAL)
 	}
 
+	override val showImages: StateFlow<Boolean> =
+		settingsRepository.getBooleanFlow(SettingKey.NoImages)
+			.map { !it }
+			.stateIn(
+				viewModelScopeIO,
+				SharingStarted.Lazily, true
+			)
+
 	override val columnsInH: StateFlow<Int> by lazy {
 		loadNovelUIColumnsHUseCase().onIO()
 			.stateIn(
@@ -450,7 +485,7 @@ class CatalogViewModel(
 		}
 	}
 
-	override val isFilterMenuVisible = MutableStateFlow(false)
+	override val isFilterMenuVisible: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
 	override fun showFilterMenu() {
 		isFilterMenuVisible.value = true

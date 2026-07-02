@@ -23,11 +23,14 @@ import org.jsoup.nodes.Element
  * Alright, lets explain what is happening here.
  *
  * This iterator is designed to wrap
+ *
+ * @param modelFactory The factory function to create a new mutable list iterator, to go back before the first element.
  */
 @Suppress("UNCHECKED_CAST")
 class ElementToTTSTextIterator(
-	private val model: MutableListIterator<Element>
+	private val modelFactory: () -> MutableListIterator<Element>
 ) : RewindableMutableListIterator<LazyTTSText>() {
+	private var model: MutableListIterator<Element> = emptyList<Element>().toMutableList().listIterator()
 	override fun add(element: LazyTTSText) = model.add(element.element)
 
 	override fun hasNext(): Boolean = model.hasNext()
@@ -49,9 +52,12 @@ class ElementToTTSTextIterator(
 	/**
 	 * This override exists to prevent the creation of a new LazyTTSText per element per rewind
 	 */
-	override fun rewind() {
-		while (hasPrevious())
-			model.previous()
+	override fun recreate() {
+		// Create our new model
+		model = modelFactory()
+
+		// clean up memory fast!!!
+		System.gc()
 	}
 
 	/**

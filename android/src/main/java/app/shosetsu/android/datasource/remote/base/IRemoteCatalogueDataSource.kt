@@ -1,5 +1,6 @@
 package app.shosetsu.android.datasource.remote.base
 
+import app.shosetsu.android.common.InvalidListingIndex
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
@@ -31,7 +32,7 @@ interface IRemoteCatalogueDataSource {
 	/**
 	 * Runs a search on an extension
 	 */
-	@Throws(HTTPException::class, IOException::class, LuaError::class)
+	@Throws(HTTPException::class, IOException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun loadListing(
 		ext: IExtension,
 		listing: IExtension.Listing.Item,

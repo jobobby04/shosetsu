@@ -3,6 +3,7 @@ package app.shosetsu.android.domain.usecases.get
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import app.shosetsu.android.common.InvalidListingIndex
 import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
@@ -14,7 +15,6 @@ import coil.network.HttpException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.luaj.vm2.LuaError
-import java.io.IOException
 import javax.net.ssl.SSLException
 
 /*
@@ -66,13 +66,12 @@ class GetCatalogueListingDataUseCase(
 					// Suspending network load via Retrofit. This doesn't need to be wrapped in a
 					// withContext(Dispatcher.IO) { ... } block since Retrofit's Coroutine
 					// CallAdapter dispatches on a worker thread.
-					val response =
-						search(
-							iExtension,
-							data,
-							listing,
-							pageNumber,
-						)
+					val response = search(
+						iExtension,
+						data,
+						listing,
+						pageNumber,
+					)
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
 					// be loaded before it.
@@ -86,20 +85,13 @@ class GetCatalogueListingDataUseCase(
 					} else {
 						null
 					}
+
 					LoadResult.Page(
 						data = response,
 						prevKey = prevKey,
 						nextKey = nextKey
 					)
-				} catch (e: IOException) {
-					LoadResult.Error(e)
-				} catch (e: HTTPException) {
-					LoadResult.Error(e)
-				} catch (e: HttpException) {
-					LoadResult.Error(e)
-				} catch (e: LuaError) {
-					LoadResult.Error(e)
-				} catch (e: IllegalArgumentException) {
+				} catch (e: Exception) {
 					LoadResult.Error(e)
 				}
 			}
@@ -113,29 +105,29 @@ class GetCatalogueListingDataUseCase(
 		listing: IExtension.Listing.Item,
 	) = MyPagingSource(iExtension, data, listing)
 
-	@Throws(SSLException::class, LuaError::class)
+	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun search(
 		iExtension: IExtension,
 		data: Map<Int, Any>,
 		listing: IExtension.Listing.Item,
 		page: Int,
-	): List<ACatalogNovelUI> =
-		novelsRepository.getCatalogueData(
+	): List<ACatalogNovelUI> {
+		val list = novelsRepository.getCatalogueData(
 			iExtension,
 			listing,
 			data,
 			page,
-		).let { list ->
-			list.mapNotNull { novelListing ->
-				// For each, insert and return a stripped card
-				// This operation is to pre-cache URL and ID so loading occurs smoothly
-				try {
-					novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension))
-						?.let { ACatalogNovelUI(it, novelListing) }
-				} catch (e: SQLiteException) {
-					logE("Failed to load parse novel", e)
-					null
-				}
+		)
+		return list.mapNotNull { novelListing ->
+			// For each, insert and return a stripped card
+			// This operation is to pre-cache URL and ID so loading occurs smoothly
+			try {
+				novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension))
+					?.let { ACatalogNovelUI(it, novelListing) }
+			} catch (e: SQLiteException) {
+				logE("Failed to load parse novel", e)
+				null
 			}
 		}
+	}
 }

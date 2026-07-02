@@ -5,11 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
@@ -26,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -102,6 +109,15 @@ fun SearchView(
 	val query by viewModel.query.collectAsState()
 	val rows by viewModel.listings.collectAsState()
 	val isCozy by viewModel.isCozy.collectAsState()
+	val exception by viewModel.exceptions.collectAsState(null)
+
+	val snackbarHostState = remember { SnackbarHostState() }
+
+	LaunchedEffect(exception) {
+		if (exception != null) {
+			snackbarHostState.showSnackbar(exception ?: return@LaunchedEffect)
+		}
+	}
 
 	SearchContent(
 		rows = rows,
@@ -121,7 +137,8 @@ fun SearchView(
 		query = query,
 		onBack = onBack,
 		onSetQuery = viewModel::setQuery,
-		onApply = viewModel::applyQuery
+		onApply = viewModel::applyQuery,
+		snackbarHostState = snackbarHostState
 	)
 }
 
@@ -151,6 +168,7 @@ fun PreviewSearchContent() {
 		onBack = {},
 		onSetQuery = {},
 		onApply = {},
+		snackbarHostState = remember { SnackbarHostState() },
 	)
 }
 
@@ -158,6 +176,7 @@ fun PreviewSearchContent() {
 @Composable
 fun SearchContent(
 	rows: ImmutableList<SearchRowUI>,
+	snackbarHostState: SnackbarHostState,
 	isCozy: Boolean = false,
 	getChildren: (id: Int) -> Flow<PagingData<ACatalogNovelUI>>,
 	getException: (id: Int) -> Flow<Throwable?>,
@@ -181,6 +200,14 @@ fun SearchContent(
 				navigationIcon = {
 					NavigateBackButton(onBack)
 				}
+			)
+		},
+		snackbarHost = {
+			SnackbarHost(
+				snackbarHostState,
+				modifier = Modifier.windowInsetsPadding(
+					WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
+				)
 			)
 		}
 	) { paddingValue ->

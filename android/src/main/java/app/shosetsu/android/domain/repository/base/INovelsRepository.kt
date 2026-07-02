@@ -17,7 +17,12 @@ package app.shosetsu.android.domain.repository.base
  */
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
-import app.shosetsu.android.domain.model.local.*
+import app.shosetsu.android.common.InvalidListingIndex
+import app.shosetsu.android.domain.model.local.AnalyticsNovelEntity
+import app.shosetsu.android.domain.model.local.LibraryNovelEntity
+import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
+import app.shosetsu.android.domain.model.local.StrippedNovelEntity
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
@@ -137,7 +142,7 @@ interface INovelsRepository {
 	/**
 	 * Loads catalogue data of an [IExtension]
 	 */
-	@Throws(SSLException::class, LuaError::class)
+	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun getCatalogueData(
 		ext: IExtension,
 		listing: IExtension.Listing.Item,

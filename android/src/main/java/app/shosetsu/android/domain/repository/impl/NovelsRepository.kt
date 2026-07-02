@@ -2,11 +2,16 @@ package app.shosetsu.android.domain.repository.impl
 
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
+import app.shosetsu.android.common.InvalidListingIndex
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.database.base.IDBNovelsDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
 import app.shosetsu.android.datasource.remote.base.IRemoteNovelDataSource
-import app.shosetsu.android.domain.model.local.*
+import app.shosetsu.android.domain.model.local.AnalyticsNovelEntity
+import app.shosetsu.android.domain.model.local.LibraryNovelEntity
+import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
+import app.shosetsu.android.domain.model.local.StrippedNovelEntity
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
@@ -147,7 +152,13 @@ class NovelsRepository(
 		page: Int,
 	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, search, query, filters, page) }
 
-	@Throws(SSLException::class, LuaError::class)
+	@Throws(
+		SSLException::class,
+		LuaError::class,
+		HTTPException::class,
+		IOException::class,
+		InvalidListingIndex::class
+	)
 	override suspend fun getCatalogueData(
 		ext: IExtension,
 		listing: IExtension.Listing.Item,

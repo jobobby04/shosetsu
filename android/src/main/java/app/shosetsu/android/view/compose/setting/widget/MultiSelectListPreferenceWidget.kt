@@ -20,6 +20,7 @@ inline fun <reified T> MultiSelectListPreferenceWidget(
 	title: String,
 	subtitle: String,
 	icon: ImageVector? = null,
+	iconDescription: String? = null,
 	possibleValues: List<T>,
 	selectedValues: Set<T>,
 	crossinline stringify: @Composable (T) -> String,
@@ -32,6 +33,7 @@ inline fun <reified T> MultiSelectListPreferenceWidget(
 		subtitle = subtitle,
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
+		iconDescription = iconDescription
 	)
 
 	if (isDialogShown) {

@@ -44,4 +44,7 @@ class DBExtLibDataSource(
 		repoID: Int,
 	): List<ExtLibEntity> =
 		(extensionLibraryDao.loadLibByRepoID(repoID).convertList())
+
+	override suspend fun getExtLibsMatchingName(name: String): List<ExtLibEntity> =
+		extensionLibraryDao.getExtLibsMatchingName(name).convertList()
 }

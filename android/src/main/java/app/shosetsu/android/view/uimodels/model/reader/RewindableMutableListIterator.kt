@@ -17,6 +17,9 @@
  */
 package app.shosetsu.android.view.uimodels.model.reader
 
+/**
+ * Children must implement recreate function.
+ */
 abstract class RewindableMutableListIterator<T> : MutableListIterator<T> {
 
 	/**
@@ -44,17 +47,17 @@ abstract class RewindableMutableListIterator<T> : MutableListIterator<T> {
 	}
 
 	/**
-	 * Rewind back to the start
+	 * Recreate the iterator, enabling us to go back before the first element
 	 */
-	open fun rewind() {
-		while (hasPrevious())
-			previous()
+	open fun recreate() {
+		throw IllegalStateException("Must implement recreate")
 	}
 
 	companion object {
 		fun <T> MutableListIterator<T>.toRewindable(): RewindableMutableListIterator<T> {
 			return object : RewindableMutableListIterator<T>(),
-				MutableListIterator<T> by this@toRewindable {}
+				MutableListIterator<T> by this@toRewindable {
+			}
 		}
 	}
 }

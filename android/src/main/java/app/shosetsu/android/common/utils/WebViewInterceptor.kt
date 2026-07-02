@@ -23,6 +23,7 @@ import android.os.Build
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.Toast
+import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.webview.WebViewUtil
@@ -76,7 +77,7 @@ abstract class WebViewInterceptor(
 		if (!WebViewUtil.supportsWebView(context)) {
 			launchUI {
 				context.toast(
-					"WebView is required for the app to function",
+					context.getString(R.string.webview_required),
 					Toast.LENGTH_LONG
 				)
 			}

@@ -55,7 +55,8 @@ fun NumberPickerSettingContent(
 		widget = {
 			Text("$value", color = MaterialTheme.colorScheme.tertiary)
 		},
-		onPreferenceClick = { openDialog = true }
+		onPreferenceClick = { openDialog = true },
+		iconDescription = null
 	)
 
 	if (openDialog) {

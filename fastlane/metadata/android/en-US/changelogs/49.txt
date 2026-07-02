@@ -1,0 +1,78 @@
+# 2.5.1
+ - misc: Prettify debug updates
+ - misc: Sync gitlab ci with compileSdk
+ - misc: Bump to versionCode 49 / '2.5.1'
+ - feat(Reader): More error handling, now with a possible report button.
+ - feat(Reader): Add setting to deduplicate titles.
+ - fix(Catalog): Ensure listing selection is only visible if there is '>1',
+	- Also minor logic improvements
+ - misc: Make catalog pager exception handling a catch-all.,
+	- For some reason the exceptions caught were explicitly declared, and,
+	- using the same exact body in each catch.,
+	- So this just turns it into a generic catch-all that handles the one,
+	- and only error handling in the catalog pager, throwing it,
+	- upwards and leaving it to the UI.,
+	- Also updates the throws annotations...
+ - misc: Catch any stray exceptions in CatalogViewModel.kt
+ - misc: Complete documentation of ACatalogViewModel.kt
+ - fix: Add missing content descriptions wherever possible.
+ - fix(strings): Reverse logic of notify update progress switch.,
+	- User krilies (749903441005903882) reported that the setting description,
+	- was in reverse.
+ - fix(fdroid): Downgrade to target android 36, not 37.,
+	- Seems the 37 sdk is broken with sdkmanager, and was preventing,
+	- fdroid builds from occurring.,
+	- Upstream: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/39414#note_3414324387
+ - fix(UpdatesView): Correct text cutoff due to large chapter titles.,
+	- This required a change to how the update items height was composed.,
+	- Now the row is based on the needed height of the elements instead,,
+	- which gets determined via ratios, including the ratio for the novel,
+	- cover.,
+	- The changes to the ImageLoadingError.kt modifiers may cause,
+	- side effects, but I see none at a cursory glance.
+ - fix(TTS): Correct fundamental flaw of RewindableMutableListIterator,
+	- Previously it was assumed you can go back to the first element by,
+	- simply rewinding via 'previous', but this is an incorrect assumption.,
+	- As per the JDK list iterator documentation...,
+	- 'https://docs.oracle.com/javase/8/docs/api/java/util/ListIterator.html',
+	- which describes that the initial state is before the first element,,
+	- which can only be reached by recreating the iterator.,
+	- Thus the ElementToTTSTextIterator.kt backing was turned into a factory,,
+	- which matches the changes to RewindableMutableListIterator.kt to have,
+	- a recreate method instead of a rewind method.,
+	- The class can be renamed later.,
+	- ACRA: 58
+ - fix(RestoreBackup): Properly handle timeout when installing extension.,
+	- Use new network error string when a timeout exception occurs during an,
+	- extensions download.,
+	- If it occurs, we will try again, once,,
+	- before giving up.,
+	- Saw the acra report, now it is handled.,
+	- ACRA: 48
+ - fix(browse): Apply missing IME Action, fixing keyboard controls.,
+	- KeyboardActions requires an IME Action to be set, without it set,,
+	- no events are received.,
+	- Please document commits better for the future, y'all know who you are.,
+	- Caused by: 3c25407f
+ - fix(ExtSettings): Consume error when trying to load ext listing name.,
+	- Oops, I forgot to catch that one!,
+	- Also consumes more possible exceptions too!.
+ - fix(search): Do not crash for any extension loading issue.,
+	- This commit finally fixes all the varying crashes due to,
+	- invalid extensions.,
+	- The search view now properly consumes all exceptions when trying to,
+	- load each extension, and displays it to the user to handle and figure,
+	- out on their own time.
+ - misc: Add missing throws to 'GenericExtensionEntity.asIEntity'.
+ - fix(reader): Do not report cancellation exceptions when record chapter,
+	- I also fixed up some method naming sense.,
+	- Resolves: ACRA 83.
+ - misc(WebViewInterceptor): Use string resource for missing webview msg
+ - Merge remote-tracking branch 'origin/development' into development
+ - build: force matching tools version
+ - ci: 37.0
+ - ci: bump tools
+ - fix: dismiss novel dropdowns on interaction,
+	- This used to work. Maybe something changed in Material3?
+ - fix: use pinnedScrollBehavior,
+	- Previously, you could swipe up on top app bars and, in doing so, cause them to disappear without any apparent way to get them back. Having them disappear on scroll might be nice, but this doesn't seem to be the way to go."

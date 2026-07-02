@@ -269,7 +269,20 @@ fun PreviewNovelCardCompressedContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		"Test",
 		"",
 		onClick = {},
-		onLongClick = {}
+		onLongClick = {},
+		showImages = true
+	)
+}
+
+@Preview
+@Composable
+fun PreviewNovelCardCompressedNoImageContent() = ShosetsuTheme(AppThemes.LIGHT) {
+	NovelCardCompressedContent(
+		"Test",
+		"",
+		onClick = {},
+		onLongClick = {},
+		showImages = false
 	)
 }
 
@@ -283,7 +296,8 @@ fun NovelCardCompressedContent(
 	overlay: @Composable (RowScope.() -> Unit)? = null,
 	isPlaceholder: Boolean = false,
 	isSelected: Boolean = false,
-	isBookmarked: Boolean = false
+	isBookmarked: Boolean = false,
+	showImages: Boolean
 ) {
 	Card(
 		modifier = Modifier
@@ -304,32 +318,36 @@ fun NovelCardCompressedContent(
 			) {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.fillMaxSize(.70f)
+					modifier = Modifier
+						.fillMaxWidth(.70f)
+						.minimumTouchTargetSize()
 				) {
-					SubcomposeAsyncImage(
-						ImageRequest.Builder(LocalContext.current)
-							.data(imageURL)
-							.crossfade(true)
-							.build(),
-						stringResource(R.string.fragment_novel_info_image),
-						modifier = Modifier
-							.width(64.dp)
-							.aspectRatio(1.0f),
-						contentScale = ContentScale.Crop,
-						error = {
-							ImageLoadingError(title)
-						},
-						loading = {
-							Box(Modifier.placeholder(true))
-						}
-					)
+					if (showImages) {
+						SubcomposeAsyncImage(
+							ImageRequest.Builder(LocalContext.current)
+								.data(imageURL)
+								.crossfade(true)
+								.build(),
+							stringResource(R.string.fragment_novel_info_image),
+							modifier = Modifier
+								.width(64.dp)
+								.aspectRatio(1.0f),
+							contentScale = ContentScale.Crop,
+							error = {
+								ImageLoadingError(title)
+							},
+							loading = {
+								Box(Modifier.placeholder(true))
+							}
+						)
+					}
 
 					Text(
 						title,
 						modifier = Modifier
 							.placeholder(visible = isPlaceholder)
 							.padding(start = 8.dp)
-							.fillMaxSize()
+							.fillMaxWidth()
 					)
 				}
 

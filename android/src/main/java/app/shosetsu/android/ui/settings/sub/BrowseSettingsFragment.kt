@@ -87,7 +87,8 @@ fun BrowseSettingsContent(
 				TextPreferenceWidget(
 					title = stringResource(R.string.settings_browse_repositories_title),
 					subtitle = stringResource(R.string.settings_browse_repositories_desc, reposCount),
-					onPreferenceClick = onNavToRepositories
+					onPreferenceClick = onNavToRepositories,
+					iconDescription = null
 				)
 			}
 

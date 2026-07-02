@@ -142,4 +142,7 @@ interface IFileSystemProvider {
 	@Throws(FileNotFoundException::class)
 	fun retrievePath(externalFileDir: ExternalFileDir, path: String): String
 
+	@Throws(FileNotFoundException::class)
+	fun moveFile(files: InternalFileDir, oldPath: String, repoPath: String)
+
 }

@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,11 +30,13 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.AppThemes
 import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.uimodels.StableHolder
+import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import org.acra.ACRA
 
 /*
  * This file is part of shosetsu.
@@ -115,10 +118,11 @@ fun ChapterReaderContent(
 	onFirstFocus: () -> Unit,
 	content: @Composable (windowPadding: PaddingValues, footerPadding: PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
-	exception: String?
+	exception: ExceptionSnackbarModel?
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
+	val context = LocalContext.current
 
 	BackHandler(
 		scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
@@ -152,7 +156,19 @@ fun ChapterReaderContent(
 
 	LaunchedEffect(exception) {
 		if (exception != null) {
-			scaffoldState.snackbarHostState.showSnackbar(exception)
+			// We can only show reporting if ACRA is initialized
+			if (exception.exception != null && ACRA.isInitialised) {
+				val result = scaffoldState.snackbarHostState.showSnackbar(
+					exception.displayText,
+					actionLabel = context.getString(R.string.report)
+				)
+
+				if (result == SnackbarResult.ActionPerformed) {
+					ACRA.errorReporter.handleException(exception.exception, false)
+				}
+			} else {
+				scaffoldState.snackbarHostState.showSnackbar(exception.displayText)
+			}
 		}
 	}
 

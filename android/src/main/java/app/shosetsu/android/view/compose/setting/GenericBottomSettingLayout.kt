@@ -22,7 +22,8 @@ import app.shosetsu.android.view.compose.setting.widget.PrefsHorizontalPadding
 fun PreviewGenericBottomSetting() = ShosetsuTheme(AppThemes.LIGHT) {
 	GenericBottomSettingLayout(
 		"Test",
-		"Description"
+		"Description",
+		iconDescription = null // No icon
 	) {
 
 	}
@@ -34,6 +35,7 @@ fun GenericBottomSettingLayout(
 	description: String,
 	modifier: Modifier = Modifier,
 	icon: ImageVector? = null,
+	iconDescription: String?,
 	iconTint: Color = MaterialTheme.colorScheme.primary,
 	bottom: @Composable () -> Unit
 ) {
@@ -60,7 +62,7 @@ fun GenericBottomSettingLayout(
 				Icon(
 					imageVector = icon,
 					tint = iconTint,
-					contentDescription = null,
+					contentDescription = iconDescription,
 				)
 			}
 		} else {

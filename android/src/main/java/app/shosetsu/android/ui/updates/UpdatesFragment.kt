@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -38,6 +37,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,6 +58,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.shosetsu.android.R
@@ -107,6 +110,7 @@ fun UpdatesView(
 	openNovel: (Int) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
 	drawerIcon: @Composable () -> Unit,
+	windowSize: WindowSizeClass
 ) {
 	val viewModel = viewModelDi<AUpdatesViewModel>()
 	val items by viewModel.liveData.collectAsState()
@@ -149,7 +153,8 @@ fun UpdatesView(
 		onClearBefore = viewModel::showClearBefore,
 		hostState = hostState,
 		drawerIcon = drawerIcon,
-		displayDateAsMDY = displayDateAsMDY
+		displayDateAsMDY = displayDateAsMDY,
+		windowSize = windowSize
 	)
 
 	if (isClearBeforeVisible) {
@@ -261,7 +266,8 @@ fun UpdatesContent(
 	onClearBefore: () -> Unit,
 	hostState: SnackbarHostState,
 	drawerIcon: @Composable () -> Unit,
-	displayDateAsMDY: Boolean
+	displayDateAsMDY: Boolean,
+	windowSize: WindowSizeClass
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Scaffold(
@@ -303,7 +309,8 @@ fun UpdatesContent(
 							UpdateItemContent(
 								it,
 								onCoverClick = { openNovel(it) },
-								onClick = { openChapter(it) }
+								onClick = { openChapter(it) },
+								windowSize = windowSize
 							)
 						}
 					}
@@ -341,10 +348,14 @@ fun PreviewUpdateHeaderItemContent() {
 	UpdateHeaderItemContent(StableHolder(DateTime().trimDate()), false)
 }
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @ExperimentalMaterial3Api
 @Preview
 @Composable
 fun PreviewUpdateItemContent() {
+	val width = 900.dp
+	val height = 300.dp
+
 	UpdateItemContent(
 		UpdatesUI(
 			1,
@@ -356,53 +367,73 @@ fun PreviewUpdateItemContent() {
 			"",
 		),
 		{},
-		{}
+		{},
+		windowSize = WindowSizeClass.calculateFromSize(DpSize(width = width, height = height)),
 	)
 }
 
+private const val UPDATE_ITEM_IMAGE_RATIO_SMALL = 0.15f
+private const val UPDATE_ITEM_IMAGE_RATIO_LARGE = 0.10f
 
 @Composable
 fun UpdateItemContent(
 	updateUI: UpdatesUI,
 	onCoverClick: () -> Unit,
-	onClick: () -> Unit
+	onClick: () -> Unit,
+	windowSize: WindowSizeClass,
 ) {
+	val expandedViewPort = windowSize.widthSizeClass == WindowWidthSizeClass.Expanded
+
+	val updateItemImageRatio = if (expandedViewPort) {
+		UPDATE_ITEM_IMAGE_RATIO_LARGE
+	} else {
+		UPDATE_ITEM_IMAGE_RATIO_SMALL
+	}
+
 	Row(
 		Modifier
 			.fillMaxWidth()
-			.height(72.dp)
 			.clickable(onClick = onClick)
 			.padding(start = 16.dp, end = 8.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
-		if (updateUI.novelImageURL.isNotEmpty()) {
-			SubcomposeAsyncImage(
-				ImageRequest.Builder(LocalContext.current)
-					.data(updateUI.novelImageURL)
-					.crossfade(true)
-					.build(),
-				contentDescription = null,
-				contentScale = ContentScale.Crop,
-				modifier = Modifier
-					.aspectRatio(coverRatio)
-					.clip(MaterialTheme.shapes.small)
-					.clickable(onClick = onCoverClick),
-				error = {
-					ImageLoadingError(updateUI.novelName)
-				},
-				loading = {
-					Box(Modifier.placeholder(true))
-				}
-			)
-		} else {
-			ImageLoadingError(
-				updateUI.novelName,
-				Modifier
-					.aspectRatio(coverRatio)
-					.clip(MaterialTheme.shapes.small)
-					.clickable(onClick = onCoverClick)
-			)
+		Box(Modifier.fillMaxWidth(updateItemImageRatio)) {
+			if (updateUI.novelImageURL.isNotEmpty()) {
+				SubcomposeAsyncImage(
+					ImageRequest.Builder(LocalContext.current)
+						.data(updateUI.novelImageURL)
+						.crossfade(true)
+						.build(),
+					contentDescription = stringResource(R.string.novel_image_content_description, updateUI.novelName),
+					contentScale = ContentScale.Crop,
+					modifier = Modifier
+						.aspectRatio(coverRatio)
+						.fillMaxWidth(updateItemImageRatio)
+						.clip(MaterialTheme.shapes.small)
+						.clickable(onClick = onCoverClick),
+					error = {
+						ImageLoadingError(updateUI.novelName, Modifier.fillMaxWidth(updateItemImageRatio))
+					},
+					loading = {
+						Box(
+							Modifier
+								.placeholder(true)
+								.fillMaxWidth(updateItemImageRatio)
+						)
+					}
+				)
+			} else {
+				ImageLoadingError(
+					updateUI.novelName,
+					Modifier
+						.aspectRatio(coverRatio)
+						.fillMaxWidth(updateItemImageRatio)
+						.clip(MaterialTheme.shapes.small)
+						.clickable(onClick = onCoverClick)
+				)
+			}
 		}
+
 		Column(
 			verticalArrangement = Arrangement.Center,
 			modifier = Modifier

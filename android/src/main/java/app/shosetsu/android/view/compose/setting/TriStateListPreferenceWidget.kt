@@ -15,6 +15,7 @@ fun <T> TriStateListPreferenceWidget(
 	subtitle: String? = null,
 	dialogMessage: String? = null,
 	icon: ImageVector? = null,
+	iconDescription: String?,
 	possibleValues: List<T>,
 	initialChecked: List<T>,
 	initialInversed: List<T>,
@@ -28,6 +29,7 @@ fun <T> TriStateListPreferenceWidget(
 		subtitle = subtitle,
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
+		iconDescription = iconDescription
 	)
 
 	if (isDialogShown) {

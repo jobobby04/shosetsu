@@ -2,8 +2,9 @@ package app.shosetsu.android.datasource.local.memory.impl
 
 import app.shosetsu.android.common.consts.MEMORY_EXPIRE_EXTENSION_TIME
 import app.shosetsu.android.common.consts.MEMORY_MAX_EXT_LIBS
-import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
 import app.shosetsu.android.datasource.local.memory.base.ICache
+import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
+import app.shosetsu.android.domain.model.local.ExtLibEntity
 import kotlin.time.Duration.Companion.hours
 
 /*
@@ -29,21 +30,21 @@ import kotlin.time.Duration.Companion.hours
  */
 class MemExtLibDataSource(factory: ICache.Factory) : IMemExtLibDataSource {
 	/** Library paring */
-	private val libraries: ICache<String, String> =
+	private val libraries: ICache<ExtLibEntity, String> =
 		factory.create(MEMORY_EXPIRE_EXTENSION_TIME.hours, MEMORY_MAX_EXT_LIBS)
 
-	override fun loadLibrary(name: String): String? {
+	override fun loadLibrary(entity: ExtLibEntity): String? {
 		//logV("Loading $name from memory (success?: ${result != null})")
-		return libraries[name]
+		return libraries[entity]
 	}
 
-	override fun setLibrary(name: String, data: String) {
+	override fun setLibrary(entity: ExtLibEntity, data: String) {
 		//logV("Putting $name into memory")
-		libraries[name] = data
+		libraries[entity] = data
 	}
 
-	override fun removeLibrary(name: String) {
-		libraries.remove(name)
+	override fun removeLibrary(entity: ExtLibEntity) {
+		libraries.remove(entity)
 	}
 
 	override fun clearExtLibs() {

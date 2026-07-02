@@ -3,11 +3,11 @@ package app.shosetsu.android.datasource.local.file.impl
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.consts.FILE_LIBRARY_DIR
-import app.shosetsu.android.common.consts.FILE_SOURCE_DIR
 import app.shosetsu.android.common.enums.InternalFileDir.FILES
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.datasource.local.file.base.IFileExtLibDataSource
+import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import java.io.IOException
 
@@ -38,32 +38,51 @@ class FileExtLibDataSource(
 	init {
 		logV("Creating required directories")
 		try {
-			iFileSystemProvider.createDirectory(FILES, "$FILE_SOURCE_DIR$FILE_LIBRARY_DIR")
+			iFileSystemProvider.createDirectory(FILES, FILE_LIBRARY_DIR)
 			logV("Created required directories")
 		} catch (e: Exception) {
 			logE("Error on creation of directories", e)
 		}
 	}
 
+	private fun makeOldLibraryFile(entity: ExtLibEntity): String =
+		"$FILE_LIBRARY_DIR/${entity.scriptName}.lua"
 
-	private fun makeLibraryFile(fileName: String): String =
-		"$FILE_SOURCE_DIR$FILE_LIBRARY_DIR$fileName.lua"
+	private fun makeRepoLibraryFile(entity: ExtLibEntity): String =
+		"$FILE_LIBRARY_DIR/${entity.repoID}/${entity.scriptName}.lua"
 
-	@Throws(FilePermissionException::class, IOException::class)
-	override suspend fun writeExtLib(fileName: String, data: String) {
+
+	@Throws(FilePermissionException::class, IOException::class, CharacterCodingException::class)
+	override suspend fun writeExtLib(entity: ExtLibEntity, data: String) {
+		// Create the repo directory if it does not exist
+		iFileSystemProvider.createDirectory(FILES, "$FILE_LIBRARY_DIR/${entity.repoID}/")
+
+		// Write the new file
 		iFileSystemProvider.writeFile(
 			FILES,
-			makeLibraryFile(fileName),
+			makeRepoLibraryFile(entity),
 			data.encodeToByteArray()
 		)
 	}
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun loadExtLib(fileName: String): String =
-		iFileSystemProvider.readFile(FILES, makeLibraryFile(fileName)).decodeToString()
+	override suspend fun loadExtLib(entity: ExtLibEntity): String {
+		// Check if the repo file is present
+		return if (iFileSystemProvider.doesFileExist(FILES, makeRepoLibraryFile(entity))) {
+			// Read from the repo specific file
+			iFileSystemProvider.readFile(FILES, makeRepoLibraryFile(entity)).decodeToString()
+		} else {
+			// Read from the
+			iFileSystemProvider.readFile(
+				FILES,
+				makeOldLibraryFile(entity)
+			).decodeToString()
+		}
+	}
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun deleteExtLib(fileName: String) {
-		iFileSystemProvider.deleteFile(FILES, makeLibraryFile(fileName))
+	override suspend fun deleteExtLib(entity: ExtLibEntity) {
+		iFileSystemProvider.deleteFile(FILES, makeOldLibraryFile(entity))
+		iFileSystemProvider.deleteFile(FILES, makeRepoLibraryFile(entity))
 	}
 }

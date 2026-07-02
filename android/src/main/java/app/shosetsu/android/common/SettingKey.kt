@@ -156,6 +156,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 	object ReaderSpeed : FloatKey("reader_speed_2", 10f)
 
+	/**
+	 * When true, will automatically prune any duplicate
+	 */
+	object ReaderDeDupChapterTitle : BooleanKey("dedup_h1", true)
+
 	// Download options
 	object IsDownloadPaused : BooleanKey("isDownloadPaused", false)
 
@@ -225,6 +230,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object NovelBadgeToast : BooleanKey("novelBadge", true)
 	object SelectedNovelCardType : IntKey("novelCardType", 0)
 	object NavStyle : BooleanKey("legacy_navigation", false)
+
+	/**
+	 * When set to true, no images will be shown for compressed cards
+	 */
+	object NoImages : BooleanKey("no_images", false)
 
 	// Backup Options
 	object BackupStorageLocation : StringKey("backupStorageLocation", "")

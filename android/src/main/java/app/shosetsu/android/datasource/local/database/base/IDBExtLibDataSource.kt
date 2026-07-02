@@ -39,4 +39,11 @@ interface IDBExtLibDataSource {
 	/** Loads a [List] of [ExtLibEntity] by its [repoID] */
 	@Throws(SQLiteException::class)
 	suspend fun loadExtLibByRepo(repoID: Int): List<ExtLibEntity>
+
+	/**
+	 * Load a [List] of [ExtLibEntity] matching a given [name]
+	 *
+	 * @param name Name of the [ExtLibEntity]s to load
+	 */
+	suspend fun getExtLibsMatchingName(name: String): List<ExtLibEntity>
 }
