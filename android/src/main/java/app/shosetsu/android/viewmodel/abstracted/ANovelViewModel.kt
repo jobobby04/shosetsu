@@ -5,6 +5,7 @@ import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
+import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
@@ -74,7 +75,7 @@ abstract class ANovelViewModel
 	/**
 	 * Provides errors
 	 */
-	abstract val error: Flow<Throwable?>
+	abstract val exceptions: Flow<ExceptionSnackbarModel>
 
 	abstract val novelSettingFlow: StateFlow<NovelSettingUI?>
 

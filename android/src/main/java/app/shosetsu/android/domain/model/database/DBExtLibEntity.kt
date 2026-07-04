@@ -1,7 +1,6 @@
 package app.shosetsu.android.domain.model.database
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.Version
@@ -34,9 +33,10 @@ import app.shosetsu.lib.json.RepoLibrary
  */
 @Entity(
 	tableName = "libs",
+	// An extension library entity is identified by its name & repoID combo
+	primaryKeys = ["scriptName", "repoID"]
 )
 data class DBExtLibEntity(
-	@PrimaryKey
 	val scriptName: String,
 	var version: Version,
 	var repoID: Int,

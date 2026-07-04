@@ -31,6 +31,7 @@ class ElementToTTSTextIterator(
 	private val modelFactory: () -> MutableListIterator<Element>
 ) : RewindableMutableListIterator<LazyTTSText>() {
 	private var model: MutableListIterator<Element> = emptyList<Element>().toMutableList().listIterator()
+
 	override fun add(element: LazyTTSText) = model.add(element.element)
 
 	override fun hasNext(): Boolean = model.hasNext()
@@ -75,12 +76,21 @@ class ElementToTTSTextIterator(
 			last = model.next()
 		}
 
-		// rewind to exact starting position, where ogNextPosition was next
-		while (previousIndex() >= ogNextPosition) {
-			previous() // go back
+		// Check where the original position was
+		if (ogNextPosition == 0) {
+			// Recreate the iterator if the original next position was 0
+			recreate()
+		} else {
+			// rewind to exact starting position, where ogNextPosition was next
+			while (previousIndex() >= ogNextPosition) {
+				previous() // go back
+			}
 		}
 
 		// return the last element or null
 		return last?.let(::LazyTTSText)
 	}
+
+	override fun clone(): RewindableMutableListIterator<LazyTTSText> =
+		ElementToTTSTextIterator(modelFactory)
 }

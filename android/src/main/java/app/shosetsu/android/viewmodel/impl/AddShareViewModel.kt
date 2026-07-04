@@ -13,7 +13,11 @@ import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.model.local.InstalledExtensionEntity
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.domain.model.local.RepositoryEntity
-import app.shosetsu.android.domain.repository.base.*
+import app.shosetsu.android.domain.repository.base.IExtensionEntitiesRepository
+import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
+import app.shosetsu.android.domain.repository.base.IExtensionsRepository
+import app.shosetsu.android.domain.repository.base.INovelsRepository
+import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.RequestInstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
 import app.shosetsu.android.domain.usecases.get.GetURLUseCase

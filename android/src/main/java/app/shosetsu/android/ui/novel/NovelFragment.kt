@@ -63,6 +63,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
@@ -121,6 +122,7 @@ import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
+import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel.JumpState
@@ -190,80 +192,17 @@ fun NovelInfoView(
 	val isQRCodeVisible by viewModel.isQRCodeVisible.collectAsState()
 	val isShareMenuVisible by viewModel.isShareMenuVisible.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
-	val error by viewModel.error.collectAsState(null)
+	val exceptionSnackbarModel by viewModel.exceptions.collectAsState(null)
 	val isDownloadDialogVisible by viewModel.isDownloadDialogVisible.collectAsState()
 	val showTrueDelete by viewModel.showTrueDelete.collectAsState()
 	val openLastReadResult by viewModel.openLastReadResult.collectAsState(null)
 
+	val scope = rememberCoroutineScope()
 	val hostState = remember { SnackbarHostState() }
 	val context = LocalContext.current
 	val resources = LocalResources.current
-	val scope = rememberCoroutineScope()
 
-	LaunchedEffect(error) {
-		if (error != null) {
-			when (error) {
-				is OfflineException -> {
-					scope.launch {
-						val result = hostState.showSnackbar(
-							context.getString((error as OfflineException).messageRes),
-							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
-						)
-						if (result == SnackbarResult.ActionPerformed) {
-							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-						}
-					}
-				}
-
-				is RefreshException -> {
-					scope.launch {
-						val result = hostState.showSnackbar(
-							context.getString(
-								R.string.view_novel_refresh_failed,
-								error?.cause?.message ?: context.getString(R.string.unknown)
-							),
-							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.retry)
-						)
-						if (result == SnackbarResult.ActionPerformed) {
-							viewModel.refresh()
-						}
-					}
-				}
-
-				is NovelLoadException -> {
-					scope.launch {
-						hostState.showSnackbar(
-							context.getString(
-								R.string.fragment_novel_error_load,
-								error?.cause?.message ?: "Unknown"
-							)
-						)
-					}
-				}
-
-				is ChapterLoadException -> {
-					scope.launch {
-						hostState.showSnackbar(
-							context.getString(
-								R.string.fragment_novel_error_load_chapters,
-								error?.cause?.message ?: "Unknown"
-							)
-						)
-					}
-				}
-
-				else -> {
-					scope.launch {
-						hostState.showSnackbar(
-							error?.message ?: context.getString(R.string.error)
-						)
-					}
-				}
-			}
-		}
-	}
+	NovelViewExceptionConsumer(viewModel, hostState, exceptionSnackbarModel)
 
 	LaunchedEffect(openLastReadResult) {
 		when (val result = openLastReadResult) {
@@ -345,7 +284,8 @@ fun NovelInfoView(
 		onDownloadUnread = viewModel::downloadAllUnreadChapters,
 		onResume = viewModel::openLastRead,
 		onBack = onBack,
-		onOpenShareMenu = viewModel::openShareMenu
+		onOpenShareMenu = viewModel::openShareMenu,
+		hostState = hostState
 	)
 
 	if (isCategoriesDialogVisible)
@@ -373,24 +313,28 @@ fun NovelInfoView(
 	}
 
 	LaunchedEffect(toggleBookmarkResponse) {
+		val toggleBookmarkResponse = toggleBookmarkResponse
 		if (toggleBookmarkResponse is ToggleBookmarkResponse.DeleteChapters) {
-			val chaptersToDelete =
-				(toggleBookmarkResponse as ToggleBookmarkResponse.DeleteChapters).chapters
-			val result = hostState.showSnackbar(
-				try {
-					resources.getQuantityString(
-						R.plurals.fragment_novel_toggle_delete_chapters,
-						chaptersToDelete,
-						chaptersToDelete
-					)
-				} catch (e: Resources.NotFoundException) {
-					"Delete $chaptersToDelete chapters?"
-				},
-				actionLabel = context.getString(R.string.delete)
-			)
+			scope.launch {
+				val chaptersToDelete =
+					toggleBookmarkResponse.chapters
 
-			if (result == SnackbarResult.ActionPerformed) {
-				viewModel.deleteChapters()
+				val result = hostState.showSnackbar(
+					try {
+						resources.getQuantityString(
+							R.plurals.fragment_novel_toggle_delete_chapters,
+							chaptersToDelete,
+							chaptersToDelete
+						)
+					} catch (e: Resources.NotFoundException) {
+						"Delete $chaptersToDelete chapters?"
+					},
+					actionLabel = context.getString(R.string.delete)
+				)
+
+				if (result == SnackbarResult.ActionPerformed) {
+					viewModel.deleteChapters()
+				}
 			}
 		}
 	}
@@ -399,13 +343,15 @@ fun NovelInfoView(
 		when (jumpState) {
 			JumpState.UNKNOWN -> {}
 			JumpState.FAILURE -> {
-				val result = hostState.showSnackbar(
-					context.getString(R.string.toast_error_chapter_jump_invalid_target),
-					actionLabel = context.getString(R.string.generic_question_retry)
-				)
+				scope.launch {
+					val result = hostState.showSnackbar(
+						context.getString(R.string.toast_error_chapter_jump_invalid_target),
+						actionLabel = context.getString(R.string.generic_question_retry)
+					)
 
-				if (result == SnackbarResult.ActionPerformed) {
-					viewModel.showChapterJumpDialog()
+					if (result == SnackbarResult.ActionPerformed) {
+						viewModel.showChapterJumpDialog()
+					}
 				}
 			}
 		}
@@ -438,6 +384,79 @@ fun NovelInfoView(
 			chapterCount = chapters.size,
 			onDownload = viewModel::downloadNextCustomChapters
 		)
+	}
+}
+
+/**
+ * The exception consumer for the novel view.
+ *
+ * @param viewModel The view model
+ * @param hostState The snackbar to update
+ * @param exceptionSnackbarModel The exception model to consume
+ */
+@Composable
+fun NovelViewExceptionConsumer(
+	viewModel: ANovelViewModel,
+	hostState: SnackbarHostState,
+	exceptionSnackbarModel: ExceptionSnackbarModel?
+) {
+	val context = LocalContext.current
+	// We launch the snack bars in its own coroutine scope, so we can keep consuming the action even if a new exception comes in
+	val scope = rememberCoroutineScope()
+	LaunchedEffect(exceptionSnackbarModel) {
+		if (exceptionSnackbarModel != null) {
+			when (exceptionSnackbarModel.exception) {
+				is OfflineException -> {
+					scope.launch {
+						val result = hostState.showSnackbar(
+							exceptionSnackbarModel.displayText,
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.generic_wifi_settings)
+						)
+
+						// If the user clicked Wi-Fi settings, off we go
+						if (result == SnackbarResult.ActionPerformed) {
+							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+						}
+					}
+				}
+
+				is RefreshException -> {
+					scope.launch {
+						val result = hostState.showSnackbar(
+							exceptionSnackbarModel.displayText,
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.retry)
+						)
+
+						// The user wants to refresh again!
+						if (result == SnackbarResult.ActionPerformed) {
+							viewModel.refresh()
+						}
+					}
+				}
+
+				is NovelLoadException -> {
+					scope.launch {
+						hostState.showSnackbar(exceptionSnackbarModel.displayText)
+					}
+				}
+
+				is ChapterLoadException -> {
+					scope.launch {
+						hostState.showSnackbar(exceptionSnackbarModel.displayText)
+					}
+				}
+
+				else -> {
+					scope.launch {
+						hostState.showSnackbar(
+							exceptionSnackbarModel.displayText
+						)
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -636,7 +655,8 @@ fun PreviewNovelInfoContent() {
 			onDownloadUnread = {},
 			onResume = {},
 			onBack = {},
-			onOpenShareMenu = {}
+			onOpenShareMenu = {},
+			hostState = remember { SnackbarHostState() }
 		)
 	}
 }
@@ -682,7 +702,8 @@ fun NovelInfoContent(
 	onDownloadUnread: () -> Unit,
 	onResume: () -> Unit,
 	onBack: () -> Unit,
-	onOpenShareMenu: () -> Unit
+	onOpenShareMenu: () -> Unit,
+	hostState: SnackbarHostState
 ) {
 	val splitColumn = windowSize.widthSizeClass == WindowWidthSizeClass.Expanded
 
@@ -734,6 +755,9 @@ fun NovelInfoContent(
 				},
 				onClick = onResume
 			)
+		},
+		snackbarHost = {
+			SnackbarHost(hostState)
 		}
 	) { paddingValues ->
 		Box(

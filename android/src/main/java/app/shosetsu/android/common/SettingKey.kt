@@ -107,6 +107,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ReaderMatchFullscreenToFocus : BooleanKey("reader_match_fullscreen_focus", false)
 
 	/**
+	 * If the user has been shown the reader tts click hint
+	 */
+	object ReaderTTSClickHintShown : BooleanKey("reader_tts_hint_shown", false)
+
+	/**
 	 * User customization for CSS in html reader
 	 */
 	object ReaderHtmlCss : StringKey(
@@ -276,6 +281,11 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ReaderLanguage : StringKey("reader_language", "")
 
 	object ReaderNextChapter : BooleanKey("reader_next_chapter", false)
+
+	/**
+	 * If the TTS will alert the reader it is moving to the next chapter
+	 */
+	object ReaderNextChapterAlert : BooleanKey("reader_next_chapter_alert", true)
 
 
 	// Advanced settings

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-	<string name="app_name">Shosetsu</string>
 	<string name="website">Сайт</string>
 	<string name="github" translatable="false">Gitlab</string>
 	<string name="matrix" translatable="false">Matrix</string>

@@ -224,7 +224,8 @@ fun HomeView(
 						scope.launch {
 							drawerState.close()
 						}
-					}
+					},
+					drawerState
 				)
 			},
 			drawerState = drawerState,

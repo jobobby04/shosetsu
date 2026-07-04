@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +58,7 @@ import app.shosetsu.lib.Version
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /*
@@ -112,11 +114,15 @@ fun ConfigureExtensionContent(
 
 	// for snackbars
 	val hostState = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
 
 	// If there is an error, display it as a snackbar
 	LaunchedEffect(errors) {
+		val errors = errors
 		if (errors != null) {
-			hostState.showSnackbar(errors?.message ?: "Unknown Error")
+			scope.launch {
+				hostState.showSnackbar(errors.message ?: "Unknown Error")
+			}
 		}
 	}
 

@@ -65,10 +65,11 @@ fun TextPreferenceWidget(
 		},
 		icon = if (icon != null) {
 			{
+				// TODO enable contentDescription once we figure out what traversalIndex does not work here
 				Icon(
 					imageVector = icon,
 					tint = iconTint,
-					contentDescription = iconDescription,
+					contentDescription = null,
 				)
 			}
 		} else {

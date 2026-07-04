@@ -208,12 +208,13 @@ fun BackupSettingsContent(
 			item {
 				val subtitle by viewModel.settingsRepo
 					.getStringFlow(SettingKey.BackupStorageLocation)
-					.collectAsState("")
+					.collectAsState(stringResource(R.string.settings_backup_location_desc))
 
 				HighlightPreference(highlightBackupFolder) {
 					TextPreferenceWidget(
 						title = stringResource(R.string.settings_backup_location),
-						subtitle = subtitle,
+						subtitle = subtitle.takeIf(String::isNotBlank)
+							?: stringResource(R.string.settings_backup_location_desc),
 						iconDescription = null
 					) {
 						performBackupStorageLocationSelection()

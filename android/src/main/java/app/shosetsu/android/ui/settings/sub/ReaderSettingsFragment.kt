@@ -83,6 +83,7 @@ import app.shosetsu.android.viewmodel.impl.settings.readerEngineOption
 import app.shosetsu.android.viewmodel.impl.settings.readerLanguageOption
 import app.shosetsu.android.viewmodel.impl.settings.readerPitchOption
 import app.shosetsu.android.viewmodel.impl.settings.readerReadNextChapter
+import app.shosetsu.android.viewmodel.impl.settings.readerReadNextChapterAlert
 import app.shosetsu.android.viewmodel.impl.settings.readerSpeedOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTableHackOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
@@ -381,6 +382,7 @@ fun ReaderSettingsContent(
 			item { viewModel.readerVoiceOption() }
 			item { viewModel.readerTestOption() }
 			item { viewModel.readerReadNextChapter() }
+			item { viewModel.readerReadNextChapterAlert() }
 		}
 	}
 }

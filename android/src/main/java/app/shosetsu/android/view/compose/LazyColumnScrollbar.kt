@@ -126,24 +126,24 @@ fun VerticalFastScroller(
 
 			val thumbBottomPadding = with(LocalDensity.current) { bottomContentPadding.toPx() }
 			val heightPx = contentHeight.toFloat() -
-					thumbTopPadding -
-					thumbBottomPadding -
-					listState.layoutInfo.afterContentPadding
+				thumbTopPadding -
+				thumbBottomPadding -
+				listState.layoutInfo.afterContentPadding
 			val thumbHeightPx = with(LocalDensity.current) { ThumbLength.toPx() }
 			val trackHeightPx = heightPx - thumbHeightPx
 			val scrollHeightPx = contentHeight.toFloat() -
-					listState.layoutInfo.beforeContentPadding -
-					listState.layoutInfo.afterContentPadding -
-					thumbBottomPadding
+				listState.layoutInfo.beforeContentPadding -
+				listState.layoutInfo.afterContentPadding -
+				thumbBottomPadding
 
 			val visibleItems = layoutInfo.visibleItemsInfo
 			val topItem = visibleItems.fastFirstOrNull {
 				it.bottom >= 0 &&
-						(it.key as? String)?.startsWith(STICKY_HEADER_KEY_PREFIX)?.not() ?: true
+					(it.key as? String)?.startsWith(STICKY_HEADER_KEY_PREFIX)?.not() ?: true
 			} ?: visibleItems.first()
 			val bottomItem = visibleItems.fastLastOrNull {
 				it.top <= scrollHeightPx &&
-						(it.key as? String)?.startsWith(STICKY_HEADER_KEY_PREFIX)?.not() ?: true
+					(it.key as? String)?.startsWith(STICKY_HEADER_KEY_PREFIX)?.not() ?: true
 			} ?: visibleItems.last()
 
 			val topHiddenProportion = -1f * topItem.top / topItem.size.coerceAtLeast(1)

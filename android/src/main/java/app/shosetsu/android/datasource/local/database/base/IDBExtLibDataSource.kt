@@ -46,4 +46,11 @@ interface IDBExtLibDataSource {
 	 * @param name Name of the [ExtLibEntity]s to load
 	 */
 	suspend fun getExtLibsMatchingName(name: String): List<ExtLibEntity>
+
+	/**
+	 * Load a [List] of all [ExtLibEntity]
+	 *
+	 * @return All the extension library entities
+	 */
+	suspend fun loadAll(): List<ExtLibEntity>
 }

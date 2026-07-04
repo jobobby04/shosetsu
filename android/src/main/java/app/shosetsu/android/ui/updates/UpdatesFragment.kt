@@ -46,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,6 +81,7 @@ import app.shosetsu.android.viewmodel.abstracted.AUpdatesViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.coroutines.launch
 import org.joda.time.DateTime
 
 /*
@@ -119,20 +121,27 @@ fun UpdatesView(
 	val displayDateAsMDY by viewModel.displayDateAsMDYFlow.collectAsState()
 	val lastUpdated by viewModel.lastUpdated.collectAsState()
 
+	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 	val hostState = remember { SnackbarHostState() }
 
 	LaunchedEffect(error) {
-		when (error) {
+		when (val error = error) {
 			is OfflineException -> {
-				val result = hostState.showSnackbar(
-					context.getString((error as OfflineException).messageRes),
-					duration = SnackbarDuration.Long,
-					actionLabel = context.getString(R.string.generic_wifi_settings)
-				)
-				if (result == SnackbarResult.ActionPerformed) {
-					context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+				scope.launch {
+					val result = hostState.showSnackbar(
+						context.getString(error.messageRes),
+						duration = SnackbarDuration.Long,
+						actionLabel = context.getString(R.string.generic_wifi_settings)
+					)
+					if (result == SnackbarResult.ActionPerformed) {
+						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+					}
 				}
+			}
+
+			else -> {
+				// TODO Handle error snackbar here
 			}
 		}
 	}

@@ -93,22 +93,22 @@
 				<data android:scheme="https" />
 				<data android:host="share.shosetsu.app" />
 			</intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.deeplink.DeepLinkActivity"
-            android:exported="true"
-            android:label="@string/search"
-            android:launchMode="singleTask"
-            android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-                <action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
+		</activity>
+		<activity
+			android:name=".ui.deeplink.DeepLinkActivity"
+			android:exported="true"
+			android:label="@string/search"
+			android:launchMode="singleTask"
+			android:theme="@android:style/Theme.NoDisplay">
+			<intent-filter>
+				<action android:name="android.intent.action.SEARCH" />
+				<action android:name="com.google.android.gms.actions.SEARCH_ACTION" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter android:label="@string/settings">
-                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
-                <category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+			<intent-filter android:label="@string/settings">
+				<action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+				<category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
 			<meta-data

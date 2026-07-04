@@ -1,5 +1,6 @@
 package app.shosetsu.android.viewmodel.impl
 
+import android.app.Application
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.viewModelScope
@@ -42,6 +43,7 @@ import app.shosetsu.android.domain.usecases.update.UpdateNovelUseCase
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.ChapterUI
+import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelUI
 import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.viewmodel.abstracted.ANovelViewModel
@@ -101,6 +103,7 @@ import qrcode.QRCode
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class NovelViewModel(
+	private val application: Application,
 	private val getChapterUIsUseCase: GetChapterUIsUseCase,
 	private val loadNovelUIUseCase: GetNovelUIUseCase,
 	private val updateNovelUseCase: UpdateNovelUseCase,
@@ -124,7 +127,7 @@ class NovelViewModel(
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
 ) : ANovelViewModel() {
 
-	override val error = MutableSharedFlow<Throwable>()
+	override val exceptions: MutableSharedFlow<ExceptionSnackbarModel> = MutableSharedFlow()
 
 	override val isRefreshing = MutableStateFlow(false)
 
@@ -135,8 +138,18 @@ class NovelViewModel(
 			getChapterUIsUseCase(id).shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
 				.combineBookmarked().combineDownloaded().combineStatus().combineString().combineSort()
 				.combineReverse().combineSelection().map { it.toImmutableList() }
-		}.catch {
-			error.emit(ChapterLoadException(it))
+		}.catch { throwable ->
+			val message = application.getString(
+				R.string.fragment_novel_error_load_chapters,
+				throwable.message ?: application.getString(R.string.unknown)
+			)
+
+			exceptions.emit(
+				ExceptionSnackbarModel(
+					message,
+					ChapterLoadException(throwable)
+				)
+			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
 
@@ -252,8 +265,18 @@ class NovelViewModel(
 	override val novelLive: StateFlow<NovelUI?> by lazy {
 		novelIDLive.flatMapLatest {
 			loadNovelUIUseCase(it)
-		}.catch {
-			error.emit(NovelLoadException(it))
+		}.catch { throwable ->
+			val message = application.getString(
+				R.string.fragment_novel_error_load,
+				throwable.cause?.message ?: application.getString(R.string.unknown)
+			)
+
+			exceptions.emit(
+				ExceptionSnackbarModel(
+					message,
+					NovelLoadException(throwable)
+				)
+			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 			.also {
 				it.distinctUntilChangedBy { it?.novelURL }
@@ -378,6 +401,16 @@ class NovelViewModel(
 		emit(novelLive.first { it != null }?.let {
 			getContentURL(it)
 		})
+	}.catch { t ->
+		exceptions.emit(
+			ExceptionSnackbarModel(
+				application.getString(
+					R.string.view_novel_error_url_load,
+					t.message ?: application.getString(R.string.unknown)
+				),
+				t
+			)
+		)
 	}.onIO().stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 	override val shareInfo: StateFlow<NovelShareInfo?> =
@@ -401,15 +434,31 @@ class NovelViewModel(
 						startDownloadWorkerAfterUpdateUseCase(it.updatedChapters)
 					}
 					logI("Successfully reloaded novel")
-				} catch (t: Throwable) {
+				} catch (t: Exception) {
 					logE("Failed refreshing the novel data", t)
-					error.emit(RefreshException(t))
+
+					// Create the message
+					val message = t.message ?: application.getString(
+						R.string.view_novel_refresh_failed,
+						t.message ?: application.getString(R.string.unknown)
+					)
+
+					// Emit it!
+					exceptions.emit(
+						ExceptionSnackbarModel(
+							message,
+							RefreshException(t)
+						)
+					)
 				} finally {
 					isRefreshing.emit(false)
 				}
 			} else {
-				error.emit(
-					OfflineException(R.string.fragment_novel_snackbar_cannot_inital_load_offline)
+				exceptions.emit(
+					ExceptionSnackbarModel(
+						application.getString(R.string.fragment_novel_snackbar_cannot_inital_load_offline),
+						OfflineException()
+					)
 				)
 			}
 		}

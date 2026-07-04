@@ -2,7 +2,6 @@ package app.shosetsu.android.providers.database.dao
 
 import android.database.sqlite.SQLiteException
 import androidx.room.Dao
-import androidx.room.Ignore
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -46,21 +45,21 @@ interface ExtensionLibraryDao : BaseDao<DBExtLibEntity> {
 
 
 	@Throws(SQLiteException::class)
-	@Query("SELECT COUNT(*) FROM libs WHERE scriptName = :name")
-	suspend fun scriptLibCountFromName(name: String): Int
-
-	@Throws(SQLiteException::class)
-	@Ignore
-	suspend fun doesRepositoryExist(url: String): Boolean = scriptLibCountFromName(url) > 0
+	@Query("SELECT COUNT(*) FROM libs WHERE scriptName = :name AND repoID = :repoId")
+	suspend fun scriptLibCountFromName(name: String, repoId: Int): Int
 
 	@Throws(SQLiteException::class)
 	@Transaction
 	suspend fun insertOrUpdateScriptLib(extLibEntityEntity: DBExtLibEntity) {
-		if (scriptLibCountFromName(extLibEntityEntity.scriptName) > 0) {
+		if (scriptLibCountFromName(extLibEntityEntity.scriptName, extLibEntityEntity.repoID) > 0) {
 			blockingUpdate(extLibEntityEntity)
 		} else insertScriptLib(extLibEntityEntity)
 	}
 
 	@Query("SELECT * FROM libs WHERE scriptName = :name ORDER BY repoID DESC")
 	suspend fun getExtLibsMatchingName(name: String): List<DBExtLibEntity>
+
+
+	@Query("SELECT * FROM libs")
+	suspend fun loadAll(): List<DBExtLibEntity>
 }

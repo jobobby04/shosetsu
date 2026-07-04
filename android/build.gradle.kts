@@ -23,7 +23,7 @@ android {
 		minSdk = 22
 		targetSdk = 36
 		versionCode = 49
-		versionName = "2.5.1"
+		versionName = "2.5.2"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 
@@ -242,7 +242,14 @@ dependencies {
 
 	// Core libraries
 	implementation(libs.luaj.jse)
-	implementation(libs.shosetsuorg.klib)
+	gradle.startParameter.taskNames.forEach { task ->
+		if (!task.contains("fdroid")) {
+			implementation(libs.shosetsuorg.klib)
+		} else {
+			// F-Droid does not like gitlab maven
+			implementation(libs.shosetsuorg.klib.jitpack)
+		}
+	}
 	implementation(libs.jsoup)
 
 	// Image loading

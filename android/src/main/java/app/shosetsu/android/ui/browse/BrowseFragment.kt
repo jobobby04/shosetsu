@@ -142,16 +142,21 @@ fun BrowseView(
 	}
 
 	LaunchedEffect(error) {
+		val error = error
 		if (error != null) {
 			when (error) {
 				is OfflineException -> {
-					offlineMessage((error as OfflineException).messageRes)
+					scope.launch {
+						offlineMessage(error.messageRes)
+					}
 				}
 
 				else -> {
-					hostState.showSnackbar(
-						error?.message ?: context.getString(R.string.error)
-					)
+					scope.launch {
+						hostState.showSnackbar(
+							error.message ?: context.getString(R.string.error)
+						)
+					}
 				}
 			}
 		}

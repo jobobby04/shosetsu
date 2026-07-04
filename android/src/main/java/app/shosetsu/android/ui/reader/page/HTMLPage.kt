@@ -133,7 +133,8 @@ fun HTMLPage(
 
 				val inter = ShosetsuScript(
 					onClickMethod = onClick,
-					onDClickMethod = onDoubleClick
+					onDClickMethod = onDoubleClick,
+					scope = scope
 				)
 
 				webView.addJavascriptInterface(inter, "shosetsuScript")

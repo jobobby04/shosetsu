@@ -49,6 +49,9 @@ class ExtensionLibrariesRepository(
 	): List<ExtLibEntity> =
 		onIO { databaseSource.loadExtLibByRepo(repoID) }
 
+	override suspend fun loadAll(): List<ExtLibEntity> =
+		onIO { databaseSource.loadAll() }
+
 	@Throws(
 		SQLiteException::class,
 		HTTPException::class,

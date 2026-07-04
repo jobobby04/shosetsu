@@ -1,7 +1,9 @@
 package app.shosetsu.android.ui.reader.page
 
 import android.webkit.JavascriptInterface
-import app.shosetsu.android.common.ext.launchUI
+import app.shosetsu.android.common.ext.logV
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import app.shosetsu.android.common.ext.logI as pLogI
 
 /*
@@ -35,6 +37,7 @@ import app.shosetsu.android.common.ext.logI as pLogI
 class ShosetsuScript(
 	val onClickMethod: (String?) -> Unit,
 	val onDClickMethod: () -> Unit,
+	val scope: CoroutineScope
 ) {
 	/**
 	 * JavaScript function for [onClickMethod], passes event to UI thread.
@@ -42,7 +45,8 @@ class ShosetsuScript(
 	@Suppress("unused")
 	@JavascriptInterface
 	fun onClick(id: String?) {
-		launchUI {
+		logV("Arguments: id='$id'")
+		scope.launch {
 			onClickMethod(id)
 		}
 	}
@@ -53,7 +57,7 @@ class ShosetsuScript(
 	@Suppress("unused")
 	@JavascriptInterface
 	fun onDClick() {
-		launchUI {
+		scope.launch {
 			onDClickMethod()
 		}
 	}

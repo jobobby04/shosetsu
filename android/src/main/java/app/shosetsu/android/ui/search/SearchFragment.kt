@@ -40,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -70,6 +71,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
 /*
  * This file is part of Shosetsu.
@@ -111,11 +113,15 @@ fun SearchView(
 	val isCozy by viewModel.isCozy.collectAsState()
 	val exception by viewModel.exceptions.collectAsState(null)
 
+	val scope = rememberCoroutineScope()
 	val snackbarHostState = remember { SnackbarHostState() }
 
 	LaunchedEffect(exception) {
+		val exception = exception
 		if (exception != null) {
-			snackbarHostState.showSnackbar(exception ?: return@LaunchedEffect)
+			scope.launch {
+				snackbarHostState.showSnackbar(exception)
+			}
 		}
 	}
 

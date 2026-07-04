@@ -4,7 +4,14 @@ import androidx.work.WorkInfo
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
 import app.shosetsu.android.backend.workers.onetime.RepositoryUpdateWorker
 import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
-import app.shosetsu.android.common.SettingKey.*
+import app.shosetsu.android.common.SettingKey.NovelUpdateCycle
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowBattery
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnLowStorage
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnMeteredConnection
+import app.shosetsu.android.common.SettingKey.NovelUpdateOnlyWhenIdle
+import app.shosetsu.android.common.SettingKey.RepoUpdateOnLowBattery
+import app.shosetsu.android.common.SettingKey.RepoUpdateOnLowStorage
+import app.shosetsu.android.common.SettingKey.RepoUpdateOnMeteredConnection
 import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
@@ -15,7 +22,11 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
 
 /*
  * This file is part of shosetsu.

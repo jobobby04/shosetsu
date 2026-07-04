@@ -14,6 +14,7 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -66,9 +67,9 @@ import org.acra.ACRA
 @Composable
 fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	ChapterReaderContent(
+		isFocused = false,
 		isFirstFocusProvider = { false },
 		onFirstFocus = {},
-		isFocused = false,
 		content = { windowPadding, footerPadding ->
 			ChapterReaderPager(
 				items = persistentListOf(),
@@ -102,7 +103,8 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				toggleFocus = {}
 			) {}
 		},
-		exception = null
+		exception = null,
+		showTTSClickHint = false
 	)
 }
 
@@ -118,7 +120,8 @@ fun ChapterReaderContent(
 	onFirstFocus: () -> Unit,
 	content: @Composable (windowPadding: PaddingValues, footerPadding: PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
-	exception: ExceptionSnackbarModel?
+	exception: ExceptionSnackbarModel?,
+	showTTSClickHint: Boolean
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
@@ -155,19 +158,43 @@ fun ChapterReaderContent(
 	)
 
 	LaunchedEffect(exception) {
+		val exception = exception
 		if (exception != null) {
 			// We can only show reporting if ACRA is initialized
 			if (exception.exception != null && ACRA.isInitialised) {
-				val result = scaffoldState.snackbarHostState.showSnackbar(
-					exception.displayText,
-					actionLabel = context.getString(R.string.report)
-				)
+				scope.launch {
+					val result = scaffoldState.snackbarHostState.showSnackbar(
+						exception.displayText,
+						actionLabel = context.getString(R.string.report)
+					)
 
-				if (result == SnackbarResult.ActionPerformed) {
-					ACRA.errorReporter.handleException(exception.exception, false)
+					if (result == SnackbarResult.ActionPerformed) {
+						ACRA.errorReporter.handleException(exception.exception, false)
+					}
 				}
 			} else {
-				scaffoldState.snackbarHostState.showSnackbar(exception.displayText)
+				scope.launch {
+					scaffoldState.snackbarHostState.showSnackbar(exception.displayText)
+				}
+			}
+		}
+	}
+
+	// Consume the TTS show boolean
+	LaunchedEffect(showTTSClickHint) {
+		// Store the boolean
+		val showTTSClickHint = showTTSClickHint
+
+		// Is it true?
+		if (showTTSClickHint) {
+			// Launch the new job
+			scope.launch {
+				// Show the indefinite snackbar
+				scaffoldState.snackbarHostState.showSnackbar(
+					context.getString(R.string.reader_hint_pause_to_change),
+					duration = SnackbarDuration.Indefinite,
+					withDismissAction = true
+				)
 			}
 		}
 	}

@@ -60,6 +60,7 @@ import app.shosetsu.android.viewmodel.impl.settings.readerKeepScreenOnOption
 import app.shosetsu.android.viewmodel.impl.settings.readerLanguageOption
 import app.shosetsu.android.viewmodel.impl.settings.readerPitchOption
 import app.shosetsu.android.viewmodel.impl.settings.readerReadNextChapter
+import app.shosetsu.android.viewmodel.impl.settings.readerReadNextChapterAlert
 import app.shosetsu.android.viewmodel.impl.settings.readerSpeedOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTableHackOption
 import app.shosetsu.android.viewmodel.impl.settings.readerTestOption
@@ -104,6 +105,7 @@ fun ChapterReaderView(
 	val trackLongReading by viewModel.trackLongReading.collectAsState()
 
 	val exception by viewModel.exceptions.collectAsState(null)
+	val showTTSClickHint by viewModel.showTTSClickHint.collectAsState(false)
 
 	val context = LocalContext.current
 	val uriHandler = LocalUriHandler.current
@@ -181,6 +183,7 @@ fun ChapterReaderView(
 						item { viewModel.readerVoiceOption() }
 						item { viewModel.readerTestOption() }
 						item { viewModel.readerReadNextChapter() }
+						item { viewModel.readerReadNextChapterAlert() }
 					},
 					toggleFocus = viewModel::toggleFocus,
 					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
@@ -245,7 +248,8 @@ fun ChapterReaderView(
 				)
 			},
 			//isTapToScroll = isTapToScroll
-			exception = exception
+			exception = exception,
+			showTTSClickHint = showTTSClickHint
 		)
 		if (isReadingTooLong) {
 			AlertDialog(

@@ -3,7 +3,7 @@ package app.shosetsu.android.view.uimodels.model
 import android.text.format.DateFormat
 import androidx.compose.runtime.Immutable
 import app.shosetsu.android.common.enums.ReadingStatus
-import java.util.*
+import java.util.Date
 
 /*
  * This file is part of shosetsu.

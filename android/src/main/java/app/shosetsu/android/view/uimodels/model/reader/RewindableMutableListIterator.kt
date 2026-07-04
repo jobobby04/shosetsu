@@ -21,43 +21,15 @@ package app.shosetsu.android.view.uimodels.model.reader
  * Children must implement recreate function.
  */
 abstract class RewindableMutableListIterator<T> : MutableListIterator<T> {
-
-	/**
-	 * Get the last element
-	 */
-	open fun lastOrNull(): T? {
-		// the position we start at
-		val ogNextPosition = nextIndex()
-
-		// keep track of element that is being moved through
-		var last: T? = null
-
-		// go to the last element
-		while (hasNext()) {
-			last = next()
-		}
-
-		// rewind to exact starting position, where ogNextPosition was next
-		while (previousIndex() >= ogNextPosition) {
-			previous() // go back
-		}
-
-		// return the last element
-		return last
-	}
-
 	/**
 	 * Recreate the iterator, enabling us to go back before the first element
 	 */
-	open fun recreate() {
-		throw IllegalStateException("Must implement recreate")
-	}
+	abstract fun recreate()
 
-	companion object {
-		fun <T> MutableListIterator<T>.toRewindable(): RewindableMutableListIterator<T> {
-			return object : RewindableMutableListIterator<T>(),
-				MutableListIterator<T> by this@toRewindable {
-			}
-		}
-	}
+	abstract fun lastOrNull(): T?
+
+	/**
+	 * Create a new [RewindableMutableListIterator] using the data from this one.
+	 */
+	abstract fun clone(): RewindableMutableListIterator<T>
 }

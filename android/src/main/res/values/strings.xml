@@ -779,5 +779,14 @@
 	<string name="reader_error_tts_synthesis">TTS failed to synthesize given text.</string>
 	<string name="settings_view_no_images_title">No Images</string>
 	<string name="settings_view_no_images_desc">When enabled, no images will be shown for compressed novel cards, and novel card type will be set to "compressed".</string>
+	<string name="update_label_version_code">Version Code: %d</string>
+	<string name="update_label_commit">Commit: %d</string>
+	<string name="reader_hint_pause_to_change">Hint, To change currently read TTS text, pause the TTS first.</string>
+	<string name="view_novel_error_url_load">Failed to load novel URL: %s</string>
+	<string name="warning_repo">Warning no libraries found! Please wait a bit for them to be downloaded!</string>
+	<string name="reader_tts_next_chapter">Alert! Moving to the next chapter in a moment.</string>
+	<string name="settings_reader_next_chapter_alert_title">TTS Alert before moving chapters</string>
+	<string name="settings_reader_next_chapter_alert_desc">If enabled, a text to speech audio will give you an alert about moving to the next chapter.</string>
+	<string name="settings_backup_location_desc">Click to set a backup location</string>
 
 </resources>

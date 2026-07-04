@@ -180,7 +180,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 		StartDownloadWorkerUseCase(instance(), instance())
 	}
 	bind<StartUpdateWorkerUseCase>() with provider {
-		StartUpdateWorkerUseCase(instance())
+		StartUpdateWorkerUseCase(instance(), instance())
 	}
 
 	bind<UpdateBookmarkedNovelUseCase>() with provider { UpdateBookmarkedNovelUseCase(instance()) }

@@ -28,8 +28,9 @@ import java.io.Serial
  * @param messageRes given message
  */
 class OfflineException(
+	@Deprecated("Pass the message along directly via ExceptionSnackbarModel")
 	@StringRes
-	val messageRes: Int
+	val messageRes: Int = 0
 ) : Exception() {
 	companion object {
 		@Serial

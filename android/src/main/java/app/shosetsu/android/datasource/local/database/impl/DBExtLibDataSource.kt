@@ -47,4 +47,7 @@ class DBExtLibDataSource(
 
 	override suspend fun getExtLibsMatchingName(name: String): List<ExtLibEntity> =
 		extensionLibraryDao.getExtLibsMatchingName(name).convertList()
+
+	override suspend fun loadAll(): List<ExtLibEntity> =
+		extensionLibraryDao.loadAll().convertList()
 }

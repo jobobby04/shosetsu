@@ -19,6 +19,7 @@ import app.shosetsu.android.common.consts.Notifications
 import app.shosetsu.android.common.consts.ShortCuts
 import app.shosetsu.android.common.ext.fileOut
 import app.shosetsu.android.common.ext.launchIO
+import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.CloudflareInterceptor
@@ -204,21 +205,42 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				setupDualOutput()
 		}
 
+		// Setup kotlin-lib
 		setupCoreLib()
 
+		// Launch the repositories update manager
 		launchIO {
 			try {
-				if (extensionsRepo.loadRepositoryExtensions().isEmpty())
+				/*
+				Update the repositories if either there are no extensions or
+				if there are no extension libraries present for the main repository
+				 */
+				if (extensionsRepo.loadRepositoryExtensions().isEmpty()) {
 					startRepositoryUpdateManagerUseCase()
+				} else if (extLibRepository.loadAll().isEmpty()) {
+					// Tell the user about this
+					launchUI {
+						Toast.makeText(
+							this@ShosetsuApplication,
+							R.string.warning_repo,
+							Toast.LENGTH_LONG
+						).show()
+					}
+					startRepositoryUpdateManagerUseCase()
+				}
 			} catch (e: SQLiteException) {
 				ACRA.errorReporter.handleException(e)
 			}
 		}
+
+		// Set up the site protector
 		launchIO {
 			settingsRepo.getIntFlow(SettingKey.SiteProtectionDelay).collectLatest {
 				SiteProtector.requestDelay = it.toLong()
 			}
 		}
+
+		// Begin the onCreate process of our parent class
 		super.onCreate()
 
 		// Avoid potential crashes

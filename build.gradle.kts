@@ -18,6 +18,11 @@ allprojects {
 		}
 		google()
 		mavenCentral()
+		maven("https://jitpack.io") {
+			content {
+				includeGroup("com.gitlab.shosetsuorg")
+			}
+		}
 	}
 }
 

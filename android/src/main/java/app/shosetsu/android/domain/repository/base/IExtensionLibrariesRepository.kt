@@ -40,6 +40,13 @@ interface IExtensionLibrariesRepository {
 	suspend fun loadExtLibByRepo(repoID: Int): List<ExtLibEntity>
 
 	/**
+	 * Loads all the extension libraries
+	 *
+	 * @return All extension libraries
+	 */
+	suspend fun loadAll(): List<ExtLibEntity>
+
+	/**
 	 * Installs an extension library by its repository
 	 */
 	@Throws(

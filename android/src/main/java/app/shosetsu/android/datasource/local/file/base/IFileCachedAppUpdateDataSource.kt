@@ -40,6 +40,11 @@ interface IFileCachedAppUpdateDataSource {
 	suspend fun save(appUpdate: AppUpdateEntity)
 
 	/**
+	 * Deletes the file
+	 */
+	suspend fun delete()
+
+	/**
 	 * Saves the APK bytes to the filesystem
 	 *
 	 * @return the path to the APK

@@ -142,6 +142,7 @@ class NovelUpdateCycleWorker(
 		override suspend fun getCount(): Int =
 			getWorkerInfoList().size
 
+		suspend fun cycleEnabled(): Boolean = updateCycle() > 0L
 
 		/**
 		 * Starts the service. It will be started only if there isn't another instance already
@@ -150,7 +151,7 @@ class NovelUpdateCycleWorker(
 		override fun start(data: Data) {
 			launchIO {
 				logI(LogConstants.SERVICE_NEW)
-				if (updateCycle() == 0L) {
+				if (!cycleEnabled()) {
 					logI("Novel update cycle is disabled.")
 					return@launchIO
 				}

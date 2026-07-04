@@ -55,6 +55,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -84,6 +85,7 @@ import app.shosetsu.android.view.uimodels.model.DownloadUI
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel
 import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDownloadsState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
 
 /**
  * Shosetsu
@@ -108,25 +110,31 @@ fun DownloadsView(
 
 	val context = LocalContext.current
 	val hostState = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
 
 	LaunchedEffect(error) {
+		val error = error
 		if (error != null) {
 			when (error) {
 				is OfflineException -> {
-					val result = hostState.showSnackbar(
-						context.getString((error as OfflineException).messageRes),
-						duration = SnackbarDuration.Long,
-						actionLabel = context.getString(R.string.generic_wifi_settings)
-					)
-					if (result == SnackbarResult.ActionPerformed) {
-						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+					scope.launch {
+						val result = hostState.showSnackbar(
+							context.getString(error.messageRes),
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.generic_wifi_settings)
+						)
+						if (result == SnackbarResult.ActionPerformed) {
+							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+						}
 					}
 				}
 
 				else -> {
-					hostState.showSnackbar(
-						error?.message ?: context.getString(R.string.error)
-					)
+					scope.launch {
+						hostState.showSnackbar(
+							error.message ?: context.getString(R.string.error)
+						)
+					}
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.shosetsu.android.R
+import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.SettingKey.ReaderContinuousScroll
 import app.shosetsu.android.common.SettingKey.ReaderDisableTextSelection
 import app.shosetsu.android.common.SettingKey.ReaderDoubleTapFocus
@@ -258,6 +259,19 @@ fun ExposedSettingsRepoViewModel.trackLongReadingOption() {
 		stringResource(R.string.settings_reader_track_long_reading_desc),
 		settingsRepo,
 		ReaderTrackLongReading, modifier = Modifier
+			.fillMaxWidth()
+	)
+}
+
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun ExposedSettingsRepoViewModel.readerReadNextChapterAlert() {
+	SwitchSettingContent(
+		stringResource(R.string.settings_reader_next_chapter_alert_title),
+		stringResource(R.string.settings_reader_next_chapter_alert_desc),
+		settingsRepo,
+		SettingKey.ReaderNextChapterAlert, modifier = Modifier
 			.fillMaxWidth()
 	)
 }

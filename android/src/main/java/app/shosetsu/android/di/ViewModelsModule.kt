@@ -252,7 +252,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			chapterRepo = instance(),
 			getCategoriesUseCase = instance(),
 			getNovelCategoriesUseCase = instance(),
-			setNovelCategoriesUseCase = instance()
+			setNovelCategoriesUseCase = instance(),
+			application = instance()
 		)
 	}
 

@@ -1,6 +1,5 @@
 package app.shosetsu.android.ui.reader
 
-import android.content.ComponentCallbacks2
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Build
@@ -14,7 +13,6 @@ import androidx.core.view.WindowCompat
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_CHAPTER_ID
 import app.shosetsu.android.common.consts.BundleKeys.BUNDLE_NOVEL_ID
 import app.shosetsu.android.common.ext.collectLA
-import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.common.ext.setTheme
 import app.shosetsu.android.common.ext.viewModel
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel

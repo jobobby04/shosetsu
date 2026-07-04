@@ -27,3 +27,6 @@ common/build/intermediates/*
 acra.properties
 acra-debug.properties
 acra-uptodown.properties
+
+# Kotlin thingy
+*.salive

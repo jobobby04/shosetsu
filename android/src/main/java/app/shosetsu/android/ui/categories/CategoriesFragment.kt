@@ -52,6 +52,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +70,7 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACategoriesViewModel.CategoryChangeState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
 
 /**
  * Allow user to configure categories
@@ -84,15 +86,22 @@ fun CategoriesView(
 	val addCategoryState by viewModel.addCategoryState.collectAsState()
 
 	val hostState = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 
 	LaunchedEffect(addCategoryState) {
 		when (addCategoryState) {
-			CategoryChangeState.Finished ->
-				hostState.showSnackbar(context.getString(R.string.toast_categories_added))
+			CategoryChangeState.Finished -> {
+				scope.launch {
+					hostState.showSnackbar(context.getString(R.string.toast_categories_added))
+				}
+			}
 
-			is CategoryChangeState.Failure ->
-				hostState.showSnackbar(context.getString(R.string.toast_categories_add_fail))
+			is CategoryChangeState.Failure -> {
+				scope.launch {
+					hostState.showSnackbar(context.getString(R.string.toast_categories_add_fail))
+				}
+			}
 
 			CategoryChangeState.Unknown -> {}
 		}
@@ -100,21 +109,26 @@ fun CategoriesView(
 
 	val removeCategoryState by viewModel.removeCategoryState.collectAsState()
 	LaunchedEffect(removeCategoryState) {
-		when (addCategoryState) {
-			CategoryChangeState.Finished ->
-				hostState.showSnackbar(context.getString(R.string.fragment_categories_snackbar_repo_removed))
+		when (val removeCategoryState = removeCategoryState) {
+			CategoryChangeState.Finished -> {
+				scope.launch {
+					hostState.showSnackbar(context.getString(R.string.fragment_categories_snackbar_repo_removed))
+				}
+			}
 
 			is CategoryChangeState.Failure -> {
-				val state = removeCategoryState as CategoryChangeState.Failure
-				logE("Failed to remove category ${state.category}", state.exception)
-				val result =
-					hostState.showSnackbar(
-						context.getString(R.string.toast_categories_remove_fail),
-						actionLabel = context.getString(R.string.retry)
-					)
+				scope.launch {
+					val state = removeCategoryState as CategoryChangeState.Failure
+					logE("Failed to remove category ${state.category}", state.exception)
+					val result =
+						hostState.showSnackbar(
+							context.getString(R.string.toast_categories_remove_fail),
+							actionLabel = context.getString(R.string.retry)
+						)
 
-				if (result == SnackbarResult.ActionPerformed)
-					viewModel.remove(state.category)
+					if (result == SnackbarResult.ActionPerformed)
+						viewModel.remove(state.category)
+				}
 			}
 
 			CategoryChangeState.Unknown -> {}
@@ -125,8 +139,11 @@ fun CategoriesView(
 	LaunchedEffect(moveUpCategoryState) {
 		when (addCategoryState) {
 			CategoryChangeState.Finished -> {}
-			is CategoryChangeState.Failure ->
-				hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
+			is CategoryChangeState.Failure -> {
+				scope.launch {
+					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
+				}
+			}
 
 			CategoryChangeState.Unknown -> {}
 		}
@@ -136,8 +153,11 @@ fun CategoriesView(
 	LaunchedEffect(moveDownCategoryState) {
 		when (addCategoryState) {
 			CategoryChangeState.Finished -> {}
-			is CategoryChangeState.Failure ->
-				hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
+			is CategoryChangeState.Failure -> {
+				scope.launch {
+					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
+				}
+			}
 
 			CategoryChangeState.Unknown -> {}
 		}

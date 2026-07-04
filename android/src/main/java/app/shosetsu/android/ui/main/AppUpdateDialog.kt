@@ -1,10 +1,23 @@
 package app.shosetsu.android.ui.main
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import app.shosetsu.android.R
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 
@@ -24,6 +37,26 @@ import app.shosetsu.android.domain.model.local.AppUpdateEntity
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+@Preview
+@Composable
+fun PreviewAppUpdateDialog() {
+	AppUpdateDialog(
+		AppUpdateEntity(
+			"mew",
+			100,
+			1000,
+			url = "hehe",
+			archURLs = null,
+			notes = buildList {
+				repeat(100) {
+					add("mew")
+				}
+			}
+		),
+		{}
+	) { }
+}
 
 /**
  * Shosetsu
@@ -58,10 +91,46 @@ fun AppUpdateDialog(
 			}
 		},
 		text = {
-			Text(
-				"${update.version}\t${update.versionCode}\n" +
-					update.notes.joinToString("\n")
-			)
+			Column(
+				modifier = Modifier
+					.graphicsLayer {
+						alpha = 0.99f
+					}
+					.drawWithContent {
+						// Draw the text
+						drawContent()
+
+						// Draw the fade
+						drawRect(
+							brush = Brush.verticalGradient(
+								colors = listOf(
+									Color.Black,
+									Color.Transparent
+								),
+								startY = this.size.height * .8f
+							),
+							blendMode = BlendMode.DstIn
+						)
+					}) {
+
+				Text(update.version, style = MaterialTheme.typography.titleMedium)
+
+				if (update.versionCode != -1) {
+					Text(stringResource(R.string.update_label_version_code, update.versionCode))
+				}
+
+				if (update.commit != -1) {
+					Text(stringResource(R.string.update_label_commit, update.commit))
+				}
+
+				Text(
+					update.notes.joinToString("\n"),
+					modifier = Modifier
+						.heightIn(max = 200.dp)
+						.verticalScroll(rememberScrollState())
+				)
+			}
+
 		}
 	)
 }

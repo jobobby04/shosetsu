@@ -50,6 +50,11 @@ abstract class AChapterReaderViewModel :
 	abstract val exceptions: SharedFlow<ExceptionSnackbarModel>
 
 	/**
+	 * If the TTS click hint is to be shown to the user or not
+	 */
+	abstract val showTTSClickHint: SharedFlow<Boolean>
+
+	/**
 	 * Has the user been reading for too long?
 	 *
 	 * If so, then the user will be notified
@@ -112,6 +117,10 @@ abstract class AChapterReaderViewModel :
 	abstract fun toggleFocus()
 	abstract fun toggleSystemVisible()
 
+	/**
+	 * Called when the user clicks
+	 * @param item The UUID of the TTS item
+	 */
 	abstract fun onReaderClicked(item: String?)
 	abstract fun onReaderDoubleClicked()
 
@@ -180,7 +189,15 @@ abstract class AChapterReaderViewModel :
 	abstract fun clearMemory()
 
 	abstract val pageJumper: SharedFlow<Int>
+
+	/**
+	 * Contains the utterance ID that is currently being spoken
+	 */
 	abstract val ttsProgress: StateFlow<String?>
+
+	/**
+	 * State of the TTS playback
+	 */
 	abstract val ttsPlayback: StateFlow<TTSPlayback>
 	abstract fun onPlayTts()
 	abstract fun onPauseTts()

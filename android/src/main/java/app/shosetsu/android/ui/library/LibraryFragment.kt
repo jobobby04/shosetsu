@@ -154,23 +154,28 @@ fun LibraryView(
 	val hostState = remember { SnackbarHostState() }
 
 	LaunchedEffect(error) {
+		val error = error
 		if (error != null) {
 			when (error) {
 				is OfflineException -> {
-					val result = hostState.showSnackbar(
-						context.getString((error as OfflineException).messageRes),
-						duration = SnackbarDuration.Long,
-						actionLabel = context.getString(R.string.generic_wifi_settings)
-					)
-					if (result == ActionPerformed) {
-						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+					scope.launch {
+						val result = hostState.showSnackbar(
+							context.getString(error.messageRes),
+							duration = SnackbarDuration.Long,
+							actionLabel = context.getString(R.string.generic_wifi_settings)
+						)
+						if (result == ActionPerformed) {
+							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+						}
 					}
 				}
 
 				else -> {
-					hostState.showSnackbar(
-						error?.message ?: context.getString(R.string.error)
-					)
+					scope.launch {
+						hostState.showSnackbar(
+							error.message ?: context.getString(R.string.error)
+						)
+					}
 				}
 			}
 		}

@@ -133,9 +133,11 @@ fun AdvancedSettingsView(
 			null -> {}
 
 			AAdvancedSettingsViewModel.RestartResult.KILLED -> {
-				hostState.showSnackbar(
-					context.getString(R.string.settings_advanced_cycle_start_success)
-				)
+				scope.launch {
+					hostState.showSnackbar(
+						context.getString(R.string.settings_advanced_cycle_start_success)
+					)
+				}
 			}
 		}
 	}

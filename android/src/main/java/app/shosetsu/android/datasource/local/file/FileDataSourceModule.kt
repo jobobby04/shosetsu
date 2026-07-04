@@ -1,7 +1,19 @@
 package app.shosetsu.android.datasource.local.file
 
-import app.shosetsu.android.datasource.local.file.base.*
-import app.shosetsu.android.datasource.local.file.impl.*
+import app.shosetsu.android.datasource.local.file.base.IFileCachedAppUpdateDataSource
+import app.shosetsu.android.datasource.local.file.base.IFileCachedChapterDataSource
+import app.shosetsu.android.datasource.local.file.base.IFileChapterDataSource
+import app.shosetsu.android.datasource.local.file.base.IFileCrashDataSource
+import app.shosetsu.android.datasource.local.file.base.IFileExtLibDataSource
+import app.shosetsu.android.datasource.local.file.base.IFileExtensionDataSource
+import app.shosetsu.android.datasource.local.file.base.IFileSettingsDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileAppUpdateDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileCachedChapterDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileChapterDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileCrashDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileExtLibDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileExtensionDataSource
+import app.shosetsu.android.datasource.local.file.impl.FileSharedPreferencesSettingsDataSource
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance

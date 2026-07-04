@@ -3,6 +3,7 @@ package app.shosetsu.android.domain.usecases.start
 import androidx.work.Data
 import androidx.work.await
 import app.shosetsu.android.backend.workers.onetime.NovelUpdateWorker
+import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import app.shosetsu.android.common.ext.launchIO
 
 /*
@@ -27,7 +28,8 @@ import app.shosetsu.android.common.ext.launchIO
  * 23 / 06 / 2020
  */
 class StartUpdateWorkerUseCase(
-	private val manager: NovelUpdateWorker.Manager
+	private val manager: NovelUpdateWorker.Manager,
+	private val cycleManager: NovelUpdateCycleWorker.Manager,
 ) {
 	/**
 	 * Starts the update worker
@@ -38,13 +40,15 @@ class StartUpdateWorkerUseCase(
 	operator fun invoke(categoryID: Int, override: Boolean = false) {
 		launchIO {
 			// Check if the update worker is running
-			if (manager.isRunning())
-			// Check if we can override it
-				if (override)
-				// Kill the old one since we can
+			if (manager.isRunning()) {
+				// Check if we can override it
+				if (override) {
+					// Kill the old one since we can
 					manager.stop().await()
-				else
+				} else {
 					return@launchIO
+				}
+			}
 
 			// Was a category given?
 			if (categoryID >= 0) {
@@ -54,6 +58,14 @@ class StartUpdateWorkerUseCase(
 						.putInt(NovelUpdateWorker.KEY_CATEGORY, categoryID)
 						.build()
 				)
+			} else if (cycleManager.cycleEnabled()) {
+				// Update all categories
+				// By stopping and restarting the cycle manager, we get androidx.work to schedule
+				// the first execution immediately and the next execution after the cycle time.
+				// This means users get some control over when cycles are run,
+				// and we avoid updating again just after the user has manually triggered an update
+				cycleManager.stop()
+				cycleManager.start()
 			} else {
 				// Update all categories
 				manager.start()

@@ -8,7 +8,9 @@ import android.os.Build.VERSION_CODES
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.core.app.NotificationCompat.*
+import androidx.core.app.NotificationCompat.Action
+import androidx.core.app.NotificationCompat.Builder
+import androidx.core.app.NotificationCompat.EXTRA_NOTIFICATION_ID
 import app.shosetsu.android.R
 import app.shosetsu.android.backend.receivers.NotificationBroadcastReceiver
 

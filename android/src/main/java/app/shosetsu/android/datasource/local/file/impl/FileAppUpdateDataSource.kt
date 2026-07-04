@@ -11,6 +11,7 @@ import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.model.remote.AppUpdateDTO
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import kotlinx.serialization.json.Json
+import org.acra.ACRA
 import java.io.IOException
 import java.io.InputStream
 
@@ -68,6 +69,15 @@ class FileAppUpdateDataSource(
 		appUpdate: AppUpdateEntity
 	) {
 		write(AppUpdateDTO.fromEntity(appUpdate))
+	}
+
+	override suspend fun delete() {
+		try {
+			iFileSystemProvider.deleteFile(CACHE, APP_UPDATE_CACHE_FILE)
+		} catch (exception: FilePermissionException) {
+			logE("Failed to delete update file", exception)
+			ACRA.errorReporter.handleSilentException(exception)
+		}
 	}
 
 	@Throws(IOException::class, FilePermissionException::class, FileNotFoundException::class)

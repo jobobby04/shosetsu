@@ -1,36 +1,111 @@
 # 2.5.1
- - misc: Prettify debug updates
- - misc: Sync gitlab ci with compileSdk
- - misc: Bump to versionCode 49 / '2.5.1'
- - feat(Reader): More error handling, now with a possible report button.
- - feat(Reader): Add setting to deduplicate titles.
- - fix(Catalog): Ensure listing selection is only visible if there is '>1',
+
+As many fixes as possible, the release.
+
+## Special Thanks:
+- To '@lazy_lord:matrix.org' for testing accessibility
+- To '@errort:465789.xyz' for helping test the dev builds
+- To '@johannes:matrix.frohnmeyer-wds.de' for their dedicated contributions
+- To 'syer10' for their long term commitment
+- To everyone else for their bug reports and patience towards me fixing them
+
+## Changelog
+- feat: Add toggleable TTS alert before auto moving to the next chapter
+- fix: Correct logic to move to next chapter when TTS is finished,
+	- The ElementToTTSTextIterator.kt was once again the culprit.
+- fix: Load the repositories if there are no extension libraries found.,
+	- Handles the issue with migrating from 'v2.5.0' to 'v2.5.1'
+- fix(NovelView): Catch errors when retrieving novel URL
+- misc: Disable UpToDownAppUpdateDataSource.kt download feature,
+	- UpToDown has scrambled their download URL, and I do not want to,
+	- figure it out currently.
+- feat: Add hint of how to change TTS paragraph when the reader is playing,
+	- This will help any user understand what is going on.
+- fix: Launch TTS paragraph changes via the compose coroutines scope,
+	- Much better than launching it globally.
+- fix: Launch reader collection tasks in separate sub-jobs.,
+	- The TTS box did not work because the style collect would block it.
+- fix: Disable setting icon descriptions,
+	- I do not know why the 'traversalIndex' does not work for this element.
+- misc: Fix up the legacy navigation drawer,
+	- Also added in predictive back support
+- fix: Delete cached update file if outdated,
+	- Seems to fix the issue in dev where the update dialog persists
+- fix: Ensure snackbars are shown in a launched coroutine,
+	- Otherwise they get vaporized instantly.
+- fix: Properly link up Novel views error snackbar,
+	- For some reason it was never linked?!
+- fix: restore implicit cycle implications of StartUpdateWorkerUseCase,
+	- See https://gitlab.com/shosetsuorg/shosetsu/-/commit/9682b4fcd45f6bc0d1bd87d919081fa0803b4b0d#note_3518447218
+- fix: Change primary key of DBExtLibEntity.kt to be a composite,
+	- It is now a composite of the name and repoId,,
+	- this matches the new behavior allowing multiple repositories to have,
+	- their scripts loaded into shosetsu at once.,
+	- With this fix, is a revision to the logic of extension insertions,,
+	- which now properly check against the repo id when looking up an ext lib
+- misc: Make update dialog scrollable and cleaner.,
+	- Not only is the view smaller, it also features:,
+	- 1. Labeling of the other bits of data,
+	- 2. A fade effect towards the bottom to let people know they can scroll,
+	- (visually)
+- misc: Set debug/dev app name to 'Dev Shosetsu' for differentiation
+- misc: Simplify version comparison logic
+- fix: Add missing 'commit' field from debug updates
+- misc: Rework 'RepositoryUpdateWorker.kt' logic.,
+	- Better documented, better structured,,
+	- and less in and outs of functions.,
+	- This also fixes how extension libraries are handled, and how,
+	- disabled repositories are handled.
+- fix: Bring back 'obsolete extension' warning.,
+	- The logic works on if 'isUpdateAvailable' is true.,
+	- So we bring back the condition that 'isUpdateAvailable' is true,
+	- when the version is '-9.-9.-9'.,
+	- It is kinda stupid, but that is how it was hacked in.
+- fix: Prevent extension library file conflicts via repo subdirectories.,
+	- Newly installed extensions library will all use the new repo path.
+- fix: Prevent extension file conflicts via repo subdirectories.,
+	- Newly installed extensions will all use the new repo path.
+- fix: Properly close response before retrying
+- fix: Correct start update logic,
+	- For some reason, it started the cycle worker if the category id was not set.,
+	- Why did I do that?
+- fix: Use toggleable modifier for switch preferences,
+	- Fixes announcements of the setting state to screen readers.
+- feat: Add setting to disable images for compressed novels.,
+	- Pretty easy to implement, with minor changes,
+	- to how compressed novel cards are rendered.
+- misc: Prettify debug updates
+- misc: Sync gitlab ci with compileSdk
+- misc: Bump to versionCode 49 / '2.5.1'
+- feat(Reader): More error handling, now with a possible report button.
+- feat(Reader): Add setting to deduplicate titles.
+- fix(Catalog): Ensure listing selection is only visible if there is '>1',
 	- Also minor logic improvements
- - misc: Make catalog pager exception handling a catch-all.,
+- misc: Make catalog pager exception handling a catch-all.,
 	- For some reason the exceptions caught were explicitly declared, and,
 	- using the same exact body in each catch.,
 	- So this just turns it into a generic catch-all that handles the one,
 	- and only error handling in the catalog pager, throwing it,
 	- upwards and leaving it to the UI.,
 	- Also updates the throws annotations...
- - misc: Catch any stray exceptions in CatalogViewModel.kt
- - misc: Complete documentation of ACatalogViewModel.kt
- - fix: Add missing content descriptions wherever possible.
- - fix(strings): Reverse logic of notify update progress switch.,
+- misc: Catch any stray exceptions in CatalogViewModel.kt
+- misc: Complete documentation of ACatalogViewModel.kt
+- fix: Add missing content descriptions wherever possible.
+- fix(strings): Reverse logic of notify update progress switch.,
 	- User krilies (749903441005903882) reported that the setting description,
 	- was in reverse.
- - fix(fdroid): Downgrade to target android 36, not 37.,
+- fix(fdroid): Downgrade to target android 36, not 37.,
 	- Seems the 37 sdk is broken with sdkmanager, and was preventing,
 	- fdroid builds from occurring.,
 	- Upstream: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/39414#note_3414324387
- - fix(UpdatesView): Correct text cutoff due to large chapter titles.,
+- fix(UpdatesView): Correct text cutoff due to large chapter titles.,
 	- This required a change to how the update items height was composed.,
 	- Now the row is based on the needed height of the elements instead,,
 	- which gets determined via ratios, including the ratio for the novel,
 	- cover.,
 	- The changes to the ImageLoadingError.kt modifiers may cause,
 	- side effects, but I see none at a cursory glance.
- - fix(TTS): Correct fundamental flaw of RewindableMutableListIterator,
+- fix(TTS): Correct fundamental flaw of RewindableMutableListIterator,
 	- Previously it was assumed you can go back to the first element by,
 	- simply rewinding via 'previous', but this is an incorrect assumption.,
 	- As per the JDK list iterator documentation...,
@@ -42,37 +117,35 @@
 	- a recreate method instead of a rewind method.,
 	- The class can be renamed later.,
 	- ACRA: 58
- - fix(RestoreBackup): Properly handle timeout when installing extension.,
+- fix(RestoreBackup): Properly handle timeout when installing extension.,
 	- Use new network error string when a timeout exception occurs during an,
 	- extensions download.,
 	- If it occurs, we will try again, once,,
 	- before giving up.,
 	- Saw the acra report, now it is handled.,
 	- ACRA: 48
- - fix(browse): Apply missing IME Action, fixing keyboard controls.,
+- fix(browse): Apply missing IME Action, fixing keyboard controls.,
 	- KeyboardActions requires an IME Action to be set, without it set,,
 	- no events are received.,
 	- Please document commits better for the future, y'all know who you are.,
 	- Caused by: 3c25407f
- - fix(ExtSettings): Consume error when trying to load ext listing name.,
+- fix(ExtSettings): Consume error when trying to load ext listing name.,
 	- Oops, I forgot to catch that one!,
 	- Also consumes more possible exceptions too!.
- - fix(search): Do not crash for any extension loading issue.,
+- fix(search): Do not crash for any extension loading issue.,
 	- This commit finally fixes all the varying crashes due to,
 	- invalid extensions.,
 	- The search view now properly consumes all exceptions when trying to,
 	- load each extension, and displays it to the user to handle and figure,
 	- out on their own time.
- - misc: Add missing throws to 'GenericExtensionEntity.asIEntity'.
- - fix(reader): Do not report cancellation exceptions when record chapter,
+- misc: Add missing throws to 'GenericExtensionEntity.asIEntity'.
+- fix(reader): Do not report cancellation exceptions when record chapter,
 	- I also fixed up some method naming sense.,
 	- Resolves: ACRA 83.
- - misc(WebViewInterceptor): Use string resource for missing webview msg
- - Merge remote-tracking branch 'origin/development' into development
- - build: force matching tools version
- - ci: 37.0
- - ci: bump tools
- - fix: dismiss novel dropdowns on interaction,
+- misc(WebViewInterceptor): Use string resource for missing webview msg
+- Merge remote-tracking branch 'origin/development' into development
+- build: force matching tools version
+- fix: dismiss novel dropdowns on interaction,
 	- This used to work. Maybe something changed in Material3?
- - fix: use pinnedScrollBehavior,
+- fix: use pinnedScrollBehavior,
 	- Previously, you could swipe up on top app bars and, in doing so, cause them to disappear without any apparent way to get them back. Having them disappear on scroll might be nice, but this doesn't seem to be the way to go."

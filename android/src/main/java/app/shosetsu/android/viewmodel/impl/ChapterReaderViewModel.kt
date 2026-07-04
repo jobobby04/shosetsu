@@ -85,6 +85,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -114,6 +115,7 @@ import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.Locale
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 /*
@@ -173,6 +175,8 @@ class ChapterReaderViewModel(
 	}
 
 	override val exceptions: MutableSharedFlow<ExceptionSnackbarModel> = MutableSharedFlow()
+
+	override val showTTSClickHint: MutableSharedFlow<Boolean> = MutableSharedFlow()
 
 	override val isReadingTooLong: MutableStateFlow<Boolean> by lazy {
 		MutableStateFlow(false)
@@ -775,11 +779,43 @@ class ChapterReaderViewModel(
 		_isSystemVisible.value = !_isSystemVisible.value
 	}
 
+	private val readerTTSClickHintShown =
+		settingsRepo.getBooleanFlow(SettingKey.ReaderTTSClickHintShown)
+
 	override fun onReaderClicked(item: String?) {
-		if (item != null && ttsPlayback.value == TTSPlayback.Paused) {
-			ttsProgress.value = item.substringAfter("textElement")
-			ttsPlayback.value = TTSPlayback.Playing
-		} else if (!doubleTapFocus.value) {
+		logV("Arguments: item='$item'")
+		// If there is an item, perform the consumption logic
+		if (item != null) {
+			// Check the state of the TTS reader
+			if (ttsPlayback.value == TTSPlayback.Paused) {
+				logD("Moving progress")
+
+				// Set the new progress position
+				ttsProgress.value = item.substringAfter("textElement")
+
+				// Start the TTS again
+				ttsPlayback.value = TTSPlayback.Playing
+
+				// Return to prevent further logic
+				return
+			} else if (ttsPlayback.value == TTSPlayback.Playing && !readerTTSClickHintShown.value) {
+				logD("Telling the user a hint")
+
+				launchUI {
+					// Show the hint
+					showTTSClickHint.emit(true)
+
+					// Never show the hint again
+					settingsRepo.setBoolean(SettingKey.ReaderTTSClickHintShown, true)
+				}
+
+				// Return to prevent further logic
+				return
+			}
+		}
+
+		if (!doubleTapFocus.value) {
+			logD("Changing focus")
 			val newValue = !isFocused.value
 			isFocused.value = newValue
 			if (newValue || matchFullscreenToFocus.value)
@@ -1063,6 +1099,7 @@ class ChapterReaderViewModel(
 			it.setOnUtteranceProgressListener(
 				object : UtteranceProgressListener() {
 					override fun onStart(utteranceId: String?) {
+						logV("Arguments: utteranceId='$utteranceId'")
 						// Only set progress if not stopped
 						if (ttsPlayback.value != TTSPlayback.Stopped) {
 							ttsProgress.value = utteranceId?.substringBefore('|')
@@ -1070,6 +1107,7 @@ class ChapterReaderViewModel(
 					}
 
 					override fun onDone(utteranceId: String?) {
+						logV("Arguments: utteranceId='$utteranceId'")
 						ttsDone.value = utteranceId
 					}
 
@@ -1078,6 +1116,7 @@ class ChapterReaderViewModel(
 					}
 
 					override fun onError(utteranceId: String?, errorCode: Int) {
+						logV("Arguments: utteranceId='$utteranceId', errorCode=`$errorCode`")
 						this@ChapterReaderViewModel.logE("TTS Error code: $errorCode")
 						ttsPlayback.value = TTSPlayback.Paused
 					}
@@ -1090,112 +1129,255 @@ class ChapterReaderViewModel(
 		viewModelScopeIO.launch {
 			var oldTts: TextToSpeech? = null
 			currentChapterID.collectLatest { chapterId ->
+				logV("chapterId='$chapterId'")
+
 				// Child scope is cancelled when the chapter is changed
 				coroutineScope {
 					// Clear out old TTS
+					logD("Clearing old TTS")
 					oldTts?.stop() // we ignore error codes here, its going away
 					oldTts = null
 
 					// Find the current chapter
+					logD("Finding current chapter")
 					val item = liveData.first { it != null }
 						?.find { (it as? ReaderChapterUI)?.id == chapterId }
-						as? ReaderChapterUI ?: return@coroutineScope
+						as? ReaderChapterUI
+
+					if (item == null) {
+						logD("Failed to find the current chapter, giving up")
+						return@coroutineScope
+					}
 
 					// Clean up memory asap
+					logD("Clearing memory")
 					System.gc()
 
 					// Get the text of the chapter
+					logD("Getting next chapter text")
 					val passage = getChapterPassageHTML(item)
 						.firstOrNull { it is ChapterPassage.Success } as? ChapterPassage.Success
-						?: return@coroutineScope
 
-					launch nextChapterTts@{
-						val lastTts =
-							passage.ttsElements.lastOrNull()
-								?: return@nextChapterTts
-
-						// If the user enables the setting while in the reader, we can listen in
-						ttsNextChapter.collectLatest nextChapterTts2@{ ttsNextChapter ->
-							// skip if disabled
-							if (!ttsNextChapter) {
-								return@nextChapterTts2
-							}
-
-							// Wait for the last TTS line to be spoken to move to the next chapter
-							ttsDone.firstOrNull { it != null && it == lastTts.id }
-								?: return@nextChapterTts2
-
-							// Get current readerUIItems
-							val readerUIItems =
-								liveData.first { it != null } ?: return@nextChapterTts2
-
-							val chapterItems = readerUIItems.filterIsInstance<ReaderChapterUI>()
-
-							// Find index of the current chapter
-							val index = chapterItems.indexOfFirst { it.id == chapterId }
-
-							// ensure we got a valid index
-							if (index >= 0) {
-								// Find next chapter
-								val nextChapter = chapterItems
-									.getOrNull(index + 1) // Attempt to get next chapter
-									?: return@nextChapterTts2
-
-								// Jump to the next chapter
-								pageJumper.emit(readerUIItems.indexOf(nextChapter))
-								viewModelScopeIO.launch {
-									System.gc() // Clear out heavy operation (above)
-									onViewed(nextChapter)
-									setCurrentChapterID(nextChapter.id)
-									// Start the TTS again
-									withTimeoutOrNull(5.seconds) {
-										if (
-											ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
-										) {
-											onPlayTts()
-										}
-									}
-								}
-							}
-						}
+					if (passage == null) {
+						logD("Failed to get chapter passage, giving up")
+						return@coroutineScope
 					}
 
+					logD("Launching next chapter watcher")
+					launch nextChapterTts@{
+						var count = 0
+						while (count < 10) {
+							count++
+							nextChapterTSSProcess(passage, chapterId)
+							logD("nextChapterTSSProcess returned early, retrying in a second, $count")
+							delay(1000)
+						}
+
+						// We must never reach here
+						exceptions.emit(
+							ExceptionSnackbarModel("Failed to setup next chapter TTS process after 10 tries.")
+						)
+					}
+
+					logD("Starting TTS collector")
 					tts.collectLatest { tts ->
-						if (tts == null) {
-							oldTts?.stop() // ignore result
-							oldTts = null
-							@Suppress("LABEL_NAME_CLASH")
-							return@collectLatest
-						}
-						oldTts?.stop() // ignore result
-						oldTts = tts
-
-						// Are we playing TTS?
-						ttsPlayback.collectLatest { playback ->
-							// if we are not playing, make sure the TTS is stopped
-							if (playback != TTSPlayback.Playing) {
-								tts.stop().let(::launchHandleTTSError)
-								@Suppress("LABEL_NAME_CLASH")
-								return@collectLatest
-							}
-
-							// child scope is killed off if the parent dies
-							coroutineScope {
-								syncTTSIterator(passage.ttsElements)
-								// For each element, lets speak it out
-								passage.ttsElements.forEachRemaining {
-									if (!it.ignore)
-										customSpeak(
-											tts,
-											it.text,
-											it.id,
-											::launchHandleTTSError
-										)
-								}
-							}
-						}
+						onLatestTTS(tts, oldTts, setOldTts = { oldTts = it }, passage)
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * The process that handles the TTS next chapter process
+	 */
+	private suspend fun nextChapterTSSProcess(passage: ChapterPassage.Success, chapterId: Int) {
+		logD("Next Chapter TTS job has started, waiting for lastTTS")
+		val lastTts = run {
+			// clone so we do not interrupt parent
+			val elements = passage.ttsElements.clone()
+			// Recreate the model of our clone
+			elements.recreate()
+
+			// Return a temporary reference to this clone
+			elements
+		}.lastOrNull()
+
+		if (lastTts == null) {
+			logD("Last TTS is null, giving up")
+			return
+		}
+
+		logV("Last TTS element='$lastTts'")
+
+		// If the user enables the setting while in the reader, we can listen in
+		ttsNextChapter.collectLatest { ttsNextChapter ->
+			onLatestTTSNextChapterSetting(ttsNextChapter, lastTts, chapterId)
+		}
+	}
+
+	private val alertNextChapter = settingsRepo.getBooleanFlow(SettingKey.ReaderNextChapterAlert)
+
+	private suspend fun onLatestTTSNextChapterSetting(ttsNextChapter: Boolean, lastTts: TTSText, chapterId: Int) {
+		logV("Arguments: ttsNextChapter='$ttsNextChapter'")
+		// skip if disabled
+		if (!ttsNextChapter) {
+			logD("ttsNextChapter disabled")
+			return
+		}
+
+		// Wait for the last TTS line to be spoken to move to the next chapter
+		val result = ttsDone.firstOrNull { it != null && it == lastTts.id }
+
+		if (result == null) {
+			logD("Failed to get to last TTS element, giving up")
+			return
+		}
+
+		logD("Last TTS element reached")
+
+		// Get current readerUIItems
+		val readerUIItems =
+			liveData.first { it != null }
+
+		if (readerUIItems == null) {
+			logD("ReaderUIItems is null")
+			return
+		}
+
+		logV("readerUIItems='$readerUIItems'")
+
+		val chapterItems = readerUIItems.filterIsInstance<ReaderChapterUI>()
+
+		logV("chapterItems='$chapterItems'")
+
+		// Find index of the current chapter
+		val index = chapterItems.indexOfFirst { it.id == chapterId }
+
+		logV("index='$index'")
+
+		// ensure we got a valid index
+		if (index >= 0) {
+			logD("We got a valid index!")
+			// Find next chapter
+			val nextChapter = chapterItems
+				.getOrNull(index + 1) // Attempt to get next chapter
+
+			if (nextChapter == null) {
+				logD("next chapter is null, not going over")
+				return
+			}
+
+			logV("nextChapter='$nextChapter'")
+
+			// Check if we have to alert the user before moving on
+			if (alertNextChapter.value) {
+				// Inform the reader we are moving forward
+
+				// generate an ID
+				val id = UUID.randomUUID()
+
+				// Send the information out
+				tts.value?.speak(
+					application.getString(R.string.reader_tts_next_chapter),
+					TextToSpeech.QUEUE_FLUSH,
+					null,
+					id.toString()
+				)
+
+				// await our voice to finish
+				ttsDone.firstOrNull { it != null && id.toString() == it }
+
+				// give the user a bit to process that
+				delay(2000)
+			}
+
+			// Jump to the next chapter
+			logD("Moving to next chapter")
+			pageJumper.emit(readerUIItems.indexOf(nextChapter))
+			viewModelScopeIO.launch {
+				logD("Cleaning up memory")
+				System.gc() // Clear out heavy operation (above)
+				logD("Set the nextChapter as read")
+				onViewed(nextChapter)
+				logD("Set the nextChapter as the current")
+				setCurrentChapterID(nextChapter.id)
+
+				// Start the TTS again
+				logD("Starting up TTS again with a delay")
+				withTimeoutOrNull(5.seconds) {
+					logD("Waiting for TTS to be stopped")
+					if (
+						ttsPlayback.firstOrNull { it == TTSPlayback.Stopped } != null
+					) {
+						logD("TTS has been stopped, starting it for nextChapter")
+						onPlayTts()
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Called whenever a new TTS engine is loaded
+	 */
+	private suspend fun onLatestTTS(
+		tts: TextToSpeech?,
+		oldTts: TextToSpeech?,
+		setOldTts: (TextToSpeech?) -> Unit,
+		passage: ChapterPassage.Success
+	) {
+		logV("Arguments: tts='$tts'")
+		if (tts == null) {
+			logD("TTS is null, clearing old TTS and returning.")
+			oldTts?.stop() // ignore result
+			setOldTts(null)
+			@Suppress("LABEL_NAME_CLASH")
+			return
+		}
+		logD("Clearing out old TTS and setting new as old")
+		oldTts?.stop() // ignore result
+		setOldTts(tts)
+
+		// Are we playing TTS?
+		ttsPlayback.collectLatest { playback ->
+			onLatestTTSPlayback(playback, tts, passage)
+		}
+	}
+
+	/**
+	 * Called whenever a new TTS playback state is received
+	 */
+	private suspend fun onLatestTTSPlayback(
+		playback: TTSPlayback,
+		tts: TextToSpeech,
+		passage: ChapterPassage.Success
+	) {
+		logV("Arguments: playback='$playback'")
+
+		// if we are not playing, make sure the TTS is stopped
+		if (playback != TTSPlayback.Playing) {
+			logD("Ensuring TTS is stopped in sync with UI state")
+			tts.stop().let(::launchHandleTTSError)
+			@Suppress("LABEL_NAME_CLASH")
+			return
+		}
+
+		// child scope is killed off if the parent dies
+		coroutineScope {
+			logD("Syncing TTS iterator")
+			syncTTSIterator(passage.ttsElements)
+
+			// For each element, lets speak it out
+			passage.ttsElements.forEachRemaining {
+				logV("Processing element: it='$it'")
+				if (!it.ignore)
+					customSpeak(
+						tts,
+						it.text,
+						it.id,
+						::launchHandleTTSError
+					)
 			}
 		}
 	}

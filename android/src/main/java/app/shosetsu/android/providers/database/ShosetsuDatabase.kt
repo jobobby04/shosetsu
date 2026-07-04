@@ -44,6 +44,7 @@ import app.shosetsu.android.providers.database.dao.NovelsDao
 import app.shosetsu.android.providers.database.dao.RepositoryDao
 import app.shosetsu.android.providers.database.dao.RepositoryExtensionsDao
 import app.shosetsu.android.providers.database.dao.UpdatesDao
+import app.shosetsu.android.providers.database.migrations.Migration10to11
 import app.shosetsu.android.providers.database.migrations.Migration1To2
 import app.shosetsu.android.providers.database.migrations.Migration2To3
 import app.shosetsu.android.providers.database.migrations.Migration3To4
@@ -99,7 +100,7 @@ import kotlinx.coroutines.launch
 		DBRepositoryEntity::class,
 		DBUpdate::class,
 	],
-	version = 10
+	version = 11
 )
 @TypeConverters(
 	ChapterSortTypeConverter::class,
@@ -151,6 +152,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 					Migration7to8,
 					Migration8to9,
 					Migration9to10,
+					Migration10to11,
 				).build()
 
 			GlobalScope.launch {

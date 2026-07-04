@@ -80,38 +80,42 @@ class ChapterReaderAccompanistWebViewClient(
 		)
 		lastJob?.cancel()
 		lastJob = scope.launch {
-			getChapterHTMLStyle().collect { style ->
-				view.evaluateJavascript(style.toJs(), null)
+			launch {
+				getChapterHTMLStyle().collect { style ->
+					view.evaluateJavascript(style.toJs(), null)
+				}
 			}
 
-			var oldTtsElement: String? = null
-			ttsState.collect { id ->
-				if (id != null) {
-					logV("Moving TTS highlight to $id")
-					view.evaluateJavascript(
-						"""
+			launch {
+				var oldTtsElement: String? = null
+				ttsState.collect { id ->
+					if (id != null) {
+						logV("Moving TTS highlight to $id")
+						view.evaluateJavascript(
+							"""
 							var element = document.getElementById("textElement$id");
 							element.classList.add("tts-border-style");
 							""".trimIndent() + if (oldTtsElement != null) {
-							logV("Removing old TTS highlight from $oldTtsElement")
-							"""
+								logV("Removing old TTS highlight from $oldTtsElement")
+								"""
 								var element2 = document.getElementById("textElement$oldTtsElement");
 								element2.classList.remove("tts-border-style");
 								""".trimIndent()
-						} else "",
-						null,
-					)
-				} else if (oldTtsElement != null) {
-					logV("TTS Stopped? Removing old TTS highlight from $oldTtsElement")
-					view.evaluateJavascript(
-						"""
+							} else "",
+							null,
+						)
+					} else if (oldTtsElement != null) {
+						logV("TTS Stopped? Removing old TTS highlight from $oldTtsElement")
+						view.evaluateJavascript(
+							"""
 							var element2 = document.getElementById("textElement$oldTtsElement");
 							element2.classList.remove("tts-border-style");
 							""".trimIndent(),
-						null,
-					)
+							null,
+						)
+					}
+					oldTtsElement = id
 				}
-				oldTtsElement = id
 			}
 		}
 	}
