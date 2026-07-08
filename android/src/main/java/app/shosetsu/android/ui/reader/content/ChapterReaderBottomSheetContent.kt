@@ -37,8 +37,8 @@ import app.shosetsu.android.view.compose.setting.GenericBottomSettingLayout
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +48,6 @@ fun ChapterReaderBottomSheetContent(
 	isBookmarked: Boolean,
 	isRotationLocked: Boolean,
 	setting: NovelReaderSettingUI,
-
 	toggleRotationLock: () -> Unit,
 	toggleBookmark: () -> Unit,
 	exit: () -> Unit,
@@ -58,7 +57,7 @@ fun ChapterReaderBottomSheetContent(
 	updateSetting: (NovelReaderSettingUI) -> Unit,
 	lowerSheet: LazyListScope.() -> Unit,
 	toggleFocus: () -> Unit,
-	onShowNavigation: (() -> Unit)?
+	onShowNavigation: (() -> Unit)?,
 ) {
 	val coroutineScope = rememberCoroutineScope()
 	Row(
@@ -66,7 +65,7 @@ fun ChapterReaderBottomSheetContent(
 			.fillMaxWidth()
 			.height(56.dp),
 		horizontalArrangement = Arrangement.SpaceBetween,
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		SimpleIconButton(Icons.AutoMirrored.Filled.ArrowBack, null, onClick = exit)
 
@@ -74,48 +73,57 @@ fun ChapterReaderBottomSheetContent(
 			SimpleIconButton(
 				Icons.Outlined.VisibilityOff,
 				null,
-				onClick = toggleFocus
+				onClick = toggleFocus,
 			)
 			SimpleIconButton(
-				if (!isBookmarked) Icons.Outlined.BookmarkBorder
-				else Icons.Outlined.Bookmark,
+				if (!isBookmarked) {
+					Icons.Outlined.BookmarkBorder
+				} else {
+					Icons.Outlined.Bookmark
+				},
 				null,
-				onClick = toggleBookmark
+				onClick = toggleBookmark,
 			)
 
 			SimpleIconButton(
-				if (!isRotationLocked) Icons.Outlined.ScreenRotation
-				else Icons.Outlined.ScreenLockRotation,
+				if (!isRotationLocked) {
+					Icons.Outlined.ScreenRotation
+				} else {
+					Icons.Outlined.ScreenLockRotation
+				},
 				null,
-				onClick = toggleRotationLock
+				onClick = toggleRotationLock,
 			)
 
-			if (ttsPlayback != TTSPlayback.Playing)
+			if (ttsPlayback != TTSPlayback.Playing) {
 				SimpleIconButton(
 					Icons.Outlined.Audiotrack,
 					null,
-					onClick = onPlayTTS
+					onClick = onPlayTTS,
 				)
+			}
 
-			if (ttsPlayback == TTSPlayback.Playing)
+			if (ttsPlayback == TTSPlayback.Playing) {
 				SimpleIconButton(
 					Icons.Outlined.PauseCircle,
 					null,
-					onClick = onPauseTTS
+					onClick = onPauseTTS,
 				)
+			}
 
-			if (ttsPlayback != TTSPlayback.Stopped)
+			if (ttsPlayback != TTSPlayback.Stopped) {
 				SimpleIconButton(
 					Icons.Outlined.StopCircle,
 					null,
-					onClick = onStopTTS
+					onClick = onStopTTS,
 				)
+			}
 
 			if (onShowNavigation != null) {
 				SimpleIconButton(
 					Icons.Outlined.UnfoldLess,
 					null,
-					onClick = onShowNavigation
+					onClick = onShowNavigation,
 				)
 			}
 		}
@@ -135,17 +143,18 @@ fun ChapterReaderBottomSheetContent(
 						scaffoldState.bottomSheetState.partialExpand()
 					}
 				}
-			})
+			},
+		)
 	}
 
 	LazyColumn(
-		contentPadding = PaddingValues(vertical = 16.dp)
+		contentPadding = PaddingValues(vertical = 16.dp),
 	) {
 		item {
 			GenericBottomSettingLayout(
 				stringResource(R.string.paragraph_spacing),
 				"",
-				iconDescription = null // No icon
+				iconDescription = null, // No icon
 			) {
 				DiscreteSlider(
 					setting.paragraphSpacingSize,
@@ -153,10 +162,12 @@ fun ChapterReaderBottomSheetContent(
 					{ it, a ->
 						updateSetting(
 							setting.copy(
-								paragraphSpacingSize = if (!a)
+								paragraphSpacingSize = if (!a) {
 									it.roundToInt().toFloat()
-								else it
-							)
+								} else {
+									it
+								},
+							),
 						)
 					},
 					remember { StableHolder(0..10) },
@@ -168,7 +179,7 @@ fun ChapterReaderBottomSheetContent(
 			GenericBottomSettingLayout(
 				stringResource(R.string.paragraph_indent),
 				"",
-				iconDescription = null // No icon
+				iconDescription = null, // No icon
 			) {
 				DiscreteSlider(
 					setting.paragraphIndentSize,

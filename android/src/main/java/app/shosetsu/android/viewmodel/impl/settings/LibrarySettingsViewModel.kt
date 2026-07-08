@@ -60,8 +60,11 @@ class LibrarySettingsViewModel(
 		launchIO {
 			logI("Restarting novel updaters")
 			// If the update manager was enqueued, kill it.
-			if (novelUpdateManager.getCount() != 0 && novelUpdateManager.getWorkerState() == WorkInfo.State.ENQUEUED)
+			if (novelUpdateManager.getCount() != 0 &&
+				novelUpdateManager.getWorkerState() == WorkInfo.State.ENQUEUED
+			) {
 				novelUpdateManager.stop()
+			}
 
 			novelUpdateCycleManager.start()
 		}

@@ -20,5 +20,5 @@ data class BackupNovelEntity(
 	val chapters: List<BackupChapterEntity> = emptyList(),
 	val settings: BackupNovelSettingEntity = BackupNovelSettingEntity(),
 	val categories: List<Int> = emptyList(),
-	val pinned: Boolean = false
+	val pinned: Boolean = false,
 )

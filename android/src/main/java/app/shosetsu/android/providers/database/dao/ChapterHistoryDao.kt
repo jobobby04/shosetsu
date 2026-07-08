@@ -49,7 +49,6 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 	@Query("SELECT * FROM chapter_history WHERE novelId = :novelId ORDER BY endedReadingAt LIMIT 1")
 	suspend fun getLastRead(novelId: Int): DBChapterHistoryEntity?
 
-
 	@Throws(SQLiteException::class)
 	@Query("DELETE FROM chapter_history")
 	suspend fun clearAll()
@@ -65,8 +64,8 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 			if (history != null) {
 				update(
 					history.copy(
-						endedReadingAt = time
-					)
+						endedReadingAt = time,
+					),
 				)
 			} else {
 				// If no history was made for a given chapter.
@@ -77,27 +76,22 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 					novelId,
 					chapterId,
 					currentTime - 1000,
-					currentTime
+					currentTime,
 				)
 			}
 		}
 	}
 
 	@Throws(SQLiteException::class)
-	suspend fun insert(
-		novelId: Int,
-		chapterId: Int,
-		startedReadingAt: Long,
-		endedReadingAt: Long?
-	) {
+	suspend fun insert(novelId: Int, chapterId: Int, startedReadingAt: Long, endedReadingAt: Long?) {
 		insertAbort(
 			DBChapterHistoryEntity(
 				null,
 				novelId,
 				chapterId,
 				startedReadingAt,
-				endedReadingAt
-			)
+				endedReadingAt,
+			),
 		)
 	}
 
@@ -110,7 +104,7 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 				history.copy(
 					startedReadingAt = time,
 					endedReadingAt = null,
-				)
+				),
 			)
 		} else {
 			insert(
@@ -132,8 +126,9 @@ interface ChapterHistoryDao : BaseDao<DBChapterHistoryEntity> {
 			if (startedAt != null) {
 				markChapterAsReading(rChapter.id ?: continue, rChapter.novelID, startedAt)
 
-				if (endedAt != null)
+				if (endedAt != null) {
 					markChapterAsRead(rChapter.id ?: continue, rChapter.novelID, endedAt)
+				}
 			}
 		}
 	}

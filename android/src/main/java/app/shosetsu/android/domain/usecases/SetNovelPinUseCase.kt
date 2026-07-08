@@ -26,9 +26,7 @@ import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
  * @since 01 / 11 / 2022
  * @author Doomsdayrs
  */
-class SetNovelPinUseCase(
-	val novelPinRepository: INovelPinsRepository
-) {
+class SetNovelPinUseCase(val novelPinRepository: INovelPinsRepository) {
 	suspend operator fun invoke(novels: List<LibraryNovelUI>, value: Boolean) {
 		novelPinRepository.setPinned(novels.map { it.id }, value)
 	}

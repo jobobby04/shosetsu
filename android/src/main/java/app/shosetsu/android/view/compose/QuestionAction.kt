@@ -36,9 +36,10 @@ fun HelpButton(helpURL: String) {
 	val context = LocalContext.current
 
 	SimpleIconButton(
-		Icons.AutoMirrored.Outlined.HelpOutline, stringResource(R.string.help),
+		Icons.AutoMirrored.Outlined.HelpOutline,
+		stringResource(R.string.help),
 		onClick = {
 			context.openInWebView(helpURL)
-		}
+		},
 	)
 }

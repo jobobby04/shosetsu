@@ -29,7 +29,9 @@ import kotlinx.coroutines.flow.StateFlow
  * @since 29 / 06 / 2021
  * @author Doomsdayrs
  */
-abstract class ATextAssetReaderViewModel : ShosetsuViewModel(), SubscribeViewModel<String?> {
+abstract class ATextAssetReaderViewModel :
+	ShosetsuViewModel(),
+	SubscribeViewModel<String?> {
 
 	/**
 	 * [LiveData] of text to display
@@ -45,5 +47,4 @@ abstract class ATextAssetReaderViewModel : ShosetsuViewModel(), SubscribeViewMod
 	 * Set the target asset to read
 	 */
 	abstract fun setTarget(targetOrdinal: Int)
-
 }

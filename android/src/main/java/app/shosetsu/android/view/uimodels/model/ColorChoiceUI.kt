@@ -34,5 +34,5 @@ data class ColorChoiceUI(
 	val name: String,
 	val textColor: Int,
 	val backgroundColor: Int,
-	val isSelected: Boolean
+	val isSelected: Boolean,
 )

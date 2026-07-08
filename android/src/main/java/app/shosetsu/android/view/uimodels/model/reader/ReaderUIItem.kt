@@ -30,9 +30,9 @@ sealed class ReaderUIItem {
 	 * Data class that holds each chapter and its data (not including text content)
 	 */
 	@Immutable
-	data class ReaderChapterUI(
-		val chapter: ReaderChapterEntity
-	) : Convertible<ReaderChapterEntity>, ReaderUIItem() {
+	data class ReaderChapterUI(val chapter: ReaderChapterEntity) :
+		ReaderUIItem(),
+		Convertible<ReaderChapterEntity> {
 		val id: Int
 			get() = chapter.id
 		val title: String
@@ -47,8 +47,6 @@ sealed class ReaderUIItem {
 	 * Will appear after the last chapter, but stating there are no more chapters
 	 */
 	@Immutable
-	data class ReaderDividerUI(
-		val prev: ReaderChapterUI,
-		val next: ReaderChapterUI? = null
-	) : ReaderUIItem()
+	data class ReaderDividerUI(val prev: ReaderChapterUI, val next: ReaderChapterUI? = null) :
+		ReaderUIItem()
 }

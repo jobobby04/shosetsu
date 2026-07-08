@@ -19,9 +19,9 @@ package app.shosetsu.android.common.utils
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.utils.SiteProtector.requestDelay
 import app.shosetsu.android.common.utils.SiteProtector.retryAfter
-import kotlinx.coroutines.delay
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
+import kotlinx.coroutines.delay
 
 /**
  * Class dedicated to protecting sites from what is essentially a ddos attack from shosetsu
@@ -51,8 +51,7 @@ object SiteProtector {
 	 * Get delay, respects [retryAfter] defaults to [requestDelay]
 	 */
 	@Suppress("NOTHING_TO_INLINE")
-	private inline fun getDelay(host: String) =
-		retryAfter[host] ?: requestDelay
+	private inline fun getDelay(host: String) = retryAfter[host] ?: requestDelay
 
 	/**
 	 * Check if we can continue operating.
@@ -90,7 +89,7 @@ object SiteProtector {
 					// This ensures that two awaits never occur at the same time
 					delay(
 						(getDelay(host) / Random.nextInt(1, 10)) +
-							delayedCount * 100
+							delayedCount * 100,
 					)
 					if (delayedCount < 10) delayedCount++
 

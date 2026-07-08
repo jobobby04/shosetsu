@@ -31,19 +31,14 @@ import kotlinx.coroutines.flow.Flow
  *
  * @author github.com/doomsdayrs
  */
-class DownloadsRepository(
-	private val database: IDBDownloadsDataSource,
-) : IDownloadsRepository {
-	override fun loadDownloadsFlow(): Flow<List<DownloadEntity>> =
-		database.loadLiveDownloads().onIO()
+class DownloadsRepository(private val database: IDBDownloadsDataSource) : IDownloadsRepository {
+	override fun loadDownloadsFlow(): Flow<List<DownloadEntity>> = database.loadLiveDownloads().onIO()
 
 	@Throws(SQLiteException::class)
-	override suspend fun loadFirstDownload(): DownloadEntity? =
-		onIO { database.loadFirstDownload() }
+	override suspend fun loadFirstDownload(): DownloadEntity? = onIO { database.loadFirstDownload() }
 
 	@Throws(SQLiteException::class)
-	override suspend fun loadDownloadCount(): Int =
-		onIO { database.loadDownloadCount() }
+	override suspend fun loadDownloadCount(): Int = onIO { database.loadDownloadCount() }
 
 	@Throws(SQLiteException::class)
 	override suspend fun getDownload(chapterID: Int): DownloadEntity? =

@@ -26,12 +26,10 @@ import java.util.*
  *
  * @param content Content of the file
  */
-data class BackupEntity(
-	val content: ByteArray
-) {
+data class BackupEntity(val content: ByteArray) {
 
 	val creationDate: String = SimpleDateFormat("yyyy-MM-dd-hh-mm-ss", Locale.ROOT).format(Date())
-	val fileName: String by lazy { "shosetsu-backup-${creationDate}.$BACKUP_FILE_EXTENSION" }
+	val fileName: String by lazy { "shosetsu-backup-$creationDate.$BACKUP_FILE_EXTENSION" }
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -42,7 +40,5 @@ data class BackupEntity(
 		return true
 	}
 
-	override fun hashCode(): Int {
-		return content.contentHashCode()
-	}
+	override fun hashCode(): Int = content.contentHashCode()
 }

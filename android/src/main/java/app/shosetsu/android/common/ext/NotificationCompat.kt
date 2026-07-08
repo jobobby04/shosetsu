@@ -35,8 +35,7 @@ fun Builder.setOngoing() = setOngoing(true)
 
 fun Builder.setNotOngoing() = setOngoing(false)
 
-fun Builder.removeProgress() =
-	setProgress(0, 0, false)
+fun Builder.removeProgress() = setProgress(0, 0, false)
 
 const val ACTION_REPORT_ERROR: String = "action_report_error"
 const val EXTRA_EXCEPTION: String = "action_report_error"
@@ -49,7 +48,7 @@ const val EXTRA_EXCEPTION: String = "action_report_error"
 fun Builder.addReportErrorAction(context: Context, notificationId: Int, throwable: Throwable) {
 	val intent = Intent(
 		context,
-		NotificationBroadcastReceiver::class.java
+		NotificationBroadcastReceiver::class.java,
 	).apply {
 		action = ACTION_REPORT_ERROR
 		putExtra(EXTRA_EXCEPTION, throwable)
@@ -64,9 +63,9 @@ fun Builder.addReportErrorAction(context: Context, notificationId: Int, throwabl
 				context,
 				0,
 				intent,
-				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-			)
-		).build()
+				if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
+			),
+		).build(),
 	)
 }
 
@@ -77,4 +76,6 @@ fun actionBuilder(icon: ImageVector, title: CharSequence?, intent: PendingIntent
 
 fun Builder.setSmallIcon(icon: ImageVector): Builder = if (SDK_INT >= VERSION_CODES.M) {
 	setSmallIcon(icon.toIcon())
-} else this
+} else {
+	this
+}

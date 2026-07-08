@@ -36,7 +36,7 @@ class ShosetsuAccompanistWebChromeClient : AccompanistWebChromeClient() {
 		val sourceId = consoleMessage?.sourceId()
 		val lineNumber = consoleMessage?.lineNumber()
 		val message = consoleMessage?.message()
-		logD("${sourceId}${lineNumber}:\t${message}")
+		logD("${sourceId}$lineNumber:\t$message")
 		return true
 	}
 }

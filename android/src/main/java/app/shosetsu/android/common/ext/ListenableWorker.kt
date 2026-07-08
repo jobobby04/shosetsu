@@ -27,29 +27,20 @@ import androidx.work.ListenableWorker
  */
 
 /** @see [toast] */
-fun ListenableWorker.toast(
-	length: Int = Toast.LENGTH_SHORT,
-	message: () -> String,
-) {
+fun ListenableWorker.toast(length: Int = Toast.LENGTH_SHORT, message: () -> String) {
 	launchUI {
 		applicationContext.toast(message(), length)
 	}
 }
 
-fun ListenableWorker.toast(
-	message: String,
-	length: Int = Toast.LENGTH_SHORT,
-) {
+fun ListenableWorker.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
 	launchUI {
 		applicationContext.toast(message, length)
 	}
 }
 
 /** @see [toast] */
-fun ListenableWorker.toast(
-	@StringRes message: Int,
-	length: Int = Toast.LENGTH_SHORT,
-) {
+fun ListenableWorker.toast(@StringRes message: Int, length: Int = Toast.LENGTH_SHORT) {
 	launchUI {
 		applicationContext.toast(message, length)
 	}

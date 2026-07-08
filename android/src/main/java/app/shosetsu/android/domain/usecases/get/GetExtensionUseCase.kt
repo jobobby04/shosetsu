@@ -42,17 +42,18 @@ import app.shosetsu.lib.exceptions.InvalidMetaDataException
  */
 class GetExtensionUseCase(
 	private val extRepo: IExtensionsRepository,
-	private val extEntitiesRepo: IExtensionEntitiesRepository
+	private val extEntitiesRepo: IExtensionEntitiesRepository,
 ) {
 	@Throws(
 		SQLiteException::class,
 		IncompatibleExtensionException::class,
 		InvalidMetaDataException::class,
-		MissingExtensionException::class
+		MissingExtensionException::class,
 	)
 	suspend operator fun invoke(extensionId: Int): IExtension? {
-		if (extensionId == -1)
+		if (extensionId == -1) {
 			return null
+		}
 
 		return extRepo.getInstalledExtension(extensionId)?.let {
 			extEntitiesRepo.get(it.generify())

@@ -45,7 +45,7 @@ fun <T> ListPreferenceWidget(
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
 		isCompact = isSubtitleTheValue,
-		iconDescription = iconDescription
+		iconDescription = iconDescription,
 	)
 
 	if (isDialogShown) {
@@ -70,16 +70,20 @@ fun <T> ListPreferenceWidget(
 							}
 						}
 					}
-					if (state.canScrollBackward) HorizontalDivider(
-						modifier = Modifier.align(
-							Alignment.TopCenter
+					if (state.canScrollBackward) {
+						HorizontalDivider(
+							modifier = Modifier.align(
+								Alignment.TopCenter,
+							),
 						)
-					)
-					if (state.canScrollForward) HorizontalDivider(
-						modifier = Modifier.align(
-							Alignment.BottomCenter
+					}
+					if (state.canScrollForward) {
+						HorizontalDivider(
+							modifier = Modifier.align(
+								Alignment.BottomCenter,
+							),
 						)
-					)
+					}
 				}
 			},
 			confirmButton = {
@@ -92,11 +96,7 @@ fun <T> ListPreferenceWidget(
 }
 
 @Composable
-private fun DialogRow(
-	label: String,
-	isSelected: Boolean,
-	onSelected: () -> Unit,
-) {
+private fun DialogRow(label: String, isSelected: Boolean, onSelected: () -> Unit) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier

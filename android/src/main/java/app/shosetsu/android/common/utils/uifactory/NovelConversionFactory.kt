@@ -42,13 +42,11 @@ class NovelConversionFactory(data: NovelEntity) : UIConversionFactory<NovelEntit
 		authors = authors.toList(),
 		artists = artists.toList(),
 		tags = tags.toList(),
-		status = status
+		status = status,
 	)
 }
 
-fun List<NovelEntity>.mapToFactory() =
-	map { NovelConversionFactory(it) }
+fun List<NovelEntity>.mapToFactory() = map { NovelConversionFactory(it) }
 
 @ExperimentalCoroutinesApi
-fun Flow<List<NovelEntity>>.mapLatestToResultFlowWithFactory() =
-	mapLatest { it.mapToFactory() }
+fun Flow<List<NovelEntity>>.mapLatestToResultFlowWithFactory() = mapLatest { it.mapToFactory() }

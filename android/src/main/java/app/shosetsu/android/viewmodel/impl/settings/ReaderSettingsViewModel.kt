@@ -53,11 +53,11 @@ import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.ColorChoiceUI
 import app.shosetsu.android.viewmodel.abstracted.settings.AReaderSettingsViewModel
 import app.shosetsu.android.viewmodel.base.ExposedSettingsRepoViewModel
+import java.util.Locale
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -82,14 +82,13 @@ import java.util.Locale
  */
 class ReaderSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
-	val loadReaderThemes: LoadReaderThemes
+	val loadReaderThemes: LoadReaderThemes,
 ) : AReaderSettingsViewModel(iSettingsRepository) {
 
 	override fun getReaderThemes(): Flow<List<ColorChoiceUI>> =
 		loadReaderThemes().combine(settingsRepo.getIntFlow(ReaderTheme)) { a, b ->
 			a.map { if (it.id == b.toLong()) it.copy(isSelected = true) else it }
 		}.onIO()
-
 }
 
 @SuppressLint("ComposableNaming")
@@ -99,8 +98,9 @@ fun ExposedSettingsRepoViewModel.invertChapterSwipeOption() {
 		stringResource(R.string.settings_reader_inverted_swipe_title),
 		stringResource(R.string.settings_reader_inverted_swipe_desc),
 		settingsRepo,
-		ReaderIsInvertedSwipe, modifier = Modifier
-			.fillMaxWidth()
+		ReaderIsInvertedSwipe,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -111,8 +111,9 @@ fun ExposedSettingsRepoViewModel.showReaderDivider() {
 		stringResource(R.string.settings_reader_show_divider),
 		stringResource(R.string.settings_reader_show_divider_desc),
 		settingsRepo,
-		ReaderShowChapterDivider, modifier = Modifier
-			.fillMaxWidth()
+		ReaderShowChapterDivider,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -152,9 +153,10 @@ fun ExposedSettingsRepoViewModel.matchFullscreenToFocus() {
 		stringResource(R.string.settings_reader_fullscreen_focus),
 		stringResource(R.string.settings_reader_fullscreen_focus_desc),
 		settingsRepo,
-		ReaderMatchFullscreenToFocus, modifier = Modifier
+		ReaderMatchFullscreenToFocus,
+		modifier = Modifier
 			.fillMaxWidth(),
-		enabled = enableFullscreen
+		enabled = enableFullscreen,
 	)
 }
 
@@ -165,8 +167,9 @@ fun ExposedSettingsRepoViewModel.doubleTapFocus() {
 		stringResource(R.string.settings_reader_double_tap),
 		stringResource(R.string.settings_reader_double_tap_desc),
 		settingsRepo,
-		ReaderDoubleTapFocus, modifier = Modifier
-			.fillMaxWidth()
+		ReaderDoubleTapFocus,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -184,12 +187,12 @@ fun ExposedSettingsRepoViewModel.doubleTapSystem() {
 		stringResource(R.string.settings_reader_double_tap_system),
 		stringResource(R.string.settings_reader_double_tap_system_desc),
 		settingsRepo,
-		ReaderDoubleTapSystem, modifier = Modifier
+		ReaderDoubleTapSystem,
+		modifier = Modifier
 			.fillMaxWidth(),
-		enabled = enableFullscreen && !matchFullscreenToFocus
+		enabled = enableFullscreen && !matchFullscreenToFocus,
 	)
 }
-
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -198,8 +201,9 @@ fun ExposedSettingsRepoViewModel.continuousScrollOption() {
 		stringResource(R.string.settings_reader_title_continous_scroll),
 		stringResource(R.string.settings_reader_desc_continous_scroll),
 		settingsRepo,
-		ReaderContinuousScroll, modifier = Modifier
-			.fillMaxWidth()
+		ReaderContinuousScroll,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -210,8 +214,9 @@ fun ExposedSettingsRepoViewModel.tapToScrollOption() {
 		stringResource(R.string.settings_reader_tap_to_scroll_title),
 		"",
 		settingsRepo,
-		ReaderIsTapToScroll, modifier = Modifier
-			.fillMaxWidth()
+		ReaderIsTapToScroll,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -222,8 +227,9 @@ fun ExposedSettingsRepoViewModel.readerKeepScreenOnOption() {
 		stringResource(R.string.settings_reader_keep_screen_on),
 		stringResource(R.string.settings_reader_keep_screen_on_desc),
 		settingsRepo,
-		ReaderKeepScreenOn, modifier = Modifier
-			.fillMaxWidth()
+		ReaderKeepScreenOn,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -234,8 +240,9 @@ fun ExposedSettingsRepoViewModel.readerTableHackOption() {
 		stringResource(R.string.settings_reader_table_hack_title),
 		stringResource(R.string.settings_reader_table_hack_desc),
 		settingsRepo,
-		ReaderTableHack, modifier = Modifier
-			.fillMaxWidth()
+		ReaderTableHack,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -246,8 +253,9 @@ fun ExposedSettingsRepoViewModel.volumeScrollingOption() {
 		stringResource(R.string.settings_reader_volume_scroll_title),
 		"",
 		settingsRepo,
-		ReaderVolumeScroll, modifier = Modifier
-			.fillMaxWidth()
+		ReaderVolumeScroll,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -258,11 +266,11 @@ fun ExposedSettingsRepoViewModel.trackLongReadingOption() {
 		stringResource(R.string.settings_reader_track_long_reading_title),
 		stringResource(R.string.settings_reader_track_long_reading_desc),
 		settingsRepo,
-		ReaderTrackLongReading, modifier = Modifier
-			.fillMaxWidth()
+		ReaderTrackLongReading,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
-
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -271,8 +279,9 @@ fun ExposedSettingsRepoViewModel.readerReadNextChapterAlert() {
 		stringResource(R.string.settings_reader_next_chapter_alert_title),
 		stringResource(R.string.settings_reader_next_chapter_alert_desc),
 		settingsRepo,
-		SettingKey.ReaderNextChapterAlert, modifier = Modifier
-			.fillMaxWidth()
+		SettingKey.ReaderNextChapterAlert,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -289,7 +298,7 @@ fun ExposedSettingsRepoViewModel.textSizeOption() {
 		haveSteps = false,
 		flip = true,
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxWidth(),
 	)
 }
 
@@ -302,8 +311,9 @@ fun ExposedSettingsRepoViewModel.paragraphIndentOption() {
 		remember { StableHolder(0..10) },
 		{ "$it" },
 		settingsRepo,
-		ReaderIndentSize, modifier = Modifier
-			.fillMaxWidth()
+		ReaderIndentSize,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -319,7 +329,7 @@ fun ExposedSettingsRepoViewModel.paragraphSpacingOption() {
 		ReaderParagraphSpacing,
 		flip = true,
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxWidth(),
 	)
 }
 
@@ -335,7 +345,7 @@ fun ExposedSettingsRepoViewModel.readerPitchOption() {
 		ReaderPitch,
 		flip = true,
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxWidth(),
 	)
 }
 
@@ -351,7 +361,7 @@ fun ExposedSettingsRepoViewModel.readerSpeedOption() {
 		ReaderSpeed,
 		flip = true,
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxWidth(),
 	)
 }
 
@@ -380,7 +390,7 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 		TextPreferenceWidget(
 			title = stringResource(R.string.reader_engine),
 			subtitle = stringResource(R.string.loading),
-			iconDescription = null
+			iconDescription = null,
 		)
 		return
 	}
@@ -402,7 +412,7 @@ fun ExposedSettingsRepoViewModel.readerEngineOption() {
 				settingsRepo.setString(ReaderVoice, "")
 			}
 		},
-		iconDescription = null
+		iconDescription = null,
 	)
 }
 
@@ -440,7 +450,7 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 		TextPreferenceWidget(
 			title = stringResource(R.string.reader_language),
 			subtitle = stringResource(R.string.loading),
-			iconDescription = null
+			iconDescription = null,
 		)
 		return
 	}
@@ -464,7 +474,7 @@ fun ExposedSettingsRepoViewModel.readerLanguageOption() {
 				settingsRepo.setString(ReaderVoice, "")
 			}
 		},
-		iconDescription = null
+		iconDescription = null,
 	)
 }
 
@@ -507,7 +517,7 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 		TextPreferenceWidget(
 			title = stringResource(R.string.reader_voice),
 			subtitle = stringResource(R.string.loading),
-			iconDescription = null
+			iconDescription = null,
 		)
 		return
 	}
@@ -529,7 +539,7 @@ fun ExposedSettingsRepoViewModel.readerVoiceOption() {
 				settingsRepo.setString(ReaderVoice, voices[it].name)
 			}
 		},
-		iconDescription = null
+		iconDescription = null,
 	)
 }
 
@@ -566,6 +576,7 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 				}
 				when (ttsResult.await()) {
 					TextToSpeech.SUCCESS -> Unit
+
 					else -> {
 						context.toast(R.string.reader_test_invalid_engine)
 						return@launch
@@ -629,13 +640,13 @@ fun ExposedSettingsRepoViewModel.readerTestOption() {
 					"This is a test. I am talking so you get an idea on how I talk.",
 					TextToSpeech.QUEUE_FLUSH,
 					null,
-					kotlin.random.Random.nextInt().toString()
+					kotlin.random.Random.nextInt().toString(),
 				)
 			}
 		},
 		modifier = Modifier
 			.fillMaxWidth(),
-		iconDescription = null
+		iconDescription = null,
 	)
 }
 
@@ -646,8 +657,9 @@ fun ExposedSettingsRepoViewModel.readerReadNextChapter() {
 		stringResource(R.string.reader_read_next_chapter_title),
 		stringResource(R.string.reader_read_next_chapter_desc),
 		settingsRepo,
-		ReaderNextChapter, modifier = Modifier
-			.fillMaxWidth()
+		ReaderNextChapter,
+		modifier = Modifier
+			.fillMaxWidth(),
 	)
 }
 
@@ -657,6 +669,6 @@ fun ExposedSettingsRepoViewModel.EditCSS(openCSS: () -> Unit) {
 		title = stringResource(R.string.settings_reader_title_html_css),
 		subtitle = stringResource(R.string.settings_reader_desc_html_css),
 		onPreferenceClick = openCSS,
-		iconDescription = null
+		iconDescription = null,
 	)
 }

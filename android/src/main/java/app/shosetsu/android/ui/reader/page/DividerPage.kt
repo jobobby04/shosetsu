@@ -42,15 +42,12 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 fun PreviewDividerPage() = ShosetsuTheme(AppThemes.LIGHT) {
 	DividerPage(
 		"The first",
-		"The second"
+		"The second",
 	)
 }
 
 @Composable
-fun DividerPage(
-	previous: String,
-	next: String?
-) {
+fun DividerPage(previous: String, next: String?) {
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
@@ -61,9 +58,8 @@ fun DividerPage(
 			verticalArrangement = Arrangement.Center,
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(16.dp)
+				.padding(16.dp),
 		) {
-
 			if (next != null) {
 				Text(stringResource(R.string.reader_last_chapter), color = Color.White)
 				Text(previous, color = Color.White)

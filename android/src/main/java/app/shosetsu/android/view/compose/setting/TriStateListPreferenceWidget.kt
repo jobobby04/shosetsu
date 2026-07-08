@@ -29,7 +29,7 @@ fun <T> TriStateListPreferenceWidget(
 		subtitle = subtitle,
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
-		iconDescription = iconDescription
+		iconDescription = iconDescription,
 	)
 
 	if (isDialogShown) {

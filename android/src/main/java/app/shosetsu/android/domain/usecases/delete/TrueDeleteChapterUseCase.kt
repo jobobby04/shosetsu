@@ -33,7 +33,7 @@ import app.shosetsu.android.view.uimodels.model.ChapterUI
  */
 class TrueDeleteChapterUseCase(
 	private val repo: IChaptersRepository,
-	private val deleteChapter: DeleteChapterPassageUseCase
+	private val deleteChapter: DeleteChapterPassageUseCase,
 ) {
 	suspend operator fun invoke(chapterUI: ChapterUI) {
 		this(chapterUI.convertTo())
@@ -49,7 +49,7 @@ class TrueDeleteChapterUseCase(
 	@Throws(
 		SQLiteException::class,
 		NoSuchExtensionException::class,
-		FilePermissionException::class
+		FilePermissionException::class,
 	)
 	suspend operator fun invoke(chapter: ChapterEntity) {
 		deleteChapter(chapter)

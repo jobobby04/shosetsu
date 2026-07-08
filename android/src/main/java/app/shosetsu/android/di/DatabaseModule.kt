@@ -40,10 +40,13 @@ val databaseModule: DI.Module = DI.Module("database_module") {
 	bind<ChapterHistoryDao>() with singleton { instance<ShosetsuDatabase>().chapterHistoryDao }
 	bind<DownloadsDao>() with singleton { instance<ShosetsuDatabase>().downloadsDao }
 	bind<ExtensionLibraryDao>() with singleton { instance<ShosetsuDatabase>().extensionLibraryDao }
-	bind<InstalledExtensionsDao>() with singleton { instance<ShosetsuDatabase>().installedExtensionsDao }
-	bind<RepositoryExtensionsDao>() with singleton { instance<ShosetsuDatabase>().repositoryExtensionDao }
+	bind<InstalledExtensionsDao>() with
+		singleton { instance<ShosetsuDatabase>().installedExtensionsDao }
+	bind<RepositoryExtensionsDao>() with
+		singleton { instance<ShosetsuDatabase>().repositoryExtensionDao }
 	bind<NovelCategoriesDao>() with singleton { instance<ShosetsuDatabase>().novelCategoriesDao }
-	bind<NovelReaderSettingsDao>() with singleton { instance<ShosetsuDatabase>().novelReaderSettingsDao }
+	bind<NovelReaderSettingsDao>() with
+		singleton { instance<ShosetsuDatabase>().novelReaderSettingsDao }
 	bind<NovelsDao>() with singleton { instance<ShosetsuDatabase>().novelsDao }
 	bind<NovelPinsDao>() with singleton { instance<ShosetsuDatabase>().novelPinsDao }
 	bind<NovelSettingsDao>() with singleton { instance<ShosetsuDatabase>().novelSettingsDao }

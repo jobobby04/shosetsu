@@ -63,8 +63,9 @@ class BackupSettingsViewModel(
 			settingsRepo.setString(SettingKey.BackupStorageLocation, uri.toString())
 
 			// If the current URI is empty, we can assume that this is the users first time setting their backup directory
-			if (currentUri.isEmpty())
+			if (currentUri.isEmpty()) {
 				promptMigration.emit(true)
+			}
 		}
 	}
 

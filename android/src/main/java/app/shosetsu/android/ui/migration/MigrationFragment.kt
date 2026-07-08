@@ -73,7 +73,6 @@ import kotlinx.collections.immutable.ImmutableList
  * ====================================================================
  */
 
-
 /**
  * Shosetsu
  * 9 / June / 2019
@@ -83,9 +82,7 @@ import kotlinx.collections.immutable.ImmutableList
  */
 
 @Composable
-fun MigrationView(
-	novelIds: List<Int>,
-) {
+fun MigrationView(novelIds: List<Int>) {
 	val viewModel: AMigrationViewModel = viewModelDi()
 	LaunchedEffect(novelIds) {
 		viewModel.setNovels(novelIds)
@@ -106,7 +103,7 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
-				.fillMaxHeight(.25f)
+				.fillMaxHeight(.25f),
 		) {
 			// TODO Loading via loading flow
 			// MigrationNovelsLoadingContent()
@@ -114,7 +111,6 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 				viewModel.setWorkingOn(it.id)
 			}
 		}
-
 
 		Text(text = "With name")
 
@@ -128,13 +124,13 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
-				.fillMaxHeight(.25f)
+				.fillMaxHeight(.25f),
 		) {
 			// TODO Loading via loading flow
 			// MigrationExtensionsLoadingContent()
 			MigrationExtensionsContent(
 				list = extensionsToSelect,
-				onClick = viewModel::setSelectedExtension
+				onClick = viewModel::setSelectedExtension,
 			)
 		}
 
@@ -143,9 +139,8 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 
 		Icon(
 			imageVector = Icons.Outlined.ExpandMore,
-			contentDescription = "The above will transfer to the below"
+			contentDescription = "The above will transfer to the below",
 		)
-
 
 		// Select novel from its results
 		Box(modifier = Modifier.fillMaxWidth()) {
@@ -157,11 +152,11 @@ fun MigrationContent(viewModel: AMigrationViewModel) {
 @Composable
 fun MigrationExtensionsContent(
 	list: ImmutableList<MigrationExtensionUI>,
-	onClick: (MigrationExtensionUI) -> Unit
+	onClick: (MigrationExtensionUI) -> Unit,
 ) {
 	LazyRow(
 		horizontalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxWidth()
+		modifier = Modifier.fillMaxWidth(),
 	) {
 		items(items = list, key = { it.id }) { extensionUI ->
 			MigrationExtensionItemContent(extensionUI, onClick = onClick)
@@ -179,8 +174,8 @@ fun PreviewMigrationExtensionItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				0,
 				"This is a novel",
 				"",
-				false
-			)
+				false,
+			),
 		)
 	}
 	Box(modifier = Modifier.height(200.dp)) {
@@ -193,7 +188,7 @@ fun PreviewMigrationExtensionItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 @Composable
 fun MigrationExtensionItemContent(
 	item: MigrationExtensionUI,
-	onClick: (MigrationExtensionUI) -> Unit
+	onClick: (MigrationExtensionUI) -> Unit,
 ) {
 	Card(
 		modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
@@ -223,14 +218,14 @@ fun MigrationExtensionItemContent(
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
-					}
+					},
 				)
 			} else {
 				ImageLoadingError(Modifier.size(64.dp))
 			}
 			Text(
 				text = item.name,
-				modifier = Modifier.padding(end = 16.dp)
+				modifier = Modifier.padding(end = 16.dp),
 			)
 		}
 	}
@@ -239,11 +234,11 @@ fun MigrationExtensionItemContent(
 @Composable
 fun MigrationNovelsContent(
 	list: ImmutableList<MigrationNovelUI>,
-	onClick: (MigrationNovelUI) -> Unit
+	onClick: (MigrationNovelUI) -> Unit,
 ) {
 	LazyRow(
 		horizontalArrangement = Arrangement.Center,
-		modifier = Modifier.fillMaxWidth()
+		modifier = Modifier.fillMaxWidth(),
 	) {
 		items(items = list, key = { it.id }) { novelUI ->
 			MigrationNovelItemContent(item = novelUI, onClick = onClick)
@@ -261,14 +256,14 @@ fun PreviewMigrationNovelItemRowContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				0,
 				"This is a novel",
 				"",
-				false
-			)
+				false,
+			),
 		)
 	}
 	Row(
 		modifier = Modifier
 			.height(200.dp)
-			.width(600.dp)
+			.width(600.dp),
 	) {
 		MigrationNovelItemContent(item = item) {
 			println("Test")
@@ -289,8 +284,8 @@ fun PreviewMigrationNovelItemContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				0,
 				"This is a novel",
 				"",
-				false
-			)
+				false,
+			),
 		)
 	}
 	Box(modifier = Modifier.height(200.dp)) {
@@ -310,7 +305,7 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 			} else {
 				null
 			},
-		modifier = Modifier.aspectRatio(.70f)
+		modifier = Modifier.aspectRatio(.70f),
 	) {
 		val blackTrans = colorResource(id = R.color.black_trans)
 		Box {
@@ -322,9 +317,9 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 						Brush.verticalGradient(
 							colors = listOf(
 								Color.Transparent,
-								blackTrans
+								blackTrans,
 							),
-						)
+						),
 					)
 				}
 			if (item.imageURL.isNotEmpty()) {
@@ -340,7 +335,7 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
-					}
+					},
 				)
 			} else {
 				ImageLoadingError(item.title, modifier)
@@ -352,7 +347,7 @@ fun MigrationNovelItemContent(item: MigrationNovelUI, onClick: (MigrationNovelUI
 					.align(Alignment.BottomCenter)
 					.padding(8.dp),
 				fontWeight = FontWeight.Bold,
-				textAlign = TextAlign.Center
+				textAlign = TextAlign.Center,
 			)
 		}
 	}

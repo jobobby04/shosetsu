@@ -20,7 +20,7 @@ object Contributors {
 	 */
 	val preferredEmails = mapOf(
 		"doomsdayrs@proton.me" to "me@doomsdayrs.page",
-		"doomsdayrs@gmail.com" to "me@doomsdayrs.page"
+		"doomsdayrs@gmail.com" to "me@doomsdayrs.page",
 	)
 
 	/**

@@ -57,6 +57,8 @@ import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
+import java.io.IOException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -66,8 +68,6 @@ import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
-import java.io.IOException
-import java.util.concurrent.CopyOnWriteArrayList
 
 /*
  * This file is part of shosetsu.
@@ -92,10 +92,10 @@ import java.util.concurrent.CopyOnWriteArrayList
  *
  * @author github.com/doomsdayrs
  */
-class DownloadWorker(
-	appContext: Context,
-	params: WorkerParameters,
-) : CoroutineWorker(appContext, params), DIAware, NotificationCapable {
+class DownloadWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params),
+	DIAware,
+	NotificationCapable {
 	override val notifyContext: Context
 		get() = applicationContext
 	override val defaultNotificationID: Int = ID_CHAPTER_DOWNLOAD
@@ -105,7 +105,8 @@ class DownloadWorker(
 	private fun NotificationCompat.Builder.addCancelAction() {
 		addAction(
 			actionBuilder(
-				Icons.Default.Cancel, getString(android.R.string.cancel),
+				Icons.Default.Cancel,
+				getString(android.R.string.cancel),
 				PendingIntent.getBroadcast(
 					applicationContext,
 					0,
@@ -113,9 +114,9 @@ class DownloadWorker(
 						action = ACTION_CANCEL_CHAPTER_DOWNLOAD
 						putExtra(EXTRA_NOTIFICATION_ID, defaultNotificationID)
 					},
-					if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-				)
-			).build()
+					if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
+				),
+			).build(),
 		)
 	}
 
@@ -136,16 +137,13 @@ class DownloadWorker(
 	private val activeExtensions = CopyOnWriteArrayList<Int>()
 
 	/** Retrieves the setting for if the download system is paused or not */
-	private suspend fun isDownloadPaused(): Boolean =
-		settingRepo.getBoolean(IsDownloadPaused)
+	private suspend fun isDownloadPaused(): Boolean = settingRepo.getBoolean(IsDownloadPaused)
 
 	/** Retrieves the setting for simultaneous download threads allowed */
-	private suspend fun getDownloadThreads(): Int =
-		settingRepo.getInt(DownloadThreadPool)
+	private suspend fun getDownloadThreads(): Int = settingRepo.getInt(DownloadThreadPool)
 
 	/** Retrieves the setting for simultaneous download threads allowed per extension */
-	private suspend fun getDownloadThreadsPerExtension(): Int =
-		settingRepo.getInt(DownloadExtThreads)
+	private suspend fun getDownloadThreadsPerExtension(): Int = settingRepo.getInt(DownloadExtThreads)
 
 	/** Retrieves the setting for simultaneous download threads allowed per extension */
 	private suspend fun getNotifyIndividualChapters(): Boolean =
@@ -153,15 +151,14 @@ class DownloadWorker(
 
 	/** Loads the download count that is present currently */
 	@Throws(SQLiteException::class)
-	private suspend fun getDownloadCount(): Int =
-		downloadsRepo.loadDownloadCount()
+	private suspend fun getDownloadCount(): Int = downloadsRepo.loadDownloadCount()
 
 	@Throws(
 		IOException::class,
 		SQLiteException::class,
 		FilePermissionException::class,
 		FileNotFoundException::class,
-		LuaError::class
+		LuaError::class,
 	)
 	private suspend fun download(downloadEntity: DownloadEntity) =
 		chapRepo.getChapter(downloadEntity.chapterID)!!.let { chapterEntity ->
@@ -170,7 +167,7 @@ class DownloadWorker(
 					chapRepo.saveChapterPassageToStorage(
 						chapterEntity,
 						iExtension.chapterType,
-						passage
+						passage,
 					)
 				}
 			}
@@ -182,8 +179,9 @@ class DownloadWorker(
 		for (i in activeExtensions.size - 1 downTo 0) {
 			try {
 				val aEI = activeExtensions[i]
-				if (aEI == id)
+				if (aEI == id) {
 					count++
+				}
 			} catch (e: NullPointerException) {
 				// Ignoring this due to async
 			} catch (e: IndexOutOfBoundsException) {
@@ -193,18 +191,21 @@ class DownloadWorker(
 		return count
 	}
 
-
 	private suspend fun notify(downloadEntity: DownloadEntity, isComplete: Boolean = false) {
 		if (!getNotifyIndividualChapters()) return
 
-		val messageId = if (!isComplete) when (downloadEntity.status) {
-			DownloadStatus.PENDING -> R.string.pending
-			DownloadStatus.WAITING -> R.string.waiting
-			DownloadStatus.DOWNLOADING -> R.string.downloading
-			DownloadStatus.PAUSED -> R.string.paused
-			DownloadStatus.ERROR -> R.string.error
-			else -> R.string.completed
-		} else R.string.completed
+		val messageId = if (!isComplete) {
+			when (downloadEntity.status) {
+				DownloadStatus.PENDING -> R.string.pending
+				DownloadStatus.WAITING -> R.string.waiting
+				DownloadStatus.DOWNLOADING -> R.string.downloading
+				DownloadStatus.PAUSED -> R.string.paused
+				DownloadStatus.ERROR -> R.string.error
+				else -> R.string.completed
+			}
+		} else {
+			R.string.completed
+		}
 
 		notify(messageId, downloadEntity.chapterID + 2000) {
 			setNotOngoing()
@@ -233,7 +234,6 @@ class DownloadWorker(
 		}
 	}
 
-
 	/**
 	 * Creates a sub job that starts downloading a chapter async
 	 * This allows the creation of multiple jobs
@@ -243,7 +243,7 @@ class DownloadWorker(
 		downloadsRepo.loadFirstDownload()?.let { downloadEntity ->
 			val extID = downloadEntity.extensionID
 
-			//	notify("Pending", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
+			// 	notify("Pending", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
 
 			// This will loop until the downloadEntity status is DOWNLOADING
 			while (downloadEntity.status != DownloadStatus.DOWNLOADING) {
@@ -255,10 +255,10 @@ class DownloadWorker(
 				if (isDownloadPaused()) {
 					downloadsRepo.update(
 						downloadEntity.copy(
-							status = DownloadStatus.PENDING
-						)
+							status = DownloadStatus.PENDING,
+						),
 					)
-					//		notify("Cancelled", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
+					// 		notify("Cancelled", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
 					return
 				}
 
@@ -301,13 +301,13 @@ class DownloadWorker(
 
 				notify(downloadEntity, isComplete = true)
 				downloadsRepo.deleteEntity(downloadEntity)
-			} catch (e: Exception) {//TODO specify
+			} catch (e: Exception) { // TODO specify
 				downloadsRepo.update(
 					downloadEntity.copy(
-						status = DownloadStatus.ERROR
+						status = DownloadStatus.ERROR,
 					).also {
 						notify(it)
-					}
+					},
 				)
 			} finally {
 				activeExtensions.remove(downloadEntity.extensionID)
@@ -317,9 +317,9 @@ class DownloadWorker(
 
 	override suspend fun doWork(): Result {
 		logI("Starting loop")
-		if (isDownloadPaused())
+		if (isDownloadPaused()) {
 			logI("Loop Paused")
-		else {
+		} else {
 			// Notifies that application is downloading chapters
 			notify("Downloading chapters") {
 				setOngoing()
@@ -339,7 +339,6 @@ class DownloadWorker(
 					}
 				}
 			}
-
 
 			// Downloads the chapters
 			notify("Completed") {
@@ -368,14 +367,12 @@ class DownloadWorker(
 		private suspend fun downloadOnlyIdle(): Boolean =
 			iSettingsRepository.getBoolean(DownloadOnlyWhenIdle)
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(DOWNLOAD_WORK_ID).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Returns the status of the service.
@@ -398,18 +395,23 @@ class DownloadWorker(
 					DOWNLOAD_WORK_ID,
 					ExistingWorkPolicy.REPLACE,
 					OneTimeWorkRequestBuilder<DownloadWorker>()
-						.setConstraints(Constraints.Builder().apply {
-							setRequiredNetworkType(
-								if (downloadOnMetered()) {
-									CONNECTED
-								} else UNMETERED
-							)
-							setRequiresStorageNotLow(!downloadOnLowStorage())
-							setRequiresBatteryNotLow(!downloadOnLowBattery())
-							if (SDK_INT >= VERSION_CODES.M)
-								setRequiresDeviceIdle(downloadOnlyIdle())
-						}.build())
-						.build()
+						.setConstraints(
+							Constraints.Builder().apply {
+								setRequiredNetworkType(
+									if (downloadOnMetered()) {
+										CONNECTED
+									} else {
+										UNMETERED
+									},
+								)
+								setRequiresStorageNotLow(!downloadOnLowStorage())
+								setRequiresBatteryNotLow(!downloadOnLowBattery())
+								if (SDK_INT >= VERSION_CODES.M) {
+									setRequiresDeviceIdle(downloadOnlyIdle())
+								}
+							}.build(),
+						)
+						.build(),
 				)
 			}
 		}

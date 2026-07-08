@@ -35,13 +35,13 @@ val dbDataSourceModule = DI.Module("database_data_source") {
 
 	bind<IDBInstalledExtensionsDataSource>() with singleton {
 		DBInstalledExtensionsDataSource(
-			instance()
+			instance(),
 		)
 	}
 
 	bind<IDBRepositoryExtensionsDataSource>() with singleton {
 		DBRepositoryExtensionsDataSource(
-			instance()
+			instance(),
 		)
 	}
 
@@ -59,8 +59,7 @@ val dbDataSourceModule = DI.Module("database_data_source") {
 	bind<IDBNovelSettingsDataSource>() with singleton { DBNovelSettingsDataSource(instance()) }
 	bind<IDBNovelReaderSettingsDataSource>() with singleton {
 		DBNovelReaderSettingsDataSource(
-			instance()
+			instance(),
 		)
 	}
-
 }

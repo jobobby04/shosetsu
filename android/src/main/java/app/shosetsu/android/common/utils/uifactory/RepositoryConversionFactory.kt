@@ -33,12 +33,11 @@ class RepositoryConversionFactory(data: RepositoryEntity) :
 		id,
 		url,
 		name,
-		isEnabled
+		isEnabled,
 	)
 }
 
-fun List<RepositoryEntity>.mapToFactory() =
-	map { RepositoryConversionFactory(it) }
+fun List<RepositoryEntity>.mapToFactory() = map { RepositoryConversionFactory(it) }
 
 @ExperimentalCoroutinesApi
 fun Flow<List<RepositoryEntity>>.mapLatestToResultFlowWithFactory() =

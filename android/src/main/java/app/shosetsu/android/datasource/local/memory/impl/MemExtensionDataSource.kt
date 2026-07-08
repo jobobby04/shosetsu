@@ -34,17 +34,17 @@ class MemExtensionDataSource(factory: ICache.Factory) : IMemExtensionsDataSource
 		factory.create(MEMORY_EXPIRE_EXT_LIB_TIME.minutes, MEMORY_MAX_EXTENSIONS)
 
 	override fun loadExtensionFromMemory(extensionID: Int): IExtension? {
-		//	logV("Loading formatter $extensionID from memory")
+		// 	logV("Loading formatter $extensionID from memory")
 		return extensionsCache[extensionID]
 	}
 
 	override fun putExtensionInMemory(id: Int, extension: IExtension) {
-		//	logV("Putting formatter ${iExtension.formatterID} into memory")
+		// 	logV("Putting formatter ${iExtension.formatterID} into memory")
 		extensionsCache[id] = extension
 	}
 
 	override fun removeExtensionFromMemory(extensionID: Int): Boolean {
-		//	logV("Removing formatter $extensionID from memory")
+		// 	logV("Removing formatter $extensionID from memory")
 		return extensionsCache.remove(extensionID)
 	}
 }

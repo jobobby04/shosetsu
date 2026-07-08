@@ -8,10 +8,10 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.lib.Filter
+import javax.security.auth.Destroyable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import javax.security.auth.Destroyable
 
 /*
  * This file is part of shosetsu.
@@ -36,7 +36,8 @@ import javax.security.auth.Destroyable
  * Used for showing the specific listing of a novel
  */
 abstract class ACatalogViewModel :
-	ShosetsuViewModel(), Destroyable {
+	ShosetsuViewModel(),
+	Destroyable {
 
 	/**
 	 * What is currently being displayed to the user
@@ -129,10 +130,7 @@ abstract class ACatalogViewModel :
 	 * @param item ID of novel to load.
 	 * @param categories The categories to add the novel to.
 	 */
-	abstract fun backgroundNovelAdd(
-		item: ACatalogNovelUI,
-		categories: IntArray = intArrayOf()
-	)
+	abstract fun backgroundNovelAdd(item: ACatalogNovelUI, categories: IntArray = intArrayOf())
 
 	/**
 	 * The current state of adding a novel in the background.

@@ -29,9 +29,7 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 16 / 09 / 2020
  */
-class LoadRepositoriesUseCase(
-	private val iExtRepoRepository: IExtensionRepoRepository
-) {
+class LoadRepositoriesUseCase(private val iExtRepoRepository: IExtensionRepoRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(): Flow<List<RepositoryUI>> =
 		iExtRepoRepository.loadRepositoriesLive().mapLatestToResultFlowWithFactory()

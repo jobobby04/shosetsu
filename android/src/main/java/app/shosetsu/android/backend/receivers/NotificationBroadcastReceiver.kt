@@ -60,8 +60,8 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 				notificationManager.cancel(
 					intent.getIntExtra(
 						EXTRA_NOTIFICATION_ID,
-						-1
-					)
+						-1,
+					),
 				)
 			}
 
@@ -71,8 +71,8 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 				notificationManager.cancel(
 					intent.getIntExtra(
 						EXTRA_NOTIFICATION_ID,
-						-1
-					)
+						-1,
+					),
 				)
 			}
 
@@ -80,11 +80,11 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 				val manager by di.instance<RequestInstallExtensionUseCase>()
 				val extensionId = intent.getIntExtra(
 					EXTRA_UPDATE_EXTENSION_ID,
-					-1
+					-1,
 				)
 				val repoId = intent.getIntExtra(
 					EXTRA_UPDATE_REPO_ID,
-					-1
+					-1,
 				)
 				if (extensionId == -1 || repoId == -1) return
 
@@ -107,11 +107,10 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 				notificationManager.cancel(
 					intent.getIntExtra(
 						EXTRA_NOTIFICATION_ID,
-						-1
-					)
+						-1,
+					),
 				)
 			}
 		}
 	}
-
 }

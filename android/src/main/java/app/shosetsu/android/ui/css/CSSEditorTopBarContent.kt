@@ -30,7 +30,7 @@ fun CSSEditorTopBarContent(
 	pages: ImmutableList<String>,
 	cssTitle: String,
 	onBack: () -> Unit,
-	onHelp: () -> Unit
+	onHelp: () -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	Column {
@@ -43,16 +43,16 @@ fun CSSEditorTopBarContent(
 				SimpleIconButton(
 					Icons.AutoMirrored.Filled.ArrowBack,
 					stringResource(R.string.abc_action_bar_up_description),
-					onClick = onBack
+					onClick = onBack,
 				)
 			},
 			actions = {
 				SimpleIconButton(
 					Icons.AutoMirrored.Outlined.HelpOutline,
 					stringResource(app.shosetsu.android.R.string.help),
-					onClick = onHelp
+					onClick = onHelp,
 				)
-			}
+			},
 		)
 		TabRow(
 			// Our selected tab is our current page
@@ -60,9 +60,9 @@ fun CSSEditorTopBarContent(
 			// Override the indicator, using the provided pagerTabIndicatorOffset modifier
 			indicator = { tabPositions ->
 				TabRowDefaults.SecondaryIndicator(
-					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
 				)
-			}
+			},
 		) {
 			// Add tabs for all of our pages
 			pages.forEachIndexed { index, title ->

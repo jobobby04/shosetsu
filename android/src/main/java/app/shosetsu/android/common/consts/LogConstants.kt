@@ -17,9 +17,6 @@ package app.shosetsu.android.common.consts
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
 /**
  * shosetsu
  * 02 / 05 / 2020

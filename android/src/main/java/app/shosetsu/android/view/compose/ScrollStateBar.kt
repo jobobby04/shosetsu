@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ScrollStateBar(scrollState: ScrollState, content: @Composable () -> Unit) {
 	BoxWithConstraints(
-		modifier = Modifier.fillMaxSize()
+		modifier = Modifier.fillMaxSize(),
 	) {
 		val viewMaxHeight = constraints.maxHeight.toFloat() - with(LocalDensity.current) {
 			16.dp.toPx() // remove scrollbar height

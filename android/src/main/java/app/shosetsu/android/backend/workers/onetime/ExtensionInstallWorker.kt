@@ -45,6 +45,7 @@ import app.shosetsu.lib.exceptions.HTTPException
 import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import coil.imageLoader
 import coil.request.ImageRequest
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
@@ -54,7 +55,6 @@ import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.
@@ -79,10 +79,13 @@ import java.io.IOException
  * @since 30 / 06 / 2021
  * @author Doomsdayrs
  */
-class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(
-	appContext,
-	params,
-), DIAware, NotificationCapable {
+class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(
+		appContext,
+		params,
+	),
+	DIAware,
+	NotificationCapable {
 	override val di: DI by closestDI(appContext)
 	private val extensionDownloadRepository: IExtensionDownloadRepository by instance()
 	private val extensionRepository: IExtensionsRepository by instance()
@@ -110,8 +113,9 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 
 		/** Cancel default notification if present */
 		fun cancelDefault() {
-			if (notify)
+			if (notify) {
 				notificationManager.cancel(defaultNotificationID)
+			}
 		}
 
 		/**
@@ -122,13 +126,14 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 
 			notify(
 				contentText,
-				extensionId * -1
+				extensionId * -1,
 			) {
 				setContentTitle(contentTitle)
 				setContentInfo(extensionDownloaderString)
 				setNotOngoing()
-				if (e != null)
+				if (e != null) {
 					addReportErrorAction(applicationContext, extensionId * -1, e)
+				}
 			}
 		}
 
@@ -136,7 +141,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 		suspend fun markExtensionDownloadAsError() {
 			extensionDownloadRepository.updateStatus(
 				extensionId,
-				DownloadStatus.ERROR
+				DownloadStatus.ERROR,
 			)
 		}
 
@@ -152,7 +157,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			notifyError(
 				e.message ?: "???",
 				getString(R.string.worker_extension_install_error_get_sql),
-				e
+				e,
 			)
 
 			return Result.failure()
@@ -161,16 +166,16 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 
 			logE(
 				"Received error result when loading extension from db($extensionId)",
-				e
+				e,
 			)
 
 			notifyError(
 				e.message ?: "???",
 				getString(
 					R.string.notification_content_text_extension_load_error,
-					extensionId
+					extensionId,
 				),
-				e
+				e,
 			)
 
 			ACRA.errorReporter.handleException(e)
@@ -186,8 +191,8 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 				"Received empty on load from db",
 				applicationContext.getString(
 					R.string.notification_content_text_extension_load_error,
-					extensionId
-				)
+					extensionId,
+				),
 			)
 
 			return Result.failure()
@@ -199,9 +204,11 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 		val imageLoadJob = launchIO {
 			imageBitmap = if (notify) {
 				applicationContext.imageLoader.execute(
-					ImageRequest.Builder(applicationContext).data(extension.imageURL).build()
+					ImageRequest.Builder(applicationContext).data(extension.imageURL).build(),
 				).drawable?.toBitmap()
-			} else null
+			} else {
+				null
+			}
 		}
 
 		/**
@@ -212,20 +219,21 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			imageBitmap = null
 		}
 
-		if (notify)
+		if (notify) {
 			notify(
 				applicationContext.getString(
 					R.string.notification_content_text_extension_download,
-					extension.name
+					extension.name,
 				),
 			) {
 				setProgress(0, 0, true)
 				setLargeIcon(imageBitmap)
 			}
+		}
 
 		extensionDownloadRepository.updateStatus(
 			extensionId,
-			DownloadStatus.DOWNLOADING
+			DownloadStatus.DOWNLOADING,
 		)
 
 		val flags = try {
@@ -238,7 +246,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			logE("InvalidMetaDataException", e)
 			notifyError(
 				e.message ?: "Unknown InvalidMetaDataException",
-				getString(R.string.worker_extension_install_error_lua)
+				getString(R.string.worker_extension_install_error_lua),
 			)
 
 			return Result.failure()
@@ -248,7 +256,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			logE("LuaError", e)
 			notifyError(
 				e.message ?: "Unknown Lua Error",
-				getString(R.string.worker_extension_install_error_lua)
+				getString(R.string.worker_extension_install_error_lua),
 			)
 
 			return Result.failure()
@@ -258,7 +266,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			logE("HTTP exception ${e.code}", e)
 			notifyError(
 				e.code.toString(),
-				getString(R.string.worker_extension_install_error_http)
+				getString(R.string.worker_extension_install_error_http),
 			)
 
 			return Result.failure()
@@ -269,7 +277,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			notifyError(
 				e.message ?: "???",
 				getString(R.string.worker_extension_install_error_sql),
-				e
+				e,
 			)
 
 			return Result.failure()
@@ -280,7 +288,7 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			notifyError(
 				e.message ?: "???",
 				getString(R.string.worker_extension_install_error_perm),
-				e
+				e,
 			)
 
 			return Result.failure()
@@ -290,24 +298,23 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			logE("IOException", e)
 			notifyError(
 				e.message ?: "???",
-				getString(R.string.worker_extension_install_error_io)
+				getString(R.string.worker_extension_install_error_io),
 			)
 
 			return Result.failure()
-		} catch (e: Exception) {// TODO specify
+		} catch (e: Exception) { // TODO specify
 			markExtensionDownloadAsError()
 
 			notifyError(
 				e.message ?: "???",
 				applicationContext.getString(
 					R.string.notification_content_text_extension_installed_failed,
-					extension.name
+					extension.name,
 				),
-				e
+				e,
 			)
 
 			logE("Failed to install ${extension.name}", e)
-
 
 			cleanupImageLoader()
 
@@ -316,34 +323,35 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 
 		extensionDownloadRepository.updateStatus(
 			extensionId,
-			DownloadStatus.COMPLETE
+			DownloadStatus.COMPLETE,
 		)
 
 		cancelDefault()
 
 		extensionDownloadRepository.remove(extensionId)
 
-		if (notify)
+		if (notify) {
 			notify(
 				notificationId = extensionId * -1,
 				action = {
 					setContentTitle(
 						applicationContext.getString(
 							R.string.notification_content_text_extension_installed,
-							extension.name
-						)
+							extension.name,
+						),
 					)
 					setContentInfo(extensionDownloaderString)
 					setLargeIcon(imageBitmap)
 					removeProgress()
 					setNotOngoing()
-				}
+				},
 			)
+		}
 
 		if (flags.deleteChapters) {
 			val list = try {
 				chaptersRepository.getChaptersByExtension(extensionId)
-			} catch (e: Exception) {// TODO specify
+			} catch (e: Exception) { // TODO specify
 				logE("Failed to get chapters by extension", e)
 
 				ACRA.errorReporter.handleSilentException(e)
@@ -395,14 +403,12 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(EXTENSION_INSTALL_WORK_ID).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Starts the service.
@@ -414,13 +420,13 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 				workerManager.enqueueUniqueWork(
 					EXTENSION_INSTALL_WORK_ID,
 					ExistingWorkPolicy.APPEND_OR_REPLACE,
-					OneTimeWorkRequestBuilder<ExtensionInstallWorker>().setInputData(data).build()
+					OneTimeWorkRequestBuilder<ExtensionInstallWorker>().setInputData(data).build(),
 				)
 				logI(
 					"Worker State ${
 						workerManager.getWorkInfosForUniqueWork(EXTENSION_INSTALL_WORK_ID)
 							.await()[0].state
-					}"
+					}",
 				)
 			}
 		}
@@ -428,7 +434,6 @@ class ExtensionInstallWorker(appContext: Context, params: WorkerParameters) : Co
 		/**
 		 * Stops the service.
 		 */
-		override fun stop(): Operation =
-			workerManager.cancelUniqueWork(EXTENSION_INSTALL_WORK_ID)
+		override fun stop(): Operation = workerManager.cancelUniqueWork(EXTENSION_INSTALL_WORK_ID)
 	}
 }

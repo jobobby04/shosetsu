@@ -24,9 +24,7 @@ import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
 /**
  * 13 / 01 / 2021
  */
-class SetNovelCategoriesUseCase(
-	private val repo: INovelCategoryRepository
-) {
+class SetNovelCategoriesUseCase(private val repo: INovelCategoryRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(novelID: Int, categories: IntArray) {
 		val entities = categories.filterNot { it == 0 }.map {

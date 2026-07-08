@@ -23,7 +23,6 @@ import app.shosetsu.lib.lua.LuaExtension
  */
 
 @Throws(CharacterCodingException::class)
-fun GenericExtensionEntity.asIEntity(data: ByteArray): IExtension =
-	when (type) {
-		ExtensionType.LuaScript -> LuaExtension(data.decodeToString(), fileName)
-	}
+fun GenericExtensionEntity.asIEntity(data: ByteArray): IExtension = when (type) {
+	ExtensionType.LuaScript -> LuaExtension(data.decodeToString(), fileName)
+}

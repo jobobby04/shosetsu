@@ -34,12 +34,9 @@ import app.shosetsu.lib.json.RepoLibrary
 @Entity(
 	tableName = "libs",
 	// An extension library entity is identified by its name & repoID combo
-	primaryKeys = ["scriptName", "repoID"]
+	primaryKeys = ["scriptName", "repoID"],
 )
-data class DBExtLibEntity(
-	val scriptName: String,
-	var version: Version,
-	var repoID: Int,
-) : Convertible<ExtLibEntity> {
+data class DBExtLibEntity(val scriptName: String, var version: Version, var repoID: Int) :
+	Convertible<ExtLibEntity> {
 	override fun convertTo(): ExtLibEntity = ExtLibEntity(scriptName, version, repoID)
 }

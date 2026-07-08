@@ -1,10 +1,10 @@
 package app.shosetsu.android.common.ext
 
 import android.util.Base64
-import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.ObjectOutputStream
+import kotlinx.coroutines.*
 
 /*
  * This file is part of shosetsu.
@@ -44,7 +44,6 @@ fun Any.serializeToString(): String {
 	val bytes = byteArrayOutputStream.toByteArray()
 	return "serial-" + Base64.encodeToString(bytes, Base64.NO_WRAP)
 }
-
 
 /**
  * Converts Array of Strings into a String

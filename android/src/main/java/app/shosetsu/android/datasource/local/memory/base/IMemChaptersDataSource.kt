@@ -1,6 +1,5 @@
 package app.shosetsu.android.datasource.local.memory.base
 
-
 /*
  * This file is part of shosetsu.
  *

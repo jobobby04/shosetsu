@@ -5,11 +5,11 @@ import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.AnalyticsNovelUI
 import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
+import java.util.Locale
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import java.util.Locale
-import java.util.concurrent.TimeUnit.MILLISECONDS
 
 /*
  * This file is part of shosetsu.
@@ -36,14 +36,16 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
  */
 class AnalyticsViewModelImpl(
 	private val extRepo: IExtensionsRepository,
-	private val novelRepo: INovelsRepository
+	private val novelRepo: INovelsRepository,
 ) : AnalyticsViewModel() {
 	private val novelEntities: Flow<List<AnalyticsNovelEntity>> =
 		novelRepo.getAnalytics()
 
 	override val novels: Flow<List<AnalyticsNovelUI>> =
 		novelEntities.map { list ->
-			list.map { (id, title, imageURL, _, _, total, chapterCount, unreadChapterCount, readChapterCount, readingChapterCount) ->
+			list.map {
+					(id, title, imageURL, _, _, total, chapterCount, unreadChapterCount, readChapterCount, readingChapterCount),
+				->
 				val days = MILLISECONDS.toDays(total).toInt()
 				val hours = (MILLISECONDS.toHours(total) - days * 24).toInt()
 				val minutes =
@@ -59,7 +61,7 @@ class AnalyticsViewModelImpl(
 					chapterCount,
 					unreadChapterCount,
 					readChapterCount,
-					readingChapterCount
+					readingChapterCount,
 				)
 			}
 		}
@@ -70,10 +72,14 @@ class AnalyticsViewModelImpl(
 	override val days: Flow<Int> = totalReadingTime.map { MILLISECONDS.toDays(it).toInt() }
 
 	override val hours: Flow<Int> =
-		totalReadingTime.combine(days) { total, days -> (MILLISECONDS.toHours(total) - days * 24).toInt() }
+		totalReadingTime.combine(days) { total, days ->
+			(MILLISECONDS.toHours(total) - days * 24).toInt()
+		}
 
 	override val minutes: Flow<Int> =
-		totalReadingTime.map { total -> (MILLISECONDS.toMinutes(total) - MILLISECONDS.toHours(total) * 60).toInt() }
+		totalReadingTime.map { total ->
+			(MILLISECONDS.toMinutes(total) - MILLISECONDS.toHours(total) * 60).toInt()
+		}
 
 	override val totalLibraryNovelCount: Flow<Int> = novelEntities.map { it.size }
 
@@ -112,9 +118,13 @@ class AnalyticsViewModelImpl(
 				.take(3)
 				.map { (key) ->
 					key.replaceFirstChar {
-						if (it.isLowerCase()) it.titlecase(
-							Locale.getDefault()
-						) else it.toString()
+						if (it.isLowerCase()) {
+							it.titlecase(
+								Locale.getDefault(),
+							)
+						} else {
+							it.toString()
+						}
 					}
 				}
 		}

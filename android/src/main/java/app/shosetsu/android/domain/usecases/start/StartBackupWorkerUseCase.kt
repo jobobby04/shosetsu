@@ -26,17 +26,17 @@ import app.shosetsu.android.common.ext.launchIO
  */
 class StartBackupWorkerUseCase(
 	private val manager: BackupWorker.Manager,
-	private val updateWorkerManager: NovelUpdateWorker.Manager
+	private val updateWorkerManager: NovelUpdateWorker.Manager,
 ) {
 	operator fun invoke() {
 		launchIO {
 			if (!manager.isRunning()) {
 				// Stops the update worker to prevent it from interfering
-				if (updateWorkerManager.isRunning())
+				if (updateWorkerManager.isRunning()) {
 					updateWorkerManager.stop()
+				}
 
 				manager.start()
-
 			}
 		}
 	}

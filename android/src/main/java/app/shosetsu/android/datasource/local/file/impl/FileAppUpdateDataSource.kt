@@ -10,10 +10,10 @@ import app.shosetsu.android.datasource.local.file.base.IFileCachedAppUpdateDataS
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.model.remote.AppUpdateDTO
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
-import kotlinx.serialization.json.Json
-import org.acra.ACRA
 import java.io.IOException
 import java.io.InputStream
+import kotlinx.serialization.json.Json
+import org.acra.ACRA
 
 /*
  * This file is part of shosetsu.
@@ -36,9 +36,8 @@ import java.io.InputStream
  * shosetsu
  * 07 / 09 / 2020
  */
-class FileAppUpdateDataSource(
-	private val iFileSystemProvider: IFileSystemProvider
-) : IFileCachedAppUpdateDataSource {
+class FileAppUpdateDataSource(private val iFileSystemProvider: IFileSystemProvider) :
+	IFileCachedAppUpdateDataSource {
 
 	init {
 		try {
@@ -50,24 +49,19 @@ class FileAppUpdateDataSource(
 	}
 
 	@Throws(FilePermissionException::class, IOException::class)
-	private fun write(debugAppUpdate: AppUpdateDTO) =
-		iFileSystemProvider.writeFile(
-			CACHE,
-			APP_UPDATE_CACHE_FILE,
-			Json.encodeToString(debugAppUpdate).encodeToByteArray()
-		)
+	private fun write(debugAppUpdate: AppUpdateDTO) = iFileSystemProvider.writeFile(
+		CACHE,
+		APP_UPDATE_CACHE_FILE,
+		Json.encodeToString(debugAppUpdate).encodeToByteArray(),
+	)
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	override suspend fun load(): AppUpdateEntity =
-		Json.decodeFromString<AppUpdateDTO>(
-			iFileSystemProvider.readFile(CACHE, APP_UPDATE_CACHE_FILE).decodeToString()
-		).convertTo()
-
+	override suspend fun load(): AppUpdateEntity = Json.decodeFromString<AppUpdateDTO>(
+		iFileSystemProvider.readFile(CACHE, APP_UPDATE_CACHE_FILE).decodeToString(),
+	).convertTo()
 
 	@Throws(FilePermissionException::class, IOException::class)
-	override suspend fun save(
-		appUpdate: AppUpdateEntity
-	) {
+	override suspend fun save(appUpdate: AppUpdateEntity) {
 		write(AppUpdateDTO.fromEntity(appUpdate))
 	}
 
@@ -81,13 +75,11 @@ class FileAppUpdateDataSource(
 	}
 
 	@Throws(IOException::class, FilePermissionException::class, FileNotFoundException::class)
-	override fun writeAPK(
-		appUpdate: AppUpdateEntity,
-		bytes: InputStream
-	): String {
+	override fun writeAPK(appUpdate: AppUpdateEntity, bytes: InputStream): String {
 		// Ensure no previous file exists
-		if (iFileSystemProvider.doesFileExist(CACHE, updatesCPath))
+		if (iFileSystemProvider.doesFileExist(CACHE, updatesCPath)) {
 			iFileSystemProvider.deleteFile(CACHE, updatesCPath)
+		}
 
 		// Create the new file
 		iFileSystemProvider.createFile(CACHE, updatesCPath)
@@ -104,6 +96,4 @@ class FileAppUpdateDataSource(
 		const val updatesFile = "/update.apk"
 		const val updatesCPath = "$updatesPath$updatesFile"
 	}
-
-
 }

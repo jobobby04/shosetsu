@@ -33,7 +33,7 @@ import androidx.navigation.NavBackStackEntry
 @Composable
 fun NavigationRail(
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (ShosetsuDestination.Primary) -> Unit
+	onNavigate: (ShosetsuDestination.Primary) -> Unit,
 ) {
 	NavigationRail {
 		ShosetsuDestination.Primary.all.forEach { destination ->
@@ -44,7 +44,7 @@ fun NavigationRail(
 				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
-				}
+				},
 			)
 		}
 	}

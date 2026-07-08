@@ -44,10 +44,7 @@ interface ChapterHistoryRepository {
 	 * Mark a chapter as being read
 	 */
 	@Throws(SQLiteException::class)
-	suspend fun markChapterAsReading(
-		chapter: ChapterEntity,
-		time: Long = System.currentTimeMillis()
-	)
+	suspend fun markChapterAsReading(chapter: ChapterEntity, time: Long = System.currentTimeMillis())
 
 	/**
 	 * Get the last read chapter for a novel

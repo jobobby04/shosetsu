@@ -32,9 +32,7 @@ import org.kodein.di.android.closestDI
  * 06 / 09 / 2020
  * @param context Context of the application
  */
-abstract class CoroutineWorkerManager(
-	val context: Context
-) : DIAware {
+abstract class CoroutineWorkerManager(val context: Context) : DIAware {
 	/**
 	 * Dependency injection
 	 */
@@ -65,8 +63,7 @@ abstract class CoroutineWorkerManager(
 	/**
 	 * Is the given worker running or not.
 	 */
-	open suspend fun isRunning(): Boolean =
-		getWorkerState() == WorkInfo.State.RUNNING
+	open suspend fun isRunning(): Boolean = getWorkerState() == WorkInfo.State.RUNNING
 
 	/**
 	 * Start the given worker

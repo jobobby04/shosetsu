@@ -81,7 +81,7 @@ class SearchViewModel(
 	private val iExtensionsRepository: IExtensionsRepository,
 	private val extEntitiesRepo: IExtensionEntitiesRepository,
 	private val loadCatalogueQueryDataUseCase: GetCatalogueQueryDataUseCase,
-	private val getExtensionUseCase: GetExtensionUseCase
+	private val getExtensionUseCase: GetExtensionUseCase,
 ) : ASearchViewModel() {
 
 	/**
@@ -127,8 +127,8 @@ class SearchViewModel(
 								context.getString(
 									R.string.search_error_ext_broken,
 									extension.name,
-									extension.id
-								)
+									extension.id,
+								),
 							)
 						} catch (e: IncompatibleExtensionException) {
 							logE("Incompatible extension, ignoring", e)
@@ -136,8 +136,8 @@ class SearchViewModel(
 								context.getString(
 									R.string.search_error_ext_incompatible,
 									extension.name,
-									extension.id
-								)
+									extension.id,
+								),
 							)
 						} catch (e: MissingOrInvalidKeysException) {
 							logE("Extension is missing keys, ignoring", e)
@@ -145,8 +145,8 @@ class SearchViewModel(
 								context.getString(
 									R.string.search_error_ext_incomplete,
 									extension.name,
-									extension.id
-								)
+									extension.id,
+								),
 							)
 						} catch (e: Exception) {
 							logE("Unhandled exception, reporting!")
@@ -154,8 +154,8 @@ class SearchViewModel(
 								context.getString(
 									R.string.search_error_ext_generic,
 									extension.name,
-									extension.id
-								)
+									extension.id,
+								),
 							)
 							ACRA.errorReporter.handleSilentException(e)
 						}
@@ -163,7 +163,7 @@ class SearchViewModel(
 					arrayList.map { (id, _, name, _, imageURL, _, _, _, _, _, _) ->
 						SearchRowUI(id, name, imageURL)
 					}
-				}
+				},
 			)
 		}
 		.mapLatest { list ->
@@ -176,13 +176,17 @@ class SearchViewModel(
 	@OptIn(ExperimentalCoroutinesApi::class)
 	override val listings: StateFlow<ImmutableList<SearchRowUI>> by lazy {
 		searchRows.flatMapLatest { ogList ->
-			combine(ogList.map { rowUI ->
-				getExceptionFlow(rowUI.extensionID).map {
-					if (it != null)
-						rowUI.copy(hasError = true)
-					else rowUI
-				}
-			}) {
+			combine(
+				ogList.map { rowUI ->
+					getExceptionFlow(rowUI.extensionID).map {
+						if (it != null) {
+							rowUI.copy(hasError = true)
+						} else {
+							rowUI
+						}
+					}
+				},
+			) {
 				it.toList()
 			}
 		}.map { list ->
@@ -225,8 +229,7 @@ class SearchViewModel(
 			loadExtension(extensionId).cachedIn(viewModelScope)
 		}
 
-	override fun getException(id: Int): Flow<Throwable?> =
-		getExceptionFlow(id)
+	override fun getException(id: Int): Flow<Throwable?> = getExceptionFlow(id)
 
 	override fun refresh() {
 		launchIO {
@@ -243,17 +246,15 @@ class SearchViewModel(
 		}
 	}
 
-	private fun getRefreshFlow(id: Int) =
-		refreshFlows.getOrPut(id) {
-			MutableSharedFlow<Unit>(replay = 1).apply {
-				viewModelScopeIO.launch { emit(Unit) }
-			}
+	private fun getRefreshFlow(id: Int) = refreshFlows.getOrPut(id) {
+		MutableSharedFlow<Unit>(replay = 1).apply {
+			viewModelScopeIO.launch { emit(Unit) }
 		}
+	}
 
-	private fun getExceptionFlow(id: Int) =
-		exceptionFlows.getOrPut(id) {
-			MutableStateFlow(null)
-		}
+	private fun getExceptionFlow(id: Int) = exceptionFlows.getOrPut(id) {
+		MutableStateFlow(null)
+	}
 
 	/**
 	 * Creates a flow for a library query
@@ -270,14 +271,14 @@ class SearchViewModel(
 				try {
 					emitAll(
 						Pager(
-							PagingConfig(10)
+							PagingConfig(10),
 						) {
 							searchBookMarkedNovelsUseCase(query)
 						}.flow.map { data ->
 							val ids = HashSet<Int>()
 							data.filter { ids.add(it.id) }
 								.map { ACatalogNovelUI(it) }
-						}
+						},
 					)
 				} catch (e: SQLiteException) {
 					exceptionFlow.value = e
@@ -289,37 +290,35 @@ class SearchViewModel(
 	 * Creates a flow for an extension query
 	 */
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private fun loadExtension(extensionID: Int): Flow<PagingData<ACatalogNovelUI>> {
-		return flow {
-			val ext = getExtensionUseCase(extensionID)!!
-			val exceptionFlow = getExceptionFlow(extensionID)
+	private fun loadExtension(extensionID: Int): Flow<PagingData<ACatalogNovelUI>> = flow {
+		val ext = getExtensionUseCase(extensionID)!!
+		val exceptionFlow = getExceptionFlow(extensionID)
 
-			emitAll(
-				appliedQueryFlow.combine(getRefreshFlow(extensionID)) { query, _ -> query }
-					.filterNotNull()
-					.transformLatest { query ->
-						exceptionFlow.value = null
+		emitAll(
+			appliedQueryFlow.combine(getRefreshFlow(extensionID)) { query, _ -> query }
+				.filterNotNull()
+				.transformLatest { query ->
+					exceptionFlow.value = null
 
-						emitAll(
-							Pager(
-								PagingConfig(10)
-							) {
-								runBlocking {
-									loadCatalogueQueryDataUseCase(
-										extensionID,
-										query,
-										HashMap<Int, Any>().apply {
-											putAll(ext.searchFiltersModel.toList().mapify())
-											this[PAGE_INDEX] = ext.startIndex
-										}
-									)
-								}
-							}.flow
-						)
-					}.catch {
-						exceptionFlow.value = it
-					}
-			)
-		}.onIO()
-	}
+					emitAll(
+						Pager(
+							PagingConfig(10),
+						) {
+							runBlocking {
+								loadCatalogueQueryDataUseCase(
+									extensionID,
+									query,
+									HashMap<Int, Any>().apply {
+										putAll(ext.searchFiltersModel.toList().mapify())
+										this[PAGE_INDEX] = ext.startIndex
+									},
+								)
+							}
+						}.flow,
+					)
+				}.catch {
+					exceptionFlow.value = it
+				},
+		)
+	}.onIO()
 }

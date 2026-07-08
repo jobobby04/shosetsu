@@ -23,7 +23,7 @@ fun SliderSettingContent(
 	modifier: Modifier = Modifier,
 	haveSteps: Boolean = true,
 	manipulateUpdate: ((Int) -> Int)? = null,
-	maxHeaderSize: Dp? = null
+	maxHeaderSize: Dp? = null,
 ) {
 	val choice by repo.getIntFlow(key).collectAsState()
 
@@ -31,22 +31,23 @@ fun SliderSettingContent(
 		title = title,
 		description = description,
 		modifier = modifier,
-		iconDescription = null // No icon
+		iconDescription = null, // No icon
 	) {
 		DiscreteSlider(
 			choice,
 			parseValue(choice),
 			{ it, a ->
 				launchIO {
-					if (manipulateUpdate != null && !a)
+					if (manipulateUpdate != null && !a) {
 						repo.setInt(key, manipulateUpdate(it))
-					else
+					} else {
 						repo.setInt(key, it)
+					}
 				}
 			},
 			valueRange,
 			haveSteps = haveSteps,
-			maxHeaderSize
+			maxHeaderSize,
 		)
 	}
 }
@@ -62,7 +63,7 @@ fun FloatSliderSettingContent(
 	modifier: Modifier = Modifier,
 	haveSteps: Boolean = true,
 	flip: Boolean = false,
-	maxHeaderSize: Dp? = null
+	maxHeaderSize: Dp? = null,
 ) {
 	val choice by repo.getFloatFlow(key).collectAsState()
 
@@ -70,7 +71,7 @@ fun FloatSliderSettingContent(
 		title = title,
 		description = description,
 		modifier = modifier,
-		iconDescription = null // No icon
+		iconDescription = null, // No icon
 	) {
 		DiscreteSlider(
 			choice,
@@ -79,15 +80,17 @@ fun FloatSliderSettingContent(
 				launchIO {
 					repo.setFloat(
 						key,
-						if (flip && !fromDialog)
+						if (flip && !fromDialog) {
 							newValue.roundToInt().toFloat()
-						else newValue
+						} else {
+							newValue
+						},
 					)
 				}
 			},
 			valueRange,
 			haveSteps,
-			maxHeaderSize
+			maxHeaderSize,
 		)
 	}
 }

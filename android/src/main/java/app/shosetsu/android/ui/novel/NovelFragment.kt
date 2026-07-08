@@ -167,7 +167,7 @@ fun NovelInfoView(
 	onMigrate: (novelId: Int) -> Unit,
 	openInWebView: (String) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	val viewModel: ANovelViewModel = viewModelDi()
 
@@ -208,7 +208,7 @@ fun NovelInfoView(
 		when (val result = openLastReadResult) {
 			ANovelViewModel.LastOpenResult.Complete -> {
 				hostState.showSnackbar(
-					context.getString(R.string.fragment_novel_snackbar_finished_reading)
+					context.getString(R.string.fragment_novel_snackbar_finished_reading),
 				)
 			}
 
@@ -250,7 +250,7 @@ fun NovelInfoView(
 				onToggleSelection = {
 					viewModel.toggleSelection(it)
 				},
-				selectionMode = selectedChaptersState.count > 0
+				selectionMode = selectedChaptersState.count > 0,
 			)
 		},
 		downloadSelected = viewModel::downloadSelected,
@@ -285,16 +285,17 @@ fun NovelInfoView(
 		onResume = viewModel::openLastRead,
 		onBack = onBack,
 		onOpenShareMenu = viewModel::openShareMenu,
-		hostState = hostState
+		hostState = hostState,
 	)
 
-	if (isCategoriesDialogVisible)
+	if (isCategoriesDialogVisible) {
 		CategoriesDialog(
 			onDismissRequest = { viewModel.hideCategoriesDialog() },
 			categories = categories,
 			novelCategories = novelCategories,
-			setCategories = viewModel::setNovelCategories
+			setCategories = viewModel::setNovelCategories,
 		)
+	}
 
 	if (isChapterJumpDialogVisible) {
 		JumpDialog(
@@ -303,7 +304,7 @@ fun NovelInfoView(
 			},
 			confirm = { query, byTitle ->
 				viewModel.jump(query, byTitle)
-			}
+			},
 		)
 	}
 
@@ -324,12 +325,12 @@ fun NovelInfoView(
 						resources.getQuantityString(
 							R.plurals.fragment_novel_toggle_delete_chapters,
 							chaptersToDelete,
-							chaptersToDelete
+							chaptersToDelete,
 						)
 					} catch (e: Resources.NotFoundException) {
 						"Delete $chaptersToDelete chapters?"
 					},
-					actionLabel = context.getString(R.string.delete)
+					actionLabel = context.getString(R.string.delete),
 				)
 
 				if (result == SnackbarResult.ActionPerformed) {
@@ -342,11 +343,12 @@ fun NovelInfoView(
 	LaunchedEffect(jumpState) {
 		when (jumpState) {
 			JumpState.UNKNOWN -> {}
+
 			JumpState.FAILURE -> {
 				scope.launch {
 					val result = hostState.showSnackbar(
 						context.getString(R.string.toast_error_chapter_jump_invalid_target),
-						actionLabel = context.getString(R.string.generic_question_retry)
+						actionLabel = context.getString(R.string.generic_question_retry),
 					)
 
 					if (result == SnackbarResult.ActionPerformed) {
@@ -361,15 +363,16 @@ fun NovelInfoView(
 		val shareInfo by viewModel.shareInfo.collectAsState(null)
 		NovelShareMenu(
 			shareBasicURL = {
-				if (shareInfo != null)
+				if (shareInfo != null) {
 					activity?.openShare(shareInfo!!.novelURL, shareInfo!!.novelTitle)
+				}
 			},
 			shareQRCode = {
 				viewModel.showQRCodeDialog()
 			},
 			dismiss = {
 				viewModel.hideShareMenu()
-			}
+			},
 		)
 	}
 
@@ -382,7 +385,7 @@ fun NovelInfoView(
 		NovelCustomDownloadDialog(
 			onDismissRequest = viewModel::hideDownloadDialog,
 			chapterCount = chapters.size,
-			onDownload = viewModel::downloadNextCustomChapters
+			onDownload = viewModel::downloadNextCustomChapters,
 		)
 	}
 }
@@ -398,7 +401,7 @@ fun NovelInfoView(
 fun NovelViewExceptionConsumer(
 	viewModel: ANovelViewModel,
 	hostState: SnackbarHostState,
-	exceptionSnackbarModel: ExceptionSnackbarModel?
+	exceptionSnackbarModel: ExceptionSnackbarModel?,
 ) {
 	val context = LocalContext.current
 	// We launch the snack bars in its own coroutine scope, so we can keep consuming the action even if a new exception comes in
@@ -412,7 +415,7 @@ fun NovelViewExceptionConsumer(
 						val result = hostState.showSnackbar(
 							exceptionSnackbarModel.displayText,
 							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
+							actionLabel = context.getString(R.string.generic_wifi_settings),
 						)
 
 						// If the user clicked Wi-Fi settings, off we go
@@ -427,7 +430,7 @@ fun NovelViewExceptionConsumer(
 						val result = hostState.showSnackbar(
 							exceptionSnackbarModel.displayText,
 							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.retry)
+							actionLabel = context.getString(R.string.retry),
 						)
 
 						// The user wants to refresh again!
@@ -452,7 +455,7 @@ fun NovelViewExceptionConsumer(
 				else -> {
 					scope.launch {
 						hostState.showSnackbar(
-							exceptionSnackbarModel.displayText
+							exceptionSnackbarModel.displayText,
 						)
 					}
 				}
@@ -465,7 +468,7 @@ fun NovelViewExceptionConsumer(
 fun NovelFilterMenu(
 	settings: NovelSettingUI?,
 	updateSettings: (NovelSettingUI) -> Unit,
-	onDismiss: () -> Unit
+	onDismiss: () -> Unit,
 ) {
 	BottomSheetDialog(onDismiss) {
 		NovelFilterMenuView(settings, updateSettings)
@@ -477,15 +480,12 @@ fun NovelFilterMenu(
 fun PreviewJumpDialog() {
 	JumpDialog(
 		dismiss = {},
-		confirm = { _, _ -> }
+		confirm = { _, _ -> },
 	)
 }
 
 @Composable
-fun JumpDialog(
-	dismiss: () -> Unit,
-	confirm: (query: String, byTitle: Boolean) -> Unit
-) {
+fun JumpDialog(dismiss: () -> Unit, confirm: (query: String, byTitle: Boolean) -> Unit) {
 	var query by remember { mutableStateOf("") }
 	var byTitle by remember { mutableStateOf(false) }
 	val isError = if (!byTitle) !query.isDigitsOnly() else false
@@ -497,14 +497,14 @@ fun JumpDialog(
 					confirm(query, byTitle)
 					dismiss()
 				},
-				enabled = !isError
+				enabled = !isError,
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
 		},
 		dismissButton = {
 			TextButton(
-				onClick = dismiss
+				onClick = dismiss,
 			) {
 				Text(stringResource(android.R.string.cancel))
 			}
@@ -514,13 +514,14 @@ fun JumpDialog(
 		},
 		text = {
 			Column(
-				verticalArrangement = Arrangement.spacedBy(4.dp)
+				verticalArrangement = Arrangement.spacedBy(4.dp),
 			) {
 				OutlinedTextField(
 					query,
 					onValueChange = {
-						if (!it.contains('\n'))
+						if (!it.contains('\n')) {
 							query = it
+						}
 					},
 					isError = isError,
 					placeholder = {
@@ -530,14 +531,14 @@ fun JumpDialog(
 									R.string.fragment_novel_jump_dialog_hint_chapter_title
 								} else {
 									R.string.fragment_novel_jump_dialog_hint_chapter_number
-								}
-							)
+								},
+							),
 						)
 					},
 					keyboardOptions = KeyboardOptions(
-						keyboardType = if (byTitle) KeyboardType.Ascii else KeyboardType.Decimal
+						keyboardType = if (byTitle) KeyboardType.Ascii else KeyboardType.Decimal,
 					),
-					singleLine = true
+					singleLine = true,
 				)
 
 				Row(
@@ -547,13 +548,13 @@ fun JumpDialog(
 						}
 						.fillMaxWidth(),
 					horizontalArrangement = Arrangement.SpaceBetween,
-					verticalAlignment = Alignment.CenterVertically
+					verticalAlignment = Alignment.CenterVertically,
 				) {
 					Text(stringResource(R.string.fragment_novel_jum_dialog_by_title))
 					Switch(byTitle, { byTitle = it })
 				}
 			}
-		}
+		},
 	)
 }
 
@@ -561,7 +562,6 @@ fun JumpDialog(
 @Preview
 @Composable
 fun PreviewNovelInfoContent() {
-
 	val info = NovelUI(
 		id = 0,
 		novelURL = "",
@@ -577,7 +577,7 @@ fun PreviewNovelInfoContent() {
 		authors = listOf("A", "B", "C"),
 		artists = listOf("A", "B", "C"),
 		tags = listOf("A", "B", "C"),
-		status = Novel.Status.COMPLETED
+		status = Novel.Status.COMPLETED,
 	)
 
 	val chapters = List(10) {
@@ -600,9 +600,8 @@ fun PreviewNovelInfoContent() {
 				}
 			},
 			bookmarked = it % 2 == 0,
-			isSaved = it % 2 != 0
+			isSaved = it % 2 != 0,
 		)
-
 	}.toImmutableList()
 
 	val width = 900.dp
@@ -628,7 +627,7 @@ fun PreviewNovelInfoContent() {
 				NovelChapterContent(
 					chapter = it,
 					openChapter = { },
-					selectionMode = false
+					selectionMode = false,
 				) {}
 			},
 			downloadSelected = {},
@@ -657,7 +656,7 @@ fun PreviewNovelInfoContent() {
 			onResume = {},
 			onBack = {},
 			onOpenShareMenu = {},
-			hostState = remember { SnackbarHostState() }
+			hostState = remember { SnackbarHostState() },
 		)
 	}
 }
@@ -704,20 +703,18 @@ fun NovelInfoContent(
 	onResume: () -> Unit,
 	onBack: () -> Unit,
 	onOpenShareMenu: () -> Unit,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
 ) {
 	val splitColumn = windowSize.widthSizeClass == WindowWidthSizeClass.Expanded
 
 	@Composable
-	fun header(
-		novelInfo: NovelUI
-	) {
+	fun header(novelInfo: NovelUI) {
 		NovelInfoHeaderContent(
 			novelInfo = novelInfo,
 			openWebview = openWebView,
 			categories = categories,
 			setCategoriesDialogOpen = setCategoriesDialogOpen,
-			toggleBookmark = toggleBookmark
+			toggleBookmark = toggleBookmark,
 		)
 	}
 
@@ -743,7 +740,7 @@ fun NovelInfoContent(
 				onDownloadCustom = onDownloadCustom,
 				onDownloadUnread = onDownloadUnread,
 				onDownloadAll = onDownloadAll,
-				onOpenShareMenu = onOpenShareMenu
+				onOpenShareMenu = onOpenShareMenu,
 			)
 		},
 		floatingActionButton = {
@@ -754,32 +751,33 @@ fun NovelInfoContent(
 				icon = {
 					Icon(Icons.Default.PlayArrow, stringResource(R.string.resume))
 				},
-				onClick = onResume
+				onClick = onResume,
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { paddingValues ->
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(paddingValues)
+				.padding(paddingValues),
 		) {
 			Row(
 				Modifier
 					.fillMaxSize()
-					.pullRefresh(pullRefreshState)
+					.pullRefresh(pullRefreshState),
 			) {
 				if (splitColumn) {
 					Box(
 						Modifier
 							.fillMaxWidth(0.5f)
 							.fillMaxHeight()
-							.verticalScroll(rememberScrollState())
+							.verticalScroll(rememberScrollState()),
 					) {
-						if (novelInfo != null)
+						if (novelInfo != null) {
 							header(novelInfo)
+						}
 					}
 				}
 
@@ -787,14 +785,15 @@ fun NovelInfoContent(
 					val state = rememberLazyListState()
 					LazyColumnScrollbar(state = state, contentPadding = PaddingValues(bottom = 140.dp)) {
 						if (novelInfo != null) {
-							if (!splitColumn)
+							if (!splitColumn) {
 								item {
 									header(novelInfo)
 								}
+							}
 						} else {
 							item {
 								LinearProgressIndicator(
-									modifier = Modifier.fillMaxWidth()
+									modifier = Modifier.fillMaxWidth(),
 								)
 							}
 						}
@@ -804,7 +803,7 @@ fun NovelInfoContent(
 								NovelChapterBar(
 									chapters?.size ?: 0,
 									openChapterJump,
-									openFilter
+									openFilter,
 								)
 							}
 						}
@@ -816,8 +815,9 @@ fun NovelInfoContent(
 					if (novelInfo != null && chapters != null) {
 						LaunchedEffect(itemAt) {
 							launch {
-								if (!state.isScrollInProgress)
+								if (!state.isScrollInProgress) {
 									state.scrollToItem(itemAt)
+								}
 							}
 						}
 					}
@@ -827,7 +827,7 @@ fun NovelInfoContent(
 			PullRefreshIndicator(
 				isRefreshing,
 				pullRefreshState,
-				Modifier.align(Alignment.TopCenter)
+				Modifier.align(Alignment.TopCenter),
 			)
 
 			// Chapter Selection Bar
@@ -846,10 +846,11 @@ fun NovelInfoContent(
 			}
 
 			// Loading indicator
-			if (isRefreshing)
+			if (isRefreshing) {
 				LinearProgressIndicator(
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
 				)
+			}
 		}
 	}
 }
@@ -867,7 +868,7 @@ fun PreviewChapterSelectionBar() {
 			{},
 			{},
 			true,
-			{}
+			{},
 		)
 	}
 }
@@ -881,7 +882,6 @@ fun BoxScope.ChapterSelectionBar(
 	markSelectedAsUnread: () -> Unit,
 	bookmarkSelected: () -> Unit,
 	unbookmarkSelected: () -> Unit,
-
 	showTrueDelete: Boolean,
 	onTrueDelete: () -> Unit,
 ) = SelectionBar {
@@ -890,7 +890,7 @@ fun BoxScope.ChapterSelectionBar(
 			Icons.Filled.Download,
 			stringResource(R.string.fragment_novel_selected_download),
 			onClick = downloadSelected,
-			enabled = selectedChaptersState.showDownload
+			enabled = selectedChaptersState.showDownload,
 		)
 	}
 	AnimatedVisibility(selectedChaptersState.showDelete) {
@@ -898,7 +898,7 @@ fun BoxScope.ChapterSelectionBar(
 			Icons.Outlined.Delete,
 			stringResource(R.string.fragment_novel_selected_delete),
 			onClick = deleteSelected,
-			enabled = selectedChaptersState.showDelete
+			enabled = selectedChaptersState.showDelete,
 		)
 	}
 	AnimatedVisibility(selectedChaptersState.showMarkAsRead) {
@@ -906,7 +906,7 @@ fun BoxScope.ChapterSelectionBar(
 			Icons.Filled.LibraryAddCheck,
 			stringResource(R.string.fragment_novel_selected_read),
 			onClick = markSelectedAsRead,
-			enabled = selectedChaptersState.showMarkAsRead
+			enabled = selectedChaptersState.showMarkAsRead,
 		)
 	}
 	AnimatedVisibility(selectedChaptersState.showMarkAsUnread) {
@@ -914,7 +914,7 @@ fun BoxScope.ChapterSelectionBar(
 			Icons.Outlined.LibraryAddCheck,
 			stringResource(R.string.fragment_novel_selected_unread),
 			onClick = markSelectedAsUnread,
-			enabled = selectedChaptersState.showMarkAsUnread
+			enabled = selectedChaptersState.showMarkAsUnread,
 		)
 	}
 	AnimatedVisibility(selectedChaptersState.showBookmark) {
@@ -922,7 +922,7 @@ fun BoxScope.ChapterSelectionBar(
 			Icons.Filled.BookmarkAdd,
 			stringResource(R.string.fragment_novel_selected_bookmark),
 			onClick = bookmarkSelected,
-			enabled = selectedChaptersState.showBookmark
+			enabled = selectedChaptersState.showBookmark,
 		)
 	}
 	AnimatedVisibility(selectedChaptersState.showRemoveBookmark) {
@@ -930,13 +930,13 @@ fun BoxScope.ChapterSelectionBar(
 			Icons.Outlined.BookmarkRemove,
 			stringResource(R.string.fragment_novel_selected_unbookmark),
 			onClick = unbookmarkSelected,
-			enabled = selectedChaptersState.showRemoveBookmark
+			enabled = selectedChaptersState.showRemoveBookmark,
 		)
 	}
 	AnimatedVisibility(showTrueDelete) {
 		NovelSelectedMoreButton(
 			true,
-			onTrueDelete
+			onTrueDelete,
 		)
 	}
 }
@@ -955,7 +955,7 @@ fun PreviewChapterContent() {
 		readingPosition = 0.95,
 		readingStatus = ReadingStatus.READING,
 		bookmarked = true,
-		isSaved = true
+		isSaved = true,
 	)
 
 	Surface {
@@ -963,7 +963,7 @@ fun PreviewChapterContent() {
 			chapter,
 			openChapter = {},
 			onToggleSelection = {},
-			selectionMode = false
+			selectionMode = false,
 		)
 	}
 }
@@ -974,27 +974,31 @@ fun NovelChapterContent(
 	chapter: ChapterUI,
 	selectionMode: Boolean,
 	openChapter: () -> Unit,
-	onToggleSelection: () -> Unit
+	onToggleSelection: () -> Unit,
 ) {
 	SelectableBox(
 		chapter.isSelected,
 		modifier = Modifier
 			.let {
-				if (chapter.readingStatus == ReadingStatus.READ)
+				if (chapter.readingStatus == ReadingStatus.READ) {
 					it.alpha(.5f)
-				else it
+				} else {
+					it
+				}
 			}
 			.combinedClickable(
 				onClick =
-					if (!selectionMode)
+					if (!selectionMode) {
 						openChapter
-					else onToggleSelection,
-				onLongClick = onToggleSelection
+					} else {
+						onToggleSelection
+					},
+				onLongClick = onToggleSelection,
 			)
 			.fillMaxWidth(),
 	) {
 		Column(
-			modifier = Modifier.padding(16.dp)
+			modifier = Modifier.padding(16.dp),
 		) {
 			Text(
 				chapter.title,
@@ -1002,39 +1006,41 @@ fun NovelChapterContent(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(bottom = 8.dp),
-				color = if (chapter.bookmarked) MaterialTheme.colorScheme.primary else Color.Unspecified
+				color = if (chapter.bookmarked) MaterialTheme.colorScheme.primary else Color.Unspecified,
 			)
 
 			Row(
 				horizontalArrangement = Arrangement.SpaceBetween,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
 			) {
 				Row {
 					Text(
 						chapter.releaseDate,
 						fontSize = 12.sp,
-						modifier = Modifier.padding(end = 8.dp)
+						modifier = Modifier.padding(end = 8.dp),
 					)
 
-					if (chapter.readingStatus == ReadingStatus.READING)
+					if (chapter.readingStatus == ReadingStatus.READING) {
 						Row {
 							Text(
 								stringResource(R.string.fragment_novel_chapter_position),
 								fontSize = 12.sp,
-								modifier = Modifier.padding(end = 4.dp)
+								modifier = Modifier.padding(end = 4.dp),
 							)
 							Text(
 								chapter.displayPosition,
-								fontSize = 12.sp
+								fontSize = 12.sp,
 							)
 						}
+					}
 				}
 
-				if (chapter.isSaved)
+				if (chapter.isSaved) {
 					Text(
 						stringResource(R.string.downloaded),
-						fontSize = 12.sp
+						fontSize = 12.sp,
 					)
+				}
 			}
 		}
 	}
@@ -1058,8 +1064,8 @@ fun PreviewHeaderContent(
 		authors = listOf("A", "B", "C"),
 		artists = listOf("A", "B", "C"),
 		tags = listOf("A", "B", "C"),
-		status = Novel.Status.COMPLETED
-	)
+		status = Novel.Status.COMPLETED,
+	),
 ) {
 	Surface {
 		NovelInfoHeaderContent(
@@ -1067,7 +1073,7 @@ fun PreviewHeaderContent(
 			{},
 			persistentListOf(),
 			{},
-			{}
+			{},
 		)
 	}
 }
@@ -1091,8 +1097,8 @@ fun PreviewHeaderWithNoDescriptionContent() {
 			authors = listOf("A", "B", "C"),
 			artists = listOf("A", "B", "C"),
 			tags = listOf("A", "B", "C"),
-			status = Novel.Status.COMPLETED
-		)
+			status = Novel.Status.COMPLETED,
+		),
 	)
 }
 
@@ -1115,8 +1121,8 @@ fun PreviewHeaderWithNoGenresContent() {
 			authors = listOf("A", "B", "C"),
 			artists = listOf("A", "B", "C"),
 			tags = listOf("A", "B", "C"),
-			status = Novel.Status.COMPLETED
-		)
+			status = Novel.Status.COMPLETED,
+		),
 	)
 }
 
@@ -1139,8 +1145,8 @@ fun PreviewHeaderWithNoDescriptionOrGenresContent() {
 			authors = listOf("A", "B", "C"),
 			artists = listOf("A", "B", "C"),
 			tags = listOf("A", "B", "C"),
-			status = Novel.Status.COMPLETED
-		)
+			status = Novel.Status.COMPLETED,
+		),
 	)
 }
 
@@ -1166,7 +1172,7 @@ fun NovelInfoCoverContent(
 		},
 		loading = {
 			Box(Modifier.placeholder(true))
-		}
+		},
 	)
 }
 
@@ -1179,16 +1185,17 @@ fun NovelInfoHeaderContent(
 	setCategoriesDialogOpen: () -> Unit,
 ) {
 	var isCoverClicked: Boolean by remember { mutableStateOf(false) }
-	if (isCoverClicked)
+	if (isCoverClicked) {
 		Dialog(onDismissRequest = { isCoverClicked = false }) {
 			NovelInfoCoverContent(
 				novelInfo.title,
 				novelInfo.imageURL,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
 			) {
 				isCoverClicked = false
 			}
 		}
+	}
 
 	Column(
 		modifier = Modifier.fillMaxWidth(),
@@ -1212,7 +1219,7 @@ fun NovelInfoHeaderContent(
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
-				}
+				},
 			)
 
 			Column(
@@ -1223,7 +1230,7 @@ fun NovelInfoHeaderContent(
 						modifier = Modifier
 							.fillMaxWidth()
 							.padding(end = 8.dp),
-						verticalAlignment = Alignment.CenterVertically
+						verticalAlignment = Alignment.CenterVertically,
 					) {
 						NovelInfoCoverContent(
 							novelInfo.title,
@@ -1233,7 +1240,7 @@ fun NovelInfoHeaderContent(
 								.aspectRatio(coverRatio)
 								.padding(top = 8.dp, start = 4.dp)
 								.clip(MaterialTheme.shapes.medium),
-							contentScale = ContentScale.Crop
+							contentScale = ContentScale.Crop,
 						) {
 							isCoverClicked = true
 						}
@@ -1241,9 +1248,9 @@ fun NovelInfoHeaderContent(
 							modifier = Modifier.padding(
 								top = 16.dp,
 								start = 8.dp,
-								end = 8.dp
+								end = 8.dp,
 							),
-							verticalArrangement = Arrangement.Center
+							verticalArrangement = Arrangement.Center,
 						) {
 							Text(
 								novelInfo.title,
@@ -1252,35 +1259,39 @@ fun NovelInfoHeaderContent(
 									.padding(bottom = 8.dp)
 									.fillMaxWidth(),
 							)
-							if (novelInfo.authors.isNotEmpty() && novelInfo.authors.all { it.isNotEmpty() })
+							if (novelInfo.authors.isNotEmpty() && novelInfo.authors.all { it.isNotEmpty() }) {
 								Row(
-									modifier = Modifier.padding(bottom = 8.dp)
+									modifier = Modifier.padding(bottom = 8.dp),
 								) {
-									if (novelInfo.artists.isEmpty() && novelInfo.artists.none { it.isNotEmpty() })
+									if (novelInfo.artists.isEmpty() && novelInfo.artists.none { it.isNotEmpty() }) {
 										Text(
 											stringResource(R.string.novel_author),
-											style = MaterialTheme.typography.titleSmall
+											style = MaterialTheme.typography.titleSmall,
 										)
+									}
 									Text(
 										novelInfo.displayAuthors,
-										style = MaterialTheme.typography.titleSmall
+										style = MaterialTheme.typography.titleSmall,
 									)
 								}
+							}
 
-							if (novelInfo.artists.isNotEmpty() && novelInfo.artists.all { it.isNotEmpty() })
+							if (novelInfo.artists.isNotEmpty() && novelInfo.artists.all { it.isNotEmpty() }) {
 								Row(
-									modifier = Modifier.padding(bottom = 8.dp)
+									modifier = Modifier.padding(bottom = 8.dp),
 								) {
-									if (novelInfo.authors.isEmpty() && novelInfo.authors.none { it.isNotEmpty() })
+									if (novelInfo.authors.isEmpty() && novelInfo.authors.none { it.isNotEmpty() }) {
 										Text(
 											stringResource(R.string.artist_s),
-											style = MaterialTheme.typography.titleSmall
+											style = MaterialTheme.typography.titleSmall,
 										)
+									}
 									Text(
 										novelInfo.displayArtists,
-										style = MaterialTheme.typography.titleSmall
+										style = MaterialTheme.typography.titleSmall,
 									)
 								}
+							}
 
 							Row {
 								Text(
@@ -1290,15 +1301,15 @@ fun NovelInfoHeaderContent(
 										Novel.Status.PAUSED -> stringResource(R.string.paused)
 										Novel.Status.UNKNOWN -> stringResource(R.string.unknown)
 									},
-									style = MaterialTheme.typography.titleSmall
+									style = MaterialTheme.typography.titleSmall,
 								)
 								Text(
 									" • ",
-									style = MaterialTheme.typography.titleSmall
+									style = MaterialTheme.typography.titleSmall,
 								)
 								Text(
 									novelInfo.extName,
-									style = MaterialTheme.typography.titleSmall
+									style = MaterialTheme.typography.titleSmall,
 								)
 							}
 						}
@@ -1311,7 +1322,7 @@ fun NovelInfoHeaderContent(
 						.fillMaxWidth()
 						.padding(bottom = 8.dp),
 					horizontalArrangement = Arrangement.SpaceEvenly,
-					verticalAlignment = Alignment.CenterVertically
+					verticalAlignment = Alignment.CenterVertically,
 				) {
 					LongClickTextButton(
 						onClick = {
@@ -1326,10 +1337,10 @@ fun NovelInfoHeaderContent(
 						},
 						modifier = Modifier
 							.padding(vertical = 8.dp, horizontal = 4.dp)
-							.weight(1F)
+							.weight(1F),
 					) {
 						Column(
-							horizontalAlignment = Alignment.CenterHorizontally
+							horizontalAlignment = Alignment.CenterHorizontally,
 						) {
 							Icon(
 								if (novelInfo.bookmarked) {
@@ -1338,11 +1349,12 @@ fun NovelInfoHeaderContent(
 									Icons.Outlined.FavoriteBorder
 								},
 								null,
-								tint = if (novelInfo.bookmarked)
+								tint = if (novelInfo.bookmarked) {
 									MaterialTheme.colorScheme.primary
-								else
-									MaterialTheme.colorScheme.onSurface,
-								modifier = Modifier.size(20.dp)
+								} else {
+									MaterialTheme.colorScheme.onSurface
+								},
+								modifier = Modifier.size(20.dp),
 							)
 							Spacer(Modifier.height(4.dp))
 							Text(
@@ -1351,36 +1363,37 @@ fun NovelInfoHeaderContent(
 										R.string.fragment_novel_in_library
 									} else {
 										R.string.fragment_novel_add_to_library
-									}
+									},
 								),
 								style = MaterialTheme.typography.bodyLarge,
-								color = if (novelInfo.bookmarked)
+								color = if (novelInfo.bookmarked) {
 									MaterialTheme.colorScheme.primary
-								else
-									MaterialTheme.colorScheme.onSurface,
+								} else {
+									MaterialTheme.colorScheme.onSurface
+								},
 								fontSize = 12.sp,
 								textAlign = TextAlign.Center,
 							)
 						}
 					}
 
-					if (categories.isNotEmpty())
+					if (categories.isNotEmpty()) {
 						TextButton(
 							onClick = {
 								setCategoriesDialogOpen()
 							},
 							modifier = Modifier
 								.padding(vertical = 8.dp, horizontal = 4.dp)
-								.weight(1F)
+								.weight(1F),
 						) {
 							Column(
-								horizontalAlignment = Alignment.CenterHorizontally
+								horizontalAlignment = Alignment.CenterHorizontally,
 							) {
 								Icon(
 									Icons.AutoMirrored.Outlined.Label,
 									stringResource(R.string.categories),
 									modifier = Modifier.size(20.dp),
-									tint = MaterialTheme.colorScheme.onSurface
+									tint = MaterialTheme.colorScheme.onSurface,
 								)
 								Spacer(Modifier.height(4.dp))
 								Text(
@@ -1391,20 +1404,21 @@ fun NovelInfoHeaderContent(
 								)
 							}
 						}
+					}
 					TextButton(
 						onClick = openWebview,
 						modifier = Modifier
 							.padding(vertical = 8.dp, horizontal = 4.dp)
-							.weight(1F)
+							.weight(1F),
 					) {
 						Column(
-							horizontalAlignment = Alignment.CenterHorizontally
+							horizontalAlignment = Alignment.CenterHorizontally,
 						) {
 							Icon(
 								Icons.Default.OpenInBrowser,
 								stringResource(R.string.action_open_in_webview),
 								modifier = Modifier.size(20.dp),
-								tint = MaterialTheme.colorScheme.onSurface
+								tint = MaterialTheme.colorScheme.onSurface,
 							)
 							Spacer(Modifier.height(4.dp))
 							Text(
@@ -1428,7 +1442,7 @@ fun NovelInfoHeaderContent(
 						.fillMaxWidth()
 						.padding(top = 8.dp),
 					text = novelInfo.description,
-					genre = novelInfo.displayGenre
+					genre = novelInfo.displayGenre,
 				)
 			}
 		}
@@ -1445,18 +1459,14 @@ fun PreviewNovelChapterBar() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NovelChapterBar(
-	chapterCount: Int,
-	openChapterJump: () -> Unit,
-	openFilter: () -> Unit
-) {
+fun NovelChapterBar(chapterCount: Int, openChapterJump: () -> Unit, openFilter: () -> Unit) {
 	// Chapters header bar
 	Row(
 		horizontalArrangement = Arrangement.SpaceBetween,
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp),
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Row {
 			Text(stringResource(R.string.chapters))
@@ -1467,7 +1477,7 @@ fun NovelChapterBar(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
 				.padding(8.dp)
-				.height(34.dp)
+				.height(34.dp),
 		) {
 			Card(
 				onClick = openChapterJump,
@@ -1477,7 +1487,7 @@ fun NovelChapterBar(
 					modifier = Modifier
 						.fillMaxHeight()
 						.padding(horizontal = 4.dp),
-					contentAlignment = Alignment.Center
+					contentAlignment = Alignment.Center,
 				) {
 					Text(
 						stringResource(R.string.jump_to_chapter_short),
@@ -1489,7 +1499,7 @@ fun NovelChapterBar(
 				onClick = openFilter,
 				modifier = Modifier
 					.padding(start = 8.dp)
-					.height(32.dp)
+					.height(32.dp),
 			) {
 				Row(
 					Modifier
@@ -1507,11 +1517,7 @@ fun NovelChapterBar(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ExpandedText(
-	modifier: Modifier = Modifier,
-	text: String,
-	genre: ImmutableList<String>
-) {
+fun ExpandedText(modifier: Modifier = Modifier, text: String, genre: ImmutableList<String>) {
 	var isExpanded by remember { mutableStateOf(false) }
 
 	Column(
@@ -1519,8 +1525,8 @@ fun ExpandedText(
 		modifier = modifier then Modifier.clickable(
 			indication = null,
 			onClick = { isExpanded = !isExpanded },
-			interactionSource = remember { MutableInteractionSource() }
-		)
+			interactionSource = remember { MutableInteractionSource() },
+		),
 	) {
 		if (text.isNotBlank()) {
 			Text(
@@ -1528,13 +1534,15 @@ fun ExpandedText(
 					text
 				} else {
 					text.let {
-						if (it.length > 200)
+						if (it.length > 200) {
 							it.substring(0, 200) + "..."
-						else it
+						} else {
+							it
+						}
 					}
 				},
 				style = MaterialTheme.typography.bodyMedium,
-				modifier = Modifier.padding(start = 8.dp, end = 8.dp)
+				modifier = Modifier.padding(start = 8.dp, end = 8.dp),
 			)
 		}
 
@@ -1545,7 +1553,7 @@ fun ExpandedText(
 						.fillMaxWidth()
 						.padding(vertical = 8.dp),
 					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-					contentPadding = PaddingValues(horizontal = 8.dp)
+					contentPadding = PaddingValues(horizontal = 8.dp),
 				) {
 					items(genre) {
 						NovelGenre(it)
@@ -1557,7 +1565,7 @@ fun ExpandedText(
 						.fillMaxWidth()
 						.padding(vertical = 8.dp),
 					horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-					verticalArrangement = Arrangement.spacedBy(4.dp)
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					genre.forEach {
 						NovelGenre(it)
@@ -1578,16 +1586,14 @@ fun ExpandedText(
 				} else {
 					stringResource(R.string.less)
 				},
-				modifier = Modifier.padding(bottom = 8.dp)
+				modifier = Modifier.padding(bottom = 8.dp),
 			)
 		}
 	}
 }
 
 @Composable
-private fun NovelGenre(
-	text: String
-) {
+private fun NovelGenre(text: String) {
 	ElevatedSuggestionChip(
 		onClick = {},
 		label = { Text(text) },
@@ -1599,7 +1605,7 @@ fun CategoriesDialog(
 	onDismissRequest: () -> Unit,
 	categories: ImmutableList<CategoryUI>,
 	novelCategories: ImmutableList<Int>,
-	setCategories: (IntArray) -> Unit
+	setCategories: (IntArray) -> Unit,
 ) {
 	val selectedCategories = remember(novelCategories) {
 		novelCategories.toMutableStateList()
@@ -1611,7 +1617,7 @@ fun CategoriesDialog(
 				onClick = {
 					setCategories(selectedCategories.toIntArray())
 					onDismissRequest()
-				}
+				},
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
@@ -1638,17 +1644,17 @@ fun CategoriesDialog(
 									selectedCategories += it.id
 								}
 							},
-						verticalAlignment = Alignment.CenterVertically
+						verticalAlignment = Alignment.CenterVertically,
 					) {
 						Checkbox(
 							checked = it.id in selectedCategories,
 							onCheckedChange = null,
-							modifier = Modifier.padding(horizontal = 8.dp)
+							modifier = Modifier.padding(horizontal = 8.dp),
 						)
 						Text(it.name)
 					}
 				}
 			}
-		}
+		},
 	)
 }

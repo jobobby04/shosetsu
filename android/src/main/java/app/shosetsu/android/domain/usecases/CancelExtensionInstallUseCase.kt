@@ -26,9 +26,7 @@ import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
  * @since 28 / 07 / 2021
  * @author Doomsdayrs
  */
-class CancelExtensionInstallUseCase(
-	private val repo: IExtensionDownloadRepository
-) {
+class CancelExtensionInstallUseCase(private val repo: IExtensionDownloadRepository) {
 
 	suspend operator fun invoke(extension: BrowseExtensionUI) {
 		repo.remove(extension.id)

@@ -42,24 +42,22 @@ data class ChapterUI(
 	val readingStatus: ReadingStatus,
 	val bookmarked: Boolean,
 	val isSaved: Boolean,
-	val isSelected: Boolean = false
+	val isSelected: Boolean = false,
 ) : Convertible<ChapterEntity> {
 
 	val displayPosition = "%2.1f%%".format(readingPosition * 100)
 
-	override fun convertTo(): ChapterEntity =
-		ChapterEntity(
-			id,
-			link,
-			novelID,
-			extensionID,
-			title,
-			releaseDate,
-			order,
-			readingPosition,
-			readingStatus,
-			bookmarked,
-			isSaved
-		)
-
+	override fun convertTo(): ChapterEntity = ChapterEntity(
+		id,
+		link,
+		novelID,
+		extensionID,
+		title,
+		releaseDate,
+		order,
+		readingPosition,
+		readingStatus,
+		bookmarked,
+		isSaved,
+	)
 }

@@ -38,7 +38,7 @@ class StartDownloadWorkerAfterUpdateUseCase(
 	private val sR: ISettingsRepository,
 	private val download: DownloadChapterPassageUseCase,
 	private val startDownloadWorker: StartDownloadWorkerUseCase,
-	private val getNovelCategoriesUseCase: GetNovelCategoriesUseCase
+	private val getNovelCategoriesUseCase: GetNovelCategoriesUseCase,
 ) {
 
 	/**
@@ -62,13 +62,15 @@ class StartDownloadWorkerAfterUpdateUseCase(
 					.values
 					.flatten()
 
-				if (filteredChapters.isEmpty())
+				if (filteredChapters.isEmpty()) {
 					return@let false
+				}
 
 				download(filteredChapters)
 				startDownloadWorker()
 				true
-			} else
+			} else {
 				false
+			}
 		}
 }

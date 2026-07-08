@@ -23,11 +23,12 @@ import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
  * 11 / 03 / 2021
  */
 class GetExtSelectedListingUseCase(
-	private val iExtensionSettingsRepository: IExtensionSettingsRepository
+	private val iExtensionSettingsRepository: IExtensionSettingsRepository,
 ) {
 	suspend operator fun invoke(extensionId: Int): Int {
-		if (extensionId == -1)
+		if (extensionId == -1) {
 			return -1
+		}
 
 		return iExtensionSettingsRepository.getSelectedListing(extensionId)
 	}

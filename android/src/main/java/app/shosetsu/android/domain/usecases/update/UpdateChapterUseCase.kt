@@ -25,9 +25,7 @@ import app.shosetsu.android.view.uimodels.model.ChapterUI
  * shosetsu
  * 06 / 06 / 2020
  */
-class UpdateChapterUseCase(
-	private val chaptersRepository: IChaptersRepository,
-) {
+class UpdateChapterUseCase(private val chaptersRepository: IChaptersRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(chapterUI: ChapterUI) {
 		chaptersRepository.updateChapter(chapterUI.convertTo())

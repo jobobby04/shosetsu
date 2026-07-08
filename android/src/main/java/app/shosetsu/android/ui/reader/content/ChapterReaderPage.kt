@@ -81,7 +81,7 @@ fun ChapterReaderPage(
 					.padding(windowPadding)
 					.consumeWindowInsets(windowPadding)
 					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
+					.background(MaterialTheme.colorScheme.background),
 			) {
 				ErrorContent(
 					throwable?.message
@@ -89,7 +89,7 @@ fun ChapterReaderPage(
 					ErrorAction(R.string.retry) {
 						retryChapter(item)
 					},
-					stackTrace = throwable?.stackTraceToString()
+					stackTrace = throwable?.stackTraceToString(),
 				)
 			}
 		}
@@ -100,12 +100,12 @@ fun ChapterReaderPage(
 					.padding(windowPadding)
 					.consumeWindowInsets(windowPadding)
 					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
+					.background(MaterialTheme.colorScheme.background),
 			) {
 				LinearProgressIndicator(
 					modifier = Modifier
 						.fillMaxWidth()
-						.align(Alignment.TopCenter)
+						.align(Alignment.TopCenter),
 				)
 			}
 		}
@@ -117,7 +117,7 @@ fun ChapterReaderPage(
 				Modifier
 					.padding(footerPadding)
 					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
+					.background(MaterialTheme.colorScheme.background),
 			) {
 				HTMLPage(
 					html = (html as ChapterPassage.Success).content,

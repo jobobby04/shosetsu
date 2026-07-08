@@ -26,7 +26,8 @@ import androidx.appcompat.app.AppCompatDelegate
 enum class AppThemes(val key: Int, private val appCompatId: Int) {
 	FOLLOW_SYSTEM(0, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM),
 	LIGHT(1, AppCompatDelegate.MODE_NIGHT_NO),
-	DARK(2, AppCompatDelegate.MODE_NIGHT_YES);
+	DARK(2, AppCompatDelegate.MODE_NIGHT_YES),
+	;
 
 	companion object {
 		fun fromKey(key: Int): AppThemes = entries.find { it.key == key } ?: FOLLOW_SYSTEM

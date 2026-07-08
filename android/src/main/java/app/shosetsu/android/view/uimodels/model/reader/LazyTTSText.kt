@@ -17,10 +17,10 @@
  */
 package app.shosetsu.android.view.uimodels.model.reader
 
+import java.util.UUID
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
-import java.util.UUID
 
 /**
  * Lazily loads the text content from a given [element].

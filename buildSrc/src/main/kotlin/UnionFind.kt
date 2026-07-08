@@ -3,7 +3,7 @@
  * that also allows associating a single value with each set.
  */
 class UnionFind<K : Any, V : Any>(
-	private val merge: ((canonical: V, alternative: V) -> V)? = null
+	private val merge: ((canonical: V, alternative: V) -> V)? = null,
 ) {
 	private val nodes = mutableMapOf<K, Node<K, V>>()
 
@@ -24,7 +24,9 @@ class UnionFind<K : Any, V : Any>(
 					} else if (canonicalRoot.value == alternativeRoot.value) {
 						alternativeRoot.value = null
 					} else {
-						throw IllegalStateException("Canonical and alternative roots have different values: ${canonicalRoot.value} and ${alternativeRoot.value}")
+						throw IllegalStateException(
+							"Canonical and alternative roots have different values: ${canonicalRoot.value} and ${alternativeRoot.value}",
+						)
 					}
 				} else {
 					canonicalRoot.value = alternativeRoot.value

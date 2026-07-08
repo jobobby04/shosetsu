@@ -27,15 +27,12 @@ import kotlinx.coroutines.flow.Flow
 /**
  * 20 / 01 / 2021
  */
-class NovelSettingsRepository(
-	private val database: IDBNovelSettingsDataSource
-) : INovelSettingsRepository {
+class NovelSettingsRepository(private val database: IDBNovelSettingsDataSource) :
+	INovelSettingsRepository {
 	@Throws(SQLiteException::class)
-	override suspend fun get(novelID: Int): NovelSettingEntity? =
-		onIO { database.get(novelID) }
+	override suspend fun get(novelID: Int): NovelSettingEntity? = onIO { database.get(novelID) }
 
-	override fun getFlow(novelID: Int): Flow<NovelSettingEntity?> =
-		database.getFlow(novelID).onIO()
+	override fun getFlow(novelID: Int): Flow<NovelSettingEntity?> = database.getFlow(novelID).onIO()
 
 	@Throws(SQLiteException::class)
 	override suspend fun update(novelSettingEntity: NovelSettingEntity): Unit =

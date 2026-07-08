@@ -29,9 +29,7 @@ import kotlinx.coroutines.flow.mapLatest
  * @since 06 / 03 / 2022
  * @author Doomsdayrs
  */
-class GetCategoriesUseCase(
-	private val repo: ICategoryRepository
-) {
+class GetCategoriesUseCase(private val repo: ICategoryRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	@Throws(SQLiteException::class)
 	operator fun invoke() = repo.getCategoriesAsFlow()

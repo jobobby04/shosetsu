@@ -28,9 +28,8 @@ import app.shosetsu.android.providers.database.dao.ExtensionLibraryDao
  * shosetsu
  * 12 / 05 / 2020
  */
-class DBExtLibDataSource(
-	private val extensionLibraryDao: ExtensionLibraryDao,
-) : IDBExtLibDataSource {
+class DBExtLibDataSource(private val extensionLibraryDao: ExtensionLibraryDao) :
+	IDBExtLibDataSource {
 	@Throws(SQLiteException::class)
 	override suspend fun updateExtension(extLibEntity: ExtLibEntity): Unit =
 		(extensionLibraryDao.update(extLibEntity.toDB()))
@@ -40,14 +39,11 @@ class DBExtLibDataSource(
 		(extensionLibraryDao.insertOrUpdateScriptLib(extLibEntity.toDB()))
 
 	@Throws(SQLiteException::class)
-	override suspend fun loadExtLibByRepo(
-		repoID: Int,
-	): List<ExtLibEntity> =
+	override suspend fun loadExtLibByRepo(repoID: Int): List<ExtLibEntity> =
 		(extensionLibraryDao.loadLibByRepoID(repoID).convertList())
 
 	override suspend fun getExtLibsMatchingName(name: String): List<ExtLibEntity> =
 		extensionLibraryDao.getExtLibsMatchingName(name).convertList()
 
-	override suspend fun loadAll(): List<ExtLibEntity> =
-		extensionLibraryDao.loadAll().convertList()
+	override suspend fun loadAll(): List<ExtLibEntity> = extensionLibraryDao.loadAll().convertList()
 }

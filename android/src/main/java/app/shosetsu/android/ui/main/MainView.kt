@@ -56,8 +56,9 @@ fun MainView() {
 
 	// Has to happen as soon as possible
 	LaunchedEffect(showIntro) {
-		if (showIntro)
+		if (showIntro) {
 			context.startActivity(Intent(context, IntroductionActivity::class.java))
+		}
 	}
 	val theme by viewModel.appTheme.collectAsState()
 	val updateToOpen by viewModel.openUpdate.collectAsState(null)
@@ -85,7 +86,7 @@ fun MainView() {
 
 	IntentHandler(
 		onNavigate = ::navigate,
-		onUpdate = viewModel::update
+		onUpdate = viewModel::update,
 	)
 
 	LaunchedEffect(theme) {
@@ -99,7 +100,7 @@ fun MainView() {
 
 		NavHost(
 			navController.root,
-			startDestination = PrimaryWrapper
+			startDestination = PrimaryWrapper,
 		) {
 			mainGraph(
 				navController,
@@ -111,7 +112,7 @@ fun MainView() {
 			AppUpdateDialog(
 				concrete,
 				onDismissRequest = viewModel::dismissUpdateDialog,
-				onUpdate = viewModel::update
+				onUpdate = viewModel::update,
 			)
 		}
 	}

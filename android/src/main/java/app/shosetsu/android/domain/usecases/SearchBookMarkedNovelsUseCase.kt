@@ -26,9 +26,7 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
  * shosetsu
  * 08 / 05 / 2020
  */
-class SearchBookMarkedNovelsUseCase(
-	private val iNovelsRepository: INovelsRepository,
-) {
+class SearchBookMarkedNovelsUseCase(private val iNovelsRepository: INovelsRepository) {
 	@Throws(SQLiteException::class)
 	operator fun invoke(p1: String): PagingSource<Int, StrippedBookmarkedNovelEntity> =
 		iNovelsRepository.searchBookmarked(p1)

@@ -100,9 +100,7 @@ import org.acra.ACRA
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RepositoriesView(
-	onBack: () -> Unit
-) {
+fun RepositoriesView(onBack: () -> Unit) {
 	val viewModel: ARepositoryViewModel = viewModelDi()
 
 	val error by viewModel.error.collectAsState(null)
@@ -119,7 +117,7 @@ fun RepositoriesView(
 						val result = hostState.showSnackbar(
 							context.getString((error as OfflineException).messageRes),
 							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
+							actionLabel = context.getString(R.string.generic_wifi_settings),
 						)
 						if (result == SnackbarResult.ActionPerformed) {
 							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
@@ -130,7 +128,7 @@ fun RepositoriesView(
 				else -> {
 					scope.launch {
 						hostState.showSnackbar(
-							error?.message ?: context.getString(R.string.error)
+							error?.message ?: context.getString(R.string.error),
 						)
 					}
 				}
@@ -150,10 +148,11 @@ fun RepositoriesView(
 			val result = hostState.showSnackbar(
 				context.getString(R.string.fragment_repositories_snackbar_repo_changed),
 				duration = SnackbarDuration.Long,
-				actionLabel = context.getString(R.string.fragment_repositories_action_repo_update)
+				actionLabel = context.getString(R.string.fragment_repositories_action_repo_update),
 			)
-			if (result == SnackbarResult.ActionPerformed)
+			if (result == SnackbarResult.ActionPerformed) {
 				viewModel.updateRepositories()
+			}
 		}
 	}
 
@@ -174,13 +173,13 @@ fun RepositoriesView(
 
 				logE(
 					"Failed to remove repository $repo",
-					exception
+					exception,
 				)
 
 				scope.launch {
 					val result = hostState.showSnackbar(
 						context.getString(R.string.toast_repository_remove_fail),
-						actionLabel = context.getString(R.string.generic_question_retry)
+						actionLabel = context.getString(R.string.generic_question_retry),
 					)
 
 					if (result == SnackbarResult.ActionPerformed) {
@@ -199,10 +198,11 @@ fun RepositoriesView(
 							R.string.fragment_repositories_snackbar_repo_removed,
 						),
 						// Ask the user if they want to undo
-						actionLabel = context.getString(R.string.generic_undo)
+						actionLabel = context.getString(R.string.generic_undo),
 					)
 					when (result) {
 						SnackbarResult.ActionPerformed -> viewModel.undoRemove(repo)
+
 						// If they don't, ask to refresh
 						SnackbarResult.Dismissed -> showWarning()
 					}
@@ -223,7 +223,7 @@ fun RepositoriesView(
 					val result =
 						hostState.showSnackbar(
 							context.getString(R.string.toast_repository_add_fail),
-							actionLabel = context.getString(R.string.generic_question_retry)
+							actionLabel = context.getString(R.string.generic_question_retry),
 						)
 
 					if (result == SnackbarResult.ActionPerformed) viewModel.addRepository(name, url)
@@ -235,7 +235,7 @@ fun RepositoriesView(
 				scope.launch {
 					// Ask if the user wants to refresh the UI
 					val result = hostState.showSnackbar(
-						context.getString(R.string.toast_repository_added)
+						context.getString(R.string.toast_repository_added),
 					)
 
 					if (result == SnackbarResult.Dismissed) showWarning()
@@ -262,11 +262,12 @@ fun RepositoriesView(
 						hostState.showSnackbar(
 							context.getString(R.string.fragment_repositories_snackbar_fail_undo_repo_removal),
 							// Ask if the user wants to retry
-							actionLabel = context.getString(R.string.generic_question_retry)
+							actionLabel = context.getString(R.string.generic_question_retry),
 						)
 
 					when (result) {
 						SnackbarResult.ActionPerformed -> viewModel.undoRemove(repo)
+
 						// If the user doesn't want to retry, ask to refresh
 						SnackbarResult.Dismissed -> showWarning()
 					}
@@ -293,7 +294,7 @@ fun RepositoriesView(
 					// Ask the user if they want to retry
 					val result =
 						hostState.showSnackbar(
-							context.getString(R.string.toast_error_repository_toggle_enabled_failed)
+							context.getString(R.string.toast_error_repository_toggle_enabled_failed),
 						)
 					if (result == SnackbarResult.ActionPerformed) viewModel.toggleIsEnabled(repo)
 				}
@@ -306,11 +307,12 @@ fun RepositoriesView(
 				scope.launch {
 					val result = hostState.showSnackbar(
 						context.getString(
-							if (newState)
+							if (newState) {
 								R.string.toast_success_repository_toggled_enabled
-							else
+							} else {
 								R.string.toast_success_repository_toggled_disabled
-						)
+							},
+						),
 					)
 					// After, ask the user if they want to refresh
 					if (result == SnackbarResult.Dismissed) showWarning()
@@ -321,7 +323,6 @@ fun RepositoriesView(
 			}
 		}
 	}
-
 
 	RepositoriesContent(
 		items = items,
@@ -337,7 +338,7 @@ fun RepositoriesView(
 		onRefresh = viewModel::updateRepositories,
 		onShowShare = viewModel::showShare,
 		onBack = onBack,
-		hostState = hostState
+		hostState = hostState,
 	)
 
 	if (isAddDialogVisible) {
@@ -350,7 +351,7 @@ fun RepositoriesView(
 			remove = viewModel::remove,
 			dismiss = {
 				itemToRemove = null
-			}
+			},
 		)
 	}
 
@@ -360,21 +361,20 @@ fun RepositoriesView(
 		QRCodeShareDialog(
 			map,
 			hide = viewModel::hideShare,
-			currentShare!!.name
+			currentShare!!.name,
 		)
 	}
 }
 
 @Composable
-private fun createPreviewUI(id: Int = 1, enabled: Boolean = true) =
-	remember {
-		RepositoryUI(
-			id,
-			"shosetsu.app/$id",
-			"Example $id",
-			enabled
-		)
-	}
+private fun createPreviewUI(id: Int = 1, enabled: Boolean = true) = remember {
+	RepositoryUI(
+		id,
+		"shosetsu.app/$id",
+		"Example $id",
+		enabled,
+	)
+}
 
 @Preview
 @Composable
@@ -382,7 +382,7 @@ fun PreviewRepositoriesRemoveDialog() {
 	RepositoriesRemoveDialog(
 		createPreviewUI(1),
 		remove = { },
-		dismiss = {}
+		dismiss = {},
 	)
 }
 
@@ -390,7 +390,7 @@ fun PreviewRepositoriesRemoveDialog() {
 fun RepositoriesRemoveDialog(
 	repo: RepositoryUI,
 	remove: (RepositoryUI) -> Unit,
-	dismiss: () -> Unit
+	dismiss: () -> Unit,
 ) {
 	AlertDialog(
 		title = {
@@ -405,18 +405,18 @@ fun RepositoriesRemoveDialog(
 				onClick = {
 					remove(repo)
 					dismiss()
-				}
+				},
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
 		},
 		dismissButton = {
 			TextButton(
-				onClick = dismiss
+				onClick = dismiss,
 			) {
 				Text(stringResource(android.R.string.cancel))
 			}
-		}
+		},
 	)
 }
 
@@ -425,7 +425,7 @@ fun RepositoriesRemoveDialog(
 fun PreviewRepositoriesAddDialog() {
 	RepositoriesAddDialog(
 		addRepository = { _, _ -> },
-		hideAddDialog = {}
+		hideAddDialog = {},
 	)
 }
 
@@ -446,7 +446,7 @@ fun RepositoriesAddDialog(
 		text = {
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(4.dp)
+				verticalArrangement = Arrangement.spacedBy(4.dp),
 			) {
 				OutlinedTextField(
 					name,
@@ -455,7 +455,7 @@ fun RepositoriesAddDialog(
 					},
 					placeholder = {
 						Text(stringResource(R.string.repository_add_name_hint))
-					}
+					},
 				)
 				OutlinedTextField(
 					url,
@@ -466,7 +466,7 @@ fun RepositoriesAddDialog(
 					placeholder = {
 						Text(stringResource(R.string.repository_add_url_hint))
 					},
-					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Uri)
+					keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Uri),
 				)
 			}
 		},
@@ -479,7 +479,7 @@ fun RepositoriesAddDialog(
 					addRepository(name, url)
 					hideAddDialog()
 				},
-				enabled = !isError
+				enabled = !isError,
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
@@ -492,7 +492,7 @@ fun RepositoriesAddDialog(
 			) {
 				Text(stringResource(android.R.string.cancel))
 			}
-		}
+		},
 	)
 }
 
@@ -509,7 +509,7 @@ fun RepositoriesContent(
 	onRefresh: () -> Unit,
 	onShowShare: (RepositoryUI) -> Unit,
 	onBack: () -> Unit,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
 ) {
 	Scaffold(
 		topBar = {
@@ -522,7 +522,7 @@ fun RepositoriesContent(
 				},
 				actions = {
 					HelpButton(URL_HELP_REPOSITORY)
-				}
+				},
 			)
 		},
 		snackbarHost = {
@@ -536,19 +536,19 @@ fun RepositoriesContent(
 				icon = {
 					Icon(
 						Icons.Default.Add,
-						stringResource(R.string.fragment_repositories_action_add)
+						stringResource(R.string.fragment_repositories_action_add),
 					)
 				},
-				onClick = addRepository
+				onClick = addRepository,
 			)
-		}
+		},
 	) { paddingValues ->
 		if (items.isNotEmpty()) {
 			val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 			Box(
 				Modifier
 					.pullRefresh(pullRefreshState)
-					.padding(paddingValues)
+					.padding(paddingValues),
 			) {
 				val state = rememberLazyListState()
 				LazyColumn(
@@ -556,9 +556,9 @@ fun RepositoriesContent(
 						start = 8.dp,
 						top = 8.dp,
 						end = 8.dp,
-						bottom = 64.dp
+						bottom = 64.dp,
 					),
-					state = state
+					state = state,
 				) {
 					items(items, key = { it.id }) { item ->
 						RepositoryContent(
@@ -571,7 +571,7 @@ fun RepositoriesContent(
 							},
 							onShowShare = {
 								onShowShare(item)
-							}
+							},
 						)
 					}
 				}
@@ -579,14 +579,14 @@ fun RepositoriesContent(
 				PullRefreshIndicator(
 					isRefreshing,
 					pullRefreshState,
-					Modifier.align(Alignment.TopCenter)
+					Modifier.align(Alignment.TopCenter),
 				)
 			}
 		} else {
 			ErrorContent(
 				stringResource(R.string.empty_repositories_message),
 				ErrorAction(R.string.empty_repositories_action) { addRepository() },
-				modifier = Modifier.padding(paddingValues)
+				modifier = Modifier.padding(paddingValues),
 			)
 		}
 	}
@@ -600,7 +600,7 @@ fun PreviewRepositoryContent() {
 		createPreviewUI(enabled = enabled),
 		onCheckedChange = { enabled != enabled },
 		onRemove = {},
-		onShowShare = {}
+		onShowShare = {},
 	)
 }
 
@@ -612,7 +612,7 @@ fun RepositoryContent(
 	item: RepositoryUI,
 	onCheckedChange: () -> Unit,
 	onRemove: () -> Unit,
-	onShowShare: () -> Unit
+	onShowShare: () -> Unit,
 ) {
 	Card(Modifier.padding(bottom = 8.dp)) {
 		Row(
@@ -620,20 +620,20 @@ fun RepositoryContent(
 				.padding(8.dp)
 				.fillMaxWidth(),
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.SpaceBetween
+			horizontalArrangement = Arrangement.SpaceBetween,
 		) {
 			Column(
-				Modifier.fillMaxWidth(.7f)
+				Modifier.fillMaxWidth(.7f),
 			) {
 				Text(text = item.name)
 
 				Row(
-					modifier = Modifier.padding(start = 16.dp)
+					modifier = Modifier.padding(start = 16.dp),
 				) {
 					Row {
 						Text(
 							text = stringResource(id = R.string.id_label),
-							style = MaterialTheme.typography.bodySmall
+							style = MaterialTheme.typography.bodySmall,
 						)
 						Text(text = "${item.id}", style = MaterialTheme.typography.bodySmall)
 					}
@@ -641,7 +641,7 @@ fun RepositoryContent(
 						Text(
 							text = item.url,
 							style = MaterialTheme.typography.bodySmall,
-							modifier = Modifier.padding(start = 8.dp)
+							modifier = Modifier.padding(start = 8.dp),
 						)
 					}
 				}
@@ -656,7 +656,7 @@ fun RepositoryContent(
 						onClick = {
 							onDismissRequest()
 							onRemove()
-						}
+						},
 					)
 
 					DropdownMenuItem(
@@ -666,7 +666,7 @@ fun RepositoryContent(
 						onClick = {
 							onDismissRequest()
 							onShowShare()
-						}
+						},
 					)
 				}
 
@@ -674,7 +674,7 @@ fun RepositoryContent(
 					checked = item.isRepoEnabled,
 					onCheckedChange = {
 						onCheckedChange()
-					}
+					},
 				)
 			}
 		}

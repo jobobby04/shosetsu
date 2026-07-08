@@ -27,7 +27,4 @@ import app.shosetsu.android.domain.model.database.DBNovelCategoryEntity
  * @param novelID [DBNovelCategoryEntity.novelID]
  * @param categoryID [DBNovelCategoryEntity.categoryID]
  */
-data class NovelCategoryEntity(
-	val novelID: Int,
-	val categoryID: Int,
-)
+data class NovelCategoryEntity(val novelID: Int, val categoryID: Int)

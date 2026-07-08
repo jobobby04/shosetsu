@@ -41,16 +41,13 @@ import app.shosetsu.android.view.compose.SimpleIconButton
  */
 
 @Composable
-fun NovelSelectedMoreButton(
-	showTrueDelete: Boolean,
-	onTrueDelete: () -> Unit
-) = MoreIconButton {
+fun NovelSelectedMoreButton(showTrueDelete: Boolean, onTrueDelete: () -> Unit) = MoreIconButton {
 	if (showTrueDelete) {
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.fragment_novel_true_delete))
 			},
-			onClick = onTrueDelete
+			onClick = onTrueDelete,
 		)
 	}
 }
@@ -62,7 +59,7 @@ fun NovelDownloadButton(
 	onDownloadNext10: () -> Unit,
 	onDownloadCustom: () -> Unit,
 	onDownloadUnread: () -> Unit,
-	onDownloadAll: () -> Unit
+	onDownloadAll: () -> Unit,
 ) {
 	var showDropDown by remember { mutableStateOf(false) }
 	val onDismissRequest = { showDropDown = false }
@@ -72,7 +69,7 @@ fun NovelDownloadButton(
 		stringResource(R.string.downloads),
 		onClick = {
 			showDropDown = true
-		}
+		},
 	)
 
 	DropdownMenu(showDropDown, onDismissRequest = onDismissRequest) {
@@ -83,7 +80,7 @@ fun NovelDownloadButton(
 			onClick = {
 				onDismissRequest()
 				onDownloadNext()
-			}
+			},
 		)
 
 		DropdownMenuItem(
@@ -93,7 +90,7 @@ fun NovelDownloadButton(
 			onClick = {
 				onDismissRequest()
 				onDownloadNext5()
-			}
+			},
 		)
 
 		DropdownMenuItem(
@@ -103,7 +100,7 @@ fun NovelDownloadButton(
 			onClick = {
 				onDismissRequest()
 				onDownloadNext10()
-			}
+			},
 		)
 
 		DropdownMenuItem(
@@ -113,7 +110,7 @@ fun NovelDownloadButton(
 			onClick = {
 				onDismissRequest()
 				onDownloadCustom()
-			}
+			},
 		)
 
 		DropdownMenuItem(
@@ -123,7 +120,7 @@ fun NovelDownloadButton(
 			onClick = {
 				onDismissRequest()
 				onDownloadUnread()
-			}
+			},
 		)
 
 		DropdownMenuItem(
@@ -133,7 +130,7 @@ fun NovelDownloadButton(
 			onClick = {
 				onDismissRequest()
 				onDownloadAll()
-			}
+			},
 		)
 	}
 }
@@ -144,9 +141,9 @@ fun NovelMoreButton(
 	onJump: () -> Unit,
 	onSetCategories: () -> Unit,
 	canMigrate: Boolean,
-	hasCategories: Boolean
+	hasCategories: Boolean,
 ) = MoreIconButton { onDismissRequest ->
-	if (canMigrate)
+	if (canMigrate) {
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.migrate_source))
@@ -154,8 +151,9 @@ fun NovelMoreButton(
 			onClick = {
 				onDismissRequest()
 				onMigrate()
-			}
+			},
 		)
+	}
 
 	DropdownMenuItem(
 		text = {
@@ -164,10 +162,10 @@ fun NovelMoreButton(
 		onClick = {
 			onDismissRequest()
 			onJump()
-		}
+		},
 	)
 
-	if (hasCategories)
+	if (hasCategories) {
 		DropdownMenuItem(
 			text = {
 				Text(stringResource(R.string.set_categories))
@@ -175,18 +173,16 @@ fun NovelMoreButton(
 			onClick = {
 				onDismissRequest()
 				onSetCategories()
-			}
+			},
 		)
+	}
 }
 
-
 @Composable
-fun NovelShareButton(
-	onShare: () -> Unit,
-) {
+fun NovelShareButton(onShare: () -> Unit) {
 	SimpleIconButton(
 		Icons.Default.Share,
 		stringResource(R.string.share),
-		onClick = onShare
+		onClick = onShare,
 	)
 }

@@ -24,8 +24,9 @@ import app.shosetsu.android.viewmodel.base.SubscribeViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.StateFlow
 
-abstract class ACategoriesViewModel : SubscribeViewModel<ImmutableList<CategoryUI>>,
-	ShosetsuViewModel() {
+abstract class ACategoriesViewModel :
+	ShosetsuViewModel(),
+	SubscribeViewModel<ImmutableList<CategoryUI>> {
 
 	/**
 	 * Is the add category dialog visible
@@ -83,7 +84,6 @@ abstract class ACategoriesViewModel : SubscribeViewModel<ImmutableList<CategoryU
 	 * Hide the add category dialog
 	 */
 	abstract fun hideAddDialog()
-
 
 	/**
 	 * State of any given category change

@@ -36,7 +36,7 @@ data class ChapterHistoryUI(
 	val chapterId: Int,
 	val chapterTitle: String,
 	val startedReadingAt: Long,
-	val endedReadingAt: Long?
+	val endedReadingAt: Long?,
 ) {
 	val startedTime = DateFormat.format("hh:mm", Date(startedReadingAt)).toString()
 	val endedTime = if (endedReadingAt != null) {

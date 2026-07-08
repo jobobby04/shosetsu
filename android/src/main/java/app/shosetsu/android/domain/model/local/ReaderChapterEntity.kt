@@ -22,8 +22,4 @@ package app.shosetsu.android.domain.model.local
  *
  * Used by reader, provides all needed functions
  */
-data class ReaderChapterEntity(
-	val id: Int,
-
-	val title: String,
-)
+data class ReaderChapterEntity(val id: Int, val title: String)

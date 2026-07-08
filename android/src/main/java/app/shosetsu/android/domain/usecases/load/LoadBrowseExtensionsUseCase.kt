@@ -32,26 +32,25 @@ import kotlinx.coroutines.flow.*
  */
 class LoadBrowseExtensionsUseCase(
 	private val extensionsRepository: IExtensionsRepository,
-	private val extensionDownloadRepository: IExtensionDownloadRepository
+	private val extensionDownloadRepository: IExtensionDownloadRepository,
 ) {
 	@OptIn(ExperimentalCoroutinesApi::class)
-	operator fun invoke(): Flow<List<BrowseExtensionUI>> =
-		extensionsRepository.loadBrowseExtensions()
-			.flatMapLatest { extensionList -> // Merge with downloadStatus
-				val listOfFlows =
-					extensionList.map { it to extensionDownloadRepository.getStatusFlow(it.id) }
-						.map { (extensionUI, statusFlow) ->
-							statusFlow.map { status ->
-								extensionUI.copy(
-									isInstalling = status == DownloadStatus.PENDING || status == DownloadStatus.DOWNLOADING,
-								)
-							}
+	operator fun invoke(): Flow<List<BrowseExtensionUI>> = extensionsRepository.loadBrowseExtensions()
+		.flatMapLatest { extensionList ->
+			// Merge with downloadStatus
+			val listOfFlows =
+				extensionList.map { it to extensionDownloadRepository.getStatusFlow(it.id) }
+					.map { (extensionUI, statusFlow) ->
+						statusFlow.map { status ->
+							extensionUI.copy(
+								isInstalling = status == DownloadStatus.PENDING || status == DownloadStatus.DOWNLOADING,
+							)
 						}
+					}
 
-				// Merge the flows
-				combine(*listOfFlows.toTypedArray()) { it.toList() }
-			}
-			.mapLatestToResultFlowWithFactory()
-			.mapLatest { it.convertList() }
-
+			// Merge the flows
+			combine(*listOfFlows.toTypedArray()) { it.toList() }
+		}
+		.mapLatestToResultFlowWithFactory()
+		.mapLatest { it.convertList() }
 }

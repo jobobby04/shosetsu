@@ -35,7 +35,6 @@ import androidx.core.app.NotificationManagerCompat
  * </p>
  */
 
-
 /**
  * Display a toast in this context.
  *
@@ -59,4 +58,3 @@ fun Context.toast(string: String, duration: Int = LENGTH_SHORT) {
  */
 val Context.notificationManager: NotificationManagerCompat
 	get() = NotificationManagerCompat.from(this)
-

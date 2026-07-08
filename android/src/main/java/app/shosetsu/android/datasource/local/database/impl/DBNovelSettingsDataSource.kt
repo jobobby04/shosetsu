@@ -27,9 +27,7 @@ import kotlinx.coroutines.flow.map
 /**
  * 01 / 01 / 2021
  */
-class DBNovelSettingsDataSource(
-	private val dao: NovelSettingsDao
-) : IDBNovelSettingsDataSource {
+class DBNovelSettingsDataSource(private val dao: NovelSettingsDao) : IDBNovelSettingsDataSource {
 
 	override fun getFlow(novelID: Int): Flow<NovelSettingEntity?> =
 		dao.getFlow(novelID).map { it?.convertTo() }
@@ -37,23 +35,18 @@ class DBNovelSettingsDataSource(
 	override suspend fun update(novelSettingEntity: NovelSettingEntity): Unit =
 		dao.update(novelSettingEntity.toDB())
 
-
-	override suspend fun get(novelID: Int): NovelSettingEntity? =
-		dao.get(novelID)?.convertTo()
+	override suspend fun get(novelID: Int): NovelSettingEntity? = dao.get(novelID)?.convertTo()
 
 	override suspend fun insert(novelSettingEntity: NovelSettingEntity): Long =
 		dao.insertAbort(novelSettingEntity.toDB())
 
-
-	private fun NovelSettingEntity.toDB(): DBNovelSettingsEntity =
-		DBNovelSettingsEntity(
-			novelID,
-			sortType,
-			showOnlyReadingStatusOf,
-			showOnlyBookmarked,
-			showOnlyDownloaded,
-			reverseOrder,
-			showOnlyString,
-		)
+	private fun NovelSettingEntity.toDB(): DBNovelSettingsEntity = DBNovelSettingsEntity(
+		novelID,
+		sortType,
+		showOnlyReadingStatusOf,
+		showOnlyBookmarked,
+		showOnlyDownloaded,
+		reverseOrder,
+		showOnlyString,
+	)
 }
-

@@ -31,9 +31,7 @@ import kotlinx.coroutines.flow.map
  * shosetsu
  * 12 / 05 / 2020
  */
-class DBUpdatesDataSource(
-	private val updatesDao: UpdatesDao,
-) : IDBUpdatesDataSource {
+class DBUpdatesDataSource(private val updatesDao: UpdatesDao) : IDBUpdatesDataSource {
 	@Throws(SQLiteException::class)
 	override fun getUpdates(): Flow<List<UpdateEntity>> =
 		updatesDao.loadUpdates().map { it.convertList() }
@@ -43,8 +41,7 @@ class DBUpdatesDataSource(
 		(updatesDao.insertAllReplace(list.toDB()))
 
 	@Throws(SQLiteException::class)
-	override fun getCompleteUpdates(
-	): Flow<List<UpdateCompleteEntity>> =
+	override fun getCompleteUpdates(): Flow<List<UpdateCompleteEntity>> =
 		updatesDao.loadCompleteUpdates()
 
 	@Throws(SQLiteException::class)

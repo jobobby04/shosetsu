@@ -4,7 +4,8 @@ enum class ProductFlavors(val key: String) {
 	PLAY_STORE("playstore"),
 	F_DROID("fdroid"),
 	UP_TO_DOWN("uptodown"),
-	STANDARD("standard");
+	STANDARD("standard"),
+	;
 
 	companion object {
 		fun fromKey(key: String) = entries.find { it.key == key }!!

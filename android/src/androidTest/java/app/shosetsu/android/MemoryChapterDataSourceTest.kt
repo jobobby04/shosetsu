@@ -4,14 +4,14 @@ import app.shosetsu.android.common.consts.MEMORY_EXPIRE_CHAPTER_TIME
 import app.shosetsu.android.common.consts.MEMORY_MAX_CHAPTERS
 import app.shosetsu.android.datasource.local.memory.impl.ConCacheFactory
 import app.shosetsu.android.datasource.local.memory.impl.MemChaptersDataSource
+import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.junit.Before
 import org.junit.Test
-import kotlin.system.measureTimeMillis
-import kotlin.time.Duration.Companion.minutes
 
 /*
  * This file is part of Shosetsu.
@@ -47,7 +47,9 @@ class MemoryChapterDataSourceTest {
 		println("=================================")
 		// How long until data expires
 		println("Expires in $expireTime ms")
-		require((expireTime / (60 * 1000)) == MEMORY_EXPIRE_CHAPTER_TIME) { "Expire time does not match up properly" }
+		require((expireTime / (60 * 1000)) == MEMORY_EXPIRE_CHAPTER_TIME) {
+			"Expire time does not match up properly"
+		}
 		println("Expire time matches")
 	}
 
@@ -60,14 +62,14 @@ class MemoryChapterDataSourceTest {
 			val job = GlobalScope.launch {
 				println("Saving enough chapters to go over max limit")
 
-
 				println("Saving #$CHAPTER_ID, to ensure it is deleted")
 				// Saving this chapter
 				memorySource.saveChapterInCache(CHAPTER_ID, CHAPTER_CONTENT.toByteArray())
 
 				println("Saving chapters")
-				for (i in 1 until MEMORY_MAX_CHAPTERS + 2)
+				for (i in 1 until MEMORY_MAX_CHAPTERS + 2) {
 					memorySource.saveChapterInCache(i.toInt(), "$i".toByteArray())
+				}
 
 				println("Checking if chapter is present")
 				require(memorySource.loadChapterFromCache(CHAPTER_ID) != null)
@@ -90,7 +92,7 @@ class MemoryChapterDataSourceTest {
 				memorySource.loadChapterFromCache(CHAPTER_ID).let {
 					println("We have $CHAPTER_CONTENT, ensuring they are the same")
 					assert(
-						CHAPTER_CONTENT.toByteArray().contentEquals(it)
+						CHAPTER_CONTENT.toByteArray().contentEquals(it),
 					) { "They are not the same" }
 					println("They match up")
 				}

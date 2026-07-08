@@ -28,4 +28,3 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 interface ExposedSettingsRepoViewModel {
 	val settingsRepo: ISettingsRepository
 }
-

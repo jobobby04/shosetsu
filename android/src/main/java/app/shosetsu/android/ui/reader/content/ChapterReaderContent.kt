@@ -82,7 +82,7 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				isSwipeInverted = false,
 				pageJumper = StableHolder(MutableSharedFlow()),
 				createPage = {
-				}
+				},
 			)
 		},
 		sheetContent = {
@@ -100,11 +100,11 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				onStopTTS = {},
 				updateSetting = {},
 				lowerSheet = {},
-				toggleFocus = {}
+				toggleFocus = {},
 			) {}
 		},
 		exception = null,
-		showTTSClickHint = false
+		showTTSClickHint = false,
 	)
 }
 
@@ -116,19 +116,18 @@ fun PreviewChapterReaderContent() = ShosetsuTheme(AppThemes.LIGHT) {
 fun ChapterReaderContent(
 	isFocused: Boolean,
 	isFirstFocusProvider: () -> Boolean,
-
 	onFirstFocus: () -> Unit,
 	content: @Composable (windowPadding: PaddingValues, footerPadding: PaddingValues) -> Unit,
 	sheetContent: @Composable ColumnScope.(BottomSheetScaffoldState) -> Unit,
 	exception: ExceptionSnackbarModel?,
-	showTTSClickHint: Boolean
+	showTTSClickHint: Boolean,
 ) {
 	val scope = rememberCoroutineScope()
 	val scaffoldState = rememberBottomSheetScaffoldState()
 	val context = LocalContext.current
 
 	BackHandler(
-		scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
+		scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded,
 	) {
 		scope.launch {
 			scaffoldState.bottomSheetState.partialExpand()
@@ -141,7 +140,12 @@ fun ChapterReaderContent(
 		sheetContent = {
 			sheetContent(scaffoldState)
 		},
-		sheetPeekHeight = if (isFocused) 0.dp else insets.calculateBottomPadding() + BottomSheetDefaults.SheetPeekHeight,
+		sheetPeekHeight = if (isFocused) {
+			0.dp
+		} else {
+			insets.calculateBottomPadding() +
+				BottomSheetDefaults.SheetPeekHeight
+		},
 		content = { paddingValues ->
 			content(WindowInsets.safeDrawing.asPaddingValues(), paddingValues)
 		},
@@ -151,10 +155,10 @@ fun ChapterReaderContent(
 			SnackbarHost(
 				it,
 				modifier = Modifier.windowInsetsPadding(
-					WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
-				)
+					WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom),
+				),
 			)
-		}
+		},
 	)
 
 	LaunchedEffect(exception) {
@@ -165,7 +169,7 @@ fun ChapterReaderContent(
 				scope.launch {
 					val result = scaffoldState.snackbarHostState.showSnackbar(
 						exception.displayText,
-						actionLabel = context.getString(R.string.report)
+						actionLabel = context.getString(R.string.report),
 					)
 
 					if (result == SnackbarResult.ActionPerformed) {
@@ -193,7 +197,7 @@ fun ChapterReaderContent(
 				scaffoldState.snackbarHostState.showSnackbar(
 					context.getString(R.string.reader_hint_pause_to_change),
 					duration = SnackbarDuration.Indefinite,
-					withDismissAction = true
+					withDismissAction = true,
 				)
 			}
 		}

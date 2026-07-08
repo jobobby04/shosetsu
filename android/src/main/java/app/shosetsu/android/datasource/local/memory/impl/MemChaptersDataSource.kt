@@ -36,6 +36,5 @@ class MemChaptersDataSource(factory: ICache.Factory) : IMemChaptersDataSource {
 		chapters[chapterID] = chapter
 	}
 
-	override fun loadChapterFromCache(chapterID: Int): ByteArray? =
-		chapters[chapterID]
+	override fun loadChapterFromCache(chapterID: Int): ByteArray? = chapters[chapterID]
 }

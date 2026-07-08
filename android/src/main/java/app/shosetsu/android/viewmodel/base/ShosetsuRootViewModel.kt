@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
-abstract class ShosetsuRootViewModel : ShosetsuViewModel(), ThemedViewModel {
+abstract class ShosetsuRootViewModel :
+	ShosetsuViewModel(),
+	ThemedViewModel {
 	protected abstract val loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase
 
 	/**

@@ -18,7 +18,7 @@ fun NavGraphBuilder.browseGraph(navController: ShosetsuNavController) {
 			onOpenNovel = {
 				navController.navigate(Novel(it))
 			},
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 
@@ -26,7 +26,7 @@ fun NavGraphBuilder.browseGraph(navController: ShosetsuNavController) {
 		val extensionId = entry.toRoute<ConfigureExtension>().extensionId
 		ConfigureExtensionView(
 			extensionId,
-			onExit = navController::popBackStack
+			onExit = navController::popBackStack,
 		)
 	}
 
@@ -38,7 +38,7 @@ fun NavGraphBuilder.browseGraph(navController: ShosetsuNavController) {
 			openNovel = {
 				navController.navigate(Novel(it))
 			},
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 }

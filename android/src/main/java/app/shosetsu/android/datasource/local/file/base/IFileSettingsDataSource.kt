@@ -64,12 +64,7 @@ interface IFileSettingsDataSource {
 
 	suspend fun setBoolean(name: String, key: SettingKey<Boolean>, value: Boolean)
 
-	suspend fun setStringSet(
-		name: String,
-		key: SettingKey<Set<String>>,
-		value: Set<String>,
-	)
+	suspend fun setStringSet(name: String, key: SettingKey<Set<String>>, value: Set<String>)
 
 	suspend fun setFloat(name: String, key: SettingKey<Float>, value: Float)
-
 }

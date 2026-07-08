@@ -40,7 +40,7 @@ fun StringSettingContent(
 	description: String,
 	value: String,
 	modifier: Modifier = Modifier,
-	onValueChanged: (newString: String) -> Unit
+	onValueChanged: (newString: String) -> Unit,
 ) {
 	Column(
 		modifier = modifier,
@@ -49,7 +49,7 @@ fun StringSettingContent(
 			value = value,
 			onValueChange = onValueChanged,
 			label = { Text(title) },
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier.fillMaxWidth(),
 		)
 		Text(description)
 	}
@@ -69,7 +69,7 @@ fun StringSettingContent(
 
 	Column(
 		Modifier
-			.padding(horizontal = 16.dp)
+			.padding(horizontal = 16.dp),
 	) {
 		TextField(
 			value = value,
@@ -78,13 +78,13 @@ fun StringSettingContent(
 			},
 			modifier = modifier,
 			label = { Text(title) },
-			enabled = enabled
+			enabled = enabled,
 		)
 		Text(
 			description,
 			style = SUB_TEXT_SIZE,
 			modifier = Modifier.alpha(0.7f),
-			color = LocalContentColor.current
+			color = LocalContentColor.current,
 		)
 	}
 }
@@ -93,6 +93,5 @@ fun StringSettingContent(
 @Composable
 fun PreviewStringSettingContent() {
 	StringSettingContent("Text Input", "This is a text input", "") {
-
 	}
 }

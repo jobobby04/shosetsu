@@ -24,7 +24,4 @@ package app.shosetsu.android.view.uimodels.model
  * @param displayText Text to show the user
  * @param exception The error that occurred, if null, no report button will be shown.
  */
-data class ExceptionSnackbarModel(
-	val displayText: String,
-	val exception: Throwable? = null
-)
+data class ExceptionSnackbarModel(val displayText: String, val exception: Throwable? = null)

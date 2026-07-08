@@ -38,9 +38,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * shosetsu
  * 04 / 09 / 2020
  */
-class IsOnlineUseCase(
-	private val application: Application,
-) {
+class IsOnlineUseCase(private val application: Application) {
 	private val connectivityManager by lazy {
 		application.getSystemService<ConnectivityManager>()!!
 	}
@@ -86,10 +84,7 @@ class IsOnlineUseCase(
 				trySend(invoke())
 			}
 
-			override fun onCapabilitiesChanged(
-				network: Network,
-				networkCapabilities: NetworkCapabilities
-			) {
+			override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
 				super.onCapabilitiesChanged(network, networkCapabilities)
 				trySend(invoke())
 			}
@@ -111,10 +106,9 @@ class IsOnlineUseCase(
 			// For Android 5
 			connectivityManager.registerNetworkCallback(
 				NetworkRequest.Builder().build(),
-				callback
+				callback,
 			)
 		}
-
 
 		awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
 	}

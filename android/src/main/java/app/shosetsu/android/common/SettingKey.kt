@@ -27,14 +27,12 @@ import kotlinx.serialization.json.Json
  * 23 / 06 / 2020
  */
 
-
 typealias IntKey = SettingKey<Int>
 typealias LongKey = SettingKey<Long>
 typealias BooleanKey = SettingKey<Boolean>
 typealias FloatKey = SettingKey<Float>
 typealias StringKey = SettingKey<String>
 typealias StringSetKey = SettingKey<Set<String>>
-
 
 sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
@@ -69,7 +67,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	// How things look in Reader
 	object ReaderUserThemes : StringSetKey("readerThemes", emptySet())
 
-
 	object ReaderTextSize : FloatKey("readerTextSize", 14f)
 
 	object ReaderParagraphSpacing : FloatKey("readerParagraphSpacing", 1f)
@@ -92,10 +89,9 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 	object ReaderType : IntKey("readerType", -1)
 
-	//- How things act in Reader
+	// - How things act in Reader
 	object ReaderIsTapToScroll : BooleanKey("tapToScroll", false)
 	object ReaderVolumeScroll : BooleanKey("volumeToScroll_force", false)
-
 
 	object ReaderIsInvertedSwipe : BooleanKey("invertedSwipe", false)
 	object ReadingMarkingType : StringKey("readingMarkingType", MarkingType.ONVIEW.name)
@@ -118,7 +114,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 		"readerHtmlCss",
 		"""
 
-		""".trimIndent()
+		""".trimIndent(),
 	)
 
 	/**
@@ -151,10 +147,10 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object ReaderDisableTextSelection : BooleanKey("reader_disable_text_sel", false)
 
-	//- Some things
+	// - Some things
 	object ChaptersResumeFirstUnread : BooleanKey(
 		"readerResumeFirstUnread",
-		false
+		false,
 	)
 
 	object ReaderPitch : FloatKey("reader_pitch_2", 10f)
@@ -168,7 +164,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 
 	// Download options
 	object IsDownloadPaused : BooleanKey("isDownloadPaused", false)
-
 
 	/**
 	 * Which chapter to delete after reading
@@ -220,14 +215,12 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object RepoUpdateOnMeteredConnection : BooleanKey("repoUpdateMetered", true)
 	object RepoUpdateDisableOnFail : BooleanKey("update_repository_disable_on_fail", false)
 
-
 	// App Update Options
 	object AppUpdateOnStartup : BooleanKey("appUpdateOnStartup", true)
 	object AppUpdateOnMeteredConnection : BooleanKey("appUpdateMetered", true)
 
 	object AppUpdateOnlyWhenIdle : BooleanKey("appUpdateIdle", false)
 	object AppUpdateCycle : IntKey("appUpdateCycle", 12)
-
 
 	// View options
 	object ChapterColumnsInPortait : IntKey("columnsInNovelsViewP", 3)
@@ -274,7 +267,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	/** If the reader can mark a read chapter as reading when its opened / scrolled */
 	object ReaderMarkReadAsReading : BooleanKey(
 		"readerMarkReadAsReading",
-		false
+		false,
 	)
 
 	object ReaderTrackLongReading : BooleanKey("reader_track_long_reading", true)
@@ -292,7 +285,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object ReaderNextChapterAlert : BooleanKey("reader_next_chapter_alert", true)
 
-
 	// Advanced settings
 
 	/**
@@ -300,7 +292,6 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 * 	allowing diversity to avoid app bans.
 	 */
 	object UserAgent : StringKey("user_agent_2", DEFAULT_USER_AGENT)
-
 
 	object UseProxy : BooleanKey("use_proxy", false)
 	object ProxyHost : StringKey("proxy_host", "")
@@ -332,35 +323,18 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	 */
 	object SiteProtectionDelay : IntKey("site_protection_delay", 300)
 
-	class CustomString(
-		name: String,
-		default: String
-	) : StringKey("string_$name", default)
+	class CustomString(name: String, default: String) : StringKey("string_$name", default)
 
-	class CustomInt(
-		name: String,
-		default: Int
-	) : IntKey("int_$name", default)
+	class CustomInt(name: String, default: Int) : IntKey("int_$name", default)
 
-	class CustomBoolean(
-		name: String,
-		default: Boolean
-	) : BooleanKey("boolean_$name", default)
+	class CustomBoolean(name: String, default: Boolean) : BooleanKey("boolean_$name", default)
 
-	class CustomLong(
-		name: String,
-		default: Long
-	) : SettingKey<Long>("long_$name", default)
+	class CustomLong(name: String, default: Long) : SettingKey<Long>("long_$name", default)
 
-	class CustomFloat(
-		name: String,
-		default: Float
-	) : FloatKey("float_$name", default)
+	class CustomFloat(name: String, default: Float) : FloatKey("float_$name", default)
 
-	class CustomStringSet(
-		name: String,
-		default: Set<String>
-	) : StringSetKey("stringSet_$name", default)
+	class CustomStringSet(name: String, default: Set<String>) :
+		StringSetKey("stringSet_$name", default)
 
 	companion object {
 		private val map: Map<String, SettingKey<*>> by lazy {
@@ -382,7 +356,5 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 		return true
 	}
 
-	override fun hashCode(): Int {
-		return name.hashCode()
-	}
+	override fun hashCode(): Int = name.hashCode()
 }

@@ -19,27 +19,18 @@ import android.content.ContentValues
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-operator fun ContentValues.set(key: String, value: String?) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: String?) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: Int) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: Int) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: Byte) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: Byte) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: Short) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: Short) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: Long) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: Long) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: Float) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: Float) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: Double) =
-	put(key, value)
+operator fun ContentValues.set(key: String, value: Double) = put(key, value)
 
-operator fun ContentValues.set(key: String, value: ByteArray) =
-	put(key, value)
-
+operator fun ContentValues.set(key: String, value: ByteArray) = put(key, value)

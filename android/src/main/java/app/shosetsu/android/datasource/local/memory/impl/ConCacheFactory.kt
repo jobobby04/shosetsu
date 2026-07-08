@@ -5,15 +5,11 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration
 
 class ConCacheFactory : ICache.Factory {
-	override fun <K : Any, V : Any> create(
-		expireDuration: Duration,
-		maxSize: Int
-	): ICache<K, V> = Cache(expireDuration.inWholeMilliseconds, maxSize)
+	override fun <K : Any, V : Any> create(expireDuration: Duration, maxSize: Int): ICache<K, V> =
+		Cache(expireDuration.inWholeMilliseconds, maxSize)
 
-	private class Cache<K : Any, V : Any>(
-		private val expireTime: Long,
-		private val maxSize: Int,
-	) : ICache<K, V> {
+	private class Cache<K : Any, V : Any>(private val expireTime: Long, private val maxSize: Int) :
+		ICache<K, V> {
 		private val _hashMap = ConcurrentHashMap<K, Pair<Long, V>>()
 
 		/**
@@ -39,9 +35,11 @@ class ConCacheFactory : ICache.Factory {
 			}
 		}
 
-		override fun remove(key: K): Boolean =
-			if (!contains(key)) false
-			else _hashMap.remove(key) != null
+		override fun remove(key: K): Boolean = if (!contains(key)) {
+			false
+		} else {
+			_hashMap.remove(key) != null
+		}
 
 		override fun set(key: K, value: V) {
 			if (_hashMap.size > maxSize) {
@@ -56,8 +54,9 @@ class ConCacheFactory : ICache.Factory {
 
 			val keys = _hashMap.keys.reversed()
 			for (i in keys) {
-				if (i == key)
+				if (i == key) {
 					return true
+				}
 			}
 			return false
 		}
@@ -66,7 +65,9 @@ class ConCacheFactory : ICache.Factory {
 			recycle()
 			return if (contains(key)) {
 				_hashMap[key]?.second
-			} else null
+			} else {
+				null
+			}
 		}
 
 		override fun clear() {

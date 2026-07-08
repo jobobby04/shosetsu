@@ -21,9 +21,7 @@ package app.shosetsu.android.common.enums
  * shosetsu
  * 08 / 12 / 2020
  */
-enum class NovelCardType(
-	private val code: Int
-) {
+enum class NovelCardType(private val code: Int) {
 	NORMAL(0),
 	COMPRESSED(1),
 	COZY(2), ;

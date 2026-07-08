@@ -35,9 +35,8 @@ import kotlinx.coroutines.flow.combine
  */
 class DownloadSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
-	private val manager: DownloadWorker.Manager
+	private val manager: DownloadWorker.Manager,
 ) : ADownloadSettingsViewModel(iSettingsRepository) {
-
 
 	override val notifyRestartWorker = MutableSharedFlow<Request>()
 
@@ -48,8 +47,9 @@ class DownloadSettingsViewModel(
 				.combine(settingsRepo.getBooleanFlow(DownloadOnLowBattery)) { a, b -> a to b }
 				.combine(settingsRepo.getBooleanFlow(DownloadOnMeteredConnection)) { a, b -> a to b }
 				.collect {
-					if (manager.getCount() != 0 && manager.getWorkerState() == WorkInfo.State.ENQUEUED)
+					if (manager.getCount() != 0 && manager.getWorkerState() == WorkInfo.State.ENQUEUED) {
 						notifyRestartWorker.emit(Request)
+					}
 				}
 		}
 	}

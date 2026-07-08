@@ -30,18 +30,16 @@ fun String.urlEncode(): String {
 	return URLEncoder.encode(this, "utf-8")
 }
 
-fun NovelLink.toURL(): String =
-	"$BASE_SHARE_URL/novel" +
-		"?name=${name.urlEncode()}" +
-		"&url=${url.urlEncode()}" +
-		"&imageURL=${imageURL.urlEncode()}" +
-		"&extID=${extensionQRCode.id}" +
-		"&extURL=${extensionQRCode.imageURL.urlEncode()}" +
-		"&extName=${extensionQRCode.name.urlEncode()}" +
-		"&repoName=${extensionQRCode.repo.name.urlEncode()}" +
-		"&repoURL=${extensionQRCode.repo.url.urlEncode()}"
+fun NovelLink.toURL(): String = "$BASE_SHARE_URL/novel" +
+	"?name=${name.urlEncode()}" +
+	"&url=${url.urlEncode()}" +
+	"&imageURL=${imageURL.urlEncode()}" +
+	"&extID=${extensionQRCode.id}" +
+	"&extURL=${extensionQRCode.imageURL.urlEncode()}" +
+	"&extName=${extensionQRCode.name.urlEncode()}" +
+	"&repoName=${extensionQRCode.repo.name.urlEncode()}" +
+	"&repoURL=${extensionQRCode.repo.url.urlEncode()}"
 
-fun RepositoryLink.toURL(): String =
-	"$BASE_SHARE_URL/repository" +
-		"?name=${name.urlEncode()}" +
-		"&url=${url.urlEncode()}"
+fun RepositoryLink.toURL(): String = "$BASE_SHARE_URL/repository" +
+	"?name=${name.urlEncode()}" +
+	"&url=${url.urlEncode()}"

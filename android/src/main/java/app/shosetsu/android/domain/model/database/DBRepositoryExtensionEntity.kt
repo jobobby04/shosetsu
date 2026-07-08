@@ -51,8 +51,8 @@ import app.shosetsu.lib.json.RepoExtension
 			entity = DBRepositoryEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["repoId"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
 	indices = [
 		Index("repoId"),
@@ -60,9 +60,8 @@ import app.shosetsu.lib.json.RepoExtension
 	/**
 	 * Both repoId & id make a primary key.
 	 */
-	primaryKeys = ["repoId", "id"]
+	primaryKeys = ["repoId", "id"],
 )
-
 data class DBRepositoryExtensionEntity(
 	/** Repository extension belongs too*/
 	val repoId: Int,
@@ -81,7 +80,7 @@ data class DBRepositoryExtensionEntity(
 
 	var md5: String,
 
-	val type: ExtensionType
+	val type: ExtensionType,
 ) : Convertible<GenericExtensionEntity> {
 	override fun convertTo(): GenericExtensionEntity = GenericExtensionEntity(
 		id,
@@ -92,6 +91,6 @@ data class DBRepositoryExtensionEntity(
 		lang,
 		version,
 		md5,
-		type
+		type,
 	)
 }

@@ -36,7 +36,7 @@ data class LibraryFilterState(
 	val artistFilter: Map<String, InclusionState> = emptyMap(),
 	val tagFilter: Map<String, InclusionState> = emptyMap(),
 	val arePinsOnTop: Boolean = true,
-	val downloadedOnly: InclusionState? = null
+	val downloadedOnly: InclusionState? = null,
 ) {
 	companion object {
 		val libraryFilterStateJson = Json {

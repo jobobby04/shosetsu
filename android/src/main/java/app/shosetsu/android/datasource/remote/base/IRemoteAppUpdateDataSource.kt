@@ -34,10 +34,9 @@ interface IRemoteAppUpdateDataSource {
 	@Throws(
 		EmptyResponseBodyException::class,
 		HTTPException::class,
-		IOException::class
+		IOException::class,
 	)
 	suspend fun loadAppUpdate(): AppUpdateEntity
-
 
 	/**
 	 * Specifies that this [IRemoteAppUpdateDataSource] can download the app update itself
@@ -46,7 +45,7 @@ interface IRemoteAppUpdateDataSource {
 		@Throws(
 			EmptyResponseBodyException::class,
 			HTTPException::class,
-			IOException::class
+			IOException::class,
 		)
 		suspend fun downloadAppUpdate(update: AppUpdateEntity): InputStream
 	}

@@ -29,28 +29,23 @@ import app.shosetsu.lib.Novel
  * @author github.com/doomsdayrs
  */
 
-fun Novel.Chapter.entity(novelEntity: NovelEntity): ChapterEntity =
-	ChapterEntity(
-		url = this.link,
-		novelID = novelEntity.id!!,
-		extensionID = novelEntity.extensionID,
-		title = this.title,
-		releaseDate = this.release,
-		order = this.order
-	)
+fun Novel.Chapter.entity(novelEntity: NovelEntity): ChapterEntity = ChapterEntity(
+	url = this.link,
+	novelID = novelEntity.id!!,
+	extensionID = novelEntity.extensionID,
+	title = this.title,
+	releaseDate = this.release,
+	order = this.order,
+)
 
-fun Novel.Chapter.entity(
-	novelID: Int,
-	extensionID: Int,
-): ChapterEntity =
-	ChapterEntity(
-		url = this.link,
-		novelID = novelID,
-		extensionID = extensionID,
-		title = this.title,
-		releaseDate = this.release,
-		order = this.order
-	)
+fun Novel.Chapter.entity(novelID: Int, extensionID: Int): ChapterEntity = ChapterEntity(
+	url = this.link,
+	novelID = novelID,
+	extensionID = extensionID,
+	title = this.title,
+	releaseDate = this.release,
+	order = this.order,
+)
 
 fun Novel.Info.convertTo(extensionId: Int): NovelEntity = NovelEntity(
 	url = this.link,
@@ -59,21 +54,17 @@ fun Novel.Info.convertTo(extensionId: Int): NovelEntity = NovelEntity(
 	extensionID = extensionId,
 )
 
-fun Novel.Info.asEntity(
-	link: String,
-	extensionID: Int,
-): NovelEntity =
-	NovelEntity(
-		url = link,
-		imageURL = this.imageURL,
-		description = this.description,
-		extensionID = extensionID,
-		loaded = true,
-		title = this.title,
-		artists = this.artists.toList(),
-		authors = this.authors.toList(),
-		language = this.language,
-		genres = this.genres.toList(),
-		tags = this.tags.toList(),
-		status = this.status,
-	)
+fun Novel.Info.asEntity(link: String, extensionID: Int): NovelEntity = NovelEntity(
+	url = link,
+	imageURL = this.imageURL,
+	description = this.description,
+	extensionID = extensionID,
+	loaded = true,
+	title = this.title,
+	artists = this.artists.toList(),
+	authors = this.authors.toList(),
+	language = this.language,
+	genres = this.genres.toList(),
+	tags = this.tags.toList(),
+	status = this.status,
+)

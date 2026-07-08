@@ -33,7 +33,7 @@ import androidx.navigation.NavBackStackEntry
 @Composable
 fun BottomNavigationBar(
 	currentDestination: NavBackStackEntry?,
-	onNavigate: (ShosetsuDestination.Primary) -> Unit
+	onNavigate: (ShosetsuDestination.Primary) -> Unit,
 ) {
 	NavigationBar {
 		ShosetsuDestination.Primary.all.forEach { destination ->
@@ -44,7 +44,7 @@ fun BottomNavigationBar(
 				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
-				}
+				},
 			)
 		}
 	}

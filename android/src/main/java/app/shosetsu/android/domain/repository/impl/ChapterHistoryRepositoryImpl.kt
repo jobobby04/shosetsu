@@ -33,9 +33,8 @@ import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
  * @since 16 / 01 / 2023
  * @author Doomsdayrs
  */
-class ChapterHistoryRepositoryImpl(
-	private val chapterHistoryDatabase: DBChapterHistoryDataSource
-) : ChapterHistoryRepository {
+class ChapterHistoryRepositoryImpl(private val chapterHistoryDatabase: DBChapterHistoryDataSource) :
+	ChapterHistoryRepository {
 	@Throws(SQLiteException::class)
 	override suspend fun markChapterAsRead(chapter: ChapterEntity, time: Long) {
 		onIO {

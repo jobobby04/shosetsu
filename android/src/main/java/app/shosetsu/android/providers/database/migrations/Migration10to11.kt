@@ -31,6 +31,8 @@ object Migration10to11 : Migration(10, 11) {
 	@Throws(SQLException::class)
 	override fun migrate(db: SupportSQLiteDatabase) {
 		db.execSQL("DROP TABLE IF EXISTS 'libs'")
-		db.execSQL("CREATE TABLE IF NOT EXISTS `libs` (`scriptName` TEXT NOT NULL, `version` TEXT NOT NULL, `repoID` INTEGER NOT NULL, PRIMARY KEY(`scriptName`, `repoID`))")
+		db.execSQL(
+			"CREATE TABLE IF NOT EXISTS `libs` (`scriptName` TEXT NOT NULL, `version` TEXT NOT NULL, `repoID` INTEGER NOT NULL, PRIMARY KEY(`scriptName`, `repoID`))",
+		)
 	}
 }

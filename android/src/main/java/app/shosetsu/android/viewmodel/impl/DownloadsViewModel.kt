@@ -83,24 +83,25 @@ class DownloadsViewModel(
 	}
 
 	private val selectedDownloads = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-	private suspend fun copySelected(): HashMap<Int, Boolean> =
-		selectedDownloads.first().copy()
+	private suspend fun copySelected(): HashMap<Int, Boolean> = selectedDownloads.first().copy()
 
 	private fun clearSelected() {
 		selectedDownloads.value = emptyMap()
 	}
 
-	private fun List<DownloadUI>.sort() = sortedWith(compareBy<DownloadUI> {
-		it.status == DownloadStatus.ERROR
-	}.thenBy {
-		it.status == DownloadStatus.PAUSED
-	}.thenBy {
-		it.status == DownloadStatus.PENDING
-	}.thenBy {
-		it.status == DownloadStatus.WAITING
-	}.thenBy {
-		it.status == DownloadStatus.DOWNLOADING
-	})
+	private fun List<DownloadUI>.sort() = sortedWith(
+		compareBy<DownloadUI> {
+			it.status == DownloadStatus.ERROR
+		}.thenBy {
+			it.status == DownloadStatus.PAUSED
+		}.thenBy {
+			it.status == DownloadStatus.PENDING
+		}.thenBy {
+			it.status == DownloadStatus.WAITING
+		}.thenBy {
+			it.status == DownloadStatus.DOWNLOADING
+		},
+	)
 
 	private val downloadsFlow by lazy {
 		getDownloadsUseCase()
@@ -134,11 +135,10 @@ class DownloadsViewModel(
 						it.status == DownloadStatus.PENDING ||
 						it.status == DownloadStatus.ERROR ||
 						(isDownloadPaused.first() && it.status == DownloadStatus.DOWNLOADING)
-				}
+				},
 			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, SelectedDownloadsState())
 	}
-
 
 	override val isDownloadPaused: StateFlow<Boolean> by lazy {
 		settings.getBooleanFlow(IsDownloadPaused)
@@ -164,7 +164,7 @@ class DownloadsViewModel(
 				}
 			} else {
 				error.emit(
-					OfflineException(R.string.fragment_downloads_snackbar_offline_no_download)
+					OfflineException(R.string.fragment_downloads_snackbar_offline_no_download),
 				)
 			}
 		}

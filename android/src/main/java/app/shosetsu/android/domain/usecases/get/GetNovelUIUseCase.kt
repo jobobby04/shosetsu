@@ -31,24 +31,29 @@ import kotlinx.coroutines.flow.*
  */
 class GetNovelUIUseCase(
 	private val novelsRepository: INovelsRepository,
-	private val extensionRepository: IExtensionsRepository
+	private val extensionRepository: IExtensionsRepository,
 ) {
 	@Throws(SQLiteException::class)
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(novelID: Int): Flow<NovelUI?> = flow {
-		if (novelID != -1)
-			emitAll(novelsRepository.getNovelFlow(novelID).mapLatest {
-				it?.let { novelEntity ->
-					(NovelConversionFactory(novelEntity).convertTo())
-				}
-			}.map { novelUI ->
-				if (novelUI != null)
-					extensionRepository.getInstalledExtension(novelUI.extID)?.let { ext ->
-						novelUI.copy(
-							extName = ext.name
-						)
-					} ?: novelUI
-				else null
-			})
+		if (novelID != -1) {
+			emitAll(
+				novelsRepository.getNovelFlow(novelID).mapLatest {
+					it?.let { novelEntity ->
+						(NovelConversionFactory(novelEntity).convertTo())
+					}
+				}.map { novelUI ->
+					if (novelUI != null) {
+						extensionRepository.getInstalledExtension(novelUI.extID)?.let { ext ->
+							novelUI.copy(
+								extName = ext.name,
+							)
+						} ?: novelUI
+					} else {
+						null
+					}
+				},
+			)
+		}
 	}
 }

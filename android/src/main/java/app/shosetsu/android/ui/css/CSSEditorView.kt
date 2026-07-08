@@ -19,14 +19,12 @@ import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun CSSEditorView(
-	cssId: Int,
-	onBackPressed: () -> Unit
-) {
+fun CSSEditorView(cssId: Int, onBackPressed: () -> Unit) {
 	val viewModel: ACSSEditorViewModel = viewModelDi()
 	LaunchedEffect(cssId) {
-		if (cssId != -2)
+		if (cssId != -2) {
 			viewModel.setCSSId(cssId)
+		}
 	}
 
 	val cssTitle by viewModel.cssTitle.collectAsState()
@@ -80,7 +78,7 @@ fun CSSEditorView(
 			},
 			hasPaste = hasPaste,
 			canRedo = canRedo,
-			canUndo = canUndo
+			canUndo = canUndo,
 		) {
 			viewModel.saveCSS()
 		}

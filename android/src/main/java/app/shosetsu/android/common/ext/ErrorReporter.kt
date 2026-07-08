@@ -19,5 +19,3 @@ package app.shosetsu.android.common.ext
  * @since 28 / 12 / 2021
  * @author Doomsdayrs
  */
-
-

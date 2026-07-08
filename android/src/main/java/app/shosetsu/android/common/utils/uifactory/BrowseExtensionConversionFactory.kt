@@ -41,12 +41,11 @@ class BrowseExtensionConversionFactory(data: BrowseExtensionEntity) :
 		isUpdateAvailable = isUpdateAvailable,
 		updateVersion = updateVersion,
 		isInstalling = isInstalling,
-		isObsolete = isObsolete
+		isObsolete = isObsolete,
 	)
 }
 
-fun List<BrowseExtensionEntity>.mapToFactory() =
-	map { BrowseExtensionConversionFactory(it) }
+fun List<BrowseExtensionEntity>.mapToFactory() = map { BrowseExtensionConversionFactory(it) }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun Flow<List<BrowseExtensionEntity>>.mapLatestToResultFlowWithFactory() =

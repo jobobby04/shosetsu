@@ -40,9 +40,8 @@ abstract class RemoveMigration(from: Int, to: Int) : Migration(from, to) {
 	fun deleteColumnFromTable(
 		database: SupportSQLiteDatabase,
 		tableName: String,
-		vararg colName: String?
+		vararg colName: String?,
 	) {
-
 		val backupTableName = "data_backup"
 		database.execSQL("DROP TABLE IF EXISTS $backupTableName;")
 		val columnInfo = database.query("PRAGMA table_info('$tableName')")
@@ -72,11 +71,11 @@ abstract class RemoveMigration(from: Int, to: Int) : Migration(from, to) {
 					while (foreignKeys.moveToNext()) {
 						createBackupTableSQL += ",FOREIGN KEY (${foreignKeys.getString(3)}) REFERENCES ${
 							foreignKeys.getString(
-								2
+								2,
 							)
 						}(${foreignKeys.getString(4)}) ON UPDATE ${foreignKeys.getString(5)} ON DELETE ${
 							foreignKeys.getString(
-								6
+								6,
 							)
 						}"
 					}

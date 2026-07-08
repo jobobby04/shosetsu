@@ -71,7 +71,7 @@ fun PlaceholderNovelCardNormalContent() {
 		"",
 		onClick = {},
 		onLongClick = {},
-		isPlaceholder = true
+		isPlaceholder = true,
 	)
 }
 
@@ -82,7 +82,7 @@ fun PreviewNovelCardNormalContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		"Test",
 		"",
 		onClick = {},
-		onLongClick = {}
+		onLongClick = {},
 	)
 }
 
@@ -96,14 +96,14 @@ fun NovelCardNormalContent(
 	overlay: @Composable (BoxScope.() -> Unit)? = null,
 	isPlaceholder: Boolean = false,
 	isSelected: Boolean = false,
-	isBookmarked: Boolean = false
+	isBookmarked: Boolean = false,
 ) {
 	Card(
 		modifier = Modifier
 			.selectedOutline(isSelected)
 			.combinedClickable(
 				onClick = onClick,
-				onLongClick = onLongClick
+				onLongClick = onLongClick,
 			)
 			.alpha(if (isBookmarked) .5f else 1f),
 	) {
@@ -121,7 +121,7 @@ fun NovelCardNormalContent(
 				contentScale = ContentScale.Crop,
 				error = {
 					ImageLoadingError(title)
-				}
+				},
 			)
 
 			Box(
@@ -130,7 +130,6 @@ fun NovelCardNormalContent(
 					.fillMaxSize()
 					.drawWithCache {
 						onDrawWithContent {
-
 							drawRect(
 								brush = Brush.linearGradient(
 									listOf(
@@ -139,19 +138,19 @@ fun NovelCardNormalContent(
 									),
 									Offset(0.0f, 0.0f),
 									Offset(0.0f, Float.POSITIVE_INFINITY),
-									TileMode.Clamp
-								)
+									TileMode.Clamp,
+								),
 							)
 						}
 					}
-					.alpha(if (isPlaceholder) 0.0f else 1.0f)
+					.alpha(if (isPlaceholder) 0.0f else 1.0f),
 			)
 			Box(
 				Modifier
 					.align(Alignment.BottomCenter)
 					.fillMaxWidth()
 					.padding(4.dp),
-				contentAlignment = Alignment.Center
+				contentAlignment = Alignment.Center,
 			) {
 				Text(
 					title,
@@ -161,11 +160,12 @@ fun NovelCardNormalContent(
 					color = Color.White,
 					overflow = TextOverflow.Ellipsis,
 					maxLines = 3,
-					fontSize = 14.sp
+					fontSize = 14.sp,
 				)
 			}
-			if (overlay != null)
+			if (overlay != null) {
 				overlay()
+			}
 		}
 	}
 }
@@ -177,7 +177,7 @@ fun PlaceholderNovelCardCozyContent() {
 		"",
 		onClick = {},
 		onLongClick = {},
-		isPlaceholder = true
+		isPlaceholder = true,
 	)
 }
 
@@ -188,7 +188,7 @@ fun PreviewNovelCardCozyContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		"Test",
 		"",
 		onClick = {},
-		onLongClick = {}
+		onLongClick = {},
 	)
 }
 
@@ -202,18 +202,18 @@ fun NovelCardCozyContent(
 	overlay: @Composable (BoxScope.() -> Unit)? = null,
 	isPlaceholder: Boolean = false,
 	isSelected: Boolean = false,
-	isBookmarked: Boolean = false
+	isBookmarked: Boolean = false,
 ) {
 	Column(
 		modifier = Modifier
 			.selectedOutline(isSelected)
-			.alpha(if (isBookmarked) .5f else 1f)
+			.alpha(if (isBookmarked) .5f else 1f),
 	) {
 		Card(
 			modifier = Modifier
 				.combinedClickable(
 					onClick = onClick,
-					onLongClick = onLongClick
+					onLongClick = onLongClick,
 				),
 		) {
 			Box {
@@ -233,12 +233,12 @@ fun NovelCardCozyContent(
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
-					}
+					},
 				)
 
-				if (overlay != null)
+				if (overlay != null) {
 					overlay()
-
+				}
 			}
 		}
 
@@ -246,7 +246,7 @@ fun NovelCardCozyContent(
 			Modifier
 				.fillMaxWidth()
 				.padding(4.dp),
-			contentAlignment = Alignment.Center
+			contentAlignment = Alignment.Center,
 		) {
 			Text(
 				title,
@@ -255,12 +255,11 @@ fun NovelCardCozyContent(
 				textAlign = TextAlign.Center,
 				overflow = TextOverflow.Ellipsis,
 				maxLines = 3,
-				fontSize = 14.sp
+				fontSize = 14.sp,
 			)
 		}
 	}
 }
-
 
 @Preview
 @Composable
@@ -270,7 +269,7 @@ fun PreviewNovelCardCompressedContent() = ShosetsuTheme(AppThemes.LIGHT) {
 		"",
 		onClick = {},
 		onLongClick = {},
-		showImages = true
+		showImages = true,
 	)
 }
 
@@ -282,7 +281,7 @@ fun PreviewNovelCardCompressedNoImageContent() = ShosetsuTheme(AppThemes.LIGHT) 
 		"",
 		onClick = {},
 		onLongClick = {},
-		showImages = false
+		showImages = false,
 	)
 }
 
@@ -297,14 +296,14 @@ fun NovelCardCompressedContent(
 	isPlaceholder: Boolean = false,
 	isSelected: Boolean = false,
 	isBookmarked: Boolean = false,
-	showImages: Boolean
+	showImages: Boolean,
 ) {
 	Card(
 		modifier = Modifier
 			.selectedOutline(isSelected)
 			.combinedClickable(
 				onClick = onClick,
-				onLongClick = onLongClick
+				onLongClick = onLongClick,
 			)
 			.alpha(if (isBookmarked) .5f else 1f),
 	) {
@@ -314,13 +313,13 @@ fun NovelCardCompressedContent(
 				horizontalArrangement = Arrangement.SpaceBetween,
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(end = 4.dp)
+					.padding(end = 4.dp),
 			) {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.fillMaxWidth(.70f)
-						.minimumTouchTargetSize()
+						.minimumTouchTargetSize(),
 				) {
 					if (showImages) {
 						SubcomposeAsyncImage(
@@ -338,7 +337,7 @@ fun NovelCardCompressedContent(
 							},
 							loading = {
 								Box(Modifier.placeholder(true))
-							}
+							},
 						)
 					}
 
@@ -347,17 +346,18 @@ fun NovelCardCompressedContent(
 						modifier = Modifier
 							.placeholder(visible = isPlaceholder)
 							.padding(start = 8.dp)
-							.fillMaxWidth()
+							.fillMaxWidth(),
 					)
 				}
 
-				if (overlay != null)
+				if (overlay != null) {
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
 						horizontalArrangement = Arrangement.spacedBy(4.dp),
 					) {
 						overlay()
 					}
+				}
 			}
 		}
 	}

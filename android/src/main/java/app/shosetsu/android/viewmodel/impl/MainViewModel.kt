@@ -50,7 +50,6 @@ class MainViewModel(
 
 	override val appUpdate: MutableStateFlow<AppUpdateEntity?> = MutableStateFlow(null)
 
-
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
 	override fun update() {
@@ -68,8 +67,8 @@ class MainViewModel(
 								ProductFlavors.PLAY_STORE -> "com.android.vending"
 								ProductFlavors.F_DROID -> "org.fdroid.fdroid"
 								else -> null
-							}
-						)
+							},
+						),
 					)
 				}
 			}

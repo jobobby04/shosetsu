@@ -75,6 +75,9 @@ import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.imageLoader
 import coil.request.ImageRequest
+import java.io.IOException
+import java.time.Instant
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import org.kodein.di.DI
@@ -82,9 +85,6 @@ import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.LuaError
-import java.io.IOException
-import java.time.Instant
-import kotlin.coroutines.cancellation.CancellationException
 
 /*
  * This file is part of shosetsu.
@@ -111,10 +111,10 @@ import kotlin.coroutines.cancellation.CancellationException
  *	 Handles update requests for the entire application
  * </p>
  */
-class NovelUpdateWorker(
-	appContext: Context,
-	params: WorkerParameters,
-) : CoroutineWorker(appContext, params), DIAware, NotificationCapable {
+class NovelUpdateWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params),
+	DIAware,
+	NotificationCapable {
 	override val notifyContext: Context
 		get() = applicationContext
 
@@ -125,7 +125,8 @@ class NovelUpdateWorker(
 	private fun NotificationCompat.Builder.addCancelAction() {
 		addAction(
 			actionBuilder(
-				Icons.Default.Cancel, getString(android.R.string.cancel),
+				Icons.Default.Cancel,
+				getString(android.R.string.cancel),
 				PendingIntent.getBroadcast(
 					applicationContext,
 					0,
@@ -133,9 +134,9 @@ class NovelUpdateWorker(
 						action = ACTION_CANCEL_NOVEL_UPDATE
 						putExtra(EXTRA_NOTIFICATION_ID, defaultNotificationID)
 					},
-					if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-				)
-			).build()
+					if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
+				),
+			).build(),
 		)
 	}
 
@@ -214,9 +215,11 @@ class NovelUpdateWorker(
 				includedNovels.filterNot { it.id in excludedNovels }
 			}
 		}.let { list ->
-			if (onlyUpdateOngoing())
+			if (onlyUpdateOngoing()) {
 				list.filter { it.status != Novel.Status.COMPLETED }
-			else list
+			} else {
+				list
+			}
 		}.let { list ->
 			list.distinctBy { it.id }
 				.sortedBy { it.title }
@@ -239,10 +242,12 @@ class NovelUpdateWorker(
 						setSilent(true)
 						addCancelAction()
 					}
-				} else notify(R.string.worker_novel_updating_silent) {
-					setOngoing()
-					setSilent(true)
-					addCancelAction()
+				} else {
+					notify(R.string.worker_novel_updating_silent) {
+						setOngoing()
+						setSilent(true)
+						addCancelAction()
+					}
 				}
 
 				val it = try {
@@ -251,13 +256,13 @@ class NovelUpdateWorker(
 					logE("Failed to load novel: $nE", e)
 					notify(
 						"${e.message}",
-						10000 + nE.id
+						10000 + nE.id,
 					) {
 						setContentTitle(
 							getString(
 								R.string.worker_novel_update_load_failure,
-								nE.title
-							)
+								nE.title,
+							),
 						)
 
 						setNotOngoing()
@@ -270,13 +275,13 @@ class NovelUpdateWorker(
 					logE("Failed to load novel: $nE", e)
 					notify(
 						"${e.message}",
-						10000 + nE.id
+						10000 + nE.id,
 					) {
 						setContentTitle(
 							getString(
 								R.string.worker_novel_update_load_failure,
-								nE.title
-							)
+								nE.title,
+							),
 						)
 
 						setNotOngoing()
@@ -289,13 +294,13 @@ class NovelUpdateWorker(
 					logE("Failed to load novel: $nE", e)
 					notify(
 						"${e.message}",
-						10000 + nE.id
+						10000 + nE.id,
 					) {
 						setContentTitle(
 							getString(
 								R.string.worker_novel_update_load_failure,
-								nE.title
-							)
+								nE.title,
+							),
 						)
 
 						setNotOngoing()
@@ -312,13 +317,13 @@ class NovelUpdateWorker(
 					logE("Failed to load novel: $nE", e)
 					notify(
 						"${e.message}",
-						10000 + nE.id
+						10000 + nE.id,
 					) {
 						setContentTitle(
 							getString(
 								R.string.worker_novel_update_load_failure,
-								nE.title
-							)
+								nE.title,
+							),
 						)
 
 						setNotOngoing()
@@ -329,17 +334,18 @@ class NovelUpdateWorker(
 						addReportErrorAction(
 							applicationContext,
 							10000 + nE.id,
-							e
+							e,
 						)
 					}
 					continue
 				}
-				if (it != null)
+				if (it != null) {
 					if (it.updatedChapters.isNotEmpty()) {
 						updateNovels.add(nE)
 						updatedChapters.addAll(it.updatedChapters)
 					}
-				//TODO Handle null
+				}
+				// TODO Handle null
 				progress++
 			}
 
@@ -351,24 +357,28 @@ class NovelUpdateWorker(
 			}
 
 			// Get rid of the complete notification after 5 seconds
-			if (!classicFinale())
+			if (!classicFinale()) {
 				launchIO {
 					delay(5000)
 					notificationManager.cancel(defaultNotificationID)
 				}
+			}
 		}
 
 		// If not the classic finale, create a notification for each novel about its updated chaps
-		if (!classicFinale())
+		if (!classicFinale()) {
 			for (novel in updateNovels) {
-				launchIO { // Run each novel notification on it's own seperate thread
+				launchIO {
+					// Run each novel notification on it's own seperate thread
 					notifyUpdate(novel, updatedChapters.filter { it.novelID == novel.id })
 				}
 			}
+		}
 
 		// Will update only if downloadOnUpdate is enabled and there have been chapters
-		if (downloadOnUpdate() && updateNovels.isNotEmpty() && updatedChapters.isNotEmpty())
+		if (downloadOnUpdate() && updateNovels.isNotEmpty() && updatedChapters.isNotEmpty()) {
 			startDownloadWorker(updatedChapters)
+		}
 
 		return Result.success()
 	}
@@ -379,24 +389,21 @@ class NovelUpdateWorker(
 	 * @param novel that has been updated
 	 * @param chapters chapters that have been added
 	 */
-	private suspend fun notifyUpdate(
-		novel: LibraryNovelEntity,
-		chapters: List<ChapterEntity>
-	) {
+	private suspend fun notifyUpdate(novel: LibraryNovelEntity, chapters: List<ChapterEntity>) {
 		val chapterSize: Int = chapters.size
 		val firstChapterId = chapters.minByOrNull { it.order }?.id
 		val lastChapterId = chapters.maxByOrNull { it.order }?.id
 		val bitmap: Bitmap? =
 			applicationContext.imageLoader.execute(
 				ImageRequest.Builder(applicationContext).data(novel.imageURL)
-					.build()
+					.build(),
 			).drawable?.toBitmap()
 
 		notify(
 			contentText = applicationContext.resources.getQuantityString(
 				R.plurals.worker_novel_update_updated_novel_count,
 				chapterSize,
-				chapterSize
+				chapterSize,
 			),
 			notificationId = 10000 + novel.id,
 			tag = lastChapterId?.let { ch -> "update/${novel.id}/$ch" },
@@ -404,8 +411,8 @@ class NovelUpdateWorker(
 			setContentTitle(
 				getString(
 					R.string.worker_novel_update_updated_novel,
-					novel.title
-				)
+					novel.title,
+				),
 			)
 
 			setLargeIcon(bitmap)
@@ -417,7 +424,7 @@ class NovelUpdateWorker(
 				setContentIntent(null)
 				addOpenReader(
 					novel.id,
-					firstChapterId
+					firstChapterId,
 				)
 				setAutoCancel(true)
 			}
@@ -435,13 +442,13 @@ class NovelUpdateWorker(
 				intent(applicationContext, ChapterReader::class.java) {
 					bundleOf(
 						BundleKeys.BUNDLE_CHAPTER_ID to chapterId,
-						BundleKeys.BUNDLE_NOVEL_ID to novelId
+						BundleKeys.BUNDLE_NOVEL_ID to novelId,
 					)
 				},
 				(
 					if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-					) or FLAG_ONE_SHOT
-			)
+					) or FLAG_ONE_SHOT,
+			),
 		)
 	}
 
@@ -474,14 +481,12 @@ class NovelUpdateWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(UPDATE_WORK_ID).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Starts the service. It will be started only if there isn't another instance already
@@ -498,14 +503,17 @@ class NovelUpdateWorker(
 							setRequiredNetworkType(
 								if (updateOnMetered()) {
 									CONNECTED
-								} else UNMETERED
+								} else {
+									UNMETERED
+								},
 							)
 							setRequiresStorageNotLow(!updateOnLowStorage())
 							setRequiresBatteryNotLow(!updateOnLowBattery())
-							if (SDK_INT >= VERSION_CODES.M)
+							if (SDK_INT >= VERSION_CODES.M) {
 								setRequiresDeviceIdle(updateOnlyIdle())
-						}.build()
-					).setInputData(data).build()
+							}
+						}.build(),
+					).setInputData(data).build(),
 				)
 				workerManager.getWorkInfosForUniqueWork(UPDATE_WORK_ID).await()[0].let {
 					logD("State ${it.state}")

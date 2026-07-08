@@ -44,12 +44,7 @@ interface DBChapterHistoryDataSource {
 	suspend fun update(chapterHistoryEntity: ChapterHistoryEntity)
 
 	@Throws(SQLiteException::class)
-	suspend fun insert(
-		novelId: Int,
-		chapterId: Int,
-		startedReadingAt: Long,
-		endedReadingAt: Long?
-	)
+	suspend fun insert(novelId: Int, chapterId: Int, startedReadingAt: Long, endedReadingAt: Long?)
 
 	@Throws(SQLiteException::class)
 	suspend fun getLastRead(novelId: Int): ChapterHistoryEntity?

@@ -36,8 +36,10 @@ abstract class GenerateContributorsTask : DefaultTask() {
 		generatedKotlinDir.convention(project.layout.buildDirectory.dir("generated/contributors"))
 	}
 
-	private val superinterface = ClassName("app.shosetsu.android.domain.repository.base", "ContributorsRepository")
-	private val className = ClassName("app.shosetsu.android.domain.repository.impl", "ContributorsRepositoryImpl")
+	private val superinterface =
+		ClassName("app.shosetsu.android.domain.repository.base", "ContributorsRepository")
+	private val className =
+		ClassName("app.shosetsu.android.domain.repository.impl", "ContributorsRepositoryImpl")
 	private val contributorClass = ClassName("app.shosetsu.android.domain.model.local", "Contributor")
 
 	@OptIn(ExperimentalSerializationApi::class)
@@ -55,26 +57,28 @@ abstract class GenerateContributorsTask : DefaultTask() {
 						FunSpec.builder("getAll")
 							.addModifiers(KModifier.OVERRIDE)
 							.returns(List::class.asTypeName().parameterizedBy(contributorClass))
-							.addCode(CodeBlock.builder().apply {
-								add("return listOf(\n")
-								indent()
-								var first = true
-								for (contributor in contributors) {
-									if (first) first = false else add(",\n")
-									add("Contributor(\n")
+							.addCode(
+								CodeBlock.builder().apply {
+									add("return listOf(\n")
 									indent()
-									add("name = %S,\n", contributor.name)
-									add("email = ").addNullableString(contributor.email).add(",\n")
-									add("commits = %L,\n", contributor.commits)
-									add("website = ").addNullableString(contributor.website).add(",\n")
-									add("image = ").addNullableString(contributor.image).add(",\n")
+									var first = true
+									for (contributor in contributors) {
+										if (first) first = false else add(",\n")
+										add("Contributor(\n")
+										indent()
+										add("name = %S,\n", contributor.name)
+										add("email = ").addNullableString(contributor.email).add(",\n")
+										add("commits = %L,\n", contributor.commits)
+										add("website = ").addNullableString(contributor.website).add(",\n")
+										add("image = ").addNullableString(contributor.image).add(",\n")
+										unindent()
+										add(")")
+									}
 									unindent()
-									add(")")
-								}
-								unindent()
-								add("\n)\n")
-							}.build()).build()
-					).build()
+									add("\n)\n")
+								}.build(),
+							).build(),
+					).build(),
 			).build()
 			.writeTo(generatedKotlinDir.get().asFile)
 	}
@@ -83,7 +87,7 @@ abstract class GenerateContributorsTask : DefaultTask() {
 		val encountered = UnionFind<String, EncounteredContributor>(merge = { a, b ->
 			EncounteredContributor(
 				a.email,
-				a.commits + b.commits
+				a.commits + b.commits,
 			)
 		})
 
@@ -96,9 +100,9 @@ abstract class GenerateContributorsTask : DefaultTask() {
 							// Get the authors preferred email
 							Contributors.preferredEmails.getOrDefault(
 								commit.authorIdent.emailAddress,
-								commit.authorIdent.emailAddress
+								commit.authorIdent.emailAddress,
 							),
-							0
+							0,
 						)
 					}!!.commits++
 					encountered.union(canonical = name, alternative = name.lowercase())
@@ -123,7 +127,7 @@ abstract class GenerateContributorsTask : DefaultTask() {
 					email = eContributor.email,
 					commits = eContributor.commits,
 					website = Contributors.websites[name.lowercase()],
-					image = Contributors.images[name.lowercase()]
+					image = Contributors.images[name.lowercase()],
 				)
 			}
 			.sortedByDescending { (_, _, commits, _, _) -> commits }

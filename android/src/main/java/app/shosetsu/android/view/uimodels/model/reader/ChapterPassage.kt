@@ -37,8 +37,6 @@ sealed class ChapterPassage {
 	 * @param content content of this chapter
 	 * @param ttsElements text to speech elements of this chapter
 	 */
-	data class Success(
-		val content: String,
-		val ttsElements: RewindableMutableListIterator<TTSText>
-	) : ChapterPassage()
+	data class Success(val content: String, val ttsElements: RewindableMutableListIterator<TTSText>) :
+		ChapterPassage()
 }

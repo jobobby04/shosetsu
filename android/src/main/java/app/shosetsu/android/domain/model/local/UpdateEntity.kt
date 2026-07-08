@@ -30,8 +30,4 @@ import app.shosetsu.android.domain.model.database.DBUpdate
  * @param novelID [DBUpdate.novelID]
  * @param time [DBUpdate.time]
  */
-data class UpdateEntity(
-	val chapterID: Int,
-	val novelID: Int,
-	val time: Long,
-)
+data class UpdateEntity(val chapterID: Int, val novelID: Int, val time: Long)

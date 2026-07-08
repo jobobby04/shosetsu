@@ -60,7 +60,6 @@ const val FILE_SCRIPT_DIR: String = "$FILE_SOURCE_DIR/scripts/"
  */
 const val FILE_LIBRARY_DIR: String = "$FILE_SOURCE_DIR/libraries/"
 
-
 /**
  * Directory on the repository that contains the extensions,
  * proceeding this will be the extension language
@@ -70,7 +69,6 @@ const val REPO_SOURCE_DIR: String = "/src/"
 const val APP_UPDATE_CACHE_FILE = "SHOSETSU_APP_UPDATE.json"
 
 const val APK_MIME = "application/vnd.android.package-archive"
-
 
 /**
  * Constant of twenty minutes

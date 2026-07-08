@@ -103,7 +103,7 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 			FROM novel_categories
 		) AS MC
 		ON M.id = MC.novelID
-		"""
+		""",
 	)
 	fun loadBookmarkedNovelsFlow(): Flow<List<LibraryNovelEntity>>
 
@@ -130,7 +130,7 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 	suspend fun update(list: List<LibraryNovelEntity>) {
 		list.forEach { bookMarked ->
 			getNovel(bookMarked.id)?.copy(
-				bookmarked = bookMarked.bookmarked
+				bookmarked = bookMarked.bookmarked,
 			)?.let {
 				update(it)
 			}
@@ -144,7 +144,9 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 	@Query("SELECT * FROM novels")
 	fun loadNovels(): List<DBNovelEntity>
 
-	@Query("SELECT id, title, imageURL FROM novels WHERE title like '%'||:query||'%' AND novels.bookmarked = 1")
+	@Query(
+		"SELECT id, title, imageURL FROM novels WHERE title like '%'||:query||'%' AND novels.bookmarked = 1",
+	)
 	fun searchBookmarked(query: String): PagingSource<Int, StrippedBookmarkedNovelEntity>
 
 	@Query(
@@ -177,10 +179,10 @@ interface NovelsDao : BaseDao<DBNovelEntity> {
 			) as readingChapterCount
 		FROM novels
 		WHERE bookmarked = 1
-		"""
+		""",
 	)
 	fun getAnalytics(): Flow<List<AnalyticsNovelEntity>>
 
-	//@Query("SELECT * FROM novels WHERE id = :novelID LIMIT 1")
-	//fun loadNovelWithChapters(novelID: Int): DBNovelWithChapters
+	// @Query("SELECT * FROM novels WHERE id = :novelID LIMIT 1")
+	// fun loadNovelWithChapters(novelID: Int): DBNovelWithChapters
 }

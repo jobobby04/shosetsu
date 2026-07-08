@@ -10,5 +10,4 @@ class PlayAppUpdateDataSource : IRemoteAppUpdateDataSource {
 		@Suppress("TodoComment")
 		TODO("Add play store update source")
 	}
-
 }

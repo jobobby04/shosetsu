@@ -41,10 +41,10 @@ import app.shosetsu.android.dto.Convertible
 			entity = DBChapterEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["chapterID"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
-	indices = [Index("chapterID")]
+	indices = [Index("chapterID")],
 )
 data class DBUpdate(
 	@PrimaryKey
@@ -55,6 +55,6 @@ data class DBUpdate(
 	override fun convertTo(): UpdateEntity = UpdateEntity(
 		chapterID,
 		novelID,
-		time
+		time,
 	)
 }

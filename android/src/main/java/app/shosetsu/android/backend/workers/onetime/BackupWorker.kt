@@ -75,6 +75,11 @@ import app.shosetsu.android.domain.repository.base.INovelPinsRepository
 import app.shosetsu.android.domain.repository.base.INovelSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
+import java.io.ByteArrayOutputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.zip.GZIPOutputStream
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -90,11 +95,6 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.ByteArrayOutputStream
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.zip.GZIPOutputStream
 
 /*
  * This file is part of Shosetsu.
@@ -116,10 +116,13 @@ import java.util.zip.GZIPOutputStream
 /**
  * 18 / 01 / 2021
  */
-class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(
-	appContext,
-	params,
-), DIAware, NotificationCapable {
+class BackupWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(
+		appContext,
+		params,
+	),
+	DIAware,
+	NotificationCapable {
 
 	override val di: DI by closestDI(appContext)
 
@@ -157,11 +160,9 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		get() = applicationContext
 	override val defaultNotificationID: Int = Notifications.ID_BACKUP
 
-	private suspend fun backupChapters() =
-		iSettingsRepository.getBoolean(ShouldBackupChapters)
+	private suspend fun backupChapters() = iSettingsRepository.getBoolean(ShouldBackupChapters)
 
-	private suspend fun backupSettings() =
-		iSettingsRepository.getBoolean(ShouldBackupSettings)
+	private suspend fun backupSettings() = iSettingsRepository.getBoolean(ShouldBackupSettings)
 
 	private suspend fun backupStorageLocation() =
 		iSettingsRepository.getString(BackupStorageLocation).takeIf { it.isNotEmpty() }?.toUri()
@@ -195,7 +196,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 					startedReadingAt = chapterHistory?.startedReadingAt,
 					endedReadingAt = chapterHistory?.endedReadingAt,
 					releaseDate = chapterEntity.releaseDate,
-					order = chapterEntity.order
+					order = chapterEntity.order,
 				)
 			}
 		}
@@ -203,14 +204,13 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		return emptyFlow()
 	}
 
-	private suspend fun getBackupCategories(): Map<Int, BackupCategoryEntity> {
-		return categoriesRepository.getCategories().associate {
+	private suspend fun getBackupCategories(): Map<Int, BackupCategoryEntity> =
+		categoriesRepository.getCategories().associate {
 			it.id!! to BackupCategoryEntity(
 				it.name,
-				it.order
+				it.order,
 			)
 		}
-	}
 
 	/**
 	 * Loads a backup via the [Uri] provided by Androids file selection
@@ -218,7 +218,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 	@Throws(
 		FileNotFoundException::class,
 		FilePermissionException::class,
-		NullContentResolverException::class
+		NullContentResolverException::class,
 	)
 	private fun writeToUri(uri: Uri, backupEntity: BackupEntity) {
 		val contentResolver = applicationContext.contentResolver
@@ -230,7 +230,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 			}
 		} ?: throw FilePermissionException(
 			uri.path ?: "",
-			FilePermissionException.PermissionType.WRITE
+			FilePermissionException.PermissionType.WRITE,
 		)
 	}
 
@@ -318,7 +318,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		extensions: List<InstalledExtensionEntity>,
 		novelsToChapters: Flow<Pair<NovelEntity, Flow<BackupChapterEntity>>>,
 		backupSettings: Boolean,
-		categories: Map<Int, BackupCategoryEntity>
+		categories: Map<Int, BackupCategoryEntity>,
 	): Result? {
 		logI("Loading repositories required")
 		notify("Loading repositories required")
@@ -349,9 +349,11 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 							novel.extensionID == extensionEntity.id
 						}.map { (novel, chapters) ->
 							val novelSettings =
-								if (backupSettings)
+								if (backupSettings) {
 									novelSettingsRepository.get(novel.id!!)
-								else null
+								} else {
+									null
+								}
 
 							val backupNovelSettings = novelSettings?.let {
 								BackupNovelSettingEntity(
@@ -366,7 +368,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 							val novelCategories =
 								novelCategoriesRepository.getNovelCategoriesFromNovel(
-									novel.id!!
+									novel.id!!,
 								).map { categories[it.categoryID]!!.order }
 
 							// The chapters to list function will be a memory hog
@@ -386,7 +388,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 								status = novel.status,
 								settings = backupNovelSettings,
 								categories = novelCategories,
-								pinned = novelPinRepository.isPinned(novel.id!!)
+								pinned = novelPinRepository.isPinned(novel.id!!),
 							) to chapters
 						}.map { (backupEntity, chapters) ->
 							// Make sure we have as much memory as possible
@@ -394,12 +396,12 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 
 							// Perform the massive collection / transformation
 							backupEntity.copy(
-								chapters = chapters.toList()
+								chapters = chapters.toList(),
 							)
-						}.toList()
+						}.toList(),
 					)
 				},
-				categories = categories.values.toList()
+				categories = categories.values.toList(),
 			)
 
 			logI("Encoding to json")
@@ -425,9 +427,9 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 								applicationContext,
 								0,
 								openAppToSetBackupDirectory,
-								if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-							)
-						).build()
+								if (SDK_INT >= VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
+							),
+						).build(),
 					)
 				}
 				backupRepository.updateProgress(BackupProgress.FAILURE)
@@ -445,7 +447,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 				applicationContext.contentResolver,
 				parentDocumentUri,
 				"application/octet-stream",
-				backupEntity.fileName
+				backupEntity.fileName,
 			) ?: return missing()
 			writeToUri(uri, backupEntity)
 		} catch (e: NullContentResolverException) {
@@ -507,14 +509,12 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(BACKUP_WORK_ID).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Starts the service. It will be started only if there isn't another instance already
@@ -526,22 +526,22 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 				workerManager.enqueueUniqueWork(
 					BACKUP_WORK_ID,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<BackupWorker>(
-					).setConstraints(
+					OneTimeWorkRequestBuilder<BackupWorker>().setConstraints(
 						Constraints.Builder().apply {
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 								setRequiresDeviceIdle(requiresBackupOnIdle())
+							}
 
 							setRequiresStorageNotLow(!allowsBackupOnLowStorage())
 							setRequiresBatteryNotLow(!allowsBackupOnLowBattery())
-						}.build()
-					).build()
+						}.build(),
+					).build(),
 				)
 				logI(
 					"Worker State ${
 						workerManager.getWorkInfosForUniqueWork(BACKUP_WORK_ID)
 							.await()[0].state
-					}"
+					}",
 				)
 			}
 		}
@@ -549,7 +549,6 @@ class BackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWor
 		/**
 		 * Stops the service.
 		 */
-		override fun stop(): Operation =
-			workerManager.cancelUniqueWork(BACKUP_WORK_ID)
+		override fun stop(): Operation = workerManager.cancelUniqueWork(BACKUP_WORK_ID)
 	}
 }

@@ -29,9 +29,8 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * 11 / 03 / 2021
  */
-class ExtensionSettingsRepository(
-	private val iFileSettingSystem: IFileSettingsDataSource
-) : IExtensionSettingsRepository {
+class ExtensionSettingsRepository(private val iFileSettingSystem: IFileSettingsDataSource) :
+	IExtensionSettingsRepository {
 	private fun selectedListingKey() = CustomInt("selectedListing", 0)
 
 	override suspend fun getSelectedListing(extensionID: Int): Int = onIO {
@@ -45,91 +44,64 @@ class ExtensionSettingsRepository(
 		iFileSettingSystem.setInt("$extensionID", selectedListingKey(), selectedListing)
 	}
 
-
 	override suspend fun getInt(extensionID: Int, settingID: Int, default: Int): Int = onIO {
 		iFileSettingSystem.getInt("$extensionID", CustomInt("$settingID", default))
 	}
 
-	override suspend fun getString(
-		extensionID: Int,
-		settingID: Int,
-		default: String
-	): String = onIO {
+	override suspend fun getString(extensionID: Int, settingID: Int, default: String): String = onIO {
 		iFileSettingSystem.getString(
 			"$extensionID",
-			CustomString("$settingID", default)
+			CustomString("$settingID", default),
 		)
 	}
 
-	override suspend fun getBoolean(
-		extensionID: Int,
-		settingID: Int,
-		default: Boolean
-	): Boolean = onIO {
-		iFileSettingSystem.getBoolean(
-			"$extensionID",
-			CustomBoolean("$settingID", default)
-		)
-	}
+	override suspend fun getBoolean(extensionID: Int, settingID: Int, default: Boolean): Boolean =
+		onIO {
+			iFileSettingSystem.getBoolean(
+				"$extensionID",
+				CustomBoolean("$settingID", default),
+			)
+		}
 
-	override suspend fun getFloat(
-		extensionID: Int,
-		settingID: Int,
-		default: Float
-	): Float = onIO {
+	override suspend fun getFloat(extensionID: Int, settingID: Int, default: Float): Float = onIO {
 		iFileSettingSystem.getFloat(
 			"$extensionID",
-			CustomFloat("$settingID", default)
+			CustomFloat("$settingID", default),
 		)
 	}
 
-
-	override fun getIntFlow(
-		extensionID: Int,
-		settingID: Int,
-		default: Int
-	): StateFlow<Int> =
+	override fun getIntFlow(extensionID: Int, settingID: Int, default: Int): StateFlow<Int> =
 		iFileSettingSystem.observeInt(
 			"$extensionID",
-			CustomInt("$settingID", default)
+			CustomInt("$settingID", default),
 		)
 
-	override fun getStringFlow(
-		extensionID: Int,
-		settingID: Int,
-		default: String
-	): StateFlow<String> =
+	override fun getStringFlow(extensionID: Int, settingID: Int, default: String): StateFlow<String> =
 		iFileSettingSystem.observeString(
 			"$extensionID",
-			CustomString("$settingID", default)
+			CustomString("$settingID", default),
 		)
 
 	override fun getBooleanFlow(
 		extensionID: Int,
 		settingID: Int,
-		default: Boolean
-	): StateFlow<Boolean> =
-		iFileSettingSystem.observeBoolean(
-			"$extensionID",
-			CustomBoolean("$settingID", default)
-		)
+		default: Boolean,
+	): StateFlow<Boolean> = iFileSettingSystem.observeBoolean(
+		"$extensionID",
+		CustomBoolean("$settingID", default),
+	)
 
-	override fun getFloatFlow(
-		extensionID: Int,
-		settingID: Int,
-		default: Float
-	): StateFlow<Float> =
+	override fun getFloatFlow(extensionID: Int, settingID: Int, default: Float): StateFlow<Float> =
 		iFileSettingSystem.observeFloat(
 			"$extensionID",
-			CustomFloat("$settingID", default)
+			CustomFloat("$settingID", default),
 		)
-
 
 	override suspend fun setInt(extensionID: Int, settingID: Int, value: Int) = onIO {
 		iFileSettingSystem.setInt(
 			"$extensionID",
 			CustomInt("$settingID", 0),
-			value
+			value,
 		)
 	}
 
@@ -137,7 +109,7 @@ class ExtensionSettingsRepository(
 		iFileSettingSystem.setString(
 			"$extensionID",
 			CustomString("$settingID", ""),
-			value
+			value,
 		)
 	}
 
@@ -145,16 +117,18 @@ class ExtensionSettingsRepository(
 		iFileSettingSystem.setBoolean(
 			"$extensionID",
 			CustomBoolean("$settingID", false),
-			value
+			value,
 		)
 	}
 
 	override suspend fun setFloat(extensionID: Int, settingID: Int, value: Float) = onIO {
 		iFileSettingSystem.setFloat(
-			"$extensionID", CustomFloat(
+			"$extensionID",
+			CustomFloat(
 				"$settingID",
-				0f
-			), value
+				0f,
+			),
+			value,
 		)
 	}
 }

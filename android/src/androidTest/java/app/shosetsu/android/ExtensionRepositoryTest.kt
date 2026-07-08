@@ -62,7 +62,6 @@ class ExtensionRepositoryTest : DIAware {
 			val url = "Build test"
 			val name = "Temporary test"
 
-
 			// Add the temp entity
 			repo.addRepository(
 				url = "Build test",
@@ -71,12 +70,10 @@ class ExtensionRepositoryTest : DIAware {
 			logD<ExtensionRepositoryTest>("Added successfully")
 			print()
 
-
 			// Getting the entity from repo
 			logD<ExtensionRepositoryTest>("Attempting to retrieve entity")
 			val handle = repo.loadRepositories().find { it.url == url }
 			requireNotNull(handle) { "Failed to retrieve" }
-
 
 			// Duplicate injection
 			logD<ExtensionRepositoryTest>("Attempting database duplicate injection")

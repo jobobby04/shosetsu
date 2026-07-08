@@ -20,9 +20,6 @@ import app.shosetsu.android.domain.model.local.ExtLibEntity
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
 /**
  * shosetsu
  * 04 / 05 / 2020

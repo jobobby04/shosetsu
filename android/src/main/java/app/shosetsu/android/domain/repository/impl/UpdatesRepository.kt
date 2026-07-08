@@ -33,16 +33,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  *
  * @author github.com/doomsdayrs
  */
-class UpdatesRepository(
-	private val database: IDBUpdatesDataSource,
-) : IUpdatesRepository {
+class UpdatesRepository(private val database: IDBUpdatesDataSource) : IUpdatesRepository {
 
 	@Throws(SQLiteException::class)
 	override suspend fun addUpdates(list: List<UpdateEntity>): Array<Long> =
 		onIO { database.insertUpdates(list) }
 
-	override fun getUpdatesFlow(): Flow<List<UpdateEntity>> =
-		database.getUpdates().onIO()
+	override fun getUpdatesFlow(): Flow<List<UpdateEntity>> = database.getUpdates().onIO()
 
 	override fun getCompleteUpdatesFlow(): Flow<List<UpdateCompleteEntity>> =
 		database.getCompleteUpdates().distinctUntilChanged().onIO()

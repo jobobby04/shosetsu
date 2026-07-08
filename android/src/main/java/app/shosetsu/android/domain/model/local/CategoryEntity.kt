@@ -28,10 +28,4 @@ import app.shosetsu.android.domain.model.database.DBCategoryEntity
  * @param name [DBCategoryEntity.name]
  * @param order [DBCategoryEntity.order]
  */
-data class CategoryEntity(
-	var id: Int? = null,
-
-	var name: String,
-
-	var order: Int
-)
+data class CategoryEntity(var id: Int? = null, var name: String, var order: Int)

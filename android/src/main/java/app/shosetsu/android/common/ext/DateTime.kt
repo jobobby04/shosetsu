@@ -1,7 +1,7 @@
 package app.shosetsu.android.common.ext
 
-import org.joda.time.DateTime
 import java.util.*
+import org.joda.time.DateTime
 
 /*
  * This file is part of shosetsu.

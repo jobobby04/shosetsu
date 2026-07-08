@@ -6,18 +6,17 @@ import app.shosetsu.android.common.ext.quickie
 import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
-import java.io.IOException
 
 /**
  * Load app updates from F-Droid
  */
-class FDroidAppUpdateDataSource(
-	private val okHttpClient: OkHttpClient
-) : IRemoteAppUpdateDataSource {
+class FDroidAppUpdateDataSource(private val okHttpClient: OkHttpClient) :
+	IRemoteAppUpdateDataSource {
 	companion object {
 		private const val FDROID_UPDATE_URL =
 			"https://f-droid.org/api/v1/packages/app.shosetsu.android.fdroid"
@@ -35,14 +34,11 @@ class FDroidAppUpdateDataSource(
 		val packageName: String = "",
 		val suggestedVersionCode: Int = -1,
 		val packages: List<PackageData> = emptyList(),
-		val error: String? = null
+		val error: String? = null,
 	)
 
 	@Serializable
-	data class PackageData(
-		val versionName: String,
-		val versionCode: Int
-	)
+	data class PackageData(val versionName: String, val versionCode: Int)
 
 	@Throws(HTTPException::class, EmptyResponseBodyException::class, IOException::class)
 	@OptIn(ExperimentalSerializationApi::class)
@@ -52,21 +48,23 @@ class FDroidAppUpdateDataSource(
 				return response.body?.use { responseBody ->
 					responseBody.byteStream().use { responseStream ->
 						val info = json.decodeSafeFromStream<PackagesInfo>(responseStream)
-						if (info.error != null)
+						if (info.error != null) {
 							throw EmptyResponseBodyException(info.error)
+						}
 
 						var packageData = info.packages.firstOrNull {
 							it.versionCode == info.suggestedVersionCode
 						}
 
-						if (packageData == null)
+						if (packageData == null) {
 							packageData = info.packages.first()
+						}
 
 						AppUpdateEntity(
 							packageData.versionName,
 							packageData.versionCode,
 							url = FDROID_DOWNLOAD_URL,
-							notes = emptyList()
+							notes = emptyList(),
 						)
 					}
 				} ?: throw EmptyResponseBodyException(FDROID_UPDATE_URL)
@@ -86,5 +84,4 @@ class FDroidAppUpdateDataSource(
 		}
 	}
 	 */
-
 }

@@ -33,9 +33,7 @@ import java.util.*
  * @since 19 / 07 / 2021
  * @author Doomsdayrs
  */
-class FileCrashDataSource(
-	private val fileSystem: IFileSystemProvider
-) : IFileCrashDataSource {
+class FileCrashDataSource(private val fileSystem: IFileSystemProvider) : IFileCrashDataSource {
 	init {
 		try {
 			fileSystem.createDirectory(APP, DIRECTORY)

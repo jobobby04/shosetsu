@@ -43,7 +43,6 @@ interface ExtensionLibraryDao : BaseDao<DBExtLibEntity> {
 	@Query("SELECT * FROM libs WHERE repoID = :repositoryID")
 	suspend fun loadLibByRepoID(repositoryID: Int): List<DBExtLibEntity>
 
-
 	@Throws(SQLiteException::class)
 	@Query("SELECT COUNT(*) FROM libs WHERE scriptName = :name AND repoID = :repoId")
 	suspend fun scriptLibCountFromName(name: String, repoId: Int): Int
@@ -53,12 +52,13 @@ interface ExtensionLibraryDao : BaseDao<DBExtLibEntity> {
 	suspend fun insertOrUpdateScriptLib(extLibEntityEntity: DBExtLibEntity) {
 		if (scriptLibCountFromName(extLibEntityEntity.scriptName, extLibEntityEntity.repoID) > 0) {
 			blockingUpdate(extLibEntityEntity)
-		} else insertScriptLib(extLibEntityEntity)
+		} else {
+			insertScriptLib(extLibEntityEntity)
+		}
 	}
 
 	@Query("SELECT * FROM libs WHERE scriptName = :name ORDER BY repoID DESC")
 	suspend fun getExtLibsMatchingName(name: String): List<DBExtLibEntity>
-
 
 	@Query("SELECT * FROM libs")
 	suspend fun loadAll(): List<DBExtLibEntity>

@@ -42,13 +42,13 @@ import app.shosetsu.android.common.ext.setOngoing
 import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.File
+import java.io.IOException
 import kotlinx.coroutines.flow.first
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.File
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -71,17 +71,19 @@ import java.io.IOException
  * shosetsu
  * 20 / 12 / 2020
  */
-class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(
-	appContext,
-	params
-), DIAware, NotificationCapable {
+class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(
+		appContext,
+		params,
+	),
+	DIAware,
+	NotificationCapable {
 	override val di: DI by closestDI(appContext)
 	private val updateRepo by instance<IAppUpdatesRepository>()
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 
 	override val notifyContext: Context
 		get() = applicationContext
-
 
 	override val defaultNotificationID: Int = ID_APP_UPDATE_INSTALL
 
@@ -90,7 +92,6 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			.setSubText(applicationContext.getString(R.string.notification_app_update_install_title))
 			.setSmallIcon(Icons.Default.SystemUpdateAlt)
 			.setProgress(0, 0, true)
-
 
 	override suspend fun doWork(): Result {
 		notify(R.string.notification_app_update_loading) {
@@ -169,8 +170,8 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 				actionBuilder(
 					Icons.Default.SystemUpdateAlt,
 					applicationContext.getString(R.string.install),
-					installApkPendingActivity(applicationContext, uri)
-				).build()
+					installApkPendingActivity(applicationContext, uri),
+				).build(),
 			)
 		}
 
@@ -192,7 +193,7 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			context,
 			0,
 			intent,
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
 		)
 	}
 
@@ -203,14 +204,12 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWorkFlow(APP_UPDATE_INSTALL_WORK_ID).first()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		override fun start(data: Data) {
 			launchIO {
@@ -218,18 +217,16 @@ class AppUpdateInstallWorker(appContext: Context, params: WorkerParameters) : Co
 				workerManager.enqueueUniqueWork(
 					APP_UPDATE_INSTALL_WORK_ID,
 					ExistingWorkPolicy.KEEP,
-					OneTimeWorkRequestBuilder<AppUpdateInstallWorker>().build()
+					OneTimeWorkRequestBuilder<AppUpdateInstallWorker>().build(),
 				)
 				logI(
 					"Worker State ${
 						getWorkerInfoList()[0].state
-					}"
+					}",
 				)
 			}
 		}
 
-		override fun stop(): Operation =
-			workerManager.cancelUniqueWork(APP_UPDATE_INSTALL_WORK_ID)
-
+		override fun stop(): Operation = workerManager.cancelUniqueWork(APP_UPDATE_INSTALL_WORK_ID)
 	}
 }

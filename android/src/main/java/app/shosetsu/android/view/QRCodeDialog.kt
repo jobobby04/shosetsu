@@ -60,7 +60,7 @@ fun PreviewLoadingQRCodeShareDialog() {
 	QRCodeShareDialog(
 		null,
 		hide = {},
-		title = "Test"
+		title = "Test",
 	)
 }
 
@@ -70,22 +70,18 @@ fun PreviewQRCodeShareDialog() {
 	QRCodeShareDialog(
 		QRCodeData(
 			ImageBitmap(50, 50),
-			"url"
+			"url",
 		),
 		hide = {},
-		title = "Test"
+		title = "Test",
 	)
 }
 
 @Composable
 @OptIn(ExperimentalAnimationGraphicsApi::class)
-fun QRCodeShareDialog(
-	qrCodeData: QRCodeData?,
-	hide: () -> Unit,
-	title: String? = null
-) {
+fun QRCodeShareDialog(qrCodeData: QRCodeData?, hide: () -> Unit, title: String? = null) {
 	Dialog(
-		onDismissRequest = hide
+		onDismissRequest = hide,
 	) {
 		Card {
 			Column(
@@ -93,10 +89,11 @@ fun QRCodeShareDialog(
 					.padding(16.dp)
 					.fillMaxWidth(),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(8.dp)
+				verticalArrangement = Arrangement.spacedBy(8.dp),
 			) {
-				if (title != null)
+				if (title != null) {
 					Text(title, style = MaterialTheme.typography.titleLarge)
+				}
 				val clipboard = LocalClipboard.current
 				val scope = rememberCoroutineScope()
 
@@ -104,7 +101,7 @@ fun QRCodeShareDialog(
 					modifier = Modifier
 						.aspectRatio(1.0f)
 						.fillMaxWidth(),
-					contentAlignment = Alignment.Center
+					contentAlignment = Alignment.Center,
 				) {
 					if (qrCodeData != null) {
 						Image(
@@ -114,7 +111,7 @@ fun QRCodeShareDialog(
 								.background(androidx.compose.ui.graphics.Color.White)
 								.padding(16.dp)
 								.aspectRatio(1.0f)
-								.fillMaxSize()
+								.fillMaxSize(),
 						)
 					} else {
 						AnimatedRefresh()
@@ -125,11 +122,11 @@ fun QRCodeShareDialog(
 					onClick = {
 						scope.launch {
 							clipboard.setClipEntry(
-								ClipData.newPlainText("text", qrCodeData!!.data).toClipEntry()
+								ClipData.newPlainText("text", qrCodeData!!.data).toClipEntry(),
 							)
 						}
 					},
-					enabled = qrCodeData != null
+					enabled = qrCodeData != null,
 				) {
 					Text(stringResource(android.R.string.copy))
 				}

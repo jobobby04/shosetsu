@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ChaptersDao : BaseDao<DBChapterEntity> {
 
-	//# Queries
+	// # Queries
 
 	/**
 	 * Gets a flow of the chapters corresponding to the novel
@@ -65,8 +65,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	@Query("SELECT id, title FROM chapters WHERE novelID = :novelID ORDER BY `order`")
 	fun getReaderChaptersFlow(novelID: Int): Flow<List<ReaderChapterEntity>>
 
-
-	//## Single result queries
+	// ## Single result queries
 
 	/**
 	 * Get a chapter by its id
@@ -82,13 +81,13 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	@Query("SELECT * FROM chapters WHERE _rowid_ = :rowId LIMIT 1")
 	suspend fun getChapter(rowId: Long): DBChapterEntity?
 
-	//# Transactions
+	// # Transactions
 
 	private suspend inline fun <R> internalHandleNewData(
 		novelId: Int,
 		newData: List<Novel.Chapter>,
 		inserter: (novelChapter: Novel.Chapter) -> R,
-		withResult: (R) -> Unit = {}
+		withResult: (R) -> Unit = {},
 	) {
 		val dbChapters: List<DBChapterEntity> = getChapters(novelId)
 
@@ -101,7 +100,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 			if (matchingChapter != null) {
 				update(
 					chapterEntity = matchingChapter,
-					newData = newChapter
+					newData = newChapter,
 				)
 			} else {
 				withResult(inserter(newChapter))
@@ -116,7 +115,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	 */
 	private suspend inline fun deleteMissing(
 		dbChapters: List<DBChapterEntity>,
-		newData: List<Novel.Chapter>
+		newData: List<Novel.Chapter>,
 	) {
 		// Remove deleted chapters
 		val removedChapters = dbChapters
@@ -142,15 +141,11 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	 */
 	@Transaction
 	@Throws(SQLiteException::class)
-	suspend fun handleNewData(
-		novelId: Int,
-		extensionId: Int,
-		newData: List<Novel.Chapter>
-	) {
+	suspend fun handleNewData(novelId: Int, extensionId: Int, newData: List<Novel.Chapter>) {
 		internalHandleNewData(
 			novelId = novelId,
 			newData = newData,
-			inserter = { insertAbort(it, novelId, extensionId) }
+			inserter = { insertAbort(it, novelId, extensionId) },
 		)
 	}
 
@@ -176,7 +171,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 			novelId = novelId,
 			newData = newData,
 			inserter = { insertReturn(novelId, extensionId, it) },
-			withResult = { if (it != null) newChapters.add(it) }
+			withResult = { if (it != null) newChapters.add(it) },
 		)
 
 		return newChapters
@@ -191,7 +186,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	@Throws(
 		IndexOutOfBoundsException::class,
 		SQLiteException::class,
-		IndexOutOfBoundsException::class
+		IndexOutOfBoundsException::class,
 	)
 	suspend fun insertReturn(
 		novelID: Int,
@@ -201,7 +196,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 		val rowId = insertAbort(
 			novelChapter = novelChapter,
 			novelID = novelID,
-			extensionID = extensionID
+			extensionID = extensionID,
 		)
 
 		if (rowId < 0) throw IndexOutOfBoundsException("Invalid rowId")
@@ -218,30 +213,26 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	private suspend fun insertAbort(
 		novelChapter: Novel.Chapter,
 		novelID: Int,
-		extensionID: Int
-	): Long =
-		insertAbort(
-			novelChapter.entity(
-				novelID = novelID,
-				extensionID = extensionID
-			).toDB()
-		)
+		extensionID: Int,
+	): Long = insertAbort(
+		novelChapter.entity(
+			novelID = novelID,
+			extensionID = extensionID,
+		).toDB(),
+	)
 
 	/**
 	 * Update's [chapterEntity] with [newData]
 	 */
 	@Throws(SQLiteException::class)
-	private suspend fun update(
-		chapterEntity: DBChapterEntity,
-		newData: Novel.Chapter
-	) {
+	private suspend fun update(chapterEntity: DBChapterEntity, newData: Novel.Chapter) {
 		update(
 			chapterEntity.copy(
 				url = newData.link,
 				title = newData.title,
 				releaseDate = newData.release,
-				order = newData.order
-			)
+				order = newData.order,
+			),
 		)
 	}
 
@@ -259,7 +250,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 		UPDATE chapters
 		SET readingStatus = :readingStatus
 		WHERE id in (:chapterIds)
-		"""
+		""",
 	)
 	suspend fun updateChapterReadingStatus(chapterIds: List<Int>, readingStatus: ReadingStatus)
 
@@ -267,10 +258,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 	 * Bulk transaction to ensure that [chapterIds] < 999
 	 */
 	@Transaction
-	suspend fun updateChapterReadingStatusBulk(
-		chapterIds: List<Int>,
-		readingStatus: ReadingStatus
-	) {
+	suspend fun updateChapterReadingStatusBulk(chapterIds: List<Int>, readingStatus: ReadingStatus) {
 		ensureSQLSizeCompliant(chapterIds) {
 			updateChapterReadingStatus(it, readingStatus)
 		}
@@ -281,7 +269,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 		UPDATE chapters
 		SET bookmarked = :bookmarked
 		WHERE id in (:chapterIds)
-		"""
+		""",
 	)
 	suspend fun updateChapterBookmark(chapterIds: List<Int>, bookmarked: Boolean)
 
@@ -300,7 +288,7 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 		UPDATE chapters
 		SET isSaved = 0
 		WHERE id in (:chapterIds)
-		"""
+		""",
 	)
 	suspend fun markChaptersDeleted(chapterIds: List<Int>)
 
@@ -332,13 +320,15 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 				).let {
 					when (it.readingStatus) {
 						ReadingStatus.READING -> it
+
 						ReadingStatus.READ -> it
+
 						else -> it.copy(
 							readingStatus = bChapter.rS,
-							readingPosition = bChapter.rP
+							readingPosition = bChapter.rP,
 						)
 					}
-				}.toDB()
+				}.toDB(),
 			)
 		}
 	}

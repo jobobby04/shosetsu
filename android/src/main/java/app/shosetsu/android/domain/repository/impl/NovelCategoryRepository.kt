@@ -23,9 +23,8 @@ import app.shosetsu.android.domain.model.local.NovelCategoryEntity
 import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
 import kotlinx.coroutines.flow.Flow
 
-class NovelCategoryRepository(
-	private val database: IDBNovelCategoriesDataSource,
-) : INovelCategoryRepository {
+class NovelCategoryRepository(private val database: IDBNovelCategoriesDataSource) :
+	INovelCategoryRepository {
 
 	override fun getNovelCategoriesFromNovelFlow(novelID: Int): Flow<List<NovelCategoryEntity>> =
 		database.getNovelCategoriesFromNovelFlow(novelID)
@@ -39,8 +38,7 @@ class NovelCategoryRepository(
 	override suspend fun setNovelCategories(entities: List<NovelCategoryEntity>) =
 		database.setNovelCategories(entities)
 
-	override suspend fun deleteNovelCategories(novelID: Int) =
-		database.deleteNovelCategories(novelID)
+	override suspend fun deleteNovelCategories(novelID: Int) = database.deleteNovelCategories(novelID)
 
 	override suspend fun deleteNovelsCategories(novelIDs: List<Int>) =
 		database.deleteNovelsCategories(novelIDs)

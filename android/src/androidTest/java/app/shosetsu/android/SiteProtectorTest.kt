@@ -3,6 +3,8 @@ package app.shosetsu.android
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.providers.network.retryAfterDateFormat
 import app.shosetsu.android.providers.network.slowRequest
+import java.util.Date
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -15,8 +17,6 @@ import okhttp3.Request
 import okhttp3.Response
 import org.junit.Before
 import org.junit.Test
-import java.util.Date
-import java.util.concurrent.TimeUnit
 
 /*
  * This file is part of shosetsu.
@@ -103,8 +103,10 @@ class SiteProtectorTest {
 					SiteProtector.await(host) {
 						val endTime = System.currentTimeMillis()
 
-						if (testNumber > 0) assert(endTime >= startTime) {
-							"Async jobs were not delayed"
+						if (testNumber > 0) {
+							assert(endTime >= startTime) {
+								"Async jobs were not delayed"
+							}
 						}
 
 						println("Completed job #$testNumber at ${endTime}ms")
@@ -168,7 +170,6 @@ class SiteProtectorTest {
 			Request.Builder().url(host)
 				.build()
 
-
 		val startTime = System.currentTimeMillis()
 		val retryAfterDate = retryAfterDateFormat.format(Date(startTime + RETRY_AFTER_DELAY))
 		println(retryAfterDate)
@@ -176,7 +177,7 @@ class SiteProtectorTest {
 			Response.Builder()
 				.addHeader(
 					"Retry-After",
-					retryAfterDate
+					retryAfterDate,
 				)
 				.code(429)
 				.request(fauxRequest)
@@ -211,11 +212,12 @@ class SiteProtectorTest {
 			TODO("Not yet implemented")
 		}
 
-		override fun proceed(request: Request): Response =
-			if (firstCall) {
-				firstCall = false
-				response
-			} else response
+		override fun proceed(request: Request): Response = if (firstCall) {
+			firstCall = false
+			response
+		} else {
+			response
+		}
 
 		override fun readTimeoutMillis(): Int {
 			TODO("Not yet implemented")
@@ -240,7 +242,6 @@ class SiteProtectorTest {
 		override fun writeTimeoutMillis(): Int {
 			TODO("Not yet implemented")
 		}
-
 	}
 }
 

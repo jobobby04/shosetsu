@@ -33,7 +33,7 @@ inline fun <reified T> MultiSelectListPreferenceWidget(
 		subtitle = subtitle,
 		icon = icon,
 		onPreferenceClick = { isDialogShown = true },
-		iconDescription = iconDescription
+		iconDescription = iconDescription,
 	)
 
 	if (isDialogShown) {

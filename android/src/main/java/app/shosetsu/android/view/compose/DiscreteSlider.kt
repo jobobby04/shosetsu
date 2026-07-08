@@ -41,7 +41,7 @@ fun PreviewSeekBar() = ShosetsuTheme(AppThemes.LIGHT) {
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
-			.padding(16.dp)
+			.padding(16.dp),
 	) {
 		DiscreteSlider(
 			value,
@@ -72,7 +72,7 @@ fun DiscreteSlider(
 	maxHeaderSize: Dp? = null,
 ) {
 	Row(
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		var showDialog by remember { mutableStateOf(false) }
 
@@ -86,10 +86,12 @@ fun DiscreteSlider(
 			Text(
 				text = parsedValue,
 				modifier = Modifier.let {
-					if (maxHeaderSize != null)
+					if (maxHeaderSize != null) {
 						it.width(maxHeaderSize)
-					else it
-				}
+					} else {
+						it
+					}
+				},
 			)
 		}
 		Slider(
@@ -98,7 +100,7 @@ fun DiscreteSlider(
 				updateValue(it.roundToInt(), false)
 			},
 			valueRange = valueRange.item.first.toFloat()..valueRange.item.last.toFloat(),
-			steps = if (haveSteps) valueRange.item.count() - 2 else 0
+			steps = if (haveSteps) valueRange.item.count() - 2 else 0,
 		)
 	}
 }
@@ -118,16 +120,16 @@ fun DiscreteSlider(
 	updateValue: (Float, fromDialog: Boolean) -> Unit,
 	valueRange: StableHolder<IntRange>,
 	haveSteps: Boolean = true,
-	maxHeaderSize: Dp? = null
+	maxHeaderSize: Dp? = null,
 ) {
 	Row(
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		var showDialog by remember { mutableStateOf(false) }
 
-		if (showDialog)
+		if (showDialog) {
 			DiscreteSliderDialog(value, valueRange, { showDialog = false }, updateValue)
-
+		}
 
 		TextButton(onClick = {
 			showDialog = true
@@ -135,10 +137,12 @@ fun DiscreteSlider(
 			Text(
 				text = parsedValue,
 				modifier = Modifier.let {
-					if (maxHeaderSize != null)
+					if (maxHeaderSize != null) {
 						it.width(maxHeaderSize)
-					else it
-				}
+					} else {
+						it
+					}
+				},
 			)
 		}
 		Slider(
@@ -147,7 +151,7 @@ fun DiscreteSlider(
 				updateValue(it, false)
 			},
 			valueRange = valueRange.item.first.toFloat()..valueRange.item.last.toFloat(),
-			steps = if (haveSteps) valueRange.item.count() - 2 else 0
+			steps = if (haveSteps) valueRange.item.count() - 2 else 0,
 		)
 	}
 }
@@ -171,7 +175,7 @@ fun DiscreteSliderDialog(
 		validateInput = {
 			it.isDigitsOnly() && it.isNotEmpty() && it.toInt() in valueRange.item
 		},
-		updateValue
+		updateValue,
 	)
 }
 
@@ -196,7 +200,7 @@ fun DiscreteSliderDialog(
 				newValue.toFloat()
 					.let { valueRange.item.first <= it && it <= valueRange.item.last }
 		},
-		updateValue
+		updateValue,
 	)
 }
 
@@ -225,8 +229,8 @@ private fun <T> DiscreteSliderDialog(
 					bottom = 16.dp,
 					top = 8.dp,
 					start = 24.dp,
-					end = 24.dp
-				)
+					end = 24.dp,
+				),
 			)
 		},
 		text = {
@@ -234,14 +238,14 @@ private fun <T> DiscreteSliderDialog(
 				Text(
 					description.format(
 						valueRange.item.first,
-						valueRange.item.last
+						valueRange.item.last,
 					),
 					style = MaterialTheme.typography.bodyLarge,
 					modifier = Modifier.padding(
 						bottom = 16.dp,
 						start = 24.dp,
-						end = 24.dp
-					)
+						end = 24.dp,
+					),
 				)
 				TextField(
 					value = fieldContent,
@@ -253,11 +257,11 @@ private fun <T> DiscreteSliderDialog(
 					},
 					singleLine = true,
 					keyboardOptions = KeyboardOptions(
-						keyboardType = KeyboardType.Number
+						keyboardType = KeyboardType.Number,
 					),
 					modifier = Modifier
 						.padding(bottom = 8.dp, start = 24.dp, end = 24.dp)
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 		},
@@ -273,14 +277,14 @@ private fun <T> DiscreteSliderDialog(
 				onClick = {
 					updateValue(
 						castInput(fieldContent),
-						true
+						true,
 					)
 					onDismissRequest()
 				},
-				enabled = isTextValid
+				enabled = isTextValid,
 			) {
 				Text(stringResource(R.string.apply))
 			}
-		}
+		},
 	)
 }

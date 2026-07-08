@@ -26,9 +26,7 @@ import kotlinx.coroutines.flow.map
  * shosetsu
  * 07 / 06 / 2020
  */
-class GetReaderChaptersUseCase(
-	private val chapterRepo: IChaptersRepository,
-) {
+class GetReaderChaptersUseCase(private val chapterRepo: IChaptersRepository) {
 	operator fun invoke(novelID: Int): Flow<List<ReaderChapterUI>> =
 		chapterRepo.getReaderChaptersFlow(novelID).map { chapters ->
 			chapters.map {

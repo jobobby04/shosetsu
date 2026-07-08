@@ -76,9 +76,7 @@ import kotlinx.coroutines.launch
  * Allow user to configure categories
  */
 @Composable
-fun CategoriesView(
-	onBack: () -> Unit,
-) {
+fun CategoriesView(onBack: () -> Unit) {
 	val viewModel: ACategoriesViewModel = viewModelDi()
 
 	val items by viewModel.liveData.collectAsState()
@@ -123,11 +121,12 @@ fun CategoriesView(
 					val result =
 						hostState.showSnackbar(
 							context.getString(R.string.toast_categories_remove_fail),
-							actionLabel = context.getString(R.string.retry)
+							actionLabel = context.getString(R.string.retry),
 						)
 
-					if (result == SnackbarResult.ActionPerformed)
+					if (result == SnackbarResult.ActionPerformed) {
 						viewModel.remove(state.category)
+					}
 				}
 			}
 
@@ -139,6 +138,7 @@ fun CategoriesView(
 	LaunchedEffect(moveUpCategoryState) {
 		when (addCategoryState) {
 			CategoryChangeState.Finished -> {}
+
 			is CategoryChangeState.Failure -> {
 				scope.launch {
 					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
@@ -153,6 +153,7 @@ fun CategoriesView(
 	LaunchedEffect(moveDownCategoryState) {
 		when (addCategoryState) {
 			CategoryChangeState.Finished -> {}
+
 			is CategoryChangeState.Failure -> {
 				scope.launch {
 					hostState.showSnackbar(context.getString(R.string.toast_categories_move_fail))
@@ -177,7 +178,7 @@ fun CategoriesView(
 			viewModel.moveDown(it)
 		},
 		showAddDialog = viewModel::showAddDialog,
-		onBack = onBack
+		onBack = onBack,
 	)
 
 	if (itemToRemove != null) {
@@ -190,7 +191,7 @@ fun CategoriesView(
 					onClick = {
 						viewModel.remove(itemToRemove!!)
 						itemToRemove = null
-					}
+					},
 				) {
 					Text(stringResource(android.R.string.ok))
 				}
@@ -205,7 +206,7 @@ fun CategoriesView(
 			},
 			text = {
 				Text(stringResource(R.string.alert_dialog_message_warn_categories_removal))
-			}
+			},
 		)
 	}
 
@@ -214,7 +215,7 @@ fun CategoriesView(
 	if (isAddDialogVisible) {
 		CategoriesAddDialog(
 			viewModel::hideAddDialog,
-			viewModel::addCategory
+			viewModel::addCategory,
 		)
 	}
 }
@@ -224,15 +225,12 @@ fun CategoriesView(
 fun PreviewCategoriesAddDialog() {
 	CategoriesAddDialog(
 		hideAddDialog = {},
-		addCategory = {}
+		addCategory = {},
 	)
 }
 
 @Composable
-fun CategoriesAddDialog(
-	hideAddDialog: () -> Unit,
-	addCategory: (String) -> Unit
-) {
+fun CategoriesAddDialog(hideAddDialog: () -> Unit, addCategory: (String) -> Unit) {
 	var text by remember { mutableStateOf("") }
 	AlertDialog(
 		onDismissRequest = {
@@ -244,7 +242,7 @@ fun CategoriesAddDialog(
 					addCategory(text)
 					hideAddDialog()
 				},
-				enabled = text.isNotBlank()
+				enabled = text.isNotBlank(),
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
@@ -261,16 +259,17 @@ fun CategoriesAddDialog(
 			OutlinedTextField(
 				text,
 				onValueChange = {
-					if (!it.contains('\n'))
+					if (!it.contains('\n')) {
 						text = it
+					}
 				},
 				label = {
 					Text(stringResource(R.string.categories_add_name_hint))
 				},
 				isError = text.isBlank(),
-				singleLine = true
+				singleLine = true,
 			)
-		}
+		},
 	)
 }
 
@@ -282,7 +281,7 @@ fun CategoriesContent(
 	onMoveUp: (CategoryUI) -> Unit,
 	onMoveDown: (CategoryUI) -> Unit,
 	showAddDialog: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	val state = rememberLazyListState()
 
@@ -294,7 +293,7 @@ fun CategoriesContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 		floatingActionButton = {
@@ -305,15 +304,15 @@ fun CategoriesContent(
 				icon = {
 					Icon(
 						Icons.Default.AddCircle,
-						stringResource(R.string.fragment_categories_action_add)
+						stringResource(R.string.fragment_categories_action_add),
 					)
 				},
-				onClick = showAddDialog
+				onClick = showAddDialog,
 			)
-		}
+		},
 	) { padding ->
 		val isNotSingular by remember(items) { derivedStateOf { items.size > 1 } }
-		if (items.isNotEmpty())
+		if (items.isNotEmpty()) {
 			LazyColumn(
 				Modifier
 					.padding(padding)
@@ -323,9 +322,9 @@ fun CategoriesContent(
 					bottom = 64.dp,
 					top = 16.dp,
 					start = 8.dp,
-					end = 8.dp
+					end = 8.dp,
 				),
-				verticalArrangement = Arrangement.spacedBy(4.dp)
+				verticalArrangement = Arrangement.spacedBy(4.dp),
 			) {
 				itemsIndexed(items) { index, item ->
 					Card {
@@ -334,42 +333,44 @@ fun CategoriesContent(
 								.padding(horizontal = 8.dp, vertical = 4.dp)
 								.fillMaxWidth(),
 							verticalAlignment = Alignment.CenterVertically,
-							horizontalArrangement = Arrangement.SpaceBetween
+							horizontalArrangement = Arrangement.SpaceBetween,
 						) {
 							Text(item.name, style = MaterialTheme.typography.titleLarge)
 							Row(
 								verticalAlignment = Alignment.CenterVertically,
-								horizontalArrangement = Arrangement.SpaceBetween
+								horizontalArrangement = Arrangement.SpaceBetween,
 							) {
 								if (isNotSingular) {
-									if (index != 0)
+									if (index != 0) {
 										SimpleIconButton(
 											Icons.Outlined.ExpandLess,
 											description = null,
-											onClick = { onMoveDown(item) }
+											onClick = { onMoveDown(item) },
 										)
+									}
 
-									if (index != items.lastIndex)
+									if (index != items.lastIndex) {
 										SimpleIconButton(
 											Icons.Outlined.ExpandMore,
 											description = null,
-											onClick = { onMoveUp(item) }
+											onClick = { onMoveUp(item) },
 										)
+									}
 								}
 								SimpleIconButton(
 									Icons.Default.Delete,
 									description = null,
-									onClick = { onRemove(item) }
+									onClick = { onRemove(item) },
 								)
 							}
 						}
 					}
 				}
 			}
-		else {
+		} else {
 			ErrorContent(
 				R.string.categories_empty,
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
 		}
 	}

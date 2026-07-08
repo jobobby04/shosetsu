@@ -26,10 +26,6 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
  * @since 18 / 11 / 2021
  * @author Doomsdayrs
  */
-class GetTrueDeleteChapterUseCase(
-	private val settings: ISettingsRepository
-) {
-	suspend operator fun invoke() =
-		settings.getBoolean(SettingKey.ExposeTrueChapterDelete)
-
+class GetTrueDeleteChapterUseCase(private val settings: ISettingsRepository) {
+	suspend operator fun invoke() = settings.getBoolean(SettingKey.ExposeTrueChapterDelete)
 }

@@ -39,7 +39,7 @@ import app.shosetsu.android.view.compose.SimpleIconButton
 fun PreviewCSSEditorBottomBarContent() {
 	Box(
 		Modifier.fillMaxSize(),
-		contentAlignment = Alignment.BottomCenter
+		contentAlignment = Alignment.BottomCenter,
 	) {
 		CSSEditorBottomBarContent(
 			false,
@@ -51,7 +51,7 @@ fun PreviewCSSEditorBottomBarContent() {
 			{},
 			{},
 			{},
-			true
+			true,
 		)
 	}
 }
@@ -67,36 +67,37 @@ fun CSSEditorBottomBarContent(
 	onSave: () -> Unit,
 	onExport: () -> Unit,
 	onRedo: () -> Unit,
-	canRedo: Boolean
+	canRedo: Boolean,
 ) {
 	Column {
-		if (!isCSSValid && cssInvalidReason != null)
+		if (!isCSSValid && cssInvalidReason != null) {
 			Surface(
 				border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
 				modifier = Modifier
 					.align(Alignment.CenterHorizontally)
 					.fillMaxWidth()
-					.padding(16.dp)
+					.padding(16.dp),
 			) {
 				Column(
-					modifier = Modifier.padding(8.dp)
+					modifier = Modifier.padding(8.dp),
 				) {
 					Text(
-						"Invalid CSS"
+						"Invalid CSS",
 					)
 					Text(
 						cssInvalidReason,
 						style = SUB_TEXT_SIZE,
 						modifier = Modifier
-							.alpha(0.7f)
+							.alpha(0.7f),
 					)
 				}
 			}
+		}
 		BottomAppBar {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				horizontalArrangement = Arrangement.SpaceBetween,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
 			) {
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
@@ -105,14 +106,15 @@ fun CSSEditorBottomBarContent(
 						Icons.AutoMirrored.Outlined.Undo,
 						stringResource(R.string.activity_css_undo),
 						onClick = onUndo,
-						enabled = canUndo
+						enabled = canUndo,
 					)
 
 					SimpleIconButton(
 						painterResource(androidx.appcompat.R.drawable.abc_ic_menu_paste_mtrl_am_alpha),
 						stringResource(R.string.activity_css_paste),
-						onClick = onPaste, enabled = hasPaste,
-						modifier = Modifier.padding(start = 8.dp)
+						onClick = onPaste,
+						enabled = hasPaste,
+						modifier = Modifier.padding(start = 8.dp),
 					)
 				}
 
@@ -123,11 +125,11 @@ fun CSSEditorBottomBarContent(
 					onClick = onSave,
 					shape = fabShape,
 					containerColor = MaterialTheme.colorScheme.primary,
-					contentColor = colorResource(android.R.color.white)
+					contentColor = colorResource(android.R.color.white),
 				) {
 					Icon(
 						Icons.Default.Save,
-						stringResource(R.string.activity_css_save)
+						stringResource(R.string.activity_css_save),
 					)
 				}
 
@@ -137,13 +139,15 @@ fun CSSEditorBottomBarContent(
 					SimpleIconButton(
 						Icons.Default.SaveAlt,
 						stringResource(R.string.activity_css_export),
-						onClick = onExport, enabled = false,
-						modifier = Modifier.padding(end = 8.dp)
+						onClick = onExport,
+						enabled = false,
+						modifier = Modifier.padding(end = 8.dp),
 					)
 					SimpleIconButton(
 						Icons.AutoMirrored.Outlined.Redo,
 						stringResource(R.string.activity_css_redo),
-						onClick = onRedo, enabled = canRedo
+						onClick = onRedo,
+						enabled = canRedo,
 					)
 				}
 			}
