@@ -80,8 +80,10 @@ packages:
 lint:
   interruptible: true
   stage: lint
-  script:
-    - ./gradlew -Pci --console=plain :android:lint -PbuildDir=lint
+  script: ./gradlew -Pci --console=plain lint -PbuildDir=lint
+  artifacts:
+    reports:
+      codequality: lint/reports/ktlint/ktlint.json
 
 # Make Project
 .assembleStandard:

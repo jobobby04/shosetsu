@@ -27,6 +27,8 @@ kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutines = "1.8.0"
 kotlinxSerializationJson = "1.8.0"
 ksp = "2.1.0-1.0.29"
+ktlint = "1.8.0"
+ktlint-gitlab-reporter = "2.0.1"
 lifecycle = "2.8.7"
 luajJse = "3.0.1"
 navigationCompose = "2.8.5"
@@ -128,6 +130,8 @@ qrcode = { module = "io.github.g0dkar:qrcode-kotlin-android", version.ref = "qrc
 shosetsuorg-klib = { module = "app.shosetsu.lib:kotlin-lib", version.ref = "kotlinLib" }
 shosetsuorg-klib-jitpack = { module = "com.gitlab.shosetsuorg:kotlin-lib", version.ref = "kotlinLib" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+ktlint = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }
+ktlint-gitlab-reporter = { module = "io.github.tobi2k:ktlint-gitlab-reporter", version.ref = "ktlint-gitlab-reporter" }
 
 [plugins]
 android-application = { id = "com.android.application" }
