@@ -6,6 +6,7 @@ import app.shosetsu.android.datasource.local.memory.impl.ConCacheFactory
 import app.shosetsu.android.datasource.local.memory.impl.MemChaptersDataSource
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -37,7 +38,7 @@ import org.junit.Test
  */
 class MemoryChapterDataSourceTest {
 	private val memorySource by lazy { MemChaptersDataSource(ConCacheFactory()) }
-	private val expireTime by lazy { MEMORY_EXPIRE_CHAPTER_TIME.minutes.inWholeMilliseconds }
+	private val expireTime by lazy { MEMORY_EXPIRE_CHAPTER_TIME.minutes }
 
 	/**
 	 * Double check that the expire time is correct and it is a memory source
@@ -47,7 +48,7 @@ class MemoryChapterDataSourceTest {
 		println("=================================")
 		// How long until data expires
 		println("Expires in $expireTime ms")
-		require((expireTime / (60 * 1000)) == MEMORY_EXPIRE_CHAPTER_TIME) {
+		require((expireTime.inWholeMilliseconds / (60 * 1000)) == MEMORY_EXPIRE_CHAPTER_TIME) {
 			"Expire time does not match up properly"
 		}
 		println("Expire time matches")
@@ -68,7 +69,7 @@ class MemoryChapterDataSourceTest {
 
 				println("Saving chapters")
 				for (i in 1 until MEMORY_MAX_CHAPTERS + 2) {
-					memorySource.saveChapterInCache(i.toInt(), "$i".toByteArray())
+					memorySource.saveChapterInCache(i, "$i".toByteArray())
 				}
 
 				println("Checking if chapter is present")
@@ -98,7 +99,7 @@ class MemoryChapterDataSourceTest {
 				}
 				println("Delaying until time is sufficient for it to be deleted")
 
-				delay(expireTime + 1000)
+				delay(expireTime + 1.seconds)
 				assert(memorySource.loadChapterFromCache(CHAPTER_ID) == null) {
 					"Did not delete"
 				}

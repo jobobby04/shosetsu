@@ -37,6 +37,7 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -170,7 +171,7 @@ fun HTMLPage(
 		)
 	}
 
-	val delayer = remember { ProgressiveDelayer(100) }
+	val delayer = remember { ProgressiveDelayer(100.milliseconds) }
 	LaunchedEffect(scrollState.maxValue, state.loadingState) {
 		// Ensure this only occurs on the first time
 		if (first) {

@@ -87,12 +87,13 @@ import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
-/**
+/*
  * Shosetsu
  * 9 / June / 2019
  *
  * @author github.com/doomsdayrs
  */
+
 /**
  * View that displays downloads the app is working on
  */

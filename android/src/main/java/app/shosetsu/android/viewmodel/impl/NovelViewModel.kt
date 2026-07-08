@@ -307,26 +307,26 @@ class NovelViewModel(
 			}
 	}
 
-	private val _showOnlyStatusOfFlow: Flow<ReadingStatus?> =
+	private val showOnlyStatusOfFlow: Flow<ReadingStatus?> =
 		novelSettingFlow.mapLatest { it?.showOnlyReadingStatusOf }
 
-	private val _onlyDownloadedFlow: Flow<Boolean> =
+	private val onlyDownloadedFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.showOnlyDownloaded ?: false }
 
-	private val _onlyBookmarkedFlow: Flow<Boolean> =
+	private val onlyBookmarkedFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.showOnlyBookmarked ?: false }
 
-	private val _onlyStringFlow: Flow<String?> =
+	private val onlyStringFlow: Flow<String?> =
 		novelSettingFlow.mapLatest { it?.showOnlyString }
 
-	private val _sortTypeFlow: Flow<ChapterSortType> =
+	private val sortTypeFlow: Flow<ChapterSortType> =
 		novelSettingFlow.mapLatest { it?.sortType ?: ChapterSortType.SOURCE }
 
-	private val _reversedSortFlow: Flow<Boolean> =
+	private val reversedSortFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.reverseOrder ?: false }
 
 	private fun Flow<List<ChapterUI>>.combineBookmarked(): Flow<List<ChapterUI>> =
-		combine(_onlyBookmarkedFlow) { result, onlyBookmarked ->
+		combine(onlyBookmarkedFlow) { result, onlyBookmarked ->
 			if (onlyBookmarked) {
 				result.filter { ui -> ui.bookmarked }
 			} else {
@@ -335,7 +335,7 @@ class NovelViewModel(
 		}
 
 	private fun Flow<List<ChapterUI>>.combineDownloaded(): Flow<List<ChapterUI>> =
-		combine(_onlyDownloadedFlow) { result, onlyDownloaded ->
+		combine(onlyDownloadedFlow) { result, onlyDownloaded ->
 			if (onlyDownloaded) {
 				result.filter { it.isSaved }
 			} else {
@@ -344,7 +344,7 @@ class NovelViewModel(
 		}
 
 	private fun Flow<List<ChapterUI>>.combineString(): Flow<List<ChapterUI>> =
-		combine(_onlyStringFlow) { result, onlyString ->
+		combine(onlyStringFlow) { result, onlyString ->
 			if (!onlyString.isNullOrBlank()) {
 				result.filter { it.title.contains(onlyString, ignoreCase = true) }
 			} else {
@@ -354,7 +354,7 @@ class NovelViewModel(
 
 	@ExperimentalCoroutinesApi
 	private fun Flow<List<ChapterUI>>.combineStatus(): Flow<List<ChapterUI>> =
-		combine(_showOnlyStatusOfFlow) { result, readingStatusOf ->
+		combine(showOnlyStatusOfFlow) { result, readingStatusOf ->
 			readingStatusOf?.let { status ->
 				if (status != ReadingStatus.UNREAD) {
 					result.filter { it.readingStatus == status }
@@ -368,7 +368,7 @@ class NovelViewModel(
 
 	@ExperimentalCoroutinesApi
 	private fun Flow<List<ChapterUI>>.combineSort(): Flow<List<ChapterUI>> =
-		combine(_sortTypeFlow) { chapters, sortType ->
+		combine(sortTypeFlow) { chapters, sortType ->
 			when (sortType) {
 				ChapterSortType.SOURCE -> {
 					chapters.sortedBy { it.order }
@@ -382,7 +382,7 @@ class NovelViewModel(
 
 	@ExperimentalCoroutinesApi
 	private fun Flow<List<ChapterUI>>.combineReverse(): Flow<List<ChapterUI>> =
-		combine(_reversedSortFlow) { result, reverse ->
+		combine(reversedSortFlow) { result, reverse ->
 			if (reverse) {
 				result.reversed()
 			} else {

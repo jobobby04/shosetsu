@@ -2,7 +2,20 @@ package app.shosetsu.android.di
 
 import app.shosetsu.android.providers.database.ShosetsuDatabase
 import app.shosetsu.android.providers.database.ShosetsuDatabase.Companion.getRoomDatabase
-import app.shosetsu.android.providers.database.dao.*
+import app.shosetsu.android.providers.database.dao.CategoriesDao
+import app.shosetsu.android.providers.database.dao.ChapterHistoryDao
+import app.shosetsu.android.providers.database.dao.ChaptersDao
+import app.shosetsu.android.providers.database.dao.DownloadsDao
+import app.shosetsu.android.providers.database.dao.ExtensionLibraryDao
+import app.shosetsu.android.providers.database.dao.InstalledExtensionsDao
+import app.shosetsu.android.providers.database.dao.NovelCategoriesDao
+import app.shosetsu.android.providers.database.dao.NovelPinsDao
+import app.shosetsu.android.providers.database.dao.NovelReaderSettingsDao
+import app.shosetsu.android.providers.database.dao.NovelSettingsDao
+import app.shosetsu.android.providers.database.dao.NovelsDao
+import app.shosetsu.android.providers.database.dao.RepositoryDao
+import app.shosetsu.android.providers.database.dao.RepositoryExtensionsDao
+import app.shosetsu.android.providers.database.dao.UpdatesDao
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance

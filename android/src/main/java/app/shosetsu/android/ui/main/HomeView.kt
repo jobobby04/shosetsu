@@ -46,7 +46,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.repository.base.IBackupRepository
-import app.shosetsu.android.ui.main.graph.DefaultMotionDuration
+import app.shosetsu.android.ui.main.graph.DEFAULT_MOTION_DURATION
 import app.shosetsu.android.ui.main.graph.PredictiveBack
 import app.shosetsu.android.ui.main.graph.ShosetsuNavController
 import app.shosetsu.android.ui.main.graph.homeGraph
@@ -57,7 +57,7 @@ import app.shosetsu.android.viewmodel.abstracted.AHomeViewModel
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.launch
 
-private const val TabFadeDuration = 200
+private const val TAB_FADE_DURATION = 200
 
 private enum class NavigationMode {
 	BOTTOM,
@@ -162,9 +162,9 @@ fun HomeView(shosetsuNavController: ShosetsuNavController, sizeClass: WindowSize
 				shosetsuNavController.home,
 				startDestination = Destination.Library,
 				enterTransition = {
-					materialFadeThroughIn(initialScale = 1f, durationMillis = TabFadeDuration)
+					materialFadeThroughIn(initialScale = 1f, durationMillis = TAB_FADE_DURATION)
 				},
-				exitTransition = { materialFadeThroughOut(durationMillis = TabFadeDuration) },
+				exitTransition = { materialFadeThroughOut(durationMillis = TAB_FADE_DURATION) },
 			) {
 				homeGraph(
 					shosetsuNavController,
@@ -212,7 +212,7 @@ fun HomeView(shosetsuNavController: ShosetsuNavController, sizeClass: WindowSize
 				animate(
 					initialValue = scale,
 					targetValue = 1f,
-					animationSpec = tween(durationMillis = DefaultMotionDuration),
+					animationSpec = tween(durationMillis = DEFAULT_MOTION_DURATION),
 				) { value, _ ->
 					scale = value
 				}

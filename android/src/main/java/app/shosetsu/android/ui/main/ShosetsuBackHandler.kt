@@ -48,7 +48,7 @@ fun ShosetsuBackHandler(
 
 	var protect by remember { mutableStateOf(true) }
 
-	BackHandler(isDrawerOpen || requireDoubleBackToExit && protect) {
+	BackHandler(isDrawerOpen || (requireDoubleBackToExit && protect)) {
 		// If drawer is open, close it
 		if (isDrawerOpen) {
 			scope.launch {

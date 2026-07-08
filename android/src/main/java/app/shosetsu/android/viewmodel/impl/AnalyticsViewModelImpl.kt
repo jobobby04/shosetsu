@@ -41,6 +41,7 @@ class AnalyticsViewModelImpl(
 	private val novelEntities: Flow<List<AnalyticsNovelEntity>> =
 		novelRepo.getAnalytics()
 
+	@Suppress("ktlint:standard:max-line-length")
 	override val novels: Flow<List<AnalyticsNovelUI>> =
 		novelEntities.map { list ->
 			list.map {

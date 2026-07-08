@@ -125,7 +125,9 @@ class CSSEditorViewModel(
 
 	override fun write(content: String) {
 		launchIO {
-			if (undoStack.isNotEmpty() && undoStack.peek() == content) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == content) {
+				return@launchIO // ignore if nothing changed
+			}
 			undoStack.add(cssContent.value)
 			canUndo.value = true
 			redoStack.clear()
@@ -145,7 +147,9 @@ class CSSEditorViewModel(
 		val combined = value + pasteContent
 		if (value == combined) return // ignore paste if the old value equals paste
 		launchIO {
-			if (undoStack.isNotEmpty() && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == combined) {
+				return@launchIO // ignore if nothing changed
+			}
 			undoStack.add(value)
 			canUndo.value = true
 			redoStack.clear()

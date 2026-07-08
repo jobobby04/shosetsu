@@ -258,7 +258,7 @@ class DownloadWorker(appContext: Context, params: WorkerParameters) :
 							status = DownloadStatus.PENDING,
 						),
 					)
-					// 		notify("Cancelled", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
+// 					notify("Cancelled", downloadEntity.chapterID + 100) { setNotOngoing()setSubText("Download")setContentTitle(downloadEntity.chapterName) }
 					return
 				}
 

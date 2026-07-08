@@ -52,7 +52,7 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Shosetsu
  *
  * @since 27 / 03 / 2023

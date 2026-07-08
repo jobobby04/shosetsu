@@ -95,8 +95,7 @@ class ChaptersRepository(
 		}
 	}
 
-	/**
-	 *
+	/*
 	 * 1. save to memory
 	 * 2. save to filesystem
 	 * 3. if filesystem save was a success, then update the chapter

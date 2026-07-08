@@ -10,27 +10,27 @@ class ConCacheFactory : ICache.Factory {
 
 	private class Cache<K : Any, V : Any>(private val expireTime: Long, private val maxSize: Int) :
 		ICache<K, V> {
-		private val _hashMap = ConcurrentHashMap<K, Pair<Long, V>>()
+		private val hashMap = ConcurrentHashMap<K, Pair<Long, V>>()
 
 		/**
-		 * Recycler function, Iterates through the entries in [_hashMap] and clears out stale data
+		 * Recycler function, Iterates through the entries in [hashMap] and clears out stale data
 		 *
 		 * Data is considered stale if it's creation point is > [expireTime]
 		 */
 		@Suppress("MemberVisibilityCanBePrivate")
 		fun recycle() {
 			// Reverses keys to go from back to front
-			val keys = _hashMap.keys.reversed()
+			val keys = hashMap.keys.reversed()
 
 			// Saving value before hand saves 1ms~ per iteration
 			val compareTime = System.currentTimeMillis()
 
 			for (i in keys) {
 				// Gets the time for entry `i`, If `i` no longer exists, continue
-				val (time, _) = _hashMap[i] ?: continue
+				val (time, _) = hashMap[i] ?: continue
 
 				if (time + expireTime <= compareTime) {
-					_hashMap.remove(i)
+					hashMap.remove(i)
 				}
 			}
 		}
@@ -38,21 +38,21 @@ class ConCacheFactory : ICache.Factory {
 		override fun remove(key: K): Boolean = if (!contains(key)) {
 			false
 		} else {
-			_hashMap.remove(key) != null
+			hashMap.remove(key) != null
 		}
 
 		override fun set(key: K, value: V) {
-			if (_hashMap.size > maxSize) {
-				remove(_hashMap.keys.first())
+			if (hashMap.size > maxSize) {
+				remove(hashMap.keys.first())
 			}
 
-			_hashMap[key] = System.currentTimeMillis() to value
+			hashMap[key] = System.currentTimeMillis() to value
 		}
 
 		override fun contains(key: K): Boolean {
-			if (_hashMap.isEmpty()) return false
+			if (hashMap.isEmpty()) return false
 
-			val keys = _hashMap.keys.reversed()
+			val keys = hashMap.keys.reversed()
 			for (i in keys) {
 				if (i == key) {
 					return true
@@ -64,14 +64,14 @@ class ConCacheFactory : ICache.Factory {
 		override fun get(key: K): V? {
 			recycle()
 			return if (contains(key)) {
-				_hashMap[key]?.second
+				hashMap[key]?.second
 			} else {
 				null
 			}
 		}
 
 		override fun clear() {
-			_hashMap.clear()
+			hashMap.clear()
 		}
 	}
 }

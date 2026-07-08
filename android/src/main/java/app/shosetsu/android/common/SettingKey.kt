@@ -148,10 +148,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object ReaderDisableTextSelection : BooleanKey("reader_disable_text_sel", false)
 
 	// - Some things
-	object ChaptersResumeFirstUnread : BooleanKey(
-		"readerResumeFirstUnread",
-		false,
-	)
+	object ChaptersResumeFirstUnread : BooleanKey("readerResumeFirstUnread", false)
 
 	object ReaderPitch : FloatKey("reader_pitch_2", 10f)
 
@@ -265,10 +262,7 @@ sealed class SettingKey<T : Any>(val name: String, val default: T) {
 	object DownloadNotifyChapters : BooleanKey("download_notify_chapters", false)
 
 	/** If the reader can mark a read chapter as reading when its opened / scrolled */
-	object ReaderMarkReadAsReading : BooleanKey(
-		"readerMarkReadAsReading",
-		false,
-	)
+	object ReaderMarkReadAsReading : BooleanKey("readerMarkReadAsReading", false)
 
 	object ReaderTrackLongReading : BooleanKey("reader_track_long_reading", true)
 

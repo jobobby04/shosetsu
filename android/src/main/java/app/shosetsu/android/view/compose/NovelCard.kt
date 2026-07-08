@@ -62,7 +62,7 @@ import coil.request.ImageRequest
  * @author Doomsdayrs
  */
 
-const val coverRatio = 0.7F
+const val COVER_RATIO = 0.7F
 
 @Composable
 fun PlaceholderNovelCardNormalContent() {
@@ -116,7 +116,7 @@ fun NovelCardNormalContent(
 				stringResource(R.string.fragment_novel_info_image),
 				modifier = Modifier
 					.fillMaxSize()
-					.aspectRatio(coverRatio)
+					.aspectRatio(COVER_RATIO)
 					.placeholder(visible = isPlaceholder),
 				contentScale = ContentScale.Crop,
 				error = {
@@ -126,7 +126,7 @@ fun NovelCardNormalContent(
 
 			Box(
 				modifier = Modifier
-					.aspectRatio(coverRatio)
+					.aspectRatio(COVER_RATIO)
 					.fillMaxSize()
 					.drawWithCache {
 						onDrawWithContent {
@@ -225,7 +225,7 @@ fun NovelCardCozyContent(
 					stringResource(R.string.fragment_novel_info_image),
 					modifier = Modifier
 						.fillMaxSize()
-						.aspectRatio(coverRatio)
+						.aspectRatio(COVER_RATIO)
 						.placeholder(visible = isPlaceholder),
 					contentScale = ContentScale.Crop,
 					error = {

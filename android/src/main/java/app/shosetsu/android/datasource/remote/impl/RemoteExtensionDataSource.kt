@@ -46,10 +46,8 @@ class RemoteExtensionDataSource(private val client: OkHttpClient) : IRemoteExten
 			extensionEntity,
 		)
 
-		@Suppress("BlockingMethodInNonBlockingContext")
 		val response = client.quickie(url)
 		if (response.isSuccessful) {
-			@Suppress("BlockingMethodInNonBlockingContext")
 			return response.body?.bytes() ?: throw EmptyResponseBodyException(url)
 		} else {
 			throw HTTPException(response.code)

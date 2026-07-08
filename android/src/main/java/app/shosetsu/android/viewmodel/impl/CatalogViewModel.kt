@@ -166,7 +166,7 @@ class CatalogViewModel(
 					getExtSelectedListingFlow(extId).flatMapLatest {
 						// When the listing is reselected, we clear out the existing filter
 						filterDataState.clear()
-						_applyFilter()
+						applyFilterInternal()
 						queryFlow.flatMapLatest { query ->
 							filterDataFlow.mapLatest { data ->
 								Pager(
@@ -308,13 +308,13 @@ class CatalogViewModel(
 
 	private fun resetFilter(filter: Filter<*>) {
 		when (filter) {
-			is Filter.Password -> _setFilterStringState(filter, filter.state)
-			is Filter.Text -> _setFilterStringState(filter, filter.state)
-			is Filter.Switch -> _setFilterBooleanState(filter, filter.state)
-			is Filter.Checkbox -> _setFilterBooleanState(filter, filter.state)
-			is Filter.TriState -> _setFilterIntState(filter, filter.state)
-			is Filter.Dropdown -> _setFilterIntState(filter, filter.state)
-			is Filter.RadioGroup -> _setFilterIntState(filter, filter.state)
+			is Filter.Password -> setFilterStringStateInternal(filter, filter.state)
+			is Filter.Text -> setFilterStringStateInternal(filter, filter.state)
+			is Filter.Switch -> setFilterBooleanStateInternal(filter, filter.state)
+			is Filter.Checkbox -> setFilterBooleanStateInternal(filter, filter.state)
+			is Filter.TriState -> setFilterIntStateInternal(filter, filter.state)
+			is Filter.Dropdown -> setFilterIntStateInternal(filter, filter.state)
+			is Filter.RadioGroup -> setFilterIntStateInternal(filter, filter.state)
 			is Filter.FList -> filter.filters.forEach { resetFilter(it) }
 			is Filter.Group<*> -> filter.filters.forEach { resetFilter(it) }
 			is Filter.Header -> {}
@@ -384,7 +384,7 @@ class CatalogViewModel(
 	/**
 	 * Locks the filter data flow mutex and sets the new value.
 	 */
-	private fun _applyFilter() {
+	private fun applyFilterInternal() {
 		if (filterMutex.tryLock()) {
 			try {
 				filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
@@ -396,7 +396,7 @@ class CatalogViewModel(
 
 	override fun applyFilter() {
 		launchIO {
-			_applyFilter()
+			applyFilterInternal()
 		}
 	}
 
@@ -405,14 +405,14 @@ class CatalogViewModel(
 			MutableStateFlow(id.state)
 		}.onIO()
 
-	private fun _setFilterStringState(id: Filter<String>, value: String) {
+	private fun setFilterStringStateInternal(id: Filter<String>, value: String) {
 		filterDataState.specialGetOrPut(id.id) {
 			MutableStateFlow(id.state)
 		}.value = value
 	}
 
 	override fun setFilterStringState(id: Filter<String>, value: String) {
-		launchIO { _setFilterStringState(id, value) }
+		launchIO { setFilterStringStateInternal(id, value) }
 	}
 
 	override fun getFilterBooleanState(id: Filter<Boolean>): Flow<Boolean> =
@@ -420,14 +420,14 @@ class CatalogViewModel(
 			MutableStateFlow(id.state)
 		}.onIO()
 
-	private fun _setFilterBooleanState(id: Filter<Boolean>, value: Boolean) {
+	private fun setFilterBooleanStateInternal(id: Filter<Boolean>, value: Boolean) {
 		filterDataState.specialGetOrPut(id.id) {
 			MutableStateFlow(id.state)
 		}.value = value
 	}
 
 	override fun setFilterBooleanState(id: Filter<Boolean>, value: Boolean) {
-		launchIO { _setFilterBooleanState(id, value) }
+		launchIO { setFilterBooleanStateInternal(id, value) }
 	}
 
 	override fun getFilterIntState(id: Filter<Int>): Flow<Int> =
@@ -435,14 +435,14 @@ class CatalogViewModel(
 			MutableStateFlow(id.state)
 		}.onIO()
 
-	private fun _setFilterIntState(id: Filter<Int>, value: Int) {
+	private fun setFilterIntStateInternal(id: Filter<Int>, value: Int) {
 		filterDataState.specialGetOrPut(id.id) {
 			MutableStateFlow(id.state)
 		}.value = value
 	}
 
 	override fun setFilterIntState(id: Filter<Int>, value: Int) {
-		launchIO { _setFilterIntState(id, value) }
+		launchIO { setFilterIntStateInternal(id, value) }
 	}
 
 	override fun resetFilter() {

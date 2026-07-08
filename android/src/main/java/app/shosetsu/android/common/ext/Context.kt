@@ -25,7 +25,7 @@ import androidx.core.app.NotificationManagerCompat
  * ====================================================================
  */
 
-/**
+/*
  * shosetsu
  * 07 / 02 / 2020
  *

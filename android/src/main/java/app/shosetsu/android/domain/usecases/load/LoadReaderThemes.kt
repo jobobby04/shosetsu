@@ -45,45 +45,43 @@ class LoadReaderThemes(
 		iSettingsRepository.getStringSetFlow(SettingKey.ReaderUserThemes)
 			.mapLatest { set: Set<String> ->
 
-				(
-					if (set.isNotEmpty()) {
-						set.map { ColorChoiceData.fromString(it) }
-					} else {
-						listOf(
-							ColorChoiceData(
-								-1,
-								context.getString(R.string.light),
-								-0x1000000,
-								-0x1,
-							),
-							ColorChoiceData(
-								-2,
-								context.getString(R.string.light_dark),
-								-0x333334,
-								-0xbbbbbc,
-							),
-							ColorChoiceData(
-								-3,
-								context.getString(R.string.sepia),
-								-0x1000000,
-								ContextCompat.getColor(context, R.color.wheat).also {
-									logE("Hey here is the color you need: $it")
-								},
-							),
-							ColorChoiceData(
-								-4,
-								context.getString(R.string.amoled),
-								-0x1,
-								-0x1000000,
-							),
-						).also { choices ->
-							launchIO {
-								choices.map { it.toString() }.toSet().let {
-									iSettingsRepository.setStringSet(SettingKey.ReaderUserThemes, it)
-								}
+				if (set.isNotEmpty()) {
+					set.map { ColorChoiceData.fromString(it) }
+				} else {
+					listOf(
+						ColorChoiceData(
+							-1,
+							context.getString(R.string.light),
+							-0x1000000,
+							-0x1,
+						),
+						ColorChoiceData(
+							-2,
+							context.getString(R.string.light_dark),
+							-0x333334,
+							-0xbbbbbc,
+						),
+						ColorChoiceData(
+							-3,
+							context.getString(R.string.sepia),
+							-0x1000000,
+							ContextCompat.getColor(context, R.color.wheat).also {
+								logE("Hey here is the color you need: $it")
+							},
+						),
+						ColorChoiceData(
+							-4,
+							context.getString(R.string.amoled),
+							-0x1,
+							-0x1000000,
+						),
+					).also { choices ->
+						launchIO {
+							choices.map { it.toString() }.toSet().let {
+								iSettingsRepository.setStringSet(SettingKey.ReaderUserThemes, it)
 							}
 						}
 					}
-					).mapToFactory().convertList()
+				}.mapToFactory().convertList()
 			}
 }

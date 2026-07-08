@@ -39,7 +39,6 @@ class RemoteExtRepoDataSource(private val client: OkHttpClient) : IRemoteExtRepo
 	override suspend fun downloadRepoData(repo: RepositoryEntity): RepoIndex {
 		val url = "${repo.url}/index.json"
 
-		@Suppress("BlockingMethodInNonBlockingContext")
 		val response = client.quickie(url)
 
 		if (response.isSuccessful) {

@@ -29,7 +29,9 @@ import org.jsoup.nodes.Element
 @Suppress("UNCHECKED_CAST")
 class ElementToTTSTextIterator(private val modelFactory: () -> MutableListIterator<Element>) :
 	RewindableMutableListIterator<LazyTTSText>() {
-	private var model: MutableListIterator<Element> = emptyList<Element>().toMutableList().listIterator()
+	private var model: MutableListIterator<Element> = emptyList<Element>()
+		.toMutableList()
+		.listIterator()
 
 	override fun add(element: LazyTTSText) = model.add(element.element)
 

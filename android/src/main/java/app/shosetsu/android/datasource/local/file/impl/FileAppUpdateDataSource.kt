@@ -41,8 +41,8 @@ class FileAppUpdateDataSource(private val iFileSystemProvider: IFileSystemProvid
 
 	init {
 		try {
-			iFileSystemProvider.createDirectory(CACHE, updatesPath)
-			logV("Created directory: `$updatesPath`")
+			iFileSystemProvider.createDirectory(CACHE, UPDATES_PATH)
+			logV("Created directory: `$UPDATES_PATH`")
 		} catch (e: Exception) {
 			logE("Failed to create directory", e)
 		}
@@ -77,23 +77,22 @@ class FileAppUpdateDataSource(private val iFileSystemProvider: IFileSystemProvid
 	@Throws(IOException::class, FilePermissionException::class, FileNotFoundException::class)
 	override fun writeAPK(appUpdate: AppUpdateEntity, bytes: InputStream): String {
 		// Ensure no previous file exists
-		if (iFileSystemProvider.doesFileExist(CACHE, updatesCPath)) {
-			iFileSystemProvider.deleteFile(CACHE, updatesCPath)
+		if (iFileSystemProvider.doesFileExist(CACHE, UPDATES_FILE_PATH)) {
+			iFileSystemProvider.deleteFile(CACHE, UPDATES_FILE_PATH)
 		}
 
 		// Create the new file
-		iFileSystemProvider.createFile(CACHE, updatesCPath)
+		iFileSystemProvider.createFile(CACHE, UPDATES_FILE_PATH)
 
 		// Write to the new file
-		iFileSystemProvider.writeFile(CACHE, updatesCPath, bytes)
+		iFileSystemProvider.writeFile(CACHE, UPDATES_FILE_PATH, bytes)
 
 		// Return the file path
-		return iFileSystemProvider.retrievePath(CACHE, updatesCPath)
+		return iFileSystemProvider.retrievePath(CACHE, UPDATES_FILE_PATH)
 	}
 
 	companion object {
-		const val updatesPath = "/updates/"
-		const val updatesFile = "/update.apk"
-		const val updatesCPath = "$updatesPath$updatesFile"
+		const val UPDATES_PATH = "/updates/"
+		const val UPDATES_FILE_PATH = "$UPDATES_PATH/update.apk"
 	}
 }

@@ -316,8 +316,8 @@ fun getCategorySelectDescription(
 
 	val includedItemsText = when {
 		// Some selected, but not all
-		includedCategories.isNotEmpty() && includedCategories.size != categories.size -> includedCategories.joinToString {
-			it.name
+		includedCategories.isNotEmpty() && includedCategories.size != categories.size -> {
+			includedCategories.joinToString { it.name }
 		}
 
 		// All explicitly selected

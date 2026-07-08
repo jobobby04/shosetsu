@@ -75,17 +75,15 @@ class GetCatalogueQueryDataUseCase(
 							HashMap(data).also { it[PAGE_INDEX] = pageNumber },
 						).let {
 							val data: List<Novel.Info> = it
-							(
-								data.mapNotNull { novelListing ->
-									try {
-										novelsRepository.insertReturnStripped(novelListing.convertTo(extensionId))
-											?.let { ACatalogNovelUI(it, novelListing) }
-									} catch (e: SQLiteException) {
-										logE("Failed to load parse novel", e)
-										null
-									}
+							data.mapNotNull { novelListing ->
+								try {
+									novelsRepository.insertReturnStripped(novelListing.convertTo(extensionId))
+										?.let { ACatalogNovelUI(it, novelListing) }
+								} catch (e: SQLiteException) {
+									logE("Failed to load parse novel", e)
+									null
 								}
-								)
+							}
 						}
 
 					// Since 0 is the lowest page number, return null to signify no more pages should

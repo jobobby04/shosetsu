@@ -1,6 +1,6 @@
 package app.shosetsu.android.common.ext
 
-import java.util.*
+import java.util.Calendar
 import org.joda.time.DateTime
 
 /*
@@ -21,12 +21,13 @@ import org.joda.time.DateTime
  * ====================================================================
  */
 
-/**
+/*
  * shosetsu
  * 23 / 04 / 2020
  *
  * @author github.com/doomsdayrs
  */
+
 /**
  * @return this [DateTime] without any value lower then a day
  */

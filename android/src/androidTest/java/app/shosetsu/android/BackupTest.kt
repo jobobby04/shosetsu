@@ -98,7 +98,6 @@ class BackupTest : DIAware {
 	private fun randomNovels() = ArrayList<BackupNovelEntity>().apply {
 		for (i in 0 until randomInt) {
 			add(
-				/* element = */
 				BackupNovelEntity(
 					randomString,
 					true,

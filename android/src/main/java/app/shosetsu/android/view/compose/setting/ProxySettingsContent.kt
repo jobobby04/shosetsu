@@ -82,16 +82,16 @@ fun ProxySettingsContent(
 		modifier = modifier,
 		widget = {
 			Text(
-				color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+				color = if (proxyEnabled) {
+					MaterialTheme.colorScheme.primary
+				} else {
+					MaterialTheme.colorScheme.secondary
+				},
 				text = if (proxyEnabled) "On" else "Off",
 			)
 		},
 		onPreferenceClick = { openDialog = !openDialog },
 		iconDescription = null,
-	)
-	Text(
-		color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-		text = if (proxyEnabled) "On" else "Off",
 	)
 
 	if (openDialog) {
@@ -205,7 +205,11 @@ fun ProxySettingsDialogContent(
 					config = config.copy(password = it)
 				},
 				singleLine = true,
-				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+				visualTransformation = if (passwordVisible) {
+					VisualTransformation.None
+				} else {
+					PasswordVisualTransformation()
+				},
 				label = { Text(text = "Password") },
 				enabled = enabled and config.authUsed,
 				trailingIcon = {
@@ -226,6 +230,18 @@ fun ProxySettingsDialogContent(
 			}
 		}
 	}
+}
+
+@Preview
+@Composable
+fun ProxySettingsContentPreview() {
+	ProxySettingsContent(
+		title = "title",
+		description = "description",
+		proxyEnabled = false,
+		proxyString = "",
+		onValueChanged = { _, _ -> },
+	)
 }
 
 @Preview

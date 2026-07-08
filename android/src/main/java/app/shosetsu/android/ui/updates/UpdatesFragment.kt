@@ -67,11 +67,11 @@ import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.SimpleIconButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.relativeTimeSpanString
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
@@ -418,7 +418,7 @@ fun UpdateItemContent(
 					),
 					contentScale = ContentScale.Crop,
 					modifier = Modifier
-						.aspectRatio(coverRatio)
+						.aspectRatio(COVER_RATIO)
 						.fillMaxWidth(updateItemImageRatio)
 						.clip(MaterialTheme.shapes.small)
 						.clickable(onClick = onCoverClick),
@@ -437,7 +437,7 @@ fun UpdateItemContent(
 				ImageLoadingError(
 					updateUI.novelName,
 					Modifier
-						.aspectRatio(coverRatio)
+						.aspectRatio(COVER_RATIO)
 						.fillMaxWidth(updateItemImageRatio)
 						.clip(MaterialTheme.shapes.small)
 						.clickable(onClick = onCoverClick),
@@ -491,7 +491,11 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: 
 			DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 				context.getString(R.string.yesterday)
 
-			else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
+			else -> if (displayDateAsMDY) {
+				"${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}"
+			} else {
+				"${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
+			}
 		}
 	}
 	Text(

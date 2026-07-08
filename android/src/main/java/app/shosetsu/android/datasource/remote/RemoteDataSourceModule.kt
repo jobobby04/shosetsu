@@ -2,8 +2,19 @@ package app.shosetsu.android.datasource.remote
 
 import app.shosetsu.android.common.enums.ProductFlavors
 import app.shosetsu.android.common.utils.flavor
-import app.shosetsu.android.datasource.remote.base.*
-import app.shosetsu.android.datasource.remote.impl.*
+import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
+import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
+import app.shosetsu.android.datasource.remote.base.IRemoteChaptersDataSource
+import app.shosetsu.android.datasource.remote.base.IRemoteExtLibDataSource
+import app.shosetsu.android.datasource.remote.base.IRemoteExtRepoDataSource
+import app.shosetsu.android.datasource.remote.base.IRemoteExtensionDataSource
+import app.shosetsu.android.datasource.remote.base.IRemoteNovelDataSource
+import app.shosetsu.android.datasource.remote.impl.RemoteCatalogueDataSource
+import app.shosetsu.android.datasource.remote.impl.RemoteChaptersDataSource
+import app.shosetsu.android.datasource.remote.impl.RemoteExtLibDataSource
+import app.shosetsu.android.datasource.remote.impl.RemoteExtRepoDataSource
+import app.shosetsu.android.datasource.remote.impl.RemoteExtensionDataSource
+import app.shosetsu.android.datasource.remote.impl.RemoteNovelDataSource
 import app.shosetsu.android.datasource.remote.impl.update.FDroidAppUpdateDataSource
 import app.shosetsu.android.datasource.remote.impl.update.GitAppUpdateDataSource
 import app.shosetsu.android.datasource.remote.impl.update.PlayAppUpdateDataSource

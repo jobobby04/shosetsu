@@ -24,7 +24,7 @@ import kotlinx.serialization.serializer
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Shosetsu
  *
  * @since 11 / 08 / 2023
@@ -37,7 +37,7 @@ import kotlinx.serialization.serializer
  * @see <a href="https://github.com/Kotlin/kotlinx.serialization/issues/2231">Issue 2231</a>
  */
 @ExperimentalSerializationApi
-public inline fun <reified T> Json.decodeSafeFromStream(stream: InputStream): T =
+inline fun <reified T> Json.decodeSafeFromStream(stream: InputStream): T =
 	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 		decodeFromStream(serializersModule.serializer(), stream)
 	} else {

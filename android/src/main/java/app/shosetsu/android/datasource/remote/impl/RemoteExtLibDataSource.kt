@@ -41,11 +41,9 @@ class RemoteExtLibDataSource(private val client: OkHttpClient) : IRemoteExtLibDa
 			extLibEntity,
 		)
 
-		@Suppress("BlockingMethodInNonBlockingContext")
 		val response = client.quickie(url)
 
 		if (response.isSuccessful) {
-			@Suppress("BlockingMethodInNonBlockingContext")
 			return response.body?.string() ?: throw EmptyResponseBodyException(url)
 		} else {
 			throw HTTPException(response.code)

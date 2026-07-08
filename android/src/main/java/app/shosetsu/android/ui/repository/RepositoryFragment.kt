@@ -139,9 +139,6 @@ fun RepositoriesView(onBack: () -> Unit) {
 	/**
 	 * Warn the user that they need to refresh their extension list
 	 */
-	/**
-	 * Warn the user that they need to refresh their extension list
-	 */
 	fun showWarning() {
 		scope.launch {
 			// Ask the user if they want to refresh

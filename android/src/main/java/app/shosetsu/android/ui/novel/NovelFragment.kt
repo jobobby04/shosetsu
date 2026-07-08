@@ -111,13 +111,13 @@ import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.NovelShareMenu
 import app.shosetsu.android.view.QRCodeShareDialog
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.LongClickTextButton
 import app.shosetsu.android.view.compose.SelectableBox
 import app.shosetsu.android.view.compose.SelectionBar
 import app.shosetsu.android.view.compose.SimpleIconButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.NovelSettingUI
 import app.shosetsu.android.view.uimodels.model.CategoryUI
@@ -1237,7 +1237,7 @@ fun NovelInfoHeaderContent(
 							novelInfo.imageURL,
 							modifier = Modifier
 								.fillMaxWidth(.35f)
-								.aspectRatio(coverRatio)
+								.aspectRatio(COVER_RATIO)
 								.padding(top = 8.dp, start = 4.dp)
 								.clip(MaterialTheme.shapes.medium),
 							contentScale = ContentScale.Crop,

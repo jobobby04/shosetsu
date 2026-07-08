@@ -21,7 +21,7 @@ import androidx.work.ListenableWorker
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * shosetsu
  * 31 / 07 / 2020
  */

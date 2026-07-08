@@ -40,6 +40,7 @@ import org.kodein.di.instance
  *
  * @author github.com/doomsdayrs
  */
+@Suppress("ktlint:standard:max-line-length")
 inline fun <reified VM : ViewModel, T> T.viewModel(): Lazy<VM> where T : DIAware, T : ViewModelStoreOwner =
 	lazy(LazyThreadSafetyMode.NONE) {
 		ViewModelProvider(

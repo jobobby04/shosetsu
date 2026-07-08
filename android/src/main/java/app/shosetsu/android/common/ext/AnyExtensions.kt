@@ -23,7 +23,7 @@ import kotlinx.coroutines.*
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * shosetsu
  * 04 / 03 / 2020
  *

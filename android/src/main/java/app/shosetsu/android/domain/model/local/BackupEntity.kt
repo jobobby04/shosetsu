@@ -2,7 +2,8 @@ package app.shosetsu.android.domain.model.local
 
 import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /*
  * This file is part of Shosetsu.

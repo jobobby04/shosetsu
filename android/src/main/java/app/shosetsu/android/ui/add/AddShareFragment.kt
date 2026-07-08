@@ -36,12 +36,12 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.URL_HELP_SHARE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
 import app.shosetsu.lib.share.ExtensionLink
@@ -374,7 +374,7 @@ fun AddShareContent(
 												),
 												modifier = Modifier
 													.heightIn(max = 128.dp)
-													.aspectRatio(coverRatio),
+													.aspectRatio(COVER_RATIO),
 												error = {
 													ImageLoadingError(novelLink.name)
 												},

@@ -45,11 +45,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SimpleIconButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
@@ -290,7 +290,7 @@ fun HistoryItemContent(updateUI: ChapterHistoryUI?, openNovel: () -> Unit, onCli
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.clip(MaterialTheme.shapes.medium)
-					.aspectRatio(coverRatio)
+					.aspectRatio(COVER_RATIO)
 					.clickable(onClick = openNovel),
 				error = {
 					ImageLoadingError(updateUI.novelTitle)
@@ -303,7 +303,7 @@ fun HistoryItemContent(updateUI: ChapterHistoryUI?, openNovel: () -> Unit, onCli
 			ImageLoadingError(
 				updateUI?.novelTitle,
 				Modifier
-					.aspectRatio(coverRatio)
+					.aspectRatio(COVER_RATIO)
 					.placeholder(updateUI == null),
 			)
 		}

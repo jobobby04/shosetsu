@@ -589,7 +589,7 @@ class ChapterReaderViewModel(
 
 	override fun updateChapterAsRead(chapter: ReaderChapterUI) {
 		launchIO {
-			_recordChapterAsRead(chapter)
+			recordChapterAsReadCatching(chapter)
 
 			try {
 				chapterRepository.getChapter(chapter.id)?.let {
@@ -623,7 +623,7 @@ class ChapterReaderViewModel(
 	/**
 	 * Wrapper of [recordChapterIsReading] for exceptions.
 	 */
-	private suspend fun _recordChapterIsReading(chapter: ReaderChapterUI) {
+	private suspend fun recordChapterIsReadingCatching(chapter: ReaderChapterUI) {
 		try {
 			recordChapterIsReading(chapter)
 		} catch (e: CancellationException) {
@@ -644,7 +644,7 @@ class ChapterReaderViewModel(
 	/**
 	 * Wrapper of [recordChapterAsRead] for exceptions.
 	 */
-	private suspend fun _recordChapterAsRead(chapter: ReaderChapterUI) {
+	private suspend fun recordChapterAsReadCatching(chapter: ReaderChapterUI) {
 		try {
 			recordChapterAsRead(chapter)
 		} catch (e: CancellationException) {
@@ -678,7 +678,7 @@ class ChapterReaderViewModel(
 				 */
 				if (readingMarkingTypeFlow.first() != ONVIEW) return@launchIO
 
-				_recordChapterIsReading(chapter)
+				recordChapterIsReadingCatching(chapter)
 
 				chapterRepository.updateChapter(
 					chapterEntity.copy(readingStatus = READING),
@@ -694,7 +694,7 @@ class ChapterReaderViewModel(
 			// If the chapter reaches 90% read, we can assume the reader already sees it all :P
 			if (readingPosition <= 0.90) {
 				settingsRepo.getBoolean(ReaderMarkReadAsReading).let { markReadAsReading ->
-					/**
+					/*
 					 * If marking chapters that are read as reading is disabled
 					 * and the chapter's readingStatus is read, save progress temporarily.
 					 */
@@ -710,7 +710,7 @@ class ChapterReaderViewModel(
 					 */
 					val markingType = readingMarkingTypeFlow.first()
 					if (markingType == ONSCROLL) {
-						_recordChapterIsReading(chapter)
+						recordChapterIsReadingCatching(chapter)
 					}
 
 					// Remove temp progress
@@ -732,7 +732,7 @@ class ChapterReaderViewModel(
 			} else {
 				// User probably sees everything at this point
 
-				_recordChapterAsRead(chapter)
+				recordChapterAsReadCatching(chapter)
 
 				// Temp remember the progress
 				progressMapFlow.value = progressMapFlow.value.copy().apply {

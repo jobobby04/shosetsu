@@ -43,12 +43,13 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Shosetsu
  *
  * @since 26 / 05 / 2022
  * @author Doomsdayrs
  */
+
 /**
  * Creates the HTML page
  */
