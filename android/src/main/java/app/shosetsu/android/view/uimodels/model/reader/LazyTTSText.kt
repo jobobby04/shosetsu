@@ -29,27 +29,11 @@ import java.util.UUID
  *  as a copy in memory.
  */
 class LazyTTSText(val element: Element) : TTSText {
-	/**
-	 * The "actual" element of this element
-	 */
-	private val actualElement by lazy {
-		// Finds the "actual" element
-		var actualElement = element
-		var parent = element.parent()
-		if (parent?.hasOwnText?.not() ?: false) parent = parent.parent()
-		// traverse upwards to find our parent
-		while (parent?.hasOwnText ?: false) {
-			actualElement = parent
-			parent = actualElement.parent()
-		}
-		actualElement
-	}
-
 	private val Node.hasOwnText: Boolean get() = childNodes().any { it is TextNode && !it.isBlank }
 
 	override val text by lazy {
 		// gets all the text from the html, then trims whitespace around it
-		actualElement.wholeText().trim()
+		element.wholeText().trim()
 	}
 
 	/**
@@ -57,26 +41,13 @@ class LazyTTSText(val element: Element) : TTSText {
 	 */
 	override val ignore by lazy {
 		// we do the same as text, but immediately throw away the contents of the text
-		actualElement.wholeText().trim().isEmpty()
+		element.wholeText().isBlank()
 	}
 
 	/**
 	 * Get the id of this element
 	 */
 	override val id: String by lazy {
-		// find the uuid of this element
-		if (actualElement.hasAttr("id") && actualElement.attr("id")
-				.contains("textElement")
-		) {
-			// extract UUID from id
-			actualElement.attr("id").substring(11)
-		} else {
-			// assign a random UUID for future use
-			val uuid = UUID.randomUUID()
-			actualElement.attr("id", "textElement$uuid")
-
-			// return uuid
-			uuid.toString()
-		}
+		element.attr("id").removePrefix("textElement")
 	}
 }
