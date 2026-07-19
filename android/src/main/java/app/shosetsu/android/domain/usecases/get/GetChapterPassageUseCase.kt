@@ -36,7 +36,7 @@ class GetChapterPassageUseCase(
 		SQLiteException::class,
 		FilePermissionException::class,
 		FileNotFoundException::class,
-		LuaError::class
+		LuaError::class,
 	)
 	suspend operator fun invoke(readerChapterUI: ReaderChapterUI): ByteArray? =
 		iChaptersRepository.getChapter(readerChapterUI.id)?.let { chapterEntity ->

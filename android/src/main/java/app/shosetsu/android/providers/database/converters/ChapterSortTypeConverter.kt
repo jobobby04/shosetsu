@@ -25,10 +25,8 @@ import app.shosetsu.android.common.enums.ChapterSortType
  */
 class ChapterSortTypeConverter {
 	@TypeConverter
-	fun toString(chapterSortType: ChapterSortType?): String? =
-		chapterSortType?.name
+	fun toString(chapterSortType: ChapterSortType?): String? = chapterSortType?.name
 
 	@TypeConverter
-	fun toSortType(key: String?): ChapterSortType? =
-		key?.let { ChapterSortType.valueOf(it) }
+	fun toSortType(key: String?): ChapterSortType? = key?.let { ChapterSortType.valueOf(it) }
 }

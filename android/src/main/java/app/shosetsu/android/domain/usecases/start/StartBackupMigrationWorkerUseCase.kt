@@ -28,18 +28,20 @@ import app.shosetsu.android.common.ext.launchIO
 class StartBackupMigrationWorkerUseCase(
 	private val manager: MigrateBackupWorker.Manager,
 	private val updateWorkerManager: NovelUpdateWorker.Manager,
-	private val backupWorkerManager: BackupWorker.Manager
+	private val backupWorkerManager: BackupWorker.Manager,
 ) {
 	operator fun invoke() {
 		launchIO {
 			if (!manager.isRunning()) {
 				// Stops the update worker to prevent it from interfering
-				if (updateWorkerManager.isRunning())
+				if (updateWorkerManager.isRunning()) {
 					updateWorkerManager.stop()
+				}
 
 				// Stops the backup worker to prevent it from interfering
-				if (backupWorkerManager.isRunning())
+				if (backupWorkerManager.isRunning()) {
 					backupWorkerManager.stop()
+				}
 
 				// Start the migration
 				manager.start()

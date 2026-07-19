@@ -26,7 +26,7 @@ fun ImageVector.toIcon(
 		layoutDirection = layoutDirection,
 		size = size,
 		config = config,
-	).asAndroidBitmap()
+	).asAndroidBitmap(),
 )
 
 fun ImageVector.toImageBitmap(
@@ -51,7 +51,7 @@ private fun createVectorPainter(image: ImageVector, density: Density): VectorPai
 	VectorPainterUtil.createVectorPainterFromImageVector(
 		density,
 		image,
-		VectorPainterUtil.createGroupComponent(VectorPainterUtil.createGroupComponent(), image.root)
+		VectorPainterUtil.createGroupComponent(VectorPainterUtil.createGroupComponent(), image.root),
 	)
 
 fun Painter.toImageBitmap(
@@ -62,9 +62,15 @@ fun Painter.toImageBitmap(
 ): ImageBitmap {
 	val size = (size ?: (intrinsicSize * 2f))
 		.let { if (it == Size.Unspecified) Size(16f, 16f) else it }
-	val image = ImageBitmap(width = size.width.roundToInt(), height = size.height.roundToInt(), config = config)
+	val image =
+		ImageBitmap(width = size.width.roundToInt(), height = size.height.roundToInt(), config = config)
 	val canvas = Canvas(image)
-	CanvasDrawScope().draw(density = density, layoutDirection = layoutDirection, canvas = canvas, size = size) {
+	CanvasDrawScope().draw(
+		density = density,
+		layoutDirection = layoutDirection,
+		canvas = canvas,
+		size = size,
+	) {
 		draw(size = this.size)
 	}
 	return image

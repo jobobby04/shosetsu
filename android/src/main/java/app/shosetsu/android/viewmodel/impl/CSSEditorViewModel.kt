@@ -14,6 +14,7 @@ import app.shosetsu.android.domain.usecases.load.LoadLiveAppThemeUseCase
 import app.shosetsu.android.ui.theme.FallbackColorScheme
 import app.shosetsu.android.viewmodel.abstracted.ACSSEditorViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
+import java.util.Stack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.util.Stack
 
 /*
  * This file is part of shosetsu.
@@ -73,20 +73,19 @@ class CSSEditorViewModel(
 	private val redoStack by lazy { Stack<String>() }
 	private val cssIDFlow = MutableStateFlow(-2)
 
-
 	override val cssContent = MutableStateFlow("")
 	override val cssTitle: StateFlow<String> by lazy {
 		styleFlow.map { it.title }.onIO().stateIn(
 			viewModelScopeIO,
 			SharingStarted.Lazily,
-			app.resources.getString(R.string.loading)
+			app.resources.getString(R.string.loading),
 		)
 	}
 	override val shosetsuCss: StateFlow<String> by lazy {
 		css.shosetsuCss.stateIn(
 			viewModelScopeIO,
 			SharingStarted.Lazily,
-			""
+			"",
 		)
 	}
 	override val colorScheme: MutableStateFlow<ColorScheme> = MutableStateFlow(FallbackColorScheme)
@@ -99,7 +98,7 @@ class CSSEditorViewModel(
 		cssIDFlow.map { id ->
 			StyleEntity(
 				id,
-				app.resources.getString(R.string.default_reader)
+				app.resources.getString(R.string.default_reader),
 			)
 		}
 	}
@@ -126,7 +125,9 @@ class CSSEditorViewModel(
 
 	override fun write(content: String) {
 		launchIO {
-			if (undoStack.isNotEmpty() && undoStack.peek() == content) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == content) {
+				return@launchIO // ignore if nothing changed
+			}
 			undoStack.add(cssContent.value)
 			canUndo.value = true
 			redoStack.clear()
@@ -146,7 +147,9 @@ class CSSEditorViewModel(
 		val combined = value + pasteContent
 		if (value == combined) return // ignore paste if the old value equals paste
 		launchIO {
-			if (undoStack.isNotEmpty() && undoStack.peek() == combined) return@launchIO // ignore if nothing changed
+			if (undoStack.isNotEmpty() && undoStack.peek() == combined) {
+				return@launchIO // ignore if nothing changed
+			}
 			undoStack.add(value)
 			canUndo.value = true
 			redoStack.clear()

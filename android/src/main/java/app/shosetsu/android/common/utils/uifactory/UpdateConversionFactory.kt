@@ -40,8 +40,7 @@ class UpdateConversionFactory(data: UpdateCompleteEntity) :
 	)
 }
 
-fun List<UpdateCompleteEntity>.mapToFactory() =
-	map { UpdateConversionFactory(it) }
+fun List<UpdateCompleteEntity>.mapToFactory() = map { UpdateConversionFactory(it) }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun Flow<List<UpdateCompleteEntity>>.mapLatestToResultFlowWithFactory() =

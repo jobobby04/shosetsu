@@ -1,8 +1,8 @@
 package app.shosetsu.android
 
-import org.junit.Test
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
+import org.junit.Test
 
 /*
  * This file is part of Shosetsu.
@@ -29,8 +29,10 @@ class SystemTimeSpeedTest {
 	@ExperimentalTime
 	@Test
 	fun main() {
-		println("It took ms of " + measureTime {
-			val v = System.currentTimeMillis()
-		})
+		println(
+			"It took ms of " + measureTime {
+				val v = System.currentTimeMillis()
+			},
+		)
 	}
 }

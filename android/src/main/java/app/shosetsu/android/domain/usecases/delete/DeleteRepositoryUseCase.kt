@@ -25,9 +25,7 @@ import app.shosetsu.android.view.uimodels.model.RepositoryUI
 /**
  * 18 / 01 / 2021
  */
-class DeleteRepositoryUseCase(
-	private val iExtensionRepoRepository: IExtensionRepoRepository
-) {
+class DeleteRepositoryUseCase(private val iExtensionRepoRepository: IExtensionRepoRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(repositoryEntity: RepositoryEntity) =
 		iExtensionRepoRepository.remove(repositoryEntity)

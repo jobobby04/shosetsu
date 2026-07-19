@@ -35,29 +35,23 @@ import app.shosetsu.android.view.compose.SelectionTopAppBar
 fun NovelAppBar(
 	onBack: () -> Unit,
 	selectedCount: Int,
-
 	onDeselectAll: () -> Unit,
 	onSelectAll: () -> Unit,
 	onSelectBetween: () -> Unit,
 	onInverseSelection: () -> Unit,
-
 	canMigrate: Boolean,
 	onMigrate: () -> Unit,
 	onJump: () -> Unit,
-
 	hasCategories: Boolean,
 	onSetCategories: () -> Unit,
-
-
 	onDownloadNext: () -> Unit,
 	onDownloadNext5: () -> Unit,
 	onDownloadNext10: () -> Unit,
 	onDownloadCustom: () -> Unit,
 	onDownloadUnread: () -> Unit,
 	onDownloadAll: () -> Unit,
-	onOpenShareMenu: () -> Unit
+	onOpenShareMenu: () -> Unit,
 ) {
-
 	val behavior = TopAppBarDefaults.pinnedScrollBehavior()
 
 	if (selectedCount > 0) {
@@ -84,14 +78,14 @@ fun NovelAppBar(
 					onDownloadNext10 = onDownloadNext10,
 					onDownloadCustom = onDownloadCustom,
 					onDownloadUnread = onDownloadUnread,
-					onDownloadAll = onDownloadAll
+					onDownloadAll = onDownloadAll,
 				)
 				NovelMoreButton(
 					canMigrate = canMigrate,
 					onMigrate = onMigrate,
 					onJump = onJump,
 					hasCategories = hasCategories,
-					onSetCategories = onSetCategories
+					onSetCategories = onSetCategories,
 				)
 			},
 		)

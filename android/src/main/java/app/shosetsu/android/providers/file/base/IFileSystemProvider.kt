@@ -42,7 +42,6 @@ interface IFileSystemProvider {
 
 	fun doesFileExist(externalFileDir: ExternalFileDir, path: String): Boolean
 
-
 	/**
 	 * Loads a file from the internal file directory
 	 * This means loading data from the APP specific directory
@@ -82,37 +81,23 @@ interface IFileSystemProvider {
 	@Throws(FilePermissionException::class)
 	fun deleteFile(externalFileDir: ExternalFileDir, path: String): Boolean
 
+	/**
+	 * Writes a file to the internal file directory
+	 */
+	@Throws(FilePermissionException::class, IOException::class)
+	fun writeFile(internalFileDir: InternalFileDir, path: String, content: ByteArray)
 
 	/**
 	 * Writes a file to the internal file directory
 	 */
 	@Throws(FilePermissionException::class, IOException::class)
-	fun writeFile(
-		internalFileDir: InternalFileDir,
-		path: String,
-		content: ByteArray
-	)
-
-	/**
-	 * Writes a file to the internal file directory
-	 */
-	@Throws(FilePermissionException::class, IOException::class)
-	fun writeFile(
-		internalFileDir: InternalFileDir,
-		path: String,
-		content: InputStream
-	)
+	fun writeFile(internalFileDir: InternalFileDir, path: String, content: InputStream)
 
 	/**
 	 * Writes a file to the external file directory
 	 */
 	@Throws(FilePermissionException::class, IOException::class)
-	fun writeFile(
-		externalFileDir: ExternalFileDir,
-		path: String,
-		content: ByteArray
-	)
-
+	fun writeFile(externalFileDir: ExternalFileDir, path: String, content: ByteArray)
 
 	@Throws(IOException::class)
 	fun createFile(internalFileDir: InternalFileDir, path: String): Boolean
@@ -144,5 +129,4 @@ interface IFileSystemProvider {
 
 	@Throws(FileNotFoundException::class)
 	fun moveFile(files: InternalFileDir, oldPath: String, repoPath: String)
-
 }

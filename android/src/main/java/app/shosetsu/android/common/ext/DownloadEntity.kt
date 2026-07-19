@@ -32,5 +32,5 @@ fun DownloadEntity.toDB(): DBDownloadEntity = DBDownloadEntity(
 	chapterName,
 	novelName,
 	extensionID,
-	status
+	status,
 )

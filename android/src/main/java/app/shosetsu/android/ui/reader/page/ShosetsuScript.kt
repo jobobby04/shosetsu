@@ -1,10 +1,10 @@
 package app.shosetsu.android.ui.reader.page
 
 import android.webkit.JavascriptInterface
+import app.shosetsu.android.common.ext.logI as pLogI
 import app.shosetsu.android.common.ext.logV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import app.shosetsu.android.common.ext.logI as pLogI
 
 /*
  * This file is part of shosetsu.
@@ -37,7 +37,7 @@ import app.shosetsu.android.common.ext.logI as pLogI
 class ShosetsuScript(
 	val onClickMethod: (String?) -> Unit,
 	val onDClickMethod: () -> Unit,
-	val scope: CoroutineScope
+	val scope: CoroutineScope,
 ) {
 	/**
 	 * JavaScript function for [onClickMethod], passes event to UI thread.

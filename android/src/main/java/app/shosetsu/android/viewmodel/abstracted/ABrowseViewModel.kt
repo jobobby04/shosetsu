@@ -5,11 +5,11 @@ import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
+import java.util.Locale
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -27,7 +27,6 @@ import java.util.Locale
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 
 /**
  * shosetsu
@@ -47,21 +46,23 @@ abstract class ABrowseViewModel :
 	@Immutable
 	data class FilteredLanguages(
 		val languages: ImmutableList<LanguageFilter>,
-		val states: ImmutableMap<String, Boolean>
+		val states: ImmutableMap<String, Boolean>,
 	)
 
 	abstract val isOnline: StateFlow<Boolean>
 
 	abstract val error: Flow<Throwable>
 
+	/**
+	 * If to show a confirm dialog
+	 */
+	abstract val showUninstallConfirm: StateFlow<Boolean>
+
 	/** Refreshes the repositories and data values */
 	abstract fun refresh()
 
 	/** Installs an extension */
-	abstract fun installExtension(
-		extension: BrowseExtensionUI,
-		option: ExtensionInstallOptionEntity
-	)
+	abstract fun installExtension(extension: BrowseExtensionUI, option: ExtensionInstallOptionEntity)
 
 	/** Update an extension, only works if it is already installed */
 	abstract fun updateExtension(ext: BrowseExtensionUI)
@@ -69,6 +70,10 @@ abstract class ABrowseViewModel :
 	/** Cancel an extension install */
 	abstract fun cancelInstall(ext: BrowseExtensionUI)
 
+	/**
+	 * Ask to uninstall a given extension
+	 */
+	abstract fun uninstall(ext: BrowseExtensionUI)
 
 	/**
 	 * Languages that are present, this is used for filtering
@@ -83,14 +88,12 @@ abstract class ABrowseViewModel :
 	 */
 	abstract fun setLanguageFiltered(language: String, state: Boolean)
 
-
 	abstract val onlyInstalledLive: StateFlow<Boolean>
 
 	/**
 	 * Set if to only show installed or not
 	 */
 	abstract fun showOnlyInstalled(state: Boolean)
-
 
 	abstract val searchTermLive: StateFlow<String>
 
@@ -109,4 +112,16 @@ abstract class ABrowseViewModel :
 	abstract fun showFilterMenu()
 
 	abstract fun hideFilterMenu()
+
+	/**
+	 * Dismiss the uninstallation request
+	 */
+	abstract fun dismissUninstall()
+
+	/**
+	 * Confirm the uninstallation request.
+	 *
+	 * Performs the removal immediately on the UI thread.
+	 */
+	abstract fun confirmUninstall()
 }

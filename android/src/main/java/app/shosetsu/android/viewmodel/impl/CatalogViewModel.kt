@@ -30,8 +30,9 @@ import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.Filter
-import app.shosetsu.lib.IExtension
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -53,7 +54,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
-import java.util.concurrent.ConcurrentHashMap
 
 /*
  * This file is part of shosetsu.
@@ -88,7 +88,7 @@ class CatalogViewModel(
 	private val setNovelUIType: SetNovelUITypeUseCase,
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
-	private val settingsRepository: ISettingsRepository
+	private val settingsRepository: ISettingsRepository,
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -106,39 +106,47 @@ class CatalogViewModel(
 	 * Flow source for extension ID
 	 */
 	private val extensionIDFlow: MutableStateFlow<Int> = MutableStateFlow(-1)
-	private val iExtensionFlow: StateFlow<IExtension?> by lazy {
-		extensionIDFlow.mapLatest { extensionID -> getExtensionUseCase(extensionID) }
+	private val iExtensionFlow: StateFlow<Pair<Int, Extension?>> by lazy {
+		extensionIDFlow.mapLatest { extensionID -> extensionID to getExtensionUseCase(extensionID) }
 			.catch { exceptionFlow.emit(it) }
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, extensionIDFlow.value to null)
 	}
 
 	private val selectedListingLink = MutableStateFlow<String?>(null)
-	override val selectedListing: StateFlow<IExtension.Listing?> = iExtensionFlow
+	override val selectedListing: StateFlow<Extension.Listing?> = iExtensionFlow
 		.combine(selectedListingLink, ::Pair)
-		.mapLatest { (ext, link) -> ext?.getListing(link) }
+		.mapLatest { (ext, link) -> ext.second?.getListing(link) }
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
 
-	override val listingOptions: StateFlow<ImmutableList<IExtension.Listing>> = selectedListing.mapLatest {
-		when (it) {
-			is IExtension.Listing.List -> it.getListings().toList().toImmutableList()
-			else -> persistentListOf()
+	override val listingOptions: StateFlow<ImmutableList<Extension.Listing>> =
+		selectedListing.mapLatest {
+			when (it) {
+				is Extension.Listing.List -> it.getListings().toList().toImmutableList()
+				else -> persistentListOf()
+			}
 		}
-	}
-		.catch { exceptionFlow.emit(it) }
-		.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
+			.catch { exceptionFlow.emit(it) }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
 	/**
 	 * UnusedFlow warning suppressed, we are just calling the function to add them to the map.
 	 */
-	@Suppress("UnusedFlow")
-	private fun List<Filter<*>>.init(map: ConcurrentHashMap<Int, MutableStateFlow<Any>>): ConcurrentHashMap<Int, MutableStateFlow<Any>> {
+	private fun List<Filter<*>>.init(
+		map: ConcurrentHashMap<Int, MutableStateFlow<Any>>,
+	): ConcurrentHashMap<Int, MutableStateFlow<Any>> {
 		forEach { filter ->
 			when (filter) {
 				is Filter.Password, is Filter.Text -> map[filter.id] = MutableStateFlow(filter.state)
+
 				is Filter.Switch, is Filter.Checkbox -> map[filter.id] = MutableStateFlow(filter.state)
-				is Filter.TriState, is Filter.Dropdown, is Filter.RadioGroup -> map[filter.id] = MutableStateFlow(filter.state)
+
+				is Filter.TriState, is Filter.Dropdown, is Filter.RadioGroup -> map[filter.id] =
+					MutableStateFlow(filter.state)
+
 				is Filter.FList -> filter.filters.init(map)
+
 				is Filter.Group<*> -> filter.filters.init(map)
+
 				is Filter.Header, is Filter.Separator -> {}
 			}
 		}
@@ -157,71 +165,82 @@ class CatalogViewModel(
 	}
 
 	data class FilterApplied(val id: Int, val value: Boolean)
-	private val filtersApplied: MutableStateFlow<FilterApplied> = MutableStateFlow(FilterApplied(0, false))
+	private val filtersApplied: MutableStateFlow<FilterApplied> =
+		MutableStateFlow(FilterApplied(0, false))
 
 	/**
 	 * Map of filter id to the state to pass into the extension
 	 */
-	private var filterDataState = filterItemsLive.mapLatest { it.map { it.item }.init(ConcurrentHashMap()) }
+	private var filterDataState = filterItemsLive.mapLatest {
+		it.map { it.item }.init(ConcurrentHashMap())
+	}
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, ConcurrentHashMap())
 	private val filterDataFlow = filterItemsLive.mapLatest { hashMapOf<Int, Any>() }
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, hashMapOf())
 
-	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy { iExtensionFlow
+	private val pagerFlow: Flow<Pager<Int, ACatalogNovelUI>?> by lazy {
+		iExtensionFlow
 			.combine(selectedListing, ::Pair)
 			.transformLatest { (ext, listing) ->
+				val (extId, ext) = ext
 				if (ext == null) {
 					emit(null)
 					return@transformLatest
 				}
-				emitAll(queryFlow
-					.combine(filtersApplied, ::Pair)
-					.flatMapLatest { (query, filtersApplied) ->
-						if (listing == null) return@flatMapLatest flowOf(null)
-						fun page(load: (Map<Int, Any>) -> PagingSource<Int, ACatalogNovelUI>) =
-							filterDataFlow.mapLatest { data ->
-								Pager(
-									PagingConfig(10)
+				emitAll(
+					queryFlow
+						.combine(filtersApplied, ::Pair)
+						.flatMapLatest { (query, filtersApplied) ->
+							if (listing == null) return@flatMapLatest flowOf(null)
+							fun page(load: (Map<Int, Any>) -> PagingSource<Int, ACatalogNovelUI>) =
+								filterDataFlow.mapLatest { data ->
+									Pager(
+										PagingConfig(10),
+									) {
+										load(data)
+									}
+								}
+							if (query.isEmpty() && listing is Extension.Listing.Item) {
+								page { data ->
+									getCatalogueListingData(extId, ext, data, listing)
+								}
+							} else {
+								// Prevents always searching for list listings
+								if (!filtersApplied.value &&
+									listing !is Extension.Listing.Item
 								) {
-									load(data)
+									return@flatMapLatest flowOf(null)
+								}
+
+								val search = listing.search ?: return@flatMapLatest flowOf(null)
+								page { data ->
+									loadCatalogueQueryDataUseCase(
+										extId,
+										ext,
+										query,
+										data,
+										search,
+									)
 								}
 							}
-						if (query.isEmpty() && listing is IExtension.Listing.Item) {
-							page { data ->
-								getCatalogueListingData(ext, data, listing)
-							}
-						} else {
-							// Prevents always searching for list listings
-							if (!filtersApplied.value && listing !is IExtension.Listing.Item) return@flatMapLatest flowOf(null)
-
-							val search = listing.search ?: return@flatMapLatest flowOf(null)
-							page { data ->
-								loadCatalogueQueryDataUseCase(
-									ext,
-									query,
-									data,
-									search
-								)
-							}
-						}
-					}
+						},
 				)
 			}.onIO()
 	}
 
 	override val itemsLive: Flow<PagingData<ACatalogNovelUI>> by lazy {
 		pagerFlow.combine(selectedListing, ::Pair).transformLatest { (pager, listing) ->
-			if (pager != null)
+			if (pager != null) {
 				emitAll(pager.flow)
-			else if (listing !is IExtension.Listing.Item) {
+			} else if (listing !is Extension.Listing.Item) {
 				emit(
 					PagingData.empty(
 						sourceLoadStates = LoadStates(
 							LoadState.NotLoading(false),
 							LoadState.NotLoading(false),
-							LoadState.NotLoading(false)
-						)
-					)
+							LoadState.NotLoading(false),
+						),
+					),
 				)
 			} else {
 				emit(PagingData.empty())
@@ -240,7 +259,7 @@ class CatalogViewModel(
 	}
 
 	override val extensionName: StateFlow<String> by lazy {
-		iExtensionFlow.mapLatest { it?.name ?: "" }
+		iExtensionFlow.mapLatest { it.second?.name ?: "" }
 			.catch {
 				exceptionFlow.emit(it)
 			}.onIO()
@@ -248,7 +267,7 @@ class CatalogViewModel(
 	}
 
 	override val baseURL: StateFlow<String?> =
-		iExtensionFlow.map { it?.baseURL }.catch {
+		iExtensionFlow.map { it.second?.baseURL }.catch {
 			exceptionFlow.emit(it)
 		}
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
@@ -279,7 +298,7 @@ class CatalogViewModel(
 		launchIO {
 			resetFilterDataState()
 			queryFlow.value = ""
-			_applyFilter()
+			applyFilterInternal()
 		}
 	}
 
@@ -287,10 +306,7 @@ class CatalogViewModel(
 		filterDataState.value.clear()
 	}
 
-	override fun backgroundNovelAdd(
-		item: ACatalogNovelUI,
-		categories: IntArray
-	) {
+	override fun backgroundNovelAdd(item: ACatalogNovelUI, categories: IntArray) {
 		launchIO {
 			// fyi, the function handles exceptions
 			_backgroundNovelAdd(item, categories)
@@ -301,10 +317,7 @@ class CatalogViewModel(
 	 * @see [ACatalogViewModel.backgroundNovelAdd]
 	 */
 	@Suppress("KDocMissingDocumentation", "FunctionName")
-	private suspend fun _backgroundNovelAdd(
-		item: ACatalogNovelUI,
-		categories: IntArray
-	) {
+	private suspend fun _backgroundNovelAdd(item: ACatalogNovelUI, categories: IntArray) {
 		try {
 			logI("Adding novel to library in background: $item")
 			if (item.bookmarked) {
@@ -317,8 +330,9 @@ class CatalogViewModel(
 
 			try {
 				backgroundAddUseCase(item.id)
-				if (categories.isNotEmpty())
+				if (categories.isNotEmpty()) {
 					setNovelCategoriesUseCase(item.id, categories)
+				}
 			} catch (e: Exception) {
 				backgroundAddState.emit(BackgroundNovelAddProgress.Failure(e))
 				return
@@ -327,11 +341,14 @@ class CatalogViewModel(
 			backgroundAddState.emit(
 				BackgroundNovelAddProgress.Added(
 					item.title.let {
-						if (it.length > 20)
+						if (it.length > 20) {
 							it.substring(0, 20) + "..."
-						else it
-					}
-				))
+						} else {
+							it
+						}
+					},
+				),
+			)
 			delay(100)
 			backgroundAddState.emit(BackgroundNovelAddProgress.Unknown)
 		} catch (e: Exception) {
@@ -347,7 +364,7 @@ class CatalogViewModel(
 	/**
 	 * Locks the filter data flow mutex and sets the new value.
 	 */
-	private fun _applyFilter() {
+	private fun applyFilterInternal() {
 		if (filterMutex.tryLock()) {
 			try {
 				filterDataFlow.value.clear()
@@ -360,7 +377,7 @@ class CatalogViewModel(
 
 	override fun applyFilter() {
 		launchIO {
-			_applyFilter()
+			applyFilterInternal()
 			filtersApplied.update { it.copy(id = it.id + 1, value = true) }
 		}
 	}
@@ -407,7 +424,7 @@ class CatalogViewModel(
 	override fun resetFilter() {
 		launchIO {
 			resetFilterDataState()
-			_applyFilter()
+			applyFilterInternal()
 			filtersApplied.update { it.copy(value = false) }
 		}
 	}
@@ -426,7 +443,8 @@ class CatalogViewModel(
 			.map { !it }
 			.stateIn(
 				viewModelScopeIO,
-				SharingStarted.Lazily, true
+				SharingStarted.Lazily,
+				true,
 			)
 
 	override val columnsInH: StateFlow<Int> by lazy {
@@ -434,7 +452,7 @@ class CatalogViewModel(
 			.stateIn(
 				viewModelScopeIO,
 				SharingStarted.Lazily,
-				SettingKey.ChapterColumnsInLandscape.default
+				SettingKey.ChapterColumnsInLandscape.default,
 			)
 	}
 
@@ -443,7 +461,7 @@ class CatalogViewModel(
 			.stateIn(
 				viewModelScopeIO,
 				SharingStarted.Lazily,
-				SettingKey.ChapterColumnsInPortait.default
+				SettingKey.ChapterColumnsInPortait.default,
 			)
 	}
 
@@ -465,7 +483,7 @@ class CatalogViewModel(
 	 */
 	private inline fun <reified O, reified V> ConcurrentHashMap<Int, V>.specialGetOrPut(
 		key: Int,
-		getDefaultValue: () -> O
+		getDefaultValue: () -> O,
 	): O {
 		// Do not use computeIfAbsent on JVM8 as it would change locking behavior
 		val value = this[key]
@@ -495,6 +513,3 @@ class CatalogViewModel(
 		isFilterMenuVisible.value = false
 	}
 }
-
-
-

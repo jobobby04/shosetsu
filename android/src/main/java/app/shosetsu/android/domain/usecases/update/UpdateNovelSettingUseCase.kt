@@ -25,12 +25,9 @@ import app.shosetsu.android.view.uimodels.NovelSettingUI
 /**
  * 30 / 12 / 2020
  */
-class UpdateNovelSettingUseCase(
-	private val novelSettingsRepository: INovelSettingsRepository
-) {
+class UpdateNovelSettingUseCase(private val novelSettingsRepository: INovelSettingsRepository) {
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(novelSettingUI: NovelSettingUI) =
-		invoke(novelSettingUI.convertTo())
+	suspend operator fun invoke(novelSettingUI: NovelSettingUI) = invoke(novelSettingUI.convertTo())
 
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(novelSettingEntity: NovelSettingEntity) =

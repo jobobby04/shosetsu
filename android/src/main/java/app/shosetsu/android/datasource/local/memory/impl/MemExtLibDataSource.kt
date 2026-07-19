@@ -34,12 +34,12 @@ class MemExtLibDataSource(factory: ICache.Factory) : IMemExtLibDataSource {
 		factory.create(MEMORY_EXPIRE_EXTENSION_TIME.hours, MEMORY_MAX_EXT_LIBS)
 
 	override fun loadLibrary(entity: ExtLibEntity): String? {
-		//logV("Loading $name from memory (success?: ${result != null})")
+		// logV("Loading $name from memory (success?: ${result != null})")
 		return libraries[entity]
 	}
 
 	override fun setLibrary(entity: ExtLibEntity, data: String) {
-		//logV("Putting $name into memory")
+		// logV("Putting $name into memory")
 		libraries[entity] = data
 	}
 

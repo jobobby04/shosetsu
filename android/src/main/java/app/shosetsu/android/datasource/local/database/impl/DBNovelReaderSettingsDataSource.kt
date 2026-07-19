@@ -28,29 +28,23 @@ import kotlinx.coroutines.flow.mapLatest
 /**
  * 26 / 02 / 2021
  */
-class DBNovelReaderSettingsDataSource(
-	private val dao: NovelReaderSettingsDao
-) : IDBNovelReaderSettingsDataSource {
-	override suspend fun get(novelID: Int): NovelReaderSettingEntity? =
-		dao.get(novelID)
+class DBNovelReaderSettingsDataSource(private val dao: NovelReaderSettingsDao) :
+	IDBNovelReaderSettingsDataSource {
+	override suspend fun get(novelID: Int): NovelReaderSettingEntity? = dao.get(novelID)
 
 	@OptIn(ExperimentalCoroutinesApi::class)
 	override fun getFlow(novelID: Int): Flow<NovelReaderSettingEntity?> =
 		dao.getFlow(novelID).mapLatest { it?.convertTo() }
 
-
 	override suspend fun insert(novelReaderSettingEntity: NovelReaderSettingEntity): Long =
 		(dao.insertAbort(novelReaderSettingEntity.toDB()))
-
 
 	override suspend fun update(novelReaderSettingEntity: NovelReaderSettingEntity): Unit =
 		(dao.update(novelReaderSettingEntity.toDB()))
 
-
-	fun NovelReaderSettingEntity.toDB() =
-		DBNovelReaderSettingEntity(
-			novelID = novelID,
-			paragraphIndentSize = paragraphIndentSize,
-			paragraphSpacingSize = paragraphSpacingSize
-		)
+	fun NovelReaderSettingEntity.toDB() = DBNovelReaderSettingEntity(
+		novelID = novelID,
+		paragraphIndentSize = paragraphIndentSize,
+		paragraphSpacingSize = paragraphSpacingSize,
+	)
 }

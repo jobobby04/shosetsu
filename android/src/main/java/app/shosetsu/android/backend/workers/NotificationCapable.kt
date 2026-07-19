@@ -72,7 +72,7 @@ interface NotificationCapable {
 		if (
 			ActivityCompat.checkSelfPermission(
 				applicationContext,
-				POST_NOTIFICATIONS
+				POST_NOTIFICATIONS,
 			) != PERMISSION_GRANTED
 		) {
 			return
@@ -83,7 +83,7 @@ interface NotificationCapable {
 			baseNotificationBuilder.apply {
 				setContentText(contentText)
 				action()
-			}.build()
+			}.build(),
 		)
 	}
 }

@@ -31,7 +31,11 @@ fun NumberPickerSettingContent(
 	val selection by repo.getIntFlow(key).collectAsState()
 
 	NumberPickerSettingContent(
-		title, description, selection, range, modifier
+		title,
+		description,
+		selection,
+		range,
+		modifier,
 	) {
 		launchIO { repo.setInt(key, it) }
 	}
@@ -44,7 +48,7 @@ fun NumberPickerSettingContent(
 	value: Int,
 	range: StableHolder<IntRange>,
 	modifier: Modifier = Modifier,
-	onValueChanged: (newValue: Int) -> Unit
+	onValueChanged: (newValue: Int) -> Unit,
 ) {
 	var openDialog by remember { mutableStateOf(false) }
 
@@ -56,7 +60,7 @@ fun NumberPickerSettingContent(
 			Text("$value", color = MaterialTheme.colorScheme.tertiary)
 		},
 		onPreferenceClick = { openDialog = true },
-		iconDescription = null
+		iconDescription = null,
 	)
 
 	if (openDialog) {
@@ -90,8 +94,7 @@ fun PreviewPickerSettingContent() {
 		"A Number picker",
 		"This is a number picker",
 		2,
-		range = remember { StableHolder(0..10) }
+		range = remember { StableHolder(0..10) },
 	) {
-
 	}
 }

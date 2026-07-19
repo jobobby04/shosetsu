@@ -44,13 +44,10 @@ class ExtensionLibrariesRepository(
 	private val memSource: IMemExtLibDataSource,
 ) : IExtensionLibrariesRepository {
 	@Throws(SQLiteException::class)
-	override suspend fun loadExtLibByRepo(
-		repoID: Int,
-	): List<ExtLibEntity> =
+	override suspend fun loadExtLibByRepo(repoID: Int): List<ExtLibEntity> =
 		onIO { databaseSource.loadExtLibByRepo(repoID) }
 
-	override suspend fun loadAll(): List<ExtLibEntity> =
-		onIO { databaseSource.loadAll() }
+	override suspend fun loadAll(): List<ExtLibEntity> = onIO { databaseSource.loadAll() }
 
 	@Throws(
 		SQLiteException::class,
@@ -58,10 +55,7 @@ class ExtensionLibrariesRepository(
 		SocketTimeoutException::class,
 		UnknownHostException::class,
 	)
-	override suspend fun installExtLibrary(
-		repoURL: String,
-		extLibEntity: ExtLibEntity,
-	) = onIO {
+	override suspend fun installExtLibrary(repoURL: String, extLibEntity: ExtLibEntity) = onIO {
 		val data = LuaLibrary(remoteSource.downloadLibrary(repoURL, extLibEntity))
 		extLibEntity.version = data.libMetaData.version
 		databaseSource.updateOrInsert(extLibEntity)
@@ -69,7 +63,11 @@ class ExtensionLibrariesRepository(
 		fileSource.writeExtLib(extLibEntity, data.content)
 	}
 
-	@Throws(FileNotFoundException::class, FilePermissionException::class, MissingExtensionLibrary::class)
+	@Throws(
+		FileNotFoundException::class,
+		FilePermissionException::class,
+		MissingExtensionLibrary::class,
+	)
 	override suspend fun loadExtLibrary(name: String): String {
 		val extLib = databaseSource.getExtLibsMatchingName(name).maxByOrNull { it.version }
 			?: throw MissingExtensionLibrary(name)

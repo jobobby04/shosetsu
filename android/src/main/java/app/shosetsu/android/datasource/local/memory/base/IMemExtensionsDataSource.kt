@@ -28,7 +28,7 @@ interface IMemExtensionsDataSource {
 	fun loadExtensionFromMemory(extensionID: Int): IExtension?
 
 	/** Put formatter in memory */
-	fun putExtensionInMemory(iExtension: IExtension)
+	fun putExtensionInMemory(id: Int, extension: IExtension)
 
 	/** Remove formatter by ID from cache*/
 	fun removeExtensionFromMemory(extensionID: Int): Boolean

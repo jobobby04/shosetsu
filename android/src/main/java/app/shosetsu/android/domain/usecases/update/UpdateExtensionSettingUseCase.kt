@@ -35,12 +35,12 @@ import app.shosetsu.lib.exceptions.InvalidMetaDataException
 class UpdateExtensionSettingUseCase(
 	private val extRepo: IExtensionsRepository,
 	private val extEntitiesRepo: IExtensionEntitiesRepository,
-	private val extSettingsRepo: IExtensionSettingsRepository
+	private val extSettingsRepo: IExtensionSettingsRepository,
 ) {
 	@Throws(
 		SQLiteException::class,
 		IncompatibleExtensionException::class,
-		InvalidMetaDataException::class
+		InvalidMetaDataException::class,
 	)
 	private suspend fun update(extensionId: Int, settingId: Int, value: Any?) =
 		extRepo.getInstalledExtension(extensionId)?.let { entity ->

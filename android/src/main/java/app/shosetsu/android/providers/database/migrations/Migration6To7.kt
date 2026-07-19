@@ -30,10 +30,15 @@ object Migration6To7 : Migration(6, 7) {
 
 	@Throws(SQLException::class)
 	override fun migrate(db: SupportSQLiteDatabase) {
-		db.execSQL("CREATE TABLE `categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `order` INTEGER NOT NULL)")
-		db.execSQL("CREATE TABLE `novel_categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `novelID` INTEGER NOT NULL, `categoryID` INTEGER NOT NULL, FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`categoryID`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
-		db.execSQL("CREATE INDEX `index_novel_categories_categoryID` ON `novel_categories` (`categoryID`)")
+		db.execSQL(
+			"CREATE TABLE `categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `order` INTEGER NOT NULL)",
+		)
+		db.execSQL(
+			"CREATE TABLE `novel_categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `novelID` INTEGER NOT NULL, `categoryID` INTEGER NOT NULL, FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`categoryID`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+		)
+		db.execSQL(
+			"CREATE INDEX `index_novel_categories_categoryID` ON `novel_categories` (`categoryID`)",
+		)
 		db.execSQL("CREATE INDEX `index_novel_categories_novelID` ON `novel_categories` (`novelID`)")
 	}
-
 }

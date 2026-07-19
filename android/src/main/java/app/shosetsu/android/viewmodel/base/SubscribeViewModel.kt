@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 29 / 04 / 2020

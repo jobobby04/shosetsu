@@ -27,7 +27,9 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 20 / 06 / 2020
  */
-abstract class AMainViewModel : ShosetsuRootViewModel(), IsOnlineCheckViewModel {
+abstract class AMainViewModel :
+	ShosetsuRootViewModel(),
+	IsOnlineCheckViewModel {
 
 	/**
 	 * App update, if any
@@ -57,10 +59,7 @@ abstract class AMainViewModel : ShosetsuRootViewModel(), IsOnlineCheckViewModel 
 	 * @param pkg preferred application to open with
 	 * @param updateURL url to open with
 	 */
-	data class UserUpdate(
-		val updateURL: String,
-		val pkg: String?
-	)
+	data class UserUpdate(val updateURL: String, val pkg: String?)
 
 	/** If the application should show the show splash screen */
 	abstract val showIntro: StateFlow<Boolean>

@@ -47,9 +47,9 @@ class GenerateTest {
 				"https://www.phoronix.net/image.php?id=2022&image=nvapi",
 				RepositoryLink(
 					"Repo",
-					"https://www.phoronix.com/scan.php?page=news_item&px=DXVK-NVAPI-0.5.3"
-				)
-			)
+					"https://www.phoronix.com/scan.php?page=news_item&px=DXVK-NVAPI-0.5.3",
+				),
+			),
 		)
 
 	@Test

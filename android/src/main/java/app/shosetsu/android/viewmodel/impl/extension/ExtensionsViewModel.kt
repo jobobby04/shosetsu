@@ -32,6 +32,7 @@ import app.shosetsu.android.domain.usecases.CancelExtensionInstallUseCase
 import app.shosetsu.android.domain.usecases.IsOnlineUseCase
 import app.shosetsu.android.domain.usecases.RequestInstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
+import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.load.LoadBrowseExtensionsUseCase
 import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.ABrowseViewModel
@@ -50,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.runBlocking
 
 /**
  * shosetsu
@@ -63,23 +65,28 @@ class ExtensionsViewModel(
 	private val startRepositoryUpdateManager: StartRepositoryUpdateManagerUseCase,
 	private val installExtensionUI: RequestInstallExtensionUseCase,
 	private val cancelExtensionInstall: CancelExtensionInstallUseCase,
+	private val uninstallExtension: UninstallExtensionUseCase,
 	private val isOnlineUseCase: IsOnlineUseCase,
 	override val settingsRepo: ISettingsRepository,
-) : ABrowseViewModel(), ExposedSettingsRepoViewModel {
+) : ABrowseViewModel(),
+	ExposedSettingsRepoViewModel {
 
 	override val isOnline =
 		isOnlineUseCase.getFlow().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
 	override val error = MutableSharedFlow<Throwable>()
 
+	private val extensionToUninstall = MutableStateFlow<BrowseExtensionUI?>(null)
+
+	override val showUninstallConfirm: StateFlow<Boolean> =
+		extensionToUninstall.map { it != null }
+			.stateIn(viewModelScopeIO, SharingStarted.Lazily, false)
+
 	override fun refresh() {
 		startRepositoryUpdateManager()
 	}
 
-	override fun installExtension(
-		extension: BrowseExtensionUI,
-		option: ExtensionInstallOptionEntity
-	) {
+	override fun installExtension(extension: BrowseExtensionUI, option: ExtensionInstallOptionEntity) {
 		launchIO {
 			if (isOnline.value) {
 				installExtensionUI(extension, option)
@@ -105,6 +112,10 @@ class ExtensionsViewModel(
 		}
 	}
 
+	override fun uninstall(ext: BrowseExtensionUI) {
+		extensionToUninstall.value = ext
+	}
+
 	private val extensionFlow by lazy {
 		getBrowseExtensions()
 	}
@@ -117,7 +128,10 @@ class ExtensionsViewModel(
 	}
 
 	override val filteredLanguagesLive: StateFlow<FilteredLanguages> by lazy {
-		languageListFlow.combine(settingsRepo.getStringSetFlow(BrowseFilteredLanguages)) { languageResult, filteredLanguages ->
+		languageListFlow.combine(settingsRepo.getStringSetFlow(BrowseFilteredLanguages)) {
+				languageResult,
+				filteredLanguages,
+			->
 
 			val map = HashMap<String, Boolean>().apply {
 				languageResult.forEach { language ->
@@ -128,7 +142,7 @@ class ExtensionsViewModel(
 		}.onIO().stateIn(
 			viewModelScopeIO,
 			SharingStarted.Lazily,
-			FilteredLanguages(persistentListOf(), persistentMapOf())
+			FilteredLanguages(persistentListOf(), persistentMapOf()),
 		)
 	}
 
@@ -155,11 +169,9 @@ class ExtensionsViewModel(
 					} catch (e: Exception) {
 						logE("Failed to update $BrowseFilteredLanguages", e)
 					}
-
 				}
 			} catch (e: Exception) {
 				logE("Failed to retrieve $BrowseFilteredLanguages", e)
-
 			}
 		}
 	}
@@ -193,6 +205,22 @@ class ExtensionsViewModel(
 		isFilterMenuVisible.value = false
 	}
 
+	override fun dismissUninstall() {
+		extensionToUninstall.value = null
+	}
+
+	override fun confirmUninstall() {
+		val ext = extensionToUninstall.value ?: return
+
+		dismissUninstall()
+
+		logI("Performing force uninstall!")
+
+		runBlocking {
+			uninstallExtension(ext)
+		}
+	}
+
 	override val searchTermLive: MutableStateFlow<String> by lazy {
 		MutableStateFlow("")
 	}
@@ -202,14 +230,16 @@ class ExtensionsViewModel(
 			combine(
 				settingsRepo.getStringSetFlow(BrowseFilteredLanguages),
 				settingsRepo.getBooleanFlow(SettingKey.BrowseOnlyInstalled),
-				searchTermLive
+				searchTermLive,
 			) { languagesToFilter, onlyInstalled, searchTerm ->
 				list
 					.asSequence()
 					.let { sequence ->
-						if (searchTerm.isNotBlank())
+						if (searchTerm.isNotBlank()) {
 							sequence.filter { it.name.contains(searchTerm, true) }
-						else sequence
+						} else {
+							sequence
+						}
 					}
 					.filter { if (onlyInstalled) it.isInstalled else true }
 					.filterNot { languagesToFilter.contains(it.lang) }
@@ -221,5 +251,4 @@ class ExtensionsViewModel(
 			}
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
-
 }

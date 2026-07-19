@@ -26,11 +26,7 @@ import app.shosetsu.android.view.uimodels.model.RepositoryUI
  *
  * This will replace any data currently present with this repository
  */
-class ForceInsertRepositoryUseCase(
-	private val repository: IExtensionRepoRepository
-) {
+class ForceInsertRepositoryUseCase(private val repository: IExtensionRepoRepository) {
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(item: RepositoryUI) =
-		repository.insert(item.convertTo())
-
+	suspend operator fun invoke(item: RepositoryUI) = repository.insert(item.convertTo())
 }

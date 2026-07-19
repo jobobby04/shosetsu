@@ -1,6 +1,5 @@
 package app.shosetsu.android.domain.model.local
 
-
 /*
  * This file is part of shosetsu.
  *
@@ -31,9 +30,4 @@ package app.shosetsu.android.domain.model.local
  * @param isEnabled Is the repository enabled?
  *  Might be disabled due to error or user choice.
  */
-data class RepositoryEntity(
-	val id: Int,
-	val url: String,
-	var name: String,
-	var isEnabled: Boolean
-)
+data class RepositoryEntity(val id: Int, val url: String, var name: String, var isEnabled: Boolean)

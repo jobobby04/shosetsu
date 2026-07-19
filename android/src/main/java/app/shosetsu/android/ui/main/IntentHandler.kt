@@ -26,19 +26,21 @@ import kotlinx.coroutines.flow.collectLatest
 private fun handleIntentAction(
 	intent: Intent,
 	onNavigate: (ShosetsuDestination) -> Unit,
-	onUpdate: () -> Unit
+	onUpdate: () -> Unit,
 ) {
 	intent.logD("Intent received was ${intent.action}")
 	when (intent.action) {
 		ACTION_OPEN_CATALOGUE -> onNavigate(Destination.Browse)
+
 		ACTION_OPEN_UPDATES -> onNavigate(Destination.Updates)
+
 		ACTION_OPEN_LIBRARY -> onNavigate(Destination.Library)
 
 		Intent.ACTION_SEARCH, ACTION_OPEN_SEARCH -> {
 			onNavigate(
 				Destination.Search(
-					query = intent.getStringExtra(SearchManager.QUERY) ?: ""
-				)
+					query = intent.getStringExtra(SearchManager.QUERY) ?: "",
+				),
 			)
 		}
 
@@ -51,17 +53,21 @@ private fun handleIntentAction(
 				if (intent.data!!.scheme != null) {
 					onNavigate(
 						Destination.More.AddShare(
-							intent.data.toString()
-						)
+							intent.data.toString(),
+						),
 					)
-				} else intent.logE("Scheme was null")
-			} else intent.logE("View action data null")
+				} else {
+					intent.logE("Scheme was null")
+				}
+			} else {
+				intent.logE("View action data null")
+			}
 		}
 
 		ACTION_VIEW_SETTING_BACKUP_SELECT_FOLDER -> {
 			intent.logI("Navigating to backup settings...")
 			onNavigate(
-				Destination.More.Settings.Backup(true)
+				Destination.More.Settings.Backup(true),
 			)
 		}
 
@@ -71,6 +77,7 @@ private fun handleIntentAction(
 		}
 
 		Intent.ACTION_MAIN -> {}
+
 		else -> {
 			intent.logW("Cannot handle this intent.")
 		}
@@ -78,10 +85,7 @@ private fun handleIntentAction(
 }
 
 @Composable
-fun IntentHandler(
-	onNavigate: (ShosetsuDestination) -> Unit,
-	onUpdate: () -> Unit
-) {
+fun IntentHandler(onNavigate: (ShosetsuDestination) -> Unit, onUpdate: () -> Unit) {
 	val context = LocalContext.current
 
 	LaunchedEffect(Unit) {

@@ -85,7 +85,9 @@ import org.kodein.di.android.closestDI
  * Opens a URL in the apps internal webview
  * This allows cross saving cookies, allowing the app to access features such as logins
  */
-class WebViewApp : AppCompatActivity(), DIAware {
+class WebViewApp :
+	AppCompatActivity(),
+	DIAware {
 	override val di: DI by closestDI()
 
 	private fun shareWebpage(url: String) {
@@ -162,9 +164,10 @@ fun WebViewScreen(
 	userAgent: String,
 	onShare: (String) -> Unit,
 	onOpenInBrowser: (String) -> Unit,
-	onClearCookies: (String) -> Unit
+	onClearCookies: (String) -> Unit,
 ) {
-	val state = rememberWebViewState(url = url, additionalHttpHeaders = mapOf("User-Agent" to userAgent))
+	val state =
+		rememberWebViewState(url = url, additionalHttpHeaders = mapOf("User-Agent" to userAgent))
 	val navigator = rememberWebViewNavigator()
 	var currentUrl by remember { mutableStateOf(url) }
 	Scaffold(
@@ -176,7 +179,7 @@ fun WebViewScreen(
 							Text(
 								text = state.pageTitle ?: stringResource(R.string.app_name),
 								maxLines = 1,
-								overflow = TextOverflow.Ellipsis
+								overflow = TextOverflow.Ellipsis,
 							)
 							Text(
 								text = currentUrl,
@@ -215,34 +218,40 @@ fun WebViewScreen(
 						)
 						MoreIconButton { onDismissRequest ->
 							DropdownMenuItem(
-								onClick = { navigator.reload(); onDismissRequest() },
+								onClick = {
+									navigator.reload()
+									onDismissRequest()
+								},
 								text = {
 									Text(text = stringResource(R.string.action_webview_refresh))
-								}
+								},
 							)
 							DropdownMenuItem(
 								onClick = {
-									onShare(currentUrl); onDismissRequest()
+									onShare(currentUrl)
+									onDismissRequest()
 								},
 								text = {
 									Text(text = stringResource(R.string.share))
-								}
+								},
 							)
 							DropdownMenuItem(
 								onClick = {
-									onOpenInBrowser(currentUrl); onDismissRequest()
+									onOpenInBrowser(currentUrl)
+									onDismissRequest()
 								},
 								text = {
 									Text(text = stringResource(R.string.open_in_browser))
-								}
+								},
 							)
 							DropdownMenuItem(
 								onClick = {
-									onClearCookies(currentUrl); onDismissRequest()
+									onClearCookies(currentUrl)
+									onDismissRequest()
 								},
 								text = {
 									Text(text = stringResource(R.string.action_webview_clear_cookies))
-								}
+								},
 							)
 						}
 					},
@@ -270,8 +279,7 @@ fun WebViewScreen(
 					else -> {}
 				}
 			}
-
-		}
+		},
 	) { contentPadding ->
 		val webClient = remember {
 			object : AccompanistWebViewClient() {
@@ -282,11 +290,7 @@ fun WebViewScreen(
 					}
 				}
 
-				override fun doUpdateVisitedHistory(
-					view: WebView,
-					url: String?,
-					isReload: Boolean,
-				) {
+				override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
 					super.doUpdateVisitedHistory(view, url, isReload)
 					url?.let {
 						currentUrl = it
@@ -315,7 +319,7 @@ fun WebViewScreen(
 				}
 			},
 			client = webClient,
-			chromeClient = ShosetsuAccompanistWebChromeClient()
+			chromeClient = ShosetsuAccompanistWebChromeClient(),
 		)
 	}
 }

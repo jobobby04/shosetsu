@@ -27,9 +27,8 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 18 / 09 / 2020
  */
-class SettingsRepository(
-	private val iLocalSettingsDataSource: IFileSettingsDataSource
-) : ISettingsRepository {
+class SettingsRepository(private val iLocalSettingsDataSource: IFileSettingsDataSource) :
+	ISettingsRepository {
 
 	override fun getLongFlow(key: SettingKey<Long>): StateFlow<Long> =
 		iLocalSettingsDataSource.observeLong(DEFAULT_NAME, key)
@@ -79,10 +78,7 @@ class SettingsRepository(
 	override suspend fun setBoolean(key: SettingKey<Boolean>, value: Boolean): Unit =
 		onIO { iLocalSettingsDataSource.setBoolean(DEFAULT_NAME, key, value) }
 
-	override suspend fun setStringSet(
-		key: SettingKey<Set<String>>,
-		value: Set<String>
-	): Unit =
+	override suspend fun setStringSet(key: SettingKey<Set<String>>, value: Set<String>): Unit =
 		onIO { iLocalSettingsDataSource.setStringSet(DEFAULT_NAME, key, value) }
 
 	override suspend fun setFloat(key: SettingKey<Float>, value: Float): Unit =

@@ -12,4 +12,12 @@ indent_style = space
 
 # noinspection EditorConfigKeyCorrectness
 [*.{kt,kts}]
-max_line_length = 120
+ktlint_code_style = android_studio
+# https://pinterest.github.io/ktlint/latest/rules/standard/#function-naming
+ktlint_function_naming_ignore_when_annotated_with = Composable
+
+ij_kotlin_packages_to_use_import_on_demand = app.shosetsu.lib,okhttp3,org.luaj.vm2,org.luaj.vm2.lib,org.luaj.vm2.LuaValue,kotlin.io.path,kotlinx.coroutines.flow,kotlinx.coroutines
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+max_line_length = 100

@@ -36,30 +36,24 @@ import kotlinx.coroutines.flow.mapLatest
  */
 class GetExtensionSettingsUseCase(
 	private val extSettingsRepository: IExtensionSettingsRepository,
-	private val getExt: GetExtensionUseCase
+	private val getExt: GetExtensionUseCase,
 ) {
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private fun asSettingItem(
-		extensionID: Int,
-		filter: FilterEntity.Switch
-	): Flow<FilterEntity> =
+	private fun asSettingItem(extensionID: Int, filter: FilterEntity.Switch): Flow<FilterEntity> =
 		extSettingsRepository.getBooleanFlow(
 			extensionID,
 			filter.id,
-			filter.state
+			filter.state,
 		).mapLatest { state ->
 			filter.copy(state = state)
 		}
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private fun asSettingItem(
-		extensionID: Int,
-		filter: FilterEntity.Checkbox
-	): Flow<FilterEntity> =
+	private fun asSettingItem(extensionID: Int, filter: FilterEntity.Checkbox): Flow<FilterEntity> =
 		extSettingsRepository.getBooleanFlow(
 			extensionID,
 			filter.id,
-			filter.state
+			filter.state,
 		).mapLatest { state ->
 			filter.copy(state = state)
 		}
@@ -75,7 +69,7 @@ class GetExtensionSettingsUseCase(
 					extSettingsRepository.getStringFlow(
 						extensionID,
 						filter.id,
-						filter.state
+						filter.state,
 					).mapLatest { state ->
 						filter.copy(state = state)
 					}
@@ -93,7 +87,7 @@ class GetExtensionSettingsUseCase(
 					extSettingsRepository.getStringFlow(
 						extensionID,
 						filter.id,
-						filter.state.name
+						filter.state.name,
 					).mapLatest { newState ->
 						filter.copy(state = TriStateState.valueOf(newState))
 					}
@@ -103,7 +97,7 @@ class GetExtensionSettingsUseCase(
 					extSettingsRepository.getIntFlow(
 						extensionID,
 						filter.id,
-						filter.selected
+						filter.selected,
 					).mapLatest { state ->
 						filter.copy(selected = state)
 					}
@@ -113,9 +107,9 @@ class GetExtensionSettingsUseCase(
 					extSettingsRepository.getIntFlow(
 						extensionID,
 						filter.id,
-						filter.selected
+						filter.selected,
 					).mapLatest { state ->
-						//TODO RadioGroup
+						// TODO RadioGroup
 						filter.copy(selected = state)
 					}
 				}
@@ -133,6 +127,7 @@ class GetExtensionSettingsUseCase(
 				}
 
 				is FilterEntity.Header -> flowOf(filter)
+
 				is FilterEntity.Separator -> flowOf(filter)
 			}
 		}
@@ -140,18 +135,17 @@ class GetExtensionSettingsUseCase(
 	private fun List<Flow<FilterEntity>>.combine(): Flow<List<FilterEntity>> =
 		combine(this) { it.toList() }
 
-	operator fun invoke(extensionID: Int): Flow<List<FilterEntity>> =
-		flow {
-			if (extensionID == -1) {
-				emit(emptyList())
-				return@flow
-			}
-
-			getExt(extensionID)?.let { extension ->
-				val list: List<FilterEntity> =
-					extension.settingsModel.map { FilterEntity.fromFilter(it) }
-
-				emitAll(list.convert(extensionID).combine())
-			}
+	operator fun invoke(extensionID: Int): Flow<List<FilterEntity>> = flow {
+		if (extensionID == -1) {
+			emit(emptyList())
+			return@flow
 		}
+
+		getExt(extensionID)?.let { extension ->
+			val list: List<FilterEntity> =
+				extension.settingsModel.map { FilterEntity.fromFilter(it) }
+
+			emitAll(list.convert(extensionID).combine())
+		}
+	}
 }

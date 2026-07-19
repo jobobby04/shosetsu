@@ -19,7 +19,7 @@ fun <T> ListPreferenceSettingContent(
 	fromKey: (String) -> T,
 	icon: ImageVector? = null,
 	repo: ISettingsRepository,
-	key: SettingKey<String>
+	key: SettingKey<String>,
 ) {
 	val choice by repo.getStringFlow(key).collectAsState()
 
@@ -32,7 +32,7 @@ fun <T> ListPreferenceSettingContent(
 		onValueChange = {
 			launchIO { repo.setString(key, toKey(it)) }
 		},
-		iconDescription = null
+		iconDescription = null,
 	)
 }
 
@@ -56,6 +56,6 @@ fun StringListPreferenceSettingContent(
 		onValueChange = {
 			launchIO { repo.setInt(key, choices.indexOf(it)) }
 		},
-		iconDescription = iconDescription
+		iconDescription = iconDescription,
 	)
 }

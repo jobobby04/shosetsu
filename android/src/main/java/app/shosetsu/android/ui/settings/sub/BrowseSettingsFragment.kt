@@ -45,16 +45,13 @@ import app.shosetsu.android.viewmodel.abstracted.settings.ABrowseSettingsViewMod
  */
 
 @Composable
-fun BrowseSettingsView(
-	onBack: () -> Unit,
-	onNavToRepositories: () -> Unit,
-) {
+fun BrowseSettingsView(onBack: () -> Unit, onNavToRepositories: () -> Unit) {
 	val viewModel: ABrowseSettingsViewModel = viewModelDi()
 
 	BrowseSettingsContent(
 		viewModel = viewModel,
 		onNavToRepositories = onNavToRepositories,
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
@@ -63,7 +60,7 @@ fun BrowseSettingsView(
 fun BrowseSettingsContent(
 	viewModel: ABrowseSettingsViewModel,
 	onNavToRepositories: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	Scaffold(
 		topBar = {
@@ -73,13 +70,13 @@ fun BrowseSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(bottom = 64.dp, top = 16.dp),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
 			item {
 				val reposCount by viewModel.repoCount.collectAsState()
@@ -88,7 +85,7 @@ fun BrowseSettingsContent(
 					title = stringResource(R.string.settings_browse_repositories_title),
 					subtitle = stringResource(R.string.settings_browse_repositories_desc, reposCount),
 					onPreferenceClick = onNavToRepositories,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -99,7 +96,7 @@ fun BrowseSettingsContent(
 					repo = viewModel.settingsRepo,
 					key = SettingKey.RepoUpdateOnMeteredConnection,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 			item {
@@ -109,7 +106,7 @@ fun BrowseSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.RepoUpdateOnLowBattery,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 			item {
@@ -119,7 +116,7 @@ fun BrowseSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.RepoUpdateOnLowStorage,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 			item {
@@ -127,7 +124,8 @@ fun BrowseSettingsContent(
 					stringResource(R.string.settings_update_repo_disable_on_fail_title),
 					stringResource(R.string.settings_update_repo_disable_on_fail_desc),
 					viewModel.settingsRepo,
-					SettingKey.RepoUpdateDisableOnFail, modifier = Modifier.fillMaxWidth()
+					SettingKey.RepoUpdateDisableOnFail,
+					modifier = Modifier.fillMaxWidth(),
 				)
 			}
 		}

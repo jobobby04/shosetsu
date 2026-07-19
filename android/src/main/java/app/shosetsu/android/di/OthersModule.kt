@@ -46,20 +46,23 @@ internal val othersModule = DI.Module("others") {
 	bind<DownloadWorker.Manager>() with singleton { DownloadWorker.Manager(instance()) }
 	bind<AppUpdateCheckWorker.Manager>() with singleton { AppUpdateCheckWorker.Manager(instance()) }
 	bind<NovelUpdateWorker.Manager>() with singleton { NovelUpdateWorker.Manager(instance()) }
-	bind<AppUpdateInstallWorker.Manager>() with singleton { AppUpdateInstallWorker.Manager(instance()) }
+	bind<AppUpdateInstallWorker.Manager>() with
+		singleton { AppUpdateInstallWorker.Manager(instance()) }
 	bind<BackupWorker.Manager>() with singleton { BackupWorker.Manager(instance()) }
 	bind<RestoreBackupWorker.Manager>() with singleton { RestoreBackupWorker.Manager(instance()) }
 	bind<MigrateBackupWorker.Manager>() with singleton { MigrateBackupWorker.Manager(instance()) }
-	bind<RepositoryUpdateWorker.Manager>() with singleton { RepositoryUpdateWorker.Manager(instance()) }
-	bind<ExtensionInstallWorker.Manager>() with singleton { ExtensionInstallWorker.Manager(instance()) }
+	bind<RepositoryUpdateWorker.Manager>() with
+		singleton { RepositoryUpdateWorker.Manager(instance()) }
+	bind<ExtensionInstallWorker.Manager>() with
+		singleton { ExtensionInstallWorker.Manager(instance()) }
 
 	// - perodic
 	bind<AppUpdateCheckCycleWorker.Manager>() with singleton {
 		AppUpdateCheckCycleWorker.Manager(
-			instance()
+			instance(),
 		)
 	}
-	bind<NovelUpdateCycleWorker.Manager>() with singleton { NovelUpdateCycleWorker.Manager(instance()) }
+	bind<NovelUpdateCycleWorker.Manager>() with
+		singleton { NovelUpdateCycleWorker.Manager(instance()) }
 	bind<BackupCycleWorker.Manager>() with singleton { BackupCycleWorker.Manager(instance()) }
-
 }

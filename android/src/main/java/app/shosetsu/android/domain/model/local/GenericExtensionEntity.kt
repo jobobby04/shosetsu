@@ -57,5 +57,5 @@ data class GenericExtensionEntity(
 	/**
 	 * What language was used to create this extension
 	 */
-	val type: ExtensionType
+	val type: ExtensionType,
 )

@@ -33,38 +33,27 @@ sealed class FilterEntity {
 	abstract val id: Int
 	abstract val name: String
 
-	data class Header(
-		override val name: String,
-		override val id: Int = Random.nextInt() + 100000,
-	) : FilterEntity()
+	data class Header(override val name: String, override val id: Int = Random.nextInt() + 100000) :
+		FilterEntity()
 
 	data class Separator(
 		override val name: String,
 		override val id: Int = Random.nextInt() + 100000,
 	) : FilterEntity()
 
-	data class Text(
-		override val id: Int,
-		override val name: String,
-		val state: String = ""
-	) : FilterEntity()
+	data class Text(override val id: Int, override val name: String, val state: String = "") :
+		FilterEntity()
 
-	data class Switch(
-		override val id: Int,
-		override val name: String,
-		val state: Boolean = false
-	) : FilterEntity()
+	data class Switch(override val id: Int, override val name: String, val state: Boolean = false) :
+		FilterEntity()
 
-	data class Checkbox(
-		override val id: Int,
-		override val name: String,
-		val state: Boolean = false
-	) : FilterEntity()
+	data class Checkbox(override val id: Int, override val name: String, val state: Boolean = false) :
+		FilterEntity()
 
 	data class TriState(
 		override val id: Int,
 		override val name: String,
-		val state: TriStateState = TriStateState.IGNORED
+		val state: TriStateState = TriStateState.IGNORED,
 	) : FilterEntity()
 
 	data class Dropdown(
@@ -97,40 +86,46 @@ sealed class FilterEntity {
 		/**
 		 * Convert kotlin-lib [Filter] into a Shosetsu Filter
 		 */
-		fun fromFilter(filter: Filter<*>): FilterEntity =
-			when (filter) {
-				is Filter.Header -> Header(filter.name)
-				is Filter.Separator -> Separator(filter.name)
-				is Filter.Text -> Text(filter.id, filter.name, filter.state)
-				is Filter.Switch -> Switch(filter.id, filter.name, filter.state)
-				is Filter.Checkbox -> Checkbox(filter.id, filter.name, filter.state)
-				is Filter.TriState -> TriState(
-					filter.id,
-					filter.name,
-					when (filter.state) {
-						STATE_INCLUDE -> TriStateState.CHECKED
-						STATE_EXCLUDE -> TriStateState.UNCHECKED
-						else -> TriStateState.IGNORED
-					}
-				)
+		fun fromFilter(filter: Filter<*>): FilterEntity = when (filter) {
+			is Filter.Header -> Header(filter.name)
 
-				is Filter.Dropdown -> Dropdown(
-					filter.id,
-					filter.name,
-					filter.choices.toList(),
-					filter.state
-				)
+			is Filter.Separator -> Separator(filter.name)
 
-				is Filter.RadioGroup -> RadioGroup(
-					filter.id,
-					filter.name,
-					filter.choices.toList(),
-					filter.state
-				)
+			is Filter.Text -> Text(filter.id, filter.name, filter.state)
 
-				is Filter.FList -> FList(filter.name, filter.filters.map { fromFilter(it) })
-				is Filter.Group<*> -> Group(filter.name, filter.filters.map { fromFilter(it) })
-				is Filter.Password -> Text(filter.id, filter.name, filter.state)
-			}
+			is Filter.Switch -> Switch(filter.id, filter.name, filter.state)
+
+			is Filter.Checkbox -> Checkbox(filter.id, filter.name, filter.state)
+
+			is Filter.TriState -> TriState(
+				filter.id,
+				filter.name,
+				when (filter.state) {
+					STATE_INCLUDE -> TriStateState.CHECKED
+					STATE_EXCLUDE -> TriStateState.UNCHECKED
+					else -> TriStateState.IGNORED
+				},
+			)
+
+			is Filter.Dropdown -> Dropdown(
+				filter.id,
+				filter.name,
+				filter.choices.toList(),
+				filter.state,
+			)
+
+			is Filter.RadioGroup -> RadioGroup(
+				filter.id,
+				filter.name,
+				filter.choices.toList(),
+				filter.state,
+			)
+
+			is Filter.FList -> FList(filter.name, filter.filters.map { fromFilter(it) })
+
+			is Filter.Group<*> -> Group(filter.name, filter.filters.map { fromFilter(it) })
+
+			is Filter.Password -> Text(filter.id, filter.name, filter.state)
+		}
 	}
 }

@@ -1,11 +1,11 @@
 package app.shosetsu.android.datasource.remote.base
 
 import app.shosetsu.android.common.InvalidListingIndex
-import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
-import org.luaj.vm2.LuaError
 import java.io.IOException
+import org.luaj.vm2.LuaError
 
 /*
  * This file is part of shosetsu.
@@ -34,8 +34,8 @@ interface IRemoteCatalogueDataSource {
 	 */
 	@Throws(HTTPException::class, IOException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun loadListing(
-		ext: IExtension,
-		listing: IExtension.Listing.Item,
+		ext: Extension,
+		listing: Extension.Listing.Item,
 		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>
@@ -45,8 +45,8 @@ interface IRemoteCatalogueDataSource {
 	 */
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	suspend fun search(
-		ext: IExtension,
-		search: IExtension.Listing.Search,
+		ext: Extension,
+		search: Extension.Listing.Search,
 		query: String?,
 		filters: Map<Int, Any>,
 		page: Int,

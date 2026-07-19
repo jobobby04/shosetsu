@@ -75,10 +75,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChapterReaderView(
-	viewModel: AChapterReaderViewModel = viewModelDi(),
-	onExit: () -> Unit
-) {
+fun ChapterReaderView(viewModel: AChapterReaderViewModel = viewModelDi(), onExit: () -> Unit) {
 	val uiController = rememberSystemUiController()
 	uiController.systemBarsBehavior =
 		WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -110,20 +107,22 @@ fun ChapterReaderView(
 	val context = LocalContext.current
 	val uriHandler = LocalUriHandler.current
 
-	if (trackLongReading)
+	if (trackLongReading) {
 		LaunchedEffect(isReadingTooLong) {
 			while (!isReadingTooLong) {
 				val startTime = System.currentTimeMillis()
 				delay(MAX_CONTINUOUS_READING_TIME)
 				val currentTime = System.currentTimeMillis()
-				if ((currentTime - startTime) < ((MAX_CONTINUOUS_READING_TIME / .25)))
+				if ((currentTime - startTime) < ((MAX_CONTINUOUS_READING_TIME / .25))) {
 					viewModel.userIsReadingTooLong()
+				}
 			}
 		}
+	}
 
 	val theme by viewModel.appTheme.collectAsState()
 
-	//val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
+	// val isTapToScroll by viewModel.tapToScroll.collectAsState(false)
 	ShosetsuTheme(theme) {
 		val colorScheme = MaterialTheme.colorScheme
 		LaunchedEffect(colorScheme) {
@@ -151,9 +150,9 @@ fun ChapterReaderView(
 					updateSetting = viewModel::updateSetting,
 					lowerSheet = {
 						item { viewModel.textSizeOption() }
-						//item { viewModel.tapToScrollOption() }
-						//item { viewModel.volumeScrollingOption() }
-						//item { viewModel.horizontalSwitchOption() }
+						// item { viewModel.tapToScrollOption() }
+						// item { viewModel.volumeScrollingOption() }
+						// item { viewModel.horizontalSwitchOption() }
 						item { viewModel.invertChapterSwipeOption() }
 						item { viewModel.readerKeepScreenOnOption() }
 						item { viewModel.enableFullscreen() }
@@ -169,9 +168,9 @@ fun ChapterReaderView(
 										Intent(context, CSSEditorActivity::class.java).apply {
 											putExtra(CSSEditorActivity.CSS_ID, -1)
 										},
-										null
+										null,
 									)
-								}
+								},
 							)
 						}
 						item { viewModel.readerTextSelectionToggle() }
@@ -186,7 +185,10 @@ fun ChapterReaderView(
 						item { viewModel.readerReadNextChapterAlert() }
 					},
 					toggleFocus = viewModel::toggleFocus,
-					onShowNavigation = viewModel::toggleSystemVisible.takeIf { enableFullscreen && !matchFullscreenToFocus },
+					onShowNavigation = viewModel::toggleSystemVisible.takeIf {
+						enableFullscreen &&
+							!matchFullscreenToFocus
+					},
 				)
 			},
 			content = { windowPadding, footerPadding ->
@@ -240,16 +242,16 @@ fun ChapterReaderView(
 							is ReaderUIItem.ReaderDividerUI -> {
 								DividerPage(
 									item.prev.title,
-									item.next?.title
+									item.next?.title,
 								)
 							}
 						}
-					}
+					},
 				)
 			},
-			//isTapToScroll = isTapToScroll
+			// isTapToScroll = isTapToScroll
 			exception = exception,
-			showTTSClickHint = showTTSClickHint
+			showTTSClickHint = showTTSClickHint,
 		)
 		if (isReadingTooLong) {
 			AlertDialog(
@@ -259,7 +261,6 @@ fun ChapterReaderView(
 				},
 				text = {
 					Text(stringResource(R.string.reader_long_reading_desc))
-
 				},
 				confirmButton = {
 					var isEnabled by remember { mutableStateOf(false) }
@@ -287,8 +288,8 @@ fun ChapterReaderView(
 				},
 				properties = DialogProperties(
 					dismissOnBackPress = false,
-					dismissOnClickOutside = false
-				)
+					dismissOnClickOutside = false,
+				),
 			)
 		}
 	}

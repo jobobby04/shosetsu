@@ -26,14 +26,10 @@ import kotlinx.coroutines.flow.map
 /**
  * 09 / 03 / 2021
  */
-class LoadLibraryFilterSettingsUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
-	operator fun invoke(): Flow<LibraryFilterState> {
-		return iSettingsRepository.getStringFlow(
-			SettingKey.LibraryFilter
-		).map {
-			LibraryFilterState.libraryFilterStateJson.decodeFromString(it)
-		}
+class LoadLibraryFilterSettingsUseCase(private val iSettingsRepository: ISettingsRepository) {
+	operator fun invoke(): Flow<LibraryFilterState> = iSettingsRepository.getStringFlow(
+		SettingKey.LibraryFilter,
+	).map {
+		LibraryFilterState.libraryFilterStateJson.decodeFromString(it)
 	}
 }

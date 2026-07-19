@@ -59,7 +59,6 @@ object Notifications {
 	const val ID_APP_UPDATE: Int = 1991
 	const val ID_APP_UPDATE_INSTALL: Int = 1944
 
-
 	fun createChannels(context: Context) {
 		// Ignore if is a lower android version
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -69,42 +68,38 @@ object Notifications {
 				notificationChannel(
 					CHANNEL_UPDATE,
 					R.string.notification_channel_name_novel_update,
-					NotificationManager.IMPORTANCE_HIGH
+					NotificationManager.IMPORTANCE_HIGH,
 				),
 				notificationChannel(
 					CHANNEL_DOWNLOAD,
 					R.string.notification_channel_name_download,
-					NotificationManager.IMPORTANCE_LOW
+					NotificationManager.IMPORTANCE_LOW,
 				),
 				notificationChannel(
 					CHANNEL_APP_UPDATE,
 					R.string.notification_channel_name_app_update,
-					NotificationManager.IMPORTANCE_HIGH
+					NotificationManager.IMPORTANCE_HIGH,
 				),
 				notificationChannel(
 					CHANNEL_BACKUP,
 					R.string.notification_channel_name_backup,
-					NotificationManager.IMPORTANCE_LOW
+					NotificationManager.IMPORTANCE_LOW,
 				),
 				notificationChannel(
 					CHANNEL_REPOSITORY_UPDATE,
 					R.string.notification_channel_name_repository_update,
-					NotificationManager.IMPORTANCE_DEFAULT
-				)
+					NotificationManager.IMPORTANCE_DEFAULT,
+				),
 			)
 			notificationManager.createNotificationChannels(channels)
 		}
 	}
 
 	@RequiresApi(Build.VERSION_CODES.O)
-	private fun Context.notificationChannel(
-		id: String,
-		@StringRes name: Int,
-		importance: Int
-	) = NotificationChannel(
-		id,
-		getString(name),
-		importance
-	)
-
+	private fun Context.notificationChannel(id: String, @StringRes name: Int, importance: Int) =
+		NotificationChannel(
+			id,
+			getString(name),
+			importance,
+		)
 }

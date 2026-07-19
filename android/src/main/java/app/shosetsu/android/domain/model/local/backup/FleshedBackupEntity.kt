@@ -12,10 +12,8 @@ data class FleshedBackupEntity(
 	val version: String = VERSION_BACKUP,
 	val repos: List<BackupRepositoryEntity> = emptyList(),
 	val extensions: List<BackupExtensionEntity> = emptyList(),
-	val categories: List<BackupCategoryEntity> = emptyList()
+	val categories: List<BackupCategoryEntity> = emptyList(),
 )
 
 @Serializable
-data class MetaBackupEntity(
-	val version: String?,
-)
+data class MetaBackupEntity(val version: String?)

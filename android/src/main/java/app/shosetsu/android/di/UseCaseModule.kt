@@ -96,7 +96,6 @@ import org.kodein.di.provider
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 01 / 05 / 2020
@@ -110,11 +109,10 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<SearchBookMarkedNovelsUseCase>() with provider { SearchBookMarkedNovelsUseCase(instance()) }
 	bind<SetNovelPinUseCase>() with provider { SetNovelPinUseCase(instance()) }
 
-
 	bind<LoadBrowseExtensionsUseCase>() with provider {
 		LoadBrowseExtensionsUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -127,7 +125,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<RequestInstallExtensionUseCase>() with provider {
 		RequestInstallExtensionUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -172,7 +170,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<DeleteChapterPassageUseCase>() with provider {
 		DeleteChapterPassageUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -188,10 +186,9 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<UninstallExtensionUseCase>() with provider {
 		UninstallExtensionUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
-
 
 	bind<GetURLUseCase>() with provider {
 		GetURLUseCase(
@@ -322,7 +319,7 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<RemoveExtensionEntityUseCase>() with provider {
 		RemoveExtensionEntityUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -330,20 +327,20 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 		InstallExtensionUseCase(
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
 	bind<RecordChapterIsReadingUseCase>() with provider {
 		RecordChapterIsReadingUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<RecordChapterIsReadUseCase>() with provider {
 		RecordChapterIsReadUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -352,9 +349,8 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<TrueDeleteChapterUseCase>() with provider {
 		TrueDeleteChapterUseCase(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<GetTrueDeleteChapterUseCase>() with provider { GetTrueDeleteChapterUseCase(instance()) }
-
 }

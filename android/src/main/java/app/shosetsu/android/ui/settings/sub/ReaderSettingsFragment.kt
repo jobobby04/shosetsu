@@ -92,9 +92,9 @@ import app.shosetsu.android.viewmodel.impl.settings.readerVoiceOption
 import app.shosetsu.android.viewmodel.impl.settings.showReaderDivider
 import app.shosetsu.android.viewmodel.impl.settings.textSizeOption
 import app.shosetsu.android.viewmodel.impl.settings.trackLongReadingOption
+import java.util.Locale
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -114,11 +114,7 @@ import java.util.Locale
  */
 
 @Composable
-fun ReaderSettingsView(
-	hostState: SnackbarHostState,
-	onBack: () -> Unit,
-	openCSS: () -> Unit
-) {
+fun ReaderSettingsView(hostState: SnackbarHostState, onBack: () -> Unit, openCSS: () -> Unit) {
 	val viewModel: AReaderSettingsViewModel = viewModelDi()
 
 	val scope = rememberCoroutineScope()
@@ -133,7 +129,7 @@ fun ReaderSettingsView(
 			}
 		},
 		hostState = hostState,
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
@@ -154,18 +150,18 @@ fun ReaderSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
-			//TODO Text Preview at top
+			// TODO Text Preview at top
 
 			item {
 				StringListPreferenceSettingContent(
@@ -173,7 +169,7 @@ fun ReaderSettingsContent(
 					choices = stringArrayResource(R.array.text_alignments).toList(),
 					repo = viewModel.settingsRepo,
 					key = ReaderTextAlignment,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -193,32 +189,36 @@ fun ReaderSettingsContent(
 				GenericBottomSettingLayout(
 					title = stringResource(R.string.theme),
 					description = "",
-					iconDescription = null // No icon
+					iconDescription = null, // No icon
 				) {
 					val themes by viewModel.getReaderThemes().collectAsState(emptyList())
 
 					LazyRow(
 						contentPadding = PaddingValues(16.dp),
-						horizontalArrangement = Arrangement.spacedBy(8.dp)
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
 					) {
 						items(themes, key = { it.id }) { themeItem ->
 							Card(
-								border = if (themeItem.isSelected) BorderStroke(
-									SELECTED_STROKE_WIDTH.dp,
-									MaterialTheme.colorScheme.tertiary
-								) else null,
+								border = if (themeItem.isSelected) {
+									BorderStroke(
+										SELECTED_STROKE_WIDTH.dp,
+										MaterialTheme.colorScheme.tertiary,
+									)
+								} else {
+									null
+								},
 								onClick = {
 									launchIO {
 										viewModel.settingsRepo.setInt(
 											ReaderTheme,
-											themeItem.id.toInt()
+											themeItem.id.toInt(),
 										)
 									}
-								}
+								},
 							) {
 								Box(
 									modifier = Modifier.background(Color(themeItem.backgroundColor)),
-									contentAlignment = Alignment.Center
+									contentAlignment = Alignment.Center,
 								) {
 									Text(
 										"T",
@@ -227,7 +227,7 @@ fun ReaderSettingsContent(
 											.size(64.dp)
 											.padding(8.dp),
 										textAlign = TextAlign.Center,
-										fontSize = 32.sp
+										fontSize = 32.sp,
 									)
 								}
 							}
@@ -237,17 +237,17 @@ fun ReaderSettingsContent(
 							Card(
 								onClick = {
 									showStyleAddSnackBar()
-								}
+								},
 							) {
 								Box(
-									contentAlignment = Alignment.Center
+									contentAlignment = Alignment.Center,
 								) {
 									Image(
 										Icons.Outlined.AddCircle,
 										stringResource(R.string.style_add),
 										modifier = Modifier
 											.size(64.dp)
-											.padding(8.dp)
+											.padding(8.dp),
 									)
 								}
 							}
@@ -261,7 +261,7 @@ fun ReaderSettingsContent(
 					title = stringResource(R.string.styles),
 					icon = Icons.Outlined.ImagesearchRoller,
 					onPreferenceClick = showStyleAddSnackBar,
-					iconDescription = stringResource(R.string.icon_desc_image_search_roller)
+					iconDescription = stringResource(R.string.icon_desc_image_search_roller),
 				)
 			}
 
@@ -269,9 +269,9 @@ fun ReaderSettingsContent(
 				viewModel.invertChapterSwipeOption()
 			}
 
-			//item { viewModel.tapToScrollOption() }
+			// item { viewModel.tapToScrollOption() }
 
-			//item { viewModel.volumeScrollingOption() }
+			// item { viewModel.volumeScrollingOption() }
 
 			item {
 				SwitchSettingContent(
@@ -280,17 +280,17 @@ fun ReaderSettingsContent(
 					viewModel.settingsRepo,
 					ReaderMarkReadAsReading,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
-			//item { viewModel.horizontalSwitchOption() }
+			// item { viewModel.horizontalSwitchOption() }
 
 			item {
 				viewModel.EditCSS(openHTMLEditor)
 			}
 
-//			item { viewModel.continuousScrollOption() }
+// 			item { viewModel.continuousScrollOption() }
 
 			item {
 				val names = stringArrayResource(R.array.marking_names)
@@ -304,7 +304,9 @@ fun ReaderSettingsContent(
 					toKey = {
 						when (it) {
 							0 -> MarkingType.ONVIEW.name
+
 							1 -> MarkingType.ONSCROLL.name
+
 							else -> {
 								Log.e("MarkingMode", "UnknownType, defaulting")
 								MarkingType.ONVIEW.name
@@ -319,7 +321,7 @@ fun ReaderSettingsContent(
 					},
 					stringify = {
 						names[it]
-					}
+					},
 				)
 			}
 
@@ -330,7 +332,7 @@ fun ReaderSettingsContent(
 					viewModel.settingsRepo,
 					ChaptersResumeFirstUnread,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -341,7 +343,7 @@ fun ReaderSettingsContent(
 					viewModel.settingsRepo,
 					ReaderKeepScreenOn,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -352,7 +354,7 @@ fun ReaderSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.ReaderDeDupChapterTitle,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -391,7 +393,7 @@ fun ReaderSettingsContent(
 fun ReaderSettingsVoiceOption(
 	selectedVoice: String?,
 	voices: List<Voice>,
-	onVoiceSelected: (String) -> Unit
+	onVoiceSelected: (String) -> Unit,
 ) {
 	var expanded by remember { mutableStateOf(false) }
 
@@ -405,29 +407,30 @@ fun ReaderSettingsVoiceOption(
 						expanded = it
 					},
 					checked = expanded,
-					modifier = Modifier.wrapContentWidth()
+					modifier = Modifier.wrapContentWidth(),
 				) {
-					if (expanded)
+					if (expanded) {
 						Icon(Icons.Outlined.ExpandLess, "")
-					else
+					} else {
 						Icon(Icons.Outlined.ExpandMore, "")
+					}
 				}
 			},
 			onPreferenceClick = { expanded = !expanded },
-			iconDescription = null
+			iconDescription = null,
 		)
 
 		val sortedVoices by remember { derivedStateOf { voices.sortedByDescending { it.quality } } }
 
 		AnimatedVisibility(
-			expanded
+			expanded,
 		) {
 			Column {
 				sortedVoices.forEach {
 					ReaderSettingsVoiceItem(
 						voice = it,
 						isSelected = it.name == selectedVoice,
-						onVoiceSelected = onVoiceSelected
+						onVoiceSelected = onVoiceSelected,
 					)
 				}
 			}
@@ -441,22 +444,18 @@ fun PreviewReaderSettingsVoiceItem() {
 	ReaderSettingsVoiceItem(
 		Voice("test", Locale.ENGLISH, Voice.QUALITY_HIGH, Voice.LATENCY_HIGH, true, emptySet()),
 		true,
-		onVoiceSelected = {}
+		onVoiceSelected = {},
 	)
 }
 
 @Composable
-fun ReaderSettingsVoiceItem(
-	voice: Voice,
-	isSelected: Boolean,
-	onVoiceSelected: (String) -> Unit
-) {
+fun ReaderSettingsVoiceItem(voice: Voice, isSelected: Boolean, onVoiceSelected: (String) -> Unit) {
 	Row {
 		Checkbox(
 			isSelected,
 			onCheckedChange = {
 				onVoiceSelected(voice.name)
-			}
+			},
 		)
 
 		Text(voice.name)
@@ -487,8 +486,8 @@ fun ReaderSettingsVoiceItem(
 					else -> {
 						R.string.unknown
 					}
-				}
-			)
+				},
+			),
 		)
 	}
 }

@@ -100,7 +100,7 @@ import kotlinx.coroutines.launch
 		DBRepositoryEntity::class,
 		DBUpdate::class,
 	],
-	version = 11
+	version = 11,
 )
 @TypeConverters(
 	ChapterSortTypeConverter::class,
@@ -111,7 +111,7 @@ import kotlinx.coroutines.launch
 	ReadingStatusConverter::class,
 	StringArrayConverters::class,
 	VersionConverter::class,
-	ExtensionTypeConverter::class
+	ExtensionTypeConverter::class,
 )
 abstract class ShosetsuDatabase : RoomDatabase() {
 
@@ -137,11 +137,11 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 		@OptIn(DelicateCoroutinesApi::class)
 		@Synchronized
 		fun getRoomDatabase(context: Context): ShosetsuDatabase {
-			if (!Companion::databaseShosetsu.isInitialized)
+			if (!Companion::databaseShosetsu.isInitialized) {
 				databaseShosetsu = Room.databaseBuilder(
 					context.applicationContext,
 					ShosetsuDatabase::class.java,
-					"room_database"
+					"room_database",
 				).addMigrations(
 					Migration1To2,
 					Migration2To3,
@@ -154,6 +154,7 @@ abstract class ShosetsuDatabase : RoomDatabase() {
 					Migration9to10,
 					Migration10to11,
 				).build()
+			}
 
 			GlobalScope.launch {
 				try {

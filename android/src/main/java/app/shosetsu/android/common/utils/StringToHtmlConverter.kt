@@ -26,7 +26,7 @@ import com.google.common.html.HtmlEscapers
 fun asHtml(
 	passage: String,
 	title: String = "Converted from string",
-	separator: String = ""
+	separator: String = "",
 ): String =
 	"""
 	<!DOCTYPE html>

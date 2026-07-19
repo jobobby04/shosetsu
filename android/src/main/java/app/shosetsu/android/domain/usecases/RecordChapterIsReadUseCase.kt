@@ -33,7 +33,7 @@ import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapte
  */
 class RecordChapterIsReadUseCase(
 	private val iChapterHistoryRepository: ChapterHistoryRepository,
-	private val iChapterRepository: IChaptersRepository
+	private val iChapterRepository: IChaptersRepository,
 ) {
 	suspend operator fun invoke(chapter: ChapterEntity) {
 		iChapterHistoryRepository.markChapterAsRead(chapter)

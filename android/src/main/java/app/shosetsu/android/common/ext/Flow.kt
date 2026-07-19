@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 fun <T : Any?> Flow<T>.collectLA(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,
-	onCollect: FlowCollector<T>
+	onCollect: FlowCollector<T>,
 ) = flowWithLifecycle(owner.lifecycle)
 	.catch(catch)
 	.onEach(onCollect::emit)
@@ -41,7 +41,7 @@ fun <T : Any?> Flow<T>.collectLA(
 fun <T> Flow<T>.firstLa(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,
-	onCollect: (T) -> Unit
+	onCollect: (T) -> Unit,
 ) = take(1)
 	.catch(catch)
 	.onEach(onCollect)
@@ -51,7 +51,7 @@ fun <T> Flow<T>.firstLa(
 fun <T> Flow<T>.collectLatestLA(
 	owner: LifecycleOwner,
 	catch: suspend FlowCollector<T>.(Throwable) -> Unit,
-	onCollect: FlowCollector<T>
+	onCollect: FlowCollector<T>,
 ) = flowWithLifecycle(owner.lifecycle)
 	.catch(catch)
 	.mapLatest(onCollect::emit)
@@ -65,5 +65,4 @@ fun <T> Flow<T>.onIO() = flowOn(Dispatchers.IO)
 /**
  * Run the following suspend code on the IO dispatcher
  */
-suspend fun <T> onIO(block: suspend CoroutineScope.() -> T) =
-	withContext(Dispatchers.IO, block)
+suspend fun <T> onIO(block: suspend CoroutineScope.() -> T) = withContext(Dispatchers.IO, block)

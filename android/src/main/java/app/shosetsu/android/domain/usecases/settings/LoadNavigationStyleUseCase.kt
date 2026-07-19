@@ -25,9 +25,6 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 29 / 10 / 2020
  */
-class LoadNavigationStyleUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
-	operator fun invoke(): StateFlow<Boolean> =
-		iSettingsRepository.getBooleanFlow(SettingKey.NavStyle)
+class LoadNavigationStyleUseCase(private val iSettingsRepository: ISettingsRepository) {
+	operator fun invoke(): StateFlow<Boolean> = iSettingsRepository.getBooleanFlow(SettingKey.NavStyle)
 }

@@ -30,5 +30,5 @@ data class MigrationExtensionUI(
 	val id: Int,
 	val name: String,
 	val imageURL: String,
-	val isSelected: Boolean = false
+	val isSelected: Boolean = false,
 )

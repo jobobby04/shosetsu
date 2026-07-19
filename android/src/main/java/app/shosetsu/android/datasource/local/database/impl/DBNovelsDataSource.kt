@@ -34,9 +34,7 @@ import kotlinx.coroutines.flow.map
  * shosetsu
  * 12 / 05 / 2020
  */
-class DBNovelsDataSource(
-	private val novelsDao: NovelsDao,
-) : IDBNovelsDataSource {
+class DBNovelsDataSource(private val novelsDao: NovelsDao) : IDBNovelsDataSource {
 	override suspend fun loadBookmarkedNovels(): List<NovelEntity> =
 		novelsDao.loadBookmarkedNovels().convertList()
 
@@ -49,11 +47,9 @@ class DBNovelsDataSource(
 	override suspend fun getNovelFlow(novelID: Int): Flow<NovelEntity?> =
 		novelsDao.getNovelFlow(novelID).map { it?.convertTo() }
 
-	override suspend fun update(novelEntity: NovelEntity): Unit =
-		novelsDao.update(novelEntity.toDB())
+	override suspend fun update(novelEntity: NovelEntity): Unit = novelsDao.update(novelEntity.toDB())
 
-	override suspend fun update(list: List<LibraryNovelEntity>): Unit =
-		novelsDao.update(list)
+	override suspend fun update(list: List<LibraryNovelEntity>): Unit = novelsDao.update(list)
 
 	override suspend fun insertReturnStripped(novelEntity: NovelEntity): StrippedNovelEntity? =
 		novelsDao.insertReturnStripped(novelEntity.toDB())?.convertTo()
@@ -61,11 +57,9 @@ class DBNovelsDataSource(
 	override suspend fun insert(novelEntity: NovelEntity): Long =
 		(novelsDao.insertAbort(novelEntity.toDB()))
 
-	override suspend fun clearUnBookmarkedNovels(): Unit =
-		(novelsDao.clearUnBookmarkedNovels())
+	override suspend fun clearUnBookmarkedNovels(): Unit = (novelsDao.clearUnBookmarkedNovels())
 
-	override fun loadNovels(): List<NovelEntity> =
-		(novelsDao.loadNovels().convertList())
+	override fun loadNovels(): List<NovelEntity> = (novelsDao.loadNovels().convertList())
 
 	override fun loadNovelId(novelURL: String, extensionID: Int): Int? =
 		novelsDao.loadNovelID(novelURL, extensionID)
@@ -73,6 +67,5 @@ class DBNovelsDataSource(
 	override fun searchBookmarked(query: String): PagingSource<Int, StrippedBookmarkedNovelEntity> =
 		novelsDao.searchBookmarked(query)
 
-	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> =
-		novelsDao.getAnalytics()
+	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> = novelsDao.getAnalytics()
 }

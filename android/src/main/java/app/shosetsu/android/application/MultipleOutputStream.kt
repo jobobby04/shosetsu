@@ -1,7 +1,7 @@
-package app.shosetsu.android.domain.model.local
+package app.shosetsu.android.application
 
-import androidx.room.ColumnInfo
-import java.io.Serializable
+import java.io.IOException
+import java.io.OutputStream
 
 /*
  * This file is part of shosetsu.
@@ -18,17 +18,22 @@ import java.io.Serializable
  *
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
- * ====================================================================
  */
 
 /**
- * shosetsu
- * 23 / 04 / 2020
+ * Shosetsu
  *
- * @author github.com/doomsdayrs
+ * @since 19 / 10 / 2021
+ * @author Doomsdayrs
  */
-
-data class CountIDTuple(
-	@ColumnInfo(name = "id") val id: Int,
-	@ColumnInfo(name = "COUNT(*)") val count: Int,
-) : Serializable
+class MultipleOutputStream(private vararg val outputStreams: OutputStream) : OutputStream() {
+	/**
+	 * Iterates between each [OutputStream] in [outputStreams] and writes
+	 */
+	@Throws(IOException::class)
+	override fun write(p0: Int) {
+		outputStreams.forEach {
+			it.write(p0)
+		}
+	}
+}

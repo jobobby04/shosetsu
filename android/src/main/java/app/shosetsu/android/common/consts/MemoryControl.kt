@@ -25,13 +25,11 @@ const val MEMORY_MAX_CHAPTERS = 10
 /** How long can a chapter can remain in memory (minutes) */
 const val MEMORY_EXPIRE_CHAPTER_TIME = 10L
 
-
 /** How many extensions allowed in memory at once */
 const val MEMORY_MAX_EXTENSIONS = 100
 
 /** How long can an extension remain in memory (hours) */
 const val MEMORY_EXPIRE_EXTENSION_TIME = 1L
-
 
 /** How many ext-libs allowed in memory at once */
 const val MEMORY_MAX_EXT_LIBS = 100

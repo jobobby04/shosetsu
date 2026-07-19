@@ -34,31 +34,37 @@ import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.color
 import com.google.accompanist.placeholder.material.placeholder
 
+typealias TransitionSpec = @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float>
+
 @Suppress("DEPRECATION")
 @Deprecated(
 	"""
-accompanist/placeholder is deprecated and the API is no longer maintained. 
-We recommend forking the implementation and customising it to your needs. 
+accompanist/placeholder is deprecated and the API is no longer maintained.
+We recommend forking the implementation and customising it to your needs.
 For more information please visit https://google.github.io/accompanist/placeholder
-"""
+""",
 )
 fun Modifier.placeholder(
 	visible: Boolean,
 	color: Color = Color.Unspecified,
 	shape: Shape? = null,
 	highlight: PlaceholderHighlight? = null,
-	placeholderFadeTransitionSpec: @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float> = { spring() },
-	contentFadeTransitionSpec: @Composable Transition.Segment<Boolean>.() -> FiniteAnimationSpec<Float> = { spring() },
+	placeholderFadeTransitionSpec: TransitionSpec = { spring() },
+	contentFadeTransitionSpec: TransitionSpec = { spring() },
 ): Modifier = this.composed {
 	placeholder(
 		visible,
-		color = if (color.isSpecified) color else PlaceholderDefaults.color(
-			backgroundColor = MaterialTheme.colorScheme.surface,
-			contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surface)
-		),
+		color = if (color.isSpecified) {
+			color
+		} else {
+			PlaceholderDefaults.color(
+				backgroundColor = MaterialTheme.colorScheme.surface,
+				contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.surface),
+			)
+		},
 		shape = shape ?: MaterialTheme.shapes.small,
 		highlight,
 		placeholderFadeTransitionSpec,
-		contentFadeTransitionSpec
+		contentFadeTransitionSpec,
 	)
 }

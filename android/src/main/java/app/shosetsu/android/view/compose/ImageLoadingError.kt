@@ -50,26 +50,27 @@ import kotlin.random.Random
 @Composable
 fun ImageLoadingError(
 	modifier: Modifier = Modifier
-		.fillMaxSize()
+		.fillMaxSize(),
 ) {
 	Box(
 		modifier = modifier then Modifier
 			.background(Color(0x1F888888)),
-		contentAlignment = Alignment.Center
+		contentAlignment = Alignment.Center,
 	) {
 		Icon(
 			Icons.Filled.BrokenImage,
 			contentDescription = stringResource(R.string.image_description_broken),
 			tint = Color(0x1F888888),
-			modifier = Modifier.size(24.dp)
+			modifier = Modifier.size(24.dp),
 		)
 	}
 }
 
 @Composable
 fun ImageLoadingError(
-	text: String?, modifier: Modifier = Modifier
-		.fillMaxSize()
+	text: String?,
+	modifier: Modifier = Modifier
+		.fillMaxSize(),
 ) {
 	if (text.isNullOrBlank()) {
 		ImageLoadingError(modifier)
@@ -79,8 +80,8 @@ fun ImageLoadingError(
 	fun gradient(saturation: Float, value: Float) = Brush.horizontalGradient(
 		listOf(
 			Color.hsv(hue, saturation, value),
-			Color.hsv((hue + 35) % 360, saturation, value)
-		)
+			Color.hsv((hue + 35) % 360, saturation, value),
+		),
 	)
 
 	val foreground = remember(hue) { gradient(0.7f, 0.7f) }
@@ -92,7 +93,7 @@ fun ImageLoadingError(
 			.background(background)
 			.onSizeChanged { boxSize = it }
 			.padding(horizontal = 2.dp),
-		contentAlignment = Alignment.Center
+		contentAlignment = Alignment.Center,
 	) {
 		val fontSize = remember(boxSize, density) {
 			if (boxSize.width > 0) {

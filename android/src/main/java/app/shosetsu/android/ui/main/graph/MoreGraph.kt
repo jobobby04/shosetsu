@@ -22,9 +22,7 @@ import app.shosetsu.android.ui.main.Destination.More.TextReader
 import app.shosetsu.android.ui.main.Destination.Novel
 import app.shosetsu.android.ui.repository.RepositoriesView
 
-fun NavGraphBuilder.moreGraph(
-	navController: ShosetsuNavController,
-) {
+fun NavGraphBuilder.moreGraph(navController: ShosetsuNavController) {
 	assetReader(navController)
 
 	composableSub<About> {
@@ -32,17 +30,17 @@ fun NavGraphBuilder.moreGraph(
 			onOpenLicense = {
 				navController.navigate(TextReader(TextAsset.LICENSE.ordinal))
 			},
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 	composableSub<Categories> {
 		CategoriesView(
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 	composableSub<Downloads> {
 		DownloadsView(
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 
@@ -51,14 +49,15 @@ fun NavGraphBuilder.moreGraph(
 			entry.toRoute<AddShare>().url,
 			onBackPressed = navController::popBackStack,
 			openNovel = {
-				if (it != null)
+				if (it != null) {
 					navController.navigate(Novel(it.id!!))
-			}
+				}
+			},
 		)
 	}
 	composableSub<Repositories> {
 		RepositoriesView(
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 
@@ -71,7 +70,7 @@ fun NavGraphBuilder.moreGraph(
 			openChapter = { nId, cId ->
 				context.openChapter(nId, cId)
 			},
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 	composableSub<Analytics> {

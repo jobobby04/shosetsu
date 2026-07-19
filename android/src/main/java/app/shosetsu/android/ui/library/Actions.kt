@@ -68,24 +68,20 @@ import app.shosetsu.android.view.compose.SimpleIconButton
  */
 
 @Composable
-fun InverseSelectionButton(
-	onClick: () -> Unit
-) {
+fun InverseSelectionButton(onClick: () -> Unit) {
 	SimpleIconButton(
 		Icons.Outlined.FlipToBack,
 		stringResource(R.string.inverse_selection),
-		onClick = onClick
+		onClick = onClick,
 	)
 }
 
 @Composable
-fun SelectAllButton(
-	onClick: () -> Unit
-) {
+fun SelectAllButton(onClick: () -> Unit) {
 	SimpleIconButton(
 		Icons.Outlined.SelectAll,
 		stringResource(R.string.select_all),
-		onClick = onClick
+		onClick = onClick,
 	)
 }
 
@@ -94,24 +90,20 @@ fun SelectAllButton(
 // Set categories is in more
 
 @Composable
-fun DeselectAllButton(
-	onClick: () -> Unit
-) {
+fun DeselectAllButton(onClick: () -> Unit) {
 	SimpleIconButton(
 		Icons.Outlined.Close,
 		stringResource(R.string.deselect_all),
-		onClick = onClick
+		onClick = onClick,
 	)
 }
 
 @Composable
-fun SelectBetweenButton(
-	onClick: () -> Unit
-) {
+fun SelectBetweenButton(onClick: () -> Unit) {
 	SimpleIconButton(
 		Icons.Outlined.UnfoldLess,
 		stringResource(R.string.select_between),
-		onClick = onClick
+		onClick = onClick,
 	)
 }
 
@@ -119,7 +111,7 @@ fun SelectBetweenButton(
 @Composable
 fun PreviewLibrarySearchAction() {
 	Surface(
-		Modifier.fillMaxSize()
+		Modifier.fillMaxSize(),
 	) {
 		var query by remember { mutableStateOf("") }
 
@@ -128,7 +120,7 @@ fun PreviewLibrarySearchAction() {
 				query,
 				onSearch = {
 					query = it
-				}
+				},
 			)
 		}
 	}
@@ -149,8 +141,9 @@ fun SearchAction(
 	val focusManager = LocalFocusManager.current
 	val focusRequester = remember { FocusRequester() }
 	LaunchedEffect(query) {
-		if (query.isNotEmpty() && !expanded)
+		if (query.isNotEmpty() && !expanded) {
 			expanded = true
+		}
 	}
 
 	BackHandler(enabled = expanded) {
@@ -165,18 +158,24 @@ fun SearchAction(
 	}
 
 	Row(
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		SimpleIconButton(
 			if (expanded) Icons.AutoMirrored.Filled.ArrowBack else icon,
-			if (expanded) stringResource(android.R.string.cancel) else stringResource(android.R.string.search_go),
+			if (expanded) {
+				stringResource(
+					android.R.string.cancel,
+				)
+			} else {
+				stringResource(android.R.string.search_go)
+			},
 			onClick = {
 				if (expanded) {
 					searchQuery = ""
 					onSearch("")
 				}
 				expanded = !expanded
-			}
+			},
 		)
 
 		if (expanded) {
@@ -201,7 +200,7 @@ fun SearchAction(
 				},
 				singleLine = true,
 				textStyle = MaterialTheme.typography.bodyLarge.copy(
-					color = MaterialTheme.colorScheme.onSurface
+					color = MaterialTheme.colorScheme.onSurface,
 				),
 				cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
 			)
@@ -214,7 +213,7 @@ fun ViewTypeItem(
 	text: String,
 	type: NovelCardType,
 	selectedType: NovelCardType,
-	onSetType: (NovelCardType) -> Unit
+	onSetType: (NovelCardType) -> Unit,
 ) {
 	DropdownMenuItem(
 		text = {
@@ -228,61 +227,56 @@ fun ViewTypeItem(
 				selectedType == type,
 				onClick = {
 					onSetType(type)
-				}
+				},
 			)
-		}
+		},
 	)
 }
 
 @Composable
-fun ViewTypeButton(
-	selectedType: NovelCardType,
-	onSetType: (NovelCardType) -> Unit,
-) {
+fun ViewTypeButton(selectedType: NovelCardType, onSetType: (NovelCardType) -> Unit) {
 	var showDropDown by remember { mutableStateOf(false) }
 	SimpleIconButton(
 		Icons.Default.ViewModule,
 		stringResource(R.string.novel_card_type_selector_title),
 		onClick = {
 			showDropDown = !showDropDown
-		}
+		},
 	)
 	DropdownMenu(
 		showDropDown,
 		onDismissRequest = {
 			showDropDown = false
-		}
+		},
 	) {
 		ViewTypeItem(
 			stringResource(R.string.normal),
 			NovelCardType.NORMAL,
 			selectedType,
-			onSetType
+			onSetType,
 		)
 
 		ViewTypeItem(
 			stringResource(R.string.compressed),
 			NovelCardType.COMPRESSED,
 			selectedType,
-			onSetType
+			onSetType,
 		)
 
 		ViewTypeItem(
 			stringResource(R.string.cozy),
 			NovelCardType.COZY,
 			selectedType,
-			onSetType
+			onSetType,
 		)
 	}
 }
 
 @Composable
-fun RefreshButton(
-	onRefresh: () -> Unit
-) {
+fun RefreshButton(onRefresh: () -> Unit) {
 	SimpleIconButton(
 		Icons.Default.Refresh,
 		stringResource(R.string.update_now),
-		onClick = onRefresh
+		onClick = onRefresh,
 	)
 }

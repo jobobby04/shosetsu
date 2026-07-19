@@ -31,15 +31,12 @@ import kotlinx.coroutines.flow.map
  * shosetsu
  * 12 / 05 / 2020
  */
-class DBDownloadsDataSource(
-	private val downloadsDao: DownloadsDao,
-) : IDBDownloadsDataSource {
+class DBDownloadsDataSource(private val downloadsDao: DownloadsDao) : IDBDownloadsDataSource {
 	override fun loadLiveDownloads(): Flow<List<DownloadEntity>> =
 		downloadsDao.loadDownloadItems().map { it.convertList() }
 
 	@Throws(SQLiteException::class)
-	override suspend fun loadDownloadCount(): Int =
-		(downloadsDao.loadDownloadCount())
+	override suspend fun loadDownloadCount(): Int = (downloadsDao.loadDownloadCount())
 
 	@Throws(SQLiteException::class)
 	override suspend fun loadFirstDownload(): DownloadEntity? =

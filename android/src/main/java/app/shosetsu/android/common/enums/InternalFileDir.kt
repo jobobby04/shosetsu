@@ -30,5 +30,5 @@ enum class InternalFileDir {
 	/**
 	 * Just dumps into the app dir
 	 */
-	GENERIC
+	GENERIC,
 }

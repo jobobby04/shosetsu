@@ -57,7 +57,7 @@ fun SettingsView(
 	navToBackup: () -> Unit,
 	navToAdvanced: () -> Unit,
 	navToAbout: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	SettingsContent(
 		navToAppearance = navToAppearance,
@@ -68,7 +68,7 @@ fun SettingsView(
 		navToBackup = navToBackup,
 		navToAdvanced = navToAdvanced,
 		navToAbout = navToAbout,
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
@@ -83,7 +83,7 @@ fun SettingsContent(
 	navToBackup: () -> Unit,
 	navToAdvanced: () -> Unit,
 	navToAbout: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	Scaffold(
 		topBar = {
@@ -93,19 +93,19 @@ fun SettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		Column(
-			Modifier.padding(paddingValues)
+			Modifier.padding(paddingValues),
 		) {
 			TextPreferenceWidget(
 				title = stringResource(R.string.appearance),
 				subtitle = stringResource(R.string.appearance_summary),
 				icon = Icons.Outlined.Palette,
 				onPreferenceClick = navToAppearance,
-				iconDescription = stringResource(R.string.icon_desc_palette)
+				iconDescription = stringResource(R.string.icon_desc_palette),
 			)
 
 			TextPreferenceWidget(
@@ -113,7 +113,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.library_summary),
 				icon = Icons.Outlined.CollectionsBookmark,
 				onPreferenceClick = navToLibrary,
-				iconDescription = stringResource(R.string.icon_desc_collections_bookmark)
+				iconDescription = stringResource(R.string.icon_desc_collections_bookmark),
 			)
 
 			TextPreferenceWidget(
@@ -121,7 +121,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.reader_summary),
 				icon = Icons.AutoMirrored.Outlined.ChromeReaderMode,
 				onPreferenceClick = navToReader,
-				iconDescription = stringResource(R.string.icon_desc_chrome_reader_mode)
+				iconDescription = stringResource(R.string.icon_desc_chrome_reader_mode),
 			)
 
 			TextPreferenceWidget(
@@ -129,7 +129,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.downloads_summary),
 				icon = Icons.Filled.Download,
 				onPreferenceClick = navToDownloads,
-				iconDescription = stringResource(R.string.icon_desc_download)
+				iconDescription = stringResource(R.string.icon_desc_download),
 			)
 
 			TextPreferenceWidget(
@@ -137,7 +137,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.browse_summary),
 				icon = Icons.Outlined.Explore,
 				onPreferenceClick = navToBrowse,
-				iconDescription = stringResource(R.string.icon_desc_explore)
+				iconDescription = stringResource(R.string.icon_desc_explore),
 			)
 
 			TextPreferenceWidget(
@@ -145,7 +145,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.backup_summary),
 				icon = Icons.Outlined.Restore,
 				onPreferenceClick = navToBackup,
-				iconDescription = stringResource(R.string.icon_desc_restore)
+				iconDescription = stringResource(R.string.icon_desc_restore),
 			)
 
 			TextPreferenceWidget(
@@ -153,7 +153,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.advanced_summary),
 				icon = Icons.Outlined.Code,
 				onPreferenceClick = navToAdvanced,
-				iconDescription = stringResource(R.string.icon_desc_code)
+				iconDescription = stringResource(R.string.icon_desc_code),
 			)
 
 			TextPreferenceWidget(
@@ -161,7 +161,7 @@ fun SettingsContent(
 				subtitle = stringResource(R.string.about_summary, BuildConfig.VERSION_NAME),
 				icon = Icons.Outlined.Info,
 				onPreferenceClick = navToAbout,
-				iconDescription = stringResource(R.string.icon_desc_info)
+				iconDescription = stringResource(R.string.icon_desc_info),
 			)
 		}
 	}

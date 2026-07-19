@@ -28,17 +28,17 @@ import org.joda.time.DateTime
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 29 / 04 / 2020
  *
  * @author github.com/doomsdayrs
  */
-abstract class AUpdatesViewModel
-	: ShosetsuViewModel(),
+abstract class AUpdatesViewModel :
+	ShosetsuViewModel(),
 	SubscribeViewModel<ImmutableMap<DateTime, List<UpdatesUI>>>,
-	StartUpdateManagerViewModel, IsOnlineCheckViewModel {
+	StartUpdateManagerViewModel,
+	IsOnlineCheckViewModel {
 
 	abstract suspend fun updateChapter(updateUI: UpdatesUI, readingStatus: ReadingStatus)
 

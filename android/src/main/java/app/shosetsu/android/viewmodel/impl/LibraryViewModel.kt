@@ -48,6 +48,7 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
 import app.shosetsu.android.view.uimodels.model.LibraryUI
 import app.shosetsu.android.viewmodel.abstracted.ALibraryViewModel
+import java.util.Locale.getDefault as LGD
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
@@ -62,7 +63,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
-import java.util.Locale.getDefault as LGD
 
 /**
  * shosetsu
@@ -85,12 +85,11 @@ class LibraryViewModel(
 	private val setNovelPin: SetNovelPinUseCase,
 	private val loadLibraryFilterSettings: LoadLibraryFilterSettingsUseCase,
 	private val _updateLibraryFilterState: UpdateLibraryFilterStateUseCase,
-	private val settingsRepository: ISettingsRepository
+	private val settingsRepository: ISettingsRepository,
 ) : ALibraryViewModel() {
 
 	private val selectedNovels = MutableStateFlow<Map<Int, Map<Int, Boolean>>>(emptyMap())
-	private fun copySelected(): HashMap<Int, Map<Int, Boolean>> =
-		selectedNovels.value.copy()
+	private fun copySelected(): HashMap<Int, Map<Int, Boolean>> = selectedNovels.value.copy()
 
 	private fun clearSelected() {
 		selectedNovels.value = emptyMap()
@@ -236,7 +235,8 @@ class LibraryViewModel(
 			.map { !it }
 			.stateIn(
 				viewModelScopeIO,
-				SharingStarted.Lazily, true
+				SharingStarted.Lazily,
+				true,
 			)
 
 	private val libraryMemory: StateFlow<LibraryFilterState> by lazy {
@@ -301,7 +301,7 @@ class LibraryViewModel(
 				libraryUI.copy(
 					novels = libraryUI.novels.mapValues { categoryNovels ->
 						categoryNovels.value.distinctBy { it.id }.toImmutableList()
-					}.toImmutableMap()
+					}.toImmutableMap(),
 				)
 			}
 			.combineSelection()
@@ -324,7 +324,7 @@ class LibraryViewModel(
 			.stateIn(
 				viewModelScopeIO,
 				SharingStarted.Lazily,
-				SettingKey.ChapterColumnsInLandscape.default
+				SettingKey.ChapterColumnsInLandscape.default,
 			)
 	}
 
@@ -333,7 +333,7 @@ class LibraryViewModel(
 			.stateIn(
 				viewModelScopeIO,
 				SharingStarted.Lazily,
-				SettingKey.ChapterColumnsInPortait.default
+				SettingKey.ChapterColumnsInPortait.default,
 			)
 	}
 
@@ -352,24 +352,25 @@ class LibraryViewModel(
 	/**
 	 * Removes the list for filtering from the [LibraryNovelUI] with the flow
 	 */
-	private fun stripOutList(
-		strip: (LibraryNovelUI) -> List<String>
-	): Flow<ImmutableList<String>> = librarySourceFlow.mapLatest { list ->
-		ArrayList<String>().apply {
-			list.novels.flatMap { it.value }.distinctBy { it.id }.forEach { ui ->
-				strip(ui).forEach { key ->
-					val modifiedKey = key.replaceFirstChar {
-						if (it.isLowerCase()) {
-							it.titlecase(LGD())
-						} else it.toString()
-					}
-					if (!contains(modifiedKey) && key.isNotBlank()) {
-						add(modifiedKey)
+	private fun stripOutList(strip: (LibraryNovelUI) -> List<String>): Flow<ImmutableList<String>> =
+		librarySourceFlow.mapLatest { list ->
+			ArrayList<String>().apply {
+				list.novels.flatMap { it.value }.distinctBy { it.id }.forEach { ui ->
+					strip(ui).forEach { key ->
+						val modifiedKey = key.replaceFirstChar {
+							if (it.isLowerCase()) {
+								it.titlecase(LGD())
+							} else {
+								it.toString()
+							}
+						}
+						if (!contains(modifiedKey) && key.isNotBlank()) {
+							add(modifiedKey)
+						}
 					}
 				}
-			}
-		}.toImmutableList()
-	}.onIO()
+			}.toImmutableList()
+		}.onIO()
 
 	/**
 	 * @param flow What [Flow] to merge in updates from
@@ -377,7 +378,7 @@ class LibraryViewModel(
 	 */
 	private fun Flow<LibraryUI>.applyFilterList(
 		flow: Flow<Map<String, InclusionState>>,
-		against: (LibraryNovelUI) -> List<String>
+		against: (LibraryNovelUI) -> List<String>,
 	) = combine(flow) { list, filters ->
 		if (filters.isNotEmpty()) {
 			var result = list
@@ -389,13 +390,17 @@ class LibraryViewModel(
 								novel.value.filter { novelUI ->
 									against(novelUI).any { g ->
 										g.replaceFirstChar {
-											if (it.isLowerCase()) it.titlecase(
-												LGD()
-											) else it.toString()
+											if (it.isLowerCase()) {
+												it.titlecase(
+													LGD(),
+												)
+											} else {
+												it.toString()
+											}
 										} == s
 									}
 								}.toImmutableList()
-							}.toImmutableMap()
+							}.toImmutableMap(),
 						)
 
 					EXCLUDE ->
@@ -404,13 +409,17 @@ class LibraryViewModel(
 								novel.value.filterNot { novelUI ->
 									against(novelUI).any { g ->
 										g.replaceFirstChar {
-											if (it.isLowerCase()) it.titlecase(
-												LGD()
-											) else it.toString()
+											if (it.isLowerCase()) {
+												it.titlecase(
+													LGD(),
+												)
+											} else {
+												it.toString()
+											}
 										} == s
 									}
 								}.toImmutableList()
-							}.toImmutableMap()
+							}.toImmutableMap(),
 						)
 				}
 			}
@@ -420,11 +429,9 @@ class LibraryViewModel(
 		}
 	}
 
-	private fun Flow<LibraryUI>.combineGenreFilter() =
-		applyFilterList(genreFilterFlow) { it.genres }
+	private fun Flow<LibraryUI>.combineGenreFilter() = applyFilterList(genreFilterFlow) { it.genres }
 
-	private fun Flow<LibraryUI>.combineTagsFilter() =
-		applyFilterList(tagFilterFlow) { it.tags }
+	private fun Flow<LibraryUI>.combineTagsFilter() = applyFilterList(tagFilterFlow) { it.tags }
 
 	private fun Flow<LibraryUI>.combineAuthorFilter() =
 		applyFilterList(authorFilterFlow) { it.authors }
@@ -432,82 +439,80 @@ class LibraryViewModel(
 	private fun Flow<LibraryUI>.combineArtistFilter() =
 		applyFilterList(artistFilterFlow) { it.artists }
 
-
 	private fun Flow<LibraryUI>.combineSortReverse() =
 		combine(areNovelsReversedFlow) { novelResult, reversed ->
 			novelResult.let { library ->
-				if (reversed)
+				if (reversed) {
 					library.copy(
 						novels = library.novels.mapValues { it.value.reversed().toImmutableList() }
-							.toImmutableMap()
+							.toImmutableMap(),
 					)
-				else library
+				} else {
+					library
+				}
 			}
 		}
 
-	private fun Flow<LibraryUI>.combinePinTop() =
-		combine(arePinsOnTop) { novelResult, reversed ->
-			novelResult.let { library ->
-				if (reversed)
-					library.copy(
-						novels = library.novels.mapValues { novel ->
-							novel.value.sortedBy { !it.pinned }.toImmutableList()
-						}.toImmutableMap()
-					)
-				else library
+	private fun Flow<LibraryUI>.combinePinTop() = combine(arePinsOnTop) { novelResult, reversed ->
+		novelResult.let { library ->
+			if (reversed) {
+				library.copy(
+					novels = library.novels.mapValues { novel ->
+						novel.value.sortedBy { !it.pinned }.toImmutableList()
+					}.toImmutableMap(),
+				)
+			} else {
+				library
 			}
 		}
+	}
 
-	private fun Flow<LibraryUI>.combineFilter() =
-		combine(queryFlow) { library, query ->
-			library.copy(
-				novels = library.novels.mapValues { novel ->
-					novel.value.filter { it.title.contains(query, ignoreCase = true) }
-						.toImmutableList()
-				}.toImmutableMap()
-			)
-		}
+	private fun Flow<LibraryUI>.combineFilter() = combine(queryFlow) { library, query ->
+		library.copy(
+			novels = library.novels.mapValues { novel ->
+				novel.value.filter { it.title.contains(query, ignoreCase = true) }
+					.toImmutableList()
+			}.toImmutableMap(),
+		)
+	}
 
-	private fun Flow<LibraryUI>.combineSelection() =
-		combine(selectedNovels) { library, query ->
-			library.copy(
-				novels = library.novels.mapValues { (category, novels) ->
-					novels.map {
-						it.copy(
-							isSelected = query[category]?.get(it.id) ?: false
-						)
-					}.toImmutableList()
-				}.toImmutableMap()
-			)
-		}
+	private fun Flow<LibraryUI>.combineSelection() = combine(selectedNovels) { library, query ->
+		library.copy(
+			novels = library.novels.mapValues { (category, novels) ->
+				novels.map {
+					it.copy(
+						isSelected = query[category]?.get(it.id) ?: false,
+					)
+				}.toImmutableList()
+			}.toImmutableMap(),
+		)
+	}
 
+	private fun Flow<LibraryUI>.combineSortType() = combine(novelSortTypeFlow) { library, sortType ->
+		library.copy(
+			novels = when (sortType) {
+				NovelSortType.BY_TITLE -> library.novels.mapValues { (_, value) ->
+					value.sortedBy { it.title }.toImmutableList()
+				}
 
-	private fun Flow<LibraryUI>.combineSortType() =
-		combine(novelSortTypeFlow) { library, sortType ->
-			library.copy(
-				novels = when (sortType) {
-					NovelSortType.BY_TITLE -> library.novels.mapValues { (_, value) ->
-						value.sortedBy { it.title }.toImmutableList()
-					}
+				NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues { (_, value) ->
+					value.sortedBy { it.unread }.toImmutableList()
+				}
 
-					NovelSortType.BY_UNREAD_COUNT -> library.novels.mapValues { (_, value) ->
-						value.sortedBy { it.unread }.toImmutableList()
-					}
+				NovelSortType.BY_ID -> library.novels.mapValues { (_, value) ->
+					value.sortedBy { it.id }.toImmutableList()
+				}
 
-					NovelSortType.BY_ID -> library.novels.mapValues { (_, value) ->
-						value.sortedBy { it.id }.toImmutableList()
-					}
+				NovelSortType.BY_UPDATED -> library.novels.mapValues { (_, value) ->
+					value.sortedBy { it.lastUpdate }.toImmutableList()
+				}
 
-					NovelSortType.BY_UPDATED -> library.novels.mapValues { (_, value) ->
-						value.sortedBy { it.lastUpdate }.toImmutableList()
-					}
-
-					NovelSortType.BY_READ_TIME -> library.novels.mapValues { (_, value) ->
-						value.sortedBy { it.readTime }.toImmutableList()
-					}
-				}.toImmutableMap()
-			)
-		}
+				NovelSortType.BY_READ_TIME -> library.novels.mapValues { (_, value) ->
+					value.sortedBy { it.readTime }.toImmutableList()
+				}
+			}.toImmutableMap(),
+		)
+	}
 
 	private fun Flow<LibraryUI>.combineUnreadStatus() =
 		combine(unreadStatusFlow) { novelResult, sortType ->
@@ -517,13 +522,13 @@ class LibraryViewModel(
 						INCLUDE -> list.copy(
 							novels = list.novels.mapValues { novel ->
 								novel.value.filter { it.unread > 0 }.toImmutableList()
-							}.toImmutableMap()
+							}.toImmutableMap(),
 						)
 
 						EXCLUDE -> list.copy(
 							novels = list.novels.mapValues { novel ->
 								novel.value.filterNot { it.unread > 0 }.toImmutableList()
-							}.toImmutableMap()
+							}.toImmutableMap(),
 						)
 					}
 				} ?: list
@@ -538,19 +543,18 @@ class LibraryViewModel(
 						INCLUDE -> list.copy(
 							novels = list.novels.mapValues { novel ->
 								novel.value.filter { it.downloaded > 0 }.toImmutableList()
-							}.toImmutableMap()
+							}.toImmutableMap(),
 						)
 
 						EXCLUDE -> list.copy(
 							novels = list.novels.mapValues { novel ->
 								novel.value.filterNot { it.downloaded > 0 }.toImmutableList()
-							}.toImmutableMap()
+							}.toImmutableMap(),
 						)
 					}
 				} ?: list
 			}
 		}
-
 
 	override fun isOnline(): Boolean = isOnlineUseCase()
 
@@ -571,9 +575,11 @@ class LibraryViewModel(
 				.filter { it.isSelected }
 
 			clearSelected()
-			updateBookmarkedNovelUseCase(selected.map {
-				it.copy(bookmarked = false)
-			})
+			updateBookmarkedNovelUseCase(
+				selected.map {
+					it.copy(bookmarked = false)
+				},
+			)
 		}
 	}
 
@@ -595,7 +601,7 @@ class LibraryViewModel(
 	private fun updateLibraryFilterState(mem: LibraryFilterState) {
 		launchIO {
 			_updateLibraryFilterState(
-				mem
+				mem,
 			)
 		}
 	}
@@ -606,8 +612,8 @@ class LibraryViewModel(
 		updateLibraryFilterState(
 			libraryMemory.value.copy(
 				sortType = novelSortType,
-				reversedSort = false
-			)
+				reversedSort = false,
+			),
 		)
 	}
 
@@ -616,8 +622,8 @@ class LibraryViewModel(
 	override fun setIsSortReversed(reversed: Boolean) {
 		updateLibraryFilterState(
 			libraryMemory.value.copy(
-				reversedSort = reversed
-			)
+				reversedSort = reversed,
+			),
 		)
 	}
 
@@ -626,8 +632,8 @@ class LibraryViewModel(
 	override fun setPinnedOnTop(onTop: Boolean) {
 		updateLibraryFilterState(
 			libraryMemory.value.copy(
-				arePinsOnTop = onTop
-			)
+				arePinsOnTop = onTop,
+			),
 		)
 	}
 
@@ -639,8 +645,8 @@ class LibraryViewModel(
 			} ?: map.remove(genre)
 			_updateLibraryFilterState(
 				libraryMemory.value.copy(
-					genreFilter = map
-				)
+					genreFilter = map,
+				),
 			)
 		}
 	}
@@ -657,8 +663,8 @@ class LibraryViewModel(
 			} ?: map.remove(author)
 			_updateLibraryFilterState(
 				libraryMemory.value.copy(
-					authorFilter = map
-				)
+					authorFilter = map,
+				),
 			)
 		}
 	}
@@ -675,8 +681,8 @@ class LibraryViewModel(
 			} ?: map.remove(artist)
 			_updateLibraryFilterState(
 				libraryMemory.value.copy(
-					artistFilter = map
-				)
+					artistFilter = map,
+				),
 			)
 		}
 	}
@@ -693,8 +699,8 @@ class LibraryViewModel(
 			} ?: map.remove(tag)
 			_updateLibraryFilterState(
 				libraryMemory.value.copy(
-					tagFilter = map
-				)
+					tagFilter = map,
+				),
 			)
 		}
 	}
@@ -721,8 +727,8 @@ class LibraryViewModel(
 	override fun cycleUnreadFilter(currentState: ToggleableState) {
 		updateLibraryFilterState(
 			libraryMemory.value.copy(
-				unreadInclusion = currentState.toInclusionState().cycle()
-			)
+				unreadInclusion = currentState.toInclusionState().cycle(),
+			),
 		)
 	}
 
@@ -732,8 +738,8 @@ class LibraryViewModel(
 	override fun cycleDownloadedFilter(currentState: ToggleableState) {
 		updateLibraryFilterState(
 			libraryMemory.value.copy(
-				downloadedOnly = currentState.toInclusionState().cycle()
-			)
+				downloadedOnly = currentState.toInclusionState().cycle(),
+			),
 		)
 	}
 

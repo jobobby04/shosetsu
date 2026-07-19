@@ -40,13 +40,13 @@ import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
+import java.net.UnknownHostException
 import kotlinx.coroutines.flow.first
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.IOException
-import java.net.UnknownHostException
 
 /*
  * This file is part of shosetsu.
@@ -71,10 +71,10 @@ import java.net.UnknownHostException
  *
  * Checks for an app update with a notification representing progress
  */
-class AppUpdateCheckWorker(
-	appContext: Context,
-	params: WorkerParameters
-) : CoroutineWorker(appContext, params), DIAware, NotificationCapable {
+class AppUpdateCheckWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params),
+	DIAware,
+	NotificationCapable {
 	override val di: DI by closestDI(applicationContext)
 
 	private val openAppForUpdateIntent: Intent
@@ -95,7 +95,6 @@ class AppUpdateCheckWorker(
 
 	override val notifyContext: Context
 		get() = applicationContext
-
 
 	override suspend fun doWork(): Result {
 		notify("Starting")
@@ -141,8 +140,8 @@ class AppUpdateCheckWorker(
 			notify(
 				applicationContext.getString(
 					R.string.notification_app_update_available_version,
-					entity.version
-				)
+					entity.version,
+				),
 			) {
 				setOngoing(false)
 				addAction(
@@ -153,9 +152,9 @@ class AppUpdateCheckWorker(
 							applicationContext,
 							0,
 							openAppForUpdateIntent,
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
-						)
-					).build()
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0,
+						),
+					).build(),
 				)
 			}
 		}
@@ -174,14 +173,12 @@ class AppUpdateCheckWorker(
 		private suspend fun appUpdateOnlyIdle(): Boolean =
 			iSettingsRepository.getBoolean(SettingKey.AppUpdateOnlyWhenIdle)
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWorkFlow(APP_UPDATE_WORK_ID).first()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Returns the status of the service.
@@ -209,22 +206,22 @@ class AppUpdateCheckWorker(
 				workerManager.enqueueUniqueWork(
 					APP_UPDATE_WORK_ID,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<AppUpdateCheckWorker>(
-					).setConstraints(
+					OneTimeWorkRequestBuilder<AppUpdateCheckWorker>().setConstraints(
 						Constraints.Builder().apply {
 							setRequiredNetworkType(
-								if (appUpdateOnMetered()) CONNECTED else UNMETERED
+								if (appUpdateOnMetered()) CONNECTED else UNMETERED,
 							)
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 								setRequiresDeviceIdle(appUpdateOnlyIdle())
-						}.build()
-					).build()
+							}
+						}.build(),
+					).build(),
 				)
 				logI(
 					"Worker State ${
 						workerManager.getWorkInfosForUniqueWorkFlow(APP_UPDATE_WORK_ID)
 							.first()[0].state
-					}"
+					}",
 				)
 			}
 		}
@@ -234,5 +231,4 @@ class AppUpdateCheckWorker(
 		 */
 		override fun stop(): Operation = workerManager.cancelUniqueWork(APP_UPDATE_WORK_ID)
 	}
-
 }

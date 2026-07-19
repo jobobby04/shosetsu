@@ -28,14 +28,14 @@ import app.shosetsu.android.common.ext.launchUI
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.webview.WebViewUtil
 import app.shosetsu.android.common.utils.webview.setDefaultSettings
+import java.util.Locale
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import java.util.Locale
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 abstract class WebViewInterceptor(
 	private val context: Context,
@@ -51,7 +51,9 @@ abstract class WebViewInterceptor(
 		// Crashes on some devices. We skip this in some cases since the only impact is slower
 		// WebView init in those rare cases.
 		// See https://bugs.chromium.org/p/chromium/issues/detail?id=1279562
-		if (DeviceUtil.isMiui || (Build.VERSION.SDK_INT == Build.VERSION_CODES.S && DeviceUtil.isSamsung)) {
+		if (DeviceUtil.isMiui ||
+			(Build.VERSION.SDK_INT == Build.VERSION_CODES.S && DeviceUtil.isSamsung)
+		) {
 			return@lazy
 		}
 
@@ -78,7 +80,7 @@ abstract class WebViewInterceptor(
 			launchUI {
 				context.toast(
 					context.getString(R.string.webview_required),
-					Toast.LENGTH_LONG
+					Toast.LENGTH_LONG,
 				)
 			}
 			return response
@@ -88,26 +90,22 @@ abstract class WebViewInterceptor(
 		return intercept(chain, request, response)
 	}
 
-	fun parseHeaders(headers: Headers): Map<String, String> {
-		return headers
-			// Keeping unsafe header makes webview throw [net::ERR_INVALID_ARGUMENT]
-			.filter { (name, value) ->
-				isRequestHeaderSafe(name, value)
-			}
-			.groupBy(keySelector = { (name, _) -> name }) { (_, value) -> value }
-			.mapValues { it.value.getOrNull(0).orEmpty() }
-	}
+	fun parseHeaders(headers: Headers): Map<String, String> = headers
+		// Keeping unsafe header makes webview throw [net::ERR_INVALID_ARGUMENT]
+		.filter { (name, value) ->
+			isRequestHeaderSafe(name, value)
+		}
+		.groupBy(keySelector = { (name, _) -> name }) { (_, value) -> value }
+		.mapValues { it.value.getOrNull(0).orEmpty() }
 
 	fun CountDownLatch.awaitFor30Seconds() {
 		await(30, TimeUnit.SECONDS)
 	}
 
-	fun createWebView(request: Request): WebView {
-		return WebView(context).apply {
-			setDefaultSettings()
-			// Avoid sending empty User-Agent, Chromium WebView will reset to default if empty
-			settings.userAgentString = request.header("User-Agent") ?: defaultUserAgentProvider()
-		}
+	fun createWebView(request: Request): WebView = WebView(context).apply {
+		setDefaultSettings()
+		// Avoid sending empty User-Agent, Chromium WebView will reset to default if empty
+		settings.userAgentString = request.header("User-Agent") ?: defaultUserAgentProvider()
 	}
 }
 

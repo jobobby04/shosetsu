@@ -42,9 +42,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 	@Throws(SQLiteException::class)
 	@Transaction
-	suspend fun insertRepositoryAndReturn(
-		entity: DBRepositoryEntity
-	): DBRepositoryEntity? = loadRepositoryFromROWID(insertReplace(entity))
+	suspend fun insertRepositoryAndReturn(entity: DBRepositoryEntity): DBRepositoryEntity? =
+		loadRepositoryFromROWID(insertReplace(entity))
 
 	/**
 	 * Run only if you know for sure the data exists
@@ -102,7 +101,6 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 
 			if (repo.url.toHttpUrlOrNull() == oldUniv) {
 				update(repo.copy(url = repoUniv.toString()))
-
 			}
 		}
 
@@ -111,29 +109,31 @@ interface RepositoryDao : BaseDao<DBRepositoryEntity> {
 				null,
 				url = repoMain.toString(),
 				name = "Main",
-				isEnabled = true
-			)
+				isEnabled = true,
+			),
 		)
 
 		// Create the Universe repository
-		if (flavor() != ProductFlavors.PLAY_STORE)
+		if (flavor() != ProductFlavors.PLAY_STORE) {
 			createIfNotExist(
 				DBRepositoryEntity(
 					null,
 					url = repoUniv.toString(),
-					//url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
+					// url = "https://raw.githubusercontent.com/shosetsuorg/extensions/dev/src/main/resources/",
 					name = "Universe",
-					isEnabled = true
-				)
+					isEnabled = true,
+				),
 			)
+		}
 	}
 
 	@Transaction
 	@Throws(SQLiteException::class)
 	suspend fun createIfNotExist(DBRepositoryEntity: DBRepositoryEntity): Int {
 		repositoryCountAndROWIDFromURL(DBRepositoryEntity.url)?.let { tuple ->
-			if (tuple.count == 0)
+			if (tuple.count == 0) {
 				return insertRepositoryAndReturn(DBRepositoryEntity)?.id ?: -1
+			}
 			return tuple.id
 		}
 		return -1

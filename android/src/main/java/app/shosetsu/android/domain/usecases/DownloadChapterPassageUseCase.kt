@@ -39,7 +39,7 @@ import app.shosetsu.android.view.uimodels.model.ChapterUI
 class DownloadChapterPassageUseCase(
 	private val novelRepo: INovelsRepository,
 	private val downloadsRepository: IDownloadsRepository,
-	private var iSettingsRepository: ISettingsRepository
+	private var iSettingsRepository: ISettingsRepository,
 ) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(originalChapters: List<ChapterEntity>) {
@@ -60,20 +60,20 @@ class DownloadChapterPassageUseCase(
 					url,
 					title,
 					novel.title,
-					extensionID
+					extensionID,
 				)
-			}
+			},
 		)
 
-		if (!novel.bookmarked)
+		if (!novel.bookmarked) {
 			if (iSettingsRepository.getBoolean(SettingKey.BookmarkOnDownload)) {
 				novelRepo.update(
 					novel.copy(
-						bookmarked = true
-					)
+						bookmarked = true,
+					),
 				)
 			}
-
+		}
 	}
 
 	@Throws(SQLiteException::class)

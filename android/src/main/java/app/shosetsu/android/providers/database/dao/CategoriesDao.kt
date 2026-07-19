@@ -35,7 +35,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoriesDao : BaseDao<DBCategoryEntity> {
 
-	//# Queries
+	// # Queries
 
 	/**
 	 * Gets a flow of the categories

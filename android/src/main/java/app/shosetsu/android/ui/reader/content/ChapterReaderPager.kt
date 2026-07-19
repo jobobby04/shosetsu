@@ -55,19 +55,14 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 fun ChapterReaderPager(
 	items: ImmutableList<ReaderUIItem>,
 	isHorizontal: Boolean,
-
 	isSwipeInverted: Boolean,
-
 	pageJumper: StableHolder<SharedFlow<Int>>,
 	currentPage: Int?,
 	onPageChanged: (Int) -> Unit,
-
 	markChapterAsCurrent: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
 	onChapterRead: (item: ReaderUIItem.ReaderChapterUI) -> Unit,
-
 	onStopTTS: () -> Unit,
-
-	createPage: @Composable (page: Int) -> Unit
+	createPage: @Composable (page: Int) -> Unit,
 ) {
 	// Do not create the pager if the currentPage has not been set yet
 	if (currentPage == null) {
@@ -86,7 +81,7 @@ fun ChapterReaderPager(
 	}
 
 	var curChapter: ReaderUIItem.ReaderChapterUI? by remember { mutableStateOf(null) }
-	if (items.isNotEmpty())
+	if (items.isNotEmpty()) {
 		LaunchedEffect(pagerState) {
 			snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { newPage ->
 				onStopTTS()
@@ -100,13 +95,15 @@ fun ChapterReaderPager(
 
 					is ReaderUIItem.ReaderDividerUI -> {
 						// Do not mark read backwards
-						if (item.next?.id != curChapter?.id)
+						if (item.next?.id != curChapter?.id) {
 							item.prev.let(onChapterRead)
+						}
 					}
 				}
 				onPageChanged(newPage)
 			}
 		}
+	}
 
 	if (isHorizontal) {
 		HorizontalPager(
@@ -115,7 +112,7 @@ fun ChapterReaderPager(
 			reverseLayout = isSwipeInverted,
 			pageContent = {
 				createPage(it)
-			}
+			},
 		)
 	} else {
 		VerticalPager(
@@ -123,7 +120,7 @@ fun ChapterReaderPager(
 			modifier = Modifier.fillMaxSize(),
 			pageContent = {
 				createPage(it)
-			}
+			},
 		)
 	}
 }

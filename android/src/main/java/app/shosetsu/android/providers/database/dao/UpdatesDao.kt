@@ -75,7 +75,7 @@ interface UpdatesDao : BaseDao<DBUpdate> {
 								bookmarked
 							FROM novels WHERE id = updates.novelID
 						) = 1
-				"""
+				""",
 	)
 	fun loadCompleteUpdates(): Flow<List<UpdateCompleteEntity>>
 

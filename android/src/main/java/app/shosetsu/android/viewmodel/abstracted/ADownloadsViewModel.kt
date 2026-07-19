@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 29 / 04 / 2020
@@ -33,8 +32,8 @@ import kotlinx.coroutines.flow.StateFlow
  * @author github.com/doomsdayrs
  */
 abstract class ADownloadsViewModel :
-	SubscribeViewModel<ImmutableList<DownloadUI>>,
-	ShosetsuViewModel() {
+	ShosetsuViewModel(),
+	SubscribeViewModel<ImmutableList<DownloadUI>> {
 
 	abstract val error: Flow<Throwable>
 	abstract val selectedDownloadState: StateFlow<SelectedDownloadsState>

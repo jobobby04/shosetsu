@@ -6,7 +6,7 @@ import app.shosetsu.android.dto.Convertible
 import app.shosetsu.lib.ExtensionType
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.Version
-import java.util.*
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.

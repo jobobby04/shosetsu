@@ -47,7 +47,6 @@ interface BaseDao<T> {
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	suspend fun insertIgnore(data: T): Long
 
-
 	@Throws(SQLiteException::class)
 	@Insert(onConflict = OnConflictStrategy.ABORT)
 	suspend fun insertAllAbort(list: List<T>): Array<Long>

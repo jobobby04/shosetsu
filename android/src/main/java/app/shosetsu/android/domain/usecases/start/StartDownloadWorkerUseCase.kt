@@ -27,7 +27,7 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
  */
 class StartDownloadWorkerUseCase(
 	private val manager: Manager,
-	private val iSettingsRepository: ISettingsRepository
+	private val iSettingsRepository: ISettingsRepository,
 ) {
 	/**
 	 * Starts the download worker
@@ -36,7 +36,8 @@ class StartDownloadWorkerUseCase(
 	suspend operator fun invoke(override: Boolean = false) {
 		if (iSettingsRepository.getBoolean(SettingKey.IsDownloadPaused)) return
 
-		if (!manager.isRunning() || override)
+		if (!manager.isRunning() || override) {
 			manager.start()
+		}
 	}
 }

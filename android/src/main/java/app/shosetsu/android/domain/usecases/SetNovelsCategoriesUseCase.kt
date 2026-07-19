@@ -24,16 +24,14 @@ import app.shosetsu.android.domain.repository.base.INovelCategoryRepository
 /**
  * 13 / 01 / 2021
  */
-class SetNovelsCategoriesUseCase(
-	private val repo: INovelCategoryRepository
-) {
+class SetNovelsCategoriesUseCase(private val repo: INovelCategoryRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(novelIDs: List<Int>, categories: IntArray) {
 		val entities = categories.filterNot { it == 0 }.distinct().flatMap { categoryID ->
 			novelIDs.distinct().map { novelID ->
 				NovelCategoryEntity(
 					novelID = novelID,
-					categoryID = categoryID
+					categoryID = categoryID,
 				)
 			}
 		}

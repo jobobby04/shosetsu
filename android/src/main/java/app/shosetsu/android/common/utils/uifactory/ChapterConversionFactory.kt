@@ -40,13 +40,11 @@ class ChapterConversionFactory(data: ChapterEntity) :
 		readingPosition = readingPosition,
 		readingStatus = readingStatus,
 		bookmarked = bookmarked,
-		isSaved = isSaved
+		isSaved = isSaved,
 	)
 }
 
-fun List<ChapterEntity>.mapToFactory() =
-	map { ChapterConversionFactory(it) }
+fun List<ChapterEntity>.mapToFactory() = map { ChapterConversionFactory(it) }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-fun Flow<List<ChapterEntity>>.mapLatestToResultFlowWithFactory() =
-	mapLatest { it.mapToFactory() }
+fun Flow<List<ChapterEntity>>.mapLatestToResultFlowWithFactory() = mapLatest { it.mapToFactory() }

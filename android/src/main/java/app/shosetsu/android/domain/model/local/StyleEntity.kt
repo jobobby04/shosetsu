@@ -23,7 +23,4 @@ package app.shosetsu.android.domain.model.local
  * @since 22 / 10 / 2021
  * @author Doomsdayrs
  */
-data class StyleEntity(
-	val id: Int,
-	val title: String
-)
+data class StyleEntity(val id: Int, val title: String)

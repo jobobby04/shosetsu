@@ -34,8 +34,5 @@ interface IRemoteExtLibDataSource {
 	 * @param extLibEntity The library to download
 	 */
 	@Throws(HTTPException::class, IOException::class, EmptyResponseBodyException::class)
-	suspend fun downloadLibrary(
-		repoURL: String,
-		extLibEntity: ExtLibEntity,
-	): String
+	suspend fun downloadLibrary(repoURL: String, extLibEntity: ExtLibEntity): String
 }

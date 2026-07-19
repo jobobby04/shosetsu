@@ -24,9 +24,7 @@ import app.shosetsu.android.common.ext.launchIO
  * shosetsu
  * 20 / 12 / 2020
  */
-class StartAppUpdateInstallWorkerUseCase(
-	private val manager: AppUpdateInstallWorker.Manager
-) {
+class StartAppUpdateInstallWorkerUseCase(private val manager: AppUpdateInstallWorker.Manager) {
 	operator fun invoke() {
 		launchIO {
 			if (!manager.isRunning()) {

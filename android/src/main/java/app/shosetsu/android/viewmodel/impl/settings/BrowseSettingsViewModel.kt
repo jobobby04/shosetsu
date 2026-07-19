@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 
 class BrowseSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
-	loadRepositoriesUseCase: LoadRepositoriesUseCase
+	loadRepositoriesUseCase: LoadRepositoriesUseCase,
 ) : ABrowseSettingsViewModel(iSettingsRepository) {
 	override val repoCount: StateFlow<Int> by lazy {
 		loadRepositoriesUseCase()

@@ -4,8 +4,8 @@ import android.database.sqlite.SQLiteException
 import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.lib.exceptions.HTTPException
 import app.shosetsu.lib.json.RepoIndex
-import kotlinx.coroutines.flow.Flow
 import java.io.IOException
+import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -23,9 +23,6 @@ import java.io.IOException
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
-
 
 /**
  * shosetsu
@@ -48,7 +45,6 @@ interface IExtensionRepoRepository {
 	 */
 	@Throws(SQLiteException::class)
 	suspend fun loadRepositories(): List<RepositoryEntity>
-
 
 	/**
 	 * Identical to [loadRepositories] except filters out all [RepositoryEntity]

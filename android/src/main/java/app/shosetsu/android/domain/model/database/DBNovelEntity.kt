@@ -44,12 +44,12 @@ import app.shosetsu.lib.Novel.Info
 @Entity(
 	tableName = "novels",
 	indices = [
-		Index(value = ["url", "formatterID"], unique = true)
-	]
+		Index(value = ["url", "formatterID"], unique = true),
+	],
 )
 data class DBNovelEntity(
-	@PrimaryKey(autoGenerate = true)
 	/** ID of this novel */
+	@PrimaryKey(autoGenerate = true)
 	var id: Int? = null,
 
 	var url: String,
@@ -96,6 +96,6 @@ data class DBNovelEntity(
 		authors,
 		artists,
 		tags,
-		status
+		status,
 	)
 }

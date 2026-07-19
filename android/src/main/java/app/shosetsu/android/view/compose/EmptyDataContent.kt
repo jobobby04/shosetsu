@@ -56,7 +56,7 @@ fun PreviewErrorContent() {
 			ErrorAction(R.string.todo) { },
 			ErrorAction(R.string.todo) { },
 		),
-		stackTrace = "l\nl\nl\nl\nl\n"
+		stackTrace = "l\nl\nl\nl\nl\n",
 	)
 }
 
@@ -91,12 +91,10 @@ private val ERROR_FACES = listOf(
 	"(´-ι_-｀)",
 	"(・ω・｀)………..",
 	"〴⋋_⋌〵",
-	"（＞μ＜＃）"
+	"（＞μ＜＃）",
 )
 
-fun getRandomErrorFace(): String {
-	return ERROR_FACES[Random.nextInt(ERROR_FACES.size)]
-}
+fun getRandomErrorFace(): String = ERROR_FACES[Random.nextInt(ERROR_FACES.size)]
 
 /**
  * Represents a given error action visible on the error page.
@@ -116,7 +114,7 @@ fun ErrorContent(
 	messageRes = messageRes,
 	actions = arrayOf(actions),
 	modifier = modifier,
-	stackTrace = stackTrace
+	stackTrace = stackTrace,
 )
 
 @Composable
@@ -125,13 +123,12 @@ fun ErrorContent(
 	modifier: Modifier = Modifier,
 	actions: Array<ErrorAction> = arrayOf(),
 	stackTrace: String? = null,
-) =
-	ErrorContent(
-		modifier = modifier,
-		message = stringResource(id = messageRes),
-		stackTrace = stackTrace,
-		actions = actions
-	)
+) = ErrorContent(
+	modifier = modifier,
+	message = stringResource(id = messageRes),
+	stackTrace = stackTrace,
+	actions = actions,
+)
 
 @Composable
 fun ErrorContent(
@@ -143,7 +140,7 @@ fun ErrorContent(
 	message = message,
 	actions = arrayOf(actions),
 	modifier = modifier,
-	stackTrace = stackTrace
+	stackTrace = stackTrace,
 )
 
 @Composable
@@ -157,28 +154,29 @@ fun ErrorContent(
 	Box(
 		modifier = modifier
 			.fillMaxSize()
-			.padding(16.dp), contentAlignment = Alignment.Center
+			.padding(16.dp),
+		contentAlignment = Alignment.Center,
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			modifier = Modifier
+			modifier = Modifier,
 		) {
 			Text(
 				face,
 				fontSize = 48.sp,
-				modifier = Modifier.padding(bottom = 16.dp)
+				modifier = Modifier.padding(bottom = 16.dp),
 			)
 			Text(
 				message,
 				fontSize = 16.sp,
 				textAlign = TextAlign.Center,
-				modifier = Modifier.padding(bottom = 8.dp)
+				modifier = Modifier.padding(bottom = 8.dp),
 			)
 
 			actions.forEach {
 				TextButton(
 					onClick = { it.onClick() },
-					contentPadding = PaddingValues(16.dp)
+					contentPadding = PaddingValues(16.dp),
 				) {
 					Text(stringResource(it.id))
 				}
@@ -191,14 +189,19 @@ fun ErrorContent(
 					isStacktraceVisible,
 					onCheckedChange = {
 						isStacktraceVisible = it
-					}
+					},
 				) {
 					Icon(
-						imageVector = if (!isStacktraceVisible) Icons.Outlined.ExpandMore
-						else Icons.Outlined.ExpandLess,
-						contentDescription = if (!isStacktraceVisible)
+						imageVector = if (!isStacktraceVisible) {
+							Icons.Outlined.ExpandMore
+						} else {
+							Icons.Outlined.ExpandLess
+						},
+						contentDescription = if (!isStacktraceVisible) {
 							stringResource(R.string.more)
-						else stringResource(R.string.less)
+						} else {
+							stringResource(R.string.less)
+						},
 					)
 				}
 

@@ -68,31 +68,31 @@ abstract class ShosetsuCssViewModelComponent {
 			ShosetsuCSSBuilder(
 				backgroundColor = back,
 				foregroundColor = fore,
-				textSize = textSize
+				textSize = textSize,
 			)
 		}.combine(indentSizeFlow) { builder, indent ->
 			builder.copy(
-				indentSize = indent
+				indentSize = indent,
 			)
 		}.combine(paragraphSpacingFlow) { builder, space ->
 			builder.copy(
-				paragraphSpacing = space
+				paragraphSpacing = space,
 			)
 		}.combine(tableHackEnabledFlow) { builder, enabled ->
 			builder.copy(
-				tableHackEnabled = enabled
+				tableHackEnabled = enabled,
 			)
 		}.combine(disableTextSelection) { builder, enabled ->
 			builder.copy(
-				disableTextSelection = enabled
+				disableTextSelection = enabled,
 			)
 		}.combine(colorSchemeFlow) { builder, colorScheme ->
 			builder.copy(
-				colorScheme = colorScheme
+				colorScheme = colorScheme,
 			)
 		}.combine(paddingValuesFlow) { builder, paddingValues ->
 			builder.copy(
-				paddingValues = paddingValues
+				paddingValues = paddingValues,
 			)
 		}.map {
 			val shosetsuStyle: HashMap<String, HashMap<String, String>> = hashMapOf()
@@ -170,13 +170,18 @@ abstract class ShosetsuCssViewModelComponent {
 				this["--shosetsu-paragraph-spacing"] = "${it.paragraphSpacing}em"
 
 				this["--shosetsu-padding-top"] = "${it.paddingValues.calculateTopPadding().value.toLong()}px"
-				this["--shosetsu-padding-bottom"] = "${it.paddingValues.calculateBottomPadding().value.toLong()}px"
+				this["--shosetsu-padding-bottom"] =
+					"${it.paddingValues.calculateBottomPadding().value.toLong()}px"
 				// at least 0.5em is needed to prevent weird scrolling behavior with some content
 				// (like chapter 1 of "The Perfect Run" from "Royal Road")
 				this["--shosetsu-padding-left"] =
-					"max(0.5em, ${it.paddingValues.calculateLeftPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
+					"max(0.5em, ${it.paddingValues.calculateLeftPadding(
+						layoutDirection = LayoutDirection.Ltr,
+					).value.toLong()}px)"
 				this["--shosetsu-padding-right"] =
-					"max(0.5em, ${it.paddingValues.calculateRightPadding(layoutDirection = LayoutDirection.Ltr).value.toLong()}px)"
+					"max(0.5em, ${it.paddingValues.calculateRightPadding(
+						layoutDirection = LayoutDirection.Ltr,
+					).value.toLong()}px)"
 			}
 
 			setShosetsuStyle("body") {
@@ -204,12 +209,13 @@ abstract class ShosetsuCssViewModelComponent {
 				this["border"] = "2px solid red"
 			}
 
-			if (it.tableHackEnabled)
+			if (it.tableHackEnabled) {
 				setShosetsuStyle("table") {
 					this["overflow-x"] = "auto"
 					this["display"] = "block"
 					this["white-space"] = "nowrap"
 				}
+			}
 
 			shosetsuStyle.map { elem ->
 				"${elem.key} {" + elem.value.map { rule -> "${rule.key}:${rule.value}" }
@@ -227,6 +233,6 @@ abstract class ShosetsuCssViewModelComponent {
 		val tableHackEnabled: Boolean = ReaderTableHack.default,
 		val disableTextSelection: Boolean = ReaderDisableTextSelection.default,
 		val colorScheme: ColorScheme = FallbackColorScheme,
-		val paddingValues: PaddingValues = PaddingValues(0.dp)
+		val paddingValues: PaddingValues = PaddingValues(0.dp),
 	)
 }

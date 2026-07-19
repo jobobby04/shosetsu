@@ -29,8 +29,9 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 16 / 09 / 2020
  */
-abstract class ARepositoryViewModel
-	: SubscribeViewModel<ImmutableList<RepositoryUI>>, ShosetsuViewModel() {
+abstract class ARepositoryViewModel :
+	ShosetsuViewModel(),
+	SubscribeViewModel<ImmutableList<RepositoryUI>> {
 	abstract val error: Flow<Throwable>
 
 	/**
@@ -70,12 +71,10 @@ abstract class ARepositoryViewModel
 	 */
 	abstract fun isURL(string: String): Boolean
 
-
 	/**
 	 * Remove the repo from the app
 	 */
 	abstract fun remove(repo: RepositoryUI)
-
 
 	/**
 	 * Toggles the state of [RepositoryUI.isRepoEnabled], returns the new state
@@ -111,41 +110,25 @@ abstract class ARepositoryViewModel
 	abstract fun hideShare()
 
 	sealed interface AddRepoState {
-		data class Failure(
-			val exception: Exception,
-			val name: String,
-			val url: String
-		) : AddRepoState
+		data class Failure(val exception: Exception, val name: String, val url: String) : AddRepoState
 
 		data object Success : AddRepoState
 	}
 
 	sealed interface UndoRepoRemoveState {
-		data class Failure(
-			val repo: RepositoryUI,
-			val exception: Exception
-		) : UndoRepoRemoveState
+		data class Failure(val repo: RepositoryUI, val exception: Exception) : UndoRepoRemoveState
 
 		data object Success : UndoRepoRemoveState
 	}
 
 	sealed interface ToggleRepoIsEnabledState {
-		data class Failure(
-			val repo: RepositoryUI,
-			val exception: Exception
-		) : ToggleRepoIsEnabledState
+		data class Failure(val repo: RepositoryUI, val exception: Exception) : ToggleRepoIsEnabledState
 
-		data class Success(
-			val repo: RepositoryUI,
-			val newState: Boolean
-		) : ToggleRepoIsEnabledState
+		data class Success(val repo: RepositoryUI, val newState: Boolean) : ToggleRepoIsEnabledState
 	}
 
 	sealed interface RemoveRepoState {
-		data class Failure(
-			val exception: Exception,
-			val repo: RepositoryUI
-		) : RemoveRepoState
+		data class Failure(val exception: Exception, val repo: RepositoryUI) : RemoveRepoState
 
 		data class Success(val repo: RepositoryUI) : RemoveRepoState
 	}

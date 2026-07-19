@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 29 / 04 / 2020
@@ -38,8 +37,8 @@ import kotlinx.coroutines.flow.StateFlow
  * @author github.com/doomsdayrs
  */
 abstract class ALibraryViewModel :
-	SubscribeViewModel<LibraryUI?>,
 	ShosetsuViewModel(),
+	SubscribeViewModel<LibraryUI?>,
 	IsOnlineCheckViewModel,
 	StartUpdateManagerViewModel {
 
@@ -144,5 +143,4 @@ abstract class ALibraryViewModel :
 	abstract fun showFilterMenu()
 
 	abstract fun hideFilterMenu()
-
 }

@@ -1,7 +1,33 @@
 package app.shosetsu.android.datasource.local.database
 
-import app.shosetsu.android.datasource.local.database.base.*
-import app.shosetsu.android.datasource.local.database.impl.*
+import app.shosetsu.android.datasource.local.database.base.DBChapterHistoryDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBCategoriesDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBChaptersDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBDownloadsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBExtLibDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBExtRepoDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBInstalledExtensionsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBNovelCategoriesDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBNovelPinsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBNovelReaderSettingsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBNovelSettingsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBNovelsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBRepositoryExtensionsDataSource
+import app.shosetsu.android.datasource.local.database.base.IDBUpdatesDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBCategoriesDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBChapterHistoryDataSourceImpl
+import app.shosetsu.android.datasource.local.database.impl.DBChaptersDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBDownloadsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBExtLibDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBExtRepoDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBInstalledExtensionsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBNovelCategoriesDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBNovelPinsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBNovelReaderSettingsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBNovelSettingsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBNovelsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBRepositoryExtensionsDataSource
+import app.shosetsu.android.datasource.local.database.impl.DBUpdatesDataSource
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
@@ -35,13 +61,13 @@ val dbDataSourceModule = DI.Module("database_data_source") {
 
 	bind<IDBInstalledExtensionsDataSource>() with singleton {
 		DBInstalledExtensionsDataSource(
-			instance()
+			instance(),
 		)
 	}
 
 	bind<IDBRepositoryExtensionsDataSource>() with singleton {
 		DBRepositoryExtensionsDataSource(
-			instance()
+			instance(),
 		)
 	}
 
@@ -59,8 +85,7 @@ val dbDataSourceModule = DI.Module("database_data_source") {
 	bind<IDBNovelSettingsDataSource>() with singleton { DBNovelSettingsDataSource(instance()) }
 	bind<IDBNovelReaderSettingsDataSource>() with singleton {
 		DBNovelReaderSettingsDataSource(
-			instance()
+			instance(),
 		)
 	}
-
 }

@@ -24,9 +24,7 @@ import app.shosetsu.android.view.uimodels.model.CategoryUI
 /**
  * 13 / 01 / 2021
  */
-class DeleteCategoryUseCase(
-	private val repo: ICategoryRepository
-) {
+class DeleteCategoryUseCase(private val repo: ICategoryRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(category: CategoryUI) = repo.deleteCategory(category.convertTo())
 }

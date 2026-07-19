@@ -38,8 +38,8 @@ import app.shosetsu.android.dto.Convertible
 @Entity(
 	tableName = "repositories",
 	indices = [
-		Index("url", unique = true)
-	]
+		Index("url", unique = true),
+	],
 )
 data class DBRepositoryEntity(
 	@PrimaryKey(autoGenerate = true)
@@ -50,12 +50,12 @@ data class DBRepositoryEntity(
 
 	var name: String,
 
-	var isEnabled: Boolean
+	var isEnabled: Boolean,
 ) : Convertible<RepositoryEntity> {
 	override fun convertTo(): RepositoryEntity = RepositoryEntity(
 		id!!,
 		url,
 		name,
-		isEnabled
+		isEnabled,
 	)
 }

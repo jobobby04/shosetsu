@@ -75,9 +75,7 @@ import kotlinx.coroutines.runBlocking
  */
 
 @Composable
-fun AdvancedSettingsView(
-	onBack: () -> Unit
-) {
+fun AdvancedSettingsView(onBack: () -> Unit) {
 	val viewModel: AAdvancedSettingsViewModel = viewModelDi()
 
 	val purgeState by viewModel.purgeState.collectAsState(null)
@@ -90,6 +88,7 @@ fun AdvancedSettingsView(
 	LaunchedEffect(purgeState) {
 		when (purgeState) {
 			null -> {}
+
 			is AAdvancedSettingsViewModel.PurgeState.Failure -> {
 				scope.launch {
 					logE("Failed to purge")
@@ -97,7 +96,7 @@ fun AdvancedSettingsView(
 						context.getString(R.string.fragment_settings_advanced_snackbar_purge_failure),
 						duration = SnackbarDuration.Long,
 						actionLabel = context.getString(R.string.retry),
-						withDismissAction = true
+						withDismissAction = true,
 					)
 					if (result == SnackbarResult.ActionPerformed) {
 						viewModel.purgeUselessData()
@@ -108,11 +107,10 @@ fun AdvancedSettingsView(
 			AAdvancedSettingsViewModel.PurgeState.Success -> {
 				scope.launch {
 					hostState.showSnackbar(
-						context.getString(R.string.fragment_settings_advanced_snackbar_purge_success)
+						context.getString(R.string.fragment_settings_advanced_snackbar_purge_success),
 					)
 				}
 			}
-
 		}
 	}
 
@@ -122,7 +120,7 @@ fun AdvancedSettingsView(
 				val result = hostState.showSnackbar(
 					context.getString(R.string.settings_advanced_snackbar_cycle_kill_success),
 					duration = SnackbarDuration.Long,
-					actionLabel = context.getString(R.string.restart)
+					actionLabel = context.getString(R.string.restart),
 				)
 
 				if (result == SnackbarResult.ActionPerformed) {
@@ -135,7 +133,7 @@ fun AdvancedSettingsView(
 			AAdvancedSettingsViewModel.RestartResult.KILLED -> {
 				scope.launch {
 					hostState.showSnackbar(
-						context.getString(R.string.settings_advanced_cycle_start_success)
+						context.getString(R.string.settings_advanced_cycle_start_success),
 					)
 				}
 			}
@@ -157,8 +155,8 @@ fun AdvancedSettingsView(
 								R.string.settings_advanced_clear_cookies_complete
 							} else {
 								R.string.settings_advanced_clear_cookies_nada
-							}
-						)
+							},
+						),
 					)
 				}
 			}
@@ -167,10 +165,9 @@ fun AdvancedSettingsView(
 			viewModel.forceRepoSync()
 		},
 		onBack = onBack,
-		hostState = hostState
+		hostState = hostState,
 	)
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -181,7 +178,7 @@ fun AdvancedSettingsContent(
 	onForceRepoSync: () -> Unit,
 	onClearCookies: () -> Unit,
 	onBack: () -> Unit,
-	hostState: SnackbarHostState
+	hostState: SnackbarHostState,
 ) {
 	val useShosetsuAgent by viewModel.settingsRepo.getBooleanFlow(UseShosetsuAgent)
 		.collectAsState()
@@ -193,27 +190,26 @@ fun AdvancedSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(
 				top = 16.dp,
-				bottom = 64.dp
+				bottom = 64.dp,
 			),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
-
 			item {
 				TextPreferenceWidget(
 					title = stringResource(R.string.remove_novel_cache),
 					subtitle = stringResource(R.string.settings_advanced_purge_novel_cache),
 					onPreferenceClick = onPurgeNovelCache,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -222,7 +218,7 @@ fun AdvancedSettingsContent(
 					title = stringResource(R.string.settings_advanced_verify_checksum_title),
 					description = stringResource(R.string.settings_advanced_verify_checksum_desc),
 					repo = viewModel.settingsRepo,
-					key = VerifyCheckSum
+					key = VerifyCheckSum,
 				)
 			}
 
@@ -231,7 +227,7 @@ fun AdvancedSettingsContent(
 					title = stringResource(R.string.settings_advanced_require_double_back_title),
 					description = stringResource(R.string.settings_advanced_require_double_back_desc),
 					repo = viewModel.settingsRepo,
-					key = RequireDoubleBackToExit
+					key = RequireDoubleBackToExit,
 				)
 			}
 
@@ -240,7 +236,7 @@ fun AdvancedSettingsContent(
 					title = stringResource(R.string.settings_advanced_kill_cycle_workers_title),
 					subtitle = stringResource(R.string.settings_advanced_kill_cycle_workers_desc),
 					onPreferenceClick = onKillCycleWorkers,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -249,7 +245,7 @@ fun AdvancedSettingsContent(
 					title = stringResource(R.string.settings_advanced_force_repo_update_title),
 					subtitle = stringResource(R.string.settings_advanced_force_repo_update_desc),
 					onPreferenceClick = onForceRepoSync,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -258,7 +254,7 @@ fun AdvancedSettingsContent(
 					title = stringResource(R.string.settings_advanced_clear_cookies_title),
 					subtitle = stringResource(R.string.settings_advanced_clear_cookies_desc),
 					onPreferenceClick = onClearCookies,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -269,7 +265,7 @@ fun AdvancedSettingsContent(
 					modifier = Modifier
 						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
-					key = ExposeTrueChapterDelete
+					key = ExposeTrueChapterDelete,
 				)
 			}
 
@@ -280,7 +276,7 @@ fun AdvancedSettingsContent(
 					modifier = Modifier
 						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
-					key = LogToFile
+					key = LogToFile,
 				)
 			}
 
@@ -291,7 +287,7 @@ fun AdvancedSettingsContent(
 					modifier = Modifier
 						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
-					key = AutoBookmarkFromQR
+					key = AutoBookmarkFromQR,
 				)
 			}
 
@@ -302,7 +298,7 @@ fun AdvancedSettingsContent(
 					modifier = Modifier
 						.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
-					key = ACRAEnabled
+					key = ACRAEnabled,
 				)
 			}
 
@@ -327,7 +323,7 @@ fun AdvancedSettingsContent(
 					repo = viewModel.settingsRepo,
 					modifier = Modifier
 						.fillMaxWidth(),
-					key = UseShosetsuAgent
+					key = UseShosetsuAgent,
 				)
 			}
 
@@ -335,7 +331,7 @@ fun AdvancedSettingsContent(
 				Column(
 					modifier = Modifier
 						.alpha(if (useShosetsuAgent) .5f else 1f),
-					horizontalAlignment = Alignment.CenterHorizontally
+					horizontalAlignment = Alignment.CenterHorizontally,
 				) {
 					StringSettingContent(
 						title = stringResource(R.string.settings_advanced_ua_title),
@@ -344,17 +340,18 @@ fun AdvancedSettingsContent(
 						modifier = Modifier
 							.fillMaxWidth(),
 						key = UserAgent,
-						enabled = !useShosetsuAgent
+						enabled = !useShosetsuAgent,
 					)
 					val context = LocalContext.current
 					SimpleIconButton(
-						Icons.Default.Refresh, stringResource(R.string.reset),
+						Icons.Default.Refresh,
+						stringResource(R.string.reset),
 						onClick = {
 							runBlocking {
 								viewModel.settingsRepo.setString(UserAgent, WebViewUtil.getInferredUserAgent(context))
 							}
 						},
-						enabled = !useShosetsuAgent
+						enabled = !useShosetsuAgent,
 					)
 				}
 			}

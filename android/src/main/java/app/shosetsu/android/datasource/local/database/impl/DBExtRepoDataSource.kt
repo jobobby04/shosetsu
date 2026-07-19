@@ -29,9 +29,7 @@ import kotlinx.coroutines.flow.map
  * shosetsu
  * 12 / 05 / 2020
  */
-class DBExtRepoDataSource(
-	private val repositoryDao: RepositoryDao,
-) : IDBExtRepoDataSource {
+class DBExtRepoDataSource(private val repositoryDao: RepositoryDao) : IDBExtRepoDataSource {
 	override fun loadRepositoriesLive(): Flow<List<RepositoryEntity>> =
 		repositoryDao.loadRepositoriesLive().map { it.convertList() }
 
@@ -44,11 +42,9 @@ class DBExtRepoDataSource(
 	override suspend fun addRepository(url: String, name: String): Long =
 		(repositoryDao.insertAbort(DBRepositoryEntity(null, url, name, true)))
 
-	override suspend fun remove(entity: RepositoryEntity): Unit =
-		(repositoryDao.delete(entity.toDB()))
+	override suspend fun remove(entity: RepositoryEntity): Unit = (repositoryDao.delete(entity.toDB()))
 
-	override suspend fun update(entity: RepositoryEntity): Unit =
-		(repositoryDao.update(entity.toDB()))
+	override suspend fun update(entity: RepositoryEntity): Unit = (repositoryDao.update(entity.toDB()))
 
 	override suspend fun insert(entity: RepositoryEntity): Long =
 		(repositoryDao.insertReplace(entity.toDB()))

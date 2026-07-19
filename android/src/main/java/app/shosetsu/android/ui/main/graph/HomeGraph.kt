@@ -32,7 +32,7 @@ import app.shosetsu.android.ui.updates.UpdatesView
 fun NavGraphBuilder.homeGraph(
 	navController: ShosetsuNavController,
 	drawerIcon: @Composable () -> Unit,
-	windowSize: WindowSizeClass
+	windowSize: WindowSizeClass,
 ) {
 	composable<Library> {
 		LibraryView(
@@ -45,7 +45,7 @@ fun NavGraphBuilder.homeGraph(
 			drawerIcon = drawerIcon,
 			onGoToBrowse = {
 				navigateToMainView(navController, Browse)
-			}
+			},
 		)
 	}
 
@@ -63,7 +63,7 @@ fun NavGraphBuilder.homeGraph(
 			openSearch = {
 				navController.navigate(Search(null))
 			},
-			drawerIcon = drawerIcon
+			drawerIcon = drawerIcon,
 		)
 	}
 
@@ -75,7 +75,7 @@ fun NavGraphBuilder.homeGraph(
 			},
 			openChapter = context::openChapter,
 			drawerIcon = drawerIcon,
-			windowSize = windowSize
+			windowSize = windowSize,
 		)
 	}
 	composable<More> {
@@ -107,7 +107,7 @@ fun NavGraphBuilder.homeGraph(
 			onNavToSettings = {
 				navController.navigate(Settings)
 			},
-			drawerIcon = drawerIcon
+			drawerIcon = drawerIcon,
 		)
 	}
 }

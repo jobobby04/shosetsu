@@ -45,15 +45,15 @@ import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastLastOrNull
 import androidx.compose.ui.util.fastMaxBy
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.sample
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun LazyColumnScrollbar(
@@ -147,13 +147,16 @@ fun VerticalFastScroller(
 			} ?: visibleItems.last()
 
 			val topHiddenProportion = -1f * topItem.top / topItem.size.coerceAtLeast(1)
-			val bottomHiddenProportion = (bottomItem.bottom - scrollHeightPx) / bottomItem.size.coerceAtLeast(1)
+			val bottomHiddenProportion =
+				(bottomItem.bottom - scrollHeightPx) / bottomItem.size.coerceAtLeast(1)
 			val previousSections = topHiddenProportion + topItem.index
-			val remainingSections = bottomHiddenProportion + (layoutInfo.totalItemsCount - (bottomItem.index + 1))
+			val remainingSections =
+				bottomHiddenProportion + (layoutInfo.totalItemsCount - (bottomItem.index + 1))
 			val scrollableSections = previousSections + remainingSections
 
 			val layoutChangeTracker = remember { MutableData(scrollableSections) }
-			val layoutChanged = !anyScrollInProgress && abs(layoutChangeTracker.value - scrollableSections) > 0.1
+			val layoutChanged =
+				!anyScrollInProgress && abs(layoutChangeTracker.value - scrollableSections) > 0.1
 			layoutChangeTracker.value = scrollableSections
 
 			val estimateConfidence = remember { MutableData(remainingSections) }
@@ -176,11 +179,13 @@ fun VerticalFastScroller(
 				val scrollRemainingSections = (1f - thumbProportion) * maxRemainingSections
 				val currentSection = layoutInfo.totalItemsCount - scrollRemainingSections
 				val scrollSectionIndex = currentSection.toInt().coerceAtMost(layoutInfo.totalItemsCount)
-				val expectedScrollItem = visibleItems.find { it.index == scrollSectionIndex } ?: visibleItems.first()
+				val expectedScrollItem =
+					visibleItems.find { it.index == scrollSectionIndex } ?: visibleItems.first()
 				val scrollRelativeOffset = expectedScrollItem.size * (currentSection - scrollSectionIndex)
 				val scrollSectionOffset = (scrollRelativeOffset - scrollHeightPx).roundToInt()
 				val scrollItemIndex = scrollSectionIndex.coerceIn(0, layoutInfo.totalItemsCount - 1)
-				val scrollItemOffset = scrollSectionOffset + (scrollSectionIndex - scrollItemIndex) * bottomItem.size
+				val scrollItemOffset =
+					scrollSectionOffset + (scrollSectionIndex - scrollItemIndex) * bottomItem.size
 				listState.scrollToItem(index = scrollItemIndex, scrollOffset = scrollItemOffset)
 				scrolled.tryEmit(Unit)
 			}

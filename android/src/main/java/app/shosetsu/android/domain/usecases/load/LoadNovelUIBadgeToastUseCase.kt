@@ -24,8 +24,6 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
  * shosetsu
  * 08 / 12 / 2020
  */
-class LoadNovelUIBadgeToastUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
+class LoadNovelUIBadgeToastUseCase(private val iSettingsRepository: ISettingsRepository) {
 	operator fun invoke() = iSettingsRepository.getBooleanFlow(SettingKey.NovelBadgeToast)
 }

@@ -15,14 +15,14 @@ import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.android.domain.repository.base.IExtensionsRepository
 import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 /*
  * This file is part of shosetsu.
@@ -51,16 +51,48 @@ class ExtensionsRepository(
 	private val installedDBSource: IDBInstalledExtensionsDataSource,
 	private val repoDBSource: IDBRepositoryExtensionsDataSource,
 	private val remoteSource: IRemoteExtensionDataSource,
-	private val _repoDBSource: IDBExtRepoDataSource
+	private val _repoDBSource: IDBExtRepoDataSource,
 ) : IExtensionsRepository {
 	@Throws(SQLiteException::class)
 	@OptIn(ExperimentalCoroutinesApi::class)
-	override fun loadBrowseExtensions(): Flow<List<BrowseExtensionEntity>> {
-		return repoDBSource.loadExtensionsFlow().flatMapLatest { list ->
+	override fun loadBrowseExtensions(): Flow<List<BrowseExtensionEntity>> =
+		repoDBSource.loadExtensionsFlow().flatMapLatest { list ->
 
 			val browseExtensions = list.groupBy { it.id }.map { (extId, matchingExtensions) ->
 				installedDBSource.loadExtensionLive(extId).map { installedExt ->
 					val firstExt = matchingExtensions.first()
+
+					// Variables to calculate, with their defaults
+					var isUpdateAvailable = false
+					var isObsolete = false
+
+					// Is this extension installed?
+					if (installedExt != null) {
+						// Extension is installed
+
+						// Try to get the repo version
+						val repoVersion =
+							matchingExtensions.find { it.repoID == installedExt.repoID }?.version
+
+						// Check if the repo version is found or not
+						if (repoVersion != null) {
+							// We have an upstream version
+							if (installedExt.version < repoVersion) {
+								// Repo version is newer! Update!
+								isUpdateAvailable = true
+							} else {
+								// Repo version is not newer...
+								// Is it marked obsolete?
+								if (repoVersion == Version(-9, -9, -9)) {
+									// We are now obsolete!
+									isObsolete = true
+								}
+							}
+						} else {
+							// The repo version is gone... obsolete likely
+							isObsolete = true
+						}
+					}
 
 					BrowseExtensionEntity(
 						id = extId,
@@ -71,35 +103,32 @@ class ExtensionsRepository(
 							matchingExtensions.mapNotNull { genericExt ->
 								val repo = _repoDBSource.loadRepository(genericExt.repoID)
 
-								if (repo != null && repo.isEnabled)
+								if (repo != null && repo.isEnabled) {
 									ExtensionInstallOptionEntity(
 										genericExt.repoID,
 										repo.name,
-										genericExt.version
+										genericExt.version,
 									)
-								else null
+								} else {
+									null
+								}
 							}.sortedBy { it.repoId }.sortedBy { it.version }
-						} else null,
+						} else {
+							null
+						},
 						isInstalled = installedExt != null,
 						installedVersion = installedExt?.version,
 						installedRepo = installedExt?.repoID ?: -1,
-						isUpdateAvailable = if (installedExt != null) {
-							val repoVersion =
-								matchingExtensions.find { it.repoID == installedExt.repoID }?.version
-
-							if (repoVersion != null) {
-								installedExt.version < repoVersion || repoVersion == Version(-9, -9, -9)
-							} else false
-						} else false,
+						isUpdateAvailable = isUpdateAvailable,
 						updateVersion = matchingExtensions.find { it.repoID == installedExt?.repoID }?.version,
 						isInstalling = false, // We can ignore this, another layer will set it
+						isObsolete = isObsolete,
 					)
 				}
 			}
 
 			combine(browseExtensions) { it.toList() }
 		}.distinctUntilChanged().onIO()
-	}
 
 	override fun loadExtensionsFLow(): Flow<List<InstalledExtensionEntity>> =
 		installedDBSource.loadExtensionsFlow().onIO()
@@ -166,9 +195,8 @@ class ExtensionsRepository(
 	)
 	override suspend fun downloadExtension(
 		repositoryEntity: RepositoryEntity,
-		extension: GenericExtensionEntity
-	): ByteArray =
-		onIO { remoteSource.downloadExtension(repositoryEntity, extension) }
+		extension: GenericExtensionEntity,
+	): ByteArray = onIO { remoteSource.downloadExtension(repositoryEntity, extension) }
 
 	@Throws(SQLiteException::class)
 	override suspend fun isExtensionInstalled(extensionEntity: GenericExtensionEntity): Boolean =

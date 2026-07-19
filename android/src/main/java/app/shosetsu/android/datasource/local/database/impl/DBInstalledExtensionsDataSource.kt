@@ -26,14 +26,12 @@ import kotlinx.coroutines.flow.map
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 12 / May / 2020
  */
-class DBInstalledExtensionsDataSource(
-	private val extensionsDao: InstalledExtensionsDao,
-) : IDBInstalledExtensionsDataSource {
+class DBInstalledExtensionsDataSource(private val extensionsDao: InstalledExtensionsDao) :
+	IDBInstalledExtensionsDataSource {
 	override fun loadExtensionsFlow(): Flow<List<InstalledExtensionEntity>> =
 		extensionsDao.loadExtensionsFlow().map { it.convertList() }
 

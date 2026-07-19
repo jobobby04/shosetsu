@@ -9,11 +9,11 @@ import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.model.remote.AppUpdateDTO
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
+import java.io.InputStream
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
-import java.io.IOException
-import java.io.InputStream
 
 /*
  * This file is part of shosetsu.
@@ -38,9 +38,9 @@ import java.io.InputStream
  *
  * For standard releases
  */
-class GitAppUpdateDataSource(
-	private val okHttpClient: OkHttpClient
-) : IRemoteAppUpdateDataSource, IRemoteAppUpdateDataSource.Downloadable {
+class GitAppUpdateDataSource(private val okHttpClient: OkHttpClient) :
+	IRemoteAppUpdateDataSource,
+	IRemoteAppUpdateDataSource.Downloadable {
 	private val shosetsuGitUpdateURL: String by lazy {
 		"https://gitlab.com/shosetsuorg/shosetsu/-/raw/${
 			if (DEBUG) "development" else "main"
@@ -59,7 +59,7 @@ class GitAppUpdateDataSource(
 	@Throws(
 		EmptyResponseBodyException::class,
 		HTTPException::class,
-		IOException::class
+		IOException::class,
 	)
 	override suspend fun loadAppUpdate(): AppUpdateEntity {
 		okHttpClient.quickie(shosetsuGitUpdateURL)
@@ -78,16 +78,16 @@ class GitAppUpdateDataSource(
 	@Throws(
 		EmptyResponseBodyException::class,
 		HTTPException::class,
-		IOException::class
+		IOException::class,
 	)
 	override suspend fun downloadAppUpdate(update: AppUpdateEntity): InputStream {
 		okHttpClient.quickie(update.archURL()).let { response ->
 			if (response.isSuccessful) {
 				return response.body?.byteStream()
 					?: throw EmptyResponseBodyException(update.archURL())
-			} else throw HTTPException(response.code)
+			} else {
+				throw HTTPException(response.code)
+			}
 		}
 	}
-
-
 }

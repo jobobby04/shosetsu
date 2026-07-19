@@ -98,7 +98,7 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 		NovelsRepository(
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -108,7 +108,7 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 
 	bind<IAppUpdatesRepository>() with singleton {
 		AppUpdatesRepository(instance(), instance())
-		//FakeAppUpdatesRepository()
+		// FakeAppUpdatesRepository()
 	}
 
 	bind<ISettingsRepository>() with singleton { SettingsRepository(instance()) }
@@ -119,7 +119,7 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 	bind<INovelReaderSettingsRepository>() with singleton { NovelReaderSettingsRepository(instance()) }
 	bind<IExtensionSettingsRepository>() with singleton {
 		ExtensionSettingsRepository(
-			iFileSettingSystem = instance()
+			iFileSettingSystem = instance(),
 		)
 	}
 
@@ -128,7 +128,7 @@ val repositoryModule: DI.Module = DI.Module("repository_module") {
 		ExtensionEntitiesRepository(
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 

@@ -50,14 +50,12 @@ object DeviceUtil {
 	}
 
 	@SuppressLint("PrivateApi")
-	private fun getSystemProperty(key: String?): String? {
-		return try {
-			Class.forName("android.os.SystemProperties")
-				.getDeclaredMethod("get", String::class.java)
-				.invoke(null, key) as String
-		} catch (e: Exception) {
-			logW("Unable to use SystemProperties.get()", e)
-			null
-		}
+	private fun getSystemProperty(key: String?): String? = try {
+		Class.forName("android.os.SystemProperties")
+			.getDeclaredMethod("get", String::class.java)
+			.invoke(null, key) as String
+	} catch (e: Exception) {
+		logW("Unable to use SystemProperties.get()", e)
+		null
 	}
 }

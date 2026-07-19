@@ -12,12 +12,11 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 
 @Composable
-fun CSSPreviewContent(
-	cssContent: String,
-	shosetsuCss: String,
-) {
+fun CSSPreviewContent(cssContent: String, shosetsuCss: String) {
 	val state =
-		rememberWebViewStateWithHTMLData(stringResource(R.string.activity_css_example, shosetsuCss, cssContent))
+		rememberWebViewStateWithHTMLData(
+			stringResource(R.string.activity_css_example, shosetsuCss, cssContent),
+		)
 	WebView(
 		state,
 		modifier = Modifier

@@ -50,13 +50,13 @@ import app.shosetsu.lib.Novel.Chapter
 			entity = DBNovelEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["novelID"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
 	indices = [
 		Index("novelID"),
 		Index(value = ["url", "formatterID"], unique = true),
-	]
+	],
 )
 data class DBChapterEntity(
 	@PrimaryKey(autoGenerate = true)
@@ -94,6 +94,6 @@ data class DBChapterEntity(
 		readingPosition,
 		readingStatus,
 		bookmarked,
-		isSaved
+		isSaved,
 	)
 }

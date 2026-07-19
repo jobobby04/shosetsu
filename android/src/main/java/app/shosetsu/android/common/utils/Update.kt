@@ -25,13 +25,14 @@ import app.shosetsu.android.domain.model.local.AppUpdateEntity
 /**
  * Attempt to get the proper update url
  */
-fun AppUpdateEntity.archURL() =
-	if (archURLs != null) {
-		when (System.getProperty("os.arch")) {
-			"armeabi-v7a" -> archURLs.`armeabi-v7a`
-			"arm64-v8a" -> archURLs.`arm64-v8a`
-			"x86" -> archURLs.x86
-			"x86_64" -> archURLs.x86_64
-			else -> url // default to using the universal APK
-		}
-	} else url
+fun AppUpdateEntity.archURL() = if (archURLs != null) {
+	when (System.getProperty("os.arch")) {
+		"armeabi-v7a" -> archURLs.`armeabi-v7a`
+		"arm64-v8a" -> archURLs.`arm64-v8a`
+		"x86" -> archURLs.x86
+		"x86_64" -> archURLs.x86_64
+		else -> url // default to using the universal APK
+	}
+} else {
+	url
+}

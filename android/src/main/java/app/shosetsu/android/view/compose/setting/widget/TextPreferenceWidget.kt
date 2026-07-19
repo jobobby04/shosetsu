@@ -90,20 +90,20 @@ private fun TextPreferenceWidgetPreview() = ShosetsuTheme(AppThemes.LIGHT) {
 				subtitle = "Text preference summary",
 				icon = Icons.Filled.Build,
 				onPreferenceClick = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 			TextPreferenceWidget(
 				title = "Text preference",
 				subtitle = "Text preference summary",
 				onPreferenceClick = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 			TextPreferenceWidget(
 				title = "Compact Text preference",
 				subtitle = "Text preference summary",
 				isCompact = true,
 				onPreferenceClick = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 		}
 	}

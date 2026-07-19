@@ -80,7 +80,6 @@ import org.kodein.di.provider
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 01 / 05 / 2020
@@ -93,7 +92,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			loadLiveAppThemeUseCase = instance(),
 			startInstallWorker = instance(),
 			settingsRepository = instance(),
-			appUpdateRepo = instance()
+			appUpdateRepo = instance(),
 		)
 	}
 
@@ -102,7 +101,8 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 		HomeViewModel(
 			loadNavigationStyleUseCase = instance(),
 			loadRequireDoubleBackUseCase = instance(),
-			backupRepo = instance()
+			backupRepo = instance(),
+			settings = instance(),
 		)
 	}
 
@@ -122,7 +122,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			setNovelPin = instance(),
 			loadLibraryFilterSettings = instance(),
 			_updateLibraryFilterState = instance(),
-			settingsRepository = instance()
+			settingsRepository = instance(),
 		)
 	}
 
@@ -133,7 +133,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			startDownloadWorkerUseCase = instance(),
 			settings = instance(),
 			isOnlineUseCase = instance(),
-			downloadsRepository = instance()
+			downloadsRepository = instance(),
 		)
 	}
 
@@ -154,14 +154,14 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			startUpdateWorkerUseCase = instance(),
 			isOnlineUseCase = instance(),
 			updatesRepository = instance(),
-			settingsRepository = instance()
+			settingsRepository = instance(),
 		)
 	}
 
 	bind<AAboutViewModel>() with provider {
 		AboutViewModel(
 			manager = instance(),
-			contributorRepo = instance()
+			contributorRepo = instance(),
 		)
 	}
 
@@ -176,7 +176,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
@@ -194,7 +194,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			setNovelUIType = instance(),
 			getCategoriesUseCase = instance(),
 			setNovelCategoriesUseCase = instance(),
-			settingsRepository = instance()
+			settingsRepository = instance(),
 		)
 	}
 
@@ -204,13 +204,14 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 
 	// Extensions
 	bind<ABrowseViewModel>() with provider {
 		ExtensionsViewModel(
+			instance(),
 			instance(),
 			instance(),
 			instance(),
@@ -253,7 +254,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			getCategoriesUseCase = instance(),
 			getNovelCategoriesUseCase = instance(),
 			setNovelCategoriesUseCase = instance(),
-			application = instance()
+			application = instance(),
 		)
 	}
 
@@ -274,7 +275,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<ARepositoryViewModel>() with provider {
@@ -290,7 +291,6 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			cacheFactory = instance(),
 		)
 	}
-
 
 	// Settings
 	bind<AAdvancedSettingsViewModel>() with provider {
@@ -310,20 +310,20 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			manager = instance(),
 			startBackupWorkerUseCase = instance(),
 			startRestoreWorker = instance(),
-			startBackupMigrationWorker = instance()
+			startBackupMigrationWorker = instance(),
 		)
 	}
 	bind<ADownloadSettingsViewModel>() with provider {
 		DownloadSettingsViewModel(
 			iSettingsRepository = instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<AReaderSettingsViewModel>() with provider {
 		ReaderSettingsViewModel(
 			iSettingsRepository = instance(),
 
-			loadReaderThemes = instance()
+			loadReaderThemes = instance(),
 		)
 	}
 	bind<ALibrarySettingsViewModel>() with provider {
@@ -332,19 +332,19 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 			instance(),
 			instance(),
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<AAppearanceSettingsViewModel>() with provider {
 		AppearanceSettingsViewModel(
 			iSettingsRepository = instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<ABrowseSettingsViewModel>() with provider {
 		BrowseSettingsViewModel(
 			iSettingsRepository = instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<ATextAssetReaderViewModel>() with provider {
@@ -369,7 +369,7 @@ val viewModelsModule: DI.Module = DI.Module("view_models_module") {
 	bind<AnalyticsViewModel>() with provider {
 		AnalyticsViewModelImpl(
 			instance(),
-			instance()
+			instance(),
 		)
 	}
 	bind<WebViewViewModel>() with provider {

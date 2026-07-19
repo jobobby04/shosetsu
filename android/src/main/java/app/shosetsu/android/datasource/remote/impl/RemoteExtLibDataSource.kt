@@ -5,8 +5,8 @@ import app.shosetsu.android.common.ext.quickie
 import app.shosetsu.android.datasource.remote.base.IRemoteExtLibDataSource
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.lib.exceptions.HTTPException
-import okhttp3.OkHttpClient
 import java.io.IOException
+import okhttp3.OkHttpClient
 
 /*
  * This file is part of shosetsu.
@@ -29,29 +29,24 @@ import java.io.IOException
  * shosetsu
  * 13 / 05 / 2020
  */
-class RemoteExtLibDataSource(
-	private val client: OkHttpClient,
-) : IRemoteExtLibDataSource {
+class RemoteExtLibDataSource(private val client: OkHttpClient) : IRemoteExtLibDataSource {
 
 	private fun makeLibraryURL(repo: String, le: ExtLibEntity): String =
-		"${repo}/lib/${le.scriptName}.lua"
+		"$repo/lib/${le.scriptName}.lua"
 
 	@Throws(HTTPException::class, IOException::class, EmptyResponseBodyException::class)
-	override suspend fun downloadLibrary(
-		repoURL: String,
-		extLibEntity: ExtLibEntity,
-	): String {
+	override suspend fun downloadLibrary(repoURL: String, extLibEntity: ExtLibEntity): String {
 		val url = makeLibraryURL(
 			repoURL,
-			extLibEntity
+			extLibEntity,
 		)
 
-		@Suppress("BlockingMethodInNonBlockingContext")
 		val response = client.quickie(url)
 
 		if (response.isSuccessful) {
-			@Suppress("BlockingMethodInNonBlockingContext")
 			return response.body?.string() ?: throw EmptyResponseBodyException(url)
-		} else throw HTTPException(response.code)
+		} else {
+			throw HTTPException(response.code)
+		}
 	}
 }

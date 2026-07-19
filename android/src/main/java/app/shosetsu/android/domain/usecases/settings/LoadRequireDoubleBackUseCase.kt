@@ -25,9 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 29 / 10 / 2020
  */
-class LoadRequireDoubleBackUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
+class LoadRequireDoubleBackUseCase(private val iSettingsRepository: ISettingsRepository) {
 	operator fun invoke(): StateFlow<Boolean> =
 		iSettingsRepository.getBooleanFlow(SettingKey.RequireDoubleBackToExit)
 }

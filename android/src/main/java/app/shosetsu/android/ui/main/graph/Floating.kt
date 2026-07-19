@@ -34,7 +34,7 @@ fun NavGraphBuilder.assetReader(navController: ShosetsuNavController) {
 
 		TextAssetReaderView(
 			assetId,
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 }

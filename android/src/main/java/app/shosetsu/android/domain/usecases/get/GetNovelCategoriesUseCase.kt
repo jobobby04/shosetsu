@@ -28,9 +28,7 @@ import kotlinx.coroutines.flow.mapLatest
  * @since 06 / 03 / 2022
  * @author Doomsdayrs
  */
-class GetNovelCategoriesUseCase(
-	private val repo: INovelCategoryRepository
-) {
+class GetNovelCategoriesUseCase(private val repo: INovelCategoryRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	@Throws(SQLiteException::class)
 	operator fun invoke(novelID: Int) = repo.getNovelCategoriesFromNovelFlow(novelID)

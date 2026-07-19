@@ -47,10 +47,7 @@ class ChapterReaderAccompanistWebViewClient(
 	 *
 	 * TODO possible way to prompt to open externally
 	 */
-	override fun shouldOverrideUrlLoading(
-		view: WebView?,
-		request: WebResourceRequest
-	): Boolean {
+	override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest): Boolean {
 		openURI(request.url)
 		return true
 	}
@@ -76,7 +73,8 @@ class ChapterReaderAccompanistWebViewClient(
 						element._shosetsuListenersAdded = true;
 					}
 				});
-				""".trimIndent(), null
+			""".trimIndent(),
+			null,
 		)
 		lastJob?.cancel()
 		lastJob = scope.launch {
@@ -101,7 +99,9 @@ class ChapterReaderAccompanistWebViewClient(
 								var element2 = document.getElementById("textElement$oldTtsElement");
 								element2.classList.remove("tts-border-style");
 								""".trimIndent()
-							} else "",
+							} else {
+								""
+							},
 							null,
 						)
 					} else if (oldTtsElement != null) {

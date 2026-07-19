@@ -27,10 +27,11 @@ import org.jsoup.nodes.Element
  * @param modelFactory The factory function to create a new mutable list iterator, to go back before the first element.
  */
 @Suppress("UNCHECKED_CAST")
-class ElementToTTSTextIterator(
-	private val modelFactory: () -> MutableListIterator<Element>
-) : RewindableMutableListIterator<LazyTTSText>() {
-	private var model: MutableListIterator<Element> = emptyList<Element>().toMutableList().listIterator()
+class ElementToTTSTextIterator(private val modelFactory: () -> MutableListIterator<Element>) :
+	RewindableMutableListIterator<LazyTTSText>() {
+	private var model: MutableListIterator<Element> = emptyList<Element>()
+		.toMutableList()
+		.listIterator()
 
 	override fun add(element: LazyTTSText) = model.add(element.element)
 

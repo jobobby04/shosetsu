@@ -27,7 +27,6 @@ import java.util.UUID
  * @author Doomsdayrs
  */
 
-
 val validBreaks = listOf(".\n\n", ".\n", "\n\n", ",\n", ". ", ", ", " ")
 
 fun customSpeak(
@@ -35,7 +34,7 @@ fun customSpeak(
 	text: String,
 	utteranceId: String,
 	handleResult: (Int) -> Unit,
-	flush: Boolean = false
+	flush: Boolean = false,
 ) {
 	val trimmed = text.replace("\r\n", "\n")
 		.replace("\t", " ")
@@ -46,7 +45,7 @@ fun customSpeak(
 			trimmed,
 			if (flush) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,
 			null,
-			utteranceId
+			utteranceId,
 		)
 
 		handleResult(result)
@@ -68,7 +67,7 @@ fun customSpeak(
 			trimmed.substring(ind + 1),
 			utteranceId.substringBefore('|') + UUID.randomUUID(),
 			handleResult,
-			false
+			false,
 		)
 	}
 }

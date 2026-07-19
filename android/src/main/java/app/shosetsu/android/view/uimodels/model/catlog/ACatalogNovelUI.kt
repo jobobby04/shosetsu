@@ -71,7 +71,7 @@ data class ACatalogNovelUI(
 				wordCount = null,
 				commentCount = null,
 				viewCount = null,
-				favoriteCount = null
+				favoriteCount = null,
 			)
 		}
 
@@ -94,7 +94,7 @@ data class ACatalogNovelUI(
 				wordCount = info.wordCount,
 				commentCount = info.commentCount,
 				viewCount = info.viewCount,
-				favoriteCount = info.favoriteCount
+				favoriteCount = info.favoriteCount,
 			)
 		}
 	}

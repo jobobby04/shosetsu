@@ -30,7 +30,4 @@ import androidx.compose.ui.graphics.ImageBitmap
  * @param data Content encoded in the image
  */
 @Immutable
-data class QRCodeData(
-	val imageBitmap: ImageBitmap,
-	val data: String
-)
+data class QRCodeData(val imageBitmap: ImageBitmap, val data: String)

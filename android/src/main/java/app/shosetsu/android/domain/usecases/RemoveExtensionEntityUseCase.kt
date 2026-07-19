@@ -32,7 +32,7 @@ import app.shosetsu.android.domain.repository.base.IExtensionsRepository
  */
 class RemoveExtensionEntityUseCase(
 	private val extensionRepository: IExtensionsRepository,
-	private val extensionEntitiesRepository: IExtensionEntitiesRepository
+	private val extensionEntitiesRepository: IExtensionEntitiesRepository,
 ) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(entity: GenericExtensionEntity) {

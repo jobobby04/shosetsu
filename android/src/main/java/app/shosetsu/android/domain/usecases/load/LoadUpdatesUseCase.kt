@@ -31,14 +31,12 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 13 / 05 / 2020
  */
-class LoadUpdatesUseCase(
-	private val updatesRepository: IUpdatesRepository,
-) {
+class LoadUpdatesUseCase(private val updatesRepository: IUpdatesRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(): Flow<List<UpdatesUI>> = flow {
 		emitAll(
 			updatesRepository.getCompleteUpdatesFlow().mapLatestToResultFlowWithFactory()
-				.mapLatest { it.convertList() }
+				.mapLatest { it.convertList() },
 		)
 	}
 }

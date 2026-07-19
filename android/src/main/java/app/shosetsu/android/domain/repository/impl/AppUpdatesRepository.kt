@@ -18,9 +18,9 @@ import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.android.domain.repository.base.IAppUpdatesRepository
 import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.firstOrNull
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.
@@ -77,7 +77,7 @@ class AppUpdatesRepository(
 			ProductFlavors.UP_TO_DOWN -> {
 				val currentVersion = Version(BuildConfig.VERSION_NAME.substringBefore("-"))
 				val remoteVersion = Version(
-					newVersion.version.substringBefore("-").substringAfter("v")
+					newVersion.version.substringBefore("-").substringAfter("v"),
 				)
 
 				return remoteVersion.compareTo(currentVersion)
@@ -134,7 +134,7 @@ class AppUpdatesRepository(
 		MissingFeatureException::class,
 		EmptyResponseBodyException::class,
 		HTTPException::class,
-		NoSuchElementException::class
+		NoSuchElementException::class,
 	)
 	override suspend fun downloadAppUpdate(): String = onIO {
 		if (iRemoteAppUpdateDataSource is IRemoteAppUpdateDataSource.Downloadable) {
@@ -146,7 +146,11 @@ class AppUpdatesRepository(
 
 				// Write
 				iFileAppUpdateDataSource.writeAPK(update, response)
-			} else throw NoSuchElementException("No update")
-		} else throw MissingFeatureException("self update")
+			} else {
+				throw NoSuchElementException("No update")
+			}
+		} else {
+			throw MissingFeatureException("self update")
+		}
 	}
 }

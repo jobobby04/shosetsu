@@ -65,13 +65,13 @@ fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 				},
 				navToAbout = {
 					navController.navigate(More.About)
-				}
+				},
 			)
 		}
 
 		composableSub<Settings.Appearance> {
 			AppearanceSettingsView(
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
 			)
 		}
 		composableSub<Settings.Library> {
@@ -79,7 +79,7 @@ fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 				onBack = navController::popBackStack,
 				onNavToCategories = {
 					navController.navigate(More.Categories)
-				}
+				},
 			)
 		}
 		composableSub<Settings.Reader> {
@@ -94,14 +94,14 @@ fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 						Intent(context, CSSEditorActivity::class.java).apply {
 							putExtra(CSSEditorActivity.CSS_ID, -1)
 						},
-						null
+						null,
 					)
-				}
+				},
 			)
 		}
 		composableSub<Settings.Downloads> {
 			DownloadsSettingsView(
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
 			)
 		}
 		composableSub<Settings.Browse> {
@@ -109,18 +109,18 @@ fun NavGraphBuilder.settingsGraph(navController: ShosetsuNavController) {
 				onBack = navController::popBackStack,
 				onNavToRepositories = {
 					navController.navigate(More.Repositories)
-				}
+				},
 			)
 		}
 		composableSub<Settings.Backup> { entry ->
 			BackupView(
 				highlightBackupFolder = entry.toRoute<Settings.Backup>().highlightBackupFolder,
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
 			)
 		}
 		composableSub<Settings.Advanced> {
 			AdvancedSettingsView(
-				onBack = navController::popBackStack
+				onBack = navController::popBackStack,
 			)
 		}
 	}

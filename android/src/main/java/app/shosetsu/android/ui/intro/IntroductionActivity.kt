@@ -88,7 +88,9 @@ import org.kodein.di.android.closestDI
  * shosetsu
  * 15 / 03 / 2020
  */
-class IntroductionActivity : AppCompatActivity(), DIAware {
+class IntroductionActivity :
+	AppCompatActivity(),
+	DIAware {
 
 	override val di: DI by closestDI()
 
@@ -106,10 +108,7 @@ class IntroductionActivity : AppCompatActivity(), DIAware {
  * Introduction view in compose
  */
 @Composable
-fun IntroView(
-	viewModel: AIntroViewModel = viewModelDi(),
-	exit: () -> Unit
-) {
+fun IntroView(viewModel: AIntroViewModel = viewModelDi(), exit: () -> Unit) {
 	val state = rememberPagerState { IntroPages.entries.size }
 	val scope = rememberCoroutineScope()
 	val isLicenseRead by viewModel.isLicenseRead.collectAsState()
@@ -122,16 +121,17 @@ fun IntroView(
 	}
 
 	LaunchedEffect(state.currentPage) {
-		if (state.currentPage == IntroPages.End.ordinal)
+		if (state.currentPage == IntroPages.End.ordinal) {
 			viewModel.setFinished()
+		}
 	}
 
 	fun nextPage() {
-		if (state.currentPage != IntroPages.End.ordinal)
+		if (state.currentPage != IntroPages.End.ordinal) {
 			scope.launch {
 				state.scrollToPage(state.currentPage + 1)
 			}
-		else {
+		} else {
 			exit()
 		}
 	}
@@ -145,7 +145,7 @@ fun IntroView(
 					Row(
 						modifier = Modifier.fillMaxWidth(),
 						horizontalArrangement = Arrangement.SpaceBetween,
-						verticalAlignment = Alignment.CenterVertically
+						verticalAlignment = Alignment.CenterVertically,
 					) {
 						Box {
 							if (state.currentPage > 0) {
@@ -162,23 +162,27 @@ fun IntroView(
 								shouldSupportShowNext
 							) {
 								SimpleIconButton(
-									if (state.currentPage != IntroPages.End.ordinal)
+									if (state.currentPage != IntroPages.End.ordinal) {
 										Icons.AutoMirrored.Filled.ArrowForward
-									else Icons.Default.Close,
+									} else {
+										Icons.Default.Close
+									},
 									stringResource(
-										if (state.currentPage != IntroPages.End.ordinal)
-											R.string.intro_page_next else R.string.intro_close
+										if (state.currentPage != IntroPages.End.ordinal) {
+											R.string.intro_page_next
+										} else {
+											R.string.intro_close
+										},
 									),
 									onClick = {
 										nextPage()
-									}
+									},
 								)
 							}
-
 						}
 					}
 				}
-			}
+			},
 		) {
 			IntroContent(viewModel, it, state, isLicenseRead, ::nextPage)
 		}
@@ -191,16 +195,18 @@ fun IntroContent(
 	paddingValues: PaddingValues,
 	state: PagerState,
 	isLicenseRead: Boolean,
-	nextPage: () -> Unit
+	nextPage: () -> Unit,
 ) {
 	HorizontalPager(
 		state = state,
 		modifier = Modifier.padding(paddingValues),
-		userScrollEnabled = state.currentPage != IntroPages.Support.ordinal
+		userScrollEnabled = state.currentPage != IntroPages.Support.ordinal,
 	) { page ->
 		when (page) {
 			IntroPages.Title.ordinal -> IntroTitlePage()
+
 			IntroPages.Explanation.ordinal -> IntroExplanationPage()
+
 			IntroPages.License.ordinal -> {
 				IntroLicensePage(isLicenseRead) {
 					viewModel.setLicenseRead()
@@ -210,7 +216,7 @@ fun IntroContent(
 			IntroPages.ACRA.ordinal -> {
 				val isACRA by viewModel.isACRAEnabled.collectAsState()
 				IntroACRAPage(
-					isACRA
+					isACRA,
 				) {
 					viewModel.setACRAEnabled(it)
 				}
@@ -220,15 +226,15 @@ fun IntroContent(
 				{
 					viewModel.supportShowNext()
 				},
-				nextPage
+				nextPage,
 			)
 
 			IntroPages.Permissions.ordinal -> IntroPermissionPage()
+
 			IntroPages.End.ordinal -> IntroEndPage()
 		}
 	}
 }
-
 
 enum class IntroPages {
 	Title,
@@ -237,7 +243,7 @@ enum class IntroPages {
 	ACRA,
 	Permissions,
 	Support,
-	End
+	End,
 }
 
 @Preview
@@ -253,13 +259,13 @@ fun IntroTitlePage() {
 			.fillMaxSize()
 			.padding(16.dp),
 		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Icon(painterResource(R.drawable.shou_icon), stringResource(R.string.app_name))
 		Text(
 			stringResource(R.string.intro_title_greet),
 			style = MaterialTheme.typography.headlineMedium,
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
 		)
 	}
 }
@@ -272,7 +278,6 @@ fun PreviewIntroExplanationPage() {
 
 @Composable
 fun IntroExplanationPage() {
-
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
@@ -283,15 +288,14 @@ fun IntroExplanationPage() {
 		Icon(Icons.Default.Info, null, modifier = Modifier.size(64.dp))
 		Text(
 			stringResource(R.string.intro_what_is_app),
-			style = MaterialTheme.typography.headlineSmall
+			style = MaterialTheme.typography.headlineSmall,
 		)
 		Text(
 			stringResource(R.string.intro_what_is_app_desc_new),
 			style = MaterialTheme.typography.bodyLarge,
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
 		)
 	}
-
 }
 
 @Preview
@@ -302,50 +306,50 @@ fun PreviewIntroLicensePage() {
 		isLicenseRead = isLicenseRead,
 		onLicenseRead = {
 			isLicenseRead = true
-		}
+		},
 	)
 }
 
 @Composable
-fun IntroLicensePage(
-	isLicenseRead: Boolean,
-	onLicenseRead: () -> Unit
-) {
-
+fun IntroLicensePage(isLicenseRead: Boolean, onLicenseRead: () -> Unit) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize(),
 		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Card(
-			shape = RectangleShape
+			shape = RectangleShape,
 		) {
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(16.dp),
 				verticalArrangement = Arrangement.Center,
-				horizontalAlignment = Alignment.CenterHorizontally
+				horizontalAlignment = Alignment.CenterHorizontally,
 			) {
 				Text(
 					stringResource(R.string.license),
-					style = MaterialTheme.typography.headlineSmall
+					style = MaterialTheme.typography.headlineSmall,
 				)
 				Text(
 					stringResource(R.string.intro_license_desc_new),
 					style = MaterialTheme.typography.bodyLarge,
-					textAlign = TextAlign.Center
+					textAlign = TextAlign.Center,
 				)
 			}
 		}
 		val scrollState = rememberScrollState()
 		LaunchedEffect(scrollState.value) {
-			if (!isLicenseRead) // Only run if the license is not read to save on performance
-				if (scrollState.maxValue != 0 && scrollState.value != 0) // prevent db0
+			if (!isLicenseRead) {
+				// Only run if the license is not read to save on performance
+				if (scrollState.maxValue != 0 && scrollState.value != 0) {
+					// prevent db0
 					if (scrollState.value / scrollState.maxValue >= .9) {
 						onLicenseRead()
 					}
+				}
+			}
 		}
 		ScrollStateBar(scrollState) {
 			Text(
@@ -353,11 +357,10 @@ fun IntroLicensePage(
 				style = MaterialTheme.typography.bodyMedium,
 				modifier = Modifier
 					.verticalScroll(scrollState)
-					.padding(16.dp)
+					.padding(16.dp),
 			)
 		}
 	}
-
 }
 
 @Preview
@@ -365,34 +368,29 @@ fun IntroLicensePage(
 fun PreviewIntroACRAPage() {
 	var isACRAEnabled by remember { mutableStateOf(false) }
 	IntroACRAPage(
-		isACRAEnabled
+		isACRAEnabled,
 	) {
 		isACRAEnabled = it
 	}
 }
 
 @Composable
-fun IntroACRAPage(
-	isACRAEnabled: Boolean,
-	setACRAEnabled: (Boolean) -> Unit
-) {
-
+fun IntroACRAPage(isACRAEnabled: Boolean, setACRAEnabled: (Boolean) -> Unit) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding(16.dp),
 		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(stringResource(R.string.intro_acra), style = MaterialTheme.typography.headlineSmall)
 		Text(
 			stringResource(R.string.intro_acra_desc),
 			style = MaterialTheme.typography.bodyLarge,
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
 		)
 		Checkbox(isACRAEnabled, setACRAEnabled)
 	}
-
 }
 
 @Preview
@@ -414,32 +412,30 @@ fun PreviewIntroPermissionPage() {
 
 @Composable
 fun IntroPermissionPage() {
-
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
 			.padding(16.dp),
 		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
 			stringResource(R.string.intro_perm_title),
-			style = MaterialTheme.typography.headlineSmall
+			style = MaterialTheme.typography.headlineSmall,
 		)
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
 			IntroPermissionRow(
 				android.Manifest.permission.POST_NOTIFICATIONS,
-				stringResource(R.string.intro_perm_notif_desc)
+				stringResource(R.string.intro_perm_notif_desc),
 			)
 		} else {
 			Text(
 				stringResource(R.string.intro_perm_none),
 				style = MaterialTheme.typography.bodyLarge,
-				textAlign = TextAlign.Center
+				textAlign = TextAlign.Center,
 			)
 		}
 	}
-
 }
 
 @Preview
@@ -449,16 +445,13 @@ fun PreviewIntroSupportPage() {
 }
 
 @Composable
-fun IntroSupportPage(
-	showNext: () -> Unit,
-	next: () -> Unit,
-) {
+fun IntroSupportPage(showNext: () -> Unit, next: () -> Unit) {
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		// Header
 		Card(
-			shape = RectangleShape
+			shape = RectangleShape,
 		) {
 			Text(
 				stringResource(R.string.intro_support_title),
@@ -466,7 +459,7 @@ fun IntroSupportPage(
 				modifier = Modifier
 					.padding(16.dp)
 					.fillMaxWidth(),
-				textAlign = TextAlign.Center
+				textAlign = TextAlign.Center,
 			)
 		}
 
@@ -476,19 +469,19 @@ fun IntroSupportPage(
 				.fillMaxSize()
 				.verticalScroll(rememberScrollState()),
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(8.dp)
+			verticalArrangement = Arrangement.spacedBy(8.dp),
 		) {
 			Text(
 				stringResource(R.string.intro_support_desc),
 				style = MaterialTheme.typography.bodyMedium,
-				modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
 			)
 			val uriHandler = LocalUriHandler.current
 
 			Column(
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(4.dp),
-				modifier = Modifier.padding(start = 16.dp, end = 16.dp)
+				modifier = Modifier.padding(start = 16.dp, end = 16.dp),
 			) {
 				IntroSupportItem(R.string.patreon, URL_PATREON) {
 					showNext()
@@ -520,7 +513,7 @@ fun IntroSupportPage(
 				},
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+					.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
 			) {
 				Text(stringResource(R.string.support_ignore))
 			}
@@ -533,7 +526,7 @@ fun IntroSupportPage(
 fun PreviewIntroSupportItem() {
 	IntroSupportItem(
 		R.string.pause,
-		"link"
+		"link",
 	) {
 	}
 }
@@ -543,12 +536,12 @@ fun IntroSupportItem(textId: Int, link: String, onClick: () -> Unit) {
 	Card(
 		onClick = onClick,
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxWidth(),
 	) {
 		Column(
 			modifier = Modifier
 				.padding(8.dp)
-				.fillMaxWidth()
+				.fillMaxWidth(),
 		) {
 			Text(stringResource(textId), style = MaterialTheme.typography.titleSmall)
 			Text(link, style = MaterialTheme.typography.bodySmall)
@@ -558,16 +551,13 @@ fun IntroSupportItem(textId: Int, link: String, onClick: () -> Unit) {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun IntroPermissionRow(
-	permission: String,
-	description: String
-) {
+fun IntroPermissionRow(permission: String, description: String) {
 	val permissionState = rememberPermissionState(permission)
 
 	Row(
 		modifier = Modifier.fillMaxWidth(),
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.SpaceBetween
+		horizontalArrangement = Arrangement.SpaceBetween,
 	) {
 		Text(description, modifier = Modifier.fillMaxWidth(.7f))
 
@@ -576,7 +566,7 @@ fun IntroPermissionRow(
 			onCheckedChange = {
 				permissionState.launchPermissionRequest()
 			},
-			modifier = Modifier.fillMaxWidth(.2f)
+			modifier = Modifier.fillMaxWidth(.2f),
 		)
 	}
 }
@@ -594,17 +584,16 @@ fun IntroEndPage() {
 			.fillMaxSize()
 			.padding(16.dp),
 		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
+		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(
 			stringResource(R.string.intro_happy_end),
-			style = MaterialTheme.typography.headlineSmall
+			style = MaterialTheme.typography.headlineSmall,
 		)
 		Text(
 			stringResource(R.string.intro_happy_end_desc),
 			style = MaterialTheme.typography.bodyLarge,
-			textAlign = TextAlign.Center
+			textAlign = TextAlign.Center,
 		)
 	}
-
 }

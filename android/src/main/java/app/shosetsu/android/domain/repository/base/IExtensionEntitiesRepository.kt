@@ -40,7 +40,7 @@ interface IExtensionEntitiesRepository {
 	@Throws(
 		IncompatibleExtensionException::class,
 		InvalidMetaDataException::class,
-		MissingExtensionException::class
+		MissingExtensionException::class,
 	)
 	suspend fun get(extensionEntity: GenericExtensionEntity): IExtension
 
@@ -50,6 +50,6 @@ interface IExtensionEntitiesRepository {
 	suspend fun save(
 		extensionEntity: GenericExtensionEntity,
 		iExt: IExtension,
-		extensionContent: ByteArray
+		extensionContent: ByteArray,
 	)
 }

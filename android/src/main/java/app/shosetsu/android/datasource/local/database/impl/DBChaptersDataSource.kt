@@ -36,13 +36,9 @@ import kotlinx.coroutines.flow.map
  *
  * @author github.com/doomsdayrs
  */
-class DBChaptersDataSource(
-	private val chaptersDao: ChaptersDao,
-) : IDBChaptersDataSource {
+class DBChaptersDataSource(private val chaptersDao: ChaptersDao) : IDBChaptersDataSource {
 
-	override suspend fun getChaptersFlow(
-		novelID: Int,
-	): Flow<List<ChapterEntity>> =
+	override suspend fun getChaptersFlow(novelID: Int): Flow<List<ChapterEntity>> =
 		chaptersDao.getChaptersFlow(novelID).map { it.convertList() }
 
 	@Throws(SQLiteException::class)
@@ -65,25 +61,21 @@ class DBChaptersDataSource(
 		novelID: Int,
 		extensionID: Int,
 		list: List<Novel.Chapter>,
-	): Unit =
-		chaptersDao.handleNewData(novelID, extensionID, list)
-
+	): Unit = chaptersDao.handleNewData(novelID, extensionID, list)
 
 	@Throws(IndexOutOfBoundsException::class, SQLiteException::class)
 	override suspend fun handleChapterReturn(
 		novelID: Int,
 		extensionID: Int,
 		list: List<Novel.Chapter>,
-	): List<ChapterEntity> =
-		chaptersDao.handleNewDataReturn(novelID, extensionID, list).convertList()
+	): List<ChapterEntity> = chaptersDao.handleNewDataReturn(novelID, extensionID, list).convertList()
 
 	@Throws(SQLiteException::class)
 	override suspend fun updateChapter(chapterEntity: ChapterEntity): Unit =
 		chaptersDao.update(chapterEntity.toDB())
 
 	@Throws(SQLiteException::class)
-	override suspend fun delete(entity: ChapterEntity): Unit =
-		chaptersDao.delete(entity.toDB())
+	override suspend fun delete(entity: ChapterEntity): Unit = chaptersDao.delete(entity.toDB())
 
 	@Throws(SQLiteException::class)
 	override suspend fun delete(entity: List<ChapterEntity>) {
@@ -98,7 +90,7 @@ class DBChaptersDataSource(
 
 	override suspend fun updateChapterReadingStatus(
 		chapterIds: List<Int>,
-		readingStatus: ReadingStatus
+		readingStatus: ReadingStatus,
 	) {
 		chaptersDao.updateChapterReadingStatusBulk(chapterIds, readingStatus)
 	}

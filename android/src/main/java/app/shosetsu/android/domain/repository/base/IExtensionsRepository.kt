@@ -8,9 +8,9 @@ import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.Flow
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -80,7 +80,7 @@ interface IExtensionsRepository {
 	 */
 	data class InstallExtensionFlags(
 		val deleteChapters: Boolean,
-		val oldType: Novel.ChapterType? = null
+		val oldType: Novel.ChapterType? = null,
 	)
 
 	/**
@@ -124,7 +124,7 @@ interface IExtensionsRepository {
 	)
 	suspend fun downloadExtension(
 		repositoryEntity: RepositoryEntity,
-		extension: GenericExtensionEntity
+		extension: GenericExtensionEntity,
 	): ByteArray
 
 	/**

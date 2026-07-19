@@ -3,7 +3,11 @@ package app.shosetsu.android.view.compose.setting
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,7 +44,7 @@ fun StringSettingContent(
 	description: String,
 	value: String,
 	modifier: Modifier = Modifier,
-	onValueChanged: (newString: String) -> Unit
+	onValueChanged: (newString: String) -> Unit,
 ) {
 	Column(
 		modifier = modifier,
@@ -49,7 +53,7 @@ fun StringSettingContent(
 			value = value,
 			onValueChange = onValueChanged,
 			label = { Text(title) },
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier.fillMaxWidth(),
 		)
 		Text(description)
 	}
@@ -69,7 +73,7 @@ fun StringSettingContent(
 
 	Column(
 		Modifier
-			.padding(horizontal = 16.dp)
+			.padding(horizontal = 16.dp),
 	) {
 		TextField(
 			value = value,
@@ -78,13 +82,13 @@ fun StringSettingContent(
 			},
 			modifier = modifier,
 			label = { Text(title) },
-			enabled = enabled
+			enabled = enabled,
 		)
 		Text(
 			description,
 			style = SUB_TEXT_SIZE,
 			modifier = Modifier.alpha(0.7f),
-			color = LocalContentColor.current
+			color = LocalContentColor.current,
 		)
 	}
 }
@@ -93,6 +97,5 @@ fun StringSettingContent(
 @Composable
 fun PreviewStringSettingContent() {
 	StringSettingContent("Text Input", "This is a text input", "") {
-
 	}
 }

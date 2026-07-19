@@ -41,25 +41,24 @@ import java.io.IOException
 class InstallExtensionUseCase(
 	private val extensionRepository: IExtensionsRepository,
 	private val extensionEntitiesRepository: IExtensionEntitiesRepository,
-	private val extensionRepoRepository: IExtensionRepoRepository
+	private val extensionRepoRepository: IExtensionRepoRepository,
 ) {
 	@Throws(
 		HTTPException::class,
 		SQLiteException::class,
 		FilePermissionException::class,
 		IOException::class,
-		InvalidMetaDataException::class
+		InvalidMetaDataException::class,
 	)
 	suspend operator fun invoke(extToInstall: GenericExtensionEntity): InstallExtensionFlags {
 		val repo = extensionRepoRepository.getRepo(extToInstall.repoID)!!
 
 		val extensionContent: ByteArray = extensionRepository.downloadExtension(
 			repo,
-			extToInstall
+			extToInstall,
 		)
 
 		val iExt = extToInstall.asIEntity(extensionContent)
-
 
 		val oldType: Novel.ChapterType?
 		val deleteChapters: Boolean
@@ -75,13 +74,14 @@ class InstallExtensionUseCase(
 		}
 
 		// Uninstall the currently installed version of the extension
-		if (oldInstalledExt != null)
+		if (oldInstalledExt != null) {
 			extensionEntitiesRepository.uninstall(oldInstalledExt.generify())
+		}
 
 		// Write to storage/cache
 		extensionEntitiesRepository.save(extToInstall, iExt, extensionContent)
 
-		if (oldInstalledExt != null)
+		if (oldInstalledExt != null) {
 			extensionRepository.updateInstalledExtension(
 				oldInstalledExt.copy(
 					repoID = extToInstall.repoID,
@@ -92,10 +92,10 @@ class InstallExtensionUseCase(
 					version = extToInstall.version,
 					md5 = extToInstall.md5,
 					type = extToInstall.type,
-					chapterType = iExt.chapterType
-				)
+					chapterType = iExt.chapterType,
+				),
 			)
-		else {
+		} else {
 			extensionRepository.insert(
 				InstalledExtensionEntity(
 					id = extToInstall.id,
@@ -108,14 +108,14 @@ class InstallExtensionUseCase(
 					md5 = extToInstall.md5,
 					type = extToInstall.type,
 					enabled = true,
-					chapterType = iExt.chapterType
-				)
+					chapterType = iExt.chapterType,
+				),
 			)
 		}
 
 		return InstallExtensionFlags(
 			deleteChapters,
-			oldType
+			oldType,
 		)
 	}
 }

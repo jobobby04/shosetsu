@@ -36,10 +36,10 @@ fun SwitchPreferenceWidget(
 				checked = checked,
 				onCheckedChange = null,
 				modifier = Modifier.padding(start = TrailingWidgetBuffer),
-				enabled = enabled
+				enabled = enabled,
 			)
 		},
-		iconDescription = iconDescription
+		iconDescription = iconDescription,
 	)
 }
 
@@ -54,26 +54,26 @@ private fun SwitchPreferenceWidgetPreview() = ShosetsuTheme(AppThemes.LIGHT) {
 				icon = Icons.Filled.Preview,
 				checked = true,
 				onCheckedChanged = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 			SwitchPreferenceWidget(
 				title = "Switch preference",
 				subtitle = "Switch preference summary",
 				checked = false,
 				onCheckedChanged = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 			SwitchPreferenceWidget(
 				title = "Switch preference no summary",
 				checked = false,
 				onCheckedChanged = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 			SwitchPreferenceWidget(
 				title = "Another switch preference no summary",
 				checked = false,
 				onCheckedChanged = {},
-				iconDescription = null
+				iconDescription = null,
 			)
 		}
 	}

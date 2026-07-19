@@ -25,10 +25,6 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
  *
  * @see [app.shosetsu.android.common.SettingKey.DeleteReadChapter]
  */
-class LoadDeletePreviousChapterUseCase(
-	val iSettingsRepository: ISettingsRepository
-) {
-	suspend operator fun invoke() =
-		iSettingsRepository.getInt(SettingKey.DeleteReadChapter)
-
+class LoadDeletePreviousChapterUseCase(val iSettingsRepository: ISettingsRepository) {
+	suspend operator fun invoke() = iSettingsRepository.getInt(SettingKey.DeleteReadChapter)
 }

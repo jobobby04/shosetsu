@@ -12,7 +12,9 @@ data class ProxyConfig(
 			val (auth, hostname) = if (proxyString.contains('@')) {
 				val (auth_, host_) = proxyString.split('@', limit = 2)
 				Pair(auth_, host_)
-			} else Pair("", proxyString)
+			} else {
+				Pair("", proxyString)
+			}
 			val (username, password) = if (auth.isNotEmpty()) {
 				if (auth.contains(':')) {
 					val split = auth.split(':')
@@ -24,12 +26,16 @@ data class ProxyConfig(
 				} else {
 					Pair(auth, "")
 				}
-			} else Pair("", "")
+			} else {
+				Pair("", "")
+			}
 
 			val (host, port) = if (hostname.contains(':')) {
 				val (host_, port_) = hostname.split(':', limit = 2)
 				Pair(host_, port_.toIntOrNull() ?: -1)
-			} else Pair(hostname, -1)
+			} else {
+				Pair(hostname, -1)
+			}
 
 			return ProxyConfig(host, port, username.isNotEmpty(), username, password)
 		}
@@ -49,18 +55,19 @@ data class ProxyConfig(
 	}
 
 	override fun toString(): String {
-		if (hostname.isEmpty())
+		if (hostname.isEmpty()) {
 			return ""
+		}
 
 		val sb = StringBuilder()
 		if (authUsed) {
 			sb.append(username)
 
-			if (password.isNotEmpty())
-				sb.append(":${password}@")
+			if (password.isNotEmpty()) {
+				sb.append(":$password@")
+			}
 		}
-		sb.append("${hostname}:${port}")
+		sb.append("$hostname:$port")
 		return sb.toString()
 	}
 }
-

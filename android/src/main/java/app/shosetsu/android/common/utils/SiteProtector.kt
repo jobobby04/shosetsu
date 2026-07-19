@@ -19,9 +19,12 @@ package app.shosetsu.android.common.utils
 import app.shosetsu.android.common.SettingKey
 import app.shosetsu.android.common.utils.SiteProtector.requestDelay
 import app.shosetsu.android.common.utils.SiteProtector.retryAfter
-import kotlinx.coroutines.delay
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.times
+import kotlinx.coroutines.delay
 
 /**
  * Class dedicated to protecting sites from what is essentially a ddos attack from shosetsu
@@ -33,13 +36,13 @@ object SiteProtector {
 	 * Filled with delays provided by HTTP 429s
 	 * If entry is found, then it should be removed afterwards.
 	 */
-	private val retryAfter = ConcurrentHashMap<String, Long>()
+	private val retryAfter = ConcurrentHashMap<String, Duration>()
 
 	/**
 	 * @param after delay in ms
 	 */
 	fun setRetryAfter(host: String, after: Long) {
-		retryAfter[host] = after
+		retryAfter[host] = after.milliseconds
 	}
 
 	/**
@@ -51,8 +54,7 @@ object SiteProtector {
 	 * Get delay, respects [retryAfter] defaults to [requestDelay]
 	 */
 	@Suppress("NOTHING_TO_INLINE")
-	private inline fun getDelay(host: String) =
-		retryAfter[host] ?: requestDelay
+	private inline fun getDelay(host: String): Duration = retryAfter[host] ?: requestDelay.milliseconds
 
 	/**
 	 * Check if we can continue operating.
@@ -61,7 +63,7 @@ object SiteProtector {
 	 */
 	@Suppress("NOTHING_TO_INLINE")
 	private inline fun checkIfCan(host: String, lastUsedTime: Long): Boolean =
-		(lastUsedTime + getDelay(host)) > System.currentTimeMillis()
+		(lastUsedTime + getDelay(host).inWholeMilliseconds) > System.currentTimeMillis()
 
 	/**
 	 * Ask to use the site, once received
@@ -90,7 +92,7 @@ object SiteProtector {
 					// This ensures that two awaits never occur at the same time
 					delay(
 						(getDelay(host) / Random.nextInt(1, 10)) +
-							delayedCount * 100
+							delayedCount * 100.milliseconds,
 					)
 					if (delayedCount < 10) delayedCount++
 

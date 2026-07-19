@@ -20,13 +20,13 @@ import app.shosetsu.android.common.enums.AppThemes
 private val DarkColorScheme = darkColorScheme(
 	primary = Primary,
 	secondary = Secondary,
-	tertiary = Tertiary
+	tertiary = Tertiary,
 )
 
 private val LightColorScheme = lightColorScheme(
 	primary = Primary,
 	secondary = Secondary,
-	tertiary = Tertiary
+	tertiary = Tertiary,
 
 	/* Other default colors to override
 	background = Color(0xFFFFFBFE),
@@ -36,16 +36,13 @@ private val LightColorScheme = lightColorScheme(
 	onTertiary = Color.White,
 	onBackground = Color(0xFF1C1B1F),
 	onSurface = Color(0xFF1C1B1F),
-	*/
+	 */
 )
 
 val FallbackColorScheme = LightColorScheme
 
 @Composable
-fun ShosetsuTheme(
-	theme: AppThemes,
-	content: @Composable () -> Unit
-) {
+fun ShosetsuTheme(theme: AppThemes, content: @Composable () -> Unit) {
 	val darkTheme = when (theme) {
 		AppThemes.FOLLOW_SYSTEM -> isSystemInDarkTheme()
 		AppThemes.LIGHT -> false
@@ -58,6 +55,7 @@ fun ShosetsuTheme(
 		}
 
 		darkTheme -> DarkColorScheme
+
 		else -> LightColorScheme
 	}
 	val view = LocalView.current
@@ -76,10 +74,10 @@ fun ShosetsuTheme(
 		content = {
 			CompositionLocalProvider(
 				// this breaks relative font sizes in the browse screen
-//				LocalTextStyle provides MaterialTheme.typography.bodyLarge,
+// 				LocalTextStyle provides MaterialTheme.typography.bodyLarge,
 				LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-				content = content
+				content = content,
 			)
-		}
+		},
 	)
 }

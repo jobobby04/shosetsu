@@ -29,13 +29,9 @@ import androidx.annotation.RequiresApi
 @Suppress("OverridingDeprecatedMember")
 abstract class WebViewClientCompat : WebViewClient() {
 
-	open fun shouldOverrideUrlCompat(view: WebView, url: String): Boolean {
-		return false
-	}
+	open fun shouldOverrideUrlCompat(view: WebView, url: String): Boolean = false
 
-	open fun shouldInterceptRequestCompat(view: WebView, url: String): WebResourceResponse? {
-		return null
-	}
+	open fun shouldInterceptRequestCompat(view: WebView, url: String): WebResourceResponse? = null
 
 	open fun onReceivedErrorCompat(
 		view: WebView,
@@ -47,29 +43,21 @@ abstract class WebViewClientCompat : WebViewClient() {
 	}
 
 	@RequiresApi(Build.VERSION_CODES.N)
-	final override fun shouldOverrideUrlLoading(
-		view: WebView,
-		request: WebResourceRequest,
-	): Boolean {
-		return shouldOverrideUrlCompat(view, request.url.toString())
-	}
+	final override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
+		shouldOverrideUrlCompat(view, request.url.toString())
 
 	@Deprecated("shouldOverrideUrlLoading(WebView, WebResourceRequest)")
-	final override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-		return shouldOverrideUrlCompat(view, url)
-	}
+	final override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean =
+		shouldOverrideUrlCompat(view, url)
 
 	final override fun shouldInterceptRequest(
 		view: WebView,
 		request: WebResourceRequest,
-	): WebResourceResponse? {
-		return shouldInterceptRequestCompat(view, request.url.toString())
-	}
+	): WebResourceResponse? = shouldInterceptRequestCompat(view, request.url.toString())
 
 	@Deprecated("shouldInterceptRequest(WebView, WebResourceRequest)")
-	final override fun shouldInterceptRequest(view: WebView, url: String): WebResourceResponse? {
-		return shouldInterceptRequestCompat(view, url)
-	}
+	final override fun shouldInterceptRequest(view: WebView, url: String): WebResourceResponse? =
+		shouldInterceptRequestCompat(view, url)
 
 	@RequiresApi(Build.VERSION_CODES.M)
 	final override fun onReceivedError(

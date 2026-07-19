@@ -43,12 +43,13 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Shosetsu
  *
  * @since 26 / 05 / 2022
  * @author Doomsdayrs
  */
+
 /**
  * Creates the HTML page
  */
@@ -81,7 +82,7 @@ fun ChapterReaderPage(
 					.padding(windowPadding)
 					.consumeWindowInsets(windowPadding)
 					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
+					.background(MaterialTheme.colorScheme.background),
 			) {
 				ErrorContent(
 					throwable?.message
@@ -89,7 +90,7 @@ fun ChapterReaderPage(
 					ErrorAction(R.string.retry) {
 						retryChapter(item)
 					},
-					stackTrace = throwable?.stackTraceToString()
+					stackTrace = throwable?.stackTraceToString(),
 				)
 			}
 		}
@@ -100,12 +101,12 @@ fun ChapterReaderPage(
 					.padding(windowPadding)
 					.consumeWindowInsets(windowPadding)
 					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
+					.background(MaterialTheme.colorScheme.background),
 			) {
 				LinearProgressIndicator(
 					modifier = Modifier
 						.fillMaxWidth()
-						.align(Alignment.TopCenter)
+						.align(Alignment.TopCenter),
 				)
 			}
 		}
@@ -117,7 +118,7 @@ fun ChapterReaderPage(
 				Modifier
 					.padding(footerPadding)
 					.fillMaxSize()
-					.background(MaterialTheme.colorScheme.background)
+					.background(MaterialTheme.colorScheme.background),
 			) {
 				HTMLPage(
 					html = (html as ChapterPassage.Success).content,

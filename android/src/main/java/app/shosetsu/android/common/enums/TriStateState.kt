@@ -24,7 +24,10 @@ package app.shosetsu.android.common.enums
  * @author Doomsdayrs
  */
 enum class TriStateState {
-	IGNORED, CHECKED, UNCHECKED;
+	IGNORED,
+	CHECKED,
+	UNCHECKED,
+	;
 
 	fun cycle(skipIgnored: Boolean) = when (this) {
 		IGNORED -> CHECKED

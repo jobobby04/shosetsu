@@ -26,9 +26,7 @@ import app.shosetsu.android.view.uimodels.model.LibraryNovelUI
  * shosetsu
  * 29 / 07 / 2020
  */
-class UpdateBookmarkedNovelUseCase(
-	private val novelsRepository: INovelsRepository,
-) {
+class UpdateBookmarkedNovelUseCase(private val novelsRepository: INovelsRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(list: List<LibraryNovelUI>) =
 		novelsRepository.updateLibraryNovelEntity(list.convertList())

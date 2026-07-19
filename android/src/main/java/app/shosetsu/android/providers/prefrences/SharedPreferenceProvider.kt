@@ -47,52 +47,38 @@ class SharedPreferenceProvider(
 	/**
 	 * Wraps a [SharedPreferences] object, providing functionality wrapping
 	 */
-	private data class PreferenceHolder(
-		val preferences: SharedPreferences,
-	) {
+	private data class PreferenceHolder(val preferences: SharedPreferences) {
 		private val flowHolder: SharedPreferenceFlowState = SharedPreferenceFlowState()
 
-		fun observeLong(key: SettingKey<Long>): StateFlow<Long> =
-			flowHolder.observeLong(key)
+		fun observeLong(key: SettingKey<Long>): StateFlow<Long> = flowHolder.observeLong(key)
 
-		fun observeString(key: StringKey): StateFlow<String> =
-			flowHolder.observeString(key)
+		fun observeString(key: StringKey): StateFlow<String> = flowHolder.observeString(key)
 
-		fun observeInt(key: IntKey): StateFlow<Int> =
-			flowHolder.observeInt(key)
+		fun observeInt(key: IntKey): StateFlow<Int> = flowHolder.observeInt(key)
 
-		fun observeBoolean(key: BooleanKey): StateFlow<Boolean> =
-			flowHolder.observeBoolean(key)
+		fun observeBoolean(key: BooleanKey): StateFlow<Boolean> = flowHolder.observeBoolean(key)
 
-		fun observeStringSet(key: StringSetKey): StateFlow<Set<String>> =
-			flowHolder.observeStringSet(key)
+		fun observeStringSet(key: StringSetKey): StateFlow<Set<String>> = flowHolder.observeStringSet(key)
 
-		fun observeFloat(key: FloatKey): StateFlow<Float> =
-			flowHolder.observeFloat(key)
+		fun observeFloat(key: FloatKey): StateFlow<Float> = flowHolder.observeFloat(key)
 
+		fun getLong(key: SettingKey<Long>): Long = preferences.getLong(key.name, key.default)
 
-		fun getLong(key: SettingKey<Long>): Long =
-			preferences.getLong(key.name, key.default)
+		fun getString(key: StringKey): String = preferences.getString(key.name, key.default) ?: ""
 
-		fun getString(key: StringKey): String =
-			preferences.getString(key.name, key.default) ?: ""
+		fun getInt(key: IntKey): Int = preferences.getInt(key.name, key.default)
 
-		fun getInt(key: IntKey): Int =
-			preferences.getInt(key.name, key.default)
-
-		fun getBoolean(key: BooleanKey): Boolean =
-			preferences.getBoolean(key.name, key.default)
+		fun getBoolean(key: BooleanKey): Boolean = preferences.getBoolean(key.name, key.default)
 
 		fun getStringSet(key: StringSetKey): Set<String> =
 			preferences.getStringSet(key.name, key.default) ?: setOf()
 
-		fun getFloat(key: FloatKey): Float =
-			try {
-				preferences.getFloat(key.name, key.default)
-			} catch (e: ClassCastException) {
-				setFloat(key, key.default)
-				key.default
-			}
+		fun getFloat(key: FloatKey): Float = try {
+			preferences.getFloat(key.name, key.default)
+		} catch (e: ClassCastException) {
+			setFloat(key, key.default)
+			key.default
+		}
 
 		fun setLong(key: SettingKey<Long>, value: Long): Unit =
 			preferences.edit { putLong(key.name, value) }
@@ -100,8 +86,7 @@ class SharedPreferenceProvider(
 		fun setString(key: StringKey, value: String): Unit =
 			preferences.edit { putString(key.name, value) }
 
-		fun setInt(key: IntKey, value: Int): Unit =
-			preferences.edit { putInt(key.name, value) }
+		fun setInt(key: IntKey, value: Int): Unit = preferences.edit { putInt(key.name, value) }
 
 		fun setBoolean(key: BooleanKey, value: Boolean): Unit =
 			preferences.edit { putBoolean(key.name, value) }
@@ -109,8 +94,7 @@ class SharedPreferenceProvider(
 		fun setStringSet(key: StringSetKey, value: Set<String>): Unit =
 			preferences.edit { putStringSet(key.name, value) }
 
-		fun setFloat(key: FloatKey, value: Float): Unit =
-			preferences.edit { putFloat(key.name, value) }
+		fun setFloat(key: FloatKey, value: Float): Unit = preferences.edit { putFloat(key.name, value) }
 
 		private inner class SharedPreferenceFlowState :
 			SharedPreferences.OnSharedPreferenceChangeListener {
@@ -133,47 +117,41 @@ class SharedPreferenceProvider(
 
 			private val floatMap: SettingKeyFlowMap<Float> by lazyHashMapOf()
 
-			fun observeLong(key: SettingKey<Long>): StateFlow<Long> =
-				longMap.getOrPut(key) {
-					MutableStateFlow(getLong(key)).also {
-						longMap[key] = it
-					}
+			fun observeLong(key: SettingKey<Long>): StateFlow<Long> = longMap.getOrPut(key) {
+				MutableStateFlow(getLong(key)).also {
+					longMap[key] = it
 				}
+			}
 
-			fun observeString(key: StringKey): StateFlow<String> =
-				stringMap.getOrPut(key) {
-					MutableStateFlow(getString(key)).also {
-						stringMap[key] = it
-					}
+			fun observeString(key: StringKey): StateFlow<String> = stringMap.getOrPut(key) {
+				MutableStateFlow(getString(key)).also {
+					stringMap[key] = it
 				}
+			}
 
-			fun observeInt(key: IntKey): StateFlow<Int> =
-				intMap.getOrPut(key) {
-					MutableStateFlow(getInt(key)).also {
-						intMap[key] = it
-					}
+			fun observeInt(key: IntKey): StateFlow<Int> = intMap.getOrPut(key) {
+				MutableStateFlow(getInt(key)).also {
+					intMap[key] = it
 				}
+			}
 
-			fun observeBoolean(key: BooleanKey): StateFlow<Boolean> =
-				booleanMap.getOrPut(key) {
-					MutableStateFlow(getBoolean(key)).also {
-						booleanMap[key] = it
-					}
+			fun observeBoolean(key: BooleanKey): StateFlow<Boolean> = booleanMap.getOrPut(key) {
+				MutableStateFlow(getBoolean(key)).also {
+					booleanMap[key] = it
 				}
+			}
 
-			fun observeStringSet(key: StringSetKey): StateFlow<Set<String>> =
-				stringSetMap.getOrPut(key) {
-					MutableStateFlow(getStringSet(key)).also {
-						stringSetMap[key] = it
-					}
+			fun observeStringSet(key: StringSetKey): StateFlow<Set<String>> = stringSetMap.getOrPut(key) {
+				MutableStateFlow(getStringSet(key)).also {
+					stringSetMap[key] = it
 				}
+			}
 
-			fun observeFloat(key: FloatKey): StateFlow<Float> =
-				floatMap.getOrPut(key) {
-					MutableStateFlow(getFloat(key)).also {
-						floatMap[key] = it
-					}
+			fun observeFloat(key: FloatKey): StateFlow<Float> = floatMap.getOrPut(key) {
+				MutableStateFlow(getFloat(key)).also {
+					floatMap[key] = it
 				}
+			}
 
 			override fun onSharedPreferenceChanged(sp: SharedPreferences?, s: String?) {
 				if (s == null) return
@@ -181,11 +159,17 @@ class SharedPreferenceProvider(
 				val key: SettingKey<*> =
 					SettingKey.valueOf(s) ?: when (s.substringBefore("_")) {
 						"int" -> SettingKey.CustomInt(s.substringAfter("_"), 0)
+
 						"string" -> SettingKey.CustomString(s.substringAfter("_"), "")
+
 						"boolean" -> SettingKey.CustomBoolean(s.substringAfter("_"), false)
+
 						"long" -> SettingKey.CustomLong(s.substringAfter("_"), 0L)
+
 						"float" -> SettingKey.CustomFloat(s.substringAfter("_"), 0f)
+
 						"stringSet" -> SettingKey.CustomStringSet(s.substringAfter("_"), setOf())
+
 						else -> {
 							logE("No SettingKey has been found matching ($s)")
 							return
@@ -252,12 +236,9 @@ class SharedPreferenceProvider(
 		}
 	}
 
-
-	private fun getPreferences(name: String): PreferenceHolder =
-		preferenceMap.getOrPut(name) {
-			PreferenceHolder(context.getSharedPreferences(name, 0))
-		}
-
+	private fun getPreferences(name: String): PreferenceHolder = preferenceMap.getOrPut(name) {
+		PreferenceHolder(context.getSharedPreferences(name, 0))
+	}
 
 	fun observeLong(name: String, key: SettingKey<Long>): StateFlow<Long> =
 		getPreferences(name).observeLong(key)
@@ -265,8 +246,7 @@ class SharedPreferenceProvider(
 	fun observeString(name: String, key: StringKey): StateFlow<String> =
 		getPreferences(name).observeString(key)
 
-	fun observeInt(name: String, key: IntKey): StateFlow<Int> =
-		getPreferences(name).observeInt(key)
+	fun observeInt(name: String, key: IntKey): StateFlow<Int> = getPreferences(name).observeInt(key)
 
 	fun observeBoolean(name: String, key: BooleanKey): StateFlow<Boolean> =
 		getPreferences(name).observeBoolean(key)
@@ -277,29 +257,18 @@ class SharedPreferenceProvider(
 	fun observeFloat(name: String, key: FloatKey): StateFlow<Float> =
 		getPreferences(name).observeFloat(key)
 
+	fun getLong(name: String, key: SettingKey<Long>): Long = getPreferences(name).getLong(key)
 
-	fun getLong(name: String, key: SettingKey<Long>): Long =
-		getPreferences(name).getLong(key)
+	fun getString(name: String, key: StringKey): String = getPreferences(name).getString(key)
 
+	fun getInt(name: String, key: IntKey): Int = getPreferences(name).getInt(key)
 
-	fun getString(name: String, key: StringKey): String =
-		getPreferences(name).getString(key)
-
-	fun getInt(name: String, key: IntKey): Int =
-		getPreferences(name).getInt(key)
-
-
-	fun getBoolean(name: String, key: BooleanKey): Boolean =
-		getPreferences(name).getBoolean(key)
-
+	fun getBoolean(name: String, key: BooleanKey): Boolean = getPreferences(name).getBoolean(key)
 
 	fun getStringSet(name: String, key: StringSetKey): Set<String> =
 		getPreferences(name).getStringSet(key)
 
-
-	fun getFloat(name: String, key: FloatKey): Float =
-		getPreferences(name).getFloat(key)
-
+	fun getFloat(name: String, key: FloatKey): Float = getPreferences(name).getFloat(key)
 
 	fun setLong(name: String, key: SettingKey<Long>, value: Long): Unit =
 		getPreferences(name).setLong(key, value)
@@ -307,8 +276,7 @@ class SharedPreferenceProvider(
 	fun setString(name: String, key: StringKey, value: String): Unit =
 		getPreferences(name).setString(key, value)
 
-	fun setInt(name: String, key: IntKey, value: Int): Unit =
-		getPreferences(name).setInt(key, value)
+	fun setInt(name: String, key: IntKey, value: Int): Unit = getPreferences(name).setInt(key, value)
 
 	fun setBoolean(name: String, key: BooleanKey, value: Boolean): Unit =
 		getPreferences(name).setBoolean(key, value)
@@ -318,7 +286,4 @@ class SharedPreferenceProvider(
 
 	fun setFloat(name: String, key: FloatKey, value: Float): Unit =
 		getPreferences(name).setFloat(key, value)
-
 }
-
-

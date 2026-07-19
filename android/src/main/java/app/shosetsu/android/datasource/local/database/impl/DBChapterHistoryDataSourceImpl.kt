@@ -32,12 +32,10 @@ import app.shosetsu.android.providers.database.dao.ChapterHistoryDao
  * @since 12 / 02 / 2023
  * @author Doomsdayrs
  */
-class DBChapterHistoryDataSourceImpl(
-	private val dao: ChapterHistoryDao
-) : DBChapterHistoryDataSource {
+class DBChapterHistoryDataSourceImpl(private val dao: ChapterHistoryDao) :
+	DBChapterHistoryDataSource {
 	@Throws(SQLiteException::class)
-	override fun getHistory(): PagingSource<Int, DBChapterHistoryEntity> =
-		dao.getHistory()
+	override fun getHistory(): PagingSource<Int, DBChapterHistoryEntity> = dao.getHistory()
 
 	private fun ChapterHistoryEntity.toDB(): DBChapterHistoryEntity =
 		DBChapterHistoryEntity(id, novelId, chapterId, startedReadingAt, endedReadingAt)
@@ -46,8 +44,7 @@ class DBChapterHistoryDataSourceImpl(
 		ChapterHistoryEntity(id!!, novelId, chapterId, startedReadingAt, endedReadingAt)
 
 	@Throws(SQLiteException::class)
-	override suspend fun get(chapterId: Int): ChapterHistoryEntity? =
-		dao.get(chapterId)?.toEntity()
+	override suspend fun get(chapterId: Int): ChapterHistoryEntity? = dao.get(chapterId)?.toEntity()
 
 	@Throws(SQLiteException::class)
 	override suspend fun update(chapterHistoryEntity: ChapterHistoryEntity) {
@@ -59,13 +56,13 @@ class DBChapterHistoryDataSourceImpl(
 		novelId: Int,
 		chapterId: Int,
 		startedReadingAt: Long,
-		endedReadingAt: Long?
+		endedReadingAt: Long?,
 	) {
 		dao.insert(
 			novelId,
 			chapterId,
 			startedReadingAt,
-			endedReadingAt
+			endedReadingAt,
 		)
 	}
 

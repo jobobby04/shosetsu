@@ -36,7 +36,7 @@ class FakeAppUpdatesRepository : IAppUpdatesRepository {
 			999,
 			9999,
 			"https://gitlab.com/shosetsuorg/shosetsu-preview/releases/download/r1136/shosetsu-r1136.apk",
-			notes = listOf("This is a fake update")
+			notes = listOf("This is a fake update"),
 		)
 
 		appUpdate.emit(entity)

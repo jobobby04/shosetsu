@@ -36,7 +36,7 @@ data class NovelSettingUI(
 	val showOnlyBookmarked: Boolean = false,
 	val showOnlyDownloaded: Boolean = false,
 	val showOnlyString: String? = null,
-	val reverseOrder: Boolean = false
+	val reverseOrder: Boolean = false,
 ) : Convertible<NovelSettingEntity> {
 	override fun convertTo(): NovelSettingEntity = NovelSettingEntity(
 		novelID,

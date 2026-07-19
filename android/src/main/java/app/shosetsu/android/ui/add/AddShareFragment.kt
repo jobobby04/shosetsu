@@ -36,12 +36,12 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.consts.URL_HELP_SHARE
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.NovelEntity
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.HelpButton
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
 import app.shosetsu.lib.share.ExtensionLink
@@ -80,16 +80,13 @@ import coil.request.ImageRequest
  */
 
 @Composable
-fun AddShareView(
-	shareURL: String?,
-	onBackPressed: () -> Unit,
-	openNovel: (NovelEntity?) -> Unit
-) {
+fun AddShareView(shareURL: String?, onBackPressed: () -> Unit, openNovel: (NovelEntity?) -> Unit) {
 	val viewModel: AAddShareViewModel = viewModelDi()
 
 	LaunchedEffect(shareURL) {
-		if (shareURL != null)
+		if (shareURL != null) {
 			viewModel.setURL(shareURL)
+		}
 	}
 
 	val url by viewModel.url.collectAsState()
@@ -134,7 +131,7 @@ fun AddShareView(
 			openNovel(entity)
 		},
 		isNovelOpenable = isNovelOpenable,
-		onBack = onBackPressed
+		onBack = onBackPressed,
 	)
 }
 
@@ -147,15 +144,14 @@ fun PreviewAboutContent() {
 		0,
 		"Test Ext",
 		"https://raw.githubusercontent.com/shosetsuorg/extensions/dev/icons/AsianHobbyist.png",
-		repoLink
+		repoLink,
 	)
 	val novelLink = NovelLink(
 		"How to Get My Husband on My Side",
 		"https://noveltrench.com/wp-content/uploads/2021/03/How-To-Get-My-Husband-On-My-Side-193x278.jpg",
 		"https://noveltrench.com/novel/how-to-get-my-husband-on-my-side/",
-		extLink
+		extLink,
 	)
-
 
 	AddShareContent(
 		showURLInput = true,
@@ -175,7 +171,7 @@ fun PreviewAboutContent() {
 		isStyleAlreadyPresent = true,
 		isExtAlreadyPresent = true,
 		isRepoAlreadyPresent = true,
-		openNovel = {}
+		openNovel = {},
 	)
 }
 
@@ -186,7 +182,6 @@ fun AddShareContent(
 	url: String = "",
 	setURL: (String) -> Unit = { },
 	applyURL: () -> Unit = {},
-
 	isProcessing: Boolean,
 	isUrlValid: Boolean = false,
 	isAdding: Boolean = false,
@@ -204,7 +199,7 @@ fun AddShareContent(
 	isRepoAlreadyPresent: Boolean = false,
 	isComplete: Boolean = false,
 	isNovelOpenable: Boolean = false,
-	onBack: () -> Unit = {}
+	onBack: () -> Unit = {},
 ) {
 	Scaffold(
 		topBar = {
@@ -217,30 +212,31 @@ fun AddShareContent(
 				},
 				actions = {
 					HelpButton(URL_HELP_SHARE)
-				}
+				},
 			)
-		}
+		},
 	) { padding ->
 		if (isComplete) {
 			Box(
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(padding),
-				contentAlignment = Alignment.Center
+				contentAlignment = Alignment.Center,
 			) {
 				Column(horizontalAlignment = Alignment.CenterHorizontally) {
 					Text(
 						stringResource(R.string.completed),
-						style = MaterialTheme.typography.bodyLarge
+						style = MaterialTheme.typography.bodyLarge,
 					)
 					TextButton(onClick = reject) {
 						Text(stringResource(android.R.string.ok))
 					}
 
-					if (isNovelOpenable)
+					if (isNovelOpenable) {
 						TextButton(onClick = openNovel) {
 							Text(stringResource(R.string.fragment_add_open_novel))
 						}
+					}
 				}
 			}
 		} else if (isProcessing) {
@@ -248,7 +244,7 @@ fun AddShareContent(
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(padding),
-				contentAlignment = Alignment.Center
+				contentAlignment = Alignment.Center,
 			) {
 				CircularProgressIndicator()
 			}
@@ -258,7 +254,7 @@ fun AddShareContent(
 					.fillMaxSize()
 					.padding(padding),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.Center
+				verticalArrangement = Arrangement.Center,
 			) {
 				TextField(url, setURL, isError = isUrlValid)
 				TextButton(applyURL) {
@@ -273,7 +269,7 @@ fun AddShareContent(
 				) {
 					retry()
 				},
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
 		} else if (isNovelAlreadyPresent && novelLink != null) {
 			ErrorContent(
@@ -290,7 +286,7 @@ fun AddShareContent(
 						openNovel()
 					},
 				),
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
 		} else if (isStyleAlreadyPresent && styleLink != null) {
 			ErrorContent(
@@ -300,9 +296,11 @@ fun AddShareContent(
 				) {
 					reject()
 				},
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
-		} else if (isExtAlreadyPresent && extensionLink != null && novelLink == null && styleLink == null) {
+		} else if (isExtAlreadyPresent && extensionLink != null && novelLink == null &&
+			styleLink == null
+		) {
 			ErrorContent(
 				stringResource(R.string.fragment_add_present_ext, extensionLink.name),
 				ErrorAction(
@@ -310,9 +308,12 @@ fun AddShareContent(
 				) {
 					reject()
 				},
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
-		} else if (isRepoAlreadyPresent && repositoryLink != null && novelLink == null && styleLink == null && extensionLink == null) {
+		} else if (isRepoAlreadyPresent && repositoryLink != null && novelLink == null &&
+			styleLink == null &&
+			extensionLink == null
+		) {
 			ErrorContent(
 				stringResource(R.string.fragment_add_present_repo, repositoryLink.name),
 				ErrorAction(
@@ -320,7 +321,7 @@ fun AddShareContent(
 				) {
 					reject()
 				},
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
 		} else {
 			Column(
@@ -329,18 +330,18 @@ fun AddShareContent(
 					.fillMaxSize()
 					.padding(bottom = 56.dp),
 				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.SpaceBetween
+				verticalArrangement = Arrangement.SpaceBetween,
 			) {
 				Text(
 					stringResource(R.string.fragment_add_following),
 					modifier = Modifier.padding(bottom = 16.dp, top = 16.dp),
-					style = MaterialTheme.typography.headlineSmall
+					style = MaterialTheme.typography.headlineSmall,
 				)
 
 				LazyColumn(
 					horizontalAlignment = Alignment.CenterHorizontally,
 					contentPadding = PaddingValues(16.dp),
-					modifier = Modifier.fillMaxHeight(.75f)
+					modifier = Modifier.fillMaxHeight(.75f),
 				) {
 					if (novelLink != null) {
 						item {
@@ -348,22 +349,20 @@ fun AddShareContent(
 								Text(
 									stringResource(R.string.fragment_add_novel),
 									style = MaterialTheme.typography.titleLarge,
-									modifier = Modifier.padding(bottom = 8.dp)
+									modifier = Modifier.padding(bottom = 8.dp),
 								)
 
 								Card(
 									modifier = Modifier
 										.fillMaxWidth()
-										.padding(bottom = 16.dp)
+										.padding(bottom = 16.dp),
 								) {
 									Column(
-										modifier = Modifier.padding(16.dp)
+										modifier = Modifier.padding(16.dp),
 									) {
-
 										Row(
-											verticalAlignment = Alignment.CenterVertically
+											verticalAlignment = Alignment.CenterVertically,
 										) {
-
 											SubcomposeAsyncImage(
 												model = ImageRequest.Builder(LocalContext.current)
 													.data(novelLink.imageURL)
@@ -371,28 +370,28 @@ fun AddShareContent(
 													.build(),
 												contentDescription = stringResource(
 													R.string.novel_image_content_description,
-													novelLink.name
+													novelLink.name,
 												),
 												modifier = Modifier
 													.heightIn(max = 128.dp)
-													.aspectRatio(coverRatio),
+													.aspectRatio(COVER_RATIO),
 												error = {
 													ImageLoadingError(novelLink.name)
 												},
 												loading = {
 													Box(Modifier.placeholder(true))
-												}
+												},
 											)
 											Column(
-												modifier = Modifier.padding(start = 8.dp)
+												modifier = Modifier.padding(start = 8.dp),
 											) {
 												Text(
 													novelLink.name,
-													style = MaterialTheme.typography.bodyLarge
+													style = MaterialTheme.typography.bodyLarge,
 												)
 												Text(
 													novelLink.url,
-													style = MaterialTheme.typography.bodySmall
+													style = MaterialTheme.typography.bodySmall,
 												)
 											}
 										}
@@ -401,28 +400,27 @@ fun AddShareContent(
 							}
 						}
 					}
-					//if (styleLink != null) {
-					//	// TODO Style
-					//}
+					// if (styleLink != null) {
+					// 	// TODO Style
+					// }
 					if (extensionLink != null && !isExtAlreadyPresent) {
 						item {
 							Column {
 								Text(
 									stringResource(R.string.fragment_add_extension),
 									style = MaterialTheme.typography.titleLarge,
-									modifier = Modifier.padding(bottom = 8.dp)
+									modifier = Modifier.padding(bottom = 8.dp),
 								)
 								Card(
 									modifier = Modifier
 										.padding(bottom = 16.dp)
-										.fillMaxWidth()
+										.fillMaxWidth(),
 								) {
 									Column(
 										modifier = Modifier.padding(16.dp),
 									) {
-
 										Row(
-											verticalAlignment = Alignment.CenterVertically
+											verticalAlignment = Alignment.CenterVertically,
 										) {
 											SubcomposeAsyncImage(
 												ImageRequest.Builder(LocalContext.current)
@@ -436,11 +434,11 @@ fun AddShareContent(
 												},
 												loading = {
 													Box(Modifier.placeholder(true))
-												}
+												},
 											)
 											Text(
 												extensionLink.name,
-												style = MaterialTheme.typography.bodyLarge
+												style = MaterialTheme.typography.bodyLarge,
 											)
 										}
 									}
@@ -456,24 +454,23 @@ fun AddShareContent(
 										R.string.fragment_add_repository,
 									),
 									style = MaterialTheme.typography.titleLarge,
-									modifier = Modifier.padding(bottom = 8.dp)
+									modifier = Modifier.padding(bottom = 8.dp),
 								)
 								Card(
-									modifier = Modifier.fillMaxWidth()
+									modifier = Modifier.fillMaxWidth(),
 								) {
 									Column(
-										modifier = Modifier.padding(16.dp)
+										modifier = Modifier.padding(16.dp),
 									) {
-
 										Text(
 											repositoryLink.name,
-											style = MaterialTheme.typography.bodyLarge
+											style = MaterialTheme.typography.bodyLarge,
 										)
 										Text(
 											repositoryLink.url,
 											style = MaterialTheme.typography.bodySmall,
 
-											)
+										)
 									}
 								}
 							}
@@ -481,26 +478,28 @@ fun AddShareContent(
 					}
 				}
 
-				if (isAdding)
+				if (isAdding) {
 					CircularProgressIndicator()
+				}
 
 				Card(
 					modifier = Modifier
 						.fillMaxWidth()
-						.padding(16.dp)
+						.padding(16.dp),
 				) {
 					Row(
 						horizontalArrangement = Arrangement.SpaceEvenly,
-						modifier = Modifier.fillMaxWidth()
+						modifier = Modifier.fillMaxWidth(),
 					) {
 						TextButton(reject, contentPadding = PaddingValues(16.dp)) {
 							Text(stringResource(android.R.string.cancel))
 						}
 
-						if (!isAdding)
+						if (!isAdding) {
 							TextButton(add, contentPadding = PaddingValues(16.dp)) {
 								Text(stringResource(android.R.string.ok))
 							}
+						}
 					}
 				}
 			}

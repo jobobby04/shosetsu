@@ -3,18 +3,18 @@
  * that also allows associating a single value with each set.
  */
 class UnionFind<K : Any, V : Any>(
-	private val merge: ((canonical: V, alternative: V) -> V)? = null
+	private val merge: ((canonical: V, alternative: V) -> V)? = null,
 ) {
 	private val nodes = mutableMapOf<K, Node<K, V>>()
 
 	/**
 	 * Find a node matching a given key, if none is found, put and returns an empty node.
 	 */
-	private fun _find(key: K): Node<K, V> = nodes.getOrPut(key) { Node(key, null, null) }.find()
+	private fun findNode(key: K): Node<K, V> = nodes.getOrPut(key) { Node(key, null, null) }.find()
 
 	fun union(canonical: K, alternative: K) {
-		val canonicalRoot = _find(canonical)
-		val alternativeRoot = _find(alternative)
+		val canonicalRoot = findNode(canonical)
+		val alternativeRoot = findNode(alternative)
 		if (canonicalRoot != alternativeRoot) {
 			if (alternativeRoot.value != null) {
 				if (canonicalRoot.value != null) {
@@ -24,7 +24,9 @@ class UnionFind<K : Any, V : Any>(
 					} else if (canonicalRoot.value == alternativeRoot.value) {
 						alternativeRoot.value = null
 					} else {
-						throw IllegalStateException("Canonical and alternative roots have different values: ${canonicalRoot.value} and ${alternativeRoot.value}")
+						throw IllegalStateException(
+							"Canonical and alternative roots have different values: ${canonicalRoot.value} and ${alternativeRoot.value}",
+						)
 					}
 				} else {
 					canonicalRoot.value = alternativeRoot.value
@@ -38,11 +40,11 @@ class UnionFind<K : Any, V : Any>(
 	/**
 	 * Given a key, return the key of the node matching the given key.
 	 */
-	fun find(key: K): K = _find(key).key
+	fun find(key: K): K = findNode(key).key
 
-	operator fun get(key: K): V? = _find(key).value
+	operator fun get(key: K): V? = findNode(key).value
 	operator fun set(key: K, value: V) {
-		_find(key).value = value
+		findNode(key).value = value
 	}
 
 	/**
@@ -52,7 +54,7 @@ class UnionFind<K : Any, V : Any>(
 	 */
 	fun compute(key: K, remappingFunction: (K, V?) -> V?): V? {
 		// Find the node
-		val node = _find(key)
+		val node = findNode(key)
 
 		// Perform a remapping of its current value
 		node.value = remappingFunction(node.key, node.value)

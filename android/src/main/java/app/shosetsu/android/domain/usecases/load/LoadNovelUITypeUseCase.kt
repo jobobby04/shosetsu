@@ -28,13 +28,10 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 08 / 12 / 2020
  */
-class LoadNovelUITypeUseCase(
-	private val repository: ISettingsRepository
-) {
+class LoadNovelUITypeUseCase(private val repository: ISettingsRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
-	operator fun invoke(): Flow<NovelCardType> {
-		return repository.getIntFlow(SettingKey.SelectedNovelCardType).mapLatest {
+	operator fun invoke(): Flow<NovelCardType> =
+		repository.getIntFlow(SettingKey.SelectedNovelCardType).mapLatest {
 			NovelCardType.valueOf(it)
 		}
-	}
 }

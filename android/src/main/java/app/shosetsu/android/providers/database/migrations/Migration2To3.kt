@@ -41,19 +41,23 @@ object Migration2To3 : Migration(2, 3) {
 			val tableName = "repositories"
 
 			// Creates new table
-			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `url` TEXT NOT NULL UNIQUE, `name` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL)")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `url` TEXT NOT NULL UNIQUE, `name` TEXT NOT NULL, `isEnabled` INTEGER NOT NULL)",
+			)
 
 			// Migrate
-			db.execSQL("INSERT INTO `${tableName}_new` SELECT _rowid_, `url`, `url` as `name`, 1 as `isEnabled` FROM `$tableName`")
+			db.execSQL(
+				"INSERT INTO `${tableName}_new` SELECT _rowid_, `url`, `url` as `name`, 1 as `isEnabled` FROM `$tableName`",
+			)
 
 			// Drop
 			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `$tableName`")
 
 			// Creat indexes
-			db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_${tableName}_url` ON `${tableName}` (`url`)")
+			db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_${tableName}_url` ON `$tableName` (`url`)")
 		}
 
 		// Handle chapter migration
@@ -61,7 +65,9 @@ object Migration2To3 : Migration(2, 3) {
 			val tableName = "chapters"
 
 			// Create new table
-			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `url` TEXT NOT NULL, `novelID` INTEGER NOT NULL, `formatterID` INTEGER NOT NULL, `title` TEXT NOT NULL, `releaseDate` TEXT NOT NULL, `order` REAL NOT NULL, `readingPosition` REAL NOT NULL, `readingStatus` INTEGER NOT NULL, `bookmarked` INTEGER NOT NULL, `isSaved` INTEGER NOT NULL, FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`formatterID`) REFERENCES `extensions`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `url` TEXT NOT NULL, `novelID` INTEGER NOT NULL, `formatterID` INTEGER NOT NULL, `title` TEXT NOT NULL, `releaseDate` TEXT NOT NULL, `order` REAL NOT NULL, `readingPosition` REAL NOT NULL, `readingStatus` INTEGER NOT NULL, `bookmarked` INTEGER NOT NULL, `isSaved` INTEGER NOT NULL, FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`formatterID`) REFERENCES `extensions`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
+			)
 
 			// Handle migration
 			val cursor = db.query("SELECT * FROM $tableName")
@@ -81,7 +87,7 @@ object Migration2To3 : Migration(2, 3) {
 						this["'readingStatus'"] = cursor.getInt("readingStatus")
 						this["'bookmarked'"] = cursor.getInt("bookmarked")
 						this["'isSaved'"] = cursor.getInt("isSaved")
-					}
+					},
 				)
 			}
 
@@ -89,12 +95,14 @@ object Migration2To3 : Migration(2, 3) {
 			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `$tableName`")
 
 			// Create indexes
-			db.execSQL("CREATE INDEX IF NOT EXISTS `index_chapters_novelID` ON `${tableName}` (`novelID`)")
-			db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_chapters_url` ON `${tableName}` (`url`)")
-			db.execSQL("CREATE INDEX IF NOT EXISTS `index_chapters_formatterID` ON `${tableName}` (`formatterID`)")
+			db.execSQL("CREATE INDEX IF NOT EXISTS `index_chapters_novelID` ON `$tableName` (`novelID`)")
+			db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_chapters_url` ON `$tableName` (`url`)")
+			db.execSQL(
+				"CREATE INDEX IF NOT EXISTS `index_chapters_formatterID` ON `$tableName` (`formatterID`)",
+			)
 		}
 
 		// Handle extension migration
@@ -102,23 +110,25 @@ object Migration2To3 : Migration(2, 3) {
 			val tableName = "extensions"
 
 			// Create new table
-			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER NOT NULL, `repoID` INTEGER NOT NULL, `name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `imageURL` TEXT, `lang` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `installed` INTEGER NOT NULL, `installedVersion` TEXT, `repositoryVersion` TEXT NOT NULL, `chapterType` INTEGER NOT NULL, `md5` TEXT NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )\n")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER NOT NULL, `repoID` INTEGER NOT NULL, `name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `imageURL` TEXT, `lang` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `installed` INTEGER NOT NULL, `installedVersion` TEXT, `repositoryVersion` TEXT NOT NULL, `chapterType` INTEGER NOT NULL, `md5` TEXT NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )\n",
+			)
 
 			// Migrate
 			db.execSQL(
 				"""
 INSERT INTO `${tableName}_new` SELECT `id`, `repoID`, `name`, `name`, `imageURL`, `lang`,`enabled`,`installed`,`installedVersion`,`repositoryVersion`,0,`md5`,0 FROM `$tableName`									
-								"""
+								""",
 			)
 
 			// Drop
 			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `$tableName`")
 
 			// Create indexes
-			db.execSQL("CREATE INDEX IF NOT EXISTS `index_extensions_repoID` ON `${tableName}` (`repoID`)")
+			db.execSQL("CREATE INDEX IF NOT EXISTS `index_extensions_repoID` ON `$tableName` (`repoID`)")
 		}
 
 		// Handle novel migration
@@ -130,14 +140,22 @@ INSERT INTO `${tableName}_new` SELECT `id`, `repoID`, `name`, `name`, `imageURL`
 
 		// Create novel_settings
 		run {
-			db.execSQL("CREATE TABLE IF NOT EXISTS `novel_settings` (`novelID` INTEGER NOT NULL, `sortType` TEXT NOT NULL, `showOnlyReadingStatusOf` INTEGER, `showOnlyBookmarked` INTEGER NOT NULL, `showOnlyDownloaded` INTEGER NOT NULL, `reverseOrder` INTEGER NOT NULL, PRIMARY KEY(`novelID`), FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
-			db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_novel_settings_novelID` ON `novel_settings` (`novelID`)")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `novel_settings` (`novelID` INTEGER NOT NULL, `sortType` TEXT NOT NULL, `showOnlyReadingStatusOf` INTEGER, `showOnlyBookmarked` INTEGER NOT NULL, `showOnlyDownloaded` INTEGER NOT NULL, `reverseOrder` INTEGER NOT NULL, PRIMARY KEY(`novelID`), FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+			)
+			db.execSQL(
+				"CREATE UNIQUE INDEX IF NOT EXISTS `index_novel_settings_novelID` ON `novel_settings` (`novelID`)",
+			)
 		}
 
 		// Create novel_reader_settings
 		run {
-			db.execSQL("CREATE TABLE IF NOT EXISTS `novel_reader_settings` (`novelID` INTEGER NOT NULL, `paragraphIndentSize` INTEGER NOT NULL, `paragraphSpacingSize` REAL NOT NULL, PRIMARY KEY(`novelID`), FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
-			db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_novel_reader_settings_novelID` ON `novel_reader_settings` (`novelID`)")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `novel_reader_settings` (`novelID` INTEGER NOT NULL, `paragraphIndentSize` INTEGER NOT NULL, `paragraphSpacingSize` REAL NOT NULL, PRIMARY KEY(`novelID`), FOREIGN KEY(`novelID`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+			)
+			db.execSQL(
+				"CREATE UNIQUE INDEX IF NOT EXISTS `index_novel_reader_settings_novelID` ON `novel_reader_settings` (`novelID`)",
+			)
 		}
 	}
 }

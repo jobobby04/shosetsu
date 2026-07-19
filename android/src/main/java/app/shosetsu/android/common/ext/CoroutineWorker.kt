@@ -21,15 +21,12 @@ import androidx.work.CoroutineWorker
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
 fun CoroutineWorker.notificationManager(): Lazy<NotificationManagerCompat> =
 	lazy(LazyThreadSafetyMode.NONE) {
 		NotificationManagerCompat.from(applicationContext)
 	}
 
-fun CoroutineWorker.getString(@StringRes resId: Int) =
-	applicationContext.getString(resId)
+fun CoroutineWorker.getString(@StringRes resId: Int) = applicationContext.getString(resId)
 
 fun CoroutineWorker.getString(@StringRes resId: Int, vararg any: Any) =
 	applicationContext.getString(resId, *any)

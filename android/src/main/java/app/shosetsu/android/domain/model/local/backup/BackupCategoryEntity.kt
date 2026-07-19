@@ -21,7 +21,4 @@ package app.shosetsu.android.domain.model.local.backup
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BackupCategoryEntity(
-	val name: String,
-	val order: Int,
-)
+data class BackupCategoryEntity(val name: String, val order: Int)

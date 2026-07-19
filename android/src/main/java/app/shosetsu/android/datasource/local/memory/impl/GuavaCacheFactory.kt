@@ -6,15 +6,10 @@ import kotlin.time.Duration
 import kotlin.time.toJavaDuration
 
 class GuavaCacheFactory : ICache.Factory {
-	override fun <K : Any, V : Any> create(
-		expireDuration: Duration,
-		maxSize: Int
-	): ICache<K, V> = Cache(expireDuration, maxSize.toLong())
+	override fun <K : Any, V : Any> create(expireDuration: Duration, maxSize: Int): ICache<K, V> =
+		Cache(expireDuration, maxSize.toLong())
 
-	private class Cache<K : Any, V : Any>(
-		expireTime: Duration,
-		maxSize: Long,
-	) : ICache<K, V> {
+	private class Cache<K : Any, V : Any>(expireTime: Duration, maxSize: Long) : ICache<K, V> {
 		private val cache = CacheBuilder.newBuilder()
 			.maximumSize(maxSize)
 			.expireAfterWrite(expireTime.toJavaDuration())

@@ -23,14 +23,13 @@ import app.shosetsu.android.domain.model.local.LibraryNovelEntity
 import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.domain.model.local.StrippedNovelEntity
-import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.Flow
-import org.luaj.vm2.LuaError
 import java.io.IOException
 import javax.net.ssl.SSLException
-
+import kotlinx.coroutines.flow.Flow
+import org.luaj.vm2.LuaError
 
 /**
  * shosetsu
@@ -113,11 +112,10 @@ interface INovelsRepository {
 	 */
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	suspend fun retrieveNovelInfo(
-		extension: IExtension,
+		extension: Extension,
 		novelEntity: NovelEntity,
 		loadChapters: Boolean,
 	): Novel.Info
-
 
 	/**
 	 *  Removes all novels that are not bookmarked
@@ -126,26 +124,25 @@ interface INovelsRepository {
 	@Throws(SQLiteException::class)
 	suspend fun clearUnBookmarkedNovels()
 
-
 	/**
-	 * Queries the [IExtension] for a search result
+	 * Queries the [Extension] for a search result
 	 */
 	@Throws(LuaError::class)
 	suspend fun getCatalogueSearch(
-		ext: IExtension,
-		search: IExtension.Listing.Search,
+		ext: Extension,
+		search: Extension.Listing.Search,
 		query: String,
 		filters: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>
 
 	/**
-	 * Loads catalogue data of an [IExtension]
+	 * Loads catalogue data of an [Extension]
 	 */
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun getCatalogueData(
-		ext: IExtension,
-		listing: IExtension.Listing.Item,
+		ext: Extension,
+		listing: Extension.Listing.Item,
 		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>

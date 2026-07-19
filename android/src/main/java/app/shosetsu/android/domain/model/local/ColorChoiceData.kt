@@ -55,9 +55,8 @@ data class ColorChoiceData(
 					null
 				} ?: "UNKNOWN",
 				it[2].toInt(),
-				it[3].toInt()
+				it[3].toInt(),
 			)
 		}
 	}
-
 }

@@ -26,7 +26,9 @@ package app.shosetsu.android.common.utils
  * Ensure the [list] is compliant to the SQL limits
  */
 inline fun <T> ensureSQLSizeCompliant(list: List<T>, use: (List<T>) -> Unit) {
-	if (list.size > 900)
+	if (list.size > 900) {
 		list.chunked(900).forEach(use)
-	else use(list)
+	} else {
+		use(list)
+	}
 }

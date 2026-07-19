@@ -67,7 +67,9 @@ interface RepositoryExtensionsDao : BaseDao<DBRepositoryExtensionEntity> {
 	suspend fun insertOrUpdate(data: DBRepositoryExtensionEntity) {
 		if (getCount(data.repoId, data.id) > 0) {
 			update(data)
-		} else insertAbort(data)
+		} else {
+			insertAbort(data)
+		}
 	}
 
 	@Throws(SQLiteException::class)

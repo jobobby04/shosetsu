@@ -22,8 +22,8 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
+import org.kodein.di.instance
 
 /*
  * This file is part of shosetsu.
@@ -46,10 +46,8 @@ import java.util.concurrent.TimeUnit
  * shosetsu
  * 06 / 09 / 2020
  */
-class BackupCycleWorker(
-	appContext: Context,
-	params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+class BackupCycleWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params) {
 
 	override suspend fun doWork(): Result {
 		logI(LogConstants.SERVICE_EXECUTE)
@@ -96,8 +94,7 @@ class BackupCycleWorker(
 	class Manager(context: Context) : CoroutineWorkerManager(context) {
 		private val iSettingsRepository: ISettingsRepository by instance()
 
-		private suspend fun backupCycle(): Long =
-			iSettingsRepository.getInt(BackupCycle).toLong()
+		private suspend fun backupCycle(): Long = iSettingsRepository.getInt(BackupCycle).toLong()
 
 		private suspend fun requiresBackupOnIdle(): Boolean =
 			iSettingsRepository.getBoolean(BackupOnlyWhenIdle)
@@ -119,14 +116,12 @@ class BackupCycleWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(BACKUP_CYCLE_WORK_ID).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Starts the service. It will be started only if there isn't another instance already
@@ -144,20 +139,21 @@ class BackupCycleWorker(
 					ExistingPeriodicWorkPolicy.UPDATE,
 					PeriodicWorkRequestBuilder<BackupCycleWorker>(
 						backupCycle(),
-						TimeUnit.HOURS
+						TimeUnit.HOURS,
 					).setConstraints(
 						Constraints.Builder().apply {
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 								setRequiresDeviceIdle(requiresBackupOnIdle())
+							}
 							setRequiresBatteryNotLow(!allowsBackupOnLowBattery())
 							setRequiresStorageNotLow(!allowsBackupOnLowStorage())
-						}.build()
-					).build()
+						}.build(),
+					).build(),
 				)
 				logI(
 					"BackupCycleWorker State ${
 						workerManager.getWorkInfosForUniqueWork(BACKUP_CYCLE_WORK_ID).await()[0]
-					}"
+					}",
 				)
 			}
 		}

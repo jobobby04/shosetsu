@@ -4,9 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog as OBottomSheetDialog
-
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 
 /*
  * This file is part of shosetsu.
@@ -36,7 +35,7 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog as OBottomS
 fun BottomSheetDialog(
 	onDismissRequest: () -> Unit,
 	properties: BottomSheetDialogProperties = BottomSheetDialogProperties(),
-	content: @Composable () -> Unit
+	content: @Composable () -> Unit,
 ) {
 	BackHandler(onBack = onDismissRequest)
 	OBottomSheetDialog(onDismissRequest, properties) {

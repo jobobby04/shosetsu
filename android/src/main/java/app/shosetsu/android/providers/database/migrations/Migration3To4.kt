@@ -35,7 +35,9 @@ object Migration3To4 : Migration(3, 4) {
 			val tableName = "extensions"
 
 			// Create new table
-			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER NOT NULL, `repoID` INTEGER NOT NULL, `name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `imageURL` TEXT, `lang` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `installed` INTEGER NOT NULL, `installedVersion` TEXT, `repositoryVersion` TEXT NOT NULL, `chapterType` INTEGER NOT NULL, `md5` TEXT NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `${tableName}_new` (`id` INTEGER NOT NULL, `repoID` INTEGER NOT NULL, `name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `imageURL` TEXT, `lang` TEXT NOT NULL, `enabled` INTEGER NOT NULL, `installed` INTEGER NOT NULL, `installedVersion` TEXT, `repositoryVersion` TEXT NOT NULL, `chapterType` INTEGER NOT NULL, `md5` TEXT NOT NULL, `type` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+			)
 
 			// Migrate
 			db.execSQL(
@@ -56,18 +58,17 @@ SELECT
 	`md5`,
 	0 
 FROM `$tableName`;
-									"""
+									""",
 			)
 
 			// Drop
 			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `$tableName`")
 
 			// Create indexes
-			db.execSQL("CREATE INDEX IF NOT EXISTS `index_extensions_repoID` ON `${tableName}` (`repoID`)")
-
+			db.execSQL("CREATE INDEX IF NOT EXISTS `index_extensions_repoID` ON `$tableName` (`repoID`)")
 		}
 
 		// Migrate extension libraries
@@ -75,7 +76,9 @@ FROM `$tableName`;
 			val tableName = "libs"
 
 			// Create new table
-			db.execSQL("CREATE TABLE IF NOT EXISTS `${tableName}_new` (`scriptName` TEXT NOT NULL, `version` TEXT NOT NULL, `repoID` INTEGER NOT NULL, PRIMARY KEY(`scriptName`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )")
+			db.execSQL(
+				"CREATE TABLE IF NOT EXISTS `${tableName}_new` (`scriptName` TEXT NOT NULL, `version` TEXT NOT NULL, `repoID` INTEGER NOT NULL, PRIMARY KEY(`scriptName`), FOREIGN KEY(`repoID`) REFERENCES `repositories`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+			)
 
 			// Migrate
 			db.execSQL("INSERT INTO `${tableName}_new` SELECT * FROM `$tableName`")
@@ -84,10 +87,10 @@ FROM `$tableName`;
 			db.execSQL("DROP TABLE $tableName")
 
 			// Rename table_new to table
-			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `${tableName}`")
+			db.execSQL("ALTER TABLE `${tableName}_new` RENAME TO `$tableName`")
 
 			// Create indexes
-			db.execSQL("CREATE INDEX IF NOT EXISTS `index_libs_repoID` ON `${tableName}` (`repoID`)")
+			db.execSQL("CREATE INDEX IF NOT EXISTS `index_libs_repoID` ON `$tableName` (`repoID`)")
 		}
 	}
 }

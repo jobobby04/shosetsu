@@ -24,7 +24,6 @@ import org.kodein.di.singleton
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 01 / 05 / 2020

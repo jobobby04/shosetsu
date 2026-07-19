@@ -110,7 +110,6 @@ import kotlinx.coroutines.launch
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Shosetsu
  * 9 / June / 2019
@@ -125,7 +124,7 @@ fun LibraryView(
 	onOpenNovel: (novelId: Int) -> Unit,
 	onMigrate: (ids: List<Int>) -> Unit,
 	drawerIcon: @Composable () -> Unit,
-	onGoToBrowse: () -> Unit
+	onGoToBrowse: () -> Unit,
 ) {
 	val viewModel = viewModelDi<ALibraryViewModel>()
 
@@ -162,7 +161,7 @@ fun LibraryView(
 						val result = hostState.showSnackbar(
 							context.getString(error.messageRes),
 							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
+							actionLabel = context.getString(R.string.generic_wifi_settings),
 						)
 						if (result == ActionPerformed) {
 							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
@@ -173,7 +172,7 @@ fun LibraryView(
 				else -> {
 					scope.launch {
 						hostState.showSnackbar(
-							error.message ?: context.getString(R.string.error)
+							error.message ?: context.getString(R.string.error),
 						)
 					}
 				}
@@ -201,12 +200,14 @@ fun LibraryView(
 						resources.getQuantityString(
 							R.plurals.toast_unread_count,
 							item.unread,
-							item.unread
-						)
+							item.unread,
+						),
 					)
 				}
 			}
-		} else null,
+		} else {
+			null
+		},
 		onInverseSelection = viewModel::invertSelection,
 		onSelectAll = viewModel::selectAll,
 		onRemove = viewModel::removeSelectedFromLibrary,
@@ -225,7 +226,7 @@ fun LibraryView(
 		onShowFilterMenu = viewModel::showFilterMenu,
 		drawerIcon = drawerIcon,
 		onGoToBrowse = onGoToBrowse,
-		showImages = showImages
+		showImages = showImages,
 	)
 	if (isCategoriesDialogOpen) {
 		CategoriesDialog(
@@ -234,7 +235,7 @@ fun LibraryView(
 				items?.categories ?: persistentListOf()
 			},
 			novelCategories = remember { persistentListOf() },
-			setCategories = viewModel::setCategories
+			setCategories = viewModel::setCategories,
 		)
 	}
 
@@ -277,7 +278,7 @@ fun LibraryContent(
 	onShowFilterMenu: () -> Unit,
 	drawerIcon: @Composable () -> Unit,
 	onGoToBrowse: () -> Unit,
-	showImages: Boolean
+	showImages: Boolean,
 ) {
 	Scaffold(
 		topBar = {
@@ -294,7 +295,7 @@ fun LibraryContent(
 					onRefresh(-1) // default, TODO maybe make better?
 				},
 				isEmpty = isEmpty,
-				drawerIcon = drawerIcon
+				drawerIcon = drawerIcon,
 			)
 		},
 		snackbarHost = {
@@ -306,12 +307,12 @@ fun LibraryContent(
 				Box(
 					modifier = Modifier
 						.fillMaxSize()
-						.padding(paddingValues)
+						.padding(paddingValues),
 				) {
 					LinearProgressIndicator(
 						Modifier
 							.fillMaxWidth()
-							.align(Alignment.TopCenter)
+							.align(Alignment.TopCenter),
 					)
 				}
 			} else {
@@ -334,14 +335,14 @@ fun LibraryContent(
 					onPin = onPin,
 					onUnpin = onUnpin,
 					onSetCategories = onSetCategories,
-					showImages = showImages
+					showImages = showImages,
 				)
 			}
 		} else {
 			ErrorContent(
 				stringResource(R.string.empty_library_message),
 				modifier = Modifier.padding(paddingValues),
-				actions = ErrorAction(R.string.empty_library_message_go_to_browse, onGoToBrowse)
+				actions = ErrorAction(R.string.empty_library_message_go_to_browse, onGoToBrowse),
 			)
 		}
 	}
@@ -363,7 +364,7 @@ fun LibraryAppBar(
 	onShowFilterMenu: () -> Unit,
 	onRefresh: () -> Unit,
 	isEmpty: Boolean,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
 ) {
 	val behavior = pinnedScrollBehavior()
 
@@ -387,7 +388,7 @@ fun LibraryAppBar(
 						SimpleIconButton(
 							Icons.Outlined.FilterList,
 							stringResource(R.string.filter),
-							onClick = onShowFilterMenu
+							onClick = onShowFilterMenu,
 						)
 						RefreshButton(onRefresh)
 					}
@@ -417,13 +418,12 @@ fun LibraryPager(
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
-
 	onRemove: () -> Unit,
 	onMigrate: () -> Unit,
 	onPin: () -> Unit,
 	onUnpin: () -> Unit,
 	onSetCategories: () -> Unit,
-	showImages: Boolean
+	showImages: Boolean,
 ) = Box {
 	val scope = rememberCoroutineScope()
 	val categoryPagerState = rememberPagerState { library.categories.size }
@@ -434,14 +434,14 @@ fun LibraryPager(
 	Column(
 		Modifier
 			.padding(paddingValues)
-			.fillMaxWidth()
+			.fillMaxWidth(),
 	) {
 		if (!(library.categories.size == 1 && library.categories.first().id == 0)) {
 			ScrollableTabRow(
 				selectedTabIndex = categoryPagerState.currentPage,
 				indicator = { tabPositions ->
 					TabRowDefaults.SecondaryIndicator(
-						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions)
+						Modifier.pagerTabIndicatorOffset(categoryPagerState, tabPositions),
 					)
 				},
 				containerColor = MaterialTheme.colorScheme.background,
@@ -464,7 +464,7 @@ fun LibraryPager(
 		}
 		HorizontalPager(
 			state = categoryPagerState,
-			modifier = Modifier.fillMaxSize()
+			modifier = Modifier.fillMaxSize(),
 		) {
 			val id by remember(library) { derivedStateOf { library.categories[it].id } }
 			val items by produceState(persistentListOf(), library, it, id) {
@@ -482,7 +482,7 @@ fun LibraryPager(
 				onOpen = onOpen,
 				toggleSelection = toggleSelection,
 				toastNovel = toastNovel,
-				showImages = showImages
+				showImages = showImages,
 			)
 		}
 	}
@@ -492,26 +492,26 @@ fun LibraryPager(
 			SimpleIconButton(
 				Icons.AutoMirrored.Outlined.Label,
 				stringResource(R.string.set_categories),
-				onClick = onSetCategories
+				onClick = onSetCategories,
 			)
 			AnimatedVisibility(hasUnpinnedSelected) {
 				SimpleIconButton(
 					Icons.Default.PushPin,
 					stringResource(R.string.pin_on_top),
-					onClick = onPin
+					onClick = onPin,
 				)
 			}
 			AnimatedVisibility(hasPinnedSelected) {
 				SimpleIconButton(
 					Icons.Outlined.PushPin,
 					stringResource(R.string.unpin_from_top),
-					onClick = onUnpin
+					onClick = onUnpin,
 				)
 			}
 			SimpleIconButton(
 				Icons.Default.Delete,
 				stringResource(R.string.remove),
-				onClick = onRemove
+				onClick = onRemove,
 			)
 
 			MoreIconButton {
@@ -519,7 +519,7 @@ fun LibraryPager(
 					text = {
 						Text(stringResource(R.string.migrate_sources))
 					},
-					onClick = onMigrate
+					onClick = onMigrate,
 				)
 			}
 		}
@@ -543,7 +543,7 @@ fun LibraryCategory(
 	onOpen: (LibraryNovelUI) -> Unit,
 	toggleSelection: (LibraryNovelUI) -> Unit,
 	toastNovel: ((LibraryNovelUI) -> Unit)?,
-	showImages: Boolean
+	showImages: Boolean,
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Box(Modifier.pullRefresh(pullRefreshState)) {
@@ -551,11 +551,12 @@ fun LibraryCategory(
 		val o = LocalConfiguration.current.orientation
 
 		val size =
-			(w / when (o) {
-				Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-				else -> columnsInV
-			}).dp - 16.dp
-
+			(
+				w / when (o) {
+					Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+					else -> columnsInV
+				}
+				).dp - 16.dp
 
 		val state = rememberLazyGridState()
 
@@ -566,58 +567,65 @@ fun LibraryCategory(
 				bottom = 300.dp,
 				start = 8.dp,
 				end = 8.dp,
-				top = 4.dp
+				top = 4.dp,
 			),
 			state = state,
 			horizontalArrangement = Arrangement.spacedBy(4.dp),
-			verticalArrangement = Arrangement.spacedBy(4.dp)
+			verticalArrangement = Arrangement.spacedBy(4.dp),
 		) {
 			fun onClick(item: LibraryNovelUI) {
-				if (hasSelected)
+				if (hasSelected) {
 					toggleSelection(item)
-				else onOpen(item)
+				} else {
+					onOpen(item)
+				}
 			}
 
 			fun onLongClick(item: LibraryNovelUI) {
-				if (!hasSelected)
+				if (!hasSelected) {
 					toggleSelection(item)
+				}
 			}
 			items(
 				items,
-				key = { it.id }
+				key = { it.id },
 			) { item ->
 				val onClickBadge = if (toastNovel != null) {
 					{ toastNovel(item) }
-				} else null
+				} else {
+					null
+				}
 
 				@Composable
 				fun badge() {
-					if (item.unread > 0)
+					if (item.unread > 0) {
 						Badge(
 							modifier = Modifier.clickable(
 								onClick = {
 									onClickBadge?.invoke()
-								}
+								},
 							),
-							containerColor = MaterialTheme.colorScheme.secondaryContainer
+							containerColor = MaterialTheme.colorScheme.secondaryContainer,
 						) {
 							Text(item.unread.toString())
 						}
+					}
 				}
 
 				@Composable
 				fun pin() {
-					if (item.pinned)
+					if (item.pinned) {
 						Badge(
 							modifier = Modifier.clickable { },
-							containerColor = MaterialTheme.colorScheme.secondaryContainer
+							containerColor = MaterialTheme.colorScheme.secondaryContainer,
 						) {
 							Icon(
 								Icons.Default.PushPin,
 								stringResource(R.string.pin_on_top),
-								modifier = Modifier.size(16.dp)
+								modifier = Modifier.size(16.dp),
 							)
 						}
+					}
 				}
 
 				@Composable
@@ -627,7 +635,7 @@ fun LibraryCategory(
 							.align(Alignment.TopStart)
 							.padding(4.dp),
 						verticalAlignment = Alignment.CenterVertically,
-						horizontalArrangement = Arrangement.spacedBy(4.dp)
+						horizontalArrangement = Arrangement.spacedBy(4.dp),
 					) {
 						badge()
 						pin()
@@ -647,7 +655,7 @@ fun LibraryCategory(
 							overlay = {
 								topBar()
 							},
-							isSelected = item.isSelected
+							isSelected = item.isSelected,
 						)
 					}
 
@@ -666,7 +674,7 @@ fun LibraryCategory(
 								badge()
 							},
 							isSelected = item.isSelected,
-							showImages = showImages
+							showImages = showImages,
 						)
 					}
 
@@ -683,7 +691,7 @@ fun LibraryCategory(
 							overlay = {
 								topBar()
 							},
-							isSelected = item.isSelected
+							isSelected = item.isSelected,
 						)
 					}
 				}

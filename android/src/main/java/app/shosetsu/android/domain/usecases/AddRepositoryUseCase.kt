@@ -23,9 +23,7 @@ import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
 /**
  * 13 / 01 / 2021
  */
-class AddRepositoryUseCase(
-	private val iRepositoryRepository: IExtensionRepoRepository
-) {
+class AddRepositoryUseCase(private val iRepositoryRepository: IExtensionRepoRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(url: String, name: String) =
 		iRepositoryRepository.addRepository(url, name)

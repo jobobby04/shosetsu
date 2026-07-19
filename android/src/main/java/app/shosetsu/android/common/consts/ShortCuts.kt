@@ -36,40 +36,49 @@ object ShortCuts {
 
 	fun createShortcuts(context: Context) {
 		ShortcutManagerCompat.addDynamicShortcuts(
-			context, listOf(
+			context,
+			listOf(
 				Builder(context, "Library")
 					.setIcon(Destination.Library.icon.toIcon())
 					.setLongLabel(context.getString(R.string.library))
 					.setShortLabel(context.getString(R.string.library))
-					.setIntent(Intent(context, MainActivity::class.java).apply {
-						action = ACTION_OPEN_LIBRARY
-					})
+					.setIntent(
+						Intent(context, MainActivity::class.java).apply {
+							action = ACTION_OPEN_LIBRARY
+						},
+					)
 					.build(),
 				Builder(context, "Browse")
 					.setIcon(Destination.Browse.icon.toIcon())
 					.setLongLabel(context.getString(R.string.browse))
 					.setShortLabel(context.getString(R.string.browse))
-					.setIntent(Intent(context, MainActivity::class.java).apply {
-						action = ACTION_OPEN_CATALOGUE
-					})
+					.setIntent(
+						Intent(context, MainActivity::class.java).apply {
+							action = ACTION_OPEN_CATALOGUE
+						},
+					)
 					.build(),
 				Builder(context, "Updates")
 					.setIcon(Destination.Updates.icon.toIcon())
 					.setLongLabel(context.getString(R.string.updates))
 					.setShortLabel(context.getString(R.string.updates))
-					.setIntent(Intent(context, MainActivity::class.java).apply {
-						action = ACTION_OPEN_UPDATES
-					})
+					.setIntent(
+						Intent(context, MainActivity::class.java).apply {
+							action = ACTION_OPEN_UPDATES
+						},
+					)
 					.build(),
 				Builder(context, "Search")
 					.setIcon(Icons.Default.Search.toIcon())
 					.setLongLabel(context.getString(R.string.search))
 					.setShortLabel(context.getString(R.string.search))
-					.setIntent(Intent(context, MainActivity::class.java).apply {
-						action = ACTION_OPEN_SEARCH
-					})
-					.build()
-			)
+					.setIntent(
+						Intent(context, MainActivity::class.java).apply {
+							action = ACTION_OPEN_SEARCH
+						},
+					)
+					.build(),
+			),
 		)
 	}
 }

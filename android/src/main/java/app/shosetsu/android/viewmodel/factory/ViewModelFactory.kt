@@ -34,7 +34,9 @@ import org.kodein.type.erased
  *
  * @author github.com/doomsdayrs
  */
-class ViewModelFactory(context: Context) : ViewModelProvider.Factory, DIAware {
+class ViewModelFactory(context: Context) :
+	ViewModelProvider.Factory,
+	DIAware {
 	override val di: DI by closestDI(context)
 	override fun <T : ViewModel> create(modelClass: Class<T>): T {
 		logV("Creating instance of ${modelClass.name}")

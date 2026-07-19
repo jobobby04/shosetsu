@@ -52,7 +52,7 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Shosetsu
  *
  * @since 27 / 03 / 2023
@@ -63,9 +63,7 @@ import app.shosetsu.android.viewmodel.abstracted.AnalyticsViewModel
  * UI of [AnalyticsFragment]
  */
 @Composable
-fun AnalyticsView(
-	onBack: () -> Unit
-) {
+fun AnalyticsView(onBack: () -> Unit) {
 	val viewModel = viewModelDi<AnalyticsViewModel>()
 
 	val novels by viewModel.novels.collectAsState(emptyList())
@@ -104,7 +102,7 @@ fun AnalyticsView(
 		topGenres,
 		topExtensions,
 		novels,
-		onBack
+		onBack,
 	)
 }
 
@@ -142,9 +140,9 @@ fun PreviewAnalyticsContent() {
 						10,
 						5,
 						3,
-						2
-					)
-				)
+						2,
+					),
+				),
 			)
 		}
 	}
@@ -156,22 +154,18 @@ fun AnalyticsContent(
 	days: Int,
 	hours: Int,
 	minutes: Int,
-
 	totalLibraryNovelCount: Int,
 	totalUnreadNovelCount: Int,
 	totalReadingNovelCount: Int,
 	totalReadNovelCount: Int,
-
 	totalChapterCount: Int,
 	totalUnreadChapterCount: Int,
 	totalReadingChapterCount: Int,
 	totalReadChapterCount: Int,
-
 	topGenres: List<String>,
 	topExtensions: List<String>,
-
 	novels: List<AnalyticsNovelUI>,
-	onBack: () -> Unit = {}
+	onBack: () -> Unit = {},
 ) {
 	Scaffold(
 		topBar = {
@@ -181,7 +175,7 @@ fun AnalyticsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 	) { padding ->
@@ -191,31 +185,31 @@ fun AnalyticsContent(
 				.padding(padding)
 				.verticalScroll(rememberScrollState()),
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(4.dp)
+			verticalArrangement = Arrangement.spacedBy(4.dp),
 		) {
 			// Overview
 			Column(
 				modifier = Modifier.padding(16.dp),
-				verticalArrangement = Arrangement.spacedBy(8.dp)
+				verticalArrangement = Arrangement.spacedBy(8.dp),
 			) {
 				Text("Overview", style = MaterialTheme.typography.titleLarge)
 
 				Text("Total reading time", style = MaterialTheme.typography.titleMedium)
 				Row(
 					horizontalArrangement = Arrangement.SpaceEvenly,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
 				) {
 					AnalyticsUnitCard(
 						"Day(s)",
-						days
+						days,
 					)
 					AnalyticsUnitCard(
 						"Hours(s)",
-						hours
+						hours,
 					)
 					AnalyticsUnitCard(
 						"Minutes(s)",
-						minutes
+						minutes,
 					)
 				}
 
@@ -223,23 +217,23 @@ fun AnalyticsContent(
 
 				Row(
 					horizontalArrangement = Arrangement.SpaceEvenly,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
 				) {
 					AnalyticsUnitCard(
 						"Novel(s)",
-						totalLibraryNovelCount
+						totalLibraryNovelCount,
 					)
 					AnalyticsUnitCard(
 						"Unread",
-						totalUnreadNovelCount
+						totalUnreadNovelCount,
 					)
 					AnalyticsUnitCard(
 						"Reading",
-						totalReadingNovelCount
+						totalReadingNovelCount,
 					)
 					AnalyticsUnitCard(
 						"Read",
-						totalReadNovelCount
+						totalReadNovelCount,
 					)
 				}
 
@@ -247,23 +241,23 @@ fun AnalyticsContent(
 
 				Row(
 					horizontalArrangement = Arrangement.SpaceEvenly,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
 				) {
 					AnalyticsUnitCard(
 						"Chapter(s)",
-						totalChapterCount
+						totalChapterCount,
 					)
 					AnalyticsUnitCard(
 						"Unread",
-						totalUnreadChapterCount
+						totalUnreadChapterCount,
 					)
 					AnalyticsUnitCard(
 						"Reading",
-						totalReadingChapterCount
+						totalReadingChapterCount,
 					)
 					AnalyticsUnitCard(
 						"Read",
-						totalReadChapterCount
+						totalReadChapterCount,
 					)
 				}
 				Text("Top Genre(s)", style = MaterialTheme.typography.titleMedium)
@@ -271,15 +265,16 @@ fun AnalyticsContent(
 				Column(
 					modifier = Modifier.fillMaxWidth(),
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(4.dp)
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					for (genre in topGenres) {
 						Card(modifier = Modifier.fillMaxWidth()) {
 							Text(
-								genre, modifier = Modifier
+								genre,
+								modifier = Modifier
 									.padding(8.dp)
 									.fillMaxWidth(),
-								textAlign = TextAlign.Center
+								textAlign = TextAlign.Center,
 							)
 						}
 					}
@@ -290,15 +285,16 @@ fun AnalyticsContent(
 				Column(
 					modifier = Modifier.fillMaxWidth(),
 					horizontalAlignment = Alignment.CenterHorizontally,
-					verticalArrangement = Arrangement.spacedBy(4.dp)
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					for (extension in topExtensions) {
 						Card(modifier = Modifier.fillMaxWidth()) {
 							Text(
-								extension, modifier = Modifier
+								extension,
+								modifier = Modifier
 									.padding(8.dp)
 									.fillMaxWidth(),
-								textAlign = TextAlign.Center
+								textAlign = TextAlign.Center,
 							)
 						}
 					}
@@ -308,7 +304,7 @@ fun AnalyticsContent(
 
 			LazyRow(
 				horizontalArrangement = Arrangement.spacedBy(4.dp),
-				contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
+				contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
 			) {
 				items(novels, key = { it.id }) {
 					AnalyticsNovelCard(it)
@@ -326,19 +322,16 @@ fun AnalyticsContent(
 fun PreviewAnalyticsUnitCard() {
 	AnalyticsUnitCard(
 		"Day(s)",
-		10
+		10,
 	)
 }
 
 @Composable
-fun AnalyticsUnitCard(
-	description: String,
-	value: Int
-) {
+fun AnalyticsUnitCard(description: String, value: Int) {
 	Box {
 		Column(
 			modifier = Modifier.padding(8.dp),
-			horizontalAlignment = Alignment.CenterHorizontally
+			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			Text(value.toString(), style = MaterialTheme.typography.titleMedium)
 			Text(description, style = MaterialTheme.typography.bodyMedium)
@@ -363,15 +356,13 @@ fun PreviewAnalyticsNovelCard() {
 			10,
 			5,
 			3,
-			2
-		)
+			2,
+		),
 	)
 }
 
 @Composable
-fun AnalyticsNovelCard(
-	entity: AnalyticsNovelUI
-) {
+fun AnalyticsNovelCard(entity: AnalyticsNovelUI) {
 	Column(
 		modifier = Modifier
 			.padding(8.dp)
@@ -380,7 +371,7 @@ fun AnalyticsNovelCard(
 	) {
 		Box(
 			Modifier
-				.align(Alignment.CenterHorizontally)
+				.align(Alignment.CenterHorizontally),
 		) {
 			NovelCardNormalContent(
 				entity.title,

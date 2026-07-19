@@ -39,5 +39,4 @@ interface IBackupUriRepository {
 	 * Take the [Uri] from the repository
 	 */
 	fun take(): Uri?
-
 }

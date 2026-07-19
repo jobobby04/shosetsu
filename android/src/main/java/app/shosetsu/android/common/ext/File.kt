@@ -33,11 +33,8 @@ import java.io.File
  * @author github.com/doomsdayrs
  */
 
-
-fun File.getUriCompat(context: Context): Uri {
-	return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-		FileProvider.getUriForFile(context, "$APPLICATION_ID.provider", this)
-	} else {
-		this.toUri()
-	}
+fun File.getUriCompat(context: Context): Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+	FileProvider.getUriForFile(context, "$APPLICATION_ID.provider", this)
+} else {
+	this.toUri()
 }

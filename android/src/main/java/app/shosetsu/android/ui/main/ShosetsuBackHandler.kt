@@ -41,14 +41,14 @@ import kotlinx.coroutines.launch
 fun ShosetsuBackHandler(
 	requireDoubleBackToExit: Boolean,
 	isDrawerOpen: Boolean,
-	onCloseDrawer: suspend () -> Unit
+	onCloseDrawer: suspend () -> Unit,
 ) {
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
 
 	var protect by remember { mutableStateOf(true) }
 
-	BackHandler(isDrawerOpen || requireDoubleBackToExit && protect) {
+	BackHandler(isDrawerOpen || (requireDoubleBackToExit && protect)) {
 		// If drawer is open, close it
 		if (isDrawerOpen) {
 			scope.launch {
@@ -63,7 +63,7 @@ fun ShosetsuBackHandler(
 			val toast = Toast.makeText(
 				context,
 				R.string.double_back_message,
-				Toast.LENGTH_SHORT
+				Toast.LENGTH_SHORT,
 			)
 
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

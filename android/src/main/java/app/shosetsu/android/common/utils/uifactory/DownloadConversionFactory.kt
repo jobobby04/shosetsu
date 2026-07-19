@@ -27,9 +27,8 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 05 / 12 / 2020
  */
-class DownloadConversionFactory(
-	data: DownloadEntity
-) : UIConversionFactory<DownloadEntity, DownloadUI>(data) {
+class DownloadConversionFactory(data: DownloadEntity) :
+	UIConversionFactory<DownloadEntity, DownloadUI>(data) {
 	override fun DownloadEntity.convertTo(): DownloadUI = DownloadUI(
 		chapterID,
 		novelID,
@@ -37,13 +36,11 @@ class DownloadConversionFactory(
 		chapterName,
 		novelName,
 		extensionID,
-		status
+		status,
 	)
 }
 
-fun List<DownloadEntity>.mapToFactory() =
-	map { DownloadConversionFactory(it) }
+fun List<DownloadEntity>.mapToFactory() = map { DownloadConversionFactory(it) }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-fun Flow<List<DownloadEntity>>.mapLatestToResultFlowWithFactory() =
-	mapLatest { it.mapToFactory() }
+fun Flow<List<DownloadEntity>>.mapLatestToResultFlowWithFactory() = mapLatest { it.mapToFactory() }

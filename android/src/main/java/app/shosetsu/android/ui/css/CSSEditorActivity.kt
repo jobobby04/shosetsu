@@ -34,7 +34,9 @@ import org.kodein.di.android.closestDI
  *
  * @author github.com/doomsdayrs
  */
-class CSSEditorActivity : AppCompatActivity(), DIAware {
+class CSSEditorActivity :
+	AppCompatActivity(),
+	DIAware {
 	override val di: DI by closestDI()
 
 	companion object {
@@ -56,7 +58,7 @@ class CSSEditorActivity : AppCompatActivity(), DIAware {
 				cssId = savedInstanceState?.getInt(CSS_ID, -1) ?: -2,
 				onBackPressed = {
 					onBackPressedDispatcher.onBackPressed()
-				}
+				},
 			)
 		}
 	}

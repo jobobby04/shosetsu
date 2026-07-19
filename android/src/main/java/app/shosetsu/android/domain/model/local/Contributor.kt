@@ -26,5 +26,5 @@ data class Contributor(
 	val email: String?,
 	val commits: Int,
 	val website: String?,
-	val image: String?
+	val image: String?,
 )

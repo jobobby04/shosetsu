@@ -3,7 +3,7 @@ package app.shosetsu.android.view.uimodels.model
 import androidx.compose.runtime.Immutable
 import app.shosetsu.android.domain.model.local.ExtensionInstallOptionEntity
 import app.shosetsu.lib.Version
-import java.util.*
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -35,7 +35,8 @@ data class BrowseExtensionUI(
 	val installedRepo: Int,
 	val isUpdateAvailable: Boolean,
 	val updateVersion: Version? = null,
-	val isInstalling: Boolean
+	val isInstalling: Boolean,
+	val isObsolete: Boolean,
 ) {
 	val displayLang: String = Locale.forLanguageTag(lang).displayName
 }

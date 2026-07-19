@@ -33,9 +33,7 @@ import kotlinx.coroutines.flow.map
  *
  * @author github.com/doomsdayrs
  */
-class DBCategoriesDataSource(
-	private val categoriesDao: CategoriesDao,
-) : IDBCategoriesDataSource {
+class DBCategoriesDataSource(private val categoriesDao: CategoriesDao) : IDBCategoriesDataSource {
 
 	override fun getCategoriesFlow(): Flow<List<CategoryEntity>> =
 		categoriesDao.getCategoriesFlow().map { it.convertList() }
@@ -62,8 +60,7 @@ class DBCategoriesDataSource(
 	 * Get the next [CategoryEntity.order] variable
 	 */
 	@Throws(SQLiteException::class)
-	override suspend fun getNextCategoryOrder(): Int =
-		onIO { categoriesDao.getNextCategoryOrder() }
+	override suspend fun getNextCategoryOrder(): Int = onIO { categoriesDao.getNextCategoryOrder() }
 
 	/**
 	 * Delete a [CategoryEntity] from the database
@@ -79,12 +76,11 @@ class DBCategoriesDataSource(
 	override suspend fun updateCategories(categories: List<CategoryEntity>) =
 		onIO { categoriesDao.update(categories.toDB()) }
 
-	fun CategoryEntity.toDB() =
-		DBCategoryEntity(
-			id = id,
-			name = name,
-			order = order
-		)
+	fun CategoryEntity.toDB() = DBCategoryEntity(
+		id = id,
+		name = name,
+		order = order,
+	)
 
 	fun List<CategoryEntity>.toDB() = map { it.toDB() }
 }

@@ -30,15 +30,12 @@ import kotlinx.coroutines.flow.transform
  * @since 14 / 03 / 2023
  * @author Doomsdayrs
  */
-class GetUserAgentUseCase(
-	private val settingsRepo: ISettingsRepository,
-) {
-	suspend operator fun invoke(): String =
-		if (settingsRepo.getBoolean(SettingKey.UseShosetsuAgent)) {
-			SHOSETSU_USER_AGENT
-		} else {
-			settingsRepo.getString(SettingKey.UserAgent)
-		}
+class GetUserAgentUseCase(private val settingsRepo: ISettingsRepository) {
+	suspend operator fun invoke(): String = if (settingsRepo.getBoolean(SettingKey.UseShosetsuAgent)) {
+		SHOSETSU_USER_AGENT
+	} else {
+		settingsRepo.getString(SettingKey.UserAgent)
+	}
 
 	fun flow(): Flow<String> =
 		settingsRepo.getBooleanFlow(SettingKey.UseShosetsuAgent).transform { useShosetsu ->

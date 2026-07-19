@@ -65,6 +65,11 @@ import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.Version
 import app.shosetsu.lib.exceptions.InvalidMetaDataException
+import java.io.BufferedInputStream
+import java.io.IOException
+import java.io.InputStream
+import java.net.SocketTimeoutException
+import java.util.zip.GZIPInputStream
 import kotlinx.coroutines.delay
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.acra.ACRA
@@ -72,11 +77,6 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.BufferedInputStream
-import java.io.IOException
-import java.io.InputStream
-import java.net.SocketTimeoutException
-import java.util.zip.GZIPInputStream
 
 /*
  * This file is part of Shosetsu.
@@ -98,10 +98,13 @@ import java.util.zip.GZIPInputStream
 /**
  * 21 / 01 / 2021
  */
-class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(
-	appContext,
-	params
-), DIAware, NotificationCapable {
+class RestoreBackupWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(
+		appContext,
+		params,
+	),
+	DIAware,
+	NotificationCapable {
 	override val di: DI by closestDI(applicationContext)
 
 	private val backupRepo by instance<IBackupRepository>()
@@ -129,8 +132,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	override val defaultNotificationID: Int = ID_RESTORE
 
 	@Throws(IOException::class)
-	private fun unGZip(content: ByteArray) =
-		GZIPInputStream(content.inputStream())
+	private fun unGZip(content: ByteArray) = GZIPInputStream(content.inputStream())
 
 	/**
 	 * Loads a backup via the [Uri] provided by Androids file selection
@@ -171,7 +173,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		notify(R.string.restore_notification_content_starting)
 		val backupEntity = try {
 			loadBackupFromUri(backupUri)
-		} catch (e: Exception) {//TODO specify
+		} catch (e: Exception) { // TODO specify
 			with(e) {
 				logE(" $message", e)
 				notify("$message $e") {
@@ -179,7 +181,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					addReportErrorAction(
 						applicationContext,
 						defaultNotificationID,
-						e
+						e,
 					)
 				}
 				return Result.failure()
@@ -198,7 +200,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		// Unzip bytes to a string via gzip
 		notify(R.string.restore_notification_content_unzipping_bytes)
 
-
 		unGZip(decodedBytes).use { stream ->
 			val metaInfo = backupJSON.decodeSafeFromStream<MetaBackupEntity>(stream)
 
@@ -210,7 +211,6 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 						logE(MESSAGE_LOG_JSON_MISSING)
 						notify(R.string.restore_notification_content_missing_key) { setNotOngoing() }
 					}
-
 
 			// Checks if the version is compatible
 			logV("Version in backup: $metaVersion")
@@ -273,11 +273,10 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					idMap[it.repoId],
 					extensions,
 					it,
-					categoryOrderToCategoryIds
+					categoryOrderToCategoryIds,
 				)
 			}
 		}
-
 
 		System.gc() // Politely ask for a garbage collection
 		delay(5000) // Wait for gc to occur (maybe), also helps with the next notification
@@ -298,17 +297,20 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		extensions: List<GenericExtensionEntity>,
 		backupExtensionEntity: BackupExtensionEntity,
 		categoryOrderToCategoryIds: Map<Int, Int>,
-		isRetry: Boolean = false
+		isRetry: Boolean = false,
 	) {
 		val extensionID = backupExtensionEntity.id
 		val backupNovels = backupExtensionEntity.novels
 		logI("$extensionID")
-		val extensionEntity = extensions.find { (repoId == null || it.repoID == repoId) && it.id == extensionID }
+		val extensionEntity = extensions.find {
+			(repoId == null || it.repoID == repoId) &&
+				it.id == extensionID
+		}
 		if (extensionEntity == null) {
-			//TODO this should probably be handled
+			// TODO this should probably be handled
 			notify(
 				getString(R.string.restore_notification_content_extension_not_found) + " $extensionID",
-				notificationId = extensionID
+				notificationId = extensionID,
 			)
 			logE("Extension not found")
 			return
@@ -321,8 +323,9 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				installExtension(extensionEntity)
 			} catch (e: InvalidMetaDataException) {
 				notify(
-					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
-					notificationId = extensionID
+					getString(R.string.worker_extension_install_error_lua) +
+						" ${extensionEntity.id} | ${extensionEntity.name}",
+					notificationId = extensionID,
 				)
 				return
 			} catch (e: SocketTimeoutException) {
@@ -336,9 +339,9 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 						},
 						e.message ?: e.javaClass.simpleName,
 						extensionEntity.id,
-						extensionEntity.name
+						extensionEntity.name,
 					),
-					notificationId = extensionID
+					notificationId = extensionID,
 				)
 
 				// Only retry once
@@ -349,8 +352,9 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				return
 			} catch (e: Exception) {
 				notify(
-					getString(R.string.worker_extension_install_error_lua) + " ${extensionEntity.id} | ${extensionEntity.name}",
-					notificationId = extensionID
+					getString(R.string.worker_extension_install_error_lua) +
+						" ${extensionEntity.id} | ${extensionEntity.name}",
+					notificationId = extensionID,
 				)
 				ACRA.errorReporter.handleSilentException(e)
 				return
@@ -365,7 +369,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				restoreNovel(
 					extensionID,
 					novelEntity,
-					categoryOrderToCategoryIds
+					categoryOrderToCategoryIds,
 				)
 			} catch (e: Exception) {
 				e.printStackTrace()
@@ -377,7 +381,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	private suspend fun restoreNovel(
 		extensionID: Int,
 		backupNovelEntity: BackupNovelEntity,
-		categoryOrderToCategoryIds: Map<Int, Int>
+		categoryOrderToCategoryIds: Map<Int, Int>,
 	) {
 		logV("$extensionID, ${backupNovelEntity.url}")
 		val bNovelURL = backupNovelEntity.url
@@ -407,14 +411,14 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				authors = backupNovelEntity.authors,
 				artists = backupNovelEntity.artists,
 				tags = backupNovelEntity.tags,
-				status = backupNovelEntity.status
+				status = backupNovelEntity.status,
 			)
 
 			notify(R.string.restore_notification_content_novel_save) {
 				setContentTitle(name)
 			}
 			novelsRepo.insertReturnStripped(
-				siteNovel
+				siteNovel,
 			)?.let { (id) ->
 				targetNovelID = id
 			}
@@ -431,11 +435,11 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 							title = chapter.name,
 							link = chapter.url,
 							release = chapter.releaseDate.orEmpty(),
-							order = chapter.order?.takeUnless { it.isNaN() } ?: index.toDouble()
+							order = chapter.order?.takeUnless { it.isNaN() } ?: index.toDouble(),
 						)
-					}
+					},
 				)
-			} catch (e: Exception) {//TODO Specify
+			} catch (e: Exception) { // TODO Specify
 				logE("Failed to handle chapters", e)
 				ACRA.errorReporter.handleSilentException(e)
 			}
@@ -481,7 +485,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 
 		val settingEntity = try {
 			novelsSettingsRepo.get(targetNovelID)
-		} catch (e: Exception) {// TODO specify
+		} catch (e: Exception) { // TODO specify
 			logE("Failed to load novel settings")
 			ACRA.errorReporter.handleSilentException(e)
 			return
@@ -498,7 +502,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					showOnlyDownloaded = bSettings.showOnlyDownloaded,
 					showOnlyString = bSettings.showOnlyString,
 					reverseOrder = bSettings.reverseOrder,
-				)
+				),
 			)
 		} else {
 			novelsSettingsRepo.update(
@@ -509,7 +513,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					showOnlyDownloaded = bSettings.showOnlyDownloaded,
 					showOnlyString = bSettings.showOnlyString,
 					reverseOrder = bSettings.reverseOrder,
-				)
+				),
 			)
 		}
 
@@ -518,7 +522,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		}
 		val novelCategories = try {
 			novelCategoriesRepo.getNovelCategoriesFromNovel(targetNovelID)
-		} catch (e: Exception) {// TODO specify
+		} catch (e: Exception) { // TODO specify
 			logE("Failed to load novel categories")
 			ACRA.errorReporter.handleSilentException(e)
 			return
@@ -530,23 +534,24 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				backupNovelEntity.categories.map {
 					NovelCategoryEntity(
 						targetNovelID,
-						categoryOrderToCategoryIds[it]!!
+						categoryOrderToCategoryIds[it]!!,
 					)
-				}
+				},
 			)
 		} else {
 			val existingNovelCategories = novelCategories.map { it.categoryID }
 			novelCategoriesRepo.setNovelCategories(
 				backupNovelEntity.categories.mapNotNull {
 					val category = categoryOrderToCategoryIds[it]
-					if (category == null || it in existingNovelCategories)
+					if (category == null || it in existingNovelCategories) {
 						return@mapNotNull null
+					}
 
 					NovelCategoryEntity(
 						targetNovelID,
-						categoryOrderToCategoryIds[it]!!
+						categoryOrderToCategoryIds[it]!!,
 					)
-				}
+				},
 			)
 		}
 
@@ -566,8 +571,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	 */
 	class Manager(context: Context) : CoroutineWorkerManager(context) {
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Returns the status of the service.
@@ -585,8 +589,7 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(RESTORE_WORK_ID).await()
@@ -601,14 +604,13 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				workerManager.enqueueUniqueWork(
 					RESTORE_WORK_ID,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<RestoreBackupWorker>(
-					).setInputData(data).build()
+					OneTimeWorkRequestBuilder<RestoreBackupWorker>().setInputData(data).build(),
 				)
 				logI(
 					"Worker State ${
 						workerManager.getWorkInfosForUniqueWork(RESTORE_WORK_ID)
 							.await()[0].state
-					}"
+					}",
 				)
 			}
 		}
@@ -616,13 +618,11 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		/**
 		 * Stops the service.
 		 */
-		override fun stop(): Operation =
-			workerManager.cancelUniqueWork(RESTORE_WORK_ID)
+		override fun stop(): Operation = workerManager.cancelUniqueWork(RESTORE_WORK_ID)
 	}
 
 	companion object {
 		private const val MESSAGE_LOG_JSON_MISSING = "BACKUP JSON DOES NOT CONTAIN KEY 'version'"
-
 
 		private const val MESSAGE_LOG_JSON_OUTDATED = "BACKUP JSON MISMATCH"
 

@@ -72,5 +72,4 @@ interface InstalledExtensionsDao : BaseDao<DBInstalledExtensionEntity> {
 	@Throws(SQLiteException::class)
 	@Ignore
 	fun doesExtensionExist(id: Int): Boolean = getCount(id) > 0
-
 }

@@ -10,6 +10,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType.CONNECTED
 import androidx.work.NetworkType.UNMETERED
 import androidx.work.Operation
+import androidx.work.PeriodicWorkRequestBuilder as PWRB
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import app.shosetsu.android.backend.workers.CoroutineWorkerManager
@@ -25,9 +26,8 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import org.kodein.di.instance
 import java.util.concurrent.TimeUnit.HOURS
-import androidx.work.PeriodicWorkRequestBuilder as PWRB
+import org.kodein.di.instance
 
 /*
  * This file is part of shosetsu.
@@ -54,10 +54,8 @@ import androidx.work.PeriodicWorkRequestBuilder as PWRB
  *	 Handles update requests for the entire application
  * </p>
  */
-class NovelUpdateCycleWorker(
-	appContext: Context,
-	params: WorkerParameters,
-) : CoroutineWorker(appContext, params) {
+class NovelUpdateCycleWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params) {
 	override suspend fun doWork(): Result {
 		logI(LogConstants.SERVICE_EXECUTE)
 		val manager = NovelUpdateWorker.Manager(applicationContext)
@@ -105,9 +103,7 @@ class NovelUpdateCycleWorker(
 	class Manager(context: Context) : CoroutineWorkerManager(context) {
 		private val iSettingsRepository by instance<ISettingsRepository>()
 
-
-		private suspend fun updateCycle(): Long =
-			iSettingsRepository.getInt(NovelUpdateCycle).toLong()
+		private suspend fun updateCycle(): Long = iSettingsRepository.getInt(NovelUpdateCycle).toLong()
 
 		private suspend fun updateOnMetered(): Boolean =
 			iSettingsRepository.getBoolean(NovelUpdateOnMeteredConnection)
@@ -132,15 +128,12 @@ class NovelUpdateCycleWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()
 
-
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		suspend fun cycleEnabled(): Boolean = updateCycle() > 0L
 
@@ -160,26 +153,29 @@ class NovelUpdateCycleWorker(
 					ExistingPeriodicWorkPolicy.UPDATE,
 					PWRB<NovelUpdateCycleWorker>(
 						updateCycle(),
-						HOURS
+						HOURS,
 					).setConstraints(
 						Constraints.Builder().apply {
 							setRequiredNetworkType(
 								if (updateOnMetered()) {
 									CONNECTED
-								} else UNMETERED
+								} else {
+									UNMETERED
+								},
 							)
 							setRequiresStorageNotLow(!updateOnLowStorage())
 							setRequiresBatteryNotLow(!updateOnLowBattery())
-							if (SDK_INT >= VERSION_CODES.M)
+							if (SDK_INT >= VERSION_CODES.M) {
 								setRequiresDeviceIdle(updateOnlyIdle())
-						}.build()
+							}
+						}.build(),
 					)
-						.build()
+						.build(),
 				)
 				logI(
 					"NovelUpdateCycleWorker State ${
 						workerManager.getWorkInfosForUniqueWork(UPDATE_CYCLE_WORK_ID).await()[0]
-					}"
+					}",
 				)
 			}
 		}

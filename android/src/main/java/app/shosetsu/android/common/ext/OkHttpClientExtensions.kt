@@ -1,10 +1,10 @@
 package app.shosetsu.android.common.ext
 
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.

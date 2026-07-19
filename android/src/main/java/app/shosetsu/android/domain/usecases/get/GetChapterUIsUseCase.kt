@@ -31,15 +31,14 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 18 / 05 / 2020
  */
-class GetChapterUIsUseCase(
-	private val chapters: IChaptersRepository,
-) {
+class GetChapterUIsUseCase(private val chapters: IChaptersRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(novelID: Int): Flow<List<ChapterUI>> = flow {
-		if (novelID != -1)
+		if (novelID != -1) {
 			emitAll(
 				chapters.getChaptersLive(novelID).mapLatestToResultFlowWithFactory()
-					.mapLatest { it.convertList() }
+					.mapLatest { it.convertList() },
 			)
+		}
 	}
 }

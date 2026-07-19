@@ -38,6 +38,6 @@ data class NovelReaderSettingUI(
 	override fun convertTo(): NovelReaderSettingEntity = NovelReaderSettingEntity(
 		novelID,
 		paragraphIndentSize,
-		paragraphSpacingSize
+		paragraphSpacingSize,
 	)
 }

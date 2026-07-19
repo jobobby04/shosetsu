@@ -32,9 +32,8 @@ import kotlinx.coroutines.flow.map
  *
  * @author github.com/doomsdayrs
  */
-class DBNovelCategoriesDataSource(
-	private val novelCategoriesDao: NovelCategoriesDao,
-) : IDBNovelCategoriesDataSource {
+class DBNovelCategoriesDataSource(private val novelCategoriesDao: NovelCategoriesDao) :
+	IDBNovelCategoriesDataSource {
 
 	override fun getNovelCategoriesFromNovelFlow(novelID: Int): Flow<List<NovelCategoryEntity>> =
 		novelCategoriesDao.getNovelCategoriesFromNovelFlow(novelID).map { it.convertList() }
@@ -54,12 +53,11 @@ class DBNovelCategoriesDataSource(
 	override suspend fun deleteNovelsCategories(novelIDs: List<Int>) =
 		onIO { novelCategoriesDao.deleteNovelsCategories(novelIDs) }
 
-	fun NovelCategoryEntity.toDB() =
-		DBNovelCategoryEntity(
-			id = null,
-			novelID = novelID,
-			categoryID = categoryID
-		)
+	fun NovelCategoryEntity.toDB() = DBNovelCategoryEntity(
+		id = null,
+		novelID = novelID,
+		categoryID = categoryID,
+	)
 
 	fun List<NovelCategoryEntity>.toDB() = map { it.toDB() }
 }

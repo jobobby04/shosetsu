@@ -40,8 +40,8 @@ import kotlinx.coroutines.flow.StateFlow
  * 06 / 05 / 2020
  */
 abstract class AChapterReaderViewModel :
-	SubscribeViewModel<ImmutableList<ReaderUIItem>?>,
 	ShosetsuRootViewModel(),
+	SubscribeViewModel<ImmutableList<ReaderUIItem>?>,
 	ExposedSettingsRepoViewModel {
 
 	/**

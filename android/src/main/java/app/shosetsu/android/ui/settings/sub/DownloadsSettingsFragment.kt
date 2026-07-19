@@ -51,9 +51,7 @@ import kotlinx.coroutines.launch
  */
 
 @Composable
-fun DownloadsSettingsView(
-	onBack: () -> Unit
-) {
+fun DownloadsSettingsView(onBack: () -> Unit) {
 	val viewModel: ADownloadSettingsViewModel = viewModelDi()
 	val notifyRestartWorker by viewModel.notifyRestartWorker.collectAsState(null)
 
@@ -67,9 +65,9 @@ fun DownloadsSettingsView(
 				val result = hostState.showSnackbar(
 					context.getString(
 						R.string.fragment_settings_restart_worker,
-						context.getString(R.string.worker_title_download)
+						context.getString(R.string.worker_title_download),
 					),
-					duration = SnackbarDuration.Long
+					duration = SnackbarDuration.Long,
 				)
 
 				if (result == SnackbarResult.ActionPerformed) {
@@ -82,7 +80,7 @@ fun DownloadsSettingsView(
 	DownloadsSettingsContent(
 		viewModel,
 		hostState,
-		onBack
+		onBack,
 	)
 }
 
@@ -101,17 +99,17 @@ fun DownloadsSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
 			verticalArrangement = Arrangement.spacedBy(12.dp),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
 			item {
 				SliderSettingContent(
@@ -122,7 +120,7 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.DownloadThreadPool,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -135,7 +133,7 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.DownloadExtThreads,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -147,49 +145,49 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.DownloadNewNovelChapters,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
 			item {
 				SwitchSettingContent(
 					"Allow downloading on metered connection",
-					"",//TODO Description
+					"", // TODO Description
 					viewModel.settingsRepo,
 					SettingKey.DownloadOnMeteredConnection,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 			item {
 				SwitchSettingContent(
 					"Download on low battery",
-					"",//TODO Description
+					"", // TODO Description
 					viewModel.settingsRepo,
 					SettingKey.DownloadOnLowBattery,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 			item {
 				SwitchSettingContent(
 					"Download on low storage",
-					"",//TODO Description
+					"", // TODO Description
 					viewModel.settingsRepo,
 					SettingKey.DownloadOnLowStorage,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
 			item {
 				SwitchSettingContent(
 					"Download only when idle",
-					"",//TODO Description
+					"", // TODO Description
 					viewModel.settingsRepo,
 					SettingKey.DownloadOnlyWhenIdle,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -200,7 +198,7 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.BookmarkOnDownload,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 			item {
@@ -210,7 +208,7 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.NotifyExtensionDownload,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -232,7 +230,7 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.DeleteReadChapter,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -243,7 +241,7 @@ fun DownloadsSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.DownloadNotifyChapters,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 		}

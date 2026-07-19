@@ -38,7 +38,6 @@ interface ISettingsRepository {
 
 	fun getStringSetFlow(key: SettingKey<Set<String>>): StateFlow<Set<String>>
 
-
 	suspend fun getLong(key: SettingKey<Long>): Long
 
 	suspend fun getString(key: SettingKey<String>): String
@@ -50,7 +49,6 @@ interface ISettingsRepository {
 	suspend fun getStringSet(key: SettingKey<Set<String>>): Set<String>
 
 	suspend fun getFloat(key: SettingKey<Float>): Float
-
 
 	suspend fun setLong(key: SettingKey<Long>, value: Long)
 

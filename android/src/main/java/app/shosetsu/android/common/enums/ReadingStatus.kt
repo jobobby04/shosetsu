@@ -27,8 +27,8 @@ enum class ReadingStatus(val key: Int, val status: String) {
 	READING(1, "Reading"),
 	READ(2, "Read"),
 
-	UNKNOWN(-1, "Unknown");
-
+	UNKNOWN(-1, "Unknown"),
+	;
 
 	companion object {
 		fun fromInt(key: Int): ReadingStatus = entries.find { it.key == key } ?: UNKNOWN

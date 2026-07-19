@@ -32,15 +32,15 @@ fun CSSEditorPagerContent(
 	hasPaste: Boolean = true,
 	canUndo: Boolean,
 	canRedo: Boolean,
-	onSave: () -> Unit
+	onSave: () -> Unit,
 ) {
 	val pages = persistentListOf(
 		stringResource(
-			R.string.editor
+			R.string.editor,
 		),
 		stringResource(
-			R.string.preview
-		)
+			R.string.preview,
+		),
 	)
 
 	val pagerState = rememberPagerState { pages.size }
@@ -60,17 +60,17 @@ fun CSSEditorPagerContent(
 				onSave,
 				onExport,
 				onRedo,
-				canRedo
+				canRedo,
 			)
 		},
-		modifier = Modifier.imePadding()
+		modifier = Modifier.imePadding(),
 	) {
 		HorizontalPager(
 			state = pagerState,
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(it),
-			userScrollEnabled = false
+			userScrollEnabled = false,
 		) { page ->
 			when (page) {
 				0 -> {

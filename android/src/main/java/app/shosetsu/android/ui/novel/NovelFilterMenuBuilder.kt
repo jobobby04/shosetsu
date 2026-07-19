@@ -75,7 +75,7 @@ fun PreviewNovelFilterMenuView() {
 	var setting by remember { mutableStateOf(NovelSettingUI(1)) }
 	NovelFilterMenuView(
 		novelSetting = setting,
-		updateNovelSetting = { setting = it }
+		updateNovelSetting = { setting = it },
 	)
 }
 
@@ -97,9 +97,9 @@ fun NovelFilterMenuView(
 			// Override the indicator, using the provided pagerTabIndicatorOffset modifier
 			indicator = { tabPositions ->
 				TabRowDefaults.Indicator(
-					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
 				)
-			}
+			},
 		) {
 			// Add tabs for all of our pages
 			pages.forEachIndexed { index, title ->
@@ -119,7 +119,7 @@ fun NovelFilterMenuView(
 				0 -> NovelFilterMenuFilterContent(
 					novelSetting ?: NovelSettingUI(-1),
 					novelSetting == null,
-					updateNovelSetting = updateNovelSetting
+					updateNovelSetting = updateNovelSetting,
 				)
 
 				1 -> NovelFilterMenuSortContent(
@@ -130,10 +130,10 @@ fun NovelFilterMenuView(
 						updateNovelSetting(
 							(novelSetting ?: NovelSettingUI(-1)).copy(
 								sortType = a,
-								reverseOrder = b
-							)
+								reverseOrder = b,
+							),
 						)
-					}
+					},
 				)
 			}
 		}
@@ -149,7 +149,7 @@ fun PreviewNovelFilterMenuFilterContent() {
 		isLoading = false,
 		updateNovelSetting = {
 			setting = it
-		}
+		},
 	)
 }
 
@@ -157,12 +157,12 @@ fun PreviewNovelFilterMenuFilterContent() {
 fun NovelFilterMenuFilterContent(
 	settings: NovelSettingUI,
 	isLoading: Boolean,
-	updateNovelSetting: (NovelSettingUI) -> Unit
+	updateNovelSetting: (NovelSettingUI) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.verticalScroll(rememberScrollState())
+			.verticalScroll(rememberScrollState()),
 	) {
 		val readingStatus = settings.showOnlyReadingStatusOf
 
@@ -173,10 +173,10 @@ fun NovelFilterMenuFilterContent(
 			onClick = {
 				updateNovelSetting(
 					settings.copy(
-						showOnlyReadingStatusOf = null
-					)
+						showOnlyReadingStatusOf = null,
+					),
 				)
-			}
+			},
 		)
 
 		NovelFilterMenuFilterRadioButtonItem(
@@ -186,10 +186,10 @@ fun NovelFilterMenuFilterContent(
 			onClick = {
 				updateNovelSetting(
 					settings.copy(
-						showOnlyReadingStatusOf = READ
-					)
+						showOnlyReadingStatusOf = READ,
+					),
 				)
-			}
+			},
 		)
 
 		NovelFilterMenuFilterRadioButtonItem(
@@ -199,10 +199,10 @@ fun NovelFilterMenuFilterContent(
 			onClick = {
 				updateNovelSetting(
 					settings.copy(
-						showOnlyReadingStatusOf = UNREAD
-					)
+						showOnlyReadingStatusOf = UNREAD,
+					),
 				)
-			}
+			},
 		)
 
 		NovelFilterMenuFilterCheckboxItem(
@@ -212,8 +212,8 @@ fun NovelFilterMenuFilterContent(
 			onCheckedChange = {
 				updateNovelSetting(
 					settings.copy(
-						showOnlyBookmarked = it
-					)
+						showOnlyBookmarked = it,
+					),
 				)
 			},
 		)
@@ -225,8 +225,8 @@ fun NovelFilterMenuFilterContent(
 			onCheckedChange = {
 				updateNovelSetting(
 					settings.copy(
-						showOnlyDownloaded = it
-					)
+						showOnlyDownloaded = it,
+					),
 				)
 			},
 		)
@@ -238,8 +238,8 @@ fun NovelFilterMenuFilterContent(
 				onlyString = it
 				updateNovelSetting(
 					settings.copy(
-						showOnlyString = it.takeIf { it.isNotBlank() }?.trim()
-					)
+						showOnlyString = it.takeIf { it.isNotBlank() }?.trim(),
+					),
 				)
 			},
 			label = {
@@ -263,7 +263,7 @@ fun PreviewNovelFilterMenuFilterRadioButtonItem() {
 		isLoading = false,
 		onClick = {
 			selected = !selected
-		}
+		},
 	)
 }
 
@@ -272,7 +272,7 @@ fun NovelFilterMenuFilterRadioButtonItem(
 	title: String,
 	selected: Boolean,
 	isLoading: Boolean,
-	onClick: () -> Unit
+	onClick: () -> Unit,
 ) {
 	Row(
 		modifier = Modifier
@@ -281,14 +281,14 @@ fun NovelFilterMenuFilterRadioButtonItem(
 				if (!isLoading) onClick()
 			},
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		RadioButton(
 			selected = selected,
 			onClick = onClick,
 			modifier = Modifier
 				.placeholder(isLoading)
-				.fillMaxWidth(0.25f)
+				.fillMaxWidth(0.25f),
 		)
 		Text(title)
 	}
@@ -305,7 +305,7 @@ fun PreviewNovelFilterMenuFilterCheckboxItem() {
 		isLoading = false,
 		onCheckedChange = {
 			checked = it
-		}
+		},
 	)
 }
 
@@ -314,7 +314,7 @@ fun NovelFilterMenuFilterCheckboxItem(
 	title: String,
 	isChecked: Boolean,
 	isLoading: Boolean,
-	onCheckedChange: (Boolean) -> Unit
+	onCheckedChange: (Boolean) -> Unit,
 ) {
 	Row(
 		modifier = Modifier
@@ -323,7 +323,7 @@ fun NovelFilterMenuFilterCheckboxItem(
 				if (!isLoading) onCheckedChange(!isChecked)
 			},
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Checkbox(
 			isChecked,
@@ -332,7 +332,7 @@ fun NovelFilterMenuFilterCheckboxItem(
 			},
 			modifier = Modifier
 				.placeholder(isLoading)
-				.fillMaxWidth(0.25f)
+				.fillMaxWidth(0.25f),
 		)
 		Text(title)
 	}
@@ -348,7 +348,7 @@ fun PreviewNovelFilterMenuSortContent() {
 		isLoading = false,
 		update = { newType, newReversed ->
 			reversed = newReversed
-		}
+		},
 	)
 }
 
@@ -357,14 +357,13 @@ fun NovelFilterMenuSortContent(
 	chapterSortType: ChapterSortType,
 	isReversed: Boolean,
 	isLoading: Boolean,
-	update: (ChapterSortType, Boolean) -> Unit
+	update: (ChapterSortType, Boolean) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
-			.verticalScroll(rememberScrollState())
+			.verticalScroll(rememberScrollState()),
 	) {
-
 		NovelFilterMenuSortItemContent(
 			stringResource(R.string.fragment_library_menu_tri_by_source),
 			state = chapterSortType,
@@ -390,7 +389,7 @@ fun NovelFilterMenuSortContent(
 			},
 			setSortType = {
 				update(it, false)
-			}
+			},
 		)
 	}
 }
@@ -406,7 +405,7 @@ fun PreviewNovelFilterMenuSortItemContent() {
 		reversed = false,
 		isPlaceholder = false,
 		setIsSortReversed = { },
-		setSortType = { type = it }
+		setSortType = { type = it },
 	)
 }
 
@@ -418,32 +417,35 @@ fun NovelFilterMenuSortItemContent(
 	reversed: Boolean,
 	isPlaceholder: Boolean,
 	setIsSortReversed: (Boolean) -> Unit,
-	setSortType: (ChapterSortType) -> Unit
+	setSortType: (ChapterSortType) -> Unit,
 ) {
 	val isExpected = state == expectedState
 	Box(
 		modifier = Modifier
 			.clickable {
-				if (isExpected)
+				if (isExpected) {
 					setIsSortReversed(!reversed)
-				else setSortType(expectedState)
+				} else {
+					setSortType(expectedState)
+				}
 			}
 			.padding(8.dp)
-			.placeholder(isPlaceholder)
+			.placeholder(isPlaceholder),
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
 				.padding(8.dp)
-				.fillMaxWidth()
+				.fillMaxWidth(),
 		) {
 			Box(modifier = Modifier.size(32.dp)) {
-				if (isExpected)
+				if (isExpected) {
 					Icon(
 						if (reversed) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 						null,
-						modifier = Modifier.align(Alignment.Center)
+						modifier = Modifier.align(Alignment.Center),
 					)
+				}
 			}
 			Text(name, modifier = Modifier.padding(start = 8.dp))
 		}

@@ -1,11 +1,11 @@
 package app.shosetsu.android.common.utils
 
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * @see androidx.work.await
@@ -32,7 +32,7 @@ suspend inline fun <R> ListenableFuture<R>.await(): R {
 					}
 				}
 			},
-			{ it.run() }
+			{ it.run() },
 		)
 
 		continuation.invokeOnCancellation {

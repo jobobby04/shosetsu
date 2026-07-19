@@ -24,13 +24,11 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 /**
  * 09 / 03 / 2021
  */
-class UpdateLibraryFilterStateUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
+class UpdateLibraryFilterStateUseCase(private val iSettingsRepository: ISettingsRepository) {
 	suspend operator fun invoke(librarySortFilterEntity: LibraryFilterState) {
 		iSettingsRepository.setString(
 			SettingKey.LibraryFilter,
-			LibraryFilterState.libraryFilterStateJson.encodeToString(librarySortFilterEntity)
+			LibraryFilterState.libraryFilterStateJson.encodeToString(librarySortFilterEntity),
 		)
 	}
 }

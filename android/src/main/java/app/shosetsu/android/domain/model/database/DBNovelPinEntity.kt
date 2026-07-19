@@ -41,14 +41,14 @@ import app.shosetsu.android.dto.Convertible
 			entity = DBNovelEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["novelId"],
-			onDelete = ForeignKey.CASCADE
-		)
-	]
+			onDelete = ForeignKey.CASCADE,
+		),
+	],
 )
 data class DBNovelPinEntity(
 	@PrimaryKey
 	val novelId: Int,
-	val pinned: Boolean
+	val pinned: Boolean,
 ) : Convertible<NovelPinEntity> {
 	override fun convertTo(): NovelPinEntity = NovelPinEntity(novelId, pinned)
 }

@@ -6,9 +6,9 @@ import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.common.MissingFeatureException
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 import java.net.UnknownHostException
+import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -46,7 +46,7 @@ interface IAppUpdatesRepository {
 		FilePermissionException::class,
 		UnknownHostException::class,
 		IOException::class,
-		HTTPException::class
+		HTTPException::class,
 	)
 	suspend fun fetch(): AppUpdateEntity?
 
@@ -67,7 +67,7 @@ interface IAppUpdatesRepository {
 		MissingFeatureException::class,
 		EmptyResponseBodyException::class,
 		HTTPException::class,
-		NoSuchElementException::class
+		NoSuchElementException::class,
 	)
 	suspend fun downloadAppUpdate(): String
 }

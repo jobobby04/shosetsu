@@ -67,7 +67,7 @@ interface DownloadsDao : BaseDao<DBDownloadEntity> {
 			UPDATE downloads
 				SET status = :status
 			WHERE chapterID IN (:chapterIds)
-		"""
+		""",
 	)
 	suspend fun updateStatus(chapterIds: List<Int>, status: DownloadStatus)
 
@@ -85,7 +85,7 @@ interface DownloadsDao : BaseDao<DBDownloadEntity> {
 		"""
 			UPDATE downloads
 				SET status = 0
-		"""
+		""",
 	)
 	suspend fun setAllPending()
 }

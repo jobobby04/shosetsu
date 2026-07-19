@@ -26,9 +26,7 @@ import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
  * @since 06 / 03 / 2022
  * @author Doomsdayrs
  */
-class GetRepositoryUseCase(
-	private val repo: IExtensionRepoRepository
-) {
+class GetRepositoryUseCase(private val repo: IExtensionRepoRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(id: Int) = repo.getRepo(id)
 }

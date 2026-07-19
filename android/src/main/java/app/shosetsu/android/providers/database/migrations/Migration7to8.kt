@@ -30,6 +30,8 @@ object Migration7to8 : Migration(7, 8) {
 
 	@Throws(SQLException::class)
 	override fun migrate(db: SupportSQLiteDatabase) {
-		db.execSQL("CREATE TABLE IF NOT EXISTS `novel_pins` (`novelId` INTEGER NOT NULL, `pinned` INTEGER NOT NULL, PRIMARY KEY(`novelId`), FOREIGN KEY(`novelId`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+		db.execSQL(
+			"CREATE TABLE IF NOT EXISTS `novel_pins` (`novelId` INTEGER NOT NULL, `pinned` INTEGER NOT NULL, PRIMARY KEY(`novelId`), FOREIGN KEY(`novelId`) REFERENCES `novels`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+		)
 	}
 }

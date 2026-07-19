@@ -44,8 +44,7 @@ class InstalledExtensionConversionFactory(data: InstalledExtensionEntity) :
 	)
 }
 
-fun List<InstalledExtensionEntity>.mapToFactory() =
-	map { InstalledExtensionConversionFactory(it) }
+fun List<InstalledExtensionEntity>.mapToFactory() = map { InstalledExtensionConversionFactory(it) }
 
 @OptIn(ExperimentalCoroutinesApi::class)
 fun Flow<List<InstalledExtensionEntity>>.mapLatestToResultFlowWithFactory() =

@@ -29,9 +29,7 @@ import app.shosetsu.android.R
  * @author Clocks
  */
 @Composable
-fun VerificationWarning(
-	onDismissRequest: () -> Unit
-) {
+fun VerificationWarning(onDismissRequest: () -> Unit) {
 	AlertDialog(
 		onDismissRequest = onDismissRequest,
 		title = {
@@ -44,8 +42,8 @@ fun VerificationWarning(
 		},
 		text = {
 			Text(
-				stringResource(R.string.android_verification_warning_desc)
+				stringResource(R.string.android_verification_warning_desc),
 			)
-		}
+		},
 	)
 }

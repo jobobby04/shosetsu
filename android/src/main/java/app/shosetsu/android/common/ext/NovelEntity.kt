@@ -39,7 +39,7 @@ fun NovelEntity.toDB() = DBNovelEntity(
 	authors = authors,
 	artists = artists,
 	tags = tags,
-	status = status
+	status = status,
 )
 
 fun List<NovelEntity>.toDB() = map { it.toDB() }

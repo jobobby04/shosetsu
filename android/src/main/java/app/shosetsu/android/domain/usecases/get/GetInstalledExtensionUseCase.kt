@@ -28,9 +28,7 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 04 / 07 / 2020
  */
-class GetInstalledExtensionUseCase(
-	private val iExtensionsRepository: IExtensionsRepository,
-) {
+class GetInstalledExtensionUseCase(private val iExtensionsRepository: IExtensionsRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(id: Int): Flow<InstalledExtensionUI?> =
 		iExtensionsRepository.getInstalledExtensionFlow(id)

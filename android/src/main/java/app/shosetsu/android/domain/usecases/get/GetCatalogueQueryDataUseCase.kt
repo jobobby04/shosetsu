@@ -7,14 +7,12 @@ import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.Novel
+import app.shosetsu.lib.*
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.luaj.vm2.LuaError
 import java.io.IOException
+import kotlinx.coroutines.*
+import org.luaj.vm2.*
 
 /*
  * This file is part of shosetsu.
@@ -37,26 +35,24 @@ import java.io.IOException
  * shosetsu
  * 15 / 05 / 2020
  */
-class GetCatalogueQueryDataUseCase(
-	private val novelsRepository: INovelsRepository,
-) {
+class GetCatalogueQueryDataUseCase(private val novelsRepository: INovelsRepository) {
 	inner class MyPagingSource(
-		val iExtension: IExtension,
+		val extensionId: Int,
+		val iExtension: Extension,
 		val query: String,
 		val filters: Map<Int, Any>,
-		private val search: IExtension.Listing.Search,
+		private val search: Extension.Listing.Search,
 	) : PagingSource<Int, ACatalogNovelUI>() {
-		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? {
-			return state.anchorPosition?.let {
+		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
+			state.anchorPosition?.let {
 				state.closestPageToPosition(it)?.prevKey?.plus(1)
 					?: state.closestPageToPosition(it)?.nextKey?.minus(1)
 			}
-		}
 
 		private var lastPage: List<ACatalogNovelUI> = emptyList()
 
-		override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ACatalogNovelUI> {
-			return withContext(Dispatchers.IO) {
+		override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ACatalogNovelUI> =
+			withContext(Dispatchers.IO) {
 				try {
 					// Key may be null during a refresh, if no explicit key is passed into Pager
 					// construction. Use 0 as default, because our API is indexed started at index 0
@@ -74,15 +70,15 @@ class GetCatalogueQueryDataUseCase(
 							pageNumber,
 						).let {
 							val data: List<Novel.Info> = it
-							(data.mapNotNull { novelListing ->
+							data.mapNotNull { novelListing ->
 								try {
-									novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension))
+									novelsRepository.insertReturnStripped(novelListing.convertTo(extensionId))
 										?.let { ACatalogNovelUI(it, novelListing) }
 								} catch (e: SQLiteException) {
 									logE("Failed to load parse novel", e)
 									null
 								}
-							})
+							}
 						}
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
@@ -100,7 +96,7 @@ class GetCatalogueQueryDataUseCase(
 					LoadResult.Page(
 						data = response,
 						prevKey = prevKey,
-						nextKey = nextKey
+						nextKey = nextKey,
 					)
 				} catch (e: IOException) {
 					LoadResult.Error(e)
@@ -114,14 +110,14 @@ class GetCatalogueQueryDataUseCase(
 					LoadResult.Error(e)
 				}
 			}
-		}
 	}
 
 	@Throws(LuaError::class)
 	operator fun invoke(
-		ext: IExtension,
+		extensionId: Int,
+		ext: Extension,
 		query: String,
 		filters: Map<Int, Any>,
-		search: IExtension.Listing.Search,
-	): MyPagingSource = MyPagingSource(ext, query, filters, search)
+		search: Extension.Listing.Search,
+	): MyPagingSource = MyPagingSource(extensionId, ext, query, filters, search)
 }

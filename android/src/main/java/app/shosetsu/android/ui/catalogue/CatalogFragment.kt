@@ -89,7 +89,7 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
-import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.lua.MutableLuaListingItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -116,7 +116,7 @@ import org.acra.ACRA
  * ====================================================================
  */
 
-/**
+/*
  * Shosetsu
  * 9 / June / 2019
  *
@@ -131,8 +131,8 @@ fun CatalogueView(
 	extensionId: Int,
 	listing: String?,
 	onOpenNovel: (novelId: Int) -> Unit,
-	onSelectListing: (IExtension.Listing) -> Unit,
-	onBack: () -> Unit
+	onSelectListing: (Extension.Listing) -> Unit,
+	onBack: () -> Unit,
 ) {
 	val viewModel: ACatalogViewModel = viewModelDi()
 
@@ -176,8 +176,8 @@ fun CatalogueView(
 					hostState.showSnackbar(
 						context.getString(
 							R.string.fragment_catalogue_toast_background_add_success,
-							backgroundAddState.title
-						)
+							backgroundAddState.title,
+						),
 					)
 				}
 			}
@@ -186,8 +186,8 @@ fun CatalogueView(
 				scope.launch {
 					hostState.showSnackbar(
 						context.getString(
-							R.string.fragment_catalogue_toast_background_add
-						)
+							R.string.fragment_catalogue_toast_background_add,
+						),
 					)
 				}
 			}
@@ -200,9 +200,9 @@ fun CatalogueView(
 						context.getString(
 							R.string.fragment_catalogue_toast_background_add_fail,
 							error.message
-								?: "Unknown exception"
+								?: "Unknown exception",
 						),
-						actionLabel = context.getString(R.string.report)
+						actionLabel = context.getString(R.string.report),
 					)
 
 					if (result == SnackbarResult.ActionPerformed) {
@@ -222,7 +222,7 @@ fun CatalogueView(
 			scope.launch {
 				val result = hostState.showSnackbar(
 					exception.message ?: "Unknown error",
-					actionLabel = context.getString(R.string.reset)
+					actionLabel = context.getString(R.string.reset),
 				)
 				if (result == SnackbarResult.ActionPerformed) {
 					viewModel.resetView()
@@ -239,7 +239,7 @@ fun CatalogueView(
 			scope.launch {
 				val result = hostState.showSnackbar(
 					prepend.error.message ?: "Unknown error",
-					actionLabel = context.getString(R.string.retry)
+					actionLabel = context.getString(R.string.retry),
 				)
 				if (result == SnackbarResult.ActionPerformed) {
 					items.retry()
@@ -255,7 +255,7 @@ fun CatalogueView(
 			scope.launch {
 				val result = hostState.showSnackbar(
 					append.error.message ?: "Unknown error",
-					actionLabel = context.getString(R.string.retry)
+					actionLabel = context.getString(R.string.retry),
 				)
 				if (result == SnackbarResult.ActionPerformed) {
 					items.retry()
@@ -307,10 +307,10 @@ fun CatalogueView(
 			setCategories = {
 				viewModel.backgroundNovelAdd(
 					item = categoriesDialogItem ?: return@CategoriesDialog,
-					categories = it
+					categories = it,
 				)
 			},
-			novelCategories = remember { persistentListOf() }
+			novelCategories = remember { persistentListOf() },
 		)
 	}
 
@@ -326,7 +326,7 @@ fun CatalogueView(
 				getString = viewModel::getFilterStringState,
 				setString = viewModel::setFilterStringState,
 				applyFilter = viewModel::applyFilter,
-				resetFilter = viewModel::resetFilter
+				resetFilter = viewModel::resetFilter,
 			)
 		}
 	}
@@ -334,8 +334,8 @@ fun CatalogueView(
 
 @Composable
 fun ListingsContent(
-	items: ImmutableList<IExtension.Listing>,
-	onSelectListing: (IExtension.Listing) -> Unit
+	items: ImmutableList<Extension.Listing>,
+	onSelectListing: (Extension.Listing) -> Unit,
 ) {
 	Crossfade(items, label = "listing_items") {
 		key(it) {
@@ -346,23 +346,24 @@ fun ListingsContent(
 							.fillMaxWidth()
 							.clickable { onSelectListing(it) }
 							.padding(horizontal = 8.dp, vertical = 16.dp),
-						verticalAlignment = Alignment.CenterVertically
+						verticalAlignment = Alignment.CenterVertically,
 					) {
 						when (it) {
-							is IExtension.Listing.Item -> {
+							is Extension.Listing.Item -> {
 								Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
 								Spacer(modifier = Modifier.width(16.dp))
 								Text(
 									text = it.name,
-									style = MaterialTheme.typography.bodyLarge
+									style = MaterialTheme.typography.bodyLarge,
 								)
 							}
-							is IExtension.Listing.List -> {
+
+							is Extension.Listing.List -> {
 								Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "list")
 								Spacer(modifier = Modifier.width(16.dp))
 								Text(
 									text = it.name,
-									style = MaterialTheme.typography.bodyLarge
+									style = MaterialTheme.typography.bodyLarge,
 								)
 							}
 						}
@@ -376,13 +377,12 @@ fun ListingsContent(
 @Preview
 @Composable
 fun PreviewCatalogContent() {
-	var listingSelectionData: StableHolder<IExtension.Listing> by
-	remember {
-		mutableStateOf(
-			StableHolder(MutableLuaListingItem())
-		)
-	}
-
+	var listingSelectionData: StableHolder<Extension.Listing> by
+		remember {
+			mutableStateOf(
+				StableHolder(MutableLuaListingItem()),
+			)
+		}
 
 	CatalogContent(
 		"Meow",
@@ -403,11 +403,11 @@ fun PreviewCatalogContent() {
 		false,
 		remember { SnackbarHostState() },
 		selectedListing = listingSelectionData,
-		listingOptions = listOf<IExtension.Listing>().toImmutableList(),
+		listingOptions = listOf<Extension.Listing>().toImmutableList(),
 		setSelectedListing = {
 			listingSelectionData = StableHolder(it)
 		},
-		showImages = true
+		showImages = true,
 	)
 }
 
@@ -437,9 +437,9 @@ fun CatalogContent(
 	hasSearch: Boolean,
 	hostState: SnackbarHostState,
 	showImages: Boolean,
-	selectedListing: StableHolder<IExtension.Listing>?,
-	listingOptions: ImmutableList<IExtension.Listing>,
-	setSelectedListing: (IExtension.Listing) -> Unit,
+	selectedListing: StableHolder<Extension.Listing>?,
+	listingOptions: ImmutableList<Extension.Listing>,
+	setSelectedListing: (Extension.Listing) -> Unit,
 ) {
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -455,16 +455,16 @@ fun CatalogContent(
 				onSetQuery,
 				cardType,
 				onSetCardType,
-				openWebView
+				openWebView,
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { padding ->
 		val pullRefreshState = rememberPullRefreshState(
 			items.loadState.refresh == LoadState.Loading,
-			onRefresh = { items.refresh() }
+			onRefresh = { items.refresh() },
 		)
 
 		Column {
@@ -476,22 +476,22 @@ fun CatalogContent(
 					errorState,
 					items,
 					openWebView,
-					clearCookies
+					clearCookies,
 				)
 			} else {
 				Box(
 					Modifier
 						.pullRefresh(pullRefreshState)
-						.padding(padding)
+						.padding(padding),
 				) {
 					if (
 						items.loadState.refresh is LoadState.NotLoading &&
 						items.itemCount == 0 &&
-						selectedListing?.item !is IExtension.Listing.Item
+						selectedListing?.item !is Extension.Listing.Item
 					) {
 						ListingsContent(
 							listingOptions,
-							setSelectedListing
+							setSelectedListing,
 						)
 					} else {
 						CatalogGrid(
@@ -501,7 +501,7 @@ fun CatalogContent(
 							cardType,
 							onClick,
 							onLongClick,
-							showImages = showImages
+							showImages = showImages,
 						)
 					}
 				}
@@ -534,7 +534,7 @@ fun CatalogFloatingActionButton(hasFilters: Boolean, onShowFilterMenu: () -> Uni
 			icon = {
 				Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 			},
-			onClick = onShowFilterMenu
+			onClick = onShowFilterMenu,
 		)
 	}
 }
@@ -552,7 +552,7 @@ fun CatalogTopBar(
 	onSetQuery: (String) -> Unit,
 	cardType: NovelCardType,
 	onSetCardType: (NovelCardType) -> Unit,
-	openWebView: () -> Unit
+	openWebView: () -> Unit,
 ) {
 	var isSearchExpanded by remember { mutableStateOf(false) }
 	TopAppBar(
@@ -569,20 +569,20 @@ fun CatalogTopBar(
 				SearchAction(
 					query,
 					onSetQuery,
-					onSetExpanded = { isSearchExpanded = it }
+					onSetExpanded = { isSearchExpanded = it },
 				)
 			}
 			ViewTypeButton(
 				cardType,
-				onSetCardType
+				onSetCardType,
 			)
 
 			SimpleIconButton(
 				Icons.Default.OpenInBrowser,
 				stringResource(R.string.action_open_in_webview),
-				onClick = openWebView
+				onClick = openWebView,
 			)
-		}
+		},
 	)
 }
 
@@ -604,10 +604,12 @@ fun CatalogGrid(
 	val o = LocalConfiguration.current.orientation
 
 	val size =
-		(w / when (o) {
-			Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-			else -> columnsInV
-		}).dp - 8.dp
+		(
+			w / when (o) {
+				Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+				else -> columnsInV
+			}
+			).dp - 8.dp
 
 	val state = rememberLazyGridState()
 
@@ -618,15 +620,15 @@ fun CatalogGrid(
 			bottom = 200.dp,
 			start = 8.dp,
 			end = 8.dp,
-			top = 4.dp
+			top = 4.dp,
 		),
 		state = state,
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
-		verticalArrangement = Arrangement.spacedBy(4.dp)
+		verticalArrangement = Arrangement.spacedBy(4.dp),
 	) {
 		itemsIndexed(
 			items,
-			key = { index, item -> item.hashCode() + index }
+			key = { index, item -> item.hashCode() + index },
 		) { _, item ->
 			when (cardType) {
 				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
@@ -646,9 +648,9 @@ fun CatalogGrid(
 fun CatalogNormalCard(
 	item: ACatalogNovelUI?,
 	onClick: (ACatalogNovelUI) -> Unit,
-	onLongClick: (ACatalogNovelUI) -> Unit
+	onLongClick: (ACatalogNovelUI) -> Unit,
 ) {
-	if (item != null)
+	if (item != null) {
 		NovelCardNormalContent(
 			item.title,
 			item.imageURL,
@@ -658,8 +660,9 @@ fun CatalogNormalCard(
 			onLongClick = {
 				onLongClick(item)
 			},
-			isBookmarked = item.bookmarked
+			isBookmarked = item.bookmarked,
 		)
+	}
 }
 
 /**
@@ -670,9 +673,9 @@ fun CatalogCompressedCard(
 	item: ACatalogNovelUI?,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
-	showImages: Boolean
+	showImages: Boolean,
 ) {
-	if (item != null)
+	if (item != null) {
 		NovelCardCompressedContent(
 			item.title,
 			item.imageURL,
@@ -683,8 +686,9 @@ fun CatalogCompressedCard(
 				onLongClick(item)
 			},
 			isBookmarked = item.bookmarked,
-			showImages = showImages
+			showImages = showImages,
 		)
+	}
 }
 
 /**
@@ -694,9 +698,9 @@ fun CatalogCompressedCard(
 fun CatalogCozyCard(
 	item: ACatalogNovelUI?,
 	onClick: (ACatalogNovelUI) -> Unit,
-	onLongClick: (ACatalogNovelUI) -> Unit
+	onLongClick: (ACatalogNovelUI) -> Unit,
 ) {
-	if (item != null)
+	if (item != null) {
 		NovelCardCozyContent(
 			item.title,
 			item.imageURL,
@@ -706,8 +710,9 @@ fun CatalogCozyCard(
 			onLongClick = {
 				onLongClick(item)
 			},
-			isBookmarked = item.bookmarked
+			isBookmarked = item.bookmarked,
 		)
+	}
 }
 
 /**
@@ -718,7 +723,7 @@ fun CatalogErrorContent(
 	errorState: LoadState.Error,
 	items: LazyPagingItems<ACatalogNovelUI>,
 	openWebView: () -> Unit,
-	clearCookies: () -> Unit
+	clearCookies: () -> Unit,
 ) {
 	ErrorContent(
 		errorState.error.message ?: "Unknown",
@@ -727,7 +732,7 @@ fun CatalogErrorContent(
 			ErrorAction(R.string.action_open_in_webview, openWebView),
 			ErrorAction(R.string.settings_advanced_clear_cookies_title, clearCookies),
 		),
-		stackTrace = errorState.error.stackTraceToString()
+		stackTrace = errorState.error.stackTraceToString(),
 	)
 }
 
@@ -755,7 +760,6 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
 	}
 }
 
-
 /**
  * Preview [CatalogContentNoMore]
  */
@@ -772,13 +776,13 @@ fun PreviewCatalogContentNoMore() = ShosetsuTheme(AppThemes.LIGHT) {
 @Composable
 fun CatalogContentNoMore() {
 	Box(
-		modifier = Modifier.fillMaxWidth()
+		modifier = Modifier.fillMaxWidth(),
 	) {
 		Text(
 			stringResource(R.string.fragment_catalogue_no_more),
 			modifier = Modifier
 				.padding(32.dp)
-				.align(Alignment.Center)
+				.align(Alignment.Center),
 		)
 	}
 }

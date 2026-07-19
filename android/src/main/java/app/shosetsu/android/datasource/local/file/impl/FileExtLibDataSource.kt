@@ -32,9 +32,8 @@ import java.io.IOException
  * shosetsu
  * 12 / 05 / 2020
  */
-class FileExtLibDataSource(
-	private val iFileSystemProvider: IFileSystemProvider,
-) : IFileExtLibDataSource {
+class FileExtLibDataSource(private val iFileSystemProvider: IFileSystemProvider) :
+	IFileExtLibDataSource {
 	init {
 		logV("Creating required directories")
 		try {
@@ -51,7 +50,6 @@ class FileExtLibDataSource(
 	private fun makeRepoLibraryFile(entity: ExtLibEntity): String =
 		"$FILE_LIBRARY_DIR/${entity.repoID}/${entity.scriptName}.lua"
 
-
 	@Throws(FilePermissionException::class, IOException::class, CharacterCodingException::class)
 	override suspend fun writeExtLib(entity: ExtLibEntity, data: String) {
 		// Create the repo directory if it does not exist
@@ -61,7 +59,7 @@ class FileExtLibDataSource(
 		iFileSystemProvider.writeFile(
 			FILES,
 			makeRepoLibraryFile(entity),
-			data.encodeToByteArray()
+			data.encodeToByteArray(),
 		)
 	}
 
@@ -75,7 +73,7 @@ class FileExtLibDataSource(
 			// Read from the
 			iFileSystemProvider.readFile(
 				FILES,
-				makeOldLibraryFile(entity)
+				makeOldLibraryFile(entity),
 			).decodeToString()
 		}
 	}

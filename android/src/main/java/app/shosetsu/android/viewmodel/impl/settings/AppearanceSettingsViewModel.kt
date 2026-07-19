@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.stateIn
  */
 class AppearanceSettingsViewModel(
 	iSettingsRepository: ISettingsRepository,
-	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase
+	loadLiveAppThemeUseCase: LoadLiveAppThemeUseCase,
 ) : AAppearanceSettingsViewModel(iSettingsRepository) {
 	override val appTheme: StateFlow<AppThemes> =
 		loadLiveAppThemeUseCase()

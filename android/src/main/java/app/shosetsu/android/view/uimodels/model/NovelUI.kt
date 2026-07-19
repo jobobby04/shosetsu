@@ -76,6 +76,6 @@ data class NovelUI(
 		authors = authors,
 		artists = artists,
 		tags = tags,
-		status = status
+		status = status,
 	)
 }

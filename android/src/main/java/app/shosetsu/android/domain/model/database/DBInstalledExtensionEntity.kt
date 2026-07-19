@@ -80,6 +80,6 @@ data class DBInstalledExtensionEntity(
 		version = version,
 		chapterType = chapterType,
 		md5 = md5,
-		type = type
+		type = type,
 	)
 }

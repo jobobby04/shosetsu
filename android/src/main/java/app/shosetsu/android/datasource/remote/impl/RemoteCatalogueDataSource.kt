@@ -1,6 +1,7 @@
 package app.shosetsu.android.datasource.remote.impl
 
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import org.luaj.vm2.LuaError
@@ -22,21 +23,20 @@ import org.luaj.vm2.LuaError
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 10 / May / 2020
  */
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	override suspend fun loadListing(
-		ext: IExtension,
-		listing: IExtension.Listing.Item,
+		ext: Extension,
+		listing: Extension.Listing.Item,
 		data: Map<Int, Any>,
 		page: Int,
-	): List<Novel.Info> {
-		return if (!listing.isIncrementing && page > ext.startIndex) {
-			emptyList()
-		} else try {
+	): List<Novel.Info> = if (!listing.isIncrementing && page > ext.startIndex) {
+		emptyList()
+	} else {
+		try {
 			listing.getListing(data, page).toList()
 		} catch (e: LuaError) {
 			throw e.cause ?: e
@@ -44,8 +44,8 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	}
 
 	override suspend fun search(
-		ext: IExtension,
-		search: IExtension.Listing.Search,
+		ext: Extension,
+		search: Extension.Listing.Search,
 		query: String?,
 		filters: Map<Int, Any>,
 		page: Int,
@@ -53,10 +53,12 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 		val query = query ?: ""
 		return if (!search.isIncrementing && page > ext.startIndex) {
 			emptyList()
-		} else try {
-			search.getListing(query, filters, page)?.toList() ?: emptyList()
-		} catch (e: LuaError) {
-			throw e.cause ?: e
+		} else {
+			try {
+				search.getListing(query, filters, page)?.toList() ?: emptyList()
+			} catch (e: LuaError) {
+				throw e.cause ?: e
+			}
 		}
 	}
 }

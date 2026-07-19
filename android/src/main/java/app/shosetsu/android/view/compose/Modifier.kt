@@ -77,7 +77,5 @@ private class MinimumTouchTargetModifier(val size: DpSize) : LayoutModifier {
 		return size == otherModifier.size
 	}
 
-	override fun hashCode(): Int {
-		return size.hashCode()
-	}
+	override fun hashCode(): Int = size.hashCode()
 }

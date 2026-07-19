@@ -27,14 +27,12 @@ import app.shosetsu.android.common.ext.launchIO
  *	 Initializes formatters, libraries, and repositories
  * </p>
  */
-class StartRepositoryUpdateManagerUseCase(
-	private val manager: RepositoryUpdateWorker.Manager
-) {
+class StartRepositoryUpdateManagerUseCase(private val manager: RepositoryUpdateWorker.Manager) {
 	operator fun invoke(force: Boolean = false) {
 		launchIO {
-			if (!manager.isRunning())
+			if (!manager.isRunning()) {
 				manager.start(force = force)
+			}
 		}
 	}
-
 }

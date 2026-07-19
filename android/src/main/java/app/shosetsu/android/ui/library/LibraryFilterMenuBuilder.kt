@@ -86,11 +86,13 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun LibraryFilterMenuView(
-	viewModel: ALibraryViewModel
-) {
+fun LibraryFilterMenuView(viewModel: ALibraryViewModel) {
 	val pages =
-		listOf(stringResource(R.string.filter), stringResource(R.string.sort), stringResource(R.string.display))
+		listOf(
+			stringResource(R.string.filter),
+			stringResource(R.string.sort),
+			stringResource(R.string.display),
+		)
 	val pagerState = rememberPagerState { pages.size }
 	val scope = rememberCoroutineScope()
 
@@ -101,9 +103,9 @@ fun LibraryFilterMenuView(
 			// Override the indicator, using the provided pagerTabIndicatorOffset modifier
 			indicator = { tabPositions ->
 				TabRowDefaults.Indicator(
-					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+					Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
 				)
-			}
+			},
 		) {
 			// Add tabs for all of our pages
 			pages.forEachIndexed { index, title ->
@@ -180,7 +182,7 @@ fun LibraryFilterMenuView(
 							unreadStatusFilterState = unreadStatusFilterState,
 							cycleUnreadStatusFilterState = viewModel::cycleUnreadFilter,
 							downloadFilterState = downloadFilterState,
-							cycleDownloadFilterState = viewModel::cycleDownloadedFilter
+							cycleDownloadFilterState = viewModel::cycleDownloadedFilter,
 						)
 					}
 
@@ -196,7 +198,7 @@ fun LibraryFilterMenuView(
 							viewModel::setIsSortReversed,
 							viewModel::setSortType,
 							pinOnTopState,
-							viewModel::setPinnedOnTop
+							viewModel::setPinnedOnTop,
 						)
 					}
 
@@ -211,17 +213,17 @@ fun LibraryFilterMenuView(
 									bottom = verticalPadding,
 								)
 								.fillMaxHeight(),
-							horizontalArrangement = Arrangement.spacedBy(8.dp)
+							horizontalArrangement = Arrangement.spacedBy(8.dp),
 						) {
 							mapOf(
 								R.string.normal to NovelCardType.NORMAL,
 								R.string.compressed to NovelCardType.COMPRESSED,
-								R.string.cozy to NovelCardType.COZY
+								R.string.cozy to NovelCardType.COZY,
 							).forEach { (s, kind) ->
 								FilterChip(
 									selected = type == kind,
 									onClick = { viewModel.setViewType(kind) },
-									label = { Text(stringResource(s)) }
+									label = { Text(stringResource(s)) },
 								)
 							}
 						}
@@ -238,22 +240,18 @@ fun LibraryFilterMenuFilterContent(
 	genresIsNotEmpty: Boolean,
 	genresIsExpanded: Boolean,
 	setGenresIsExpanded: (Boolean) -> Unit,
-
 	tags: ImmutableList<String>,
 	tagsIsNotEmpty: Boolean,
 	tagsIsExpanded: Boolean,
 	setTagsIsExpanded: (Boolean) -> Unit,
-
 	authors: ImmutableList<String>,
 	authorsIsNotEmpty: Boolean,
 	authorsIsExpanded: Boolean,
 	setAuthorsIsExpanded: (Boolean) -> Unit,
-
 	artists: ImmutableList<String>,
 	artistsIsNotEmpty: Boolean,
 	artistsIsExpanded: Boolean,
 	setArtistsIsExpanded: (Boolean) -> Unit,
-
 	getFilterGenreState: (String) -> Flow<ToggleableState>,
 	cycleFilterGenreState: (String, ToggleableState) -> Unit,
 	getFilterTagState: (String) -> Flow<ToggleableState>,
@@ -262,13 +260,10 @@ fun LibraryFilterMenuFilterContent(
 	cycleFilterAuthorState: (String, ToggleableState) -> Unit,
 	getFilterArtistState: (String) -> Flow<ToggleableState>,
 	cycleFilterArtistState: (String, ToggleableState) -> Unit,
-
-
 	unreadStatusFilterState: ToggleableState,
 	cycleUnreadStatusFilterState: (ToggleableState) -> Unit,
-
 	downloadFilterState: ToggleableState,
-	cycleDownloadFilterState: (ToggleableState) -> Unit
+	cycleDownloadFilterState: (ToggleableState) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
@@ -277,14 +272,14 @@ fun LibraryFilterMenuFilterContent(
 	) {
 		UnreadStatusFilter(
 			unreadStatusFilterState,
-			cycleUnreadStatusFilterState
+			cycleUnreadStatusFilterState,
 		)
 		DownloadedFilter(
 			downloadFilterState,
-			cycleDownloadFilterState
+			cycleDownloadFilterState,
 		)
 
-		if (genresIsNotEmpty)
+		if (genresIsNotEmpty) {
 			FilterContent(
 				R.string.genres,
 				genres,
@@ -293,10 +288,11 @@ fun LibraryFilterMenuFilterContent(
 					setGenresIsExpanded(!genresIsExpanded)
 				},
 				getState = getFilterGenreState,
-				cycleState = cycleFilterGenreState
+				cycleState = cycleFilterGenreState,
 			)
+		}
 
-		if (tagsIsNotEmpty)
+		if (tagsIsNotEmpty) {
 			FilterContent(
 				R.string.tags,
 				tags,
@@ -305,10 +301,11 @@ fun LibraryFilterMenuFilterContent(
 					setTagsIsExpanded(!tagsIsExpanded)
 				},
 				getState = getFilterTagState,
-				cycleState = cycleFilterTagState
+				cycleState = cycleFilterTagState,
 			)
+		}
 
-		if (authorsIsNotEmpty)
+		if (authorsIsNotEmpty) {
 			FilterContent(
 				R.string.authors,
 				authors,
@@ -317,10 +314,11 @@ fun LibraryFilterMenuFilterContent(
 					setAuthorsIsExpanded(!authorsIsExpanded)
 				},
 				getState = getFilterAuthorState,
-				cycleState = cycleFilterAuthorState
+				cycleState = cycleFilterAuthorState,
 			)
+		}
 
-		if (artistsIsNotEmpty)
+		if (artistsIsNotEmpty) {
 			FilterContent(
 				R.string.artists,
 				artists,
@@ -329,47 +327,39 @@ fun LibraryFilterMenuFilterContent(
 					setArtistsIsExpanded(!artistsIsExpanded)
 				},
 				getState = getFilterArtistState,
-				cycleState = cycleFilterArtistState
+				cycleState = cycleFilterArtistState,
 			)
+		}
 	}
 }
 
 @Composable
-fun UnreadStatusFilter(
-	state: ToggleableState,
-	cycleState: (ToggleableState) -> Unit
-) {
+fun UnreadStatusFilter(state: ToggleableState, cycleState: (ToggleableState) -> Unit) {
 	SimpleTriStateFilter(
 		name = stringResource(R.string.unread_status),
 		state = state,
 		cycleState = cycleState,
-		modifier = Modifier.padding(top = 8.dp)
+		modifier = Modifier.padding(top = 8.dp),
 	)
 }
 
 @Composable
-fun DownloadedFilter(
-	state: ToggleableState,
-	cycleState: (ToggleableState) -> Unit
-) {
+fun DownloadedFilter(state: ToggleableState, cycleState: (ToggleableState) -> Unit) {
 	SimpleTriStateFilter(
 		name = stringResource(R.string.downloaded),
 		state = state,
 		cycleState = cycleState,
-		modifier = Modifier.padding(top = 8.dp)
+		modifier = Modifier.padding(top = 8.dp),
 	)
 }
 
 @Composable
-fun PinOnTopOption(
-	state: ToggleableState,
-	cycleState: (ToggleableState) -> Unit
-) {
+fun PinOnTopOption(state: ToggleableState, cycleState: (ToggleableState) -> Unit) {
 	SimpleTriStateFilter(
 		name = stringResource(R.string.pin_on_top),
 		state = state,
 		cycleState = cycleState,
-		modifier = Modifier.padding(top = 8.dp)
+		modifier = Modifier.padding(top = 8.dp),
 	)
 }
 
@@ -388,7 +378,7 @@ fun SimpleTriStateFilter(
 				.clickable {
 					cycleState(state)
 				}
-				.padding(vertical = 8.dp, horizontal = 16.dp)
+				.padding(vertical = 8.dp, horizontal = 16.dp),
 		) {
 			TriStateCheckbox(state = state, null)
 
@@ -397,7 +387,6 @@ fun SimpleTriStateFilter(
 	}
 }
 
-
 @Composable
 fun LibraryFilterMenuSortItemContent(
 	name: Int,
@@ -405,31 +394,34 @@ fun LibraryFilterMenuSortItemContent(
 	expectedState: NovelSortType,
 	reversed: Boolean,
 	setIsSortReversed: (Boolean) -> Unit,
-	setSortType: (NovelSortType) -> Unit
+	setSortType: (NovelSortType) -> Unit,
 ) {
 	val isExpected = state == expectedState
 	Box(
 		modifier = Modifier
 			.clickable {
-				if (isExpected)
+				if (isExpected) {
 					setIsSortReversed(!reversed)
-				else setSortType(expectedState)
+				} else {
+					setSortType(expectedState)
+				}
 			}
-			.padding(8.dp)
+			.padding(8.dp),
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			modifier = Modifier
 				.padding(8.dp)
-				.fillMaxWidth()
+				.fillMaxWidth(),
 		) {
 			Box(modifier = Modifier.size(32.dp)) {
-				if (isExpected)
+				if (isExpected) {
 					Icon(
 						if (reversed) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
 						null,
-						modifier = Modifier.align(Alignment.Center)
+						modifier = Modifier.align(Alignment.Center),
 					)
+				}
 			}
 			Text(stringResource(name), modifier = Modifier.padding(start = 8.dp))
 		}
@@ -443,7 +435,7 @@ fun LibraryFilterMenuSortContent(
 	setIsSortReversed: (Boolean) -> Unit,
 	setSortType: (NovelSortType) -> Unit,
 	pinOnTopState: Boolean,
-	setPinOnTopState: (Boolean) -> Unit
+	setPinOnTopState: (Boolean) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
@@ -454,7 +446,7 @@ fun LibraryFilterMenuSortContent(
 			state = if (pinOnTopState) On else Off,
 			cycleState = { state ->
 				setPinOnTopState(state != On)
-			}
+			},
 		)
 
 		LibraryFilterMenuSortItemContent(
@@ -463,7 +455,7 @@ fun LibraryFilterMenuSortContent(
 			BY_TITLE,
 			reversed,
 			setIsSortReversed,
-			setSortType
+			setSortType,
 		)
 		LibraryFilterMenuSortItemContent(
 			R.string.fragment_library_menu_tri_by_unread,
@@ -471,7 +463,7 @@ fun LibraryFilterMenuSortContent(
 			BY_UNREAD_COUNT,
 			reversed,
 			setIsSortReversed,
-			setSortType
+			setSortType,
 		)
 		LibraryFilterMenuSortItemContent(
 			R.string.fragment_library_menu_tri_by_id,
@@ -479,7 +471,7 @@ fun LibraryFilterMenuSortContent(
 			BY_ID,
 			reversed,
 			setIsSortReversed,
-			setSortType
+			setSortType,
 		)
 		LibraryFilterMenuSortItemContent(
 			R.string.fragment_library_menu_tri_by_updated,
@@ -487,7 +479,7 @@ fun LibraryFilterMenuSortContent(
 			BY_UPDATED,
 			reversed,
 			setIsSortReversed,
-			setSortType
+			setSortType,
 		)
 		LibraryFilterMenuSortItemContent(
 			R.string.fragment_library_menu_tri_by_read_time,
@@ -495,11 +487,10 @@ fun LibraryFilterMenuSortContent(
 			BY_READ_TIME,
 			reversed,
 			setIsSortReversed,
-			setSortType
+			setSortType,
 		)
 	}
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -509,20 +500,20 @@ fun ColumnScope.FilterContent(
 	isExpanded: Boolean,
 	toggleExpansion: () -> Unit,
 	getState: (String) -> Flow<ToggleableState>,
-	cycleState: (String, ToggleableState) -> Unit
+	cycleState: (String, ToggleableState) -> Unit,
 ) {
 	Card(
 		onClick = toggleExpansion,
-		modifier = Modifier.padding(horizontal = 8.dp)
+		modifier = Modifier.padding(horizontal = 8.dp),
 	) {
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(8.dp)
+				.padding(8.dp),
 		) {
 			Icon(
 				if (isExpanded) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
-				null
+				null,
 			)
 			Text(stringResource(name), modifier = Modifier.padding(start = 8.dp))
 		}
@@ -537,7 +528,7 @@ fun ColumnScope.FilterContent(
 					state = state,
 					cycleState = {
 						cycleState(item, it)
-					}
+					},
 				)
 			}
 		}

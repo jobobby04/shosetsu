@@ -45,9 +45,9 @@ interface NovelPinsDao : BaseDao<DBNovelPinEntity> {
 	suspend fun setPinned(ids: List<Int>, pinned: Boolean) {
 		ids.forEach { id ->
 			val item = get(id)
-			if (item != null && item.pinned != pinned)
+			if (item != null && item.pinned != pinned) {
 				update(item.copy(pinned = pinned))
-			else {
+			} else {
 				// Insert as true, as we are assuming null = false
 				insertIgnore(DBNovelPinEntity(id, pinned))
 			}

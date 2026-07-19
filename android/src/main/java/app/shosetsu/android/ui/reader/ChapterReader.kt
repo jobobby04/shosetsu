@@ -43,8 +43,9 @@ import org.kodein.di.android.closestDI
  * shosetsu
  * 13 / 12 / 2019
  */
-class ChapterReader
-	: AppCompatActivity(), DIAware {
+class ChapterReader :
+	AppCompatActivity(),
+	DIAware {
 	override val di: DI by closestDI()
 	internal val viewModel: AChapterReaderViewModel by viewModel()
 
@@ -57,12 +58,13 @@ class ChapterReader
 				   Release any UI objects that currently hold memory.
 
 				   The user interface has moved to the background.
-				*/
+				 */
 			}
 
 			TRIM_MEMORY_RUNNING_MODERATE,
 			TRIM_MEMORY_RUNNING_LOW,
-			TRIM_MEMORY_RUNNING_CRITICAL -> {
+			TRIM_MEMORY_RUNNING_CRITICAL,
+			-> {
 				/*
 				   Release any memory that your app doesn't need to run.
 
@@ -70,12 +72,13 @@ class ChapterReader
 				   The event raised indicates the severity of the memory-related event.
 				   If the event is TRIM_MEMORY_RUNNING_CRITICAL, then the system will
 				   begin killing background processes.
-				*/
+				 */
 			}
 
 			TRIM_MEMORY_BACKGROUND,
 			TRIM_MEMORY_MODERATE,
-			TRIM_MEMORY_COMPLETE -> {
+			TRIM_MEMORY_COMPLETE,
+			-> {
 				/*
 				   Release as much memory as the process can.
 
@@ -83,7 +86,7 @@ class ChapterReader
 				   The event raised indicates where the app sits within the LRU list.
 				   If the event is TRIM_MEMORY_COMPLETE, the process will be one of
 				   the first to be terminated.
-				*/
+				 */
 			}
 
 			else -> {
@@ -92,11 +95,10 @@ class ChapterReader
 
 				  The app received an unrecognized memory level value
 				  from the system. Treat this as a generic low-memory message.
-				*/
+				 */
 				viewModel.clearMemory()
 			}
 		}
-
 	}
 
 	/** On Create */
@@ -125,14 +127,16 @@ class ChapterReader
 		setContent {
 			ChapterReaderView(
 				viewModel,
-				onExit = { finish() }
+				onExit = { finish() },
 			)
 		}
 
 		viewModel.liveIsScreenRotationLocked.collectLA(this, catch = {}) {
-			if (it)
+			if (it) {
 				lockRotation()
-			else unlockRotation()
+			} else {
+				unlockRotation()
+			}
 		}
 
 		viewModel.liveKeepScreenOn.collectLA(this, catch = {}) {
@@ -147,8 +151,8 @@ class ChapterReader
 	/**
 	 * Adds the
 	 */
-	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-		return if (viewModel.isVolumeScrollEnabled.value)
+	override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean =
+		if (viewModel.isVolumeScrollEnabled.value) {
 			when (keyCode) {
 				KeyEvent.KEYCODE_VOLUME_DOWN -> {
 					viewModel.incrementProgress()
@@ -162,8 +166,9 @@ class ChapterReader
 
 				else -> super.onKeyDown(keyCode, event)
 			}
-		else super.onKeyDown(keyCode, event)
-	}
+		} else {
+			super.onKeyDown(keyCode, event)
+		}
 
 	private fun lockRotation() {
 		val currentOrientation = resources.configuration.orientation
@@ -175,7 +180,7 @@ class ChapterReader
 	}
 
 	private fun unlockRotation() {
-		//window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+		// window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
 		requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
 	}
 }

@@ -29,14 +29,15 @@ const val CRESET: String = "\u001B[0m"
 const val CRED: String = "\u001B[31m"
 
 fun writeT(t: Throwable? = null) {
-	if (t != null)
+	if (t != null) {
 		fileOut?.println(t.stackTraceToString())
+	}
 }
 
 @Suppress("unused")
 inline fun <reified T> T.logI(message: String?, t: Throwable? = null): Int {
 	val name = Thread.currentThread().stackTrace[2].methodName ?: NULL_METHOD_NAME
-	val msg = "${name}:\t$message"
+	val msg = "$name:\t$message"
 	val tag = T::class.java.simpleName
 
 	fileOut?.println("i:\t$tag:\t$msg")
@@ -49,7 +50,7 @@ inline fun <reified T> T.logI(message: String?, t: Throwable? = null): Int {
 @Suppress("unused")
 inline fun <reified T> T.logD(message: String?, t: Throwable? = null): Int {
 	val name = Thread.currentThread().stackTrace[2].methodName ?: NULL_METHOD_NAME
-	val msg = "${name}:\t$message"
+	val msg = "$name:\t$message"
 	val tag = T::class.java.simpleName
 
 	fileOut?.println("D:\t$tag:\t$msg")
@@ -62,10 +63,10 @@ inline fun <reified T> T.logD(message: String?, t: Throwable? = null): Int {
 @Suppress("unused")
 inline fun <reified T> T.logE(message: String?, t: Throwable? = null): Int {
 	val name = Thread.currentThread().stackTrace[2].methodName ?: NULL_METHOD_NAME
-	val msg = "${name}:\t$message"
+	val msg = "$name:\t$message"
 	val tag = T::class.java.simpleName
 
-	fileOut?.println("${CRED}e:\t$tag:\t$msg${CRESET}")
+	fileOut?.println("${CRED}e:\t$tag:\t$msg$CRESET")
 
 	writeT(t)
 
@@ -75,7 +76,7 @@ inline fun <reified T> T.logE(message: String?, t: Throwable? = null): Int {
 @Suppress("unused")
 inline fun <reified T> T.logW(message: String?, t: Throwable? = null): Int {
 	val name = Thread.currentThread().stackTrace[2].methodName ?: NULL_METHOD_NAME
-	val msg = "${name}:\t$message"
+	val msg = "$name:\t$message"
 	val tag = T::class.java.simpleName
 
 	fileOut?.println("w:\t$tag:\t$msg")
@@ -88,7 +89,7 @@ inline fun <reified T> T.logW(message: String?, t: Throwable? = null): Int {
 @Suppress("unused")
 inline fun <reified T> T.logV(message: String?, t: Throwable? = null): Int {
 	val name = Thread.currentThread().stackTrace[2].methodName ?: NULL_METHOD_NAME
-	val msg = "${name}:\t$message"
+	val msg = "$name:\t$message"
 	val tag = T::class.java.simpleName
 
 	fileOut?.println("v:\t$tag:\t$msg")
@@ -101,7 +102,7 @@ inline fun <reified T> T.logV(message: String?, t: Throwable? = null): Int {
 @Suppress("unused")
 inline fun <reified T> T.logWTF(message: String?, t: Throwable? = null): Int {
 	val name = Thread.currentThread().stackTrace[2].methodName ?: NULL_METHOD_NAME
-	val msg = "${name}:\t$message"
+	val msg = "$name:\t$message"
 	val tag = T::class.java.simpleName
 
 	fileOut?.println("wtf:\t$tag:\t$msg")

@@ -56,7 +56,7 @@ class StartUpdateWorkerUseCase(
 				manager.start(
 					Data.Builder()
 						.putInt(NovelUpdateWorker.KEY_CATEGORY, categoryID)
-						.build()
+						.build(),
 				)
 			} else if (cycleManager.cycleEnabled()) {
 				// Update all categories

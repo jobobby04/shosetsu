@@ -45,10 +45,10 @@ import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 import app.shosetsu.android.view.compose.setting.widget.PreferenceGroupHeader
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.viewmodel.abstracted.settings.AAppearanceSettingsViewModel
+import java.util.Locale
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import org.xmlpull.v1.XmlPullParser
-import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -68,23 +68,18 @@ import java.util.Locale
  */
 
 @Composable
-fun AppearanceSettingsView(
-	onBack: () -> Unit
-) {
+fun AppearanceSettingsView(onBack: () -> Unit) {
 	val viewModel: AAppearanceSettingsViewModel = viewModelDi()
 
 	AppearanceSettingsContent(
 		viewModel,
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppearanceSettingsContent(
-	viewModel: AAppearanceSettingsViewModel,
-	onBack: () -> Unit
-) {
+fun AppearanceSettingsContent(viewModel: AAppearanceSettingsViewModel, onBack: () -> Unit) {
 	Scaffold(
 		topBar = {
 			TopAppBar(
@@ -93,16 +88,16 @@ fun AppearanceSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(
 				top = 16.dp,
-				bottom = 64.dp
+				bottom = 64.dp,
 			),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
 			item {
 				PreferenceGroupHeader(stringResource(R.string.theme))
@@ -118,7 +113,7 @@ fun AppearanceSettingsContent(
 							viewModel.settingsRepo.setInt(AppTheme, it.key)
 						}
 						it.setAppCompatDelegateThemeMode()
-					}
+					},
 				)
 			}
 
@@ -133,7 +128,7 @@ fun AppearanceSettingsContent(
 				val langs = remember { getLangs(context) }
 				var currentLanguage by remember {
 					mutableStateOf(
-						AppCompatDelegate.getApplicationLocales().get(0)?.toLanguage() ?: context.defaultLanguage
+						AppCompatDelegate.getApplicationLocales().get(0)?.toLanguage() ?: context.defaultLanguage,
 					)
 				}
 
@@ -153,7 +148,7 @@ fun AppearanceSettingsContent(
 					value = currentLanguage,
 					entries = langs.associateWith { it.localizedDisplayName ?: it.displayName },
 					onValueChange = { currentLanguage = it },
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -165,7 +160,7 @@ fun AppearanceSettingsContent(
 					repo = viewModel.settingsRepo,
 					key = ChapterColumnsInPortait,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -177,7 +172,7 @@ fun AppearanceSettingsContent(
 					repo = viewModel.settingsRepo,
 					key = ChapterColumnsInLandscape,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -187,7 +182,7 @@ fun AppearanceSettingsContent(
 					choices = stringArrayResource(R.array.novel_card_types).toList(),
 					repo = viewModel.settingsRepo,
 					key = SelectedNovelCardType,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -197,7 +192,7 @@ fun AppearanceSettingsContent(
 					description = stringResource(R.string.novel_badge_toast_desc),
 					repo = viewModel.settingsRepo,
 					key = NovelBadgeToast,
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
 				)
 			}
 
@@ -207,7 +202,7 @@ fun AppearanceSettingsContent(
 					description = stringResource(R.string.settings_view_legacy_nav_desc),
 					modifier = Modifier.fillMaxWidth(),
 					repo = viewModel.settingsRepo,
-					key = NavStyle
+					key = NavStyle,
 				)
 			}
 
@@ -222,7 +217,7 @@ fun AppearanceSettingsContent(
 						if (newValue) {
 							viewModel.settingsRepo.setInt(SelectedNovelCardType, NovelCardType.COMPRESSED.toInt())
 						}
-					}
+					},
 				)
 			}
 		}

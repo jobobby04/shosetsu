@@ -26,9 +26,7 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 08 / 12 / 2020
  */
-class LoadNovelUIColumnsHUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
+class LoadNovelUIColumnsHUseCase(private val iSettingsRepository: ISettingsRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke() = iSettingsRepository.getIntFlow(SettingKey.ChapterColumnsInLandscape)
 		.mapLatest {

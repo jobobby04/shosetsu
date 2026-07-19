@@ -52,9 +52,9 @@ fun PreviewAppUpdateDialog() {
 				repeat(100) {
 					add("mew")
 				}
-			}
+			},
 		),
-		{}
+		{},
 	) { }
 }
 
@@ -65,11 +65,7 @@ fun PreviewAppUpdateDialog() {
  * @author Doomsdayrs
  */
 @Composable
-fun AppUpdateDialog(
-	update: AppUpdateEntity,
-	onDismissRequest: () -> Unit,
-	onUpdate: () -> Unit
-) {
+fun AppUpdateDialog(update: AppUpdateEntity, onDismissRequest: () -> Unit, onUpdate: () -> Unit) {
 	AlertDialog(
 		onDismissRequest = onDismissRequest,
 		title = {
@@ -80,7 +76,7 @@ fun AppUpdateDialog(
 				onClick = {
 					onUpdate()
 					onDismissRequest()
-				}
+				},
 			) {
 				Text(stringResource(R.string.update))
 			}
@@ -105,14 +101,14 @@ fun AppUpdateDialog(
 							brush = Brush.verticalGradient(
 								colors = listOf(
 									Color.Black,
-									Color.Transparent
+									Color.Transparent,
 								),
-								startY = this.size.height * .8f
+								startY = this.size.height * .8f,
 							),
-							blendMode = BlendMode.DstIn
+							blendMode = BlendMode.DstIn,
 						)
-					}) {
-
+					},
+			) {
 				Text(update.version, style = MaterialTheme.typography.titleMedium)
 
 				if (update.versionCode != -1) {
@@ -127,10 +123,9 @@ fun AppUpdateDialog(
 					update.notes.joinToString("\n"),
 					modifier = Modifier
 						.heightIn(max = 200.dp)
-						.verticalScroll(rememberScrollState())
+						.verticalScroll(rememberScrollState()),
 				)
 			}
-
-		}
+		},
 	)
 }

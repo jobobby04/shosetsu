@@ -24,9 +24,7 @@ import app.shosetsu.android.domain.repository.base.ICategoryRepository
 /**
  * 13 / 01 / 2021
  */
-class AddCategoryUseCase(
-	private val repo: ICategoryRepository
-) {
+class AddCategoryUseCase(private val repo: ICategoryRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(name: String): Int {
 		if (repo.categoryExists(name)) {

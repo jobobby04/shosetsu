@@ -7,8 +7,8 @@ import app.shosetsu.android.datasource.remote.base.IRemoteExtensionDataSource
 import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.lib.exceptions.HTTPException
-import okhttp3.OkHttpClient
 import java.io.IOException
+import okhttp3.OkHttpClient
 
 /*
  * This file is part of shosetsu.
@@ -31,9 +31,7 @@ import java.io.IOException
  * shosetsu
  * 13 / 05 / 2020
  */
-class RemoteExtensionDataSource(
-	private val client: OkHttpClient,
-) : IRemoteExtensionDataSource {
+class RemoteExtensionDataSource(private val client: OkHttpClient) : IRemoteExtensionDataSource {
 
 	private fun makeExtensionURL(repo: RepositoryEntity, fe: GenericExtensionEntity): String =
 		"${repo.url}$REPO_SOURCE_DIR/${fe.lang}/${fe.fileName}.lua"
@@ -45,15 +43,14 @@ class RemoteExtensionDataSource(
 	): ByteArray {
 		val url = makeExtensionURL(
 			repositoryEntity,
-			extensionEntity
+			extensionEntity,
 		)
 
-		@Suppress("BlockingMethodInNonBlockingContext")
 		val response = client.quickie(url)
-		if (response.isSuccessful)
-			@Suppress("BlockingMethodInNonBlockingContext")
+		if (response.isSuccessful) {
 			return response.body?.bytes() ?: throw EmptyResponseBodyException(url)
-		else throw HTTPException(response.code)
+		} else {
+			throw HTTPException(response.code)
+		}
 	}
-
 }

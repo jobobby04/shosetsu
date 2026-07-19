@@ -51,6 +51,8 @@ import app.shosetsu.lib.Version
  * @param updateVersion Version to update to
  *
  * @param isInstalling True if the extension is currently being installed
+ *
+ * @param isObsolete If this extension is obsolete and ought to be removed or not.
  */
 data class BrowseExtensionEntity(
 	val id: Int,
@@ -63,5 +65,6 @@ data class BrowseExtensionEntity(
 	val installedRepo: Int,
 	val isUpdateAvailable: Boolean,
 	val updateVersion: Version? = null,
-	val isInstalling: Boolean
+	val isInstalling: Boolean,
+	val isObsolete: Boolean,
 )

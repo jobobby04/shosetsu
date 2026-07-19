@@ -44,13 +44,13 @@ import androidx.core.content.ContextCompat
 import app.shosetsu.android.common.ext.toast
 import app.shosetsu.android.common.utils.webview.WebViewClientCompat
 import app.shosetsu.android.common.utils.webview.isOutdated
+import java.io.IOException
+import java.util.concurrent.CountDownLatch
 import okhttp3.Cookie
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
-import java.io.IOException
-import java.util.concurrent.CountDownLatch
 
 class CloudflareInterceptor(
 	private val context: Context,
@@ -65,11 +65,7 @@ class CloudflareInterceptor(
 		return response.code in ERROR_CODES && response.header("Server") in SERVER_CHECK
 	}
 
-	override fun intercept(
-		chain: Interceptor.Chain,
-		request: Request,
-		response: Response,
-	): Response {
+	override fun intercept(chain: Interceptor.Chain, request: Request, response: Response): Response {
 		try {
 			response.close()
 			cookieManager.remove(request.url, COOKIE_NAMES, 0)
@@ -108,11 +104,9 @@ class CloudflareInterceptor(
 
 			webview.webViewClient = object : WebViewClientCompat() {
 				override fun onPageFinished(view: WebView, url: String) {
-					fun isCloudFlareBypassed(): Boolean {
-						return cookieManager.get(origRequestUrl.toHttpUrl())
-							.firstOrNull { it.name == "cf_clearance" }
-							.let { it != null && it != oldCookie }
-					}
+					fun isCloudFlareBypassed(): Boolean = cookieManager.get(origRequestUrl.toHttpUrl())
+						.firstOrNull { it.name == "cf_clearance" }
+						.let { it != null && it != oldCookie }
 
 					if (isCloudFlareBypassed()) {
 						cloudflareBypassed = true

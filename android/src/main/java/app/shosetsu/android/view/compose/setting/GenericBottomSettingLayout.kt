@@ -23,9 +23,8 @@ fun PreviewGenericBottomSetting() = ShosetsuTheme(AppThemes.LIGHT) {
 	GenericBottomSettingLayout(
 		"Test",
 		"Description",
-		iconDescription = null // No icon
+		iconDescription = null, // No icon
 	) {
-
 	}
 }
 
@@ -37,7 +36,7 @@ fun GenericBottomSettingLayout(
 	icon: ImageVector? = null,
 	iconDescription: String?,
 	iconTint: Color = MaterialTheme.colorScheme.primary,
-	bottom: @Composable () -> Unit
+	bottom: @Composable () -> Unit,
 ) {
 	BasePreferenceWidget(
 		modifier = modifier,
@@ -63,7 +62,7 @@ fun GenericBottomSettingLayout(
 				Icon(
 					imageVector = icon,
 					tint = iconTint,
-					contentDescription = null
+					contentDescription = null,
 				)
 			}
 		} else {

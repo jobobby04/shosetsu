@@ -12,11 +12,6 @@ import app.shosetsu.android.common.utils.CookieJarSync
 import app.shosetsu.android.common.utils.SiteProtector
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.lib.ShosetsuSharedLib
-import kotlinx.coroutines.runBlocking
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
 import java.net.Authenticator
 import java.net.InetSocketAddress
 import java.net.PasswordAuthentication
@@ -25,6 +20,11 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 
 /*
  * This file is part of shosetsu.
@@ -43,14 +43,12 @@ import java.util.logging.Logger
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 04 / 05 / 2020
  */
 
 fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepository): OkHttpClient {
-
 	val useProxy = runBlocking {
 		iSettingsRepository.getBoolean(SettingKey.UseProxy)
 	}
@@ -67,7 +65,7 @@ fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepositor
 				defaultUserAgentProvider = {
 					runBlocking { iSettingsRepository.getString(SettingKey.UserAgent) }
 				},
-			)
+			),
 		)
 		.addNetworkInterceptor {
 			val request = it.request().newBuilder()
@@ -99,7 +97,7 @@ fun createOkHttpClient(context: Context, iSettingsRepository: ISettingsRepositor
 					override fun getPasswordAuthentication(): PasswordAuthentication? {
 						if (requestingHost.equals(
 								host,
-								ignoreCase = true
+								ignoreCase = true,
 							) and (requestingPort == port)
 						) {
 							return PasswordAuthentication(user, pass.toCharArray())
@@ -126,8 +124,9 @@ val retryAfterDateFormat: SimpleDateFormat = SimpleDateFormat("EEE, dd MMM yyyy 
  * Represents the pattern expected from an HTTP Retry-After response
  */
 val retryAfterDateRegex: Regex =
-	Regex("^([a-zA-Z]{3}),\\s(\\d{2})\\s(\\w{3})\\s(\\d{4})\\s(\\d{2}):(\\d{2}):(\\d{2})\\s([a-zA-Z]{3})")
-
+	Regex(
+		"^([a-zA-Z]{3}),\\s(\\d{2})\\s(\\w{3})\\s(\\d{4})\\s(\\d{2}):(\\d{2}):(\\d{2})\\s([a-zA-Z]{3})",
+	)
 
 /**
  * Parse a Retry-After date value.
@@ -194,5 +193,4 @@ fun slowRequest(chain: Interceptor.Chain, r: Request, isRetry: Boolean = false):
 /**
  * If the response has a retry after header. (not a success)
  */
-private fun Response.hasRetryAfter() =
-	code == 503 || code == 429 || code == 301
+private fun Response.hasRetryAfter() = code == 503 || code == 429 || code == 301

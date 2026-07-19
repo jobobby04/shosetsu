@@ -25,14 +25,11 @@ import kotlinx.coroutines.flow.mapLatest
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 12 / May / 2020
  */
-class LoadDownloadsUseCase(
-	private val iDownloadsRepository: IDownloadsRepository,
-) {
+class LoadDownloadsUseCase(private val iDownloadsRepository: IDownloadsRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(): Flow<List<DownloadUI>> = iDownloadsRepository.loadDownloadsFlow()
 		.mapLatestToResultFlowWithFactory()

@@ -32,32 +32,19 @@ interface IFileChapterDataSource {
 	 * Save the chapter passage to storage
 	 */
 	@Throws(FilePermissionException::class, IOException::class)
-	suspend fun save(
-		chapterEntity: ChapterEntity,
-		chapterType: Novel.ChapterType,
-		passage: ByteArray
-	)
+	suspend fun save(chapterEntity: ChapterEntity, chapterType: Novel.ChapterType, passage: ByteArray)
 
 	/**
 	 * Gets chapter passage via it's ID
 	 */
 	@Throws(FilePermissionException::class, FileNotFoundException::class)
-	suspend fun load(
-		chapterEntity: ChapterEntity,
-		chapterType: Novel.ChapterType
-	): ByteArray
+	suspend fun load(chapterEntity: ChapterEntity, chapterType: Novel.ChapterType): ByteArray
 
 	/** Deletes a chapter from the filesystem */
 	@Throws(FilePermissionException::class)
-	suspend fun delete(
-		chapterEntity: ChapterEntity,
-		chapterType: Novel.ChapterType
-	)
+	suspend fun delete(chapterEntity: ChapterEntity, chapterType: Novel.ChapterType)
 
 	/** Deletes chapters from the filesystem */
 	@Throws(FilePermissionException::class)
-	suspend fun delete(
-		chapterEntities: List<ChapterEntity>,
-		chapterType: Novel.ChapterType
-	)
+	suspend fun delete(chapterEntities: List<ChapterEntity>, chapterType: Novel.ChapterType)
 }

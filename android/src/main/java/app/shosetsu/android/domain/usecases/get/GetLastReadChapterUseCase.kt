@@ -30,10 +30,7 @@ import app.shosetsu.android.domain.repository.base.ChapterHistoryRepository
  *
  * This is useful when you need to act upon a certain chapter or its neighbors
  */
-class GetLastReadChapterUseCase(
-	private val chapterHistory: ChapterHistoryRepository
-) {
-	suspend operator fun invoke(novelId: Int): ChapterHistoryEntity? {
-		return chapterHistory.getLastRead(novelId)
-	}
+class GetLastReadChapterUseCase(private val chapterHistory: ChapterHistoryRepository) {
+	suspend operator fun invoke(novelId: Int): ChapterHistoryEntity? =
+		chapterHistory.getLastRead(novelId)
 }

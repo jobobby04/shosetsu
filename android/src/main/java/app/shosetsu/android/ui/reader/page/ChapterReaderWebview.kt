@@ -29,20 +29,16 @@ import android.view.View
 import android.webkit.WebView
 import app.shosetsu.android.R
 
-class ChapterReaderWebview(
-	context: Context,
-	attrs: AttributeSet? = null,
-) : WebView(context, attrs) {
+class ChapterReaderWebview(context: Context, attrs: AttributeSet? = null) :
+	WebView(context, attrs) {
 
 	var searchInBrowser: ((String) -> Unit)? = null
 
-	override fun startActionMode(callback: ActionMode.Callback?): ActionMode {
-		return super.startActionMode(wrapCallback(callback))
-	}
+	override fun startActionMode(callback: ActionMode.Callback?): ActionMode =
+		super.startActionMode(wrapCallback(callback))
 
-	override fun startActionMode(callback: ActionMode.Callback?, type: Int): ActionMode {
-		return super.startActionMode(wrapCallback(callback), type)
-	}
+	override fun startActionMode(callback: ActionMode.Callback?, type: Int): ActionMode =
+		super.startActionMode(wrapCallback(callback), type)
 
 	private fun wrapCallback(callback: ActionMode.Callback?): ActionMode.Callback {
 		val actionMode = object : ActionMode.Callback {
@@ -55,9 +51,8 @@ class ChapterReaderWebview(
 				return true
 			}
 
-			override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-				return callback?.onPrepareActionMode(mode, menu) ?: false
-			}
+			override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean =
+				callback?.onPrepareActionMode(mode, menu) ?: false
 
 			override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
 				if (item?.itemId == 1001) {
@@ -100,7 +95,7 @@ class ChapterReaderWebview(
 
 	private fun getSelectedText(callback: (String?) -> Unit) {
 		evaluateJavascript(
-			"(function(){return window.getSelection().toString();})()"
+			"(function(){return window.getSelection().toString();})()",
 		) { value ->
 			callback(value?.removeSurrounding("\""))
 		}

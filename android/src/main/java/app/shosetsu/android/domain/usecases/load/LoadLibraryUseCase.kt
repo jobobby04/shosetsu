@@ -35,27 +35,30 @@ import kotlinx.coroutines.flow.mapLatest
  */
 class LoadLibraryUseCase(
 	private val novelsRepo: INovelsRepository,
-	private val getCategoriesUseCase: GetCategoriesUseCase
+	private val getCategoriesUseCase: GetCategoriesUseCase,
 ) {
 	@Throws(SQLiteException::class)
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke(): Flow<LibraryUI> =
 		novelsRepo.loadLibraryNovelEntities().mapLatest { origin ->
-			origin.map { (id,
-							 title,
-							 imageURL,
-							 bookmarked,
-							 unread,
-							 downloded,
-							 pinned,
-							 genres,
-							 authors,
-							 artists,
-							 tags,
-							 status,
-							 category,
-							 lastUpdate,
-							 readTime) ->
+			origin.map { (
+				id,
+				title,
+				imageURL,
+				bookmarked,
+				unread,
+				downloded,
+				pinned,
+				genres,
+				authors,
+				artists,
+				tags,
+				status,
+				category,
+				lastUpdate,
+				readTime,
+			),
+				->
 				LibraryNovelUI(
 					id,
 					title,
@@ -71,13 +74,13 @@ class LoadLibraryUseCase(
 					status,
 					category,
 					lastUpdate,
-					readTime
+					readTime,
 				)
 			}.groupBy { it.category }
 		}.combine(getCategoriesUseCase()) { novels, categories ->
 			LibraryUI(
 				categories.toImmutableList(),
-				novels.mapValues { it.value.toImmutableList() }.toImmutableMap()
+				novels.mapValues { it.value.toImmutableList() }.toImmutableMap(),
 			)
 		}
 }

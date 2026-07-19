@@ -26,13 +26,9 @@ import app.shosetsu.android.view.uimodels.model.NovelUI
  * shosetsu
  * 06 / 06 / 2020
  */
-class UpdateNovelUseCase(
-	private val chaptersRepository: INovelsRepository,
-) {
-	suspend operator fun invoke(novelUI: NovelUI) =
-		this(novelUI.convertTo())
+class UpdateNovelUseCase(private val chaptersRepository: INovelsRepository) {
+	suspend operator fun invoke(novelUI: NovelUI) = this(novelUI.convertTo())
 
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(novelEntity: NovelEntity) =
-		chaptersRepository.update(novelEntity)
+	suspend operator fun invoke(novelEntity: NovelEntity) = chaptersRepository.update(novelEntity)
 }

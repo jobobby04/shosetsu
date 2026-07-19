@@ -30,5 +30,5 @@ data class MigrationNovelUI(
 	val id: Int,
 	val title: String,
 	val imageURL: String,
-	val isSelected: Boolean = false
+	val isSelected: Boolean = false,
 )

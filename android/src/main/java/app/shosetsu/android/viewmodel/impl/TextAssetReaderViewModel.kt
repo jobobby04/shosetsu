@@ -55,8 +55,9 @@ class TextAssetReaderViewModel(val application: Application) : ATextAssetReaderV
 		// If target is empty, emit
 		if (targetLiveData.value != null) {
 			// If the targets are the same, ignore and return
-			if (targetLiveData.value!!.ordinal == targetOrdinal)
+			if (targetLiveData.value!!.ordinal == targetOrdinal) {
 				return
+			}
 		}
 		targetLiveData.value = null
 		targetLiveData.value = TextAsset.entries[targetOrdinal]

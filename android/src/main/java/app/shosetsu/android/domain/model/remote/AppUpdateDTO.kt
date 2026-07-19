@@ -56,22 +56,21 @@ data class AppUpdateDTO(
 		commit = commit,
 		url = url,
 		archURLs = archURLs?.convertTo(),
-		notes = notes
+		notes = notes,
 	)
 
 	companion object {
-		fun fromEntity(appUpdateEntity: AppUpdateEntity): AppUpdateDTO {
-			return appUpdateEntity.let { (version, versionCode, commit, url, archURLs, notes) ->
+		fun fromEntity(appUpdateEntity: AppUpdateEntity): AppUpdateDTO =
+			appUpdateEntity.let { (version, versionCode, commit, url, archURLs, notes) ->
 				AppUpdateDTO(
 					versionCode,
 					version,
 					commit,
 					url,
 					archURLs?.toEntity(),
-					notes
+					notes,
 				)
 			}
-		}
 	}
 }
 
@@ -86,12 +85,11 @@ data class ArchitectureURLsDTO(
 		ArchitectureURLs(`armeabi-v7a`, `arm64-v8a`, x86, x86_64)
 
 	companion object {
-		fun ArchitectureURLs.toEntity() =
-			ArchitectureURLsDTO(
-				`armeabi-v7a`,
-				`arm64-v8a`,
-				x86,
-				x86_64
-			)
+		fun ArchitectureURLs.toEntity() = ArchitectureURLsDTO(
+			`armeabi-v7a`,
+			`arm64-v8a`,
+			x86,
+			x86_64,
+		)
 	}
 }

@@ -51,25 +51,21 @@ import app.shosetsu.android.R
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun NovelShareMenu(
-	shareBasicURL: () -> Unit,
-	shareQRCode: () -> Unit,
-	dismiss: () -> Unit
-) {
+fun NovelShareMenu(shareBasicURL: () -> Unit, shareQRCode: () -> Unit, dismiss: () -> Unit) {
 	BottomSheetDialog(dismiss) {
 		Column(
-			modifier = Modifier
+			modifier = Modifier,
 		) {
 			Box(
 				modifier = Modifier
 					.height(56.dp)
 					.padding(start = 16.dp),
-				contentAlignment = Alignment.CenterStart
+				contentAlignment = Alignment.CenterStart,
 			) {
 				Text(
 					stringResource(R.string.share),
 					style = MaterialTheme.typography.bodyLarge,
-					modifier = Modifier.alpha(0.8f)
+					modifier = Modifier.alpha(0.8f),
 				)
 			}
 
@@ -87,16 +83,16 @@ fun NovelShareMenu(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.height(56.dp)
-						.padding(start = 16.dp)
+						.padding(start = 16.dp),
 				) {
 					Icon(
 						Icons.Outlined.Link,
 						"",
-						modifier = Modifier.padding(end = 8.dp)
+						modifier = Modifier.padding(end = 8.dp),
 					)
 					Text(
 						stringResource(R.string.menu_share_url),
-						style = MaterialTheme.typography.bodyLarge
+						style = MaterialTheme.typography.bodyLarge,
 					)
 				}
 			}
@@ -114,16 +110,16 @@ fun NovelShareMenu(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.height(56.dp)
-						.padding(start = 16.dp)
+						.padding(start = 16.dp),
 				) {
 					Icon(
 						Icons.Outlined.QrCode,
 						"",
-						modifier = Modifier.padding(end = 8.dp)
+						modifier = Modifier.padding(end = 8.dp),
 					)
 					Text(
 						stringResource(R.string.menu_share_qr),
-						style = MaterialTheme.typography.bodyLarge
+						style = MaterialTheme.typography.bodyLarge,
 					)
 				}
 			}

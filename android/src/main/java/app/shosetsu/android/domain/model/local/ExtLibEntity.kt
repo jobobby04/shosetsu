@@ -33,8 +33,4 @@ import app.shosetsu.lib.Version
  * @param repoID [DBExtLibEntity.repoID]
  */
 
-data class ExtLibEntity(
-	val scriptName: String,
-	var version: Version,
-	var repoID: Int,
-)
+data class ExtLibEntity(val scriptName: String, var version: Version, var repoID: Int)

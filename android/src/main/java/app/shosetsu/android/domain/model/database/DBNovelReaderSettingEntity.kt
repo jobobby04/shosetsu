@@ -38,10 +38,10 @@ import app.shosetsu.android.dto.Convertible
 			entity = DBNovelEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["novelID"],
-			onDelete = ForeignKey.CASCADE
+			onDelete = ForeignKey.CASCADE,
 		),
 	],
-	indices = [Index("novelID", unique = true)]
+	indices = [Index("novelID", unique = true)],
 )
 data class DBNovelReaderSettingEntity(
 	@PrimaryKey

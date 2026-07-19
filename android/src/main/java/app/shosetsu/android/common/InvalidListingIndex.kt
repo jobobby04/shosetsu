@@ -1,7 +1,7 @@
 package app.shosetsu.android.common
 
-import okio.ArrayIndexOutOfBoundsException
 import java.io.Serial
+import okio.ArrayIndexOutOfBoundsException
 
 /*
  * This file is part of shosetsu.

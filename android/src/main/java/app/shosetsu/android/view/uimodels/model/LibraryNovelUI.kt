@@ -24,22 +24,21 @@ data class LibraryNovelUI(
 	val readTime: Long?,
 	val isSelected: Boolean = false,
 ) : Convertible<LibraryNovelEntity> {
-	override fun convertTo(): LibraryNovelEntity =
-		LibraryNovelEntity(
-			id,
-			title,
-			imageURL,
-			bookmarked,
-			unread,
-			downloaded,
-			pinned,
-			genres,
-			authors,
-			artists,
-			tags,
-			status,
-			category,
-			lastUpdate,
-			readTime
-		)
+	override fun convertTo(): LibraryNovelEntity = LibraryNovelEntity(
+		id,
+		title,
+		imageURL,
+		bookmarked,
+		unread,
+		downloaded,
+		pinned,
+		genres,
+		authors,
+		artists,
+		tags,
+		status,
+		category,
+		lastUpdate,
+		readTime,
+	)
 }

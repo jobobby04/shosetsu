@@ -41,7 +41,7 @@ fun rememberFakePullRefreshState(onRefresh: () -> Unit): Pair<Boolean, PullRefre
 		onRefresh = {
 			fakePullRefreshState.animateRefresh()
 			onRefresh()
-		}
+		},
 	)
 }
 

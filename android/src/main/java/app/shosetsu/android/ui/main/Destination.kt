@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.CollectionsBookmark
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Update
+import androidx.compose.material3.Icon as MIcon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -18,7 +19,6 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import app.shosetsu.android.R
 import kotlinx.serialization.Serializable
-import androidx.compose.material3.Icon as MIcon
 
 sealed interface ShosetsuDestination {
 	interface Primary : ShosetsuDestination {
@@ -32,7 +32,7 @@ sealed interface ShosetsuDestination {
 				Destination.Library,
 				Destination.Updates,
 				Destination.Browse,
-				Destination.More
+				Destination.More,
 			)
 		}
 	}
@@ -142,10 +142,13 @@ fun DestinationIcon(destination: ShosetsuDestination.Primary, isSelected: Boolea
 			Crossfade(isSelected) {
 				MIcon(
 					rememberVectorPainter(
-						if (it) Icons.Filled.Explore
-						else Icons.Outlined.Explore
+						if (it) {
+							Icons.Filled.Explore
+						} else {
+							Icons.Outlined.Explore
+						},
 					),
-					stringResource(destination.name)
+					stringResource(destination.name),
 				)
 			}
 		}
@@ -154,10 +157,13 @@ fun DestinationIcon(destination: ShosetsuDestination.Primary, isSelected: Boolea
 			Crossfade(isSelected) {
 				MIcon(
 					rememberVectorPainter(
-						if (it) Icons.Filled.CollectionsBookmark
-						else Icons.Outlined.CollectionsBookmark
+						if (it) {
+							Icons.Filled.CollectionsBookmark
+						} else {
+							Icons.Outlined.CollectionsBookmark
+						},
 					),
-					stringResource(destination.name)
+					stringResource(destination.name),
 				)
 			}
 		}
@@ -165,7 +171,7 @@ fun DestinationIcon(destination: ShosetsuDestination.Primary, isSelected: Boolea
 		else -> {
 			MIcon(
 				rememberVectorPainter(destination.icon),
-				stringResource(destination.name)
+				stringResource(destination.name),
 			)
 		}
 	}
