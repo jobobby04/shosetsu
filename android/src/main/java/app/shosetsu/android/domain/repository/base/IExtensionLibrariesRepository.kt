@@ -55,10 +55,7 @@ interface IExtensionLibrariesRepository {
 		SocketTimeoutException::class,
 		UnknownHostException::class,
 	)
-	suspend fun installExtLibrary(
-		repoURL: String,
-		extLibEntity: ExtLibEntity,
-	)
+	suspend fun installExtLibrary(repoURL: String, extLibEntity: ExtLibEntity)
 
 	/**
 	 * @param name Name of the library requested

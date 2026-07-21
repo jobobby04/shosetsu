@@ -24,8 +24,4 @@ package app.shosetsu.android.domain.model.local
  * Similar to [StrippedNovelEntity], except dropping [StrippedNovelEntity.bookmarked]
  * because this is always bookmarked
  */
-data class StrippedBookmarkedNovelEntity(
-	val id: Int,
-	val title: String,
-	val imageURL: String,
-)
+data class StrippedBookmarkedNovelEntity(val id: Int, val title: String, val imageURL: String)

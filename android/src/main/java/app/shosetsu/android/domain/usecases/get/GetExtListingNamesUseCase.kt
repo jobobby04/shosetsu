@@ -26,18 +26,17 @@ import app.shosetsu.lib.exceptions.InvalidMetaDataException
  *
  * Returns a list of a
  */
-class GetExtListingNamesUseCase(
-	private val getExt: GetExtensionUseCase
-) {
+class GetExtListingNamesUseCase(private val getExt: GetExtensionUseCase) {
 
 	@Throws(
 		IncompatibleExtensionException::class,
 		InvalidMetaDataException::class,
-		MissingExtensionException::class
+		MissingExtensionException::class,
 	)
 	suspend operator fun invoke(extensionId: Int): List<String> {
-		if (extensionId == -1)
+		if (extensionId == -1) {
 			return emptyList()
+		}
 
 		return getExt(extensionId)?.let { iExtension ->
 			iExtension.listings.map { it.name }

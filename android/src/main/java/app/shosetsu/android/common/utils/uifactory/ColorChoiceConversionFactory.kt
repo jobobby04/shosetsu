@@ -27,22 +27,18 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 05 / 12 / 2020
  */
-class ColorChoiceConversionFactory(
-	data: ColorChoiceData
-) : UIConversionFactory<ColorChoiceData, ColorChoiceUI>(data) {
+class ColorChoiceConversionFactory(data: ColorChoiceData) :
+	UIConversionFactory<ColorChoiceData, ColorChoiceUI>(data) {
 	override fun ColorChoiceData.convertTo(): ColorChoiceUI = ColorChoiceUI(
 		identifier,
 		name,
 		textColor,
 		backgroundColor,
-		false
+		false,
 	)
-
 }
 
-fun List<ColorChoiceData>.mapToFactory() =
-	map { ColorChoiceConversionFactory(it) }
+fun List<ColorChoiceData>.mapToFactory() = map { ColorChoiceConversionFactory(it) }
 
 @ExperimentalCoroutinesApi
-fun Flow<List<ColorChoiceData>>.mapLatestToResultFlowWithFactory() =
-	mapLatest { it.mapToFactory() }
+fun Flow<List<ColorChoiceData>>.mapLatestToResultFlowWithFactory() = mapLatest { it.mapToFactory() }

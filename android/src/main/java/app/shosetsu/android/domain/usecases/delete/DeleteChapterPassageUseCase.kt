@@ -32,7 +32,7 @@ import app.shosetsu.android.view.uimodels.model.ChapterUI
  */
 class DeleteChapterPassageUseCase(
 	private val iChaptersRepository: IChaptersRepository,
-	private val iExtensionsRepository: IExtensionsRepository
+	private val iExtensionsRepository: IExtensionsRepository,
 ) {
 	suspend operator fun invoke(chapterUI: ChapterUI) {
 		this(listOf(chapterUI.convertTo()))
@@ -45,7 +45,7 @@ class DeleteChapterPassageUseCase(
 	@Throws(
 		SQLiteException::class,
 		NoSuchExtensionException::class,
-		FilePermissionException::class
+		FilePermissionException::class,
 	)
 	suspend fun invokeUI(chapters: List<ChapterUI>) {
 		invoke(chapters.convertList())
@@ -54,7 +54,7 @@ class DeleteChapterPassageUseCase(
 	@Throws(
 		SQLiteException::class,
 		NoSuchExtensionException::class,
-		FilePermissionException::class
+		FilePermissionException::class,
 	)
 	suspend operator fun invoke(chapters: List<ChapterEntity>) {
 		if (chapters.isEmpty()) return
@@ -63,7 +63,7 @@ class DeleteChapterPassageUseCase(
 
 		iChaptersRepository.deleteChapterPassage(
 			chapters,
-			ext.chapterType
+			ext.chapterType,
 		)
 	}
 }

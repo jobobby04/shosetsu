@@ -43,7 +43,6 @@ import org.joda.time.DateTime
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 29 / 04 / 2020
@@ -95,10 +94,7 @@ class UpdatesViewModel(
 		settingsRepository.getBooleanFlow(SettingKey.NovelUpdateDateMDY)
 
 	@SuppressLint("StopShip")
-	override suspend fun updateChapter(
-		updateUI: UpdatesUI,
-		readingStatus: ReadingStatus
-	) {
+	override suspend fun updateChapter(updateUI: UpdatesUI, readingStatus: ReadingStatus) {
 		@Suppress("TodoComment")
 		TODO("Not yet implemented")
 	}

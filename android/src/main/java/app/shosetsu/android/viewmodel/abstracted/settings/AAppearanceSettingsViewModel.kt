@@ -25,5 +25,5 @@ import app.shosetsu.android.viewmodel.base.ThemedViewModel
  * 31 / 08 / 2020
  */
 abstract class AAppearanceSettingsViewModel(iSettingsRepository: ISettingsRepository) :
-	ASubSettingsViewModel(iSettingsRepository), ThemedViewModel {
-}
+	ASubSettingsViewModel(iSettingsRepository),
+	ThemedViewModel

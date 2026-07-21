@@ -37,6 +37,7 @@ import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.google.accompanist.web.rememberWebViewStateWithHTMLData
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -86,7 +87,7 @@ fun HTMLPage(
 			},
 			reset = {
 				uriToOpen = null
-			}
+			},
 		)
 	}
 
@@ -101,15 +102,18 @@ fun HTMLPage(
 
 	var first by remember { mutableStateOf(true) }
 
-	if (scrollState.isScrollInProgress)
+	if (scrollState.isScrollInProgress) {
 		DisposableEffect(Unit) {
 			onDispose {
 				println("Scrolling: ${scrollState.value} out of ${scrollState.maxValue}")
-				if (scrollState.value != 0)
+				if (scrollState.value != 0) {
 					onScroll((scrollState.value.toDouble() / scrollState.maxValue))
-				else onScroll(0.0)
+				} else {
+					onScroll(0.0)
+				}
 			}
 		}
+	}
 
 	val backgroundColor = MaterialTheme.colorScheme.background
 	ScrollStateBar(scrollState) {
@@ -134,7 +138,7 @@ fun HTMLPage(
 				val inter = ShosetsuScript(
 					onClickMethod = onClick,
 					onDClickMethod = onDoubleClick,
-					scope = scope
+					scope = scope,
 				)
 
 				webView.addJavascriptInterface(inter, "shosetsuScript")
@@ -163,11 +167,11 @@ fun HTMLPage(
 			navigator = navigator,
 			factory = {
 				ChapterReaderWebview(it)
-			}
+			},
 		)
 	}
 
-	val delayer = remember { ProgressiveDelayer(100) }
+	val delayer = remember { ProgressiveDelayer(100.milliseconds) }
 	LaunchedEffect(scrollState.maxValue, state.loadingState) {
 		// Ensure this only occurs on the first time
 		if (first) {
@@ -196,7 +200,7 @@ fun HTMLPageUriDialog(uri: Uri, open: () -> Unit, reset: () -> Unit) {
 				onClick = {
 					open()
 					reset()
-				}
+				},
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
@@ -205,7 +209,7 @@ fun HTMLPageUriDialog(uri: Uri, open: () -> Unit, reset: () -> Unit) {
 			TextButton(
 				onClick = {
 					reset()
-				}
+				},
 			) {
 				Text(stringResource(android.R.string.cancel))
 			}
@@ -219,11 +223,13 @@ fun HTMLPageUriDialog(uri: Uri, open: () -> Unit, reset: () -> Unit) {
 				Text(stringResource(R.string.reader_open_uri_desc))
 				Text(uri.toString())
 			}
-		}
+		},
 	)
 }
 
 val WebViewState.sIsLoading: Boolean
-	get() = (loadingState is LoadingState.Loading &&
-		(loadingState as LoadingState.Loading).progress != 1f) ||
+	get() = (
+		loadingState is LoadingState.Loading &&
+			(loadingState as LoadingState.Loading).progress != 1f
+		) ||
 		loadingState is LoadingState.Initializing

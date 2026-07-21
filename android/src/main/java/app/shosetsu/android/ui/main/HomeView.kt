@@ -46,7 +46,7 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.NavigationStyle
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.repository.base.IBackupRepository
-import app.shosetsu.android.ui.main.graph.DefaultMotionDuration
+import app.shosetsu.android.ui.main.graph.DEFAULT_MOTION_DURATION
 import app.shosetsu.android.ui.main.graph.PredictiveBack
 import app.shosetsu.android.ui.main.graph.ShosetsuNavController
 import app.shosetsu.android.ui.main.graph.homeGraph
@@ -54,13 +54,15 @@ import app.shosetsu.android.ui.main.graph.materialFadeThroughIn
 import app.shosetsu.android.ui.main.graph.materialFadeThroughOut
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.viewmodel.abstracted.AHomeViewModel
-import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.launch
 
-private const val TabFadeDuration = 200
+private const val TAB_FADE_DURATION = 200
 
 private enum class NavigationMode {
-	BOTTOM, DRAWER, RAIL
+	BOTTOM,
+	DRAWER,
+	RAIL,
 }
 
 /**
@@ -69,7 +71,10 @@ private enum class NavigationMode {
  * @param shosetsuNavController The applications nav controller
  * @param route The primary destination to go to
  */
-fun navigateToMainView(shosetsuNavController: ShosetsuNavController, route: ShosetsuDestination.Primary) {
+fun navigateToMainView(
+	shosetsuNavController: ShosetsuNavController,
+	route: ShosetsuDestination.Primary,
+) {
 	shosetsuNavController.home.navigate(route) {
 		// Pop up to the start destination of the graph to
 		// avoid building up a large stack of destinations
@@ -87,16 +92,20 @@ fun navigateToMainView(shosetsuNavController: ShosetsuNavController, route: Shos
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(
-	shosetsuNavController: ShosetsuNavController,
-	sizeClass: WindowSizeClass,
-) {
+fun HomeView(shosetsuNavController: ShosetsuNavController, sizeClass: WindowSizeClass) {
 	val viewModel: AHomeViewModel = viewModelDi()
 	val scope = rememberCoroutineScope()
 
 	val navStyle by viewModel.navigationStyle.collectAsState()
 	val navigationMode = when (navStyle) {
-		NavigationStyle.MATERIAL -> if (sizeClass.widthSizeClass == WindowWidthSizeClass.Compact) NavigationMode.BOTTOM else NavigationMode.RAIL
+		NavigationStyle.MATERIAL -> if (sizeClass.widthSizeClass ==
+			WindowWidthSizeClass.Compact
+		) {
+			NavigationMode.BOTTOM
+		} else {
+			NavigationMode.RAIL
+		}
+
 		NavigationStyle.LEGACY -> NavigationMode.DRAWER
 	}
 
@@ -110,10 +119,8 @@ fun HomeView(
 	ShosetsuBackHandler(
 		requireDoubleBackToExit = requireDoubleBackToExit,
 		isDrawerOpen = drawerState.isOpen,
-		onCloseDrawer = drawerState::close
+		onCloseDrawer = drawerState::close,
 	)
-
-
 
 	@Composable
 	fun Content() = Scaffold(
@@ -121,7 +128,7 @@ fun HomeView(
 			if (navigationMode == NavigationMode.BOTTOM) {
 				BottomNavigationBar(
 					navBackStackEntry,
-					{ navigateToMainView(shosetsuNavController, it) }
+					{ navigateToMainView(shosetsuNavController, it) },
 				)
 			}
 		},
@@ -129,16 +136,16 @@ fun HomeView(
 			AnimatedVisibility(
 				backupProgressState == IBackupRepository.BackupProgress.IN_PROGRESS,
 				enter = slideInVertically(),
-				exit = slideOutVertically()
+				exit = slideOutVertically(),
 			) {
 				Box(
-					modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets)
+					modifier = Modifier.windowInsetsPadding(TopAppBarDefaults.windowInsets),
 				) {
 					BackupProgressIndicator()
 				}
 			}
 		},
-		contentWindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
+		contentWindowInsets = WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal),
 	) { paddingValues ->
 		var scale by remember { mutableFloatStateOf(1f) }
 
@@ -149,13 +156,15 @@ fun HomeView(
 				.graphicsLayer {
 					scaleX = scale
 					scaleY = scale
-				}
+				},
 		) {
 			NavHost(
 				shosetsuNavController.home,
 				startDestination = Destination.Library,
-				enterTransition = { materialFadeThroughIn(initialScale = 1f, durationMillis = TabFadeDuration) },
-				exitTransition = { materialFadeThroughOut(durationMillis = TabFadeDuration) }
+				enterTransition = {
+					materialFadeThroughIn(initialScale = 1f, durationMillis = TAB_FADE_DURATION)
+				},
+				exitTransition = { materialFadeThroughOut(durationMillis = TAB_FADE_DURATION) },
 			) {
 				homeGraph(
 					shosetsuNavController,
@@ -168,11 +177,11 @@ fun HomeView(
 									scope.launch {
 										drawerState.open()
 									}
-								}
+								},
 							)
 						}
 					},
-					windowSize = sizeClass
+					windowSize = sizeClass,
 				)
 			}
 		}
@@ -193,7 +202,7 @@ fun HomeView(
 					scale = lerp(1f, 0.92f, PredictiveBack.transform(backEvent.progress))
 					navigateToMainView(
 						shosetsuNavController,
-						if (backEvent.progress > 0.25f) Destination.Library else currentTab
+						if (backEvent.progress > 0.25f) Destination.Library else currentTab,
 					)
 				}
 				navigateToMainView(shosetsuNavController, Destination.Library)
@@ -203,7 +212,7 @@ fun HomeView(
 				animate(
 					initialValue = scale,
 					targetValue = 1f,
-					animationSpec = tween(durationMillis = DefaultMotionDuration),
+					animationSpec = tween(durationMillis = DEFAULT_MOTION_DURATION),
 				) { value, _ ->
 					scale = value
 				}
@@ -225,11 +234,11 @@ fun HomeView(
 							drawerState.close()
 						}
 					},
-					drawerState
+					drawerState,
 				)
 			},
 			drawerState = drawerState,
-			gesturesEnabled = navigationMode == NavigationMode.DRAWER
+			gesturesEnabled = navigationMode == NavigationMode.DRAWER,
 		) {
 			Row(Modifier.fillMaxSize()) {
 				if (navigationMode == NavigationMode.RAIL) {
@@ -237,7 +246,7 @@ fun HomeView(
 						navBackStackEntry,
 						onNavigate = {
 							navigateToMainView(shosetsuNavController, it)
-						}
+						},
 					)
 				}
 

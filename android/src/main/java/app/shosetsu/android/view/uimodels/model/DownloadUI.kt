@@ -39,7 +39,7 @@ data class DownloadUI(
 	val novelName: String,
 	val extensionID: Int,
 	val status: DownloadStatus = DownloadStatus.PENDING,
-	val isSelected: Boolean = false
+	val isSelected: Boolean = false,
 ) : Convertible<DownloadEntity> {
 
 	override fun convertTo(): DownloadEntity = DownloadEntity(
@@ -49,6 +49,6 @@ data class DownloadUI(
 		chapterName,
 		novelName,
 		extensionID,
-		status
+		status,
 	)
 }

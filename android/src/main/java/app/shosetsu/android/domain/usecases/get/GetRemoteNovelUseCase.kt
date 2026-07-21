@@ -10,8 +10,8 @@ import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.domain.repository.base.IUpdatesRepository
 import app.shosetsu.lib.exceptions.HTTPException
-import org.luaj.vm2.LuaError
 import java.io.IOException
+import org.luaj.vm2.LuaError
 
 /*
  * This file is part of shosetsu.
@@ -45,9 +45,7 @@ class GetRemoteNovelUseCase(
 	/**
 	 * Details regarding the state of an updated novel
 	 */
-	data class UpdatedNovelInfo(
-		val updatedChapters: List<ChapterEntity> = emptyList()
-	)
+	data class UpdatedNovelInfo(val updatedChapters: List<ChapterEntity> = emptyList())
 
 	@Throws(
 		SQLiteException::class,
@@ -55,15 +53,15 @@ class GetRemoteNovelUseCase(
 		HTTPException::class,
 		IOException::class,
 		LuaError::class,
-		MissingExtensionException::class
+		MissingExtensionException::class,
 	)
-	private suspend fun main(
-		novel: NovelEntity,
-		loadChapters: Boolean = true,
-	): UpdatedNovelInfo {
+	private suspend fun main(novel: NovelEntity, loadChapters: Boolean = true): UpdatedNovelInfo {
 		logI("Loading novel data from internet for ${novel.id}")
-		if (loadChapters) logI("And loading chapters for ${novel.id}")
-		else logI("and not loading chapters for ${novel.id}")
+		if (loadChapters) {
+			logI("And loading chapters for ${novel.id}")
+		} else {
+			logI("and not loading chapters for ${novel.id}")
+		}
 		return getExt(novel.extensionID)?.let { ext ->
 			nR.retrieveNovelInfo(ext, novel, loadChapters).let { page ->
 				val hadNovelBeenLoaded: Boolean = novel.loaded
@@ -79,7 +77,7 @@ class GetRemoteNovelUseCase(
 						cR.handleChapters(
 							novelID = novel.id!!,
 							extensionID = novel.extensionID,
-							list = page.chapters.toList()
+							list = page.chapters.toList(),
 						).let {
 							UpdatedNovelInfo()
 						}
@@ -89,11 +87,13 @@ class GetRemoteNovelUseCase(
 						cR.handleChaptersReturn(
 							novelID = novel.id!!,
 							extensionID = novel.extensionID,
-							list = page.chapters.toList()
+							list = page.chapters.toList(),
 						).let { chapters ->
-							uR.addUpdates(chapters.map {
-								UpdateEntity(it.id!!, novel.id!!, System.currentTimeMillis())
-							}).let {
+							uR.addUpdates(
+								chapters.map {
+									UpdateEntity(it.id!!, novel.id!!, System.currentTimeMillis())
+								},
+							).let {
 								UpdatedNovelInfo(chapters)
 							}
 						}
@@ -111,31 +111,26 @@ class GetRemoteNovelUseCase(
 		HTTPException::class,
 		IOException::class,
 		LuaError::class,
-		MissingExtensionException::class
+		MissingExtensionException::class,
 	)
-	suspend operator fun invoke(
-		novel: NovelEntity,
-		loadChapters: Boolean = true,
-	): UpdatedNovelInfo = main(
-		novel = novel,
-		loadChapters = loadChapters
-	)
+	suspend operator fun invoke(novel: NovelEntity, loadChapters: Boolean = true): UpdatedNovelInfo =
+		main(
+			novel = novel,
+			loadChapters = loadChapters,
+		)
 
 	@Throws(
 		SQLiteException::class,
 		IndexOutOfBoundsException::class,
 		HTTPException::class,
 		IOException::class,
-		LuaError::class
+		LuaError::class,
 	)
-	suspend operator fun invoke(
-		novelID: Int,
-		loadChapters: Boolean = true,
-	): UpdatedNovelInfo? = nR.getNovel(novelID)?.let { novel ->
-		main(
-			novel = novel,
-			loadChapters = loadChapters
-		)
-	}
-
+	suspend operator fun invoke(novelID: Int, loadChapters: Boolean = true): UpdatedNovelInfo? =
+		nR.getNovel(novelID)?.let { novel ->
+			main(
+				novel = novel,
+				loadChapters = loadChapters,
+			)
+		}
 }

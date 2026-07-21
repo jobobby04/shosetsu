@@ -31,9 +31,8 @@ import kotlinx.coroutines.flow.map
  * @since 18 / 02 / 2022
  * @author Doomsdayrs
  */
-class DBRepositoryExtensionsDataSource(
-	private val dao: RepositoryExtensionsDao
-) : IDBRepositoryExtensionsDataSource {
+class DBRepositoryExtensionsDataSource(private val dao: RepositoryExtensionsDao) :
+	IDBRepositoryExtensionsDataSource {
 
 	fun GenericExtensionEntity.toDB(): DBRepositoryExtensionEntity =
 		DBRepositoryExtensionEntity(repoID, id, name, fileName, imageURL, lang, version, md5, type)

@@ -18,7 +18,7 @@ fun RestrictionSelectPreferenceWidget(
 	title: String,
 	@StringRes subtitle: Int,
 	restrictions: Map<Int, SettingKey<Boolean>>,
-	repo: ISettingsRepository
+	repo: ISettingsRepository,
 ) {
 	val restrictionStates = restrictions.mapValues { (_, key) ->
 		repo.getBooleanFlow(key).collectAsState()
@@ -37,6 +37,6 @@ fun RestrictionSelectPreferenceWidget(
 			restrictions.forEach { (title, key) ->
 				launchIO { repo.setBoolean(key, title in it) }
 			}
-		}
+		},
 	)
 }

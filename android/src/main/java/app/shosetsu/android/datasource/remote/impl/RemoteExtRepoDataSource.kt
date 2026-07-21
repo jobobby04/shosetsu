@@ -7,9 +7,9 @@ import app.shosetsu.android.datasource.remote.base.IRemoteExtRepoDataSource
 import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.lib.exceptions.HTTPException
 import app.shosetsu.lib.json.RepoIndex
+import java.io.IOException
 import kotlinx.serialization.ExperimentalSerializationApi
 import okhttp3.OkHttpClient
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.
@@ -32,18 +32,13 @@ import java.io.IOException
  * shosetsu
  * 13 / 05 / 2020
  */
-class RemoteExtRepoDataSource(
-	private val client: OkHttpClient,
-) : IRemoteExtRepoDataSource {
+class RemoteExtRepoDataSource(private val client: OkHttpClient) : IRemoteExtRepoDataSource {
 
 	@OptIn(ExperimentalSerializationApi::class)
 	@Throws(HTTPException::class, IOException::class, EmptyResponseBodyException::class)
-	override suspend fun downloadRepoData(
-		repo: RepositoryEntity,
-	): RepoIndex {
+	override suspend fun downloadRepoData(repo: RepositoryEntity): RepoIndex {
 		val url = "${repo.url}/index.json"
 
-		@Suppress("BlockingMethodInNonBlockingContext")
 		val response = client.quickie(url)
 
 		if (response.isSuccessful) {

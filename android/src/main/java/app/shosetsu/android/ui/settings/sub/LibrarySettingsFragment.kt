@@ -39,16 +39,13 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun LibrarySettingsView(
-	onNavToCategories: () -> Unit,
-	onBack: () -> Unit
-) {
+fun LibrarySettingsView(onNavToCategories: () -> Unit, onBack: () -> Unit) {
 	val viewModel: ALibrarySettingsViewModel = viewModelDi()
 
 	LibrarySettingsContent(
 		viewModel = viewModel,
 		onNavToCategories = onNavToCategories,
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
@@ -57,7 +54,7 @@ fun LibrarySettingsView(
 fun LibrarySettingsContent(
 	viewModel: ALibrarySettingsViewModel,
 	onNavToCategories: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	Scaffold(
 		topBar = {
@@ -67,13 +64,13 @@ fun LibrarySettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			contentPadding = PaddingValues(bottom = 64.dp, top = 16.dp),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
 			item {
 				val categories by viewModel.categories.collectAsState()
@@ -81,7 +78,7 @@ fun LibrarySettingsContent(
 					title = stringResource(R.string.settings_library_categories_title),
 					subtitle = stringResource(R.string.settings_library_categories_desc, categories.size),
 					onPreferenceClick = onNavToCategories,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 
@@ -92,7 +89,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.UpdateNovelsOnStartup,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -104,13 +101,21 @@ fun LibrarySettingsContent(
 					parseValue = {
 						when (it) {
 							12 -> stringResource(R.string.cycle_bidaily)
+
 							24 -> stringResource(R.string.cycle_daily)
+
 							48 -> stringResource(R.string.cycle_2_days)
+
 							72 -> stringResource(R.string.cycle_3_days)
+
 							96 -> stringResource(R.string.cycle_4_days)
+
 							120 -> stringResource(R.string.cycle_5_days)
+
 							144 -> stringResource(R.string.cycle_6_days)
+
 							168 -> stringResource(R.string.cycle_weekly)
+
 							else -> if (it == 0) {
 								stringResource(R.string.cycle_disabled)
 							} else {
@@ -138,7 +143,7 @@ fun LibrarySettingsContent(
 							else -> it
 						}
 					},
-					maxHeaderSize = 80.dp
+					maxHeaderSize = 80.dp,
 				)
 			}
 
@@ -146,7 +151,7 @@ fun LibrarySettingsContent(
 				viewModel.LibraryUpdateCategories(
 					stringResource(R.string.settings_update_novel_categories_update),
 					SettingKey.IncludeCategoriesInUpdate,
-					SettingKey.ExcludedCategoriesInUpdate
+					SettingKey.ExcludedCategoriesInUpdate,
 				)
 			}
 
@@ -157,7 +162,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.DownloadNewNovelChapters,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -165,7 +170,7 @@ fun LibrarySettingsContent(
 				viewModel.LibraryUpdateCategories(
 					stringResource(R.string.settings_update_novel_categories_download),
 					SettingKey.IncludeCategoriesToDownload,
-					SettingKey.ExcludedCategoriesToDownload
+					SettingKey.ExcludedCategoriesToDownload,
 				)
 			}
 
@@ -176,7 +181,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.OnlyUpdateOngoingNovels,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -193,7 +198,7 @@ fun LibrarySettingsContent(
 					} else {
 						emptyMap()
 					},
-					repo = viewModel.settingsRepo
+					repo = viewModel.settingsRepo,
 				)
 			}
 
@@ -204,7 +209,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.UpdateNotificationStyle,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -215,7 +220,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.NovelUpdateShowProgress,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -226,7 +231,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.NovelUpdateClassicFinish,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -237,7 +242,7 @@ fun LibrarySettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.NovelUpdateDateMDY,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 		}
@@ -248,7 +253,7 @@ fun LibrarySettingsContent(
 private fun ALibrarySettingsViewModel.LibraryUpdateCategories(
 	title: String,
 	includeKey: StringSetKey,
-	excludeKey: StringSetKey
+	excludeKey: StringSetKey,
 ) {
 	val categories by categories.collectAsState()
 	val includedCategoryIds by remember(includeKey) {
@@ -267,7 +272,7 @@ private fun ALibrarySettingsViewModel.LibraryUpdateCategories(
 				context,
 				categories,
 				includedCategoryIds,
-				excludedCategoryIds
+				excludedCategoryIds,
 			)
 		}
 	}
@@ -282,15 +287,15 @@ private fun ALibrarySettingsViewModel.LibraryUpdateCategories(
 			launchIO {
 				settingsRepo.setStringSet(
 					includeKey,
-					newIncluded.map { it.id.toString() }.toSet()
+					newIncluded.map { it.id.toString() }.toSet(),
 				)
 				settingsRepo.setStringSet(
 					excludeKey,
-					newExcluded.map { it.id.toString() }.toSet()
+					newExcluded.map { it.id.toString() }.toSet(),
 				)
 			}
 		},
-		iconDescription = null
+		iconDescription = null,
 	)
 }
 
@@ -311,10 +316,15 @@ fun getCategorySelectDescription(
 
 	val includedItemsText = when {
 		// Some selected, but not all
-		includedCategories.isNotEmpty() && includedCategories.size != categories.size -> includedCategories.joinToString { it.name }
+		includedCategories.isNotEmpty() && includedCategories.size != categories.size -> {
+			includedCategories.joinToString { it.name }
+		}
+
 		// All explicitly selected
 		includedCategories.size == categories.size -> context.getString(R.string.all)
+
 		allExcluded -> context.getString(R.string.none)
+
 		else -> context.getString(R.string.all)
 	}
 	val excludedItemsText = when {
@@ -326,15 +336,15 @@ fun getCategorySelectDescription(
 		append(
 			context.getString(
 				R.string.settings_update_novel_include_categories,
-				includedItemsText
-			)
+				includedItemsText,
+			),
 		)
 		appendLine()
 		append(
 			context.getString(
 				R.string.settings_update_novel_exclude_categories,
-				excludedItemsText
-			)
+				excludedItemsText,
+			),
 		)
 	}
 }

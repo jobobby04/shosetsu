@@ -52,7 +52,11 @@ fun ProxySettingsContent(
 	val proxySetting by repo.getStringFlow(settingKey).collectAsState()
 
 	ProxySettingsContent(
-		title, description, isUsed, proxySetting, modifier
+		title,
+		description,
+		isUsed,
+		proxySetting,
+		modifier,
 	) { used, settings ->
 		launchIO {
 			repo.setBoolean(usedKey, used)
@@ -68,7 +72,7 @@ fun ProxySettingsContent(
 	proxyEnabled: Boolean,
 	proxyString: String,
 	modifier: Modifier = Modifier,
-	onValueChanged: (newEnabled: Boolean, newSetting: String) -> Unit
+	onValueChanged: (newEnabled: Boolean, newSetting: String) -> Unit,
 ) {
 	var openDialog by remember { mutableStateOf(false) }
 
@@ -78,31 +82,31 @@ fun ProxySettingsContent(
 		modifier = modifier,
 		widget = {
 			Text(
-				color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-				text = if (proxyEnabled) "On" else "Off"
+				color = if (proxyEnabled) {
+					MaterialTheme.colorScheme.primary
+				} else {
+					MaterialTheme.colorScheme.secondary
+				},
+				text = if (proxyEnabled) "On" else "Off",
 			)
 		},
 		onPreferenceClick = { openDialog = !openDialog },
-		iconDescription = null
-	)
-	Text(
-		color = if (proxyEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-		text = if (proxyEnabled) "On" else "Off"
+		iconDescription = null,
 	)
 
-	if (openDialog)
+	if (openDialog) {
 		Dialog({ openDialog = false }) {
 			ProxySettingsDialogContent(
 				title,
 				"",
 				proxyEnabled,
-				proxyString
+				proxyString,
 			) { newEnabled, newSetting ->
 				onValueChanged(newEnabled, newSetting)
 				openDialog = false
 			}
 		}
-
+	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,9 +116,8 @@ fun ProxySettingsDialogContent(
 	description: String,
 	proxyEnabled: Boolean,
 	proxyString: String,
-	onValueChanged: (newEnabled: Boolean, newSetting: String) -> Unit
+	onValueChanged: (newEnabled: Boolean, newSetting: String) -> Unit,
 ) {
-
 	var enabled by remember { mutableStateOf(proxyEnabled) }
 	var config by remember { mutableStateOf(ProxyConfig.fromString(proxyString)) }
 	var passwordVisible by remember { mutableStateOf(false) }
@@ -136,7 +139,7 @@ fun ProxySettingsDialogContent(
 					Switch(enabled, null)
 				},
 				onPreferenceClick = { enabled = !enabled },
-				iconDescription = null
+				iconDescription = null,
 			)
 			Row {
 				TextField(
@@ -165,7 +168,7 @@ fun ProxySettingsDialogContent(
 
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
 			) {
 				Checkbox(
 					enabled = enabled,
@@ -180,8 +183,8 @@ fun ProxySettingsDialogContent(
 						enabled,
 						onClick = {
 							config = config.copy(authUsed = !config.authUsed)
-						}
-					)
+						},
+					),
 				)
 			}
 
@@ -193,7 +196,7 @@ fun ProxySettingsDialogContent(
 				isError = !usernameValid,
 				singleLine = true,
 				label = { Text(text = "Username") },
-				enabled = enabled and config.authUsed
+				enabled = enabled and config.authUsed,
 			)
 
 			TextField(
@@ -202,13 +205,17 @@ fun ProxySettingsDialogContent(
 					config = config.copy(password = it)
 				},
 				singleLine = true,
-				visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+				visualTransformation = if (passwordVisible) {
+					VisualTransformation.None
+				} else {
+					PasswordVisualTransformation()
+				},
 				label = { Text(text = "Password") },
 				enabled = enabled and config.authUsed,
 				trailingIcon = {
 					val icon = if (passwordVisible) Icons.Outlined.Info else Icons.Filled.Info
 					SimpleIconButton(icon, description = null, onClick = { passwordVisible = !passwordVisible })
-				}
+				},
 			)
 			Button(
 				modifier = Modifier
@@ -217,7 +224,7 @@ fun ProxySettingsDialogContent(
 				enabled = saveEnabled,
 				onClick = {
 					onValueChanged(enabled, config.toString())
-				}
+				},
 			) {
 				Text("Save", textAlign = TextAlign.Center)
 			}
@@ -225,6 +232,17 @@ fun ProxySettingsDialogContent(
 	}
 }
 
+@Preview
+@Composable
+fun ProxySettingsContentPreview() {
+	ProxySettingsContent(
+		title = "title",
+		description = "description",
+		proxyEnabled = false,
+		proxyString = "",
+		onValueChanged = { _, _ -> },
+	)
+}
 
 @Preview
 @Composable
@@ -234,7 +252,7 @@ fun ProxySettingsDialogFilledContent() {
 			title = "use proxy",
 			description = "description",
 			proxyEnabled = true,
-			proxyString = "user:pass@longhostnameislong:8080"
+			proxyString = "user:pass@longhostnameislong:8080",
 		) { _, _ -> }
 	}
 }
@@ -247,7 +265,7 @@ fun ProxySettingsDialogEmptyContent() {
 			title = "use proxy",
 			description = "description",
 			proxyEnabled = false,
-			proxyString = "ab:pwd@"
+			proxyString = "ab:pwd@",
 		) { _, _ -> }
 	}
 }

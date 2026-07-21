@@ -14,10 +14,7 @@ import app.shosetsu.android.common.enums.AppThemes
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
-internal fun AppThemeModePreferenceWidget(
-	value: AppThemes,
-	onItemClick: (AppThemes) -> Unit,
-) {
+internal fun AppThemeModePreferenceWidget(value: AppThemes, onItemClick: (AppThemes) -> Unit) {
 	BasePreferenceWidget(
 		subcomponent = {
 			MultiChoiceSegmentedButtonRow(

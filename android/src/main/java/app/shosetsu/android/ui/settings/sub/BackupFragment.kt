@@ -75,10 +75,7 @@ import kotlinx.coroutines.launch
  */
 
 @Composable
-fun BackupView(
-	highlightBackupFolder: Boolean,
-	onBack: () -> Unit
-) {
+fun BackupView(highlightBackupFolder: Boolean, onBack: () -> Unit) {
 	val viewModel: ABackupSettingsViewModel = viewModelDi()
 	val promptMigration by viewModel.promptMigration.collectAsState()
 
@@ -87,7 +84,7 @@ fun BackupView(
 	val hostState = remember { SnackbarHostState() }
 
 	val selectBackupToRestoreLauncher = rememberLauncherForActivityResult(
-		ActivityResultContracts.OpenDocument()
+		ActivityResultContracts.OpenDocument(),
 	) { uri ->
 		if (uri == null) {
 			viewModel.logE("Cancelled")
@@ -104,7 +101,7 @@ fun BackupView(
 	}
 
 	val selectBackupStorageLocationLauncher = rememberLauncherForActivityResult(
-		contract = ActivityResultContracts.OpenDocumentTree()
+		contract = ActivityResultContracts.OpenDocumentTree(),
 	) { uri ->
 		if (uri != null) {
 			val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
@@ -137,7 +134,7 @@ fun BackupView(
 			}
 		},
 		highlightBackupFolder = highlightBackupFolder,
-		onBack = onBack
+		onBack = onBack,
 	)
 
 	// If we need to show a dialog, show it.
@@ -180,7 +177,7 @@ fun BackupSettingsContent(
 	backupNow: () -> Unit,
 	performFileSelection: () -> Unit,
 	performBackupStorageLocationSelection: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	val snackbarHostState = remember { SnackbarHostState() }
 
@@ -195,15 +192,15 @@ fun BackupSettingsContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) {
 		LazyColumn(
 			contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 64.dp),
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(it)
+				.padding(it),
 		) {
 			item {
 				val subtitle by viewModel.settingsRepo
@@ -215,7 +212,7 @@ fun BackupSettingsContent(
 						title = stringResource(R.string.settings_backup_location),
 						subtitle = subtitle.takeIf(String::isNotBlank)
 							?: stringResource(R.string.settings_backup_location_desc),
-						iconDescription = null
+						iconDescription = null,
 					) {
 						performBackupStorageLocationSelection()
 					}
@@ -235,7 +232,7 @@ fun BackupSettingsContent(
 								modifier = Modifier.fillMaxHeight(),
 								checked = false,
 								onCheckedChange = { backupNow() },
-								shape = SegmentedButtonDefaults.itemShape(0, 2)
+								shape = SegmentedButtonDefaults.itemShape(0, 2),
 							) {
 								Text(stringResource(R.string.backup_now))
 							}
@@ -249,7 +246,7 @@ fun BackupSettingsContent(
 								Text(stringResource(R.string.restore_now))
 							}
 						}
-					}
+					},
 				)
 			}
 
@@ -265,13 +262,21 @@ fun BackupSettingsContent(
 					parseValue = { value ->
 						when (value) {
 							12 -> stringResource(R.string.cycle_bidaily)
+
 							24 -> stringResource(R.string.cycle_daily)
+
 							48 -> stringResource(R.string.cycle_2_days)
+
 							72 -> stringResource(R.string.cycle_3_days)
+
 							96 -> stringResource(R.string.cycle_4_days)
+
 							120 -> stringResource(R.string.cycle_5_days)
+
 							144 -> stringResource(R.string.cycle_6_days)
+
 							168 -> stringResource(R.string.cycle_weekly)
+
 							else -> if (value == 0) {
 								stringResource(R.string.cycle_disabled)
 							} else {
@@ -299,7 +304,7 @@ fun BackupSettingsContent(
 							else -> value
 						}
 					},
-					maxHeaderSize = 80.dp
+					maxHeaderSize = 80.dp,
 				)
 			}
 
@@ -310,7 +315,7 @@ fun BackupSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.ShouldBackupChapters,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -321,7 +326,7 @@ fun BackupSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.ShouldBackupSettings,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -332,10 +337,11 @@ fun BackupSettingsContent(
 					restrictions = mapOf(
 						R.string.backup_restore_low_storage to SettingKey.BackupOnLowStorage,
 						R.string.backup_restore_low_battery to SettingKey.BackupOnLowBattery,
-					) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+					) + if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 						mapOf(R.string.backup_restore_only_idle to SettingKey.BackupOnlyWhenIdle)
-					else
-						emptyMap(),
+					} else {
+						emptyMap()
+					},
 					repo = viewModel.settingsRepo,
 				)
 			}
@@ -347,7 +353,7 @@ fun BackupSettingsContent(
 					viewModel.settingsRepo,
 					SettingKey.BackupIndicator,
 					modifier = Modifier
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 
@@ -356,7 +362,7 @@ fun BackupSettingsContent(
 					title = stringResource(R.string.settings_backup_start_migration_title),
 					subtitle = stringResource(R.string.settings_backup_start_migration_desc),
 					onPreferenceClick = viewModel::startMigration,
-					iconDescription = null
+					iconDescription = null,
 				)
 			}
 		}

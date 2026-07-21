@@ -26,9 +26,8 @@ import kotlinx.coroutines.flow.StateFlow
  * shosetsu
  * 17 / 09 / 2020
  */
-class FileSharedPreferencesSettingsDataSource(
-	private val provider: SharedPreferenceProvider
-) : IFileSettingsDataSource {
+class FileSharedPreferencesSettingsDataSource(private val provider: SharedPreferenceProvider) :
+	IFileSettingsDataSource {
 
 	override fun observeLong(name: String, key: SettingKey<Long>): StateFlow<Long> =
 		provider.observeLong(name, key)
@@ -42,10 +41,7 @@ class FileSharedPreferencesSettingsDataSource(
 	override fun observeBoolean(name: String, key: SettingKey<Boolean>): StateFlow<Boolean> =
 		provider.observeBoolean(name, key)
 
-	override fun observeStringSet(
-		name: String,
-		key: SettingKey<Set<String>>
-	): StateFlow<Set<String>> =
+	override fun observeStringSet(name: String, key: SettingKey<Set<String>>): StateFlow<Set<String>> =
 		provider.observeStringSet(name, key)
 
 	override fun observeFloat(name: String, key: SettingKey<Float>): StateFlow<Float> =
@@ -57,16 +53,12 @@ class FileSharedPreferencesSettingsDataSource(
 	override suspend fun getString(name: String, key: SettingKey<String>): String =
 		(provider.getString(name, key))
 
-	override suspend fun getInt(name: String, key: SettingKey<Int>): Int =
-		(provider.getInt(name, key))
+	override suspend fun getInt(name: String, key: SettingKey<Int>): Int = (provider.getInt(name, key))
 
 	override suspend fun getBoolean(name: String, key: SettingKey<Boolean>): Boolean =
 		(provider.getBoolean(name, key))
 
-	override suspend fun getStringSet(
-		name: String,
-		key: SettingKey<Set<String>>
-	): Set<String> =
+	override suspend fun getStringSet(name: String, key: SettingKey<Set<String>>): Set<String> =
 		(provider.getStringSet(name, key))
 
 	override suspend fun getFloat(name: String, key: SettingKey<Float>) =
@@ -75,29 +67,20 @@ class FileSharedPreferencesSettingsDataSource(
 	override suspend fun setLong(name: String, key: SettingKey<Long>, value: Long): Unit =
 		(provider.setLong(name, key, value))
 
-	override suspend fun setString(
-		name: String,
-		key: SettingKey<String>,
-		value: String
-	): Unit =
+	override suspend fun setString(name: String, key: SettingKey<String>, value: String): Unit =
 		(provider.setString(name, key, value))
 
 	override suspend fun setInt(name: String, key: SettingKey<Int>, value: Int): Unit =
 		(provider.setInt(name, key, value))
 
-	override suspend fun setBoolean(
-		name: String,
-		key: SettingKey<Boolean>,
-		value: Boolean
-	): Unit =
+	override suspend fun setBoolean(name: String, key: SettingKey<Boolean>, value: Boolean): Unit =
 		(provider.setBoolean(name, key, value))
 
 	override suspend fun setStringSet(
 		name: String,
 		key: SettingKey<Set<String>>,
-		value: Set<String>
-	): Unit =
-		(provider.setStringSet(name, key, value))
+		value: Set<String>,
+	): Unit = (provider.setStringSet(name, key, value))
 
 	override suspend fun setFloat(name: String, key: SettingKey<Float>, value: Float): Unit =
 		(provider.setFloat(name, key, value))

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flow
 
 inline fun <T, R> Flow<T>.transformCatching(
 	crossinline exceptional: suspend FlowCollector<R>.(exception: Throwable) -> Unit,
-	crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit
+	crossinline transform: suspend FlowCollector<R>.(value: T) -> Unit,
 ): Flow<R> = flow {
 	collect { value ->
 		try {

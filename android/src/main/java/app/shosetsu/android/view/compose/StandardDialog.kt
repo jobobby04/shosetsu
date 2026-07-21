@@ -72,7 +72,7 @@ fun StandardDialog(
 		Card(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
 		) {
 			Column(
 				modifier = Modifier
@@ -82,7 +82,7 @@ fun StandardDialog(
 			) {
 				ProvideTextStyle(
 					MaterialTheme.typography.titleLarge
-						.copy(textAlign = TextAlign.Center)
+						.copy(textAlign = TextAlign.Center),
 				) {
 					title()
 				}
@@ -94,7 +94,7 @@ fun StandardDialog(
 				Row(
 					horizontalArrangement = Arrangement.End,
 					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier.align(Alignment.End)
+					modifier = Modifier.align(Alignment.End),
 				) {
 					cancelButton(onCancel)
 					confirmButton(onConfirm)
@@ -111,7 +111,7 @@ fun PreviewStandardDialog() = ShosetsuTheme(AppThemes.LIGHT) {
 		onDismissRequest = {},
 		title = {
 			Text("Test Title")
-		}
+		},
 	) {
 		Box(Modifier.size(100.dp))
 	}

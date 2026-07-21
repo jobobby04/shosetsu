@@ -9,10 +9,10 @@ import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.datasource.local.file.base.IFileCachedChapterDataSource
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import app.shosetsu.lib.Novel
+import java.io.IOException
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.
@@ -35,14 +35,13 @@ import java.io.IOException
  * shosetsu
  * 17 / 08 / 2020
  */
-class FileCachedChapterDataSource(
-	private val iFileSystemProvider: IFileSystemProvider
-) : IFileCachedChapterDataSource {
+class FileCachedChapterDataSource(private val iFileSystemProvider: IFileSystemProvider) :
+	IFileCachedChapterDataSource {
 
 	init {
 		logV("Creating required directories")
 		try {
-			iFileSystemProvider.createDirectory(CACHE, chaptersCacheDir)
+			iFileSystemProvider.createDirectory(CACHE, CHAPTERS_CACHE_DIR)
 			logV("Created required directories")
 		} catch (e: Exception) {
 			logE("Error on creation of directories", e)
@@ -54,7 +53,7 @@ class FileCachedChapterDataSource(
 		try {
 			val result = iFileSystemProvider.readFile(
 				CACHE,
-				mapFile
+				CHAPTERS_CACHE_MAP_FILE,
 			)
 			JSONArray(result.decodeToString())
 		} catch (e: FileNotFoundException) {
@@ -62,39 +61,39 @@ class FileCachedChapterDataSource(
 			val array = JSONArray()
 			iFileSystemProvider.writeFile(
 				CACHE,
-				mapFile,
-				array.toString().toByteArray()
+				CHAPTERS_CACHE_MAP_FILE,
+				array.toString().toByteArray(),
 			)
 			array
 		}
 	}
 
-	@get:Synchronized
-	@set:Synchronized
 	/**
 	 * Helps prevent reruns
 	 */
+	@get:Synchronized
+	@set:Synchronized
 	private var running: Boolean = false
 
-	@Synchronized
 	/**
 	 * Writes the instruct file
 	 */
+	@Synchronized
 	@Throws(FilePermissionException::class, IOException::class, JSONException::class)
 	private fun writeFile() {
 		iFileSystemProvider.writeFile(
 			CACHE,
-			mapFile,
-			chaptersCacheInstruction.toString(1).toByteArray()
+			CHAPTERS_CACHE_MAP_FILE,
+			chaptersCacheInstruction.toString(1).toByteArray(),
 		)
 	}
 
-	@Synchronized
 	/**
 	 * Simply creates a file object
 	 */
+	@Synchronized
 	private fun createFilePath(id: Int, chapterType: Novel.ChapterType): String =
-		"$chaptersCacheDir/$id.${chapterType.fileExtension}"
+		"$CHAPTERS_CACHE_DIR/$id.${chapterType.fileExtension}"
 
 	/**
 	 * Clears out [chaptersCacheInstruction] of its incorrect data
@@ -104,15 +103,15 @@ class FileCachedChapterDataSource(
 	private fun launchCleanUp() {
 		if (running) return
 		running = true
-		//Log.i(logID(), "Cleaning up chapter file cache")
+		// Log.i(logID(), "Cleaning up chapter file cache")
 
 		// Filters out
 		while (chaptersCacheInstruction.length() > 100) {
 			val obj = chaptersCacheInstruction.getJSONObject(0)
 			chaptersCacheInstruction.remove(0)
 			val id = obj.getInt(CHAPTER_KEY)
-			//	logD("#### REMOVING $id FROM FILE CACHE DUE TO OVERFLOW ####")
-			iFileSystemProvider.deleteFile(CACHE, "$chaptersCacheDir/$id.txt")
+			// 	logD("#### REMOVING $id FROM FILE CACHE DUE TO OVERFLOW ####")
+			iFileSystemProvider.deleteFile(CACHE, "$CHAPTERS_CACHE_DIR/$id.txt")
 		}
 
 		// Filters out expired data
@@ -123,15 +122,15 @@ class FileCachedChapterDataSource(
 			// Deletes the obj
 			if (time < (System.currentTimeMillis() - (3600000 * CACHE_TIME))) {
 				val id = obj.getInt(CHAPTER_KEY)
-				//		Log.d(logID(), "#### REMOVING $id FROM FILE CACHE ####")
-				iFileSystemProvider.deleteFile(CACHE, "$chaptersCacheDir/$id.txt")
+				// 		Log.d(logID(), "#### REMOVING $id FROM FILE CACHE ####")
+				iFileSystemProvider.deleteFile(CACHE, "$CHAPTERS_CACHE_DIR/$id.txt")
 				chaptersCacheInstruction.remove(i)
 				continue
 			}
 		}
 		writeFile()
 		running = false
-		//Log.i(logID(), "Finished cleaning up")
+		// Log.i(logID(), "Finished cleaning up")
 	}
 
 	@Throws(JSONException::class, FilePermissionException::class, IOException::class)
@@ -139,7 +138,7 @@ class FileCachedChapterDataSource(
 	override fun saveChapterInCache(
 		chapterID: Int,
 		chapterType: Novel.ChapterType,
-		passage: ByteArray
+		passage: ByteArray,
 	) {
 		// Looks for the chapter if its already in the instruction set
 		// If found, it updates the time and writes the new data
@@ -150,7 +149,7 @@ class FileCachedChapterDataSource(
 				iFileSystemProvider.writeFile(
 					CACHE,
 					createFilePath(chapterID, chapterType),
-					passage
+					passage,
 				)
 				obj.put(TIME_KEY, System.currentTimeMillis())
 				chaptersCacheInstruction.put(index, obj)
@@ -163,12 +162,14 @@ class FileCachedChapterDataSource(
 		iFileSystemProvider.writeFile(
 			CACHE,
 			createFilePath(chapterID, chapterType),
-			passage
+			passage,
 		)
-		chaptersCacheInstruction.put(JSONObject().apply {
-			put(CHAPTER_KEY, chapterID)
-			put(TIME_KEY, System.currentTimeMillis())
-		})
+		chaptersCacheInstruction.put(
+			JSONObject().apply {
+				put(CHAPTER_KEY, chapterID)
+				put(TIME_KEY, System.currentTimeMillis())
+			},
+		)
 
 		writeFile()
 
@@ -183,10 +184,7 @@ class FileCachedChapterDataSource(
 
 	@Throws(FileNotFoundException::class)
 	@Synchronized
-	override fun loadChapterPassage(
-		chapterID: Int,
-		chapterType: Novel.ChapterType
-	): ByteArray {
+	override fun loadChapterPassage(chapterID: Int, chapterType: Novel.ChapterType): ByteArray {
 		launchIO {
 			try {
 				launchCleanUp()
@@ -199,9 +197,8 @@ class FileCachedChapterDataSource(
 
 	companion object {
 
-
-		const val chaptersCacheDir = "/cachedChapters/"
-		const val mapFile = "$chaptersCacheDir/map.json"
+		const val CHAPTERS_CACHE_DIR = "/cachedChapters/"
+		const val CHAPTERS_CACHE_MAP_FILE = "$CHAPTERS_CACHE_DIR/map.json"
 
 		private const val CHAPTER_KEY = "chapterID"
 		private const val TIME_KEY = "time"

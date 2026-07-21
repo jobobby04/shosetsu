@@ -94,20 +94,19 @@ fun LongClickTextButton(
 	contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 	content: @Composable RowScope.() -> Unit,
-) =
-	LongClickButton(
-		onClick = onClick,
-		modifier = modifier,
-		onLongClick = onLongClick,
-		enabled = enabled,
-		interactionSource = interactionSource,
-		elevation = elevation,
-		shape = shape,
-		border = border,
-		colors = colors,
-		contentPadding = contentPadding,
-		content = content,
-	)
+) = LongClickButton(
+	onClick = onClick,
+	modifier = modifier,
+	onLongClick = onLongClick,
+	enabled = enabled,
+	interactionSource = interactionSource,
+	elevation = elevation,
+	shape = shape,
+	border = border,
+	colors = colors,
+	contentPadding = contentPadding,
+	content = content,
+)
 
 @Composable
 fun LongClickButton(
@@ -121,7 +120,7 @@ fun LongClickButton(
 	border: BorderStroke? = null,
 	colors: ButtonColors = ButtonDefaults2.buttonColors(),
 	contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
-	content: @Composable RowScope.() -> Unit
+	content: @Composable RowScope.() -> Unit,
 ) {
 	val containerColor = colors.containerColor(enabled).value
 	val contentColor = colors.contentColor(enabled).value
@@ -171,9 +170,8 @@ class ButtonColors internal constructor(
 	 * @param enabled whether the button is enabled
 	 */
 	@Composable
-	internal fun containerColor(enabled: Boolean): State<Color> {
-		return rememberUpdatedState(if (enabled) containerColor else disabledContainerColor)
-	}
+	internal fun containerColor(enabled: Boolean): State<Color> =
+		rememberUpdatedState(if (enabled) containerColor else disabledContainerColor)
 
 	/**
 	 * Represents the content color for this button, depending on [enabled].
@@ -181,9 +179,8 @@ class ButtonColors internal constructor(
 	 * @param enabled whether the button is enabled
 	 */
 	@Composable
-	internal fun contentColor(enabled: Boolean): State<Color> {
-		return rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
-	}
+	internal fun contentColor(enabled: Boolean): State<Color> =
+		rememberUpdatedState(if (enabled) contentColor else disabledContentColor)
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -205,7 +202,6 @@ class ButtonColors internal constructor(
 		return result
 	}
 }
-
 
 /**
  * Represents the elevation for a button in different states.
@@ -236,9 +232,8 @@ class ButtonElevation internal constructor(
 	 * @param interactionSource the [InteractionSource] for this button
 	 */
 	@Composable
-	internal fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp> {
-		return animateElevation(enabled = enabled, interactionSource = interactionSource)
-	}
+	internal fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp> =
+		animateElevation(enabled = enabled, interactionSource = interactionSource)
 
 	/**
 	 * Represents the shadow elevation used in a button, depending on its [enabled] state and
@@ -252,18 +247,11 @@ class ButtonElevation internal constructor(
 	 * @param interactionSource the [InteractionSource] for this button
 	 */
 	@Composable
-	internal fun shadowElevation(
-		enabled: Boolean,
-		interactionSource: InteractionSource
-	): State<Dp> {
-		return animateElevation(enabled = enabled, interactionSource = interactionSource)
-	}
+	internal fun shadowElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp> =
+		animateElevation(enabled = enabled, interactionSource = interactionSource)
 
 	@Composable
-	private fun animateElevation(
-		enabled: Boolean,
-		interactionSource: InteractionSource
-	): State<Dp> {
+	private fun animateElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp> {
 		val interactions = remember { mutableStateListOf<Interaction>() }
 		LaunchedEffect(interactionSource) {
 			interactionSource.interactions.collect { interaction ->
@@ -329,7 +317,7 @@ class ButtonElevation internal constructor(
 				animatable.animateElevation(
 					from = lastInteraction,
 					to = interaction,
-					target = target
+					target = target,
 				)
 			}
 		}
@@ -363,13 +351,15 @@ class ButtonElevation internal constructor(
 internal suspend fun Animatable<Dp, *>.animateElevation(
 	target: Dp,
 	from: Interaction? = null,
-	to: Interaction? = null
+	to: Interaction? = null,
 ) {
 	val spec = when {
 		// Moving to a new state
 		to != null -> ElevationDefaults.incomingAnimationSpecForInteraction(to)
+
 		// Moving to default, from a previous state
 		from != null -> ElevationDefaults.outgoingAnimationSpecForInteraction(from)
+
 		// Loading the initial state, or moving back to the baseline state from a disabled /
 		// unknown state, so just snap to the final value.
 		else -> null
@@ -385,15 +375,14 @@ private object ElevationDefaults {
 	 *
 	 * @param interaction the [Interaction] that is being animated to
 	 */
-	fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
-		return when (interaction) {
+	fun incomingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? =
+		when (interaction) {
 			is PressInteraction.Press -> DefaultIncomingSpec
 			is DragInteraction.Start -> DefaultIncomingSpec
 			is HoverInteraction.Enter -> DefaultIncomingSpec
 			is FocusInteraction.Focus -> DefaultIncomingSpec
 			else -> null
 		}
-	}
 
 	/**
 	 * Returns the [AnimationSpec]s used when animating elevation away from [interaction], to the
@@ -401,34 +390,32 @@ private object ElevationDefaults {
 	 *
 	 * @param interaction the [Interaction] that is being animated away from
 	 */
-	fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? {
-		return when (interaction) {
+	fun outgoingAnimationSpecForInteraction(interaction: Interaction): AnimationSpec<Dp>? =
+		when (interaction) {
 			is PressInteraction.Press -> DefaultOutgoingSpec
 			is DragInteraction.Start -> DefaultOutgoingSpec
 			is HoverInteraction.Enter -> HoveredOutgoingSpec
 			is FocusInteraction.Focus -> DefaultOutgoingSpec
 			else -> null
 		}
-	}
 }
 
 private val OutgoingSpecEasing: Easing = CubicBezierEasing(0.40f, 0.00f, 0.60f, 1.00f)
 
 private val DefaultIncomingSpec = TweenSpec<Dp>(
 	durationMillis = 120,
-	easing = FastOutSlowInEasing
+	easing = FastOutSlowInEasing,
 )
 
 private val DefaultOutgoingSpec = TweenSpec<Dp>(
 	durationMillis = 150,
-	easing = OutgoingSpecEasing
+	easing = OutgoingSpecEasing,
 )
 
 private val HoveredOutgoingSpec = TweenSpec<Dp>(
 	durationMillis = 120,
-	easing = OutgoingSpecEasing
+	easing = OutgoingSpecEasing,
 )
-
 
 object ButtonDefaults2 {
 	/**
@@ -453,7 +440,7 @@ object ButtonDefaults2 {
 		containerColor = containerColor,
 		contentColor = contentColor,
 		disabledContainerColor = disabledContainerColor,
-		disabledContentColor = disabledContentColor
+		disabledContentColor = disabledContentColor,
 	)
 
 	/**
@@ -476,7 +463,7 @@ object ButtonDefaults2 {
 		containerColor = containerColor,
 		contentColor = contentColor,
 		disabledContainerColor = disabledContainerColor,
-		disabledContentColor = disabledContentColor
+		disabledContentColor = disabledContentColor,
 	)
 
 	/**
@@ -509,11 +496,19 @@ object ButtonDefaults2 {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleIconButton(
-	icon: ImageVector, description: String?,
+	icon: ImageVector,
+	description: String?,
 	onClick: () -> Unit,
-	modifier: Modifier = Modifier, enabled: Boolean = true, tint: Color = LocalContentColor.current
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
+	tint: Color = LocalContentColor.current,
 ) {
-	SimpleIconButton(description = description, enabled = enabled, onClick = onClick, modifier = modifier) {
+	SimpleIconButton(
+		description = description,
+		enabled = enabled,
+		onClick = onClick,
+		modifier = modifier,
+	) {
 		Icon(
 			icon,
 			contentDescription = description,
@@ -525,11 +520,19 @@ fun SimpleIconButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleIconButton(
-	painter: Painter, description: String?,
+	painter: Painter,
+	description: String?,
 	onClick: () -> Unit,
-	modifier: Modifier = Modifier, enabled: Boolean = true, tint: Color = LocalContentColor.current
+	modifier: Modifier = Modifier,
+	enabled: Boolean = true,
+	tint: Color = LocalContentColor.current,
 ) {
-	SimpleIconButton(description = description, enabled = enabled, onClick = onClick, modifier = modifier) {
+	SimpleIconButton(
+		description = description,
+		enabled = enabled,
+		onClick = onClick,
+		modifier = modifier,
+	) {
 		Icon(
 			painter,
 			contentDescription = description,
@@ -545,7 +548,7 @@ fun SimpleIconButton(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier,
 	enabled: Boolean = true,
-	content: @Composable (() -> Unit)
+	content: @Composable (() -> Unit),
 ) {
 	if (description == null) {
 		IconButton(
@@ -585,7 +588,7 @@ fun MoreIconButton(content: @Composable ColumnScope.(onDismissRequest: () -> Uni
 		stringResource(R.string.more),
 		onClick = {
 			showDropDown = true
-		}
+		},
 	)
 
 	val onDismissRequest = { showDropDown = false }

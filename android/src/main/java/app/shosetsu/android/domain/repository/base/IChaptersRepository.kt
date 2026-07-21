@@ -9,9 +9,9 @@ import app.shosetsu.android.domain.model.local.ReaderChapterEntity
 import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
+import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import org.luaj.vm2.LuaError
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.
@@ -47,10 +47,7 @@ interface IChaptersRepository {
 	 *
 	 */
 	@Throws(FilePermissionException::class, FileNotFoundException::class, LuaError::class)
-	suspend fun getChapterPassage(
-		formatter: IExtension,
-		entity: ChapterEntity,
-	): ByteArray
+	suspend fun getChapterPassage(formatter: IExtension, entity: ChapterEntity): ByteArray
 
 	/**
 	 * Save the [ChapterEntity] [passage] to storage
@@ -62,18 +59,14 @@ interface IChaptersRepository {
 	suspend fun saveChapterPassageToStorage(
 		entity: ChapterEntity,
 		chapterType: Novel.ChapterType,
-		passage: ByteArray
+		passage: ByteArray,
 	)
 
 	/**
 	 * Handles chapters for ze novel
 	 */
 	@Throws(SQLiteException::class)
-	suspend fun handleChapters(
-		novelID: Int,
-		extensionID: Int,
-		list: List<Novel.Chapter>
-	)
+	suspend fun handleChapters(novelID: Int, extensionID: Int, list: List<Novel.Chapter>)
 
 	/**
 	 * Handles chapters return, but returns the chapters that are new
@@ -119,10 +112,7 @@ interface IChaptersRepository {
 	 * Also deletes from memory and cache
 	 */
 	@Throws(SQLiteException::class, FilePermissionException::class)
-	suspend fun deleteChapterPassage(
-		chapterEntity: ChapterEntity,
-		chapterType: Novel.ChapterType
-	)
+	suspend fun deleteChapterPassage(chapterEntity: ChapterEntity, chapterType: Novel.ChapterType)
 
 	/**
 	 * Delete the chapter passages from storage
@@ -130,10 +120,7 @@ interface IChaptersRepository {
 	 * Also deletes from memory and cache
 	 */
 	@Throws(SQLiteException::class, FilePermissionException::class)
-	suspend fun deleteChapterPassage(
-		chapters: List<ChapterEntity>,
-		chapterType: Novel.ChapterType
-	)
+	suspend fun deleteChapterPassage(chapters: List<ChapterEntity>, chapterType: Novel.ChapterType)
 
 	@Throws(SQLiteException::class)
 	suspend fun delete(entity: ChapterEntity)

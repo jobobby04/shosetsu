@@ -8,7 +8,8 @@ import app.shosetsu.android.datasource.local.file.base.IFileCrashDataSource
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -33,9 +34,7 @@ import java.util.*
  * @since 19 / 07 / 2021
  * @author Doomsdayrs
  */
-class FileCrashDataSource(
-	private val fileSystem: IFileSystemProvider
-) : IFileCrashDataSource {
+class FileCrashDataSource(private val fileSystem: IFileSystemProvider) : IFileCrashDataSource {
 	init {
 		try {
 			fileSystem.createDirectory(APP, DIRECTORY)

@@ -45,19 +45,19 @@ import app.shosetsu.android.dto.Convertible
 			entity = DBChapterEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["chapterID"],
-			onDelete = ForeignKey.CASCADE
+			onDelete = ForeignKey.CASCADE,
 		),
 		ForeignKey(
 			entity = DBNovelEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["novelID"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
 	indices = [
 		Index("chapterID"),
 		Index("novelID"),
-	]
+	],
 )
 data class DBDownloadEntity(
 	@PrimaryKey
@@ -70,14 +70,13 @@ data class DBDownloadEntity(
 	val extensionID: Int,
 	var status: DownloadStatus = DownloadStatus.PENDING,
 ) : Convertible<DownloadEntity> {
-	override fun convertTo(): DownloadEntity =
-		DownloadEntity(
-			chapterID,
-			novelID,
-			chapterURL,
-			chapterName,
-			novelName,
-			extensionID,
-			status
-		)
+	override fun convertTo(): DownloadEntity = DownloadEntity(
+		chapterID,
+		novelID,
+		chapterURL,
+		chapterName,
+		novelName,
+		extensionID,
+		status,
+	)
 }

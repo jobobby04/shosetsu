@@ -2,7 +2,8 @@ package app.shosetsu.android.domain.model.local
 
 import app.shosetsu.android.common.consts.BACKUP_FILE_EXTENSION
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /*
  * This file is part of Shosetsu.
@@ -26,12 +27,10 @@ import java.util.*
  *
  * @param content Content of the file
  */
-data class BackupEntity(
-	val content: ByteArray
-) {
+data class BackupEntity(val content: ByteArray) {
 
 	val creationDate: String = SimpleDateFormat("yyyy-MM-dd-hh-mm-ss", Locale.ROOT).format(Date())
-	val fileName: String by lazy { "shosetsu-backup-${creationDate}.$BACKUP_FILE_EXTENSION" }
+	val fileName: String by lazy { "shosetsu-backup-$creationDate.$BACKUP_FILE_EXTENSION" }
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -42,7 +41,5 @@ data class BackupEntity(
 		return true
 	}
 
-	override fun hashCode(): Int {
-		return content.contentHashCode()
-	}
+	override fun hashCode(): Int = content.contentHashCode()
 }

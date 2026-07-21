@@ -25,6 +25,6 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
  * shosetsu
  * 31 / 08 / 2020
  */
-abstract class ASubSettingsViewModel(
-	override val settingsRepo: ISettingsRepository
-) : ShosetsuViewModel(), ExposedSettingsRepoViewModel
+abstract class ASubSettingsViewModel(override val settingsRepo: ISettingsRepository) :
+	ShosetsuViewModel(),
+	ExposedSettingsRepoViewModel

@@ -37,7 +37,7 @@ fun InstalledExtensionEntity.toDB(): DBInstalledExtensionEntity = DBInstalledExt
 	version = version,
 	md5 = md5,
 	type = type,
-	enabled = enabled
+	enabled = enabled,
 )
 
 fun InstalledExtensionEntity.generify(): GenericExtensionEntity = GenericExtensionEntity(

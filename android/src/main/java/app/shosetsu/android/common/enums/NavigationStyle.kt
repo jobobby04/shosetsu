@@ -33,5 +33,5 @@ enum class NavigationStyle {
 	/**
 	 * Legacy navigation for older users
 	 */
-	LEGACY
+	LEGACY,
 }

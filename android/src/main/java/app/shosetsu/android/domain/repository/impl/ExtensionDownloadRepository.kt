@@ -49,10 +49,7 @@ class ExtensionDownloadRepository : IExtensionDownloadRepository {
 	override suspend fun getStatusFlow(extension: Int): Flow<DownloadStatus> =
 		statusMap.iGet(extension).onIO()
 
-	override suspend fun updateStatus(
-		extension: Int,
-		status: DownloadStatus
-	) {
+	override suspend fun updateStatus(extension: Int, status: DownloadStatus) {
 		onIO { statusMap.iGet(extension).emit(status) }
 	}
 }

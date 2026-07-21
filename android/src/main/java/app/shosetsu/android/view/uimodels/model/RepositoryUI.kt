@@ -32,7 +32,7 @@ data class RepositoryUI(
 	val id: Int,
 	val url: String,
 	val name: String,
-	val isRepoEnabled: Boolean
+	val isRepoEnabled: Boolean,
 ) : Convertible<RepositoryEntity> {
 
 	override fun convertTo(): RepositoryEntity = RepositoryEntity(id, url, name, isRepoEnabled)

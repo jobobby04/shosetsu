@@ -45,11 +45,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import app.shosetsu.android.R
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SimpleIconButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.uimodels.model.ChapterHistoryUI
 import app.shosetsu.android.viewmodel.abstracted.HistoryViewModel
@@ -84,7 +84,7 @@ import coil.request.ImageRequest
 fun HistoryView(
 	openNovel: (novelId: Int) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	val viewModel: HistoryViewModel = viewModelDi()
 	val items = viewModel.items.collectAsLazyPagingItems()
@@ -100,23 +100,20 @@ fun HistoryView(
 		},
 		onBack = onBack,
 		onClearAll = viewModel::clearAll,
-		onOpenClearBefore = viewModel::showClearBeforeDialog
+		onOpenClearBefore = viewModel::showClearBeforeDialog,
 	)
 
 	if (isClearBeforeDialogVisible) {
 		HistoryDatePickerDialog(
 			onDismiss = viewModel::hideClearBeforeDialog,
-			onClearBefore = viewModel::clearBefore
+			onClearBefore = viewModel::clearBefore,
 		)
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryDatePickerDialog(
-	onDismiss: () -> Unit,
-	onClearBefore: (Long) -> Unit
-) {
+fun HistoryDatePickerDialog(onDismiss: () -> Unit, onClearBefore: (Long) -> Unit) {
 	val state = rememberDatePickerState()
 
 	DatePickerDialog(
@@ -128,7 +125,7 @@ fun HistoryDatePickerDialog(
 						onClearBefore(state.selectedDateMillis!!)
 						onDismiss()
 					}
-				}
+				},
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
@@ -137,7 +134,7 @@ fun HistoryDatePickerDialog(
 			TextButton(onClick = onDismiss) {
 				Text(stringResource(android.R.string.cancel))
 			}
-		}
+		},
 	) {
 		DatePicker(
 			state,
@@ -149,9 +146,9 @@ fun HistoryDatePickerDialog(
 						PaddingValues(
 							start = 24.dp,
 							end = 12.dp,
-							top = 16.dp
-						)
-					)
+							top = 16.dp,
+						),
+					),
 				)
 			},
 		)
@@ -166,7 +163,7 @@ fun HistoryContent(
 	openChapter: (ChapterHistoryUI) -> Unit,
 	onBack: () -> Unit,
 	onClearAll: () -> Unit,
-	onOpenClearBefore: () -> Unit
+	onOpenClearBefore: () -> Unit,
 ) {
 	Scaffold(
 		topBar = {
@@ -182,20 +179,20 @@ fun HistoryContent(
 						onClearAll,
 						onOpenClearBefore,
 					)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		if (items.itemCount == 0) {
 			ErrorContent(
 				R.string.fragment_history_error_empty,
-				modifier = Modifier.padding(paddingValues)
+				modifier = Modifier.padding(paddingValues),
 			)
 		} else {
 			LazyColumn(
 				contentPadding = PaddingValues(top = 8.dp, bottom = 112.dp),
 				verticalArrangement = Arrangement.spacedBy(4.dp),
-				modifier = Modifier.padding(paddingValues)
+				modifier = Modifier.padding(paddingValues),
 			) {
 				items(items.itemCount) {
 					val historyItem = items[it]
@@ -207,7 +204,7 @@ fun HistoryContent(
 							},
 							onClick = {
 								openChapter(historyItem)
-							}
+							},
 						)
 					}
 				}
@@ -216,20 +213,17 @@ fun HistoryContent(
 	}
 }
 
-
 @Composable
-fun HistoryMoreOption(
-	onClearAll: () -> Unit,
-	onOpenClearBefore: () -> Unit
-) {
+fun HistoryMoreOption(onClearAll: () -> Unit, onOpenClearBefore: () -> Unit) {
 	var showDropDown by remember { mutableStateOf(false) }
 
 	Box {
 		SimpleIconButton(
-			Icons.Default.Delete, stringResource(R.string.clear),
+			Icons.Default.Delete,
+			stringResource(R.string.clear),
 			onClick = {
 				showDropDown = true
-			}
+			},
 		)
 
 		DropdownMenu(
@@ -242,16 +236,15 @@ fun HistoryMoreOption(
 				text = {
 					Text(stringResource(R.string.all))
 				},
-				onClick = onClearAll
+				onClick = onClearAll,
 			)
 
 			DropdownMenuItem(
 				text = {
 					Text(stringResource(R.string.before))
 				},
-				onClick = onOpenClearBefore
+				onClick = onOpenClearBefore,
 			)
-
 		}
 	}
 }
@@ -262,49 +255,56 @@ fun HistoryMoreOption(
 fun PreviewHistoryItemContent() {
 	HistoryItemContent(
 		ChapterHistoryUI(
-			1, 1, "", "", 1, "", System.currentTimeMillis(), null
+			1,
+			1,
+			"",
+			"",
+			1,
+			"",
+			System.currentTimeMillis(),
+			null,
 		),
 		{},
-		{}
+		{},
 	)
 }
 
-
 @Composable
-fun HistoryItemContent(
-	updateUI: ChapterHistoryUI?,
-	openNovel: () -> Unit,
-	onClick: () -> Unit
-) {
+fun HistoryItemContent(updateUI: ChapterHistoryUI?, openNovel: () -> Unit, onClick: () -> Unit) {
 	Row(
 		Modifier
 			.fillMaxWidth()
 			.height(72.dp)
 			.clickable(onClick = onClick)
-			.padding(start = 8.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically
+			.padding(start = 8.dp, end = 8.dp),
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		if (updateUI?.novelImageURL?.isNotEmpty() == true) {
 			SubcomposeAsyncImage(
 				ImageRequest.Builder(LocalContext.current)
 					.data(updateUI.novelImageURL).crossfade(true).build(),
-				contentDescription = stringResource(R.string.novel_image_content_description, updateUI.novelTitle),
+				contentDescription = stringResource(
+					R.string.novel_image_content_description,
+					updateUI.novelTitle,
+				),
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.clip(MaterialTheme.shapes.medium)
-					.aspectRatio(coverRatio)
+					.aspectRatio(COVER_RATIO)
 					.clickable(onClick = openNovel),
 				error = {
 					ImageLoadingError(updateUI.novelTitle)
 				},
 				loading = {
 					Box(Modifier.placeholder(true))
-				})
+				},
+			)
 		} else {
 			ImageLoadingError(
 				updateUI?.novelTitle,
 				Modifier
-					.aspectRatio(coverRatio)
-					.placeholder(updateUI == null)
+					.aspectRatio(COVER_RATIO)
+					.placeholder(updateUI == null),
 			)
 		}
 		Column(
@@ -314,8 +314,10 @@ fun HistoryItemContent(
 				.padding(4.dp),
 		) {
 			Text(
-				updateUI?.chapterTitle ?: "", maxLines = 1, overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.placeholder(updateUI == null)
+				updateUI?.chapterTitle ?: "",
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier.placeholder(updateUI == null),
 			)
 			Text(
 				updateUI?.novelTitle ?: "",
@@ -324,7 +326,7 @@ fun HistoryItemContent(
 				overflow = TextOverflow.Ellipsis,
 				modifier = Modifier
 					.alpha(.75f)
-					.placeholder(updateUI == null)
+					.placeholder(updateUI == null),
 			)
 			Text(
 				updateUI?.endedTime ?: updateUI?.startedTime ?: "",
@@ -332,7 +334,7 @@ fun HistoryItemContent(
 				maxLines = 1,
 				modifier = Modifier
 					.alpha(.5f)
-					.placeholder(updateUI == null)
+					.placeholder(updateUI == null),
 			)
 		}
 	}

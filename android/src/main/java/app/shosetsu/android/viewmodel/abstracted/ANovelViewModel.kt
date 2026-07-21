@@ -31,15 +31,13 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 29 / 04 / 2020
  *
  * @author github.com/doomsdayrs
  */
-abstract class ANovelViewModel
-	: ShosetsuViewModel() {
+abstract class ANovelViewModel : ShosetsuViewModel() {
 
 	/**
 	 * A flow that throws the UI a chapter to open
@@ -136,10 +134,7 @@ abstract class ANovelViewModel
 	 */
 	abstract val novelURL: StateFlow<String?>
 
-	data class NovelShareInfo(
-		val novelTitle: String,
-		val novelURL: String
-	)
+	data class NovelShareInfo(val novelTitle: String, val novelURL: String)
 
 	abstract val shareInfo: StateFlow<NovelShareInfo?>
 
@@ -263,6 +258,6 @@ abstract class ANovelViewModel
 		val showDelete: Boolean = false,
 		val showDownload: Boolean = false,
 		val showMarkAsRead: Boolean = false,
-		val showMarkAsUnread: Boolean = false
+		val showMarkAsUnread: Boolean = false,
 	)
 }

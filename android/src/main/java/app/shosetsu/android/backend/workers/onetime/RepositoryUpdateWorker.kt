@@ -45,13 +45,13 @@ import app.shosetsu.lib.exceptions.HTTPException
 import app.shosetsu.lib.json.RepoExtension
 import app.shosetsu.lib.json.RepoIndex
 import app.shosetsu.lib.json.RepoLibrary
+import java.io.IOException
 import kotlinx.coroutines.delay
 import org.acra.ACRA
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -92,10 +92,10 @@ import java.io.IOException
  * 3. Update each db-repo-extension that is installed to version -9.-9.-9
  * 2. Remove each db-repo-extension that is not installed.
  */
-class RepositoryUpdateWorker(
-	appContext: Context,
-	params: WorkerParameters,
-) : CoroutineWorker(appContext, params), DIAware, NotificationCapable {
+class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params),
+	DIAware,
+	NotificationCapable {
 
 	private val extRepo: IExtensionsRepository by instance()
 	private val removeExtension: RemoveExtensionEntityUseCase by instance()
@@ -160,7 +160,7 @@ class RepositoryUpdateWorker(
 				extLibToInstall = ExtLibEntity(
 					scriptName = repoExtLib.name,
 					version = repoExtLib.version,
-					repoID = repository.id
+					repoID = repository.id,
 				)
 			}
 
@@ -174,7 +174,10 @@ class RepositoryUpdateWorker(
 				try {
 					extensionLibrariesRepo.installExtLibrary(repository.url, extLibToInstall)
 				} catch (e: Exception) {
-					logE("Failed to install extension library ${extLibToInstall.scriptName} from ${repository.name}", e)
+					logE(
+						"Failed to install extension library ${extLibToInstall.scriptName} from ${repository.name}",
+						e,
+					)
 					ACRA.errorReporter.handleSilentException(e)
 				}
 			}
@@ -205,7 +208,7 @@ class RepositoryUpdateWorker(
 		for (dbExtLib in dbExtLibs) {
 			/*
 			Check if the extension library has not already been deprioritized
-			*/
+			 */
 			if (dbExtLib.version != Version(0, 0, 0)) {
 				// Deprioritize this extension
 				extensionLibrariesRepo.update(dbExtLib.copy(version = Version(0, 0, 0)))
@@ -221,7 +224,7 @@ class RepositoryUpdateWorker(
 	 * @param extensionsToRemove Extensions to remove.
 	 */
 	private suspend inline fun handleExtensionRemoval(
-		extensionsToRemove: List<GenericExtensionEntity>
+		extensionsToRemove: List<GenericExtensionEntity>,
 	) {
 		// Loop over the extensions to remove
 		for (extension in extensionsToRemove) {
@@ -230,8 +233,8 @@ class RepositoryUpdateWorker(
 				// By setting the repo version of the ext, the extension gets marked for removal
 				extRepo.updateRepositoryExtension(
 					extension.copy(
-						version = Version(-9, -9, -9)
-					)
+						version = Version(-9, -9, -9),
+					),
 				)
 			} else {
 				// Outright goodbye
@@ -250,7 +253,7 @@ class RepositoryUpdateWorker(
 	private suspend fun handleRepoExtension(
 		repo: RepositoryEntity,
 		repoExt: RepoExtension,
-		dbExtensions: List<GenericExtensionEntity>
+		dbExtensions: List<GenericExtensionEntity>,
 	) {
 		// Get the extension matching this repo
 		@Suppress("Destructure")
@@ -270,7 +273,7 @@ class RepositoryUpdateWorker(
 				lang = repoExt.lang,
 				version = repoExt.version,
 				md5 = repoExt.md5,
-				type = repoExt.type
+				type = repoExt.type,
 			)
 			logI("Inserting new extension, ${newEntity.name} #${newEntity.id}")
 			extRepo.insert(newEntity)
@@ -284,8 +287,8 @@ class RepositoryUpdateWorker(
 					lang = repoExt.lang,
 					version = repoExt.version,
 					md5 = repoExt.md5,
-					type = repoExt.type
-				)
+					type = repoExt.type,
+				),
 			)
 		}
 	}
@@ -299,7 +302,7 @@ class RepositoryUpdateWorker(
 	 */
 	private suspend fun updateExtensions(
 		repoExtList: List<RepoExtension>,
-		repo: RepositoryEntity
+		repo: RepositoryEntity,
 	): List<Int> {
 		// Get the extensions in the database
 		val dbExtensions = extRepo.getRepositoryExtensions(repo.id)
@@ -348,7 +351,7 @@ class RepositoryUpdateWorker(
 			e.printStackTrace()
 			notify(
 				"${e.message}",
-				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id
+				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id,
 			) {
 				removeProgress()
 				setContentTitle("${repo.name} failed to load")
@@ -356,14 +359,14 @@ class RepositoryUpdateWorker(
 				addReportErrorAction(
 					applicationContext,
 					ID_REPOSITORY_UPDATE + 1 + repo.id,
-					e
+					e,
 				)
 			}
 			return
 		} catch (e: IOException) {
 			notify(
 				"${e.message}",
-				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id
+				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id,
 			) {
 				removeProgress()
 				setContentTitle("${repo.name} failed to load")
@@ -373,7 +376,7 @@ class RepositoryUpdateWorker(
 		} catch (e: HTTPException) {
 			notify(
 				"${e.code}",
-				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id
+				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id,
 			) {
 				removeProgress()
 				setContentTitle("${repo.name} failed to load")
@@ -383,7 +386,7 @@ class RepositoryUpdateWorker(
 		} catch (e: Exception) {
 			notify(
 				"${e.message}",
-				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id
+				notificationId = ID_REPOSITORY_UPDATE + 1 + repo.id,
 			) {
 				removeProgress()
 				setContentTitle("${repo.name} failed to load")
@@ -391,12 +394,12 @@ class RepositoryUpdateWorker(
 				addReportErrorAction(
 					applicationContext,
 					ID_REPOSITORY_UPDATE + 1 + repo.id,
-					e
+					e,
 				)
 			}
 			logE(
 				"${repo.name} failed to load : ${e.message}",
-				e
+				e,
 			)
 			if (disableOnFail()) {
 				logI("Disabling repository: $repo")
@@ -483,14 +486,12 @@ class RepositoryUpdateWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(REPOSITORY_UPDATE_TAG).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		fun start(data: Data = Data.EMPTY, force: Boolean) {
 			launchIO {
@@ -505,19 +506,21 @@ class RepositoryUpdateWorker(
 									setRequiredNetworkType(
 										if (updateOnMetered()) {
 											NetworkType.CONNECTED
-										} else NetworkType.UNMETERED
+										} else {
+											NetworkType.UNMETERED
+										},
 									)
 									setRequiresStorageNotLow(!updateOnLowStorage())
 									setRequiresBatteryNotLow(!updateOnLowBattery())
 								}
-							}.build()
-						).build()
+							}.build(),
+						).build(),
 				)
 				logI(
 					"Worker State ${
 						workerManager.getWorkInfosForUniqueWork(REPOSITORY_UPDATE_TAG)
 							.await()[0].state
-					}"
+					}",
 				)
 			}
 		}
@@ -533,8 +536,6 @@ class RepositoryUpdateWorker(
 		/**
 		 * Stops the service.
 		 */
-		override fun stop(): Operation =
-			workerManager.cancelUniqueWork(REPOSITORY_UPDATE_TAG)
+		override fun stop(): Operation = workerManager.cancelUniqueWork(REPOSITORY_UPDATE_TAG)
 	}
-
 }

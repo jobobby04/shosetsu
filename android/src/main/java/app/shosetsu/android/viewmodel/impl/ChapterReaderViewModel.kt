@@ -77,6 +77,9 @@ import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
+import java.util.Locale
+import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CancellationException
@@ -114,9 +117,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.acra.ACRA
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import java.util.Locale
-import java.util.UUID
-import kotlin.time.Duration.Companion.seconds
 
 /*
  * This file is part of shosetsu.
@@ -223,10 +223,9 @@ class ChapterReaderViewModel(
 					.stateIn(
 						viewModelScopeIO,
 						SharingStarted.Lazily,
-						(it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value
+						(it.value || !enableFullscreen.value) && !matchFullscreenToFocus.value,
 					)
 			}
-
 	}
 
 	/**
@@ -274,7 +273,7 @@ class ChapterReaderViewModel(
 	}
 
 	override fun onFirstFocus() {
-		//logV("")
+		// logV("")
 		launchIO {
 			settingsRepo.setBoolean(ReaderIsFirstFocus, false)
 		}
@@ -337,7 +336,7 @@ class ChapterReaderViewModel(
 		if (settingsRepo.getBoolean(SettingKey.ReaderDeDupChapterTitle)) {
 			logD("Trying to remove duplicate titles...")
 			try {
-				val titles = document.select("h1");
+				val titles = document.select("h1")
 				if (titles.size > 1) {
 					// Remove duplicate titles, in reverse
 					for (title in titles.subList(1, titles.size).reversed()) {
@@ -350,9 +349,9 @@ class ChapterReaderViewModel(
 					ExceptionSnackbarModel(
 						application.getString(
 							R.string.reader_error_dedup_titles,
-							e.message ?: "unknown"
-						)
-					)
+							e.message ?: "unknown",
+						),
+					),
 				)
 			}
 		}
@@ -364,8 +363,8 @@ class ChapterReaderViewModel(
 				.transformCatching(exceptional = {
 					emit(
 						ChapterPassage.Error(
-							it
-						)
+							it,
+						),
 					)
 				}) {
 					emit(ChapterPassage.Loading)
@@ -400,15 +399,17 @@ class ChapterReaderViewModel(
 						extractor.result.listIterator()
 					}
 
-					emitAll(cssStyle.map { cssStyle ->
-						cssStyle.insert(document)
-						@Suppress("UNCHECKED_CAST")
-						ChapterPassage.Success(
-							document.toString(),
-							// this is fine
-							ttsIterator as RewindableMutableListIterator<TTSText>
-						)
-					})
+					emitAll(
+						cssStyle.map { cssStyle ->
+							cssStyle.insert(document)
+							@Suppress("UNCHECKED_CAST")
+							ChapterPassage.Success(
+								document.toString(),
+								// this is fine
+								ttsIterator as RewindableMutableListIterator<TTSText>,
+							)
+						},
+					)
 				}
 				.onIO()
 				.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1)
@@ -427,11 +428,10 @@ class ChapterReaderViewModel(
 		}
 	}
 
-	private fun createGenericExceptionModel(e: Throwable) =
-		ExceptionSnackbarModel(
-			e.message ?: application.getString(R.string.reader_error_unknown),
-			e
-		)
+	private fun createGenericExceptionModel(e: Throwable) = ExceptionSnackbarModel(
+		e.message ?: application.getString(R.string.reader_error_unknown),
+		e,
+	)
 
 	override val cssStyle: SharedFlow<ShosetsuStyle> by lazy {
 		css.shosetsuCss.combine(userCssFlow) { shoCSS, useCSS ->
@@ -469,10 +469,11 @@ class ChapterReaderViewModel(
 
 	override fun getChapterProgress(chapter: ReaderChapterUI): Flow<Double> =
 		progressMapFlow.transformLatest { progressMap ->
-			if (progressMap.containsKey(chapter.id))
+			if (progressMap.containsKey(chapter.id)) {
 				emit(progressMap[chapter.id]!!)
-			else
+			} else {
 				emitAll(chapterRepository.getChapterProgress(chapter.convertTo()))
+			}
 		}.onIO()
 
 	override val liveData: StateFlow<ImmutableList<ReaderUIItem>?> by lazy {
@@ -497,13 +498,15 @@ class ChapterReaderViewModel(
 				 * Loops down the list, adding in the seperators
 				 */
 				val startPoint = modified.size - 2
-				for (index in startPoint downTo 1)
+				for (index in startPoint downTo 1) {
 					modified.add(
-						index, ReaderDividerUI(
+						index,
+						ReaderDividerUI(
 							(modified[index - 1] as ReaderChapterUI),
-							(modified[index] as ReaderChapterUI)
-						)
+							(modified[index] as ReaderChapterUI),
+						),
 					)
+				}
 
 				modified
 			} else {
@@ -512,7 +515,7 @@ class ChapterReaderViewModel(
 		}
 
 	override fun setCurrentPage(page: Int) {
-		//logV("$page")
+		// logV("$page")
 		currentPage.value = page
 	}
 
@@ -547,15 +550,15 @@ class ChapterReaderViewModel(
 		logV("novelID=$novelID")
 		when {
 			novelIDLive.value == -1 -> {
-				//logD("Setting NovelID")
+				// logD("Setting NovelID")
 			}
 
 			novelIDLive.value != novelID -> {
-				//logD("NovelID not equal, resetting")
+				// logD("NovelID not equal, resetting")
 			}
 
 			novelIDLive.value == novelID -> {
-				//logD("NovelID equal, ignoring")
+				// logD("NovelID equal, ignoring")
 				return
 			}
 		}
@@ -573,23 +576,23 @@ class ChapterReaderViewModel(
 
 			chapterRepository.updateChapter(
 				chapter.copy(
-					bookmarked = !chapter.bookmarked
-				)
+					bookmarked = !chapter.bookmarked,
+				),
 			)
 		}
 	}
 
 	override fun updateChapterAsRead(chapter: ReaderChapterUI) {
 		launchIO {
-			_recordChapterAsRead(chapter)
+			recordChapterAsReadCatching(chapter)
 
 			try {
 				chapterRepository.getChapter(chapter.id)?.let {
 					chapterRepository.updateChapter(
 						it.copy(
 							readingStatus = READ,
-							readingPosition = 0.0
-						)
+							readingPosition = 0.0,
+						),
 					)
 				}
 			} catch (e: SQLiteException) {
@@ -601,7 +604,7 @@ class ChapterReaderViewModel(
 
 			NotificationManagerCompat.from(application).cancel(
 				"update/${novelIDLive.value}/${chapter.id}",
-				10000 + novelIDLive.value
+				10000 + novelIDLive.value,
 			)
 		}
 	}
@@ -615,39 +618,47 @@ class ChapterReaderViewModel(
 	/**
 	 * Wrapper of [recordChapterIsReading] for exceptions.
 	 */
-	private suspend fun _recordChapterIsReading(chapter: ReaderChapterUI) {
+	private suspend fun recordChapterIsReadingCatching(chapter: ReaderChapterUI) {
 		try {
 			recordChapterIsReading(chapter)
 		} catch (e: CancellationException) {
 			logE("Job to record chapter as being read was cancelled...", e)
 			// We do not want to report the error in this case, its a common on.
-			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_reading_cancelled)))
+			exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_reading_cancelled)),
+			)
 		} catch (e: Exception) {
 			logE("Failed to record chapter as being read.", e)
 			ACRA.errorReporter.handleSilentException(e)
-			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_reading)))
+			exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_reading)),
+			)
 		}
 	}
 
 	/**
 	 * Wrapper of [recordChapterAsRead] for exceptions.
 	 */
-	private suspend fun _recordChapterAsRead(chapter: ReaderChapterUI) {
+	private suspend fun recordChapterAsReadCatching(chapter: ReaderChapterUI) {
 		try {
 			recordChapterAsRead(chapter)
 		} catch (e: CancellationException) {
 			logE("Job to record chapter as read was cancelled...", e)
 			// We do not want to report the error in this case, its a common on.
-			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_read_cancelled)))
+			exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_read_cancelled)),
+			)
 		} catch (e: Exception) {
 			logE("Failed to record chapter as read.", e)
 			ACRA.errorReporter.handleSilentException(e)
-			exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_read)))
+			exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_chapter_read)),
+			)
 		}
 	}
 
 	override fun onViewed(chapter: ReaderChapterUI) {
-		//logV("$chapter")
+		// logV("$chapter")
 		launchIO {
 			settingsRepo.getBoolean(ReaderMarkReadAsReading).let { markReadAsReading ->
 				val chapterEntity = chapterRepository.getChapter(chapter.id) ?: return@launchIO
@@ -662,10 +673,10 @@ class ChapterReaderViewModel(
 				 */
 				if (readingMarkingTypeFlow.first() != ONVIEW) return@launchIO
 
-				_recordChapterIsReading(chapter)
+				recordChapterIsReadingCatching(chapter)
 
 				chapterRepository.updateChapter(
-					chapterEntity.copy(readingStatus = READING)
+					chapterEntity.copy(readingStatus = READING),
 				)
 			}
 		}
@@ -678,7 +689,7 @@ class ChapterReaderViewModel(
 			// If the chapter reaches 90% read, we can assume the reader already sees it all :P
 			if (readingPosition <= 0.90) {
 				settingsRepo.getBoolean(ReaderMarkReadAsReading).let { markReadAsReading ->
-					/**
+					/*
 					 * If marking chapters that are read as reading is disabled
 					 * and the chapter's readingStatus is read, save progress temporarily.
 					 */
@@ -690,11 +701,11 @@ class ChapterReaderViewModel(
 					}
 
 					/*
-							 * If marking type is on scroll, record as reading
-							 */
+					 * If marking type is on scroll, record as reading
+					 */
 					val markingType = readingMarkingTypeFlow.first()
 					if (markingType == ONSCROLL) {
-						_recordChapterIsReading(chapter)
+						recordChapterIsReadingCatching(chapter)
 					}
 
 					// Remove temp progress
@@ -706,15 +717,17 @@ class ChapterReaderViewModel(
 						chapterEntity.copy(
 							readingStatus = if (markingType == ONSCROLL) {
 								READING
-							} else chapterEntity.readingStatus,
-							readingPosition = readingPosition
-						)
+							} else {
+								chapterEntity.readingStatus
+							},
+							readingPosition = readingPosition,
+						),
 					)
 				}
 			} else {
 				// User probably sees everything at this point
 
-				_recordChapterAsRead(chapter)
+				recordChapterAsReadCatching(chapter)
 
 				// Temp remember the progress
 				progressMapFlow.value = progressMapFlow.value.copy().apply {
@@ -724,8 +737,8 @@ class ChapterReaderViewModel(
 				chapterRepository.updateChapter(
 					chapterEntity.copy(
 						readingStatus = READ,
-						readingPosition = 0.0
-					)
+						readingPosition = 0.0,
+					),
 				)
 			}
 		}
@@ -763,7 +776,6 @@ class ChapterReaderViewModel(
 			isSystemVisible || !enableFullscreen
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, true)
 	}
-
 
 	override fun toggleFocus() {
 		isFocused.value = !isFocused.value
@@ -813,8 +825,9 @@ class ChapterReaderViewModel(
 			logD("Changing focus")
 			val newValue = !isFocused.value
 			isFocused.value = newValue
-			if (newValue || matchFullscreenToFocus.value)
+			if (newValue || matchFullscreenToFocus.value) {
 				_isSystemVisible.value = !newValue
+			}
 		}
 	}
 
@@ -822,8 +835,9 @@ class ChapterReaderViewModel(
 		if (doubleTapFocus.value) {
 			val newValue = !isFocused.value
 			isFocused.value = newValue
-			if (newValue || matchFullscreenToFocus.value)
+			if (newValue || matchFullscreenToFocus.value) {
 				_isSystemVisible.value = !newValue
+			}
 		} else if (doubleTapSystemFlow.value) {
 			toggleSystemVisible()
 		}
@@ -840,20 +854,20 @@ class ChapterReaderViewModel(
 	}
 
 	override fun setCurrentChapterID(chapterId: Int, initial: Boolean) {
-		//logV("$chapterId, $initial")
+		// logV("$chapterId, $initial")
 		currentChapterID.value = chapterId
 
-		if (initial)
+		if (initial) {
 			launchIO {
 				val items = liveData.first { it != null }!!
 				currentPage.value = items
 					.indexOfFirst { it is ReaderChapterUI && it.id == chapterId }
 			}
+		}
 	}
 
 	override fun incrementProgress() {
 		launchIO {
-
 			val chapterId = currentChapterID.first()
 
 			val chapter = chaptersFlow.first().find { it.id == chapterId } ?: return@launchIO
@@ -862,8 +876,9 @@ class ChapterReaderViewModel(
 			/*
 			 * Increment 5% at a time, let us hope this does not back fire
 			 */
-			if ((chapterEntity.readingPosition + INCREMENT_PERCENTAGE) < 1)
+			if ((chapterEntity.readingPosition + INCREMENT_PERCENTAGE) < 1) {
 				onScroll(chapter, chapterEntity.readingPosition + INCREMENT_PERCENTAGE)
+			}
 		}
 	}
 
@@ -877,8 +892,9 @@ class ChapterReaderViewModel(
 			/*
 			 * Increment 5% at a time, let us hope this does not back fire
 			 */
-			if ((chapterEntity.readingPosition - INCREMENT_PERCENTAGE) > 0)
+			if ((chapterEntity.readingPosition - INCREMENT_PERCENTAGE) > 0) {
 				onScroll(chapter, chapterEntity.readingPosition - INCREMENT_PERCENTAGE)
+			}
 		}
 	}
 
@@ -931,7 +947,6 @@ class ChapterReaderViewModel(
 		logI("Deleting previous chapters")
 		loadDeletePreviousChapterUseCase().let { chaptersBackToDelete ->
 			if (chaptersBackToDelete != -1) {
-
 				val chapters = chaptersFlow.first()
 
 				val indexOfLast = chapters.indexOfFirst { it.id == readChapter.id }
@@ -961,7 +976,7 @@ class ChapterReaderViewModel(
 								null
 							}
 						}
-						.filter { it.isSaved } // only delete downloaded chapters
+						.filter { it.isSaved }, // only delete downloaded chapters
 				)
 			}
 		}
@@ -972,11 +987,7 @@ class ChapterReaderViewModel(
 	val ttsDone = MutableStateFlow<String?>(null)
 	override val ttsPlayback = MutableStateFlow<TTSPlayback>(TTSPlayback.Stopped)
 
-	data class TTSBuilder(
-		val engine: String,
-		val language: String,
-		val voice: String,
-	)
+	data class TTSBuilder(val engine: String, val language: String, val voice: String)
 
 	/**
 	 * Provides a TTS to use
@@ -999,6 +1010,7 @@ class ChapterReaderViewModel(
 		// Wait for the TTS to initialize
 		when (val result = ttsResult.await()) {
 			TextToSpeech.SUCCESS -> tts to builder
+
 			else -> {
 				handleTTSError(result, R.string.reader_test_invalid_engine)
 				null
@@ -1042,7 +1054,9 @@ class ChapterReaderViewModel(
 
 			// Do not continue if a language has not been set successfully
 			if (!languageSuccess) {
-				exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_test_invalid_language)))
+				exceptions.emit(
+					ExceptionSnackbarModel(application.getString(R.string.reader_test_invalid_language)),
+				)
 				return@filter false
 			}
 
@@ -1059,6 +1073,7 @@ class ChapterReaderViewModel(
 					val result = tts.setVoice(ttsVoice)
 					voiceSuccess = when (result) {
 						TextToSpeech.SUCCESS -> true
+
 						else -> {
 							handleTTSError(result)
 							false
@@ -1074,7 +1089,9 @@ class ChapterReaderViewModel(
 
 			// do not proceed if voice was not successful
 			if (!voiceSuccess) {
-				exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_test_invalid_voice)))
+				exceptions.emit(
+					ExceptionSnackbarModel(application.getString(R.string.reader_test_invalid_voice)),
+				)
 				return@filter false
 			}
 			true
@@ -1082,7 +1099,7 @@ class ChapterReaderViewModel(
 		.combine(
 			ttsPitch
 				.combine(ttsSpeed) { a, b -> a to b }
-				.distinctUntilChanged()
+				.distinctUntilChanged(),
 		) { (tts, _), (pitch, speed) ->
 			tts.apply {
 				setPitch(pitch / 10).let(::launchHandleTTSError)
@@ -1115,7 +1132,7 @@ class ChapterReaderViewModel(
 						this@ChapterReaderViewModel.logE("TTS Error code: $errorCode")
 						ttsPlayback.value = TTSPlayback.Paused
 					}
-				}
+				},
 			).let(::launchHandleTTSError)
 		}
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
@@ -1170,7 +1187,7 @@ class ChapterReaderViewModel(
 
 						// We must never reach here
 						exceptions.emit(
-							ExceptionSnackbarModel("Failed to setup next chapter TTS process after 10 tries.")
+							ExceptionSnackbarModel("Failed to setup next chapter TTS process after 10 tries."),
 						)
 					}
 
@@ -1213,7 +1230,11 @@ class ChapterReaderViewModel(
 
 	private val alertNextChapter = settingsRepo.getBooleanFlow(SettingKey.ReaderNextChapterAlert)
 
-	private suspend fun onLatestTTSNextChapterSetting(ttsNextChapter: Boolean, lastTts: TTSText, chapterId: Int) {
+	private suspend fun onLatestTTSNextChapterSetting(
+		ttsNextChapter: Boolean,
+		lastTts: TTSText,
+		chapterId: Int,
+	) {
 		logV("Arguments: ttsNextChapter='$ttsNextChapter'")
 		// skip if disabled
 		if (!ttsNextChapter) {
@@ -1277,7 +1298,7 @@ class ChapterReaderViewModel(
 					application.getString(R.string.reader_tts_next_chapter),
 					TextToSpeech.QUEUE_FLUSH,
 					null,
-					id.toString()
+					id.toString(),
 				)
 
 				// await our voice to finish
@@ -1320,7 +1341,7 @@ class ChapterReaderViewModel(
 		tts: TextToSpeech?,
 		oldTts: TextToSpeech?,
 		setOldTts: (TextToSpeech?) -> Unit,
-		passage: ChapterPassage.Success
+		passage: ChapterPassage.Success,
 	) {
 		logV("Arguments: tts='$tts'")
 		if (tts == null) {
@@ -1346,7 +1367,7 @@ class ChapterReaderViewModel(
 	private suspend fun onLatestTTSPlayback(
 		playback: TTSPlayback,
 		tts: TextToSpeech,
-		passage: ChapterPassage.Success
+		passage: ChapterPassage.Success,
 	) {
 		logV("Arguments: playback='$playback'")
 
@@ -1366,13 +1387,14 @@ class ChapterReaderViewModel(
 			// For each element, lets speak it out
 			passage.ttsElements.forEachRemaining {
 				logV("Processing element: it='$it'")
-				if (!it.ignore)
+				if (!it.ignore) {
 					customSpeak(
 						tts,
 						it.text,
 						it.id,
-						::launchHandleTTSError
+						::launchHandleTTSError,
 					)
+				}
 			}
 		}
 	}
@@ -1442,7 +1464,7 @@ class ChapterReaderViewModel(
 	 */
 	private fun launchHandleTTSError(
 		result: Int,
-		@StringRes genericMessage: Int = R.string.reader_error_tts_generic
+		@StringRes genericMessage: Int = R.string.reader_error_tts_generic,
 	) {
 		launchUI {
 			handleTTSError(result, genericMessage)
@@ -1457,17 +1479,40 @@ class ChapterReaderViewModel(
 	 */
 	private suspend fun handleTTSError(
 		result: Int,
-		@StringRes genericMessage: Int = R.string.reader_error_tts_generic
+		@StringRes genericMessage: Int = R.string.reader_error_tts_generic,
 	) {
 		when (result) {
-			TextToSpeech.ERROR_SYNTHESIS -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_synthesis)))
-			TextToSpeech.ERROR_SERVICE -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_service)))
-			TextToSpeech.ERROR_OUTPUT -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_output)))
-			TextToSpeech.ERROR_NOT_INSTALLED_YET -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_not_installed)))
-			TextToSpeech.ERROR_NETWORK_TIMEOUT -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_network_timeout)))
-			TextToSpeech.ERROR_NETWORK -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_network)))
-			TextToSpeech.ERROR_INVALID_REQUEST -> exceptions.emit(ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_invalid_request)))
-			TextToSpeech.ERROR -> exceptions.emit(ExceptionSnackbarModel(application.getString(genericMessage)))
+			TextToSpeech.ERROR_SYNTHESIS -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_synthesis)),
+			)
+
+			TextToSpeech.ERROR_SERVICE -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_service)),
+			)
+
+			TextToSpeech.ERROR_OUTPUT -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_output)),
+			)
+
+			TextToSpeech.ERROR_NOT_INSTALLED_YET -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_not_installed)),
+			)
+
+			TextToSpeech.ERROR_NETWORK_TIMEOUT -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_network_timeout)),
+			)
+
+			TextToSpeech.ERROR_NETWORK -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_network)),
+			)
+
+			TextToSpeech.ERROR_INVALID_REQUEST -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(R.string.reader_error_tts_invalid_request)),
+			)
+
+			TextToSpeech.ERROR -> exceptions.emit(
+				ExceptionSnackbarModel(application.getString(genericMessage)),
+			)
 		}
 	}
 

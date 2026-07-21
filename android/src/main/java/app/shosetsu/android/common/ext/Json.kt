@@ -1,11 +1,11 @@
 package app.shosetsu.android.common.ext
 
 import android.os.Build
+import java.io.InputStream
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.serializer
-import java.io.InputStream
 
 /*
  * This file is part of shosetsu.
@@ -24,7 +24,7 @@ import java.io.InputStream
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Shosetsu
  *
  * @since 11 / 08 / 2023
@@ -37,10 +37,9 @@ import java.io.InputStream
  * @see <a href="https://github.com/Kotlin/kotlinx.serialization/issues/2231">Issue 2231</a>
  */
 @ExperimentalSerializationApi
-public inline fun <reified T> Json.decodeSafeFromStream(stream: InputStream): T {
-	return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+inline fun <reified T> Json.decodeSafeFromStream(stream: InputStream): T =
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 		decodeFromStream(serializersModule.serializer(), stream)
 	} else {
 		decodeFromString(stream.bufferedReader().readText())
 	}
-}

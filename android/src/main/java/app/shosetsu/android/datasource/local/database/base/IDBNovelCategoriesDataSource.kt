@@ -21,9 +21,6 @@ import kotlinx.coroutines.flow.Flow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
 /**
  * shosetsu
  * 08 / 08 / 2022

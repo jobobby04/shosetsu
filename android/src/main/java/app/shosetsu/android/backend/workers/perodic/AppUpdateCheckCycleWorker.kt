@@ -23,8 +23,8 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
-import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
+import org.kodein.di.instance
 
 /*
  * This file is part of shosetsu.
@@ -47,10 +47,8 @@ import java.util.concurrent.TimeUnit
  * shosetsu
  * 06 / 09 / 2020
  */
-class AppUpdateCheckCycleWorker(
-	appContext: Context,
-	params: WorkerParameters
-) : CoroutineWorker(appContext, params) {
+class AppUpdateCheckCycleWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(appContext, params) {
 
 	override suspend fun doWork(): Result {
 		logI(LogConstants.SERVICE_EXECUTE)
@@ -91,15 +89,13 @@ class AppUpdateCheckCycleWorker(
 		return Result.success()
 	}
 
-
 	/**
 	 * Manager of [AppUpdateCheckCycleWorker]
 	 */
 	class Manager(context: Context) : CoroutineWorkerManager(context) {
 		private val iSettingsRepository: ISettingsRepository by instance()
 
-		private suspend fun appUpdateCycle(): Long =
-			iSettingsRepository.getInt(AppUpdateCycle).toLong()
+		private suspend fun appUpdateCycle(): Long = iSettingsRepository.getInt(AppUpdateCycle).toLong()
 
 		private suspend fun appUpdateOnMetered(): Boolean =
 			iSettingsRepository.getBoolean(AppUpdateOnMeteredConnection)
@@ -118,14 +114,12 @@ class AppUpdateCheckCycleWorker(
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(APP_UPDATE_CYCLE_WORK_ID).await()
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Starts the service. It will be started only if there isn't another instance already
@@ -139,21 +133,22 @@ class AppUpdateCheckCycleWorker(
 					ExistingPeriodicWorkPolicy.UPDATE,
 					PeriodicWorkRequestBuilder<AppUpdateCheckCycleWorker>(
 						appUpdateCycle(),
-						TimeUnit.HOURS
+						TimeUnit.HOURS,
 					).setConstraints(
 						Constraints.Builder().apply {
 							setRequiredNetworkType(
-								if (appUpdateOnMetered()) CONNECTED else UNMETERED
+								if (appUpdateOnMetered()) CONNECTED else UNMETERED,
 							)
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 								setRequiresDeviceIdle(appUpdateOnlyIdle())
-						}.build()
-					).build()
+							}
+						}.build(),
+					).build(),
 				)
 				logI(
 					"AppUpdateCheckCycleWorker State ${
 						workerManager.getWorkInfosForUniqueWork(APP_UPDATE_CYCLE_WORK_ID).await()[0].state
-					}"
+					}",
 				)
 			}
 		}

@@ -27,20 +27,18 @@ import kotlinx.coroutines.*
  */
 
 @OptIn(DelicateCoroutinesApi::class)
-fun ViewModel.launchUI(block: suspend CoroutineScope.() -> Unit): Job =
-	viewModelScope.launch(
-		Dispatchers.Main,
-		CoroutineStart.DEFAULT,
-		block
-	)
+fun ViewModel.launchUI(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(
+	Dispatchers.Main,
+	CoroutineStart.DEFAULT,
+	block,
+)
 
 @OptIn(DelicateCoroutinesApi::class)
-fun ViewModel.launchIO(block: suspend CoroutineScope.() -> Unit): Job =
-	viewModelScope.launch(
-		Dispatchers.IO,
-		CoroutineStart.DEFAULT,
-		block
-	)
+fun ViewModel.launchIO(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(
+	Dispatchers.IO,
+	CoroutineStart.DEFAULT,
+	block,
+)
 
 /*
 @ExperimentalCoroutinesApi

@@ -51,7 +51,6 @@ abstract class AIntroViewModel : ShosetsuRootViewModel() {
 	 */
 	abstract fun setACRAEnabled(boolean: Boolean)
 
-
 	/**
 	 * If the user finished the entire introduction or not
 	 */

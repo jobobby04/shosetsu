@@ -40,8 +40,11 @@ import org.kodein.di.singleton
  */
 val memoryDataSourceModule: DI.Module = DI.Module("cache_data_source") {
 	bind<ICache.Factory>() with singleton {
-		if (SDK_INT <= M) ConCacheFactory()
-		else GuavaCacheFactory()
+		if (SDK_INT <= M) {
+			ConCacheFactory()
+		} else {
+			GuavaCacheFactory()
+		}
 	}
 
 	bind<IMemChaptersDataSource>() with singleton { MemChaptersDataSource(instance()) }

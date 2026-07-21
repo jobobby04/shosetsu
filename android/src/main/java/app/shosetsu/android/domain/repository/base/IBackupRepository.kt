@@ -29,11 +29,10 @@ interface IBackupRepository {
 		IN_PROGRESS,
 		NOT_STARTED,
 		COMPLETE,
-		FAILURE
+		FAILURE,
 	}
 
 	val backupProgress: StateFlow<BackupProgress>
-
 
 	/**
 	 * Update the progress of backup

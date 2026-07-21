@@ -10,14 +10,6 @@ import app.shosetsu.android.domain.model.local.backup.BackupNovelEntity
 import app.shosetsu.android.domain.model.local.backup.BackupRepositoryEntity
 import app.shosetsu.android.domain.model.local.backup.FleshedBackupEntity
 import app.shosetsu.android.domain.repository.base.IBackupRepository
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.future.future
-import org.junit.Test
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.android.closestDI
-import org.kodein.di.instance
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.zip.GZIPInputStream
@@ -27,6 +19,14 @@ import kotlin.system.measureTimeMillis
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.future.future
+import org.junit.Test
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 /*
  * This file is part of Shosetsu.
@@ -71,8 +71,10 @@ class BackupTest : DIAware {
 		for (i in 0 until randomInt) {
 			add(
 				BackupRepositoryEntity(
-					i, randomString, randomString
-				)
+					i,
+					randomString,
+					randomString,
+				),
 			)
 		}
 	}
@@ -81,13 +83,14 @@ class BackupTest : DIAware {
 		for (i in 0 until randomInt) {
 			add(
 				BackupChapterEntity(
-					randomString, randomString,
+					randomString,
+					randomString,
 					Random.nextBoolean(),
 					ReadingStatus.fromInt(Random.nextInt() % 3 + 1),
 					randomInt.toDouble(),
 					releaseDate = null,
-					order = i.toDouble()
-				)
+					order = i.toDouble(),
+				),
 			)
 		}
 	}
@@ -95,7 +98,7 @@ class BackupTest : DIAware {
 	private fun randomNovels() = ArrayList<BackupNovelEntity>().apply {
 		for (i in 0 until randomInt) {
 			add(
-				/* element = */ BackupNovelEntity(
+				BackupNovelEntity(
 					randomString,
 					true,
 					true,
@@ -103,8 +106,8 @@ class BackupTest : DIAware {
 					randomString,
 					randomString,
 					"en",
-					chapters = randomChapters()
-				)
+					chapters = randomChapters(),
+				),
 			)
 		}
 	}
@@ -115,8 +118,8 @@ class BackupTest : DIAware {
 				BackupExtensionEntity(
 					randomInt,
 					1,
-					randomNovels()
-				)
+					randomNovels(),
+				),
 			)
 		}
 	}
@@ -124,10 +127,9 @@ class BackupTest : DIAware {
 	private val backup by lazy {
 		FleshedBackupEntity(
 			repos = randomRepositories(),
-			extensions = randomExtensions()
+			extensions = randomExtensions(),
 		)
 	}
-
 
 	@Throws(IOException::class)
 	fun gzip(content: String): ByteArray {
@@ -156,7 +158,7 @@ class BackupTest : DIAware {
 							it.extensions.foldRight(0) { entity, ac ->
 								ac + entity.novels.size
 							}
-						}"
+						}",
 					)
 					println(
 						"Chapters count ${
@@ -165,7 +167,7 @@ class BackupTest : DIAware {
 									cc + novel.chapters.size
 								}
 							}
-						}"
+						}",
 					)
 				}.let {
 					println("Printed count in ${it}ms")
@@ -196,6 +198,4 @@ class BackupTest : DIAware {
 			}
 		}.join()
 	}
-
-
 }

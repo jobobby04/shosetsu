@@ -33,6 +33,7 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.lib.Filter
 import app.shosetsu.lib.IExtension
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -52,7 +53,6 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.sync.Mutex
-import java.util.concurrent.ConcurrentHashMap
 
 /*
  * This file is part of shosetsu.
@@ -90,7 +90,7 @@ class CatalogViewModel(
 	private val getExtListNames: GetExtListingNamesUseCase,
 	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
 	private val updateExtSelectedListing: UpdateExtSelectedListing,
-	private val settingsRepository: ISettingsRepository
+	private val settingsRepository: ISettingsRepository,
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> by lazy { MutableStateFlow("") }
 
@@ -127,12 +127,19 @@ class CatalogViewModel(
 		forEach { filter ->
 			when (filter) {
 				is Filter.Password -> getFilterStringState(filter)
+
 				is Filter.Text -> getFilterStringState(filter)
+
 				is Filter.Switch -> getFilterBooleanState(filter)
+
 				is Filter.Checkbox -> getFilterBooleanState(filter)
+
 				is Filter.TriState -> getFilterIntState(filter)
+
 				is Filter.Dropdown -> getFilterIntState(filter)
+
 				is Filter.RadioGroup -> getFilterIntState(filter)
+
 				is Filter.FList -> {
 					filter.filters.init()
 				}
@@ -159,24 +166,26 @@ class CatalogViewModel(
 					getExtSelectedListingFlow(extId).flatMapLatest {
 						// When the listing is reselected, we clear out the existing filter
 						filterDataState.clear()
-						_applyFilter()
+						applyFilterInternal()
 						queryFlow.flatMapLatest { query ->
 							filterDataFlow.mapLatest { data ->
 								Pager(
-									PagingConfig(10)
+									PagingConfig(10),
 								) {
-									if (query.isEmpty())
+									if (query.isEmpty()) {
 										getCatalogueListingData(extId, ext, data)
-									else loadCatalogueQueryDataUseCase(
-										extId,
-										ext,
-										query,
-										data
-									)
+									} else {
+										loadCatalogueQueryDataUseCase(
+											extId,
+											ext,
+											query,
+											data,
+										)
+									}
 								}
 							}
 						}
-					}
+					},
 				)
 			}
 		}.onIO()
@@ -184,9 +193,11 @@ class CatalogViewModel(
 
 	override val itemsLive: Flow<PagingData<ACatalogNovelUI>> by lazy {
 		pagerFlow.transformLatest {
-			if (it != null)
+			if (it != null) {
 				emitAll(it.flow)
-			else emit(PagingData.empty())
+			} else {
+				emit(PagingData.empty())
+			}
 		}.catch {
 			exceptionFlow.emit(it)
 		}.cachedIn(viewModelScope)
@@ -297,13 +308,13 @@ class CatalogViewModel(
 
 	private fun resetFilter(filter: Filter<*>) {
 		when (filter) {
-			is Filter.Password -> _setFilterStringState(filter, filter.state)
-			is Filter.Text -> _setFilterStringState(filter, filter.state)
-			is Filter.Switch -> _setFilterBooleanState(filter, filter.state)
-			is Filter.Checkbox -> _setFilterBooleanState(filter, filter.state)
-			is Filter.TriState -> _setFilterIntState(filter, filter.state)
-			is Filter.Dropdown -> _setFilterIntState(filter, filter.state)
-			is Filter.RadioGroup -> _setFilterIntState(filter, filter.state)
+			is Filter.Password -> setFilterStringStateInternal(filter, filter.state)
+			is Filter.Text -> setFilterStringStateInternal(filter, filter.state)
+			is Filter.Switch -> setFilterBooleanStateInternal(filter, filter.state)
+			is Filter.Checkbox -> setFilterBooleanStateInternal(filter, filter.state)
+			is Filter.TriState -> setFilterIntStateInternal(filter, filter.state)
+			is Filter.Dropdown -> setFilterIntStateInternal(filter, filter.state)
+			is Filter.RadioGroup -> setFilterIntStateInternal(filter, filter.state)
 			is Filter.FList -> filter.filters.forEach { resetFilter(it) }
 			is Filter.Group<*> -> filter.filters.forEach { resetFilter(it) }
 			is Filter.Header -> {}
@@ -315,10 +326,7 @@ class CatalogViewModel(
 		filterItemsLive.value.forEach { filter -> resetFilter(filter.item) }
 	}
 
-	override fun backgroundNovelAdd(
-		item: ACatalogNovelUI,
-		categories: IntArray
-	) {
+	override fun backgroundNovelAdd(item: ACatalogNovelUI, categories: IntArray) {
 		launchIO {
 			// fyi, the function handles exceptions
 			_backgroundNovelAdd(item, categories)
@@ -329,10 +337,7 @@ class CatalogViewModel(
 	 * @see [ACatalogViewModel.backgroundNovelAdd]
 	 */
 	@Suppress("KDocMissingDocumentation", "FunctionName")
-	private suspend fun _backgroundNovelAdd(
-		item: ACatalogNovelUI,
-		categories: IntArray
-	) {
+	private suspend fun _backgroundNovelAdd(item: ACatalogNovelUI, categories: IntArray) {
 		try {
 			logI("Adding novel to library in background: $item")
 			if (item.bookmarked) {
@@ -345,8 +350,9 @@ class CatalogViewModel(
 
 			try {
 				backgroundAddUseCase(item.id)
-				if (categories.isNotEmpty())
+				if (categories.isNotEmpty()) {
 					setNovelCategoriesUseCase(item.id, categories)
+				}
 			} catch (e: Exception) {
 				backgroundAddState.emit(BackgroundNovelAddProgress.Failure(e))
 				return
@@ -355,11 +361,14 @@ class CatalogViewModel(
 			backgroundAddState.emit(
 				BackgroundNovelAddProgress.Added(
 					item.title.let {
-						if (it.length > 20)
+						if (it.length > 20) {
 							it.substring(0, 20) + "..."
-						else it
-					}
-				))
+						} else {
+							it
+						}
+					},
+				),
+			)
 			delay(100)
 			backgroundAddState.emit(BackgroundNovelAddProgress.Unknown)
 		} catch (e: Exception) {
@@ -375,7 +384,7 @@ class CatalogViewModel(
 	/**
 	 * Locks the filter data flow mutex and sets the new value.
 	 */
-	private fun _applyFilter() {
+	private fun applyFilterInternal() {
 		if (filterMutex.tryLock()) {
 			try {
 				filterDataFlow.value = filterDataState.copy().mapValues { it.value.value }
@@ -387,7 +396,7 @@ class CatalogViewModel(
 
 	override fun applyFilter() {
 		launchIO {
-			_applyFilter()
+			applyFilterInternal()
 		}
 	}
 
@@ -396,15 +405,14 @@ class CatalogViewModel(
 			MutableStateFlow(id.state)
 		}.onIO()
 
-	private fun _setFilterStringState(id: Filter<String>, value: String) {
+	private fun setFilterStringStateInternal(id: Filter<String>, value: String) {
 		filterDataState.specialGetOrPut(id.id) {
 			MutableStateFlow(id.state)
 		}.value = value
 	}
 
-
 	override fun setFilterStringState(id: Filter<String>, value: String) {
-		launchIO { _setFilterStringState(id, value) }
+		launchIO { setFilterStringStateInternal(id, value) }
 	}
 
 	override fun getFilterBooleanState(id: Filter<Boolean>): Flow<Boolean> =
@@ -412,14 +420,14 @@ class CatalogViewModel(
 			MutableStateFlow(id.state)
 		}.onIO()
 
-	private fun _setFilterBooleanState(id: Filter<Boolean>, value: Boolean) {
+	private fun setFilterBooleanStateInternal(id: Filter<Boolean>, value: Boolean) {
 		filterDataState.specialGetOrPut(id.id) {
 			MutableStateFlow(id.state)
 		}.value = value
 	}
 
 	override fun setFilterBooleanState(id: Filter<Boolean>, value: Boolean) {
-		launchIO { _setFilterBooleanState(id, value) }
+		launchIO { setFilterBooleanStateInternal(id, value) }
 	}
 
 	override fun getFilterIntState(id: Filter<Int>): Flow<Int> =
@@ -427,14 +435,14 @@ class CatalogViewModel(
 			MutableStateFlow(id.state)
 		}.onIO()
 
-	private fun _setFilterIntState(id: Filter<Int>, value: Int) {
+	private fun setFilterIntStateInternal(id: Filter<Int>, value: Int) {
 		filterDataState.specialGetOrPut(id.id) {
 			MutableStateFlow(id.state)
 		}.value = value
 	}
 
 	override fun setFilterIntState(id: Filter<Int>, value: Int) {
-		launchIO { _setFilterIntState(id, value) }
+		launchIO { setFilterIntStateInternal(id, value) }
 	}
 
 	override fun resetFilter() {
@@ -458,7 +466,8 @@ class CatalogViewModel(
 			.map { !it }
 			.stateIn(
 				viewModelScopeIO,
-				SharingStarted.Lazily, true
+				SharingStarted.Lazily,
+				true,
 			)
 
 	override val columnsInH: StateFlow<Int> by lazy {
@@ -466,7 +475,7 @@ class CatalogViewModel(
 			.stateIn(
 				viewModelScopeIO,
 				SharingStarted.Lazily,
-				SettingKey.ChapterColumnsInLandscape.default
+				SettingKey.ChapterColumnsInLandscape.default,
 			)
 	}
 
@@ -475,7 +484,7 @@ class CatalogViewModel(
 			.stateIn(
 				viewModelScopeIO,
 				SharingStarted.Lazily,
-				SettingKey.ChapterColumnsInPortait.default
+				SettingKey.ChapterColumnsInPortait.default,
 			)
 	}
 
@@ -497,7 +506,7 @@ class CatalogViewModel(
 	 */
 	private inline fun <reified O, reified V> ConcurrentHashMap<Int, V>.specialGetOrPut(
 		key: Int,
-		getDefaultValue: () -> O
+		getDefaultValue: () -> O,
 	): O {
 		// Do not use computeIfAbsent on JVM8 as it would change locking behavior
 		val value = this[key]
@@ -537,6 +546,3 @@ class CatalogViewModel(
 		}
 	}
 }
-
-
-

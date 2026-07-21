@@ -37,22 +37,24 @@ class GetReaderSettingUseCase(
 ) {
 	@ExperimentalCoroutinesApi
 	operator fun invoke(novelID: Int): Flow<NovelReaderSettingUI> = flow {
-		emitAll(readerRepo.getFlow(novelID).transformLatest { result ->
-			if (result != null) {
-				emit(result)
-			} else {
-				try {
-					readerRepo.insert(
-						NovelReaderSettingEntity(
-							novelID,
-							settingsRepo.getInt(SettingKey.ReaderIndentSize),
-							settingsRepo.getFloat(SettingKey.ReaderParagraphSpacing),
+		emitAll(
+			readerRepo.getFlow(novelID).transformLatest { result ->
+				if (result != null) {
+					emit(result)
+				} else {
+					try {
+						readerRepo.insert(
+							NovelReaderSettingEntity(
+								novelID,
+								settingsRepo.getInt(SettingKey.ReaderIndentSize),
+								settingsRepo.getFloat(SettingKey.ReaderParagraphSpacing),
+							),
 						)
-					)
-				} catch (e: SQLiteException) {
-					logE("Failed to insert reader settings, already inserted?", e)
+					} catch (e: SQLiteException) {
+						logE("Failed to insert reader settings, already inserted?", e)
+					}
 				}
-			}
-		})
+			},
+		)
 	}.map { NovelReaderSettingConversionFactory(it).convertTo() }
 }

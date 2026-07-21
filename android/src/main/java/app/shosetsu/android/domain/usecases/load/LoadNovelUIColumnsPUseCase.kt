@@ -26,14 +26,14 @@ import kotlinx.coroutines.flow.mapLatest
  * shosetsu
  * 08 / 12 / 2020
  */
-class LoadNovelUIColumnsPUseCase(
-	private val iSettingsRepository: ISettingsRepository
-) {
+class LoadNovelUIColumnsPUseCase(private val iSettingsRepository: ISettingsRepository) {
 	@OptIn(ExperimentalCoroutinesApi::class)
 	operator fun invoke() =
 		iSettingsRepository.getIntFlow(SettingKey.ChapterColumnsInPortait).mapLatest {
-			if (it != 0)
+			if (it != 0) {
 				it
-			else 3
+			} else {
+				3
+			}
 		}
 }

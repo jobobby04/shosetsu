@@ -1,4 +1,7 @@
-package app.shosetsu.android.common.ext
+package app.shosetsu.android.domain.model.local
+
+import androidx.room.ColumnInfo
+import java.io.Serializable
 
 /*
  * This file is part of shosetsu.
@@ -15,9 +18,17 @@ package app.shosetsu.android.common.ext
  *
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @since 28 / 12 / 2021
- * @author Doomsdayrs
+ * ====================================================================
  */
 
+/**
+ * shosetsu
+ * 23 / 04 / 2020
+ *
+ * @author github.com/doomsdayrs
+ */
 
+data class CountIDTuple(
+	@ColumnInfo(name = "id") val id: Int,
+	@ColumnInfo(name = "COUNT(*)") val count: Int,
+) : Serializable

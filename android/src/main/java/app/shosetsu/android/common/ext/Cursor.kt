@@ -22,9 +22,7 @@ import android.database.Cursor
 fun Cursor.getShort(key: String): Short =
 	getColumnIndex(key).takeIf { it >= 0 }?.let { getShort(it) }!!
 
-
-fun Cursor.getInt(key: String): Int =
-	getColumnIndex(key).takeIf { it >= 0 }?.let { getInt(it) }!!
+fun Cursor.getInt(key: String): Int = getColumnIndex(key).takeIf { it >= 0 }?.let { getInt(it) }!!
 
 fun Cursor.getLong(key: String): Long =
 	getColumnIndex(key).takeIf { it >= 0 }?.let { getLong(it) }!!

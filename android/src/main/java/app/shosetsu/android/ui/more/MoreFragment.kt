@@ -69,7 +69,7 @@ fun MoreView(
 	onNavToHistory: () -> Unit = {},
 	onNavToSettings: () -> Unit = {},
 	onNavToAbout: () -> Unit = {},
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
 ) {
 	MoreContent(
 		onNavToDownloads = onNavToDownloads,
@@ -81,23 +81,19 @@ fun MoreView(
 		onNavToHistory = onNavToHistory,
 		onNavToSettings = onNavToSettings,
 		onNavToAbout = onNavToAbout,
-		drawerIcon = drawerIcon
+		drawerIcon = drawerIcon,
 	)
 }
 
 @Composable
-fun MoreItemContent(
-	@StringRes title: Int,
-	icon: ImageVector,
-	onClick: () -> Unit
-) {
+fun MoreItemContent(@StringRes title: Int, icon: ImageVector, onClick: () -> Unit) {
 	Box(
 		modifier = Modifier
 			.clickable(onClick = onClick)
 			.fillMaxWidth(),
 	) {
 		Row(
-			verticalAlignment = Alignment.CenterVertically
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Icon(
 				icon,
@@ -105,7 +101,7 @@ fun MoreItemContent(
 				modifier = Modifier
 					.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 24.dp)
 					.size(24.dp),
-				tint = MaterialTheme.colorScheme.primary
+				tint = MaterialTheme.colorScheme.primary,
 			)
 			Text(stringResource(title))
 		}
@@ -116,7 +112,7 @@ fun MoreItemContent(
 @Composable
 fun PreviewMoreContent() {
 	MoreContent(
-		drawerIcon = { }
+		drawerIcon = { },
 	)
 }
 
@@ -132,7 +128,7 @@ fun MoreContent(
 	onNavToHistory: () -> Unit = {},
 	onNavToSettings: () -> Unit = {},
 	onNavToAbout: () -> Unit = {},
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
 ) {
 	Scaffold(
 		topBar = {
@@ -141,7 +137,7 @@ fun MoreContent(
 					Text(stringResource(R.string.more))
 				},
 				scrollBehavior = pinnedScrollBehavior(),
-				navigationIcon = drawerIcon
+				navigationIcon = drawerIcon,
 			)
 		},
 	) { padding ->
@@ -149,11 +145,11 @@ fun MoreContent(
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(padding),
-			contentPadding = PaddingValues(bottom = 80.dp)
+			contentPadding = PaddingValues(bottom = 80.dp),
 		) {
 			item {
 				Box(
-					modifier = Modifier.fillMaxWidth()
+					modifier = Modifier.fillMaxWidth(),
 				) {
 					Image(
 						painterResource(R.drawable.shou_icon),
@@ -180,7 +176,7 @@ fun MoreContent(
 				MoreItemContent(
 					R.string.repositories,
 					Icons.Outlined.AddShoppingCart,
-					onNavToRepositories
+					onNavToRepositories,
 				)
 			}
 
@@ -188,7 +184,7 @@ fun MoreContent(
 				MoreItemContent(
 					R.string.categories,
 					Icons.AutoMirrored.Outlined.Label,
-					onNavToCategories
+					onNavToCategories,
 				)
 			}
 
@@ -196,16 +192,15 @@ fun MoreContent(
 				MoreItemContent(
 					R.string.qr_code_scan,
 					Icons.Outlined.Link,
-					onNavToAddShare
+					onNavToAddShare,
 				)
 			}
-
 
 			item {
 				MoreItemContent(
 					R.string.fragment_more_dest_analytics,
 					Icons.Outlined.Analytics,
-					onNavToAnalytics
+					onNavToAnalytics,
 				)
 			}
 
@@ -213,7 +208,7 @@ fun MoreContent(
 				MoreItemContent(
 					R.string.fragment_more_dest_history,
 					Icons.Outlined.HistoryEdu,
-					onNavToHistory
+					onNavToHistory,
 				)
 			}
 

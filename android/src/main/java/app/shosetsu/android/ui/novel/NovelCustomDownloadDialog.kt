@@ -42,7 +42,7 @@ import com.chargemap.compose.numberpicker.NumberPicker
 fun NovelCustomDownloadDialog(
 	onDismissRequest: () -> Unit,
 	chapterCount: Int,
-	onDownload: (Int) -> Unit
+	onDownload: (Int) -> Unit,
 ) {
 	var value by remember { mutableIntStateOf(0) }
 	StandardDialog(
@@ -50,7 +50,7 @@ fun NovelCustomDownloadDialog(
 		title = { Text(stringResource(R.string.download_custom_chapters)) },
 		onConfirm = {
 			onDownload(value)
-		}
+		},
 	) {
 		NumberPicker(
 			value = value,
@@ -69,6 +69,6 @@ fun PreviewNovelCustomDownloadDialog() = ShosetsuTheme(AppThemes.LIGHT) {
 	NovelCustomDownloadDialog(
 		onDismissRequest = {},
 		chapterCount = 10,
-		onDownload = {}
+		onDownload = {},
 	)
 }

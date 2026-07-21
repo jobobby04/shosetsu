@@ -24,9 +24,6 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
  * shosetsu
  * 25 / 09 / 2020
  */
-class LoadChaptersResumeFirstUnreadUseCase(
-	private val settings: ISettingsRepository
-) {
-	suspend operator fun invoke(): Boolean =
-		settings.getBoolean(SettingKey.ChaptersResumeFirstUnread)
+class LoadChaptersResumeFirstUnreadUseCase(private val settings: ISettingsRepository) {
+	suspend operator fun invoke(): Boolean = settings.getBoolean(SettingKey.ChaptersResumeFirstUnread)
 }

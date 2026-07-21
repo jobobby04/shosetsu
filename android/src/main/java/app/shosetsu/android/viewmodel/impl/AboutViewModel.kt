@@ -31,13 +31,14 @@ import kotlinx.collections.immutable.toImmutableList
  */
 class AboutViewModel(
 	private val manager: AppUpdateCheckWorker.Manager,
-	private val contributorRepo: ContributorsRepository
+	private val contributorRepo: ContributorsRepository,
 ) : AAboutViewModel() {
 
 	override fun appUpdateCheck() {
 		launchIO {
-			if (!manager.isRunning())
+			if (!manager.isRunning()) {
 				manager.start()
+			}
 		}
 	}
 

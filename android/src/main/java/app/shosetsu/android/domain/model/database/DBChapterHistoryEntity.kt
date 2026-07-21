@@ -41,19 +41,19 @@ import androidx.room.PrimaryKey
 			entity = DBNovelEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["novelId"],
-			onDelete = ForeignKey.CASCADE
+			onDelete = ForeignKey.CASCADE,
 		),
 		ForeignKey(
 			entity = DBChapterEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["chapterId"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
 	indices = [
 		Index(value = ["novelId", "chapterId"], unique = true),
-		Index("chapterId")
-	]
+		Index("chapterId"),
+	],
 )
 data class DBChapterHistoryEntity(
 	@PrimaryKey(autoGenerate = true)
@@ -61,5 +61,5 @@ data class DBChapterHistoryEntity(
 	val novelId: Int,
 	val chapterId: Int,
 	val startedReadingAt: Long,
-	val endedReadingAt: Long?
+	val endedReadingAt: Long?,
 )

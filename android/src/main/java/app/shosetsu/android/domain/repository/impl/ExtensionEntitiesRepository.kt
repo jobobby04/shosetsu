@@ -41,14 +41,13 @@ import java.io.IOException
 class ExtensionEntitiesRepository(
 	private val memorySource: IMemExtensionsDataSource,
 	private val fileSource: IFileExtensionDataSource,
-	private val settingsSource: IFileSettingsDataSource
+	private val settingsSource: IFileSettingsDataSource,
 ) : IExtensionEntitiesRepository {
 
 	override suspend fun get(extensionEntity: GenericExtensionEntity): IExtension = onIO {
 		try {
 			memorySource.loadExtensionFromMemory(extensionEntity.id)!!
 		} catch (_: Exception) {
-
 			val extension: IExtension
 
 			// If the file is not found, we have to handle this professionally...
@@ -58,11 +57,12 @@ class ExtensionEntitiesRepository(
 				throw MissingExtensionException(extensionEntity.id, e)
 			}
 
-			if (!extension.exMetaData.libVersion.isCompatible())
+			if (!extension.exMetaData.libVersion.isCompatible()) {
 				throw IncompatibleExtensionException(
 					extensionEntity,
-					extension.exMetaData.libVersion
+					extension.exMetaData.libVersion,
 				)
+			}
 
 			setSettings(extensionEntity, extension, extension.settingsModel.toList())
 			memorySource.putExtensionInMemory(extensionEntity.id, extension)
@@ -79,87 +79,74 @@ class ExtensionEntitiesRepository(
 	override suspend fun save(
 		extensionEntity: GenericExtensionEntity,
 		iExt: IExtension,
-		extensionContent: ByteArray
+		extensionContent: ByteArray,
 	) = onIO {
 		memorySource.putExtensionInMemory(extensionEntity.id, iExt)
 
 		fileSource.writeExtension(extensionEntity, extensionContent)
 	}
 
-
 	suspend fun getInt(extensionID: Int, settingID: Int, default: Int): Int =
 		settingsSource.getInt("$extensionID", SettingKey.CustomInt("$settingID", default))
 
-	suspend fun getString(
-		extensionID: Int,
-		settingID: Int,
-		default: String
-	): String =
+	suspend fun getString(extensionID: Int, settingID: Int, default: String): String =
 		settingsSource.getString("$extensionID", SettingKey.CustomString("$settingID", default))
 
-	suspend fun getBoolean(
-		extensionID: Int,
-		settingID: Int,
-		default: Boolean
-	): Boolean =
+	suspend fun getBoolean(extensionID: Int, settingID: Int, default: Boolean): Boolean =
 		settingsSource.getBoolean(
 			"$extensionID",
-			SettingKey.CustomBoolean("$settingID", default)
+			SettingKey.CustomBoolean("$settingID", default),
 		)
 
-	suspend fun getFloat(
-		extensionID: Int,
-		settingID: Int,
-		default: Float
-	): Float =
+	suspend fun getFloat(extensionID: Int, settingID: Int, default: Float): Float =
 		settingsSource.getFloat("$extensionID", SettingKey.CustomFloat("$settingID", default))
 
 	private suspend fun setSettings(
 		extensionEntity: GenericExtensionEntity,
 		extension: IExtension,
-		filters: List<Filter<out Any?>>
+		filters: List<Filter<out Any?>>,
 	) {
 		filters.forEach { filter ->
 			when (filter) {
 				is Filter.Text -> {
 					extension.updateSetting(
 						filter.id,
-						getString(extensionEntity.id, filter.id, filter.state)
+						getString(extensionEntity.id, filter.id, filter.state),
 					)
 				}
 
 				is Filter.Switch -> {
 					extension.updateSetting(
 						filter.id,
-						getBoolean(extensionEntity.id, filter.id, filter.state)
+						getBoolean(extensionEntity.id, filter.id, filter.state),
 					)
 				}
 
 				is Filter.Checkbox -> {
 					extension.updateSetting(
 						filter.id,
-						getBoolean(extensionEntity.id, filter.id, filter.state)
+						getBoolean(extensionEntity.id, filter.id, filter.state),
 					)
 				}
 
 				is Filter.TriState -> {
 					extension.updateSetting(
 						filter.id,
-						getInt(extensionEntity.id, filter.id, filter.state)
+						getInt(extensionEntity.id, filter.id, filter.state),
 					)
 				}
 
 				is Filter.Dropdown -> {
 					extension.updateSetting(
 						filter.id,
-						getInt(extensionEntity.id, filter.id, filter.state)
+						getInt(extensionEntity.id, filter.id, filter.state),
 					)
 				}
 
 				is Filter.RadioGroup -> {
 					extension.updateSetting(
 						filter.id,
-						getInt(extensionEntity.id, filter.id, filter.state)
+						getInt(extensionEntity.id, filter.id, filter.state),
 					)
 				}
 

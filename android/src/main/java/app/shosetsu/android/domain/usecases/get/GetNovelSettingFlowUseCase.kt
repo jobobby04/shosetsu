@@ -32,12 +32,11 @@ import kotlinx.coroutines.flow.transform
  *
  * Gets a novel setting flow, but will create a
  */
-class GetNovelSettingFlowUseCase(
-	private val novelSettingsRepository: INovelSettingsRepository,
-) {
+class GetNovelSettingFlowUseCase(private val novelSettingsRepository: INovelSettingsRepository) {
 	operator fun invoke(novelID: Int): Flow<NovelSettingUI?> {
-		if (novelID == -1)
+		if (novelID == -1) {
 			return flow { emit(null) }
+		}
 
 		return novelSettingsRepository.getFlow(novelID).transform { settings ->
 			settings?.let {

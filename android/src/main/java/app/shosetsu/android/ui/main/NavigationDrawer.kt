@@ -59,7 +59,7 @@ fun PreviewNavigationDrawerContent() {
 	NavigationDrawerContent(
 		null,
 		{},
-		drawerState = rememberDrawerState(DrawerValue.Open)
+		drawerState = rememberDrawerState(DrawerValue.Open),
 	)
 }
 
@@ -67,15 +67,15 @@ fun PreviewNavigationDrawerContent() {
 fun NavigationDrawerContent(
 	currentDestination: NavBackStackEntry?,
 	onNavigate: (ShosetsuDestination.Primary) -> Unit,
-	drawerState: DrawerState
+	drawerState: DrawerState,
 ) {
 	ModalDrawerSheet(
-		drawerState
+		drawerState,
 	) {
 		Row(
 			verticalAlignment = Alignment.Bottom,
 			horizontalArrangement = Arrangement.spacedBy(8.dp),
-			modifier = Modifier.padding(8.dp)
+			modifier = Modifier.padding(8.dp),
 		) {
 			Image(
 				painterResource(R.drawable.shou_icon),
@@ -85,16 +85,16 @@ fun NavigationDrawerContent(
 					.fillMaxWidth(.15f)
 					.aspectRatio(1f)
 					.clip(CircleShape)
-					.background(Primary)
+					.background(Primary),
 			)
 			Column(
 				verticalArrangement = Arrangement.Bottom,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
 			) {
 				Text(
 					stringResource(R.string.app_name),
 					Modifier.padding(top = 32.dp),
-					style = MaterialTheme.typography.titleLarge
+					style = MaterialTheme.typography.titleLarge,
 				)
 				Text(stringResource(R.string.header_text), style = MaterialTheme.typography.labelLarge)
 			}
@@ -110,7 +110,7 @@ fun NavigationDrawerContent(
 				label = { Text(stringResource(destination.name)) },
 				onClick = {
 					onNavigate(destination)
-				}
+				},
 			)
 		}
 	}

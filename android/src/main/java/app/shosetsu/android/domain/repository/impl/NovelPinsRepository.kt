@@ -29,9 +29,7 @@ import app.shosetsu.android.domain.repository.base.INovelPinsRepository
  * @since 01 / 11 / 2022
  * @author Doomsdayrs
  */
-class NovelPinsRepository(
-	private val db: IDBNovelPinsDataSource
-) : INovelPinsRepository {
+class NovelPinsRepository(private val db: IDBNovelPinsDataSource) : INovelPinsRepository {
 	override suspend fun setPinned(ids: List<Int>, pinned: Boolean) {
 		try {
 			onIO {
@@ -47,11 +45,9 @@ class NovelPinsRepository(
 		db.updateOrInsert(pinEntity)
 	}
 
-	override suspend fun isPinned(id: Int): Boolean =
-		try {
-			db.isPinned(id)
-		} catch (e: SQLiteException) {
-			false
-		}
-
+	override suspend fun isPinned(id: Int): Boolean = try {
+		db.isPinned(id)
+	} catch (e: SQLiteException) {
+		false
+	}
 }

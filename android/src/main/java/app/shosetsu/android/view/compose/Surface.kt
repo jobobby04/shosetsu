@@ -65,7 +65,7 @@ fun Surface(
 	val absoluteElevation = LocalAbsoluteTonalElevation.current + tonalElevation
 	CompositionLocalProvider(
 		LocalContentColor provides contentColor,
-		LocalAbsoluteTonalElevation provides absoluteElevation
+		LocalAbsoluteTonalElevation provides absoluteElevation,
 	) {
 		Box(
 			modifier
@@ -74,10 +74,10 @@ fun Surface(
 					shape = shape,
 					backgroundColor = surfaceColorAtElevation(
 						color = color,
-						elevation = absoluteElevation
+						elevation = absoluteElevation,
 					),
 					border = border,
-					shadowElevation = shadowElevation
+					shadowElevation = shadowElevation,
 				)
 				.combinedClickable(
 					interactionSource = interactionSource,
@@ -85,9 +85,9 @@ fun Surface(
 					enabled = enabled,
 					role = Role.Button,
 					onClick = onClick,
-					onLongClick = onLongClick
+					onLongClick = onLongClick,
 				),
-			propagateMinConstraints = true
+			propagateMinConstraints = true,
 		) {
 			content()
 		}
@@ -98,7 +98,7 @@ private fun Modifier.surface(
 	shape: Shape,
 	backgroundColor: Color,
 	border: BorderStroke?,
-	shadowElevation: Dp
+	shadowElevation: Dp,
 ) = this
 	.shadow(shadowElevation, shape, clip = false)
 	.then(if (border != null) Modifier.border(border, shape) else Modifier)
@@ -106,10 +106,9 @@ private fun Modifier.surface(
 	.clip(shape)
 
 @Composable
-private fun surfaceColorAtElevation(color: Color, elevation: Dp): Color {
-	return if (color == MaterialTheme.colorScheme.surface) {
+private fun surfaceColorAtElevation(color: Color, elevation: Dp): Color =
+	if (color == MaterialTheme.colorScheme.surface) {
 		MaterialTheme.colorScheme.surfaceColorAtElevation(elevation)
 	} else {
 		color
 	}
-}

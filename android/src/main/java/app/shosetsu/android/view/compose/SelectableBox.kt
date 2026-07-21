@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 fun SelectableBox(
 	isSelected: Boolean,
 	modifier: Modifier = Modifier,
-	content: @Composable BoxScope.() -> Unit
+	content: @Composable BoxScope.() -> Unit,
 ) {
 	Box(
 		modifier = modifier
@@ -44,8 +44,8 @@ fun SelectableBox(
 					MaterialTheme.colorScheme.tertiary.copy(alpha = if (isSystemInDarkTheme()) 0.5f else 0.22f)
 				} else {
 					MaterialTheme.colorScheme.tertiary.copy(alpha = 0f)
-				}
+				},
 			),
-		content = content
+		content = content,
 	)
 }

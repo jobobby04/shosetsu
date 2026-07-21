@@ -32,12 +32,11 @@ class NovelReaderSettingConversionFactory(data: NovelReaderSettingEntity) :
 	override fun NovelReaderSettingEntity.convertTo(): NovelReaderSettingUI = NovelReaderSettingUI(
 		novelID = novelID,
 		paragraphIndentSize = paragraphIndentSize,
-		paragraphSpacingSize = paragraphSpacingSize
+		paragraphSpacingSize = paragraphSpacingSize,
 	)
 }
 
-fun List<NovelReaderSettingEntity>.mapToFactory() =
-	map { NovelReaderSettingConversionFactory(it) }
+fun List<NovelReaderSettingEntity>.mapToFactory() = map { NovelReaderSettingConversionFactory(it) }
 
 @ExperimentalCoroutinesApi
 fun Flow<List<NovelReaderSettingEntity>>.mapLatestToResultFlowWithFactory() =

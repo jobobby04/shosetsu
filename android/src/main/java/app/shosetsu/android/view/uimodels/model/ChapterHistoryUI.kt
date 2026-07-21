@@ -2,7 +2,7 @@ package app.shosetsu.android.view.uimodels.model
 
 import android.text.format.DateFormat
 import androidx.compose.runtime.Immutable
-import java.util.*
+import java.util.Date
 
 /*
  * This file is part of shosetsu.
@@ -36,7 +36,7 @@ data class ChapterHistoryUI(
 	val chapterId: Int,
 	val chapterTitle: String,
 	val startedReadingAt: Long,
-	val endedReadingAt: Long?
+	val endedReadingAt: Long?,
 ) {
 	val startedTime = DateFormat.format("hh:mm", Date(startedReadingAt)).toString()
 	val endedTime = if (endedReadingAt != null) {

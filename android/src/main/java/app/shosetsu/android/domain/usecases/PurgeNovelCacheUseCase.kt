@@ -26,9 +26,7 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
  *
  * Deletes all novels that are not bookmarked from the apps database
  */
-class PurgeNovelCacheUseCase(
-	private val iNovelsRepository: INovelsRepository
-) {
+class PurgeNovelCacheUseCase(private val iNovelsRepository: INovelsRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke() {
 		logI("Purging novel cache")

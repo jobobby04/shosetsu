@@ -36,9 +36,7 @@ import java.io.InputStream
  *
  * @since 23 / 10 / 2020
  */
-class AndroidFileSystemProvider(
-	private val context: Context
-) : IFileSystemProvider {
+class AndroidFileSystemProvider(private val context: Context) : IFileSystemProvider {
 	private val internalCacheDirPath by lazy { context.cacheDir.absolutePath }
 	private val internalFilesDirPath by lazy { context.filesDir.absolutePath }
 
@@ -54,7 +52,6 @@ class AndroidFileSystemProvider(
 	private val externalDownloadDirPath by lazy { context.getExternalFilesDir(DIRECTORY_DOWNLOADS) }
 	private val externalDocumentDirPath by lazy { context.getExternalFilesDir(DIRECTORY_DOCUMENTS) }
 
-
 	private fun InternalFileDir.path() = when (this) {
 		InternalFileDir.CACHE -> "$internalCacheDirPath/"
 		InternalFileDir.FILES -> "$internalFilesDirPath/"
@@ -67,33 +64,23 @@ class AndroidFileSystemProvider(
 		ExternalFileDir.DOCUMENTS -> "$externalDocumentDirPath/"
 	}
 
-	override fun listFiles(
-		internalFileDir: InternalFileDir,
-		path: String
-	): List<String> =
+	override fun listFiles(internalFileDir: InternalFileDir, path: String): List<String> =
 		File(internalFileDir.path(), path).list()?.toList().orEmpty()
 
-	override fun listFiles(
-		externalFileDir: ExternalFileDir,
-		path: String
-	): List<String> =
+	override fun listFiles(externalFileDir: ExternalFileDir, path: String): List<String> =
 		File(externalFileDir.path(), path).list()?.toList().orEmpty()
 
-	override fun doesFileExist(
-		internalFileDir: InternalFileDir,
-		path: String
-	): Boolean = File(internalFileDir.path(), path).exists()
+	override fun doesFileExist(internalFileDir: InternalFileDir, path: String): Boolean =
+		File(internalFileDir.path(), path).exists()
 
-	override fun doesFileExist(
-		externalFileDir: ExternalFileDir,
-		path: String
-	): Boolean = File(externalFileDir.path(), path).exists()
+	override fun doesFileExist(externalFileDir: ExternalFileDir, path: String): Boolean =
+		File(externalFileDir.path(), path).exists()
 
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
 	override fun readFile(internalFileDir: InternalFileDir, path: String): ByteArray {
 		val file = File(internalFileDir.path(), path)
 
-		//logV("Reading $path in ${internalFileDir.path()} to $file")
+		// logV("Reading $path in ${internalFileDir.path()} to $file")
 
 		if (!file.exists()) throw FileNotFoundException("$path does not exist")
 		if (!file.canRead()) throw FilePermissionException(file.path, PermissionType.READ)
@@ -105,22 +92,18 @@ class AndroidFileSystemProvider(
 	override fun readFile(externalFileDir: ExternalFileDir, path: String): ByteArray {
 		val file = File(externalFileDir.path(), path)
 
-		//logV("Reading $path in ${externalFileDir.path()} to $file")
+		// logV("Reading $path in ${externalFileDir.path()} to $file")
 
 		if (!file.exists()) throw FileNotFoundException("$path does not exist")
 		if (!file.canRead()) throw FilePermissionException(file.path, PermissionType.READ)
 		return file.readBytes()
 	}
 
-	override fun copyFileTo(
-		externalFileDir: ExternalFileDir,
-		path: String,
-		output: FileOutputStream
-	) {
-		/// First we create our file object
+	override fun copyFileTo(externalFileDir: ExternalFileDir, path: String, output: FileOutputStream) {
+		// / First we create our file object
 		val file = File(externalFileDir.path(), path)
 
-		//logV("Reading $path in ${externalFileDir.path()} to $file")
+		// logV("Reading $path in ${externalFileDir.path()} to $file")
 
 		// make sure it exists
 		if (!file.exists()) throw FileNotFoundException("$path does not exist")
@@ -134,12 +117,11 @@ class AndroidFileSystemProvider(
 		}
 	}
 
-
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
 	override fun readFile(path: String): ByteArray {
 		val file = File(path)
 
-		//	logV("Reading $path to $file")
+		// 	logV("Reading $path to $file")
 
 		if (!file.exists()) throw FileNotFoundException("File not found: `$path`")
 		if (!file.canRead()) throw FilePermissionException(path, PermissionType.READ)
@@ -149,12 +131,13 @@ class AndroidFileSystemProvider(
 	@Throws(FilePermissionException::class)
 	override fun deleteFile(internalFileDir: InternalFileDir, path: String): Boolean {
 		val file = File(internalFileDir.path(), path)
-//		logV("Deleting $path in ${internalFileDir.path()} to $file")
+// 		logV("Deleting $path in ${internalFileDir.path()} to $file")
 
 		if (!file.exists()) return false
 
-		if (!file.canWrite())
+		if (!file.canWrite()) {
 			throw FilePermissionException(file.path, PermissionType.WRITE)
+		}
 
 		return file.delete()
 	}
@@ -162,30 +145,28 @@ class AndroidFileSystemProvider(
 	@Throws(FilePermissionException::class)
 	override fun deleteFile(externalFileDir: ExternalFileDir, path: String): Boolean {
 		val file = File(externalFileDir.path(), path)
-		//	logV("Deleting $path in ${externalFileDir.path()} to $file")
+		// 	logV("Deleting $path in ${externalFileDir.path()} to $file")
 
 		if (!file.exists()) return false
 
-		if (!file.canWrite())
+		if (!file.canWrite()) {
 			throw FilePermissionException(file.path, PermissionType.WRITE)
+		}
 
 		return file.delete()
 	}
 
 	@Throws(FilePermissionException::class, IOException::class)
-	override fun writeFile(
-		internalFileDir: InternalFileDir,
-		path: String,
-		content: ByteArray
-	) {
+	override fun writeFile(internalFileDir: InternalFileDir, path: String, content: ByteArray) {
 		val file = File(internalFileDir.path(), path)
 
-		//	logV("Writing $path in ${internalFileDir.path()} to $file")
+		// 	logV("Writing $path in ${internalFileDir.path()} to $file")
 
 		if (!file.exists()) file.createNewFile()
 
-		if (!file.canWrite())
+		if (!file.canWrite()) {
 			throw FilePermissionException(file.path, PermissionType.WRITE)
+		}
 
 		return file.writeBytes(content)
 	}
@@ -194,12 +175,13 @@ class AndroidFileSystemProvider(
 	override fun writeFile(internalFileDir: InternalFileDir, path: String, content: InputStream) {
 		val file = File(internalFileDir.path(), path)
 
-		//	logV("Writing $path in ${internalFileDir.path()} to $file")
+		// 	logV("Writing $path in ${internalFileDir.path()} to $file")
 
 		if (!file.exists()) file.createNewFile()
 
-		if (!file.canWrite())
+		if (!file.canWrite()) {
 			throw FilePermissionException(file.path, PermissionType.WRITE)
+		}
 
 		content.use { iS ->
 			file.outputStream().use { oS ->
@@ -209,52 +191,40 @@ class AndroidFileSystemProvider(
 	}
 
 	@Throws(FilePermissionException::class, IOException::class)
-	override fun writeFile(
-		externalFileDir: ExternalFileDir,
-		path: String,
-		content: ByteArray
-	) {
+	override fun writeFile(externalFileDir: ExternalFileDir, path: String, content: ByteArray) {
 		val file = File(externalFileDir.path(), path)
 
-		//	logV("Writing $path in ${externalFileDir.path()} to $file")
+		// 	logV("Writing $path in ${externalFileDir.path()} to $file")
 
 		if (!file.exists()) file.createNewFile()
 
-		if (!file.canWrite())
+		if (!file.canWrite()) {
 			throw FilePermissionException(file.path, PermissionType.WRITE)
+		}
 
 		return file.writeBytes(content)
 	}
 
-	override fun createDirectory(
-		internalFileDir: InternalFileDir,
-		path: String
-	): Boolean {
+	override fun createDirectory(internalFileDir: InternalFileDir, path: String): Boolean {
 		val file = File(internalFileDir.path(), path)
 
-//		logV("Creating $path in ${internalFileDir.path()}")
+// 		logV("Creating $path in ${internalFileDir.path()}")
 
 		// if (!file.canWrite()) return errorResult(ERROR_LACK_PERM, "Cannot write file: $file")
 		return file.mkdirs()
 	}
 
-	override fun createDirectory(
-		externalFileDir: ExternalFileDir,
-		path: String
-	): Boolean {
+	override fun createDirectory(externalFileDir: ExternalFileDir, path: String): Boolean {
 		val file = File(externalFileDir.path(), path)
 
-		//	logV("Creating $path in ${externalFileDir.path()}")
+		// 	logV("Creating $path in ${externalFileDir.path()}")
 
 		// if (!file.canWrite()) return errorResult(ERROR_LACK_PERM, "Cannot write file: $file")
 		return file.mkdirs()
 	}
 
 	@Throws(FileNotFoundException::class)
-	override fun retrievePath(
-		internalFileDir: InternalFileDir,
-		path: String
-	): String {
+	override fun retrievePath(internalFileDir: InternalFileDir, path: String): String {
 		val file = File(internalFileDir.path(), path)
 
 		if (!file.exists()) throw FileNotFoundException("$path does not exist")
@@ -263,10 +233,7 @@ class AndroidFileSystemProvider(
 	}
 
 	@Throws(FileNotFoundException::class)
-	override fun retrievePath(
-		externalFileDir: ExternalFileDir,
-		path: String
-	): String {
+	override fun retrievePath(externalFileDir: ExternalFileDir, path: String): String {
 		val file = File(externalFileDir.path(), path)
 
 		if (!file.exists()) throw FileNotFoundException("$path does not exist")
@@ -274,13 +241,8 @@ class AndroidFileSystemProvider(
 		return file.absolutePath
 	}
 
-
 	@Throws(FileNotFoundException::class)
-	override fun moveFile(
-		internalFileDir: InternalFileDir,
-		oldPath: String,
-		repoPath: String
-	) {
+	override fun moveFile(internalFileDir: InternalFileDir, oldPath: String, repoPath: String) {
 		val oldFile = File(internalFileDir.path(), oldPath)
 
 		if (!oldFile.exists()) throw FileNotFoundException("$oldPath does not exist")

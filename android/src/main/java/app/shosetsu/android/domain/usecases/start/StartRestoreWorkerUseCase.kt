@@ -26,16 +26,14 @@ import app.shosetsu.android.common.ext.launchIO
 /**
  * 02 / 02 / 2021
  */
-class StartRestoreWorkerUseCase(
-	private val manager: RestoreBackupWorker.Manager,
-) {
+class StartRestoreWorkerUseCase(private val manager: RestoreBackupWorker.Manager) {
 	operator fun invoke(path: Uri) {
 		launchIO {
 			if (!manager.isRunning()) {
 				manager.start(
 					Data.Builder().apply {
 						putString(BACKUP_URI_KEY, path.toString())
-					}.build()
+					}.build(),
 				)
 			}
 		}

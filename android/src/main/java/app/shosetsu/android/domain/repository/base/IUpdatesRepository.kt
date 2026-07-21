@@ -20,7 +20,6 @@ import app.shosetsu.android.domain.model.local.UpdateCompleteEntity
 import app.shosetsu.android.domain.model.local.UpdateEntity
 import kotlinx.coroutines.flow.Flow
 
-
 /**
  * shosetsu
  * 25 / 04 / 2020

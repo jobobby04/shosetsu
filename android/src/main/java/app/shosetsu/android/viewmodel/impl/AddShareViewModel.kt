@@ -67,7 +67,7 @@ class AddShareViewModel(
 	private val installManager: ExtensionInstallWorker.Manager,
 	private val updateManager: RepositoryUpdateWorker.Manager,
 	private val settingRepo: ISettingsRepository,
-	private val iExtRepo: IExtensionEntitiesRepository
+	private val iExtRepo: IExtensionEntitiesRepository,
 ) : AAddShareViewModel() {
 	override val isAdding: MutableStateFlow<Boolean> = MutableStateFlow(false)
 	override val isComplete: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -138,33 +138,32 @@ class AddShareViewModel(
 											"extURL",
 											"extName",
 											"repoName",
-											"repoURL"
-										)
+											"repoURL",
+										),
 									)
 								) {
 									invalidate()
 									return@collectLatest
 								}
 
-
 								val repo = RepositoryLink(
 									http.queryParameter("repoName")!!,
 									http.queryParameter("repoURL")!!.toHttpUrl().toUri().normalize()
-										.toString()
+										.toString(),
 								)
 
 								val ext = ExtensionLink(
 									http.queryParameter("extID")!!.toInt(),
 									http.queryParameter("extName")!!,
 									http.queryParameter("extURL") ?: "",
-									repo
+									repo,
 								)
 								val novel = NovelLink(
 									http.queryParameter("name")!!,
 									http.queryParameter("imageURL") ?: "",
 									http.queryParameter("url")!!.toHttpUrl().toUri().normalize()
 										.toString(),
-									ext
+									ext,
 								)
 
 								logI("Checking if repository is present")
@@ -212,14 +211,17 @@ class AddShareViewModel(
 								extLink.value = ext
 								novelLink.value = novel
 
-								if (repoEntity != null)
+								if (repoEntity != null) {
 									isRepoAlreadyPresent.value = true
+								}
 
-								if (extEntity != null)
+								if (extEntity != null) {
 									isExtAlreadyPresent.value = true
+								}
 
-								if (novelEntity != null)
+								if (novelEntity != null) {
 									isNovelAlreadyPresent.value = true
+								}
 
 								isProcessing.value = false
 								isURLValid.value = true
@@ -232,7 +234,7 @@ class AddShareViewModel(
 										listOf(
 											"name",
 											"url",
-										)
+										),
 									)
 								) {
 									invalidate()
@@ -242,7 +244,7 @@ class AddShareViewModel(
 								val repo = RepositoryLink(
 									http.queryParameter("name")!!,
 									http.queryParameter("url")!!.toHttpUrl().toUri().normalize()
-										.toString()
+										.toString(),
 								)
 
 								logI("Checking if repository is present")
@@ -262,8 +264,9 @@ class AddShareViewModel(
 
 								repoLink.value = repo
 
-								if (repoEntity != null)
+								if (repoEntity != null) {
 									isRepoAlreadyPresent.value = true
+								}
 
 								isProcessing.value = false
 								isURLValid.value = true
@@ -322,7 +325,8 @@ class AddShareViewModel(
 
 				while (updateManager.getWorkerState().let {
 						it == WorkInfo.State.ENQUEUED || it == WorkInfo.State.RUNNING || it == WorkInfo.State.BLOCKED
-					}) {
+					}
+				) {
 					logI("Waiting for repo to finish updating")
 					delay(200)
 				}
@@ -332,7 +336,7 @@ class AddShareViewModel(
 			if (!isExtAlreadyPresent.value && extLink.value != null) {
 				val link = extLink.value!!
 
-				if (repoEntity == null)
+				if (repoEntity == null) {
 					repoEntity = try {
 						repoRepo.loadRepositories().first { it.url == link.repo.url }
 					} catch (e: SQLiteException) {
@@ -342,8 +346,7 @@ class AddShareViewModel(
 						exception.value = e
 						return@launchIO
 					}
-
-
+				}
 
 				installExtension(link.id, repoEntity!!.id)
 
@@ -351,7 +354,8 @@ class AddShareViewModel(
 
 				while (installManager.getWorkerState().let {
 						it == WorkInfo.State.ENQUEUED || it == WorkInfo.State.RUNNING || it == WorkInfo.State.BLOCKED
-					}) {
+					}
+				) {
 					logI("Waiting for extension to install")
 					delay(200)
 				}
@@ -367,15 +371,17 @@ class AddShareViewModel(
 			if (!isNovelAlreadyPresent.value && novelLink.value != null) {
 				val link = novelLink.value!!
 
-				if (novelEntity == null)
+				if (novelEntity == null) {
 					novelEntity = novelRepo.loadNovels().find {
 						getContentURL(it)?.toHttpUrl()?.toUri()?.normalize() ==
 							link.url.toHttpUrl().toUri().normalize()
 					}
+				}
 
 				try {
-					if (extEntity == null)
+					if (extEntity == null) {
 						extEntity = extRepo.getInstalledExtension(link.extensionQRCode.id)
+					}
 				} catch (e: SQLiteException) {
 					exception.value = e
 					return@launchIO
@@ -401,19 +407,21 @@ class AddShareViewModel(
 								imageURL = link.imageURL,
 								title = link.name,
 								extensionID = link.extensionQRCode.id,
-								bookmarked = autoBookmark
-							)
+								bookmarked = autoBookmark,
+							),
 						)
 
-						if (stripped != null)
+						if (stripped != null) {
 							novelEntity = novelRepo.getNovel(stripped.id)!!
+						}
 					} else {
-						if (autoBookmark)
+						if (autoBookmark) {
 							novelRepo.update(
 								novelEntity!!.copy(
-									bookmarked = true
-								)
+									bookmarked = true,
+								),
 							)
+						}
 					}
 
 					isNovelOpenable.value = true
@@ -460,6 +468,5 @@ class AddShareViewModel(
 		showURLInput.value = true
 	}
 
-	override fun getNovel(): NovelEntity? =
-		novelEntity
+	override fun getNovel(): NovelEntity? = novelEntity
 }

@@ -794,5 +794,7 @@
 	<string name="view_browse_confirm_uninstall_desc">Please confirm to uninstall this extension</string>
 	<string name="view_browse_label_open_catalogue">Open Catalogue</string>
 	<string name="view_browse_label_cant_open_catalogue">Do nothing, please install extension</string>
+	<string name="view_browse_label_install_extension">Install extension "%s"</string>
+	<string name="view_browse_label_open_settings">Open %s settings</string>
 
 </resources>

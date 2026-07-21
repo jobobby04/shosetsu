@@ -44,7 +44,7 @@ fun Context.openInBrowser(url: Uri, pkg: String? = null) {
 		startActivity(
 			Intent(Intent.ACTION_VIEW, url).apply {
 				setPackage(pkg)
-			}
+			},
 		)
 	} catch (e: ActivityNotFoundException) {
 		// if pkg is not found, retry with pkg null
@@ -52,32 +52,35 @@ fun Context.openInBrowser(url: Uri, pkg: String? = null) {
 	}
 }
 
-fun Context.openInBrowser(url: String, pkg: String? = null): Unit =
-	openInBrowser(url.toUri(), pkg)
+fun Context.openInBrowser(url: String, pkg: String? = null): Unit = openInBrowser(url.toUri(), pkg)
 
 fun Context.openInWebView(url: String) {
 	logI("Opening in web view: $url")
-	startActivity(intent(this, WebViewApp::class.java) {
-		bundleOf(
-			BundleKeys.BUNDLE_URL to url,
-		)
-	})
+	startActivity(
+		intent(this, WebViewApp::class.java) {
+			bundleOf(
+				BundleKeys.BUNDLE_URL to url,
+			)
+		},
+	)
 }
 
 fun Activity.openShare(url: String, title: String) {
 	logI("Sharing URL ($title):($url)")
 	application.startActivity(
-		Intent.createChooser(Intent().apply {
-			action = Intent.ACTION_SEND
-			putExtra(Intent.EXTRA_TEXT, url)
-			putExtra(Intent.EXTRA_TITLE, title)
-			type = "text/plain"
-		}, null).apply {
+		Intent.createChooser(
+			Intent().apply {
+				action = Intent.ACTION_SEND
+				putExtra(Intent.EXTRA_TEXT, url)
+				putExtra(Intent.EXTRA_TITLE, title)
+				type = "text/plain"
+			},
+			null,
+		).apply {
 			addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-		}
+		},
 	)
 }
-
 
 /**
  * shosetsu
@@ -90,12 +93,14 @@ fun Activity.openShare(url: String, title: String) {
  */
 
 fun Context.openChapter(novelID: Int, chapterID: Int) {
-	startActivity(intent(this, ChapterReader::class.java) {
-		bundleOf(
-			BUNDLE_CHAPTER_ID to chapterID,
-			BUNDLE_NOVEL_ID to novelID
-		)
-	})
+	startActivity(
+		intent(this, ChapterReader::class.java) {
+			bundleOf(
+				BUNDLE_CHAPTER_ID to chapterID,
+				BUNDLE_NOVEL_ID to novelID,
+			)
+		},
+	)
 }
 
 fun Context.readAsset(name: String): String {

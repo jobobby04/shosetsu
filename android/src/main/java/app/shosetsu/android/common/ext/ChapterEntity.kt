@@ -36,7 +36,7 @@ fun ChapterEntity.toDB(): DBChapterEntity = DBChapterEntity(
 	readingPosition,
 	readingStatus,
 	bookmarked,
-	isSaved
+	isSaved,
 )
 
 fun List<ChapterEntity>.toDB() = map { it.toDB() }

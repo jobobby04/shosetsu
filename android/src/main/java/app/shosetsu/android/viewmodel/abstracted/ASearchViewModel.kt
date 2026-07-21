@@ -26,9 +26,6 @@ import kotlinx.coroutines.flow.StateFlow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
 /**
  * shosetsu
  * 01 / 05 / 2020
@@ -94,5 +91,4 @@ abstract class ASearchViewModel : ShosetsuViewModel() {
 	 * Get the exception that occurred in a certain row
 	 */
 	abstract fun getException(id: Int): Flow<Throwable?>
-
 }

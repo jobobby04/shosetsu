@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NovelCategoriesDao : BaseDao<DBNovelCategoryEntity> {
 
-	//# Queries
+	// # Queries
 
 	/**
 	 * Gets a flow of the novel categories corresponding to the novel

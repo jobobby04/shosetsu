@@ -39,7 +39,7 @@ class CategoriesViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val addCategoryUseCase: AddCategoryUseCase,
 	private val deleteCategoryUseCase: DeleteCategoryUseCase,
-	private val moveCategoryUseCase: MoveCategoryUseCase
+	private val moveCategoryUseCase: MoveCategoryUseCase,
 ) : ACategoriesViewModel() {
 
 	override val liveData: StateFlow<ImmutableList<CategoryUI>> by lazy {
@@ -67,8 +67,8 @@ class CategoriesViewModel(
 				addCategoryState.emit(
 					CategoryChangeState.Failure(
 						CategoryUI(-1, name, -1),
-						e
-					)
+						e,
+					),
 				)
 			} finally {
 				delay(100)
@@ -86,8 +86,8 @@ class CategoriesViewModel(
 				removeCategoryState.emit(
 					CategoryChangeState.Failure(
 						categoryUI,
-						e
-					)
+						e,
+					),
 				)
 			} finally {
 				delay(100)
@@ -105,8 +105,8 @@ class CategoriesViewModel(
 				moveUpCategoryState.emit(
 					CategoryChangeState.Failure(
 						categoryUI,
-						e
-					)
+						e,
+					),
 				)
 			} finally {
 				delay(100)
@@ -124,8 +124,8 @@ class CategoriesViewModel(
 				moveDownCategoryState.emit(
 					CategoryChangeState.Failure(
 						categoryUI,
-						e
-					)
+						e,
+					),
 				)
 			} finally {
 				delay(100)

@@ -50,18 +50,22 @@ import kotlinx.coroutines.flow.Flow
 fun <T : Any> LazyGridScope.itemsIndexed(
 	items: LazyPagingItems<T>,
 	key: ((index: Int, item: T) -> Any)? = null,
-	itemContent: @Composable LazyGridItemScope.(index: Int, value: T?) -> Unit
+	itemContent: @Composable LazyGridItemScope.(index: Int, value: T?) -> Unit,
 ) {
 	items(
 		count = items.itemCount,
-		key = if (key == null) null else { index ->
-			val item = items.peek(index)
-			if (item == null) {
-				PagingPlaceholderKey(index)
-			} else {
-				key(index, item)
+		key = if (key == null) {
+			null
+		} else {
+			{ index ->
+				val item = items.peek(index)
+				if (item == null) {
+					PagingPlaceholderKey(index)
+				} else {
+					key(index, item)
+				}
 			}
-		}
+		},
 	) { index ->
 		itemContent(index, items[index])
 	}
@@ -72,17 +76,14 @@ data class PagingPlaceholderKey(private val index: Int) : Parcelable {
 		parcel.writeInt(index)
 	}
 
-	override fun describeContents(): Int {
-		return 0
-	}
+	override fun describeContents(): Int = 0
 
 	companion object {
 		@Suppress("unused")
 		@JvmField
 		val CREATOR: Parcelable.Creator<PagingPlaceholderKey> =
 			object : Parcelable.Creator<PagingPlaceholderKey> {
-				override fun createFromParcel(parcel: Parcel) =
-					PagingPlaceholderKey(parcel.readInt())
+				override fun createFromParcel(parcel: Parcel) = PagingPlaceholderKey(parcel.readInt())
 
 				override fun newArray(size: Int) = arrayOfNulls<PagingPlaceholderKey?>(size)
 			}

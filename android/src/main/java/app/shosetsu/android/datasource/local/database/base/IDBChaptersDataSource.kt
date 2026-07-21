@@ -25,9 +25,6 @@ import kotlinx.coroutines.flow.Flow
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-
 /**
  * shosetsu
  * 04 / 05 / 2020
@@ -51,11 +48,7 @@ interface IDBChaptersDataSource {
 
 	/** Handles chapters from a remote source */
 	@Throws(SQLiteException::class)
-	suspend fun handleChapters(
-		novelID: Int,
-		extensionID: Int,
-		list: List<Novel.Chapter>
-	)
+	suspend fun handleChapters(novelID: Int, extensionID: Int, list: List<Novel.Chapter>)
 
 	/** Handles chapters from a remote source, then returns the new chapters */
 	@Throws(IndexOutOfBoundsException::class, SQLiteException::class)

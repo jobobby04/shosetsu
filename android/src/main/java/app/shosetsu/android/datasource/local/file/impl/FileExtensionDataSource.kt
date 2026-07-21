@@ -35,9 +35,8 @@ import java.io.IOException
  * shosetsu
  * 12 / 05 / 2020
  */
-class FileExtensionDataSource(
-	private val iFileSystemProvider: IFileSystemProvider
-) : IFileExtensionDataSource {
+class FileExtensionDataSource(private val iFileSystemProvider: IFileSystemProvider) :
+	IFileExtensionDataSource {
 	init {
 		logV("Creating required directories")
 		try {
@@ -88,10 +87,9 @@ class FileExtensionDataSource(
 		iFileSystemProvider.writeFile(
 			FILES,
 			makeRepoExtensionFilePath(entity),
-			data
+			data,
 		)
 	}
-
 
 	@Throws(FilePermissionException::class)
 	override suspend fun deleteExtension(entity: GenericExtensionEntity) {

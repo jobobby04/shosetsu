@@ -26,15 +26,14 @@ import kotlinx.coroutines.flow.flow
  * 11 / 03 / 2021
  */
 class GetExtSelectedListingFlowUseCase(
-	private val iExtensionSettingsRepository: IExtensionSettingsRepository
+	private val iExtensionSettingsRepository: IExtensionSettingsRepository,
 ) {
-	operator fun invoke(extensionId: Int): Flow<Int> =
-		flow {
-			if (extensionId == -1) {
-				emit(-1)
-				return@flow
-			}
-
-			emitAll(iExtensionSettingsRepository.observeSelectedListing(extensionId))
+	operator fun invoke(extensionId: Int): Flow<Int> = flow {
+		if (extensionId == -1) {
+			emit(-1)
+			return@flow
 		}
+
+		emitAll(iExtensionSettingsRepository.observeSelectedListing(extensionId))
+	}
 }

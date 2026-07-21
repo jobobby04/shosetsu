@@ -8,9 +8,9 @@ import app.shosetsu.lib.Novel
 import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.QUERY_INDEX
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
 import okio.ArrayIndexOutOfBoundsException
 import org.luaj.vm2.LuaError
-import java.io.IOException
 
 /*
  * This file is part of Shosetsu.
@@ -29,7 +29,6 @@ import java.io.IOException
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 10 / May / 2020
@@ -40,18 +39,22 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 		ext: IExtension,
 		query: String,
 		data: Map<Int, Any>,
-	): List<Novel.Info> {
-		return if (ext.hasSearch) {
-			try {
-				ext.search(HashMap(data).apply {
+	): List<Novel.Info> = if (ext.hasSearch) {
+		try {
+			ext.search(
+				HashMap(data).apply {
 					this[QUERY_INDEX] = query
-				}).toList()
-			} catch (e: LuaError) {
-				if (e.cause != null)
-					throw e.cause!!
-				else throw e
+				},
+			).toList()
+		} catch (e: LuaError) {
+			if (e.cause != null) {
+				throw e.cause!!
+			} else {
+				throw e
 			}
-		} else emptyList()
+		}
+	} else {
+		emptyList()
 	}
 
 	@Throws(HTTPException::class, LuaError::class, IOException::class, InvalidListingIndex::class)
@@ -73,13 +76,16 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 
 		return if (!listing.isIncrementing && (data[PAGE_INDEX] as Int) > ext.startIndex) {
 			emptyList()
-		} else try {
-			listing.getListing(data).toList()
-		} catch (e: LuaError) {
-			if (e.cause != null)
-				throw e.cause!!
-			else throw e
+		} else {
+			try {
+				listing.getListing(data).toList()
+			} catch (e: LuaError) {
+				if (e.cause != null) {
+					throw e.cause!!
+				} else {
+					throw e
+				}
+			}
 		}
 	}
 }
-

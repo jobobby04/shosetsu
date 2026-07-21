@@ -4,14 +4,15 @@ import app.shosetsu.android.common.consts.MEMORY_EXPIRE_CHAPTER_TIME
 import app.shosetsu.android.common.consts.MEMORY_MAX_CHAPTERS
 import app.shosetsu.android.datasource.local.memory.impl.ConCacheFactory
 import app.shosetsu.android.datasource.local.memory.impl.MemChaptersDataSource
+import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.junit.Before
 import org.junit.Test
-import kotlin.system.measureTimeMillis
-import kotlin.time.Duration.Companion.minutes
 
 /*
  * This file is part of Shosetsu.
@@ -37,7 +38,7 @@ import kotlin.time.Duration.Companion.minutes
  */
 class MemoryChapterDataSourceTest {
 	private val memorySource by lazy { MemChaptersDataSource(ConCacheFactory()) }
-	private val expireTime by lazy { MEMORY_EXPIRE_CHAPTER_TIME.minutes.inWholeMilliseconds }
+	private val expireTime by lazy { MEMORY_EXPIRE_CHAPTER_TIME.minutes }
 
 	/**
 	 * Double check that the expire time is correct and it is a memory source
@@ -47,7 +48,9 @@ class MemoryChapterDataSourceTest {
 		println("=================================")
 		// How long until data expires
 		println("Expires in $expireTime ms")
-		require((expireTime / (60 * 1000)) == MEMORY_EXPIRE_CHAPTER_TIME) { "Expire time does not match up properly" }
+		require((expireTime.inWholeMilliseconds / (60 * 1000)) == MEMORY_EXPIRE_CHAPTER_TIME) {
+			"Expire time does not match up properly"
+		}
 		println("Expire time matches")
 	}
 
@@ -60,14 +63,14 @@ class MemoryChapterDataSourceTest {
 			val job = GlobalScope.launch {
 				println("Saving enough chapters to go over max limit")
 
-
 				println("Saving #$CHAPTER_ID, to ensure it is deleted")
 				// Saving this chapter
 				memorySource.saveChapterInCache(CHAPTER_ID, CHAPTER_CONTENT.toByteArray())
 
 				println("Saving chapters")
-				for (i in 1 until MEMORY_MAX_CHAPTERS + 2)
-					memorySource.saveChapterInCache(i.toInt(), "$i".toByteArray())
+				for (i in 1 until MEMORY_MAX_CHAPTERS + 2) {
+					memorySource.saveChapterInCache(i, "$i".toByteArray())
+				}
 
 				println("Checking if chapter is present")
 				require(memorySource.loadChapterFromCache(CHAPTER_ID) != null)
@@ -90,13 +93,13 @@ class MemoryChapterDataSourceTest {
 				memorySource.loadChapterFromCache(CHAPTER_ID).let {
 					println("We have $CHAPTER_CONTENT, ensuring they are the same")
 					assert(
-						CHAPTER_CONTENT.toByteArray().contentEquals(it)
+						CHAPTER_CONTENT.toByteArray().contentEquals(it),
 					) { "They are not the same" }
 					println("They match up")
 				}
 				println("Delaying until time is sufficient for it to be deleted")
 
-				delay(expireTime + 1000)
+				delay(expireTime + 1.seconds)
 				assert(memorySource.loadChapterFromCache(CHAPTER_ID) == null) {
 					"Did not delete"
 				}

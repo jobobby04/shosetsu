@@ -32,20 +32,15 @@ import app.shosetsu.android.view.uimodels.model.BrowseExtensionUI
  */
 class RequestInstallExtensionUseCase(
 	private val repo: IExtensionDownloadRepository,
-	private val manager: ExtensionInstallWorker.Manager
+	private val manager: ExtensionInstallWorker.Manager,
 ) {
-	suspend operator fun invoke(
-		extension: BrowseExtensionUI,
-		option: ExtensionInstallOptionEntity
-	) =
+	suspend operator fun invoke(extension: BrowseExtensionUI, option: ExtensionInstallOptionEntity) =
 		invoke(extension.id, option.repoId)
 
 	/**
 	 * Update an extension
 	 */
-	suspend operator fun invoke(
-		extension: BrowseExtensionUI,
-	) =
+	suspend operator fun invoke(extension: BrowseExtensionUI) =
 		invoke(extension.id, extension.installedRepo)
 
 	suspend operator fun invoke(id: Int, repoId: Int) {
@@ -55,15 +50,17 @@ class RequestInstallExtensionUseCase(
 				Data.Builder().apply {
 					putInt(KEY_EXTENSION_ID, id)
 					putInt(KEY_REPOSITORY_ID, repoId)
-				}.build()
+				}.build(),
 			)
 		}
 
 		when (val status = repo.getStatus(id)) {
 			DownloadStatus.WAITING -> doIt()
+
 			else -> {
-				if (status == DownloadStatus.ERROR || status == DownloadStatus.COMPLETE)
+				if (status == DownloadStatus.ERROR || status == DownloadStatus.COMPLETE) {
 					doIt()
+				}
 			}
 		}
 	}

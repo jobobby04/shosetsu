@@ -90,19 +90,21 @@ fun CatalogFilterMenuPreview() = ShosetsuTheme(AppThemes.LIGHT) {
 			Filter.Dropdown(5, "Drop down", listOf("A", "B", "C")),
 			Filter.RadioGroup(6, "Radio group", listOf("A", "B", "C")),
 			Filter.FList(
-				"List", listOf(
+				"List",
+				listOf(
 					Filter.Switch(7, "Switch"),
 					Filter.Checkbox(8, "Checkbox"),
 					Filter.TriState(9, "Tri state"),
-				)
+				),
 			),
 			Filter.Group(
-				"Group", listOf(
+				"Group",
+				listOf(
 					Filter.Switch(10, "Switch"),
 					Filter.Switch(11, "Switch"),
 					Filter.Switch(12, "Switch"),
-				)
-			)
+				),
+			),
 		).map { StableHolder(it) }.toImmutableList() as ImmutableList<StableHolder<Filter<*>>>,
 		getBoolean = { MutableStateFlow(false) },
 		setBoolean = { _, _ -> },
@@ -111,7 +113,7 @@ fun CatalogFilterMenuPreview() = ShosetsuTheme(AppThemes.LIGHT) {
 		getString = { MutableStateFlow("") },
 		setString = { _, _ -> },
 		applyFilter = {},
-		resetFilter = {}
+		resetFilter = {},
 	)
 }
 
@@ -125,11 +127,11 @@ fun CatalogFilterMenu(
 	getString: (Filter<String>) -> Flow<String>,
 	setString: (Filter<String>, String) -> Unit,
 	applyFilter: () -> Unit,
-	resetFilter: () -> Unit
+	resetFilter: () -> Unit,
 ) {
 	Column(
 		modifier = Modifier,
-		verticalArrangement = Arrangement.Bottom
+		verticalArrangement = Arrangement.Bottom,
 	) {
 		CatalogFilterMenuControlContent(resetFilter, applyFilter)
 
@@ -140,9 +142,8 @@ fun CatalogFilterMenu(
 			getInt,
 			setInt,
 			getString,
-			setString
+			setString,
 		)
-
 	}
 }
 
@@ -154,13 +155,13 @@ fun CatalogFilterMenuFilterListContent(
 	getInt: (Filter<Int>) -> Flow<Int>,
 	setInt: (Filter<Int>, Int) -> Unit,
 	getString: (Filter<String>) -> Flow<String>,
-	setString: (Filter<String>, String) -> Unit
+	setString: (Filter<String>, String) -> Unit,
 ) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
 			.verticalScroll(rememberScrollState()),
-		verticalArrangement = Arrangement.Bottom
+		verticalArrangement = Arrangement.Bottom,
 	) {
 		Spacer(Modifier.height(16.dp))
 		list.forEach { filter ->
@@ -170,47 +171,48 @@ fun CatalogFilterMenuFilterListContent(
 				}
 
 				is Filter.Separator -> HorizontalDivider()
+
 				is Filter.Password -> CatalogFilterMenuTextContent(
 					filter as StableHolder<Filter.Text>,
 					getString,
-					setString
+					setString,
 				)
 
 				is Filter.Text -> CatalogFilterMenuTextContent(
 					filter as StableHolder<Filter.Text>,
 					getString,
-					setString
+					setString,
 				)
 
 				is Filter.Switch -> CatalogFilterMenuSwitchContent(
 					filter as StableHolder<Filter.Switch>,
 					getBoolean,
-					setBoolean
+					setBoolean,
 				)
 
 				is Filter.Checkbox ->
 					CatalogFilterMenuCheckboxContent(
 						filter as StableHolder<Filter.Checkbox>,
 						getBoolean,
-						setBoolean
+						setBoolean,
 					)
 
 				is Filter.TriState -> CatalogFilterMenuTriStateContent(
 					filter as StableHolder<Filter.TriState>,
 					getInt,
-					setInt
+					setInt,
 				)
 
 				is Filter.Dropdown -> CatalogFilterMenuDropDownContent(
 					filter as StableHolder<Filter.Dropdown>,
 					getInt,
-					setInt
+					setInt,
 				)
 
 				is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(
 					filter as StableHolder<Filter.RadioGroup>,
 					getInt,
-					setInt
+					setInt,
 				)
 
 				is Filter.FList -> {
@@ -220,7 +222,12 @@ fun CatalogFilterMenuFilterListContent(
 								.toImmutableList()
 						},
 						filter.item.name,
-						getBoolean, setBoolean, getInt, setInt, getString, setString
+						getBoolean,
+						setBoolean,
+						getInt,
+						setInt,
+						getString,
+						setString,
 					)
 				}
 
@@ -231,7 +238,12 @@ fun CatalogFilterMenuFilterListContent(
 								.toImmutableList()
 						},
 						filter.item.name,
-						getBoolean, setBoolean, getInt, setInt, getString, setString
+						getBoolean,
+						setBoolean,
+						getInt,
+						setInt,
+						getString,
+						setString,
 					)
 				}
 			}
@@ -255,7 +267,7 @@ fun PreviewCatalogFilterMenuFilterListContent() = ShosetsuTheme(AppThemes.LIGHT)
 		getInt = { MutableStateFlow(1) },
 		setInt = { _, _ -> },
 		getString = { MutableStateFlow("") },
-		setString = { _, _ -> }
+		setString = { _, _ -> },
 	)
 }
 
@@ -268,11 +280,11 @@ fun CatalogFilterMenuFilterListContent(
 	getInt: (Filter<Int>) -> Flow<Int>,
 	setInt: (Filter<Int>, Int) -> Unit,
 	getString: (Filter<String>) -> Flow<String>,
-	setString: (Filter<String>, String) -> Unit
+	setString: (Filter<String>, String) -> Unit,
 ) {
 	var collapsed by remember { mutableStateOf(true) }
 	Column(
-		modifier = Modifier.fillMaxWidth()
+		modifier = Modifier.fillMaxWidth(),
 	) {
 		Row(
 			modifier = Modifier
@@ -281,19 +293,20 @@ fun CatalogFilterMenuFilterListContent(
 				.clickable(onClick = { collapsed = !collapsed })
 				.padding(horizontal = 16.dp),
 			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(text = name)
 			IconToggleButton(
 				onCheckedChange = {
 					collapsed = it
 				},
-				checked = collapsed
+				checked = collapsed,
 			) {
-				if (collapsed)
+				if (collapsed) {
 					Icon(Icons.Outlined.ExpandMore, "")
-				else
+				} else {
 					Icon(Icons.Outlined.ExpandLess, "")
+				}
 			}
 		}
 
@@ -301,7 +314,7 @@ fun CatalogFilterMenuFilterListContent(
 			Column(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(horizontal = 16.dp)
+					.padding(horizontal = 16.dp),
 			) {
 				list.forEach { filter ->
 					when (filter.item) {
@@ -310,52 +323,53 @@ fun CatalogFilterMenuFilterListContent(
 						}
 
 						is Filter.Separator -> HorizontalDivider()
+
 						is Filter.Password -> CatalogFilterMenuTextContent(
 							filter as StableHolder<Filter.Text>,
 							getString,
-							setString
+							setString,
 						)
 
 						is Filter.Text -> CatalogFilterMenuTextContent(
 							filter as StableHolder<Filter.Text>,
 							getString,
-							setString
+							setString,
 						)
 
 						is Filter.Switch -> CatalogFilterMenuSwitchContent(
 							filter as StableHolder<Filter.Switch>,
 							getBoolean,
-							setBoolean
+							setBoolean,
 						)
 
 						is Filter.Checkbox -> CatalogFilterMenuCheckboxContent(
 							filter as StableHolder<Filter.Checkbox>,
 							getBoolean,
-							setBoolean
+							setBoolean,
 						)
 
 						is Filter.TriState -> CatalogFilterMenuTriStateContent(
 							filter as StableHolder<Filter.TriState>,
 							getInt,
-							setInt
+							setInt,
 						)
 
 						is Filter.Dropdown -> CatalogFilterMenuDropDownContent(
 							filter as StableHolder<Filter.Dropdown>,
 							getInt,
-							setInt
+							setInt,
 						)
 
 						is Filter.RadioGroup -> CatalogFilterMenuRadioGroupContent(
 							filter as StableHolder<Filter.RadioGroup>,
 							getInt,
-							setInt
+							setInt,
 						)
 
 						is Filter.FList -> {
 							Log.e(
 								"FilterListContent",
-								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists"
+								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists",
 							)
 							CatalogFilterMenuFilterListContent(
 								remember {
@@ -368,14 +382,14 @@ fun CatalogFilterMenuFilterListContent(
 								getInt,
 								setInt,
 								getString,
-								setString
+								setString,
 							)
 						}
 
 						is Filter.Group<*> -> {
 							Log.e(
 								"FilterListContent",
-								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists"
+								"CatalogFilterMenuFilterListContent: Please avoid usage of lists in sub lists",
 							)
 							CatalogFilterMenuFilterListContent(
 								remember {
@@ -388,12 +402,11 @@ fun CatalogFilterMenuFilterListContent(
 								getInt,
 								setInt,
 								getString,
-								setString
+								setString,
 							)
 						}
 					}
 				}
-
 			}
 		}
 	}
@@ -405,7 +418,7 @@ fun PreviewCatalogFilterMenuTextContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	CatalogFilterMenuTextContent(
 		filterHolder = StableHolder(Filter.Text(0, "This is a text input")),
 		{ MutableStateFlow("") },
-		{ _, _ -> }
+		{ _, _ -> },
 	)
 }
 
@@ -414,7 +427,7 @@ fun PreviewCatalogFilterMenuTextContent() = ShosetsuTheme(AppThemes.LIGHT) {
 fun CatalogFilterMenuTextContent(
 	filterHolder: StableHolder<Filter.Text>,
 	getString: (Filter<String>) -> Flow<String>,
-	setString: (Filter<String>, String) -> Unit
+	setString: (Filter<String>, String) -> Unit,
 ) {
 	val filter = filterHolder.item
 	val text by getString(filter)
@@ -429,7 +442,7 @@ fun CatalogFilterMenuTextContent(
 		onValueChange = { setString(filter, it) },
 		label = {
 			Text(text = filter.name)
-		}
+		},
 	)
 }
 
@@ -439,7 +452,7 @@ fun PreviewCatalogFilterMenuSwitchContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	CatalogFilterMenuSwitchContent(
 		filterHolder = StableHolder(Filter.Switch(0, "Switch")),
 		{ MutableStateFlow(false) },
-		{ _, _ -> }
+		{ _, _ -> },
 	)
 }
 
@@ -447,7 +460,7 @@ fun PreviewCatalogFilterMenuSwitchContent() = ShosetsuTheme(AppThemes.LIGHT) {
 fun CatalogFilterMenuSwitchContent(
 	filterHolder: StableHolder<Filter.Switch>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
-	setBoolean: (Filter<Boolean>, Boolean) -> Unit
+	setBoolean: (Filter<Boolean>, Boolean) -> Unit,
 ) {
 	val filter = filterHolder.item
 	val state by getBoolean(filter)
@@ -460,12 +473,12 @@ fun CatalogFilterMenuSwitchContent(
 			.clickable(onClick = { setBoolean(filter, !state) })
 			.padding(horizontal = 16.dp),
 		horizontalArrangement = Arrangement.SpaceBetween,
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Text(text = filter.name)
 		Switch(
 			checked = state,
-			onCheckedChange = null
+			onCheckedChange = null,
 		)
 	}
 }
@@ -476,14 +489,15 @@ fun PreviewCatalogFilterMenuCheckboxContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	CatalogFilterMenuCheckboxContent(
 		filterHolder = StableHolder(Filter.Checkbox(0, "Checkbox")),
 		{ MutableStateFlow(false) },
-		{ _, _ -> })
+		{ _, _ -> },
+	)
 }
 
 @Composable
 fun CatalogFilterMenuCheckboxContent(
 	filterHolder: StableHolder<Filter.Checkbox>,
 	getBoolean: (Filter<Boolean>) -> Flow<Boolean>,
-	setBoolean: (Filter<Boolean>, Boolean) -> Unit
+	setBoolean: (Filter<Boolean>, Boolean) -> Unit,
 ) {
 	val filter = filterHolder.item
 	val state by getBoolean(filter)
@@ -496,12 +510,12 @@ fun CatalogFilterMenuCheckboxContent(
 			.clickable(onClick = { setBoolean(filter, !state) })
 			.padding(horizontal = 16.dp),
 		horizontalArrangement = Arrangement.SpaceBetween,
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Text(text = filter.name)
 		Checkbox(
 			checked = state,
-			onCheckedChange = null
+			onCheckedChange = null,
 		)
 	}
 }
@@ -512,14 +526,15 @@ fun PreviewCatalogFilterMenuTriStateContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	CatalogFilterMenuTriStateContent(
 		filterHolder = StableHolder(Filter.TriState(0, "Tristate")),
 		{ MutableStateFlow(1) },
-		{ _, _ -> })
+		{ _, _ -> },
+	)
 }
 
 @Composable
 fun CatalogFilterMenuTriStateContent(
 	filterHolder: StableHolder<Filter.TriState>,
 	getInt: (Filter<Int>) -> Flow<Int>,
-	setInt: (Filter<Int>, Int) -> Unit
+	setInt: (Filter<Int>, Int) -> Unit,
 ) {
 	val filter = filterHolder.item
 	val triState by getInt(filter)
@@ -544,17 +559,17 @@ fun CatalogFilterMenuTriStateContent(
 						Filter.TriState.STATE_INCLUDE -> Filter.TriState.STATE_EXCLUDE
 						Filter.TriState.STATE_EXCLUDE -> Filter.TriState.STATE_IGNORED
 						else -> Filter.TriState.STATE_IGNORED
-					}
+					},
 				)
 			})
 			.padding(horizontal = 16.dp),
 		horizontalArrangement = Arrangement.SpaceBetween,
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Text(text = filter.name)
 		TriStateCheckbox(
 			state = convertedState,
-			onClick = null
+			onClick = null,
 		)
 	}
 }
@@ -565,7 +580,7 @@ fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuTheme(AppThemes.LIGHT) {
 	CatalogFilterMenuDropDownContent(
 		filterHolder = StableHolder(Filter.Dropdown(0, "Dropdown", listOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
-		{ _, _ -> }
+		{ _, _ -> },
 	)
 }
 
@@ -573,7 +588,7 @@ fun PreviewCatalogFilterMenuDropDownContent() = ShosetsuTheme(AppThemes.LIGHT) {
 fun CatalogFilterMenuDropDownContent(
 	filterHolder: StableHolder<Filter.Dropdown>,
 	getInt: (Filter<Int>) -> Flow<Int>,
-	setInt: (Filter<Int>, Int) -> Unit
+	setInt: (Filter<Int>, Int) -> Unit,
 ) {
 	val filter = filterHolder.item
 	val selection by getInt(filter)
@@ -587,10 +602,9 @@ fun CatalogFilterMenuDropDownContent(
 			.clickable(onClick = { expanded = true })
 			.padding(horizontal = 16.dp),
 		horizontalArrangement = Arrangement.SpaceBetween,
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Text(text = filter.name)
-
 
 		Row(
 			modifier = Modifier.fillMaxHeight(),
@@ -604,13 +618,13 @@ fun CatalogFilterMenuDropDownContent(
 					expanded = it
 				},
 				checked = expanded,
-				modifier = Modifier.wrapContentWidth()
+				modifier = Modifier.wrapContentWidth(),
 			) {
-
-				if (expanded)
+				if (expanded) {
 					Icon(Icons.Outlined.ExpandLess, "")
-				else
+				} else {
 					Icon(Icons.Outlined.ExpandMore, "")
+				}
 			}
 			DropdownMenu(
 				expanded = expanded,
@@ -624,7 +638,7 @@ fun CatalogFilterMenuDropDownContent(
 						},
 						text = {
 							Text(text = AnnotatedString(s))
-						}
+						},
 					)
 				}
 			}
@@ -638,7 +652,7 @@ fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuTheme(AppThemes.LIGHT)
 	CatalogFilterMenuRadioGroupContent(
 		filterHolder = StableHolder(Filter.RadioGroup(0, "Dropdown", listOf("A", "B", "C"))),
 		{ MutableStateFlow(1) },
-		{ _, _ -> }
+		{ _, _ -> },
 	)
 }
 
@@ -646,7 +660,7 @@ fun PreviewCatalogFilterMenuRadioGroupContent() = ShosetsuTheme(AppThemes.LIGHT)
 fun CatalogFilterMenuRadioGroupContent(
 	filterHolder: StableHolder<Filter.RadioGroup>,
 	getInt: (Filter<Int>) -> Flow<Int>,
-	setInt: (Filter<Int>, Int) -> Unit
+	setInt: (Filter<Int>, Int) -> Unit,
 ) {
 	val filter = filterHolder.item
 	val selection by getInt(filter)
@@ -663,7 +677,7 @@ fun CatalogFilterMenuRadioGroupContent(
 				.clickable(onClick = { expanded = !expanded })
 				.padding(horizontal = 16.dp),
 			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Text(text = filter.name)
 
@@ -671,12 +685,13 @@ fun CatalogFilterMenuRadioGroupContent(
 				onCheckedChange = {
 					expanded = it
 				},
-				checked = expanded
+				checked = expanded,
 			) {
-				if (expanded)
+				if (expanded) {
 					Icon(Icons.Outlined.ExpandLess, "")
-				else
+				} else {
 					Icon(Icons.Outlined.ExpandMore, "")
+				}
 			}
 		}
 
@@ -693,12 +708,12 @@ fun CatalogFilterMenuRadioGroupContent(
 							.height(56.dp)
 							.clickable(onClick = { setInt(filter, index) }),
 						horizontalArrangement = Arrangement.SpaceBetween,
-						verticalAlignment = Alignment.CenterVertically
+						verticalAlignment = Alignment.CenterVertically,
 					) {
 						Text(text = s)
 						RadioButton(
 							selected = index == selection,
-							onClick = null
+							onClick = null,
 						)
 					}
 				}
@@ -708,10 +723,7 @@ fun CatalogFilterMenuRadioGroupContent(
 }
 
 @Composable
-fun CatalogFilterMenuControlContent(
-	resetFilter: () -> Unit,
-	applyFilter: () -> Unit
-) {
+fun CatalogFilterMenuControlContent(resetFilter: () -> Unit, applyFilter: () -> Unit) {
 	Surface(
 		modifier = Modifier
 			.fillMaxWidth(),
@@ -719,7 +731,7 @@ fun CatalogFilterMenuControlContent(
 		Row(
 			horizontalArrangement = Arrangement.SpaceEvenly,
 			verticalAlignment = Alignment.CenterVertically,
-			modifier = Modifier.fillMaxWidth()
+			modifier = Modifier.fillMaxWidth(),
 		) {
 			TextButton(onClick = resetFilter, contentPadding = PaddingValues(8.dp)) {
 				Text(text = stringResource(id = R.string.reset))

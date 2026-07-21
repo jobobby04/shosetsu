@@ -97,11 +97,7 @@ import kotlinx.coroutines.launch
  * @author github.com/doomsdayrs
  */
 @Composable
-fun SearchView(
-	initalQuery: String?,
-	openNovel: (novelId: Int) -> Unit,
-	onBack: () -> Unit
-) {
+fun SearchView(initalQuery: String?, openNovel: (novelId: Int) -> Unit, onBack: () -> Unit) {
 	val viewModel: ASearchViewModel = viewModelDi()
 
 	LaunchedEffect(initalQuery) {
@@ -129,10 +125,11 @@ fun SearchView(
 		rows = rows,
 		isCozy = isCozy,
 		getChildren = {
-			if (it == -1)
+			if (it == -1) {
 				viewModel.searchLibrary()
-			else
+			} else {
 				viewModel.searchExtension(it)
+			}
 		},
 		getException = viewModel::getException,
 		onClick = {
@@ -144,7 +141,7 @@ fun SearchView(
 		onBack = onBack,
 		onSetQuery = viewModel::setQuery,
 		onApply = viewModel::applyQuery,
-		snackbarHostState = snackbarHostState
+		snackbarHostState = snackbarHostState,
 	)
 }
 
@@ -157,9 +154,9 @@ fun PreviewSearchContent() {
 				SearchRowUI(
 					it,
 					"Test",
-					""
+					"",
 				)
-			}
+			},
 		),
 		getException = {
 			flow { emit(null) }
@@ -189,12 +186,10 @@ fun SearchContent(
 	onClick: (ACatalogNovelUI) -> Unit,
 	onRefresh: (id: Int) -> Unit,
 	onRefreshAll: () -> Unit,
-
 	onBack: () -> Unit,
-
 	query: String,
 	onSetQuery: (String) -> Unit,
-	onApply: (String) -> Unit
+	onApply: (String) -> Unit,
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefreshAll)
 	Scaffold(
@@ -205,23 +200,23 @@ fun SearchContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
 		},
 		snackbarHost = {
 			SnackbarHost(
 				snackbarHostState,
 				modifier = Modifier.windowInsetsPadding(
-					WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
-				)
+					WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom),
+				),
 			)
-		}
+		},
 	) { paddingValue ->
 		Box(
 			Modifier
 				.pullRefresh(pullRefreshState)
 				.padding(paddingValue)
-				.fillMaxSize()
+				.fillMaxSize(),
 		) {
 			Column {
 				SearchBar(
@@ -236,13 +231,13 @@ fun SearchContent(
 					},
 					placeholder = {
 						Text(stringResource(R.string.search))
-					}
+					},
 				) {
 				}
 
 				LazyColumn(
 					modifier = Modifier.fillMaxSize(),
-					contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp)
+					contentPadding = PaddingValues(top = 8.dp, bottom = 64.dp),
 				) {
 					items(rows, key = { row -> row.extensionID }) { row ->
 						val children: LazyPagingItems<ACatalogNovelUI> =
@@ -251,10 +246,11 @@ fun SearchContent(
 						SearchRowContent(
 							row = row,
 							loadingBar = {
-								if (children.loadState.refresh == LoadState.Loading)
+								if (children.loadState.refresh == LoadState.Loading) {
 									LinearProgressIndicator(
-										modifier = Modifier.fillMaxWidth()
+										modifier = Modifier.fillMaxWidth(),
 									)
+								}
 							},
 							items = {
 								items(
@@ -262,10 +258,10 @@ fun SearchContent(
 								) { index ->
 									val novelUI = children[index]
 									Box(
-										modifier = Modifier.width(105.dp)
+										modifier = Modifier.width(105.dp),
 									) {
-										if (novelUI != null)
-											if (!isCozy)
+										if (novelUI != null) {
+											if (!isCozy) {
 												NovelCardNormalContent(
 													novelUI.title,
 													novelUI.imageURL,
@@ -273,33 +269,39 @@ fun SearchContent(
 														onClick(novelUI)
 													},
 													onLongClick = {},
-													isBookmarked = novelUI.bookmarked
+													isBookmarked = novelUI.bookmarked,
 												)
-											else NovelCardCozyContent(
-												novelUI.title,
-												novelUI.imageURL,
-												onClick = {
-													onClick(novelUI)
-												},
-												onLongClick = {},
-												isBookmarked = novelUI.bookmarked
-											)
-										else if (!isCozy) PlaceholderNovelCardNormalContent() else PlaceholderNovelCardCozyContent()
+											} else {
+												NovelCardCozyContent(
+													novelUI.title,
+													novelUI.imageURL,
+													onClick = {
+														onClick(novelUI)
+													},
+													onLongClick = {},
+													isBookmarked = novelUI.bookmarked,
+												)
+											}
+										} else if (!isCozy) {
+											PlaceholderNovelCardNormalContent()
+										} else {
+											PlaceholderNovelCardCozyContent()
+										}
 									}
 								}
 							},
 							exception = {
 								val exception by getException(row.extensionID).collectAsState(null)
-								if (exception != null)
+								if (exception != null) {
 									ExceptionBar(
 										remember(exception) {
 											StableHolder(exception!!)
 										},
 										onRefresh = {
 											onRefresh(row.extensionID)
-										}
+										},
 									)
-								else {
+								} else {
 									val refreshState = children.loadState.refresh
 									if (refreshState is LoadState.Error) {
 										ExceptionBar(
@@ -308,11 +310,11 @@ fun SearchContent(
 											},
 											onRefresh = {
 												children.refresh()
-											}
+											},
 										)
 									}
 								}
-							}
+							},
 						)
 					}
 				}
@@ -321,31 +323,26 @@ fun SearchContent(
 			PullRefreshIndicator(
 				isRefreshing,
 				pullRefreshState,
-				Modifier.align(Alignment.TopCenter)
+				Modifier.align(Alignment.TopCenter),
 			)
 		}
 	}
-
 }
 
 @Composable
-fun ExceptionBar(
-	exception: StableHolder<Throwable>,
-	onRefresh: () -> Unit
-) {
+fun ExceptionBar(exception: StableHolder<Throwable>, onRefresh: () -> Unit) {
 	Row(
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Text(
 			exception.item.message ?: stringResource(R.string.unknown),
-			modifier = Modifier.fillMaxWidth(.75f)
+			modifier = Modifier.fillMaxWidth(.75f),
 		)
 		Button(onRefresh) {
 			Text(stringResource(R.string.retry))
 		}
 	}
 }
-
 
 @Preview
 @Composable
@@ -354,8 +351,12 @@ fun PreviewSearchRowContent() {
 		SearchRowUI(
 			extensionID = 0,
 			name = "Name",
-			imageURL = ""
-		), loadingBar = {}, items = {}, exception = {})
+			imageURL = "",
+		),
+		loadingBar = {},
+		items = {},
+		exception = {},
+	)
 }
 
 @Composable
@@ -372,7 +373,7 @@ fun SearchRowContent(
 	) {
 		Row(
 			modifier = Modifier.padding(8.dp),
-			verticalAlignment = Alignment.CenterVertically
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			if (row.imageURL.isNotEmpty()) {
 				SubcomposeAsyncImage(
@@ -387,7 +388,7 @@ fun SearchRowContent(
 					},
 					loading = {
 						Box(Modifier.placeholder(true))
-					}
+					},
 				)
 			} else {
 				ImageLoadingError(Modifier.size(32.dp))
@@ -398,7 +399,7 @@ fun SearchRowContent(
 
 		LazyRow(
 			horizontalArrangement = Arrangement.spacedBy(4.dp),
-			contentPadding = PaddingValues(horizontal = 4.dp)
+			contentPadding = PaddingValues(horizontal = 4.dp),
 		) {
 			items()
 		}

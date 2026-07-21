@@ -55,7 +55,7 @@ val fileDataSourceModule: DI.Module = DI.Module("file_data_source") {
 
 	bind<IFileCachedChapterDataSource>() with singleton {
 		FileCachedChapterDataSource(instance())
-//		QueuedFileCacheChapterDataSource(instance())
+// 		QueuedFileCacheChapterDataSource(instance())
 	}
 
 	bind<IFileCachedAppUpdateDataSource>() with singleton {
@@ -63,9 +63,9 @@ val fileDataSourceModule: DI.Module = DI.Module("file_data_source") {
 	}
 
 	bind<IFileSettingsDataSource>() with singleton {
-		FileSharedPreferencesSettingsDataSource(
-			instance()
-		)
+		FileSharedPreferencesSettingsDataSource(instance())
 	}
-	bind<IFileCrashDataSource>() with singleton { FileCrashDataSource(instance()) }
+	bind<IFileCrashDataSource>() with singleton {
+		FileCrashDataSource(instance())
+	}
 }

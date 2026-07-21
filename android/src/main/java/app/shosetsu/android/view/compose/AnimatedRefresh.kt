@@ -25,15 +25,15 @@ fun AnimatedRefresh(
 	modifier: Modifier = Modifier,
 	tint: Color = LocalContentColor.current,
 	size: Dp = 24.dp,
-	rotationDurationMs: Int = 1000
+	rotationDurationMs: Int = 1000,
 ) {
 	val infiniteTransition = rememberInfiniteTransition()
 	val angle by infiniteTransition.animateFloat(
 		initialValue = 0f,
 		targetValue = 360f,
 		animationSpec = infiniteRepeatable(
-			animation = tween(rotationDurationMs, easing = LinearEasing)
-		)
+			animation = tween(rotationDurationMs, easing = LinearEasing),
+		),
 	)
 	Icon(
 		imageVector = Icons.Default.Refresh,
@@ -41,6 +41,6 @@ fun AnimatedRefresh(
 		modifier = modifier
 			.size(size)
 			.graphicsLayer { rotationZ = angle },
-		tint = tint
+		tint = tint,
 	)
 }

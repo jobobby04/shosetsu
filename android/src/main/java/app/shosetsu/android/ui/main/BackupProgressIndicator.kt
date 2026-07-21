@@ -46,23 +46,23 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 fun BackupProgressIndicator() {
 	Card(
 		colors = CardDefaults.elevatedCardColors(
-			containerColor = Color.Red
+			containerColor = Color.Red,
 		),
-		modifier = Modifier.padding(8.dp)
+		modifier = Modifier.padding(8.dp),
 	) {
 		Column(
 			Modifier
 				.padding(16.dp)
 				.fillMaxWidth(),
-			horizontalAlignment = Alignment.CenterHorizontally
+			horizontalAlignment = Alignment.CenterHorizontally,
 		) {
 			Text(
 				stringResource(R.string.activity_main_backup_in_progress),
-				style = MaterialTheme.typography.titleMedium
+				style = MaterialTheme.typography.titleMedium,
 			)
 			Text(
 				stringResource(R.string.activity_main_backup_in_progress_warning),
-				style = MaterialTheme.typography.titleSmall
+				style = MaterialTheme.typography.titleSmall,
 			)
 		}
 	}

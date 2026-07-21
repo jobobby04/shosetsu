@@ -124,7 +124,7 @@ class NovelViewModel(
 	private val getRepositoryUseCase: GetRepositoryUseCase,
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val getNovelCategoriesUseCase: GetNovelCategoriesUseCase,
-	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase
+	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
 ) : ANovelViewModel() {
 
 	override val exceptions: MutableSharedFlow<ExceptionSnackbarModel> = MutableSharedFlow()
@@ -141,14 +141,14 @@ class NovelViewModel(
 		}.catch { throwable ->
 			val message = application.getString(
 				R.string.fragment_novel_error_load_chapters,
-				throwable.message ?: application.getString(R.string.unknown)
+				throwable.message ?: application.getString(R.string.unknown),
 			)
 
 			exceptions.emit(
 				ExceptionSnackbarModel(
 					message,
-					ChapterLoadException(throwable)
-				)
+					ChapterLoadException(throwable),
+				),
 			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
@@ -172,8 +172,7 @@ class NovelViewModel(
 
 	private fun copySelected(): HashMap<Int, Boolean> = selectedChapters.value.copy()
 
-	private fun getSelectedIds(): List<Int> =
-		selectedChapters.value.filter { it.value }.map { it.key }
+	private fun getSelectedIds(): List<Int> = selectedChapters.value.filter { it.value }.map { it.key }
 
 	override fun clearSelection() {
 		launchIO {
@@ -231,34 +230,53 @@ class NovelViewModel(
 	override val qrCode: Flow<QRCodeData?> by lazy {
 		novelLive.transformLatest { novel ->
 			if (novel != null) {
-				emitAll(novelURL.transformLatest { novelURL ->
-					if (novelURL != null) {
-						emitAll(getInstalledExtensionUseCase(novel.extID).transformLatest { ext ->
-							if (ext != null) {
-								val repo = getRepositoryUseCase(ext.repoID)
-								if (repo != null) {
-									val url = NovelLink(
-										novel.title, novel.imageURL, novelURL, ExtensionLink(
-											novel.extID, ext.name, ext.imageURL, RepositoryLink(
-												repo.name, repo.url
-											)
-										)
-									).toURL()
-									val code = QRCode(url)
+				emitAll(
+					novelURL.transformLatest { novelURL ->
+						if (novelURL != null) {
+							emitAll(
+								getInstalledExtensionUseCase(novel.extID).transformLatest { ext ->
+									if (ext != null) {
+										val repo = getRepositoryUseCase(ext.repoID)
+										if (repo != null) {
+											val url = NovelLink(
+												novel.title,
+												novel.imageURL,
+												novelURL,
+												ExtensionLink(
+													novel.extID,
+													ext.name,
+													ext.imageURL,
+													RepositoryLink(
+														repo.name,
+														repo.url,
+													),
+												),
+											).toURL()
+											val code = QRCode(url)
 
-									val bytes = code.render().getBytes()
+											val bytes = code.render().getBytes()
 
-									val bitmap = BitmapFactory
-										.decodeByteArray(bytes, 0, bytes.size)
-										.asImageBitmap()
+											val bitmap = BitmapFactory
+												.decodeByteArray(bytes, 0, bytes.size)
+												.asImageBitmap()
 
-									emit(QRCodeData(bitmap, url))
-								} else emit(null)
-							} else emit(null)
-						})
-					} else emit(null)
-				})
-			} else emit(null)
+											emit(QRCodeData(bitmap, url))
+										} else {
+											emit(null)
+										}
+									} else {
+										emit(null)
+									}
+								},
+							)
+						} else {
+							emit(null)
+						}
+					},
+				)
+			} else {
+				emit(null)
+			}
 		}.shareIn(viewModelScopeIO, SharingStarted.Lazily, 1).onIO()
 	}
 
@@ -268,14 +286,14 @@ class NovelViewModel(
 		}.catch { throwable ->
 			val message = application.getString(
 				R.string.fragment_novel_error_load,
-				throwable.cause?.message ?: application.getString(R.string.unknown)
+				throwable.cause?.message ?: application.getString(R.string.unknown),
 			)
 
 			exceptions.emit(
 				ExceptionSnackbarModel(
 					message,
-					NovelLoadException(throwable)
-				)
+					NovelLoadException(throwable),
+				),
 			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 			.also {
@@ -289,57 +307,68 @@ class NovelViewModel(
 			}
 	}
 
-	private val _showOnlyStatusOfFlow: Flow<ReadingStatus?> =
+	private val showOnlyStatusOfFlow: Flow<ReadingStatus?> =
 		novelSettingFlow.mapLatest { it?.showOnlyReadingStatusOf }
 
-	private val _onlyDownloadedFlow: Flow<Boolean> =
+	private val onlyDownloadedFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.showOnlyDownloaded ?: false }
 
-	private val _onlyBookmarkedFlow: Flow<Boolean> =
+	private val onlyBookmarkedFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.showOnlyBookmarked ?: false }
 
-	private val _onlyStringFlow: Flow<String?> =
+	private val onlyStringFlow: Flow<String?> =
 		novelSettingFlow.mapLatest { it?.showOnlyString }
 
-	private val _sortTypeFlow: Flow<ChapterSortType> =
+	private val sortTypeFlow: Flow<ChapterSortType> =
 		novelSettingFlow.mapLatest { it?.sortType ?: ChapterSortType.SOURCE }
 
-	private val _reversedSortFlow: Flow<Boolean> =
+	private val reversedSortFlow: Flow<Boolean> =
 		novelSettingFlow.mapLatest { it?.reverseOrder ?: false }
 
 	private fun Flow<List<ChapterUI>>.combineBookmarked(): Flow<List<ChapterUI>> =
-		combine(_onlyBookmarkedFlow) { result, onlyBookmarked ->
-			if (onlyBookmarked) result.filter { ui -> ui.bookmarked }
-			else result
+		combine(onlyBookmarkedFlow) { result, onlyBookmarked ->
+			if (onlyBookmarked) {
+				result.filter { ui -> ui.bookmarked }
+			} else {
+				result
+			}
 		}
 
 	private fun Flow<List<ChapterUI>>.combineDownloaded(): Flow<List<ChapterUI>> =
-		combine(_onlyDownloadedFlow) { result, onlyDownloaded ->
-			if (onlyDownloaded) result.filter { it.isSaved }
-			else result
+		combine(onlyDownloadedFlow) { result, onlyDownloaded ->
+			if (onlyDownloaded) {
+				result.filter { it.isSaved }
+			} else {
+				result
+			}
 		}
 
 	private fun Flow<List<ChapterUI>>.combineString(): Flow<List<ChapterUI>> =
-		combine(_onlyStringFlow) { result, onlyString ->
-			if (!onlyString.isNullOrBlank()) result.filter { it.title.contains(onlyString, ignoreCase = true) }
-			else result
+		combine(onlyStringFlow) { result, onlyString ->
+			if (!onlyString.isNullOrBlank()) {
+				result.filter { it.title.contains(onlyString, ignoreCase = true) }
+			} else {
+				result
+			}
 		}
 
 	@ExperimentalCoroutinesApi
 	private fun Flow<List<ChapterUI>>.combineStatus(): Flow<List<ChapterUI>> =
-		combine(_showOnlyStatusOfFlow) { result, readingStatusOf ->
+		combine(showOnlyStatusOfFlow) { result, readingStatusOf ->
 			readingStatusOf?.let { status ->
-				if (status != ReadingStatus.UNREAD) result.filter { it.readingStatus == status }
-				else result.filter {
-					it.readingStatus == status || it.readingStatus == ReadingStatus.READING
+				if (status != ReadingStatus.UNREAD) {
+					result.filter { it.readingStatus == status }
+				} else {
+					result.filter {
+						it.readingStatus == status || it.readingStatus == ReadingStatus.READING
+					}
 				}
-
 			} ?: result
 		}
 
 	@ExperimentalCoroutinesApi
 	private fun Flow<List<ChapterUI>>.combineSort(): Flow<List<ChapterUI>> =
-		combine(_sortTypeFlow) { chapters, sortType ->
+		combine(sortTypeFlow) { chapters, sortType ->
 			when (sortType) {
 				ChapterSortType.SOURCE -> {
 					chapters.sortedBy { it.order }
@@ -353,9 +382,12 @@ class NovelViewModel(
 
 	@ExperimentalCoroutinesApi
 	private fun Flow<List<ChapterUI>>.combineReverse(): Flow<List<ChapterUI>> =
-		combine(_reversedSortFlow) { result, reverse ->
-			if (reverse) result.reversed()
-			else result
+		combine(reversedSortFlow) { result, reverse ->
+			if (reverse) {
+				result.reversed()
+			} else {
+				result
+			}
 		}
 
 	private fun Flow<List<ChapterUI>>.combineSelection(): Flow<List<ChapterUI>> =
@@ -383,10 +415,11 @@ class NovelViewModel(
 			val result = isChaptersResumeFirstUnread()
 
 			val item =
-				if (!result) sortedArray.firstOrNull { it.readingStatus != ReadingStatus.READ }
-				else sortedArray.firstOrNull { it.readingStatus == ReadingStatus.UNREAD }
-
-
+				if (!result) {
+					sortedArray.firstOrNull { it.readingStatus != ReadingStatus.READ }
+				} else {
+					sortedArray.firstOrNull { it.readingStatus == ReadingStatus.UNREAD }
+				}
 
 			if (item == null) {
 				openLastReadResult.emit(LastOpenResult.Complete)
@@ -398,26 +431,30 @@ class NovelViewModel(
 	}
 
 	override val novelURL: StateFlow<String?> = flow {
-		emit(novelLive.first { it != null }?.let {
-			getContentURL(it)
-		})
+		emit(
+			novelLive.first { it != null }?.let {
+				getContentURL(it)
+			},
+		)
 	}.catch { t ->
 		exceptions.emit(
 			ExceptionSnackbarModel(
 				application.getString(
 					R.string.view_novel_error_url_load,
-					t.message ?: application.getString(R.string.unknown)
+					t.message ?: application.getString(R.string.unknown),
 				),
-				t
-			)
+				t,
+			),
 		)
 	}.onIO().stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 	override val shareInfo: StateFlow<NovelShareInfo?> =
 		novelLive.combine(novelURL) { it, url ->
-			if (it != null && url != null)
+			if (it != null && url != null) {
 				NovelShareInfo(it.title, url)
-			else null
+			} else {
+				null
+			}
 		}.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
 	override fun getChapterURL(chapterUI: ChapterUI): Flow<String?> = flow {
@@ -440,15 +477,15 @@ class NovelViewModel(
 					// Create the message
 					val message = t.message ?: application.getString(
 						R.string.view_novel_refresh_failed,
-						t.message ?: application.getString(R.string.unknown)
+						t.message ?: application.getString(R.string.unknown),
 					)
 
 					// Emit it!
 					exceptions.emit(
 						ExceptionSnackbarModel(
 							message,
-							RefreshException(t)
-						)
+							RefreshException(t),
+						),
 					)
 				} finally {
 					isRefreshing.emit(false)
@@ -457,8 +494,8 @@ class NovelViewModel(
 				exceptions.emit(
 					ExceptionSnackbarModel(
 						application.getString(R.string.fragment_novel_snackbar_cannot_inital_load_offline),
-						OfflineException()
-					)
+						OfflineException(),
+					),
 				)
 			}
 		}
@@ -467,7 +504,9 @@ class NovelViewModel(
 	override fun setNovelID(novelID: Int) {
 		when {
 			novelIDLive.value == -1 -> logI("Setting NovelID")
+
 			novelIDLive.value != novelID -> logI("NovelID not equal, resetting")
+
 			novelIDLive.value == novelID -> {
 				logI("NovelID equal, ignoring")
 				return
@@ -494,11 +533,12 @@ class NovelViewModel(
 			updateNovelUseCase(novel.copy(bookmarked = newState))
 
 			if (!newState) {
-
 				val savedChapters = chaptersLive.value.filter { it.isSaved }.size
 
-				if (savedChapters != 0) toggleBookmarkResponse.value =
-					ToggleBookmarkResponse.DeleteChapters(savedChapters)
+				if (savedChapters != 0) {
+					toggleBookmarkResponse.value =
+						ToggleBookmarkResponse.DeleteChapters(savedChapters)
+				}
 
 				delay(100)
 			}
@@ -543,8 +583,13 @@ class NovelViewModel(
 
 	override fun downloadAllUnreadChapters() {
 		launchIO {
-			downloadChapter(chaptersLive.value.filter { it.readingStatus == ReadingStatus.UNREAD && !it.isSaved }
-				.toTypedArray())
+			downloadChapter(
+				chaptersLive.value.filter {
+					it.readingStatus == ReadingStatus.UNREAD &&
+						!it.isSaved
+				}
+					.toTypedArray(),
+			)
 			startDownloadWorkerUseCase()
 		}
 	}
@@ -722,7 +767,8 @@ class NovelViewModel(
 			 */
 			val predicate: (ChapterUI) -> Boolean
 
-			@Suppress("LiftReturnOrAssignment") if (byTitle) {
+			@Suppress("LiftReturnOrAssignment")
+			if (byTitle) {
 				predicate = { it.title.contains(query) }
 			} else {
 				predicate = { it.order == query.toDouble() }

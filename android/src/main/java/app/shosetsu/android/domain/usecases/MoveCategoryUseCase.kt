@@ -44,7 +44,7 @@ class MoveCategoryUseCase(
 
 		val updatedCategories = reorderedCategories.mapIndexed { index, categoryEntity ->
 			categoryEntity.convertTo().copy(
-				order = index + 1
+				order = index + 1,
 			)
 		}
 

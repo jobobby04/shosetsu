@@ -17,7 +17,7 @@ class HomeViewModel(
 	loadNavigationStyleUseCase: LoadNavigationStyleUseCase,
 	private val loadRequireDoubleBackUseCase: LoadRequireDoubleBackUseCase,
 	backupRepo: IBackupRepository,
-	private val settings: ISettingsRepository
+	private val settings: ISettingsRepository,
 ) : AHomeViewModel() {
 
 	override val requireDoubleBackToExit: StateFlow<Boolean> by lazy {
@@ -36,7 +36,10 @@ class HomeViewModel(
 
 	override val backupProgressState: StateFlow<IBackupRepository.BackupProgress> =
 		// Combine with the backup indicator setting
-		backupRepo.backupProgress.combine(settings.getBooleanFlow(SettingKey.BackupIndicator)) { state, showIndicator ->
+		backupRepo.backupProgress.combine(settings.getBooleanFlow(SettingKey.BackupIndicator)) {
+				state,
+				showIndicator,
+			->
 			return@combine if (showIndicator) {
 				// We can show an indication
 				state

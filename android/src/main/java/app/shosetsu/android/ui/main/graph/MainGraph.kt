@@ -20,14 +20,11 @@ import app.shosetsu.android.ui.novel.NovelInfoView
  * @author Doomsdayrs
  */
 
-fun NavGraphBuilder.mainGraph(
-	navController: ShosetsuNavController,
-	sizeClass: WindowSizeClass
-) {
+fun NavGraphBuilder.mainGraph(navController: ShosetsuNavController, sizeClass: WindowSizeClass) {
 	composableSub<PrimaryWrapper> {
 		HomeView(
 			navController,
-			sizeClass = sizeClass
+			sizeClass = sizeClass,
 		)
 	}
 	browseGraph(navController)
@@ -44,7 +41,7 @@ fun NavGraphBuilder.mainGraph(
 			},
 			openInWebView = context::openInWebView,
 			openChapter = context::openChapter,
-			onBack = navController::popBackStack
+			onBack = navController::popBackStack,
 		)
 	}
 

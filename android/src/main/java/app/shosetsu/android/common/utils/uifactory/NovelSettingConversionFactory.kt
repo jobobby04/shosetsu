@@ -33,6 +33,6 @@ class NovelSettingConversionFactory(data: NovelSettingEntity) :
 		showOnlyBookmarked,
 		showOnlyDownloaded,
 		showOnlyString,
-		reverseOrder
+		reverseOrder,
 	)
 }

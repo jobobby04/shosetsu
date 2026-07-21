@@ -40,12 +40,12 @@ import org.kodein.di.instance
  *
  * @author github.com/doomsdayrs
  */
-inline fun <reified VM : ViewModel, T> T.viewModel()
-	: Lazy<VM> where T : DIAware, T : ViewModelStoreOwner =
+@Suppress("ktlint:standard:max-line-length")
+inline fun <reified VM : ViewModel, T> T.viewModel(): Lazy<VM> where T : DIAware, T : ViewModelStoreOwner =
 	lazy(LazyThreadSafetyMode.NONE) {
 		ViewModelProvider(
 			this,
-			direct.instance()
+			direct.instance(),
 		)[VM::class.java]
 	}
 
@@ -63,7 +63,7 @@ public inline fun <reified VM : ViewModel> viewModelDi(
 		viewModelStoreOwner.defaultViewModelCreationExtras
 	} else {
 		CreationExtras.Empty
-	}
+	},
 ): VM {
 	val di by closestDI(LocalContext.current)
 	val factory: ViewModelProvider.Factory? by di.instance()
@@ -72,6 +72,6 @@ public inline fun <reified VM : ViewModel> viewModelDi(
 		viewModelStoreOwner,
 		key,
 		factory,
-		extras
+		extras,
 	)
 }

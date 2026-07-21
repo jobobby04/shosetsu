@@ -42,7 +42,7 @@ import app.shosetsu.lib.json.RepoExtension
 @Entity(
 	tableName = "repository_extension",
 	foreignKeys = [
-		/**
+		/*
 		 * We cascade delete the repository version of the extension when the repository is removed.
 		 * This ensures data is cleaned up properly.
 		 * No entity should relate to this entity.
@@ -51,18 +51,17 @@ import app.shosetsu.lib.json.RepoExtension
 			entity = DBRepositoryEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["repoId"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
 	indices = [
 		Index("repoId"),
 	],
-	/**
+	/*
 	 * Both repoId & id make a primary key.
 	 */
-	primaryKeys = ["repoId", "id"]
+	primaryKeys = ["repoId", "id"],
 )
-
 data class DBRepositoryExtensionEntity(
 	/** Repository extension belongs too*/
 	val repoId: Int,
@@ -81,7 +80,7 @@ data class DBRepositoryExtensionEntity(
 
 	var md5: String,
 
-	val type: ExtensionType
+	val type: ExtensionType,
 ) : Convertible<GenericExtensionEntity> {
 	override fun convertTo(): GenericExtensionEntity = GenericExtensionEntity(
 		id,
@@ -92,6 +91,6 @@ data class DBRepositoryExtensionEntity(
 		lang,
 		version,
 		md5,
-		type
+		type,
 	)
 }

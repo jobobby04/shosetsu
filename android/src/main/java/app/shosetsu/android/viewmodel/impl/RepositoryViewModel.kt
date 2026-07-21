@@ -19,6 +19,7 @@ import app.shosetsu.android.view.uimodels.model.QRCodeData
 import app.shosetsu.android.view.uimodels.model.RepositoryUI
 import app.shosetsu.android.viewmodel.abstracted.ARepositoryViewModel
 import app.shosetsu.lib.share.RepositoryLink
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -31,7 +32,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import qrcode.QRCode
-import kotlin.time.Duration.Companion.minutes
 
 /*
  * This file is part of Shosetsu.
@@ -121,7 +121,7 @@ class RepositoryViewModel(
 				} else {
 					val url = RepositoryLink(
 						repo.name,
-						repo.url
+						repo.url,
 					).toURL()
 
 					val code = QRCode(url)
@@ -147,9 +147,7 @@ class RepositoryViewModel(
 		currentShare.value = null
 	}
 
-	override fun isURL(string: String): Boolean {
-		return false
-	}
+	override fun isURL(string: String): Boolean = false
 
 	override fun remove(repo: RepositoryUI) {
 		launchIO {

@@ -36,12 +36,10 @@ interface INovelSettingsRepository {
 	@Throws(SQLiteException::class)
 	suspend fun get(novelID: Int): NovelSettingEntity?
 
-
 	/**
 	 * Gets the settings for a novel, but in a flow that will be updated with any changes
 	 */
 	fun getFlow(novelID: Int): Flow<NovelSettingEntity?>
-
 
 	/**
 	 * Updates the settings for novels

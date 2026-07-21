@@ -16,10 +16,10 @@ import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
+import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.luaj.vm2.LuaError
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.
@@ -37,9 +37,6 @@ import java.io.IOException
  * You should have received a copy of the GNU General Public License
  * along with shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
-
 
 /**
  * shosetsu
@@ -60,34 +57,32 @@ class ChaptersRepository(
 	private suspend inline fun placeIntoCache(
 		entity: ChapterEntity,
 		chapterType: Novel.ChapterType,
-		result: ByteArray
+		result: ByteArray,
 	) = saveChapterPassageToMemory(entity, chapterType, result)
 
 	@Throws(FilePermissionException::class, FileNotFoundException::class, LuaError::class)
-	override suspend fun getChapterPassage(
-		formatter: IExtension,
-		entity: ChapterEntity,
-	): ByteArray = onIO {
-		return@onIO try {
-			memorySource.loadChapterFromCache(entity.id!!)!!
-		} catch (e: Exception) {
-			try {
-				cacheSource.loadChapterPassage(entity.id!!, formatter.chapterType).also { result ->
-					memorySource.saveChapterInCache(entity.id!!, result)
-				}
+	override suspend fun getChapterPassage(formatter: IExtension, entity: ChapterEntity): ByteArray =
+		onIO {
+			return@onIO try {
+				memorySource.loadChapterFromCache(entity.id!!)!!
 			} catch (e: Exception) {
 				try {
-					fileSource.load(entity, formatter.chapterType)
-						.also { placeIntoCache(entity, formatter.chapterType, it) }
+					cacheSource.loadChapterPassage(entity.id!!, formatter.chapterType).also { result ->
+						memorySource.saveChapterInCache(entity.id!!, result)
+					}
 				} catch (e: Exception) {
-					remoteSource.loadChapterPassage(
-						formatter,
-						entity.url
-					).also { placeIntoCache(entity, formatter.chapterType, it) }
+					try {
+						fileSource.load(entity, formatter.chapterType)
+							.also { placeIntoCache(entity, formatter.chapterType, it) }
+					} catch (e: Exception) {
+						remoteSource.loadChapterPassage(
+							formatter,
+							entity.url,
+						).also { placeIntoCache(entity, formatter.chapterType, it) }
+					}
 				}
 			}
 		}
-	}
 
 	suspend fun saveChapterPassageToMemory(
 		chapterEntity: ChapterEntity,
@@ -100,9 +95,7 @@ class ChaptersRepository(
 		}
 	}
 
-
-	/**
-	 *
+	/*
 	 * 1. save to memory
 	 * 2. save to filesystem
 	 * 3. if filesystem save was a success, then update the chapter
@@ -129,15 +122,14 @@ class ChaptersRepository(
 	}
 
 	@Throws(SQLiteException::class)
-	override suspend fun handleChapters(
-		novelID: Int,
-		extensionID: Int, list: List<Novel.Chapter>,
-	) = onIO { dbSource.handleChapters(novelID, extensionID, list) }
+	override suspend fun handleChapters(novelID: Int, extensionID: Int, list: List<Novel.Chapter>) =
+		onIO { dbSource.handleChapters(novelID, extensionID, list) }
 
 	@Throws(IndexOutOfBoundsException::class, SQLiteException::class)
 	override suspend fun handleChaptersReturn(
 		novelID: Int,
-		extensionID: Int, list: List<Novel.Chapter>,
+		extensionID: Int,
+		list: List<Novel.Chapter>,
 	): List<ChapterEntity> = onIO {
 		dbSource.handleChapterReturn(novelID, extensionID, list)
 	}
@@ -161,27 +153,25 @@ class ChaptersRepository(
 	override suspend fun getChapter(chapterID: Int): ChapterEntity? =
 		onIO { dbSource.getChapter(chapterID) }
 
-	override fun getReaderChaptersFlow(
-		novelID: Int,
-	): Flow<List<ReaderChapterEntity>> =
+	override fun getReaderChaptersFlow(novelID: Int): Flow<List<ReaderChapterEntity>> =
 		dbSource.getReaderChapters(novelID).distinctUntilChanged().onIO()
 
 	@Throws(SQLiteException::class, FilePermissionException::class)
 	override suspend fun deleteChapterPassage(
 		chapterEntity: ChapterEntity,
-		chapterType: Novel.ChapterType
+		chapterType: Novel.ChapterType,
 	) = onIO {
 		dbSource.updateChapter(
 			chapterEntity.copy(
-				isSaved = false
-			)
+				isSaved = false,
+			),
 		)
 		fileSource.delete(chapterEntity, chapterType)
 	}
 
 	override suspend fun deleteChapterPassage(
 		chapters: List<ChapterEntity>,
-		chapterType: Novel.ChapterType
+		chapterType: Novel.ChapterType,
 	) {
 		onIO {
 			try {
@@ -193,8 +183,7 @@ class ChaptersRepository(
 	}
 
 	@Throws(SQLiteException::class)
-	override suspend fun delete(entity: ChapterEntity) =
-		onIO { dbSource.delete(entity) }
+	override suspend fun delete(entity: ChapterEntity) = onIO { dbSource.delete(entity) }
 
 	override suspend fun delete(entity: List<ChapterEntity>) {
 		onIO { dbSource.delete(entity) }
@@ -208,15 +197,12 @@ class ChaptersRepository(
 
 	override suspend fun updateChapterReadingStatus(
 		chapterIds: List<Int>,
-		readingStatus: ReadingStatus
+		readingStatus: ReadingStatus,
 	) = onIO {
 		dbSource.updateChapterReadingStatus(chapterIds, readingStatus)
 	}
 
-	override suspend fun updateChapterBookmark(
-		chapterIds: List<Int>,
-		bookmarked: Boolean
-	) = onIO {
+	override suspend fun updateChapterBookmark(chapterIds: List<Int>, bookmarked: Boolean) = onIO {
 		dbSource.updateChapterBookmark(chapterIds, bookmarked)
 	}
 

@@ -67,11 +67,11 @@ import app.shosetsu.android.common.OfflineException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.trimDate
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.view.compose.COVER_RATIO
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.SimpleIconButton
-import app.shosetsu.android.view.compose.coverRatio
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.relativeTimeSpanString
 import app.shosetsu.android.view.compose.rememberFakePullRefreshState
@@ -112,7 +112,7 @@ fun UpdatesView(
 	openNovel: (Int) -> Unit,
 	openChapter: (novelId: Int, chapterId: Int) -> Unit,
 	drawerIcon: @Composable () -> Unit,
-	windowSize: WindowSizeClass
+	windowSize: WindowSizeClass,
 ) {
 	val viewModel = viewModelDi<AUpdatesViewModel>()
 	val items by viewModel.liveData.collectAsState()
@@ -132,7 +132,7 @@ fun UpdatesView(
 					val result = hostState.showSnackbar(
 						context.getString(error.messageRes),
 						duration = SnackbarDuration.Long,
-						actionLabel = context.getString(R.string.generic_wifi_settings)
+						actionLabel = context.getString(R.string.generic_wifi_settings),
 					)
 					if (result == SnackbarResult.ActionPerformed) {
 						context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
@@ -163,23 +163,20 @@ fun UpdatesView(
 		hostState = hostState,
 		drawerIcon = drawerIcon,
 		displayDateAsMDY = displayDateAsMDY,
-		windowSize = windowSize
+		windowSize = windowSize,
 	)
 
 	if (isClearBeforeVisible) {
 		ClearBeforeDialog(
 			onHideClearBefore = viewModel::hideClearBefore,
-			onClearBefore = viewModel::clearBefore
+			onClearBefore = viewModel::clearBefore,
 		)
 	}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClearBeforeDialog(
-	onHideClearBefore: () -> Unit,
-	onClearBefore: (Long) -> Unit
-) {
+fun ClearBeforeDialog(onHideClearBefore: () -> Unit, onClearBefore: (Long) -> Unit) {
 	val datePickerState = rememberDatePickerState()
 
 	DatePickerDialog(
@@ -187,18 +184,19 @@ fun ClearBeforeDialog(
 		confirmButton = {
 			TextButton(
 				onClick = {
-					if (datePickerState.selectedDateMillis != null)
+					if (datePickerState.selectedDateMillis != null) {
 						onClearBefore(datePickerState.selectedDateMillis!!)
+					}
 					onHideClearBefore()
 				},
-				enabled = datePickerState.selectedDateMillis != null
+				enabled = datePickerState.selectedDateMillis != null,
 			) {
 				Text(stringResource(android.R.string.ok))
 			}
 		},
 		dismissButton = {
 			TextButton(
-				onClick = onHideClearBefore
+				onClick = onHideClearBefore,
 			) {
 				Text(stringResource(android.R.string.cancel))
 			}
@@ -208,7 +206,7 @@ fun ClearBeforeDialog(
 			datePickerState,
 			title = {
 				Text(stringResource(R.string.fragment_updates_clear))
-			}
+			},
 		)
 	}
 }
@@ -219,7 +217,7 @@ fun UpdatesAppBar(
 	onClearAll: () -> Unit,
 	onClearBefore: () -> Unit,
 	isEmpty: Boolean,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
 ) {
 	TopAppBar(
 		title = {
@@ -230,36 +228,37 @@ fun UpdatesAppBar(
 				Box {
 					var showDropwDown by remember { mutableStateOf(false) }
 					SimpleIconButton(
-						Icons.Default.DeleteSweep, stringResource(R.string.clear),
+						Icons.Default.DeleteSweep,
+						stringResource(R.string.clear),
 						onClick = {
 							showDropwDown = !showDropwDown
-						}
+						},
 					)
 
 					DropdownMenu(
 						showDropwDown,
 						onDismissRequest = {
 							showDropwDown = false
-						}
+						},
 					) {
 						DropdownMenuItem(
 							text = {
 								Text(stringResource(R.string.all))
 							},
-							onClick = onClearAll
+							onClick = onClearAll,
 						)
 						DropdownMenuItem(
 							text = {
 								Text(stringResource(R.string.before))
 							},
-							onClick = onClearBefore
+							onClick = onClearBefore,
 						)
 					}
 				}
 			}
 		},
 		scrollBehavior = pinnedScrollBehavior(),
-		navigationIcon = drawerIcon
+		navigationIcon = drawerIcon,
 	)
 }
 
@@ -276,7 +275,7 @@ fun UpdatesContent(
 	hostState: SnackbarHostState,
 	drawerIcon: @Composable () -> Unit,
 	displayDateAsMDY: Boolean,
-	windowSize: WindowSizeClass
+	windowSize: WindowSizeClass,
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(onRefresh)
 	Scaffold(
@@ -285,24 +284,24 @@ fun UpdatesContent(
 		},
 		snackbarHost = {
 			SnackbarHost(hostState)
-		}
+		},
 	) { padding ->
 		Box(
 			Modifier
 				.pullRefresh(pullRefreshState)
-				.padding(padding)
+				.padding(padding),
 		) {
 			if (items.isEmpty()) {
 				ErrorContent(
 					R.string.empty_updates_message,
 					ErrorAction(R.string.empty_updates_refresh_action) {
 						onRefresh()
-					}
+					},
 				)
 			} else {
 				LazyColumn(
 					contentPadding = PaddingValues(bottom = 112.dp),
-					verticalArrangement = Arrangement.spacedBy(4.dp)
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					updatesLastUpdatedItem(lastUpdated)
 
@@ -310,7 +309,7 @@ fun UpdatesContent(
 						item {
 							UpdateHeaderItemContent(
 								remember(header) { StableHolder(header) },
-								displayDateAsMDY
+								displayDateAsMDY,
 							)
 						}
 
@@ -319,7 +318,7 @@ fun UpdatesContent(
 								it,
 								onCoverClick = { openNovel(it) },
 								onClick = { openChapter(it) },
-								windowSize = windowSize
+								windowSize = windowSize,
 							)
 						}
 					}
@@ -329,7 +328,7 @@ fun UpdatesContent(
 			PullRefreshIndicator(
 				isRefreshing,
 				pullRefreshState,
-				Modifier.align(Alignment.TopCenter)
+				Modifier.align(Alignment.TopCenter),
 			)
 		}
 	}
@@ -404,7 +403,7 @@ fun UpdateItemContent(
 			.fillMaxWidth()
 			.clickable(onClick = onClick)
 			.padding(start = 16.dp, end = 8.dp),
-		verticalAlignment = Alignment.CenterVertically
+		verticalAlignment = Alignment.CenterVertically,
 	) {
 		Box(Modifier.fillMaxWidth(updateItemImageRatio)) {
 			if (updateUI.novelImageURL.isNotEmpty()) {
@@ -413,10 +412,13 @@ fun UpdateItemContent(
 						.data(updateUI.novelImageURL)
 						.crossfade(true)
 						.build(),
-					contentDescription = stringResource(R.string.novel_image_content_description, updateUI.novelName),
+					contentDescription = stringResource(
+						R.string.novel_image_content_description,
+						updateUI.novelName,
+					),
 					contentScale = ContentScale.Crop,
 					modifier = Modifier
-						.aspectRatio(coverRatio)
+						.aspectRatio(COVER_RATIO)
 						.fillMaxWidth(updateItemImageRatio)
 						.clip(MaterialTheme.shapes.small)
 						.clickable(onClick = onCoverClick),
@@ -427,18 +429,18 @@ fun UpdateItemContent(
 						Box(
 							Modifier
 								.placeholder(true)
-								.fillMaxWidth(updateItemImageRatio)
+								.fillMaxWidth(updateItemImageRatio),
 						)
-					}
+					},
 				)
 			} else {
 				ImageLoadingError(
 					updateUI.novelName,
 					Modifier
-						.aspectRatio(coverRatio)
+						.aspectRatio(COVER_RATIO)
 						.fillMaxWidth(updateItemImageRatio)
 						.clip(MaterialTheme.shapes.small)
-						.clickable(onClick = onCoverClick)
+						.clickable(onClick = onCoverClick),
 				)
 			}
 		}
@@ -447,9 +449,11 @@ fun UpdateItemContent(
 			verticalArrangement = Arrangement.Center,
 			modifier = Modifier
 				.let {
-					if (updateUI.readingStatus == ReadingStatus.READ)
+					if (updateUI.readingStatus == ReadingStatus.READ) {
 						it.alpha(.5f)
-					else it
+					} else {
+						it
+					}
 				}
 				.fillMaxWidth()
 				.padding(4.dp),
@@ -457,20 +461,20 @@ fun UpdateItemContent(
 			Text(
 				updateUI.chapterName,
 				maxLines = 1,
-				overflow = TextOverflow.Ellipsis
+				overflow = TextOverflow.Ellipsis,
 			)
 			Text(
 				updateUI.novelName,
 				fontSize = 14.sp,
 				maxLines = 1,
 				overflow = TextOverflow.Ellipsis,
-				modifier = Modifier.alpha(.75f)
+				modifier = Modifier.alpha(.75f),
 			)
 			Text(
 				updateUI.displayTime,
 				fontSize = 12.sp,
 				maxLines = 1,
-				modifier = Modifier.alpha(.5f)
+				modifier = Modifier.alpha(.5f),
 			)
 		}
 	}
@@ -487,7 +491,11 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: 
 			DateTime(System.currentTimeMillis()).trimDate().minusDays(1) ->
 				context.getString(R.string.yesterday)
 
-			else -> if (displayDateAsMDY) "${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}" else "${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
+			else -> if (displayDateAsMDY) {
+				"${dateTime.item.monthOfYear}/${dateTime.item.dayOfMonth}/${dateTime.item.year}"
+			} else {
+				"${dateTime.item.dayOfMonth}/${dateTime.item.monthOfYear}/${dateTime.item.year}"
+			}
 		}
 	}
 	Text(
@@ -495,7 +503,7 @@ fun UpdateHeaderItemContent(dateTime: StableHolder<DateTime>, displayDateAsMDY: 
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(horizontal = 16.dp, vertical = 8.dp),
-//		fontSize = 14.sp
+// 		fontSize = 14.sp
 		color = MaterialTheme.colorScheme.onSurfaceVariant,
 		fontWeight = FontWeight.SemiBold,
 		style = MaterialTheme.typography.bodyMedium,

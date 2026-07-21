@@ -1,3 +1,4 @@
+import java.io.IOException
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -10,7 +11,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import java.io.IOException
 
 /** Creates an update XML to be used by the application */
 abstract class WriteDebugUpdate : DefaultTask() {
@@ -39,7 +39,9 @@ abstract class WriteDebugUpdate : DefaultTask() {
 	init {
 		gitDir.convention(project.rootProject.layout.projectDirectory.dir(".git"))
 		lastFile.convention(project.layout.projectDirectory.file("android/src/debug/assets/last"))
-		outputFile.convention(project.layout.projectDirectory.file("android/src/debug/assets/update.json"))
+		outputFile.convention(
+			project.layout.projectDirectory.file("android/src/debug/assets/update.json"),
+		)
 	}
 
 	@Serializable
@@ -47,7 +49,7 @@ abstract class WriteDebugUpdate : DefaultTask() {
 		val latestVersion: String,
 		val commit: Int,
 		val url: String,
-		val releaseNotes: List<String>
+		val releaseNotes: List<String>,
 	)
 
 	/** Task of this task */
@@ -71,7 +73,7 @@ abstract class WriteDebugUpdate : DefaultTask() {
 				.map { commitMessage ->
 					commitMessage
 						// Format it so it goes well into the json
-						//.replace("\n", "\",\n\t\t\t\t\"-")
+						// .replace("\n", "\",\n\t\t\t\t\"-")
 						.split("\n")
 						.map { it.trim() }
 						.filter { it.isNotBlank() }
@@ -84,7 +86,7 @@ abstract class WriteDebugUpdate : DefaultTask() {
 				latestVersion = commitCount.toString(),
 				commit = commitCount,
 				url = "https://cdn.shosetsu.app/debug/r$commitCount/shosetsu-r$commitCount.apk",
-				releaseNotes
+				releaseNotes,
 			)
 		}
 

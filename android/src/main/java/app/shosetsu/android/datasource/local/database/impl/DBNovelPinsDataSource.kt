@@ -28,17 +28,14 @@ import app.shosetsu.android.providers.database.dao.NovelPinsDao
  * @since 01 / 11 / 2022
  * @author Doomsdayrs
  */
-class DBNovelPinsDataSource(
-	private val dao: NovelPinsDao
-) : IDBNovelPinsDataSource {
+class DBNovelPinsDataSource(private val dao: NovelPinsDao) : IDBNovelPinsDataSource {
 	@Throws(SQLiteException::class)
 	override suspend fun setPinned(ids: List<Int>, pinned: Boolean) {
 		dao.setPinned(ids, pinned)
 	}
 
 	@Throws(SQLiteException::class)
-	override suspend fun isPinned(id: Int): Boolean =
-		dao.isPinned(id)
+	override suspend fun isPinned(id: Int): Boolean = dao.isPinned(id)
 
 	@Throws(SQLiteException::class)
 	override suspend fun updateOrInsert(pinEntity: NovelPinEntity) {

@@ -55,7 +55,7 @@ class StringChapterAsHtmlTest : DIAware {
 		GlobalScope.future {
 			getBookMarkedNovelsUseCase().collectLatest { novelList ->
 				getReaderChapterUseCase(
-					novelList.novels.values.first().first().id
+					novelList.novels.values.first().first().id,
 				).collectLatest { chapterList ->
 					val bytes = getChapterPassageUseCase(chapterList.first())
 					println(asHtml(bytes.toString(), title = chapterList.first().title))

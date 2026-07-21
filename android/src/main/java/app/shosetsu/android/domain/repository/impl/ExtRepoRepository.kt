@@ -8,8 +8,8 @@ import app.shosetsu.android.domain.model.local.RepositoryEntity
 import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
 import app.shosetsu.lib.exceptions.HTTPException
 import app.shosetsu.lib.json.RepoIndex
-import kotlinx.coroutines.flow.Flow
 import java.io.IOException
+import kotlinx.coroutines.flow.Flow
 
 /*
  * This file is part of shosetsu.
@@ -34,7 +34,7 @@ import java.io.IOException
  */
 class ExtRepoRepository(
 	private val databaseSource: IDBExtRepoDataSource,
-	private val remoteSource: IRemoteExtRepoDataSource
+	private val remoteSource: IRemoteExtRepoDataSource,
 ) : IExtensionRepoRepository {
 	@Throws(
 		HTTPException::class,

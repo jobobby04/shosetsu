@@ -75,10 +75,10 @@ class ExtensionConfigureViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	private val extListNamesFlow: Flow<ListingSelectionData> = extensionIdFlow.flatMapLatest { extensionID ->
-		val listingNames = getExtListNames(extensionID).toImmutableList()
+	private val extListNamesFlow: Flow<ListingSelectionData> = extensionIdFlow.flatMapLatest { id ->
+		val listingNames = getExtListNames(id).toImmutableList()
 
-		getExtSelectedListingFlow(extensionID).mapLatest { selectedListing ->
+		getExtSelectedListingFlow(id).mapLatest { selectedListing ->
 			ListingSelectionData(listingNames, selectedListing)
 		}
 	}.catch {
@@ -186,4 +186,3 @@ class ExtensionConfigureViewModel(
 		}
 	}
 }
-

@@ -25,14 +25,11 @@ import app.shosetsu.android.view.uimodels.model.RepositoryUI
 /**
  * 18 / 01 / 2021
  */
-class UpdateRepositoryUseCase(
-	private val iExtensionRepoRepository: IExtensionRepoRepository
-) {
+class UpdateRepositoryUseCase(private val iExtensionRepoRepository: IExtensionRepoRepository) {
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(repositoryEntity: RepositoryEntity) =
 		iExtensionRepoRepository.update(repositoryEntity)
 
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(repositoryUI: RepositoryUI) =
-		invoke(repositoryUI.convertTo())
+	suspend operator fun invoke(repositoryUI: RepositoryUI) = invoke(repositoryUI.convertTo())
 }

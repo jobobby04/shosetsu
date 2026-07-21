@@ -12,6 +12,7 @@ val generateContributors by tasks.registering(GenerateContributorsTask::class)
 tasks.preBuild { dependsOn(generateContributors) }
 
 val CI_MODE = System.getenv("CI_MODE") == "true"
+val USE_JENKINS = System.getenv("USE_JENKINS") == "true"
 
 android {
 	// keep these in sync with .gitlab-ci.yml
@@ -21,8 +22,8 @@ android {
 		applicationId = "app.shosetsu.android"
 		minSdk = 22
 		targetSdk = 36
-		versionCode = 49
-		versionName = "2.5.2"
+		versionCode = 50
+		versionName = "2.5.3"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		multiDexEnabled = true
 
@@ -239,20 +240,12 @@ dependencies {
 
 	// Core libraries
 	implementation(libs.luaj.jse)
-	val taskNames = gradle.startParameter.taskNames
-	if (taskNames.isEmpty()) {
-		// Default to my build
-		implementation(libs.shosetsuorg.klib)
+	if (USE_JENKINS) {
+		// F-Droid does not like gitlab maven
+		implementation(libs.shosetsuorg.klib.jitpack)
 	} else {
-		taskNames.forEach { task ->
-			println("Processing task: $task")
-			if (!task.contains("fdroid")) {
-				implementation(libs.shosetsuorg.klib)
-			} else {
-				// F-Droid does not like gitlab maven
-				implementation(libs.shosetsuorg.klib.jitpack)
-			}
-		}
+		// Use gitlab maven build
+		implementation(libs.shosetsuorg.klib)
 	}
 	implementation(libs.jsoup)
 

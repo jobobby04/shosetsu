@@ -1,12 +1,12 @@
 package app.shosetsu.android.common.ext
 
+import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import okio.IOException
-import kotlin.coroutines.resumeWithException
 
 /*
  * This file is part of shosetsu.

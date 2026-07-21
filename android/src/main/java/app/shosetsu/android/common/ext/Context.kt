@@ -25,7 +25,7 @@ import androidx.core.app.NotificationManagerCompat
  * ====================================================================
  */
 
-/**
+/*
  * shosetsu
  * 07 / 02 / 2020
  *
@@ -34,7 +34,6 @@ import androidx.core.app.NotificationManagerCompat
  *	 I have to admit to copying tachiyomi ;-;
  * </p>
  */
-
 
 /**
  * Display a toast in this context.
@@ -59,4 +58,3 @@ fun Context.toast(string: String, duration: Int = LENGTH_SHORT) {
  */
 val Context.notificationManager: NotificationManagerCompat
 	get() = NotificationManagerCompat.from(this)
-

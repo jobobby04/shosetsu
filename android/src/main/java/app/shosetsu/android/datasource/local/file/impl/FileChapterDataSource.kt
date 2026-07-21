@@ -31,9 +31,8 @@ import java.io.IOException
  * shosetsu
  * 12 / 05 / 2020
  */
-class FileChapterDataSource(
-	private val iFileSystemProvider: IFileSystemProvider
-) : IFileChapterDataSource {
+class FileChapterDataSource(private val iFileSystemProvider: IFileSystemProvider) :
+	IFileChapterDataSource {
 	init {
 		logV("Creating required directories")
 
@@ -43,7 +42,6 @@ class FileChapterDataSource(
 		} catch (e: Exception) {
 			logV("Error on creation of directories", e)
 		}
-
 	}
 
 	/** Makes path */
@@ -59,13 +57,13 @@ class FileChapterDataSource(
 		val path = makePath(chapterEntity, chapterType)
 		iFileSystemProvider.createDirectory(
 			DOWNLOADS,
-			path.substringBeforeLast("/")
+			path.substringBeforeLast("/"),
 		)
 
 		iFileSystemProvider.writeFile(
 			DOWNLOADS,
 			path,
-			passage
+			passage,
 		)
 	}
 
@@ -73,21 +71,14 @@ class FileChapterDataSource(
 	override suspend fun load(
 		chapterEntity: ChapterEntity,
 		chapterType: Novel.ChapterType,
-	): ByteArray =
-		iFileSystemProvider.readFile(DOWNLOADS, makePath(chapterEntity, chapterType))
+	): ByteArray = iFileSystemProvider.readFile(DOWNLOADS, makePath(chapterEntity, chapterType))
 
 	@Throws(FilePermissionException::class)
-	override suspend fun delete(
-		chapterEntity: ChapterEntity,
-		chapterType: Novel.ChapterType
-	) {
+	override suspend fun delete(chapterEntity: ChapterEntity, chapterType: Novel.ChapterType) {
 		iFileSystemProvider.deleteFile(DOWNLOADS, makePath(chapterEntity, chapterType))
 	}
 
-	override suspend fun delete(
-		chapterEntities: List<ChapterEntity>,
-		chapterType: Novel.ChapterType
-	) {
+	override suspend fun delete(chapterEntities: List<ChapterEntity>, chapterType: Novel.ChapterType) {
 		chapterEntities.map { chapterEntity ->
 			iFileSystemProvider.deleteFile(DOWNLOADS, makePath(chapterEntity, chapterType))
 		}

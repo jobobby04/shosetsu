@@ -4,8 +4,8 @@ import app.shosetsu.android.datasource.remote.base.IRemoteNovelDataSource
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
-import org.luaj.vm2.LuaError
 import java.io.IOException
+import org.luaj.vm2.LuaError
 
 /*
  * This file is part of Shosetsu.
@@ -24,7 +24,6 @@ import java.io.IOException
  * along with Shosetsu.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 /**
  * shosetsu
  * 12 / May / 2020
@@ -40,9 +39,11 @@ class RemoteNovelDataSource : IRemoteNovelDataSource {
 		try {
 			return formatter.parseNovel(novelURL, loadChapters)
 		} catch (e: LuaError) {
-			if (e.cause != null)
+			if (e.cause != null) {
 				throw e.cause!!
-			else throw e
+			} else {
+				throw e
+			}
 		}
 	}
 }

@@ -84,10 +84,7 @@ import org.acra.util.Installation
  */
 
 @Composable
-fun AboutView(
-	onOpenLicense: () -> Unit,
-	onBack: () -> Unit
-) {
+fun AboutView(onOpenLicense: () -> Unit, onBack: () -> Unit) {
 	val viewModel: AAboutViewModel = viewModelDi()
 
 	val uriHandler = LocalUriHandler.current
@@ -96,26 +93,19 @@ fun AboutView(
 		uriHandler.openUri(URL_DISCLAIMER)
 	}
 
-	fun openWebsite() =
-		uriHandler.openUri(URL_WEBSITE)
+	fun openWebsite() = uriHandler.openUri(URL_WEBSITE)
 
-	fun openExtensions() =
-		uriHandler.openUri(URL_EXTENSIONS_REPO)
+	fun openExtensions() = uriHandler.openUri(URL_EXTENSIONS_REPO)
 
-	fun openDiscord() =
-		uriHandler.openUri(URL_DISCORD)
+	fun openDiscord() = uriHandler.openUri(URL_DISCORD)
 
-	fun openMatrix() =
-		uriHandler.openUri(URL_MATRIX)
+	fun openMatrix() = uriHandler.openUri(URL_MATRIX)
 
-	fun openPatreon() =
-		uriHandler.openUri(URL_PATREON)
+	fun openPatreon() = uriHandler.openUri(URL_PATREON)
 
-	fun openGithub() =
-		uriHandler.openUri(URL_APP_REPO)
+	fun openGithub() = uriHandler.openUri(URL_APP_REPO)
 
-	fun openPrivacy() =
-		uriHandler.openUri(URL_PRIVACY)
+	fun openPrivacy() = uriHandler.openUri(URL_PRIVACY)
 
 	AboutContent(
 		currentVersion = BuildConfig.VERSION_NAME,
@@ -133,7 +123,7 @@ fun AboutView(
 			uriHandler.openUri(URL_KOFI)
 		},
 		onBack = onBack,
-		contributors = viewModel.contributors
+		contributors = viewModel.contributors,
 	)
 }
 
@@ -163,16 +153,13 @@ fun PreviewAboutContent() = ShosetsuTheme(AppThemes.LIGHT) {
 				0,
 				null,
 				null,
-			)
-		)
+			),
+		),
 	)
-
 }
 
 @Composable
-fun ContributorItem(
-	contributor: Contributor
-) {
+fun ContributorItem(contributor: Contributor) {
 	val uriHandler = LocalUriHandler.current
 
 	Box(Modifier.requiredWidthIn(max = 60.dp)) {
@@ -181,8 +168,9 @@ fun ContributorItem(
 			contributor.name,
 			contributor.image ?: "",
 			onClick = {
-				if (!contributor.website.isNullOrBlank())
+				if (!contributor.website.isNullOrBlank()) {
 					uriHandler.openUri(contributor.website)
+				}
 			},
 			onLongClick = {},
 		)
@@ -196,27 +184,28 @@ fun AboutItem(
 	description: String? = null,
 	@StringRes descriptionRes: Int? = null,
 	@DrawableRes iconRes: Int? = null,
-	onClick: () -> Unit = {}
+	onClick: () -> Unit = {},
 ) {
 	Box(
-		modifier = Modifier.clickable { onClick() }
+		modifier = Modifier.clickable { onClick() },
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
 			horizontalArrangement = Arrangement.Start,
-			modifier = Modifier.padding(16.dp)
+			modifier = Modifier.padding(16.dp),
 		) {
-			if (iconRes != null)
+			if (iconRes != null) {
 				Image(painterResource(iconRes), null, modifier = Modifier.padding(end = 8.dp))
+			}
 
 			Column(
 				verticalArrangement = Arrangement.Center,
 				horizontalAlignment = Alignment.Start,
-				modifier = Modifier.fillMaxWidth()
+				modifier = Modifier.fillMaxWidth(),
 			) {
 				Text(stringResource(titleRes), style = MaterialTheme.typography.bodyLarge)
 
-				if (descriptionRes != null || description != null)
+				if (descriptionRes != null || description != null) {
 					Text(
 						if (descriptionRes != null) {
 							stringResource(descriptionRes)
@@ -224,8 +213,9 @@ fun AboutItem(
 							description ?: return@Column
 						},
 						style = SUB_TEXT_SIZE,
-						modifier = Modifier.alpha(0.7f)
+						modifier = Modifier.alpha(0.7f),
 					)
+				}
 			}
 		}
 	}
@@ -247,7 +237,7 @@ fun AboutContent(
 	onOpenMatrix: () -> Unit,
 	onOpenPrivacy: () -> Unit,
 	onBack: () -> Unit,
-	contributors: List<Contributor>
+	contributors: List<Contributor>,
 ) {
 	Scaffold(
 		topBar = {
@@ -257,26 +247,26 @@ fun AboutContent(
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(paddingValues),
-			contentPadding = PaddingValues(bottom = 128.dp)
+			contentPadding = PaddingValues(bottom = 128.dp),
 		) {
 			item {
 				AboutItem(
 					R.string.version,
-					description = currentVersion
+					description = currentVersion,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.check_for_app_update,
-					onClick = onCheckForAppUpdate
+					onClick = onCheckForAppUpdate,
 				)
 			}
 			item {
@@ -291,7 +281,7 @@ fun AboutContent(
 					description = id,
 					onClick = {
 						scope.launch { clipboard.setClipEntry(ClipData.newPlainText("text", id).toClipEntry()) }
-					}
+					},
 				)
 			}
 			item {
@@ -305,7 +295,7 @@ fun AboutContent(
 			item {
 				LazyRow(
 					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
-					horizontalArrangement = Arrangement.spacedBy(4.dp)
+					horizontalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					items(contributors) {
 						ContributorItem(it)
@@ -320,68 +310,68 @@ fun AboutContent(
 				AboutItem(
 					R.string.website,
 					URL_WEBSITE,
-					onClick = onOpenWebsite
+					onClick = onOpenWebsite,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.github,
 					URL_APP_REPO,
-					onClick = onOpenSource
+					onClick = onOpenSource,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.extensions,
 					URL_EXTENSIONS_REPO,
-					onClick = onOpenExtensions
+					onClick = onOpenExtensions,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.matrix,
 					URL_MATRIX,
-					onClick = onOpenMatrix
+					onClick = onOpenMatrix,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.discord,
 					URL_DISCORD,
-					onClick = onOpenDiscord
+					onClick = onOpenDiscord,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.patreon_support,
 					URL_PATREON,
-					onClick = onOpenPatreon
+					onClick = onOpenPatreon,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.kofi_support,
 					URL_KOFI,
-					onClick = onOpenKofi
+					onClick = onOpenKofi,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.source_licenses,
-					onClick = onOpenLicense
+					onClick = onOpenLicense,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.disclaimer,
 					URL_DISCLAIMER,
-					onClick = onOpenDisclaimer
+					onClick = onOpenDisclaimer,
 				)
 			}
 			item {
 				AboutItem(
 					R.string.privacy_policy,
-					onClick = onOpenPrivacy
+					onClick = onOpenPrivacy,
 				)
 			}
 		}

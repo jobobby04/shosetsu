@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 class BackupRepository : IBackupRepository {
 	private val _backupProgress: MutableStateFlow<BackupProgress> by lazy {
 		MutableStateFlow(
-			BackupProgress.NOT_STARTED
+			BackupProgress.NOT_STARTED,
 		)
 	}
 

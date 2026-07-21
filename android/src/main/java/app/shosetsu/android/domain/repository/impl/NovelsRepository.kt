@@ -16,11 +16,11 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
+import javax.net.ssl.SSLException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.luaj.vm2.LuaError
-import java.io.IOException
-import javax.net.ssl.SSLException
 
 /*
  * This file is part of shosetsu.
@@ -58,25 +58,21 @@ class NovelsRepository(
 		onIO { database.loadBookmarkedNovels() }
 
 	@Throws(SQLiteException::class)
-	override suspend fun loadNovels(): List<NovelEntity> =
-		onIO { database.loadNovels() }
+	override suspend fun loadNovels(): List<NovelEntity> = onIO { database.loadNovels() }
 
 	@Throws(SQLiteException::class)
 	override suspend fun loadNovelId(novelURL: String, extensionID: Int): Int? =
 		onIO { database.loadNovelId(novelURL, extensionID) }
 
 	@Throws(SQLiteException::class)
-	override suspend fun update(novelEntity: NovelEntity): Unit =
-		onIO { database.update(novelEntity) }
+	override suspend fun update(novelEntity: NovelEntity): Unit = onIO { database.update(novelEntity) }
 
 	@Throws(SQLiteException::class)
 	override suspend fun insertReturnStripped(novelEntity: NovelEntity): StrippedNovelEntity? =
 		onIO { database.insertReturnStripped(novelEntity) }
 
 	@Throws(SQLiteException::class)
-	override suspend fun insert(novelEntity: NovelEntity): Long =
-		onIO { database.insert(novelEntity) }
-
+	override suspend fun insert(novelEntity: NovelEntity): Long = onIO { database.insert(novelEntity) }
 
 	/**
 	 * TODO this operation is resource intensive, create a low level DB object
@@ -85,19 +81,14 @@ class NovelsRepository(
 	override fun searchBookmarked(string: String): PagingSource<Int, StrippedBookmarkedNovelEntity> =
 		database.searchBookmarked(string)
 
-
 	@Throws(SQLiteException::class)
-	override suspend fun getNovel(novelID: Int): NovelEntity? =
-		onIO { database.getNovel(novelID) }
+	override suspend fun getNovel(novelID: Int): NovelEntity? = onIO { database.getNovel(novelID) }
 
 	override suspend fun getNovelFlow(novelID: Int): Flow<NovelEntity?> =
 		database.getNovelFlow(novelID).onIO()
 
 	@Throws(SQLiteException::class)
-	override suspend fun updateNovelData(
-		novelEntity: NovelEntity,
-		novelInfo: Novel.Info
-	) {
+	override suspend fun updateNovelData(novelEntity: NovelEntity, novelInfo: Novel.Info) {
 		onIO {
 			database.update(
 				novelEntity.copy(
@@ -112,8 +103,8 @@ class NovelsRepository(
 					genres = novelInfo.genres.toList(),
 					tags = novelInfo.tags.toList(),
 					authors = novelInfo.authors.toList(),
-					artists = novelInfo.artists.toList()
-				)
+					artists = novelInfo.artists.toList(),
+				),
 			)
 		}
 	}
@@ -128,15 +119,14 @@ class NovelsRepository(
 		extension: IExtension,
 		novelEntity: NovelEntity,
 		loadChapters: Boolean,
-	): Novel.Info =
-		onIO {
-			remoteSource.loadNovel(extension, novelEntity.url, loadChapters)
-				.let { info ->
-					info.copy(
-						chapters = info.chapters.distinctBy { it.link }.toTypedArray()
-					)
-				}
-		}
+	): Novel.Info = onIO {
+		remoteSource.loadNovel(extension, novelEntity.url, loadChapters)
+			.let { info ->
+				info.copy(
+					chapters = info.chapters.distinctBy { it.link }.toTypedArray(),
+				)
+			}
+	}
 
 	@Throws(SQLiteException::class)
 	override suspend fun clearUnBookmarkedNovels() {
@@ -147,7 +137,7 @@ class NovelsRepository(
 	override suspend fun getCatalogueSearch(
 		ext: IExtension,
 		query: String,
-		data: Map<Int, Any>
+		data: Map<Int, Any>,
 	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, query, data) }
 
 	@Throws(
@@ -155,7 +145,7 @@ class NovelsRepository(
 		LuaError::class,
 		HTTPException::class,
 		IOException::class,
-		InvalidListingIndex::class
+		InvalidListingIndex::class,
 	)
 	override suspend fun getCatalogueData(
 		ext: IExtension,
@@ -163,7 +153,5 @@ class NovelsRepository(
 		data: Map<Int, Any>,
 	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data) }
 
-	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> =
-		database.getAnalytics()
-
+	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> = database.getAnalytics()
 }

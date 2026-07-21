@@ -26,11 +26,10 @@ import app.shosetsu.android.domain.model.local.StrippedNovelEntity
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
-import kotlinx.coroutines.flow.Flow
-import org.luaj.vm2.LuaError
 import java.io.IOException
 import javax.net.ssl.SSLException
-
+import kotlinx.coroutines.flow.Flow
+import org.luaj.vm2.LuaError
 
 /**
  * shosetsu
@@ -118,14 +117,12 @@ interface INovelsRepository {
 		loadChapters: Boolean,
 	): Novel.Info
 
-
 	/**
 	 *  Removes all novels that are not bookmarked
 	 *  This should cascade and delete all their chapters as well
 	 */
 	@Throws(SQLiteException::class)
 	suspend fun clearUnBookmarkedNovels()
-
 
 	/**
 	 * Queries the [IExtension] for a search result
@@ -134,18 +131,14 @@ interface INovelsRepository {
 	suspend fun getCatalogueSearch(
 		ext: IExtension,
 		query: String,
-		data: Map<Int, Any>
+		data: Map<Int, Any>,
 	): List<Novel.Info>
 
 	/**
 	 * Loads catalogue data of an [IExtension]
 	 */
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
-	suspend fun getCatalogueData(
-		ext: IExtension,
-		listing: Int,
-		data: Map<Int, Any>,
-	): List<Novel.Info>
+	suspend fun getCatalogueData(ext: IExtension, listing: Int, data: Map<Int, Any>): List<Novel.Info>
 
 	/**
 	 * Get analytic entities

@@ -2,8 +2,8 @@ package app.shosetsu.android.datasource.remote.base
 
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.exceptions.HTTPException
-import org.luaj.vm2.LuaError
 import java.io.IOException
+import org.luaj.vm2.LuaError
 
 /*
  * This file is part of shosetsu.

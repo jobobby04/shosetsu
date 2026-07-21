@@ -5,13 +5,12 @@ import app.shosetsu.android.common.ext.quickie
 import app.shosetsu.android.datasource.remote.base.IRemoteAppUpdateDataSource
 import app.shosetsu.android.domain.model.local.AppUpdateEntity
 import app.shosetsu.lib.exceptions.HTTPException
+import java.io.IOException
 import okhttp3.OkHttpClient
 import org.jsoup.Jsoup
-import java.io.IOException
 
-class UpToDownAppUpdateDataSource(
-	private val okHttpClient: OkHttpClient
-) : IRemoteAppUpdateDataSource {
+class UpToDownAppUpdateDataSource(private val okHttpClient: OkHttpClient) :
+	IRemoteAppUpdateDataSource {
 	companion object {
 		const val UPTODOWN_SHOSETSU_PAGE: String = "https://shosetsu.en.uptodown.com/android"
 		const val UPTODOWN_SHOSETSU_DOWNLOAD: String = "$UPTODOWN_SHOSETSU_PAGE/download"
@@ -27,7 +26,7 @@ class UpToDownAppUpdateDataSource(
 		return AppUpdateEntity(
 			version,
 			url = UPTODOWN_SHOSETSU_DOWNLOAD,
-			notes = emptyList()
+			notes = emptyList(),
 		)
 	}
 

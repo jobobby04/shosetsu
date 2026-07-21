@@ -21,12 +21,12 @@ import androidx.navigation.compose.composable
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
-const val DefaultMotionDuration = 300
+const val DEFAULT_MOTION_DURATION = 300
 
-private const val ProgressThreshold = 0.35f
+private const val PROGRESS_THRESHOLD = 0.35f
 
 private val Int.ForOutgoing: Int
-	get() = (this * ProgressThreshold).toInt()
+	get() = (this * PROGRESS_THRESHOLD).toInt()
 
 private val Int.ForIncoming: Int
 	get() = this - this.ForOutgoing
@@ -53,7 +53,7 @@ fun fadeOutX() = fadeOut(animationSpec = tween(250))
  */
 fun materialFadeThroughIn(
 	initialScale: Float = 0.92f,
-	durationMillis: Int = DefaultMotionDuration,
+	durationMillis: Int = DEFAULT_MOTION_DURATION,
 ): EnterTransition = fadeIn(
 	animationSpec = tween(
 		durationMillis = durationMillis.ForIncoming,
@@ -74,9 +74,7 @@ fun materialFadeThroughIn(
  *
  * @param durationMillis the duration of the exit transition.
  */
-fun materialFadeThroughOut(
-	durationMillis: Int = DefaultMotionDuration,
-): ExitTransition = fadeOut(
+fun materialFadeThroughOut(durationMillis: Int = DEFAULT_MOTION_DURATION): ExitTransition = fadeOut(
 	animationSpec = tween(
 		durationMillis = durationMillis.ForOutgoing,
 		delayMillis = 0,
@@ -97,7 +95,7 @@ fun materialFadeThroughOut(
 inline fun <reified T : Any> NavGraphBuilder.composableMain(
 	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
 	deepLinks: List<NavDeepLink> = emptyList(),
-	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
+	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit),
 ) = composable<T>(
 	typeMap = typeMap,
 	deepLinks = deepLinks,
@@ -119,7 +117,7 @@ inline fun <reified T : Any> NavGraphBuilder.composableMain(
 inline fun <reified T : Any> NavGraphBuilder.composableSub(
 	typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
 	deepLinks: List<NavDeepLink> = emptyList(),
-	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit)
+	noinline content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit),
 ) = composable<T>(
 	typeMap = typeMap,
 	deepLinks = deepLinks,
@@ -127,25 +125,25 @@ inline fun <reified T : Any> NavGraphBuilder.composableSub(
 	enterTransition = {
 		slideInHorizontally(
 			animationSpec = tween(
-				durationMillis = 300
-			)
+				durationMillis = 300,
+			),
 		) { it / 20 } + fadeIn(
 			animationSpec = tween(
 				durationMillis = 195,
-				easing = LinearOutSlowInEasing
-			)
+				easing = LinearOutSlowInEasing,
+			),
 		)
 	},
 	exitTransition = {
 		slideOutHorizontally(
 			animationSpec = tween(
-				durationMillis = 300
-			)
+				durationMillis = 300,
+			),
 		) { it / 20 } + fadeOut(
 			animationSpec = tween(
 				durationMillis = 195,
-				easing = FastOutLinearInEasing
-			)
+				easing = FastOutLinearInEasing,
+			),
 		)
 	},
 	popEnterTransition = { fadeInX() },

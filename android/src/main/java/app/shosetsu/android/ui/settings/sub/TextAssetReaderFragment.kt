@@ -36,10 +36,7 @@ import app.shosetsu.android.viewmodel.abstracted.ATextAssetReaderViewModel
  */
 
 @Composable
-fun TextAssetReaderView(
-	bundleKey: Int,
-	onBack: () -> Unit,
-) {
+fun TextAssetReaderView(bundleKey: Int, onBack: () -> Unit) {
 	val viewModel: ATextAssetReaderViewModel = viewModelDi()
 
 	LaunchedEffect(bundleKey) {
@@ -52,9 +49,9 @@ fun TextAssetReaderView(
 	TextAssetReaderContent(
 		text = content,
 		title = stringResource(
-			target?.titleRes ?: R.string.loading
+			target?.titleRes ?: R.string.loading,
 		),
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
@@ -69,16 +66,17 @@ fun TextAssetReaderContent(text: String, title: String, onBack: () -> Unit) {
 				},
 				navigationIcon = {
 					NavigateBackButton(onBack)
-				}
+				},
 			)
-		}
+		},
 	) { paddingValues ->
 		Text(
-			text = text, modifier = Modifier
+			text = text,
+			modifier = Modifier
 				.padding(paddingValues)
 				.verticalScroll(
 					state = rememberScrollState(),
-				)
+				),
 		)
 	}
 }

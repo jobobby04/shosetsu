@@ -11,10 +11,10 @@ import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.PAGE_INDEX
+import javax.net.ssl.SSLException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.luaj.vm2.LuaError
-import javax.net.ssl.SSLException
 
 /*
  * This file is part of shosetsu.
@@ -39,24 +39,23 @@ import javax.net.ssl.SSLException
  */
 class GetCatalogueListingDataUseCase(
 	private val novelsRepository: INovelsRepository,
-	private val extSettingsRepo: IExtensionSettingsRepository
+	private val extSettingsRepo: IExtensionSettingsRepository,
 ) {
 	inner class MyPagingSource(
 		val extensionId: Int,
 		val iExtension: IExtension,
-		val data: Map<Int, Any>
+		val data: Map<Int, Any>,
 	) : PagingSource<Int, ACatalogNovelUI>() {
-		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? {
-			return state.anchorPosition?.let {
+		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
+			state.anchorPosition?.let {
 				state.closestPageToPosition(it)?.prevKey?.plus(1)
 					?: state.closestPageToPosition(it)?.nextKey?.minus(1)
 			}
-		}
 
 		private var lastPage: List<ACatalogNovelUI> = emptyList()
 
-		override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ACatalogNovelUI> {
-			return withContext(Dispatchers.IO) {
+		override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ACatalogNovelUI> =
+			withContext(Dispatchers.IO) {
 				try {
 					// Key may be null during a refresh, if no explicit key is passed into Pager
 					// construction. Use 0 as default, because our API is indexed started at index 0
@@ -68,7 +67,8 @@ class GetCatalogueListingDataUseCase(
 					val response = search(
 						extensionId,
 						iExtension,
-						HashMap(data).also { it[PAGE_INDEX] = pageNumber })
+						HashMap(data).also { it[PAGE_INDEX] = pageNumber },
+					)
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
 					// be loaded before it.
@@ -86,27 +86,23 @@ class GetCatalogueListingDataUseCase(
 					LoadResult.Page(
 						data = response,
 						prevKey = prevKey,
-						nextKey = nextKey
+						nextKey = nextKey,
 					)
 				} catch (e: Exception) {
 					LoadResult.Error(e)
 				}
 			}
-		}
 	}
 
 	@Throws(SSLException::class, LuaError::class)
-	operator fun invoke(
-		extensionId: Int,
-		iExtension: IExtension,
-		data: Map<Int, Any>
-	) = MyPagingSource(extensionId, iExtension, data)
+	operator fun invoke(extensionId: Int, iExtension: IExtension, data: Map<Int, Any>) =
+		MyPagingSource(extensionId, iExtension, data)
 
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun search(
 		extensionId: Int,
 		iExtension: IExtension,
-		data: Map<Int, Any>
+		data: Map<Int, Any>,
 	): List<ACatalogNovelUI> {
 		val selectedListing = extSettingsRepo.getSelectedListing(extensionId)
 
@@ -114,9 +110,8 @@ class GetCatalogueListingDataUseCase(
 		val list = novelsRepository.getCatalogueData(
 			iExtension,
 			selectedListing,
-			data
+			data,
 		)
-
 
 		return list.mapNotNull { novelListing ->
 			// For each, insert and return a stripped card

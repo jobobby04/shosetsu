@@ -29,5 +29,5 @@ data class SearchRowUI(
 	val extensionID: Int,
 	val name: String,
 	val imageURL: String,
-	val hasError: Boolean = false
+	val hasError: Boolean = false,
 )

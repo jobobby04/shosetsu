@@ -1,10 +1,10 @@
 package app.shosetsu.android.view.uimodels.model.reader
 
+import java.util.UUID
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
-import java.util.UUID
 
 private const val AUTO_DIV_THRESHOLD = 20
 
@@ -19,11 +19,14 @@ class TtsElementExtractor {
 			val traverseChildren = !traversingUp && (node !is Element || handle(node))
 			node = when {
 				traverseChildren && node.childNodeSize() > 0 -> node.childNode(0)
+
 				node == root -> return
+
 				node.nextSibling() != null -> {
 					traversingUp = false
 					node.nextSibling()!!
 				}
+
 				else -> {
 					traversingUp = true
 					node.parent() ?: return

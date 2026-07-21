@@ -22,4 +22,3 @@ fun CSSEditorContent(cssContent: String, onNewText: (String) -> Unit) {
 		textStyle = MaterialTheme.typography.bodyMedium.copy(color = LocalContentColor.current),
 	)
 }
-

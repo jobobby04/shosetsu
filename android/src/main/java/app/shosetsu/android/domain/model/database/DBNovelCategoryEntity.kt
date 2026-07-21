@@ -39,16 +39,16 @@ import app.shosetsu.android.dto.Convertible
 			entity = DBNovelEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["novelID"],
-			onDelete = ForeignKey.CASCADE
+			onDelete = ForeignKey.CASCADE,
 		),
 		ForeignKey(
 			entity = DBCategoryEntity::class,
 			parentColumns = ["id"],
 			childColumns = ["categoryID"],
-			onDelete = ForeignKey.CASCADE
-		)
+			onDelete = ForeignKey.CASCADE,
+		),
 	],
-	indices = [Index("categoryID"), Index("novelID")]
+	indices = [Index("categoryID"), Index("novelID")],
 )
 data class DBNovelCategoryEntity(
 	@PrimaryKey(autoGenerate = true)
@@ -58,6 +58,6 @@ data class DBNovelCategoryEntity(
 ) : Convertible<NovelCategoryEntity> {
 	override fun convertTo(): NovelCategoryEntity = NovelCategoryEntity(
 		novelID,
-		categoryID
+		categoryID,
 	)
 }

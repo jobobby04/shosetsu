@@ -30,7 +30,8 @@ enum class DownloadStatus(val key: Int) {
 	DOWNLOADING(1),
 	PAUSED(2),
 	ERROR(-1),
-	COMPLETE(4);
+	COMPLETE(4),
+	;
 
 	companion object {
 		fun fromInt(key: Int) = entries.find { it.key == key } ?: ERROR

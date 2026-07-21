@@ -29,7 +29,7 @@ fun DropdownSettingContent(
 	selection: Int,
 	choices: ImmutableList<String>,
 	modifier: Modifier = Modifier,
-	onSelection: (newValue: Int) -> Unit
+	onSelection: (newValue: Int) -> Unit,
 ) {
 	// nothing to render if nothing is given
 	if (choices.isEmpty()) return
@@ -49,19 +49,20 @@ fun DropdownSettingContent(
 					text = AnnotatedString(choices[selection]),
 					modifier = Modifier.clickable(onClick = {
 						expanded = true
-					})
+					}),
 				)
 				IconToggleButton(
 					onCheckedChange = {
 						expanded = it
 					},
 					checked = expanded,
-					modifier = Modifier.wrapContentWidth()
+					modifier = Modifier.wrapContentWidth(),
 				) {
-					if (expanded)
+					if (expanded) {
 						Icon(Icons.Outlined.ExpandLess, "")
-					else
+					} else {
 						Icon(Icons.Outlined.ExpandMore, "")
+					}
 				}
 				DropdownMenu(
 					expanded = expanded,
@@ -75,12 +76,12 @@ fun DropdownSettingContent(
 							},
 							text = {
 								Text(text = AnnotatedString(s))
-							}
+							},
 						)
 					}
 				}
 			}
 		},
-		iconDescription = null
+		iconDescription = null,
 	)
 }

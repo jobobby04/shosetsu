@@ -1,10 +1,10 @@
+import java.io.FileInputStream
+import java.io.IOException
+import java.util.Properties
 import org.eclipse.jgit.api.Git
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.internal.extensions.core.extra
-import java.io.FileInputStream
-import java.io.IOException
-import java.util.Properties
 
 @Throws(IOException::class)
 fun Git.getCommitCount(): Int {
@@ -19,14 +19,16 @@ fun Project.loadSProperties(name: String): Properties {
 		null
 	}
 
-	if (properties != null)
+	if (properties != null) {
 		return properties
+	}
 
 	val acraPropertiesFile = rootProject.file("$name.properties")
 	properties = Properties()
 
-	if (acraPropertiesFile.exists())
+	if (acraPropertiesFile.exists()) {
 		properties.load(FileInputStream(acraPropertiesFile))
+	}
 
 	extra.set(name, properties)
 

@@ -29,7 +29,6 @@ import java.security.NoSuchAlgorithmException
  * @author github.com/doomsdayrs
  */
 
-
 /**
  * Deserialize a string to the object
  *
@@ -42,7 +41,7 @@ inline fun <reified R> String.deserializeString(): R? {
 	var editString = this
 	if (editString != "serial-null") {
 		editString = editString.substring(7)
-		//Log.d("Deserialize", string);
+		// Log.d("Deserialize", string);
 		val bytes = Base64.decode(editString, Base64.NO_WRAP)
 		val byteArrayInputStream = ByteArrayInputStream(bytes)
 		val objectInputStream = ObjectInputStream(byteArrayInputStream)
@@ -75,8 +74,9 @@ fun String.md5(): String {
 		val messageDigest = digest.digest()
 		// Create Hex String
 		val hexString = StringBuffer()
-		for (i in messageDigest.indices)
+		for (i in messageDigest.indices) {
 			hexString.append(Integer.toHexString(0xFF and messageDigest[i].toInt()))
+		}
 		return hexString.toString()
 	} catch (e: NoSuchAlgorithmException) {
 		Log.wtf(logID(), "How could an MD5 alg be missing", e)

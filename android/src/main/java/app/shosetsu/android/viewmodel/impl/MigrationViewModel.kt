@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.*
 @OptIn(ExperimentalCoroutinesApi::class)
 class MigrationViewModel(
 	private val getNovelUI: GetNovelUIUseCase,
-	private val loadBrowseExtensionsFlow: LoadBrowseExtensionsUseCase
+	private val loadBrowseExtensionsFlow: LoadBrowseExtensionsUseCase,
 ) : AMigrationViewModel() {
 	private val novelIds: MutableStateFlow<List<Int>> = MutableStateFlow(emptyList())
 
@@ -61,7 +61,7 @@ class MigrationViewModel(
 			novels.flatMapLatest { novelResult ->
 				queryMap.getOrPut(currentNovelId) {
 					MutableStateFlow(
-						novelResult.find { it.id == currentNovelId }?.title ?: ""
+						novelResult.find { it.id == currentNovelId }?.title ?: "",
 					)
 				}
 			}
@@ -75,7 +75,7 @@ class MigrationViewModel(
 				MigrationExtensionUI(
 					it.id,
 					it.name,
-					it.imageURL
+					it.imageURL,
 				)
 			}
 		}.transform { mExtensions ->
@@ -86,11 +86,11 @@ class MigrationViewModel(
 					}.mapLatest { selectedExtension ->
 						mExtensions.map { extension ->
 							extension.copy(
-								isSelected = selectedExtension == extension.id
+								isSelected = selectedExtension == extension.id,
 							)
 						}.toImmutableList()
 					}
-				}
+				},
 			)
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 	}
@@ -100,7 +100,7 @@ class MigrationViewModel(
 			combine(
 				ids.map {
 					getNovelUI(it)
-				}
+				},
 			) {
 				it.filterNotNull()
 			}
@@ -111,7 +111,7 @@ class MigrationViewModel(
 		}.combine(which) { list, id ->
 			val result = list.map { novelUI ->
 				novelUI.copy(
-					isSelected = novelUI.id == id
+					isSelected = novelUI.id == id,
 				)
 			}.toImmutableList()
 			logV("New list: $result")
@@ -138,9 +138,11 @@ class MigrationViewModel(
 						} else {
 							emptyList()
 						}
-					}
+					},
 				)
-			} else emit(emptyList())
+			} else {
+				emit(emptyList())
+			}
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, emptyList())
 	}
 

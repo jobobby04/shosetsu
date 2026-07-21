@@ -24,7 +24,7 @@ import app.shosetsu.android.ui.library.SelectBetweenButton
 fun BoxScope.SelectionBar(content: @Composable RowScope.() -> Unit) {
 	Card(
 		modifier = Modifier
-			.align(BiasAlignment(0f, 0.7f))
+			.align(BiasAlignment(0f, 0.7f)),
 	) {
 		Row {
 			content()
@@ -50,7 +50,7 @@ fun SelectionTopAppBar(
 		SelectBetweenButton(onSelectBetween)
 	},
 	colors = TopAppBarDefaults.topAppBarColors(
-		containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+		containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
 	),
 	navigationIcon = {
 		DeselectAllButton(onDeselectAll)

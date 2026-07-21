@@ -117,7 +117,7 @@ fun BrowseView(
 	openSettings: (extensionId: Int) -> Unit,
 	openRepositories: () -> Unit,
 	openSearch: () -> Unit,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
 ) {
 	val viewModel: ABrowseViewModel = viewModelDi()
 
@@ -136,7 +136,7 @@ fun BrowseView(
 		val result = hostState.showSnackbar(
 			context.getString(message),
 			duration = SnackbarDuration.Long,
-			actionLabel = context.getString(R.string.generic_wifi_settings)
+			actionLabel = context.getString(R.string.generic_wifi_settings),
 		)
 		if (result == SnackbarResult.ActionPerformed) {
 			context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
@@ -156,7 +156,7 @@ fun BrowseView(
 				else -> {
 					scope.launch {
 						hostState.showSnackbar(
-							error.message ?: context.getString(R.string.error)
+							error.message ?: context.getString(R.string.error),
 						)
 					}
 				}
@@ -180,7 +180,7 @@ fun BrowseView(
 				} else {
 					scope.launch {
 						hostState.showSnackbar(
-							context.getString(R.string.fragment_browse_snackbar_not_installed)
+							context.getString(R.string.fragment_browse_snackbar_not_installed),
 						)
 					}
 				}
@@ -201,7 +201,7 @@ fun BrowseView(
 		query = query,
 		onSetQuery = viewModel::setSearch,
 		drawerIcon = drawerIcon,
-		uninstall = viewModel::uninstall
+		uninstall = viewModel::uninstall,
 	)
 
 	if (isFilterMenuVisible) {
@@ -215,14 +215,14 @@ fun BrowseView(
 			onDismissRequest = viewModel::dismissUninstall,
 			confirmButton = {
 				TextButton(
-					onClick = viewModel::confirmUninstall
+					onClick = viewModel::confirmUninstall,
 				) {
 					Text(stringResource(R.string.uninstall))
 				}
 			},
 			dismissButton = {
 				TextButton(
-					onClick = viewModel::dismissUninstall
+					onClick = viewModel::dismissUninstall,
 				) {
 					Text(stringResource(android.R.string.cancel))
 				}
@@ -232,7 +232,7 @@ fun BrowseView(
 			},
 			text = {
 				Text(stringResource(R.string.view_browse_confirm_uninstall_desc))
-			}
+			},
 		)
 	}
 }
@@ -257,7 +257,7 @@ fun PreviewBrowseContent() {
 					isUpdateAvailable = false,
 					updateVersion = Version(1, 2, 1),
 					isInstalling = false,
-					isObsolete = false
+					isObsolete = false,
 				)
 			}.toImmutableList(),
 		refresh = {},
@@ -292,7 +292,7 @@ fun BrowseContent(
 	hostState: SnackbarHostState,
 	onOpenFilter: () -> Unit,
 	onOpenSearch: () -> Unit,
-	drawerIcon: @Composable () -> Unit
+	drawerIcon: @Composable () -> Unit,
 ) {
 	val (isRefreshing, pullRefreshState) = rememberFakePullRefreshState(refresh)
 
@@ -307,12 +307,12 @@ fun BrowseContent(
 					SearchAction(
 						query = query,
 						onSearch = onSetQuery,
-						icon = Icons.AutoMirrored.Outlined.ManageSearch
+						icon = Icons.AutoMirrored.Outlined.ManageSearch,
 					)
 					SimpleIconButton(Icons.Default.Search, stringResource(R.string.global_search), onOpenSearch)
 					HelpButton(URL_HELP_BROWSE)
 				},
-				navigationIcon = drawerIcon
+				navigationIcon = drawerIcon,
 			)
 		},
 		snackbarHost = {
@@ -326,14 +326,14 @@ fun BrowseContent(
 				icon = {
 					Icon(Icons.Outlined.FilterList, stringResource(R.string.filter))
 				},
-				onClick = onOpenFilter
+				onClick = onOpenFilter,
 			)
 		},
 	) { padding ->
 		Box(
 			Modifier
 				.pullRefresh(pullRefreshState)
-				.padding(padding)
+				.padding(padding),
 		) {
 			if (!entities.isNullOrEmpty()) {
 				val state = rememberLazyListState()
@@ -344,7 +344,7 @@ fun BrowseContent(
 						top = 4.dp,
 					),
 					state = state,
-					verticalArrangement = Arrangement.spacedBy(4.dp)
+					verticalArrangement = Arrangement.spacedBy(4.dp),
 				) {
 					items(entities) { entity ->
 						BrowseExtensionContent(
@@ -366,7 +366,7 @@ fun BrowseContent(
 							},
 							uninstall = {
 								uninstall(entity)
-							}
+							},
 						)
 					}
 				}
@@ -379,15 +379,15 @@ fun BrowseContent(
 						},
 						ErrorAction(R.string.repositories) {
 							openRepositories()
-						}
-					)
+						},
+					),
 				)
 			}
 
 			PullRefreshIndicator(
 				isRefreshing,
 				pullRefreshState,
-				Modifier.align(Alignment.TopCenter)
+				Modifier.align(Alignment.TopCenter),
 			)
 		}
 	}
@@ -403,7 +403,7 @@ fun PreviewBrowseExtensionContent() {
 			"",
 			"en",
 			installOptions = listOf(
-				ExtensionInstallOptionEntity(1, "Wowa", Version(1, 1, 1))
+				ExtensionInstallOptionEntity(1, "Wowa", Version(1, 1, 1)),
 			),
 			isInstalled = true,
 			installedVersion = Version(1, 1, 1),
@@ -411,14 +411,14 @@ fun PreviewBrowseExtensionContent() {
 			isUpdateAvailable = true,
 			updateVersion = Version(1, 2, 1),
 			isInstalling = false,
-			isObsolete = false
+			isObsolete = false,
 		),
 		cancelInstall = {},
 		uninstall = {},
 		install = {},
 		openSettings = {},
 		openCatalogue = {},
-		update = {}
+		update = {},
 	)
 }
 
@@ -431,7 +431,7 @@ fun BrowseExtensionContent(
 	uninstall: () -> Unit,
 	openCatalogue: () -> Unit,
 	openSettings: () -> Unit,
-	cancelInstall: () -> Unit
+	cancelInstall: () -> Unit,
 ) {
 	Column(
 		Modifier
@@ -445,16 +445,16 @@ fun BrowseExtensionContent(
 				// Only show long click if installed
 				onLongClick = if (item.isInstalled) uninstall else null,
 				// Only show long click if installed
-				onLongClickLabel = if (item.isInstalled) stringResource(R.string.uninstall) else null
+				onLongClickLabel = if (item.isInstalled) stringResource(R.string.uninstall) else null,
 			)
-			.padding(horizontal = 8.dp)
+			.padding(horizontal = 8.dp),
 	) {
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(end = 8.dp),
 			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically
+			verticalAlignment = Alignment.CenterVertically,
 		) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -472,67 +472,71 @@ fun BrowseExtensionContent(
 								ImageLoadingError(
 									Modifier
 										.size(52.dp)
-										.clip(MaterialTheme.shapes.extraSmall)
+										.clip(MaterialTheme.shapes.extraSmall),
 								)
 							}
 						},
 						loading = {
 							Box(Modifier.placeholder(true))
-						}
+						},
 					)
 				} else {
 					Box(Modifier.size(64.dp), contentAlignment = Alignment.Center) {
 						ImageLoadingError(
 							Modifier
 								.size(52.dp)
-								.clip(MaterialTheme.shapes.extraSmall)
+								.clip(MaterialTheme.shapes.extraSmall),
 						)
 					}
 				}
 				Column(
-					modifier = Modifier.padding(start = 8.dp)
+					modifier = Modifier.padding(start = 8.dp),
 				) {
 					Text(item.name)
 					Row {
 						Text(item.displayLang, fontSize = TextUnit(14f, TextUnitType.Sp))
 
-						if (item.isInstalled && item.installedVersion != null)
+						if (item.isInstalled && item.installedVersion != null) {
 							Text(
 								item.installedVersion.toString(),
 								modifier = Modifier.padding(start = 8.dp),
-								fontSize = TextUnit(14f, TextUnitType.Sp)
+								fontSize = TextUnit(14f, TextUnitType.Sp),
 							)
+						}
 
 						if (item.isUpdateAvailable && item.updateVersion != null) {
-							if (item.updateVersion != Version(-9, -9, -9))
+							if (item.updateVersion != Version(-9, -9, -9)) {
 								Text(
 									stringResource(
 										R.string.update_to,
-										item.updateVersion.toString()
+										item.updateVersion.toString(),
 									),
 									modifier = Modifier.padding(start = 8.dp),
 									fontSize = TextUnit(14f, TextUnitType.Sp),
-									color = MaterialTheme.colorScheme.tertiary
+									color = MaterialTheme.colorScheme.tertiary,
 								)
+							}
 						}
 					}
 				}
 			}
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.End
+				horizontalArrangement = Arrangement.End,
 			) {
 				if (!item.isInstalled && !item.isInstalling && !item.installOptions.isNullOrEmpty()) {
 					var isDropdownVisible by remember { mutableStateOf(false) }
 					SimpleIconButton(
 						Icons.Default.Download,
-						null,
+						stringResource(R.string.view_browse_label_install_extension, item.name),
 						onClick = {
 							// We can skip to dropdown if there is only 1 install option
-							if (item.installOptions.size != 1)
+							if (item.installOptions.size != 1) {
 								isDropdownVisible = true
-							else install(item.installOptions[0])
-						}
+							} else {
+								install(item.installOptions[0])
+							}
+						},
 					)
 					DropdownMenu(
 						expanded = isDropdownVisible,
@@ -547,14 +551,14 @@ fun BrowseExtensionContent(
 								text = {
 									Column {
 										Text(
-											text = AnnotatedString(s.repoName)
+											text = AnnotatedString(s.repoName),
 										)
 										Text(
 											text = AnnotatedString(s.version.toString()),
-											modifier = Modifier.padding(start = 8.dp)
+											modifier = Modifier.padding(start = 8.dp),
 										)
 									}
-								}
+								},
 							)
 						}
 					}
@@ -566,15 +570,15 @@ fun BrowseExtensionContent(
 						stringResource(R.string.update),
 						onClick = update,
 						modifier = Modifier.rotate(180f),
-						tint = MaterialTheme.colorScheme.tertiary
+						tint = MaterialTheme.colorScheme.tertiary,
 					)
 				}
 
 				if (item.isInstalled) {
 					SimpleIconButton(
 						Icons.Outlined.Settings,
-						stringResource(R.string.settings),
-						onClick = openSettings
+						stringResource(R.string.view_browse_label_open_settings, item.name),
+						onClick = openSettings,
 					)
 				}
 
@@ -585,7 +589,7 @@ fun BrowseExtensionContent(
 						modifier = Modifier.combinedClickable(
 							onClick = {},
 							onLongClick = cancelInstall,
-						)
+						),
 					) {
 						AnimatedRefresh()
 					}
@@ -597,14 +601,14 @@ fun BrowseExtensionContent(
 			Box(
 				modifier = Modifier
 					.background(MaterialTheme.colorScheme.tertiary)
-					.fillMaxWidth()
+					.fillMaxWidth(),
 			) {
 				Text(
 					stringResource(R.string.obsolete_extension),
 					color = MaterialTheme.colorScheme.onPrimary,
 					modifier = Modifier
 						.padding(8.dp)
-						.align(Alignment.Center)
+						.align(Alignment.Center),
 				)
 			}
 		}

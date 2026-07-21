@@ -46,6 +46,13 @@ import app.shosetsu.lib.lua.shosetsuGlobals
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.PrintStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
@@ -63,13 +70,6 @@ import org.kodein.di.android.x.androidXModule
 import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.PrintStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /*
  * This file is part of shosetsu.
@@ -92,8 +92,12 @@ import java.util.Locale
  * shosetsu
  * 28 / 01 / 2020
  */
-class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
-	Configuration.Provider, ImageLoaderFactory {
+class ShosetsuApplication :
+	Application(),
+	LifecycleEventObserver,
+	DIAware,
+	Configuration.Provider,
+	ImageLoaderFactory {
 	private val extLibRepository by instance<IExtensionLibrariesRepository>()
 	private val okHttpClient by instance<OkHttpClient>()
 	private val startRepositoryUpdateManagerUseCase: StartRepositoryUpdateManagerUseCase by instance()
@@ -153,8 +157,9 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 							?.takeIf { it.size > 5 }
 							?.let {
 								val length = it.size - 5
-								for (index in 0..length)
+								for (index in 0..length) {
 									it[index].delete()
+								}
 							}
 					}
 				}
@@ -162,7 +167,6 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				loggingDir.mkdirs()
 			}
 		}
-
 
 		val fileDate = SimpleDateFormat("yyyy-MM-dd-hh-mm-ss", Locale.ROOT).format(Date())
 		val logFile = File(loggingDir, "shosetsu-log-$fileDate.txt")
@@ -183,26 +187,27 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 			PrintStream(
 				MultipleOutputStream(
 					System.out,
-					logOS
-				)
-			)
+					logOS,
+				),
+			),
 		)
 
 		System.setErr(
 			PrintStream(
 				MultipleOutputStream(
 					System.err,
-					logOS
-				)
-			)
+					logOS,
+				),
+			),
 		)
 	}
 
 	/***/
 	override fun onCreate() {
 		runBlocking {
-			if (settingsRepo.getBoolean(SettingKey.LogToFile))
+			if (settingsRepo.getBoolean(SettingKey.LogToFile)) {
 				setupDualOutput()
+			}
 		}
 
 		// Setup kotlin-lib
@@ -223,7 +228,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 						Toast.makeText(
 							this@ShosetsuApplication,
 							R.string.warning_repo,
-							Toast.LENGTH_LONG
+							Toast.LENGTH_LONG,
 						).show()
 					}
 					startRepositoryUpdateManagerUseCase()
@@ -274,7 +279,7 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		}
 
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(
-			"User-Agent" to runBlocking { getUserAgent() }
+			"User-Agent" to runBlocking { getUserAgent() },
 		)
 	}
 
@@ -303,30 +308,27 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 		}.build()
 
 	@OptIn(ExperimentalCoroutinesApi::class)
-	override fun newImageLoader(): ImageLoader =
-		ImageLoader.Builder(this).apply {
-			okHttpClient(
-				okHttpClient.newBuilder()
-					.apply {
-						interceptors().removeIf { it is CloudflareInterceptor }
-					}
-					.build()
-			)
-			diskCache {
-				DiskCache.Builder().apply {
-					directory(cacheDir.resolve("image_cache"))
+	override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this).apply {
+		okHttpClient(
+			okHttpClient.newBuilder()
+				.apply {
+					interceptors().removeIf { it is CloudflareInterceptor }
+				}
+				.build(),
+		)
+		diskCache {
+			DiskCache.Builder().apply {
+				directory(cacheDir.resolve("image_cache"))
+			}.build()
+		}
 
-				}.build()
-			}
+		DeviceUtil.isLowRamDevice(this@ShosetsuApplication)
 
-			DeviceUtil.isLowRamDevice(this@ShosetsuApplication)
-
-			// Coil spawns a new thread for every image load by default
-			fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
-			decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
-			transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
-		}.build()
-
+		// Coil spawns a new thread for every image load by default
+		fetcherDispatcher(Dispatchers.IO.limitedParallelism(8))
+		decoderDispatcher(Dispatchers.IO.limitedParallelism(2))
+		transformationDispatcher(Dispatchers.IO.limitedParallelism(2))
+	}.build()
 
 	override fun getPackageName(): String {
 		// This causes freezes in Android 6/7 for some reason
@@ -335,7 +337,8 @@ class ShosetsuApplication : Application(), LifecycleEventObserver, DIAware,
 				// Override the value passed as X-Requested-With in WebView requests
 				val stackTrace = Looper.getMainLooper().thread.stackTrace
 				val isChromiumCall = stackTrace.any { trace ->
-					trace.className.lowercase() in setOf("org.chromium.base.buildinfo", "org.chromium.base.apkinfo") &&
+					trace.className.lowercase() in
+						setOf("org.chromium.base.buildinfo", "org.chromium.base.apkinfo") &&
 						trace.methodName.lowercase() in setOf("getall", "getpackagename", "<init>")
 				}
 

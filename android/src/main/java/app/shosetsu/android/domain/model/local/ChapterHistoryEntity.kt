@@ -29,5 +29,5 @@ data class ChapterHistoryEntity(
 	val novelId: Int,
 	val chapterId: Int,
 	val startedReadingAt: Long,
-	val endedReadingAt: Long?
+	val endedReadingAt: Long?,
 )

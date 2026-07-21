@@ -24,10 +24,7 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 /**
  * 25 / 12 / 2020
  */
-class SetNovelUITypeUseCase(
-	private val settingsRepo: ISettingsRepository
-) {
+class SetNovelUITypeUseCase(private val settingsRepo: ISettingsRepository) {
 	suspend operator fun invoke(novelCardType: NovelCardType) =
 		settingsRepo.setInt(SettingKey.SelectedNovelCardType, novelCardType.toInt())
-
 }

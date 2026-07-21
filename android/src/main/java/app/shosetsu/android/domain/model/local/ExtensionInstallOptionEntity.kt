@@ -32,8 +32,4 @@ import app.shosetsu.lib.Version
  * @param repoName The name of the repository
  * @param version The version of the extension in the repository
  */
-data class ExtensionInstallOptionEntity(
-	val repoId: Int,
-	val repoName: String,
-	val version: Version
-)
+data class ExtensionInstallOptionEntity(val repoId: Int, val repoName: String, val version: Version)

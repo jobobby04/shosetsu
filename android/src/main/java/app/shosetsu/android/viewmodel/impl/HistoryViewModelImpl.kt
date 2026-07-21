@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 class HistoryViewModelImpl(
 	private val historyRepo: ChapterHistoryRepository,
 	private val chapterRepo: IChaptersRepository,
-	private val novelRepo: INovelsRepository
+	private val novelRepo: INovelsRepository,
 ) : HistoryViewModel() {
 	/**
 	 * History items, generated from combining data from 3 repositories

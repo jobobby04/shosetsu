@@ -36,11 +36,11 @@ import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.providers.file.base.IFileSystemProvider
+import java.io.FileOutputStream
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.FileOutputStream
 
 /*
  * This file is part of Shosetsu.
@@ -62,10 +62,13 @@ import java.io.FileOutputStream
 /**
  * 21 / 01 / 2021
  */
-class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : CoroutineWorker(
-	appContext,
-	params
-), DIAware, NotificationCapable {
+class MigrateBackupWorker(appContext: Context, params: WorkerParameters) :
+	CoroutineWorker(
+		appContext,
+		params,
+	),
+	DIAware,
+	NotificationCapable {
 
 	companion object {
 		@Deprecated("After a few versions, drop this.")
@@ -84,7 +87,6 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	override val notificationManager: NotificationManagerCompat by notificationManager()
 	override val notifyContext: Context = appContext
 	override val defaultNotificationID: Int = ID_BACKUP_MIGRATE
-
 
 	private val iFileSystemProvider: IFileSystemProvider by instance()
 	private val settingsRepository: ISettingsRepository by instance()
@@ -121,7 +123,7 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				contentResolver,
 				parentDocumentUri,
 				"application/octet-stream",
-				file
+				file,
 			) ?: continue
 
 			// Open the remote file, and try to write to it
@@ -138,7 +140,7 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				// We do not have a remote file! Failure!
 				val error = FilePermissionException(
 					uri.path ?: "",
-					FilePermissionException.PermissionType.WRITE
+					FilePermissionException.PermissionType.WRITE,
 				)
 
 				notify(
@@ -146,8 +148,8 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 					contentText = applicationContext.getString(
 						R.string.notification_migration_failure,
 						file,
-						error.message
-					)
+						error.message,
+					),
 				) {
 					setOngoing(false)
 					removeProgress()
@@ -170,8 +172,7 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 	 */
 	class Manager(context: Context) : CoroutineWorkerManager(context) {
 
-		override suspend fun getCount(): Int =
-			getWorkerInfoList().size
+		override suspend fun getCount(): Int = getWorkerInfoList().size
 
 		/**
 		 * Returns the status of the service.
@@ -189,8 +190,7 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 			false
 		}
 
-		override suspend fun getWorkerState(index: Int) =
-			getWorkerInfoList().getOrNull(index)?.state
+		override suspend fun getWorkerState(index: Int) = getWorkerInfoList().getOrNull(index)?.state
 
 		override suspend fun getWorkerInfoList(): List<WorkInfo> =
 			workerManager.getWorkInfosForUniqueWork(BACKUP_MIGRATE_WORK_ID).await()
@@ -205,14 +205,13 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 				workerManager.enqueueUniqueWork(
 					BACKUP_MIGRATE_WORK_ID,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<MigrateBackupWorker>(
-					).setInputData(data).build()
+					OneTimeWorkRequestBuilder<MigrateBackupWorker>().setInputData(data).build(),
 				)
 				logI(
 					"Worker State ${
 						workerManager.getWorkInfosForUniqueWork(BACKUP_MIGRATE_WORK_ID)
 							.await()[0].state
-					}"
+					}",
 				)
 			}
 		}
@@ -220,7 +219,6 @@ class MigrateBackupWorker(appContext: Context, params: WorkerParameters) : Corou
 		/**
 		 * Stops the service.
 		 */
-		override fun stop(): Operation =
-			workerManager.cancelUniqueWork(BACKUP_MIGRATE_WORK_ID)
+		override fun stop(): Operation = workerManager.cancelUniqueWork(BACKUP_MIGRATE_WORK_ID)
 	}
 }

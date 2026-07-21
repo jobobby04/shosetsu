@@ -34,8 +34,7 @@ class UninstallExtensionUseCase(
 	private val extensionEntitiesRepository: IExtensionEntitiesRepository,
 ) {
 	@Throws(SQLiteException::class)
-	suspend operator fun invoke(extensionUI: InstalledExtensionUI) =
-		invoke(extensionUI.convertTo())
+	suspend operator fun invoke(extensionUI: InstalledExtensionUI) = invoke(extensionUI.convertTo())
 
 	@Throws(SQLiteException::class)
 	suspend operator fun invoke(ext: InstalledExtensionEntity) {

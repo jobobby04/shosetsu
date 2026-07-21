@@ -5,8 +5,8 @@ import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink
 import app.shosetsu.lib.share.RepositoryLink
-import kotlinx.coroutines.flow.StateFlow
 import javax.security.auth.Destroyable
+import kotlinx.coroutines.flow.StateFlow
 
 /*
  * This file is part of Shosetsu.
@@ -29,7 +29,9 @@ import javax.security.auth.Destroyable
  * shosetsu
  * 01 / 10 / 2020
  */
-abstract class AAddShareViewModel : ShosetsuViewModel(), Destroyable {
+abstract class AAddShareViewModel :
+	ShosetsuViewModel(),
+	Destroyable {
 
 	abstract val isAdding: StateFlow<Boolean>
 	abstract val isComplete: StateFlow<Boolean>

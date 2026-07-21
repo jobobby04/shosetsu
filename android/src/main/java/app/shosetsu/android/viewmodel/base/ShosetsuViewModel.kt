@@ -37,8 +37,7 @@ abstract class ShosetsuViewModel : ViewModel() {
 	/**
 	 * TODO Figure out why this wont add with coroutine context of viewmodel
 	 */
-	fun <T> Flow<T>.onIO(): Flow<T> =
-		flowOn(Dispatchers.IO)
+	fun <T> Flow<T>.onIO(): Flow<T> = flowOn(Dispatchers.IO)
 
 	val viewModelScopeIO
 		get() = viewModelScope + Dispatchers.IO

@@ -87,19 +87,18 @@ import app.shosetsu.android.viewmodel.abstracted.ADownloadsViewModel.SelectedDow
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
-/**
+/*
  * Shosetsu
  * 9 / June / 2019
  *
  * @author github.com/doomsdayrs
  */
+
 /**
  * View that displays downloads the app is working on
  */
 @Composable
-fun DownloadsView(
-	onBack: () -> Unit
-) {
+fun DownloadsView(onBack: () -> Unit) {
 	val viewModel: ADownloadsViewModel = viewModelDi()
 
 	val items by viewModel.liveData.collectAsState()
@@ -121,7 +120,7 @@ fun DownloadsView(
 						val result = hostState.showSnackbar(
 							context.getString(error.messageRes),
 							duration = SnackbarDuration.Long,
-							actionLabel = context.getString(R.string.generic_wifi_settings)
+							actionLabel = context.getString(R.string.generic_wifi_settings),
 						)
 						if (result == SnackbarResult.ActionPerformed) {
 							context.startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
@@ -132,7 +131,7 @@ fun DownloadsView(
 				else -> {
 					scope.launch {
 						hostState.showSnackbar(
-							error.message ?: context.getString(R.string.error)
+							error.message ?: context.getString(R.string.error),
 						)
 					}
 				}
@@ -157,7 +156,7 @@ fun DownloadsView(
 		onSelectBetween = viewModel::selectBetween,
 		isPaused = isPaused,
 		togglePause = viewModel::togglePause,
-		onBack = onBack
+		onBack = onBack,
 	)
 }
 
@@ -182,7 +181,7 @@ fun DownloadsContent(
 	onSetAllPending: () -> Unit,
 	isPaused: Boolean,
 	togglePause: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	Scaffold(
 		topBar = {
@@ -194,7 +193,7 @@ fun DownloadsContent(
 				onSelectBetween,
 				onDeleteAll,
 				onSetAllPending,
-				onBack
+				onBack,
 			)
 		},
 		snackbarHost = {
@@ -202,27 +201,28 @@ fun DownloadsContent(
 		floatingActionButton = {
 			DownloadsFAB(
 				isPaused,
-				togglePause
+				togglePause,
 			)
-		}
+		},
 	) { padding ->
 		if (items.isNotEmpty()) {
 			Box(
 				modifier = Modifier
 					.fillMaxSize()
-					.padding(padding)
+					.padding(padding),
 			) {
 				LazyColumnScrollbar(contentPadding = PaddingValues(bottom = 140.dp)) {
 					items(items, key = { it.chapterID }) {
 						DownloadContent(
 							it,
 							onClick = {
-								if (selectedCount > 0)
+								if (selectedCount > 0) {
 									toggleSelection(it)
+								}
 							},
 							onLongClick = {
 								toggleSelection(it)
-							}
+							},
 						)
 					}
 				}
@@ -233,25 +233,25 @@ fun DownloadsContent(
 							Icons.Outlined.Pause,
 							stringResource(R.string.pause),
 							onClick = pauseSelection,
-							enabled = selectedDownloadState.pauseVisible
+							enabled = selectedDownloadState.pauseVisible,
 						)
 						SimpleIconButton(
 							Icons.Default.PlayArrow,
 							stringResource(R.string.start),
 							onClick = startSelection,
-							enabled = selectedDownloadState.startVisible
+							enabled = selectedDownloadState.startVisible,
 						)
 						SimpleIconButton(
 							Icons.Default.Refresh,
 							stringResource(R.string.restart),
 							onClick = startFailedSelection,
-							enabled = selectedDownloadState.restartVisible
+							enabled = selectedDownloadState.restartVisible,
 						)
 						SimpleIconButton(
 							Icons.Default.Delete,
 							stringResource(R.string.delete),
 							onClick = deleteSelected,
-							enabled = selectedDownloadState.deleteVisible
+							enabled = selectedDownloadState.deleteVisible,
 						)
 					}
 				}
@@ -259,7 +259,7 @@ fun DownloadsContent(
 		} else {
 			ErrorContent(
 				stringResource(R.string.empty_downloads_message),
-				modifier = Modifier.padding(padding)
+				modifier = Modifier.padding(padding),
 			)
 		}
 	}
@@ -274,7 +274,7 @@ fun PreviewDownloadsFAB() {
 	Surface {
 		DownloadsFAB(
 			false,
-			onToggle = {}
+			onToggle = {},
 		)
 	}
 }
@@ -283,10 +283,7 @@ fun PreviewDownloadsFAB() {
  * Floating Action Button for [DownloadsContent]
  */
 @Composable
-fun DownloadsFAB(
-	isPaused: Boolean,
-	onToggle: () -> Unit
-) {
+fun DownloadsFAB(isPaused: Boolean, onToggle: () -> Unit) {
 	ExtendedFloatingActionButton(
 		onClick = onToggle,
 		text = {
@@ -296,8 +293,8 @@ fun DownloadsFAB(
 						R.string.start
 					} else {
 						R.string.pause
-					}
-				)
+					},
+				),
 			)
 		},
 		icon = {
@@ -306,7 +303,7 @@ fun DownloadsFAB(
 			} else {
 				Icon(Icons.Default.Pause, stringResource(R.string.pause))
 			}
-		}
+		},
 	)
 }
 
@@ -325,7 +322,7 @@ fun PreviewDownloadsAppBar() {
 			onSelectBetween = {},
 			onDeleteAll = {},
 			onSetAllPending = {},
-			onBack = {}
+			onBack = {},
 		)
 	}
 }
@@ -343,7 +340,7 @@ fun DownloadsAppBar(
 	onSelectBetween: () -> Unit,
 	onDeleteAll: () -> Unit,
 	onSetAllPending: () -> Unit,
-	onBack: () -> Unit
+	onBack: () -> Unit,
 ) {
 	@Composable
 	fun title() {
@@ -370,28 +367,25 @@ fun DownloadsAppBar(
 			},
 			navigationIcon = {
 				NavigateBackButton(onBack)
-			}
+			},
 		)
 	}
 }
 
 @Composable
-fun DownloadsMoreOption(
-	onDeleteAll: () -> Unit,
-	onSetAllPending: () -> Unit
-) = MoreIconButton {
+fun DownloadsMoreOption(onDeleteAll: () -> Unit, onSetAllPending: () -> Unit) = MoreIconButton {
 	DropdownMenuItem(
 		text = {
 			Text(stringResource(R.string.fragment_downloads_set_all_pending_title))
 		},
-		onClick = onSetAllPending
+		onClick = onSetAllPending,
 	)
 
 	DropdownMenuItem(
 		text = {
 			Text(stringResource(R.string.fragment_downloads_delete_all_title))
 		},
-		onClick = onDeleteAll
+		onClick = onDeleteAll,
 	)
 }
 
@@ -407,40 +401,36 @@ fun PreviewDownloadContent() = ShosetsuTheme(AppThemes.LIGHT) {
 			"Novel",
 			0,
 			DOWNLOADING,
-			false
+			false,
 		),
 		{},
-		{}
+		{},
 	)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DownloadContent(
-	item: DownloadUI,
-	onClick: () -> Unit,
-	onLongClick: () -> Unit,
-) {
+fun DownloadContent(item: DownloadUI, onClick: () -> Unit, onLongClick: () -> Unit) {
 	SelectableBox(
 		item.isSelected,
 		modifier = Modifier
 			.combinedClickable(
 				onClick = onClick,
-				onLongClick = onLongClick
-			)
+				onLongClick = onLongClick,
+			),
 	) {
 		Column(
 			Modifier
 				.padding(16.dp)
-				.fillMaxWidth()
+				.fillMaxWidth(),
 		) {
 			Text(
 				text = item.novelName,
-				style = MaterialTheme.typography.bodyLarge
+				style = MaterialTheme.typography.bodyLarge,
 			)
 			Text(
 				text = item.chapterName,
-				style = MaterialTheme.typography.bodyMedium
+				style = MaterialTheme.typography.bodyMedium,
 			)
 
 			Row(
@@ -448,7 +438,7 @@ fun DownloadContent(
 					.padding(top = 8.dp)
 					.fillMaxWidth(),
 				horizontalArrangement = Arrangement.SpaceBetween,
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
 			) {
 				val status = item.status
 				if (status == DOWNLOADING || status == WAITING) {
@@ -483,13 +473,13 @@ fun DownloadContent(
 							else -> {
 								R.string.completed
 							}
-						}
+						},
 					),
 					textAlign = TextAlign.End,
 					style = MaterialTheme.typography.bodySmall,
 					modifier = Modifier
 						.padding(start = 8.dp)
-						.fillMaxWidth()
+						.fillMaxWidth(),
 				)
 			}
 		}
