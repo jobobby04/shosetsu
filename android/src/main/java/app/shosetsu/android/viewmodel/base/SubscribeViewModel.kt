@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
  * @author github.com/doomsdayrs
  * Allows a view to subscribe to the view model
  */
+@Deprecated("Do not implement this anymore, each viewmodel ought to have a idiomatic name for their flows.")
 interface SubscribeViewModel<T> {
 	/**
 	 * LiveData of this class
