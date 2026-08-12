@@ -796,5 +796,16 @@
 	<string name="view_browse_label_cant_open_catalogue">Do nothing, please install extension</string>
 	<string name="view_browse_label_install_extension">Install extension "%s"</string>
 	<string name="view_browse_label_open_settings">Open %s settings</string>
+	<string name="label_identification">Id:</string>
+	<string name="view_config_ext_label_filename">File Name:</string>
+	<string name="view_config_ext_label_language">Language:</string>
+	<string name="view_config_ext_label_repo">Repository:</string>
+	<string name="view_config_ext_label_checksum">Checksum:</string>
+	<string name="view_config_ext_label_version">Version:</string>
+	<string name="view_config_ext_label_type">Type:</string>
+	<string name="extension_type_lua">Lua Script</string>
+	<string name="view_config_ext_label_chapter_type">Chapter Type:</string>
+	<string name="chapter_type_string">Basic String</string>
+	<string name="chapter_type_html">HTML</string>
 
 </resources>

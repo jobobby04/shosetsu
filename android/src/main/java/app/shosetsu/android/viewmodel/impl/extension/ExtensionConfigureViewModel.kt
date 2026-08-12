@@ -22,6 +22,7 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.model.local.FilterEntity
+import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
 import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
@@ -63,6 +64,7 @@ class ExtensionConfigureViewModel(
 	private val updateExtSelectedListing: UpdateExtSelectedListing,
 	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
 	private val updateSetting: UpdateExtensionSettingUseCase,
+	private val repoRepository: IExtensionRepoRepository
 ) : AExtensionConfigureViewModel() {
 	private val extensionIdFlow: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
 
@@ -100,6 +102,19 @@ class ExtensionConfigureViewModel(
 	}
 
 	override val errors: MutableSharedFlow<Throwable> = MutableSharedFlow()
+
+	override val repoName: StateFlow<String?> = liveData.map {
+		// Is the extension info loaded yet?
+		if (it != null) {
+			// Get the repo by its id, maybe
+			repoRepository.getRepo(it.repoID)?.name
+		} else {
+			// Null if not loaded yet!
+			null
+		}
+	}.catch {
+		errors.emit(it)
+	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 
 	override val extensionListing: StateFlow<ListingSelectionData?> by lazy {
 		extListNamesFlow.onIO()
