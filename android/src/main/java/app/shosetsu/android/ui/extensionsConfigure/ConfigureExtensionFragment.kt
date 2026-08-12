@@ -63,9 +63,9 @@ import app.shosetsu.lib.Novel
 import app.shosetsu.lib.Version
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import kotlin.random.Random
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 /*
  * This file is part of shosetsu.
@@ -95,7 +95,7 @@ import kotlin.random.Random
 fun ConfigureExtensionView(
 	extensionId: Int,
 	viewModel: AExtensionConfigureViewModel = viewModelDi(),
-	onExit: () -> Unit
+	onExit: () -> Unit,
 ) {
 	LaunchedEffect(extensionId) {
 		viewModel.setExtensionID(extensionId)
@@ -103,17 +103,13 @@ fun ConfigureExtensionView(
 
 	ConfigureExtensionContent(
 		viewModel,
-		onExit
+		onExit,
 	)
 }
 
-
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ConfigureExtensionContent(
-	viewModel: AExtensionConfigureViewModel,
-	onBack: () -> Unit
-) {
+fun ConfigureExtensionContent(viewModel: AExtensionConfigureViewModel, onBack: () -> Unit) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
 	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
@@ -144,14 +140,14 @@ fun ConfigureExtensionContent(
 				navigationIcon = {
 					NavigateBackButton(onBack)
 				},
-				scrollBehavior = pinnedScrollBehavior()
+				scrollBehavior = pinnedScrollBehavior(),
 			)
-		}
+		},
 	) { paddingValues ->
 		LazyColumn(
 			state = rememberLazyListState(),
 			contentPadding = PaddingValues(bottom = 8.dp),
-			modifier = Modifier.padding(paddingValues)
+			modifier = Modifier.padding(paddingValues),
 		) {
 			item(Integer.MAX_VALUE) {
 				val extensionUIResult = extensionUIResult
@@ -172,13 +168,13 @@ fun ConfigureExtensionContent(
 						title = stringResource(R.string.listings),
 						subtitle = stringResource(
 							R.string.fragment_configure_extension_listing_desc,
-							choices[selection]
+							choices[selection],
 						),
 						icon = null,
 						value = selection,
 						entries = choices.withIndex().associate { it.index to it.value },
 						onValueChange = { viewModel.setSelectedListing(it) },
-						iconDescription = null
+						iconDescription = null,
 					)
 				}
 			}
@@ -192,14 +188,14 @@ fun ConfigureExtensionContent(
 fun SettingsItemAsCompose(
 	column: LazyListScope,
 	viewModel: AExtensionConfigureViewModel,
-	list: List<FilterEntity>
+	list: List<FilterEntity>,
 ) {
 	list.forEach { data ->
 		when (data) {
 			is FilterEntity.Header -> {
 				column.item(Random.nextInt() + 1000000) {
 					Row(
-						modifier = Modifier.fillMaxWidth()
+						modifier = Modifier.fillMaxWidth(),
 					) {
 						Text(data.name)
 						HorizontalDivider()
@@ -222,7 +218,7 @@ fun SettingsItemAsCompose(
 						onValueChanged = { value ->
 							viewModel.saveSetting(data.id, value)
 						},
-						modifier = Modifier.fillMaxWidth()
+						modifier = Modifier.fillMaxWidth(),
 					)
 				}
 			}
@@ -237,7 +233,7 @@ fun SettingsItemAsCompose(
 						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
 						},
-						iconDescription = null
+						iconDescription = null,
 					)
 				}
 			}
@@ -246,7 +242,7 @@ fun SettingsItemAsCompose(
 				column.item(data.id) {
 					Row(
 						modifier = Modifier.fillMaxWidth(),
-						horizontalArrangement = Arrangement.SpaceBetween
+						horizontalArrangement = Arrangement.SpaceBetween,
 					) {
 						Text(text = data.name)
 						TriStateCheckbox(
@@ -257,7 +253,7 @@ fun SettingsItemAsCompose(
 							},
 							onClick = {
 								viewModel.saveSetting(data.id, data.state.cycle(false).name)
-							}
+							},
 						)
 					}
 				}
@@ -273,7 +269,7 @@ fun SettingsItemAsCompose(
 						onSelection = { index ->
 							viewModel.saveSetting(data.id, index)
 						},
-						modifier = Modifier.fillMaxWidth()
+						modifier = Modifier.fillMaxWidth(),
 					)
 				}
 			}
@@ -282,7 +278,7 @@ fun SettingsItemAsCompose(
 				column.item(Random.nextInt() + 1000000) {
 					Row(
 						modifier = Modifier
-							.fillMaxWidth()
+							.fillMaxWidth(),
 					) {
 						Text(data.name)
 						HorizontalDivider()
@@ -305,7 +301,7 @@ fun SettingsItemAsCompose(
 						onCheckedChanged = { newValue ->
 							viewModel.saveSetting(data.id, newValue)
 						},
-						iconDescription = null
+						iconDescription = null,
 					)
 				}
 			}
@@ -320,7 +316,7 @@ fun SettingsItemAsCompose(
 						onSelection = { index ->
 							viewModel.saveSetting(data.id, index)
 						},
-						modifier = Modifier.fillMaxWidth()
+						modifier = Modifier.fillMaxWidth(),
 					)
 				}
 			}
@@ -345,9 +341,8 @@ fun PreviewConfigureExtensionHeaderContent() {
 			enabled = true,
 			chapterType = Novel.ChapterType.HTML,
 		),
-		repoName = "Test"
+		repoName = "Test",
 	) {
-
 	}
 }
 
@@ -368,9 +363,8 @@ fun PreviewNoRepoNameConfigureExtensionHeaderContent() {
 			enabled = true,
 			chapterType = Novel.ChapterType.HTML,
 		),
-		repoName = null
+		repoName = null,
 	) {
-
 	}
 }
 
@@ -378,22 +372,22 @@ fun PreviewNoRepoNameConfigureExtensionHeaderContent() {
 fun ConfigureExtensionHeaderContent(
 	extension: InstalledExtensionUI,
 	repoName: String?,
-	onUninstall: () -> Unit
+	onUninstall: () -> Unit,
 ) {
 	Card {
 		SelectionContainer {
 			Column(
-				verticalArrangement = Arrangement.spacedBy(4.dp)
+				verticalArrangement = Arrangement.spacedBy(4.dp),
 			) {
 				Row(
 					modifier = Modifier.fillMaxWidth(),
 					horizontalArrangement = Arrangement.SpaceBetween,
-					verticalAlignment = Alignment.CenterVertically
+					verticalAlignment = Alignment.CenterVertically,
 				) {
 					Row(
 						verticalAlignment = Alignment.CenterVertically,
 						horizontalArrangement = Arrangement.spacedBy(8.dp),
-						modifier = Modifier.padding(top = 4.dp)
+						modifier = Modifier.padding(top = 4.dp),
 					) {
 						if (extension.imageURL.isNotEmpty()) {
 							SubcomposeAsyncImage(
@@ -410,18 +404,19 @@ fun ConfigureExtensionHeaderContent(
 								},
 								loading = {
 									Box(Modifier.placeholder(true))
-								}
+								},
 							)
 						} else {
 							Box(
 								Modifier
 									.width(100.dp)
-									.aspectRatio(1.0f), contentAlignment = Alignment.Center
+									.aspectRatio(1.0f),
+								contentAlignment = Alignment.Center,
 							) {
 								ImageLoadingError(
 									Modifier
 										.size(80.dp)
-										.clip(MaterialTheme.shapes.extraSmall)
+										.clip(MaterialTheme.shapes.extraSmall),
 								)
 							}
 						}
@@ -433,17 +428,17 @@ fun ConfigureExtensionHeaderContent(
 							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 								Text(
 									stringResource(R.string.label_identification),
-									style = MaterialTheme.typography.labelLarge
+									style = MaterialTheme.typography.labelLarge,
 								)
 								Text(extension.id.toString(), style = MaterialTheme.typography.bodyMedium)
 							}
 							Row(
 								horizontalArrangement = Arrangement.spacedBy(4.dp),
-								verticalAlignment = Alignment.CenterVertically
+								verticalAlignment = Alignment.CenterVertically,
 							) {
 								Text(
 									stringResource(R.string.view_config_ext_label_repo),
-									style = MaterialTheme.typography.labelLarge
+									style = MaterialTheme.typography.labelLarge,
 								)
 								Text(extension.repoID.toString(), style = MaterialTheme.typography.bodyMedium)
 								if (repoName == null) {
@@ -455,14 +450,14 @@ fun ConfigureExtensionHeaderContent(
 							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 								Text(
 									stringResource(R.string.view_config_ext_label_version),
-									style = MaterialTheme.typography.labelLarge
+									style = MaterialTheme.typography.labelLarge,
 								)
 								Text(extension.version.toString(), style = MaterialTheme.typography.bodyMedium)
 							}
 							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 								Text(
 									stringResource(R.string.view_config_ext_label_language),
-									style = MaterialTheme.typography.labelLarge
+									style = MaterialTheme.typography.labelLarge,
 								)
 								Text(extension.displayLang, style = MaterialTheme.typography.bodyMedium)
 							}
@@ -473,16 +468,15 @@ fun ConfigureExtensionHeaderContent(
 						Icons.Default.Delete,
 						stringResource(R.string.uninstall),
 						onClick = onUninstall,
-						modifier = Modifier.minimumTouchTargetSize()
+						modifier = Modifier.minimumTouchTargetSize(),
 					)
 				}
 
 				Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)) {
-
 					Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 						Text(
 							stringResource(R.string.view_config_ext_label_filename),
-							style = MaterialTheme.typography.labelLarge
+							style = MaterialTheme.typography.labelLarge,
 						)
 						Text(extension.fileName, style = MaterialTheme.typography.bodyMedium)
 					}
@@ -490,34 +484,34 @@ fun ConfigureExtensionHeaderContent(
 					Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 						Text(
 							stringResource(R.string.view_config_ext_label_type),
-							style = MaterialTheme.typography.labelLarge
+							style = MaterialTheme.typography.labelLarge,
 						)
 						Text(
 							when (extension.type) {
 								ExtensionType.LuaScript -> stringResource(R.string.extension_type_lua)
 							},
-							style = MaterialTheme.typography.bodyMedium
+							style = MaterialTheme.typography.bodyMedium,
 						)
 					}
 
 					Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 						Text(
 							stringResource(R.string.view_config_ext_label_chapter_type),
-							style = MaterialTheme.typography.labelLarge
+							style = MaterialTheme.typography.labelLarge,
 						)
 						Text(
 							when (extension.chapterType) {
 								Novel.ChapterType.STRING -> stringResource(R.string.chapter_type_string)
 								Novel.ChapterType.HTML -> stringResource(R.string.chapter_type_html)
 							},
-							style = MaterialTheme.typography.bodyMedium
+							style = MaterialTheme.typography.bodyMedium,
 						)
 					}
 
 					Row {
 						Text(
 							stringResource(R.string.view_config_ext_label_checksum),
-							style = MaterialTheme.typography.labelLarge
+							style = MaterialTheme.typography.labelLarge,
 						)
 						Text(extension.md5, style = MaterialTheme.typography.bodyMedium)
 					}

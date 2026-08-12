@@ -64,7 +64,7 @@ class ExtensionConfigureViewModel(
 	private val updateExtSelectedListing: UpdateExtSelectedListing,
 	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
 	private val updateSetting: UpdateExtensionSettingUseCase,
-	private val repoRepository: IExtensionRepoRepository
+	private val repoRepository: IExtensionRepoRepository,
 ) : AExtensionConfigureViewModel() {
 	private val extensionIdFlow: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
 
