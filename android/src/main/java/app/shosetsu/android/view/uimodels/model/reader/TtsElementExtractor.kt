@@ -6,7 +6,8 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 
-private const val AUTO_DIV_THRESHOLD = 20
+private const val SOFT_SPLIT_THRESHOLD = 5
+private const val HARD_SPLIT_THRESHOLD = 40
 
 class TtsElementExtractor {
 	val result = Elements()
@@ -41,21 +42,79 @@ class TtsElementExtractor {
 	 */
 	private fun handle(element: Element): Boolean {
 		if (element.tagName() == "br") return true
-		val size = element.childNodeSize()
-		for (i in 0 until size) {
+		var size = element.childNodeSize()
+		var segmentStart = 0
+		var i = 0
+		var containsTextNode = false
+
+		fun flushSegment(node: Node = element.childNode(i)): Boolean {
+			if (segmentStart == 0 && i == size - 1) {
+				// Can occur due to the soft threshold and final flush
+				// If this happens, creating a wrapper would cause an infinite loop, so avoid it
+				if (containsTextNode) {
+					result.add(element)
+					element.attr("id", "textElement${UUID.randomUUID()}")
+					return false
+				}
+			} else if (i == segmentStart) {
+				if (node is TextNode) {
+					val wrap = createWrapper()
+					node.replaceWith(wrap)
+					wrap.appendChild(node)
+				}
+			} else {
+				val wrap = createWrapper()
+				node.replaceWith(wrap)
+				wrap.appendChild(node)
+				for (j in (segmentStart..<i).reversed()) {
+					val inner = element.childNode(j)
+					inner.remove()
+					wrap.prependChild(inner)
+				}
+				size = element.childNodeSize()
+			}
+			segmentStart += 1
+			i = segmentStart
+			return true
+		}
+
+		while (i < size) {
 			val node = element.childNode(i)
-			if (node !is TextNode) continue
-			if (size < AUTO_DIV_THRESHOLD) {
+			containsTextNode = containsTextNode || node is TextNode
+			if (node is TextNode && size < SOFT_SPLIT_THRESHOLD) {
+				// contains text -> respect in TTS
 				result.add(element)
 				element.attr("id", "textElement${UUID.randomUUID()}")
 				return false // do not traverse children
+			} else if (i - segmentStart >= SOFT_SPLIT_THRESHOLD && node.plausiblyEndsSentence()) {
+				if (!flushSegment(node = node)) return false
+			} else if (i - segmentStart >= HARD_SPLIT_THRESHOLD) {
+				if (!flushSegment(node = node)) return false
 			} else {
-				// wrap in div
-				val wrap = Element("div")
-				node.replaceWith(wrap)
-				wrap.appendChild(node)
+				i++
 			}
 		}
+
+		if (segmentStart < size) {
+			i = size - 1
+			if (!flushSegment()) return false
+		}
+
 		return true
+	}
+
+	private fun createWrapper(): Element =
+		Element("div") // should be Element("span") but that would make the borders ugly
+
+	private fun Node.plausiblyEndsSentence() = (this is Element && tagName() == "br") ||
+		(this is TextNode && wholeText.plausiblyEndsSentence())
+
+	private fun String.plausiblyEndsSentence(): Boolean {
+		for (i in indices.reversed()) {
+			if (this[i].isWhitespace()) continue
+			if (this[i] == '.' || this[i] == ')') return true
+			return false
+		}
+		return false
 	}
 }
