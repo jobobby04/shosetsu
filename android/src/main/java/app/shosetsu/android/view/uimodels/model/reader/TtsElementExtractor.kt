@@ -84,7 +84,6 @@ class TtsElementExtractor {
 
 			if (!containsTextNode) {
 				if (node is TextNode && node.wholeText.isNotBlank()) {
-					if (segmentStart != 0) segmentStart = i
 					containsTextNode = true
 					if (size < SOFT_SPLIT_THRESHOLD) {
 						result.add(element)
