@@ -73,6 +73,7 @@ class TtsElementExtractor {
 				}
 				size = element.childNodeSize()
 			}
+			containsTextNode = false
 			segmentStart += 1
 			i = segmentStart
 			return true
@@ -80,13 +81,23 @@ class TtsElementExtractor {
 
 		while (i < size) {
 			val node = element.childNode(i)
-			containsTextNode = containsTextNode || node is TextNode
-			if (node is TextNode && size < SOFT_SPLIT_THRESHOLD) {
-				// contains text -> respect in TTS
-				result.add(element)
-				element.attr("id", "textElement${UUID.randomUUID()}")
-				return false // do not traverse children
-			} else if (i - segmentStart >= SOFT_SPLIT_THRESHOLD && node.plausiblyEndsSentence()) {
+
+			if (!containsTextNode) {
+				if (node is TextNode && node.wholeText.isNotBlank()) {
+					if (segmentStart != 0) segmentStart = i
+					containsTextNode = true
+					if (size < SOFT_SPLIT_THRESHOLD) {
+						result.add(element)
+						element.attr("id", "textElement${UUID.randomUUID()}")
+						return false // do not traverse children
+					}
+				} else {
+					i++
+					continue
+				}
+			}
+
+			if (i - segmentStart >= SOFT_SPLIT_THRESHOLD && node.plausiblyEndsSentence()) {
 				if (!flushSegment(node = node)) return false
 			} else if (i - segmentStart >= HARD_SPLIT_THRESHOLD) {
 				if (!flushSegment(node = node)) return false
