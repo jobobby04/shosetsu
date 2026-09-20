@@ -6,12 +6,23 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
 
+/**
+ * Number of child elements after which the end of a sentence causes a split to be inserted
+ */
 private const val SOFT_SPLIT_THRESHOLD = 5
+
+/**
+ * Number of child elements after which a split is inserted regardless of whether a sentence has ended
+ */
 private const val HARD_SPLIT_THRESHOLD = 40
 
 class TtsElementExtractor {
 	val result = Elements()
 
+	/**
+	 * Finds all TTS text elements and places them in [result].
+	 * May also modify the DOM to keep the elements small.
+	 */
 	fun traverse(root: Element) {
 		// DFS, skipping child nodes if handle returns false
 		var node: Node = root
@@ -47,6 +58,13 @@ class TtsElementExtractor {
 		var i = 0
 		var containsTextNode = false
 
+		/**
+		 * Marks the current segment ([segmentStart] to [i]) as finished, possibly wrapping it with [createWrapper].
+		 *
+		 * Updates [segmentStart] and [containsTextNode] which are used internally,
+		 * and, if a segment is wrapped, updates [size] and [i] to account for the incurred size difference.
+		 * @param node always `element.childNode[i]`, a parameter to avoid recomputing if available locally
+		 */
 		fun flushSegment(node: Node = element.childNode(i)): Boolean {
 			if (segmentStart == 0 && i == size - 1) {
 				// Can occur due to the soft threshold and final flush
@@ -113,12 +131,26 @@ class TtsElementExtractor {
 		return true
 	}
 
-	private fun createWrapper(): Element =
-		Element("div") // should be Element("span") but that would make the borders ugly
+	/**
+	 * Creates an [Element] in which to wrap elements when splitting.
+	 * This should be a span, but that would make the borders ugly, so a div it is.
+	 * Extracted to avoid inconsistent behavior.
+	 */
+	private fun createWrapper(): Element = Element("div")
 
+	/**
+	 * Checks whether this node could plausibly be the end of a sentence,
+	 * or, in case it is text, if that text plausibly ends with the end of a sentence.
+	 * Since the ends of sentences are reasonably safe for TTS splits,
+	 * this makes the node eligible to be a soft split edge.
+	 */
 	private fun Node.plausiblyEndsSentence() = (this is Element && tagName() == "br") ||
 		(this is TextNode && wholeText.plausiblyEndsSentence())
 
+	/**
+	 * Checks whether this string plausibly ends with the end of a sentence.
+	 * See [Node.plausiblyEndsSentence].
+	 */
 	private fun String.plausiblyEndsSentence(): Boolean {
 		for (i in indices.reversed()) {
 			if (this[i].isWhitespace()) continue
