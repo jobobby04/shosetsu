@@ -52,10 +52,25 @@ class TtsElementExtractor private constructor(val element: Element, val result: 
 		}
 	}
 
+	/**
+	 * Size of the array of children for the current element
+	 */
 	private var size = element.childNodeSize()
+
+	/**
+	 * Index in the array of children for the current element where the current segment starts
+	 */
 	private var segmentStart = 0
+
+	/**
+	 * Current index in the array of children for the current element
+	 */
 	private var i = 0
-	private var containsTextNode = false
+
+	/**
+	 * Whether a text node exists in the current segment
+	 */
+	private var segmentContainsTextNode = false
 
 	/**
 	 * If a direct descendant is text, mark it as a TTS textElement for use by [ElementToTTSTextIterator]
@@ -67,9 +82,9 @@ class TtsElementExtractor private constructor(val element: Element, val result: 
 		while (i < size) {
 			val node = element.childNode(i)
 
-			if (!containsTextNode) {
+			if (!segmentContainsTextNode) {
 				if (node is TextNode && node.wholeText.isNotBlank()) {
-					containsTextNode = true
+					segmentContainsTextNode = true
 					if (size < SOFT_SPLIT_THRESHOLD) {
 						result.add(element)
 						element.attr("id", "textElement${UUID.randomUUID()}")
@@ -101,7 +116,7 @@ class TtsElementExtractor private constructor(val element: Element, val result: 
 	/**
 	 * Marks the current segment ([segmentStart] to [i]) as finished, possibly wrapping it with [createWrapper].
 	 *
-	 * Updates [segmentStart] and [containsTextNode] which are used internally,
+	 * Updates [segmentStart] and [segmentContainsTextNode] which are used internally,
 	 * and, if a segment is wrapped, updates [size] and [i] to account for the incurred size difference.
 	 * @param node always `element.childNode[i]`, a parameter to avoid recomputing if available locally
 	 */
@@ -109,7 +124,7 @@ class TtsElementExtractor private constructor(val element: Element, val result: 
 		if (segmentStart == 0 && i == size - 1) {
 			// Can occur due to the soft threshold and final flush
 			// If this happens, creating a wrapper would cause an infinite loop, so avoid it
-			if (containsTextNode) {
+			if (segmentContainsTextNode) {
 				result.add(element)
 				element.attr("id", "textElement${UUID.randomUUID()}")
 				return false
@@ -131,7 +146,7 @@ class TtsElementExtractor private constructor(val element: Element, val result: 
 			}
 			size = element.childNodeSize()
 		}
-		containsTextNode = false
+		segmentContainsTextNode = false
 		segmentStart += 1
 		i = segmentStart
 		return true
