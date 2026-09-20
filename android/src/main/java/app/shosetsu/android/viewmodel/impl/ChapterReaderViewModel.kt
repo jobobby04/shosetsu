@@ -384,9 +384,8 @@ class ChapterReaderViewModel(
 
 					tryToDedupTitles(document)
 
-					val extractor = TtsElementExtractor()
 					logV("Generating ids for views")
-					extractor.traverse(document.body())
+					val ttsElements = TtsElementExtractor.traverse(document.body())
 					logV("Finished generating ids for views")
 
 					// run GC as we just created a lot of objects
@@ -396,7 +395,7 @@ class ChapterReaderViewModel(
 					// keep a single backing store of the iterator,
 					//  as to prevent it from being recreated
 					val ttsIterator = ElementToTTSTextIterator {
-						extractor.result.listIterator()
+						ttsElements.listIterator()
 					}
 
 					emitAll(

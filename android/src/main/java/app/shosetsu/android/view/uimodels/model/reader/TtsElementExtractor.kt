@@ -16,86 +16,53 @@ private const val SOFT_SPLIT_THRESHOLD = 5
  */
 private const val HARD_SPLIT_THRESHOLD = 40
 
-class TtsElementExtractor {
-	val result = Elements()
+/**
+ * @see [TtsElementExtractor.traverse]
+ */
+class TtsElementExtractor private constructor(val element: Element, val result: Elements) {
+	companion object {
+		/**
+		 * Finds all TTS text elements.
+		 * May also modify the DOM to keep the elements small.
+		 */
+		fun traverse(root: Element): Elements {
+			val result = Elements()
+			// DFS, skipping child nodes if handle returns false
+			var node: Node = root
+			var traversingUp = false
+			while (true) {
+				val traverseChildren =
+					!traversingUp && (node !is Element || TtsElementExtractor(node, result = result).handle())
+				node = when {
+					traverseChildren && node.childNodeSize() > 0 -> node.childNode(0)
 
-	/**
-	 * Finds all TTS text elements and places them in [result].
-	 * May also modify the DOM to keep the elements small.
-	 */
-	fun traverse(root: Element) {
-		// DFS, skipping child nodes if handle returns false
-		var node: Node = root
-		var traversingUp = false
-		while (true) {
-			val traverseChildren = !traversingUp && (node !is Element || handle(node))
-			node = when {
-				traverseChildren && node.childNodeSize() > 0 -> node.childNode(0)
+					node == root -> return result
 
-				node == root -> return
+					node.nextSibling() != null -> {
+						traversingUp = false
+						node.nextSibling()!!
+					}
 
-				node.nextSibling() != null -> {
-					traversingUp = false
-					node.nextSibling()!!
-				}
-
-				else -> {
-					traversingUp = true
-					node.parent() ?: return
+					else -> {
+						traversingUp = true
+						node.parent() ?: return result
+					}
 				}
 			}
 		}
 	}
 
+	private var size = element.childNodeSize()
+	private var segmentStart = 0
+	private var i = 0
+	private var containsTextNode = false
+
 	/**
 	 * If a direct descendant is text, mark it as a TTS textElement for use by [ElementToTTSTextIterator]
 	 * @return true if children should be traversed
 	 */
-	private fun handle(element: Element): Boolean {
-		if (element.tagName() == "br") return true
-		var size = element.childNodeSize()
-		var segmentStart = 0
-		var i = 0
-		var containsTextNode = false
-
-		/**
-		 * Marks the current segment ([segmentStart] to [i]) as finished, possibly wrapping it with [createWrapper].
-		 *
-		 * Updates [segmentStart] and [containsTextNode] which are used internally,
-		 * and, if a segment is wrapped, updates [size] and [i] to account for the incurred size difference.
-		 * @param node always `element.childNode[i]`, a parameter to avoid recomputing if available locally
-		 */
-		fun flushSegment(node: Node = element.childNode(i)): Boolean {
-			if (segmentStart == 0 && i == size - 1) {
-				// Can occur due to the soft threshold and final flush
-				// If this happens, creating a wrapper would cause an infinite loop, so avoid it
-				if (containsTextNode) {
-					result.add(element)
-					element.attr("id", "textElement${UUID.randomUUID()}")
-					return false
-				}
-			} else if (i == segmentStart) {
-				if (node is TextNode) {
-					val wrap = createWrapper()
-					node.replaceWith(wrap)
-					wrap.appendChild(node)
-				}
-			} else {
-				val wrap = createWrapper()
-				node.replaceWith(wrap)
-				wrap.appendChild(node)
-				for (j in (segmentStart..<i).reversed()) {
-					val inner = element.childNode(j)
-					inner.remove()
-					wrap.prependChild(inner)
-				}
-				size = element.childNodeSize()
-			}
-			containsTextNode = false
-			segmentStart += 1
-			i = segmentStart
-			return true
-		}
+	private fun handle(): Boolean {
+		require(i == 0) { "Cannot be called more than once" }
 
 		while (i < size) {
 			val node = element.childNode(i)
@@ -128,6 +95,45 @@ class TtsElementExtractor {
 			if (!flushSegment()) return false
 		}
 
+		return true
+	}
+
+	/**
+	 * Marks the current segment ([segmentStart] to [i]) as finished, possibly wrapping it with [createWrapper].
+	 *
+	 * Updates [segmentStart] and [containsTextNode] which are used internally,
+	 * and, if a segment is wrapped, updates [size] and [i] to account for the incurred size difference.
+	 * @param node always `element.childNode[i]`, a parameter to avoid recomputing if available locally
+	 */
+	private fun flushSegment(node: Node = element.childNode(i)): Boolean {
+		if (segmentStart == 0 && i == size - 1) {
+			// Can occur due to the soft threshold and final flush
+			// If this happens, creating a wrapper would cause an infinite loop, so avoid it
+			if (containsTextNode) {
+				result.add(element)
+				element.attr("id", "textElement${UUID.randomUUID()}")
+				return false
+			}
+		} else if (i == segmentStart) {
+			if (node is TextNode) {
+				val wrap = createWrapper()
+				node.replaceWith(wrap)
+				wrap.appendChild(node)
+			}
+		} else {
+			val wrap = createWrapper()
+			node.replaceWith(wrap)
+			wrap.appendChild(node)
+			for (j in (segmentStart..<i).reversed()) {
+				val inner = element.childNode(j)
+				inner.remove()
+				wrap.prependChild(inner)
+			}
+			size = element.childNodeSize()
+		}
+		containsTextNode = false
+		segmentStart += 1
+		i = segmentStart
 		return true
 	}
 
