@@ -79,8 +79,8 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.acra.ACRA
 
 /*
@@ -582,7 +582,8 @@ fun LazyGridScope.catalogListingSelection(
 			if (listingSelectionData != null) {
 				ListPreferenceWidget(
 					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-					subtitle = listingSelectionData.choices[listingSelectionData.selection],
+					subtitle = listingSelectionData.choices.getOrNull(listingSelectionData.selection)
+						?: stringResource(R.string.invalid_listing_selection),
 					value = listingSelectionData.selection,
 					entries = listingSelectionData.choices.withIndex()
 						.associate { (index, value) -> index to value },

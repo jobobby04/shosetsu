@@ -58,14 +58,12 @@ import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
 import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
-import app.shosetsu.lib.ExtensionType
-import app.shosetsu.lib.Novel
-import app.shosetsu.lib.Version
+import app.shosetsu.lib.*
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import kotlin.random.Random
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlin.random.Random
 
 /*
  * This file is part of shosetsu.
@@ -164,12 +162,19 @@ fun ConfigureExtensionContent(viewModel: AExtensionConfigureViewModel, onBack: (
 				item {
 					val selection = extensionListingResult.selection.takeIf { it != -1 } ?: 0
 					val choices = extensionListingResult.choices
+					val selected = choices.getOrNull(selection)
+
 					ListPreferenceWidget(
 						title = stringResource(R.string.listings),
-						subtitle = stringResource(
-							R.string.fragment_configure_extension_listing_desc,
-							choices[selection],
-						),
+						subtitle = if (selected != null) {
+							stringResource(
+								R.string.fragment_configure_extension_listing_desc,
+								selected,
+							)
+						} else {
+							// If the selection is ever null, warn the user!
+							stringResource(R.string.invalid_listing_selection)
+						},
 						icon = null,
 						value = selection,
 						entries = choices.withIndex().associate { it.index to it.value },
@@ -430,7 +435,10 @@ fun ConfigureExtensionHeaderContent(
 									stringResource(R.string.label_identification),
 									style = MaterialTheme.typography.labelLarge,
 								)
-								Text(extension.id.toString(), style = MaterialTheme.typography.bodyMedium)
+								Text(
+									extension.id.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+								)
 							}
 							Row(
 								horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -440,7 +448,10 @@ fun ConfigureExtensionHeaderContent(
 									stringResource(R.string.view_config_ext_label_repo),
 									style = MaterialTheme.typography.labelLarge,
 								)
-								Text(extension.repoID.toString(), style = MaterialTheme.typography.bodyMedium)
+								Text(
+									extension.repoID.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+								)
 								if (repoName == null) {
 									AnimatedRefresh(size = 16.dp)
 								} else {
@@ -452,14 +463,20 @@ fun ConfigureExtensionHeaderContent(
 									stringResource(R.string.view_config_ext_label_version),
 									style = MaterialTheme.typography.labelLarge,
 								)
-								Text(extension.version.toString(), style = MaterialTheme.typography.bodyMedium)
+								Text(
+									extension.version.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+								)
 							}
 							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
 								Text(
 									stringResource(R.string.view_config_ext_label_language),
 									style = MaterialTheme.typography.labelLarge,
 								)
-								Text(extension.displayLang, style = MaterialTheme.typography.bodyMedium)
+								Text(
+									extension.displayLang,
+									style = MaterialTheme.typography.bodyMedium,
+								)
 							}
 						}
 					}

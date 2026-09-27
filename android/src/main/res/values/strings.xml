@@ -807,5 +807,6 @@
 	<string name="view_config_ext_label_chapter_type">Chapter Type:</string>
 	<string name="chapter_type_string">Basic String</string>
 	<string name="chapter_type_html">HTML</string>
+	<string name="invalid_listing_selection">Invalid listing selection!</string>
 
 </resources>
