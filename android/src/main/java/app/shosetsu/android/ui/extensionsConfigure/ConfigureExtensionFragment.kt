@@ -61,9 +61,9 @@ import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
 import app.shosetsu.lib.*
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import kotlin.random.Random
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
-import kotlin.random.Random
 
 /*
  * This file is part of shosetsu.
