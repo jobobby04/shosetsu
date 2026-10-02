@@ -16,7 +16,7 @@ import app.shosetsu.android.datasource.local.file.impl.FileExtensionDataSource
 import app.shosetsu.android.datasource.local.file.impl.FileSharedPreferencesSettingsDataSource
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -41,31 +41,15 @@ import org.kodein.di.singleton
  * 12 / 05 / 2020
  */
 val fileDataSourceModule: DI.Module = DI.Module("file_data_source") {
-	bind<IFileExtensionDataSource>() with singleton {
-		FileExtensionDataSource(instance())
-	}
-
-	bind<IFileChapterDataSource>() with singleton {
-		FileChapterDataSource(instance())
-	}
-
-	bind<IFileExtLibDataSource>() with singleton {
-		FileExtLibDataSource(instance())
-	}
+	bind<IFileExtensionDataSource>() with singleton { new(::FileExtensionDataSource) }
+	bind<IFileChapterDataSource>() with singleton { new(::FileChapterDataSource) }
+	bind<IFileExtLibDataSource>() with singleton { new(::FileExtLibDataSource) }
+	bind<IFileCachedAppUpdateDataSource>() with singleton { new(::FileAppUpdateDataSource) }
+	bind<IFileSettingsDataSource>() with singleton { new(::FileSharedPreferencesSettingsDataSource) }
+	bind<IFileCrashDataSource>() with singleton { new(::FileCrashDataSource) }
 
 	bind<IFileCachedChapterDataSource>() with singleton {
-		FileCachedChapterDataSource(instance())
-// 		QueuedFileCacheChapterDataSource(instance())
-	}
-
-	bind<IFileCachedAppUpdateDataSource>() with singleton {
-		FileAppUpdateDataSource(instance())
-	}
-
-	bind<IFileSettingsDataSource>() with singleton {
-		FileSharedPreferencesSettingsDataSource(instance())
-	}
-	bind<IFileCrashDataSource>() with singleton {
-		FileCrashDataSource(instance())
+		new(::FileCachedChapterDataSource)
+// 		new(::QueuedFileCacheChapterDataSource)
 	}
 }

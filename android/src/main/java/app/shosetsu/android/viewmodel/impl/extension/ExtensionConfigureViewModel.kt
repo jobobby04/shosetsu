@@ -28,7 +28,7 @@ import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
+import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
 import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
@@ -61,7 +61,7 @@ class ExtensionConfigureViewModel(
 	private val uninstallExtensionUI: UninstallExtensionUseCase,
 	private val getExtensionSettings: GetExtensionSettingsUseCase,
 	private val getExtListNames: GetExtListingNamesUseCase,
-	private val updateExtSelectedListing: UpdateExtSelectedListing,
+	private val updateExtSelectedListing: UpdateExtSelectedListingUseCase,
 	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
 	private val updateSetting: UpdateExtensionSettingUseCase,
 	private val repoRepository: IExtensionRepoRepository,

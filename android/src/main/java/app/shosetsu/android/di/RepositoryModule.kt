@@ -42,7 +42,7 @@ import app.shosetsu.android.domain.repository.impl.SettingsRepository
 import app.shosetsu.android.domain.repository.impl.UpdatesRepository
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -70,71 +70,46 @@ import org.kodein.di.singleton
  */
 
 val repositoryModule: DI.Module = DI.Module("repository_module") {
-	bind<ICategoryRepository>() with singleton {
-		CategoryRepository(instance())
-	}
+	bind<ICategoryRepository>() with singleton { new(::CategoryRepository) }
 
-	bind<IChaptersRepository>() with singleton {
-		ChaptersRepository(instance(), instance(), instance(), instance(), instance())
-	}
+	bind<IChaptersRepository>() with singleton { new(::ChaptersRepository) }
 
-	bind<IDownloadsRepository>() with singleton { DownloadsRepository(instance()) }
+	bind<IDownloadsRepository>() with singleton { new(::DownloadsRepository) }
 
-	bind<IExtensionsRepository>() with singleton {
-		ExtensionsRepository(instance(), instance(), instance(), instance())
-	}
+	bind<IExtensionsRepository>() with singleton { new(::ExtensionsRepository) }
 
-	bind<IExtensionLibrariesRepository>() with singleton {
-		ExtensionLibrariesRepository(instance(), instance(), instance(), instance())
-	}
+	bind<IExtensionLibrariesRepository>() with singleton { new(::ExtensionLibrariesRepository) }
 
-	bind<IExtensionRepoRepository>() with singleton { ExtRepoRepository(instance(), instance()) }
+	bind<IExtensionRepoRepository>() with singleton { new(::ExtRepoRepository) }
 
-	bind<INovelCategoryRepository>() with singleton {
-		NovelCategoryRepository(instance())
-	}
+	bind<INovelCategoryRepository>() with singleton { new(::NovelCategoryRepository) }
 
-	bind<INovelsRepository>() with singleton {
-		NovelsRepository(
-			instance(),
-			instance(),
-			instance(),
-		)
-	}
+	bind<INovelsRepository>() with singleton { new(::NovelsRepository) }
 
-	bind<INovelPinsRepository>() with singleton { NovelPinsRepository(instance()) }
+	bind<INovelPinsRepository>() with singleton { new(::NovelPinsRepository) }
 
-	bind<IUpdatesRepository>() with singleton { UpdatesRepository(instance()) }
+	bind<IUpdatesRepository>() with singleton { new(::UpdatesRepository) }
 
 	bind<IAppUpdatesRepository>() with singleton {
-		AppUpdatesRepository(instance(), instance())
-		// FakeAppUpdatesRepository()
+		new(::AppUpdatesRepository)
+		// new(::FakeAppUpdatesRepository)
 	}
 
-	bind<ISettingsRepository>() with singleton { SettingsRepository(instance()) }
+	bind<ISettingsRepository>() with singleton { new(::SettingsRepository) }
 
-	bind<IBackupRepository>() with singleton { BackupRepository() }
+	bind<IBackupRepository>() with singleton { new(::BackupRepository) }
 
-	bind<INovelSettingsRepository>() with singleton { NovelSettingsRepository(instance()) }
-	bind<INovelReaderSettingsRepository>() with singleton { NovelReaderSettingsRepository(instance()) }
-	bind<IExtensionSettingsRepository>() with singleton {
-		ExtensionSettingsRepository(
-			iFileSettingSystem = instance(),
-		)
-	}
+	bind<INovelSettingsRepository>() with singleton { new(::NovelSettingsRepository) }
 
-	bind<IExtensionDownloadRepository>() with singleton { ExtensionDownloadRepository() }
-	bind<IExtensionEntitiesRepository>() with singleton {
-		ExtensionEntitiesRepository(
-			instance(),
-			instance(),
-			instance(),
-		)
-	}
+	bind<INovelReaderSettingsRepository>() with singleton { new(::NovelReaderSettingsRepository) }
 
-	bind<ChapterHistoryRepository>() with singleton { ChapterHistoryRepositoryImpl(instance()) }
+	bind<IExtensionSettingsRepository>() with singleton { new(::ExtensionSettingsRepository) }
 
-	bind<ContributorsRepository>() with singleton {
-		ContributorsRepositoryImpl()
-	}
+	bind<IExtensionDownloadRepository>() with singleton { new(::ExtensionDownloadRepository) }
+
+	bind<IExtensionEntitiesRepository>() with singleton { new(::ExtensionEntitiesRepository) }
+
+	bind<ChapterHistoryRepository>() with singleton { new(::ChapterHistoryRepositoryImpl) }
+
+	bind<ContributorsRepository>() with singleton { new(::ContributorsRepositoryImpl) }
 }

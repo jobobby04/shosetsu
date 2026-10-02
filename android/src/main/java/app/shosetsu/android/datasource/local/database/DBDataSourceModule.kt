@@ -30,7 +30,7 @@ import app.shosetsu.android.datasource.local.database.impl.DBRepositoryExtension
 import app.shosetsu.android.datasource.local.database.impl.DBUpdatesDataSource
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -54,38 +54,19 @@ import org.kodein.di.singleton
  * 01 / 01 / 2021
  */
 val dbDataSourceModule = DI.Module("database_data_source") {
-	bind<IDBCategoriesDataSource>() with singleton { DBCategoriesDataSource(instance()) }
-	bind<IDBChaptersDataSource>() with singleton { DBChaptersDataSource(instance()) }
-	bind<DBChapterHistoryDataSource>() with singleton { DBChapterHistoryDataSourceImpl(instance()) }
-	bind<IDBDownloadsDataSource>() with singleton { DBDownloadsDataSource(instance()) }
-
-	bind<IDBInstalledExtensionsDataSource>() with singleton {
-		DBInstalledExtensionsDataSource(
-			instance(),
-		)
-	}
-
-	bind<IDBRepositoryExtensionsDataSource>() with singleton {
-		DBRepositoryExtensionsDataSource(
-			instance(),
-		)
-	}
-
-	bind<IDBExtLibDataSource>() with singleton { DBExtLibDataSource(instance()) }
-
-	bind<IDBNovelCategoriesDataSource>() with singleton { DBNovelCategoriesDataSource(instance()) }
-
-	bind<IDBNovelsDataSource>() with singleton { DBNovelsDataSource(instance()) }
-	bind<IDBNovelPinsDataSource>() with singleton { DBNovelPinsDataSource(instance()) }
-
-	bind<IDBExtRepoDataSource>() with singleton { DBExtRepoDataSource(instance()) }
-
-	bind<IDBUpdatesDataSource>() with singleton { DBUpdatesDataSource(instance()) }
-
-	bind<IDBNovelSettingsDataSource>() with singleton { DBNovelSettingsDataSource(instance()) }
-	bind<IDBNovelReaderSettingsDataSource>() with singleton {
-		DBNovelReaderSettingsDataSource(
-			instance(),
-		)
-	}
+	bind<IDBCategoriesDataSource>() with singleton { new(::DBCategoriesDataSource) }
+	bind<IDBChaptersDataSource>() with singleton { new(::DBChaptersDataSource) }
+	bind<DBChapterHistoryDataSource>() with singleton { new(::DBChapterHistoryDataSourceImpl) }
+	bind<IDBDownloadsDataSource>() with singleton { new(::DBDownloadsDataSource) }
+	bind<IDBInstalledExtensionsDataSource>() with singleton { new(::DBInstalledExtensionsDataSource) }
+	bind<IDBRepositoryExtensionsDataSource>() with
+		singleton { new(::DBRepositoryExtensionsDataSource) }
+	bind<IDBExtLibDataSource>() with singleton { new(::DBExtLibDataSource) }
+	bind<IDBNovelCategoriesDataSource>() with singleton { new(::DBNovelCategoriesDataSource) }
+	bind<IDBNovelsDataSource>() with singleton { new(::DBNovelsDataSource) }
+	bind<IDBNovelPinsDataSource>() with singleton { new(::DBNovelPinsDataSource) }
+	bind<IDBExtRepoDataSource>() with singleton { new(::DBExtRepoDataSource) }
+	bind<IDBUpdatesDataSource>() with singleton { new(::DBUpdatesDataSource) }
+	bind<IDBNovelSettingsDataSource>() with singleton { new(::DBNovelSettingsDataSource) }
+	bind<IDBNovelReaderSettingsDataSource>() with singleton { new(::DBNovelReaderSettingsDataSource) }
 }

@@ -19,6 +19,7 @@ import app.shosetsu.android.providers.database.dao.UpdatesDao
 import org.kodein.di.DI
 import org.kodein.di.bind
 import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -46,7 +47,7 @@ import org.kodein.di.singleton
  */
 
 val databaseModule: DI.Module = DI.Module("database_module") {
-	bind<ShosetsuDatabase>() with singleton { getRoomDatabase(instance()) }
+	bind<ShosetsuDatabase>() with singleton { new(::getRoomDatabase) }
 
 	bind<CategoriesDao>() with singleton { instance<ShosetsuDatabase>().categoriesDao }
 	bind<ChaptersDao>() with singleton { instance<ShosetsuDatabase>().chaptersDao }

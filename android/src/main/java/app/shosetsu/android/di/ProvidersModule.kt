@@ -5,7 +5,7 @@ import app.shosetsu.android.providers.file.impl.AndroidFileSystemProvider
 import app.shosetsu.android.providers.prefrences.SharedPreferenceProvider
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -31,6 +31,6 @@ import org.kodein.di.singleton
  */
 
 val providersModule = DI.Module("providers_module") {
-	bind<SharedPreferenceProvider>() with singleton { SharedPreferenceProvider((instance())) }
-	bind<IFileSystemProvider>() with singleton { AndroidFileSystemProvider(instance()) }
+	bind<SharedPreferenceProvider>() with singleton { new(::SharedPreferenceProvider) }
+	bind<IFileSystemProvider>() with singleton { new(::AndroidFileSystemProvider) }
 }

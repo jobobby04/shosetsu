@@ -13,7 +13,7 @@ import app.shosetsu.android.datasource.local.memory.impl.MemExtLibDataSource
 import app.shosetsu.android.datasource.local.memory.impl.MemExtensionDataSource
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -47,7 +47,7 @@ val memoryDataSourceModule: DI.Module = DI.Module("cache_data_source") {
 		}
 	}
 
-	bind<IMemChaptersDataSource>() with singleton { MemChaptersDataSource(instance()) }
-	bind<IMemExtensionsDataSource>() with singleton { MemExtensionDataSource(instance()) }
-	bind<IMemExtLibDataSource>() with singleton { MemExtLibDataSource(instance()) }
+	bind<IMemChaptersDataSource>() with singleton { new(::MemChaptersDataSource) }
+	bind<IMemExtensionsDataSource>() with singleton { new(::MemExtensionDataSource) }
+	bind<IMemExtLibDataSource>() with singleton { new(::MemExtLibDataSource) }
 }

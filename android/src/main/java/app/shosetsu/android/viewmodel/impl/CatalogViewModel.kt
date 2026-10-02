@@ -25,7 +25,7 @@ import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsHUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUIColumnsPUseCase
 import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.domain.usecases.settings.SetNovelUITypeUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
+import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListingUseCase
 import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
@@ -89,7 +89,7 @@ class CatalogViewModel(
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
 	private val getExtListNames: GetExtListingNamesUseCase,
 	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
-	private val updateExtSelectedListing: UpdateExtSelectedListing,
+	private val updateExtSelectedListing: UpdateExtSelectedListingUseCase,
 	private val settingsRepository: ISettingsRepository,
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> by lazy { MutableStateFlow("") }

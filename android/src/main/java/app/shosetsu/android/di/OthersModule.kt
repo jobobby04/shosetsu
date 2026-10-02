@@ -14,7 +14,7 @@ import app.shosetsu.android.backend.workers.perodic.BackupCycleWorker
 import app.shosetsu.android.backend.workers.perodic.NovelUpdateCycleWorker
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -43,26 +43,19 @@ internal val othersModule = DI.Module("others") {
 	// Workers
 
 	// - onetime
-	bind<DownloadWorker.Manager>() with singleton { DownloadWorker.Manager(instance()) }
-	bind<AppUpdateCheckWorker.Manager>() with singleton { AppUpdateCheckWorker.Manager(instance()) }
-	bind<NovelUpdateWorker.Manager>() with singleton { NovelUpdateWorker.Manager(instance()) }
-	bind<AppUpdateInstallWorker.Manager>() with
-		singleton { AppUpdateInstallWorker.Manager(instance()) }
-	bind<BackupWorker.Manager>() with singleton { BackupWorker.Manager(instance()) }
-	bind<RestoreBackupWorker.Manager>() with singleton { RestoreBackupWorker.Manager(instance()) }
-	bind<MigrateBackupWorker.Manager>() with singleton { MigrateBackupWorker.Manager(instance()) }
-	bind<RepositoryUpdateWorker.Manager>() with
-		singleton { RepositoryUpdateWorker.Manager(instance()) }
-	bind<ExtensionInstallWorker.Manager>() with
-		singleton { ExtensionInstallWorker.Manager(instance()) }
+	bind<DownloadWorker.Manager>() with singleton { new(DownloadWorker::Manager) }
+	bind<AppUpdateCheckWorker.Manager>() with singleton { new(AppUpdateCheckWorker::Manager) }
+	bind<NovelUpdateWorker.Manager>() with singleton { new(NovelUpdateWorker::Manager) }
+	bind<AppUpdateInstallWorker.Manager>() with singleton { new(AppUpdateInstallWorker::Manager) }
+	bind<BackupWorker.Manager>() with singleton { new(BackupWorker::Manager) }
+	bind<RestoreBackupWorker.Manager>() with singleton { new(RestoreBackupWorker::Manager) }
+	bind<MigrateBackupWorker.Manager>() with singleton { new(MigrateBackupWorker::Manager) }
+	bind<RepositoryUpdateWorker.Manager>() with singleton { new(RepositoryUpdateWorker::Manager) }
+	bind<ExtensionInstallWorker.Manager>() with singleton { new(ExtensionInstallWorker::Manager) }
 
 	// - perodic
-	bind<AppUpdateCheckCycleWorker.Manager>() with singleton {
-		AppUpdateCheckCycleWorker.Manager(
-			instance(),
-		)
-	}
-	bind<NovelUpdateCycleWorker.Manager>() with
-		singleton { NovelUpdateCycleWorker.Manager(instance()) }
-	bind<BackupCycleWorker.Manager>() with singleton { BackupCycleWorker.Manager(instance()) }
+	bind<AppUpdateCheckCycleWorker.Manager>() with
+		singleton { new(AppUpdateCheckCycleWorker::Manager) }
+	bind<NovelUpdateCycleWorker.Manager>() with singleton { new(NovelUpdateCycleWorker::Manager) }
+	bind<BackupCycleWorker.Manager>() with singleton { new(BackupCycleWorker::Manager) }
 }

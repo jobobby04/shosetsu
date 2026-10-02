@@ -72,7 +72,7 @@ import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateChapterUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListing
+import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateLibraryFilterStateUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelSettingUseCase
@@ -80,7 +80,7 @@ import app.shosetsu.android.domain.usecases.update.UpdateNovelUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateRepositoryUseCase
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.provider
 
 /*
@@ -105,272 +105,148 @@ import org.kodein.di.provider
  * 01 / 05 / 2020
  */
 val useCaseModule: DI.Module = DI.Module("useCase") {
-	bind<GetUserAgentUseCase>() with provider { GetUserAgentUseCase(instance()) }
-	bind<LoadDownloadsUseCase>() with provider { LoadDownloadsUseCase(instance()) }
+	bind<GetUserAgentUseCase>() with provider { new(::GetUserAgentUseCase) }
 
-	bind<LoadLibraryUseCase>() with provider { LoadLibraryUseCase(instance(), instance()) }
+	bind<LoadDownloadsUseCase>() with provider { new(::LoadDownloadsUseCase) }
 
-	bind<SearchBookMarkedNovelsUseCase>() with provider { SearchBookMarkedNovelsUseCase(instance()) }
-	bind<SetNovelPinUseCase>() with provider { SetNovelPinUseCase(instance()) }
+	bind<LoadLibraryUseCase>() with provider { new(::LoadLibraryUseCase) }
 
-	bind<LoadBrowseExtensionsUseCase>() with provider {
-		LoadBrowseExtensionsUseCase(
-			instance(),
-			instance(),
-		)
-	}
+	bind<SearchBookMarkedNovelsUseCase>() with provider { new(::SearchBookMarkedNovelsUseCase) }
 
-	bind<LoadUpdatesUseCase>() with provider { LoadUpdatesUseCase(instance()) }
+	bind<SetNovelPinUseCase>() with provider { new(::SetNovelPinUseCase) }
 
-	bind<StartRepositoryUpdateManagerUseCase>() with provider {
-		StartRepositoryUpdateManagerUseCase(instance())
-	}
+	bind<LoadBrowseExtensionsUseCase>() with provider { new(::LoadBrowseExtensionsUseCase) }
 
-	bind<RequestInstallExtensionUseCase>() with provider {
-		RequestInstallExtensionUseCase(
-			instance(),
-			instance(),
-		)
-	}
+	bind<LoadUpdatesUseCase>() with provider { new(::LoadUpdatesUseCase) }
 
-	bind<UpdateNovelUseCase>() with provider { UpdateNovelUseCase(instance()) }
+	bind<StartRepositoryUpdateManagerUseCase>() with
+		provider { new(::StartRepositoryUpdateManagerUseCase) }
 
-	bind<GetExtensionUseCase>() with provider { GetExtensionUseCase(instance(), instance()) }
+	bind<RequestInstallExtensionUseCase>() with provider { new(::RequestInstallExtensionUseCase) }
 
-	bind<NovelBackgroundAddUseCase>() with provider {
-		NovelBackgroundAddUseCase(instance(), instance(), instance())
-	}
+	bind<UpdateNovelUseCase>() with provider { new(::UpdateNovelUseCase) }
 
-	bind<GetNovelUIUseCase>() with provider { GetNovelUIUseCase(instance(), instance()) }
+	bind<GetExtensionUseCase>() with provider { new(::GetExtensionUseCase) }
 
-	bind<GetRemoteNovelUseCase>() with provider {
-		GetRemoteNovelUseCase(instance(), instance(), instance(), instance())
-	}
-	bind<StartDownloadWorkerAfterUpdateUseCase>() with provider {
-		StartDownloadWorkerAfterUpdateUseCase(instance(), instance(), instance(), instance())
-	}
+	bind<NovelBackgroundAddUseCase>() with provider { new(::NovelBackgroundAddUseCase) }
 
-	bind<GetCatalogueListingDataUseCase>() with provider {
-		GetCatalogueListingDataUseCase(instance(), instance())
-	}
+	bind<GetNovelUIUseCase>() with provider { new(::GetNovelUIUseCase) }
 
-	bind<GetChapterUIsUseCase>() with provider { GetChapterUIsUseCase(instance()) }
+	bind<GetRemoteNovelUseCase>() with provider { new(::GetRemoteNovelUseCase) }
 
-	bind<UpdateChapterUseCase>() with provider { UpdateChapterUseCase(instance()) }
+	bind<StartDownloadWorkerAfterUpdateUseCase>() with
+		provider { new(::StartDownloadWorkerAfterUpdateUseCase) }
 
-	bind<GetReaderChaptersUseCase>() with provider {
-		GetReaderChaptersUseCase(
-			instance(),
-		)
-	}
+	bind<GetCatalogueListingDataUseCase>() with provider { new(::GetCatalogueListingDataUseCase) }
 
-	bind<GetChapterPassageUseCase>() with provider {
-		GetChapterPassageUseCase(instance(), instance())
-	}
+	bind<GetChapterUIsUseCase>() with provider { new(::GetChapterUIsUseCase) }
 
-	bind<DownloadChapterPassageUseCase>() with provider {
-		DownloadChapterPassageUseCase(instance(), instance(), instance())
-	}
-	bind<DeleteChapterPassageUseCase>() with provider {
-		DeleteChapterPassageUseCase(
-			instance(),
-			instance(),
-		)
-	}
+	bind<UpdateChapterUseCase>() with provider { new(::UpdateChapterUseCase) }
 
-	bind<StartDownloadWorkerUseCase>() with provider {
-		StartDownloadWorkerUseCase(instance(), instance())
-	}
-	bind<StartUpdateWorkerUseCase>() with provider {
-		StartUpdateWorkerUseCase(instance(), instance())
-	}
+	bind<GetReaderChaptersUseCase>() with provider { new(::GetReaderChaptersUseCase) }
 
-	bind<UpdateBookmarkedNovelUseCase>() with provider { UpdateBookmarkedNovelUseCase(instance()) }
+	bind<GetChapterPassageUseCase>() with provider { new(::GetChapterPassageUseCase) }
 
-	bind<UninstallExtensionUseCase>() with provider {
-		UninstallExtensionUseCase(
-			instance(),
-			instance(),
-		)
-	}
+	bind<DownloadChapterPassageUseCase>() with provider { new(::DownloadChapterPassageUseCase) }
+	bind<DeleteChapterPassageUseCase>() with provider { new(::DeleteChapterPassageUseCase) }
 
-	bind<GetURLUseCase>() with provider {
-		GetURLUseCase(
-			instance(),
-		)
-	}
-	bind<IsOnlineUseCase>() with provider { IsOnlineUseCase(instance()) }
+	bind<StartDownloadWorkerUseCase>() with provider { new(::StartDownloadWorkerUseCase) }
 
-	bind<GetCatalogueQueryDataUseCase>() with provider {
-		GetCatalogueQueryDataUseCase(instance(), instance())
-	}
+	bind<StartUpdateWorkerUseCase>() with provider { new(::StartUpdateWorkerUseCase) }
 
-	bind<GetExtensionSettingsUseCase>() with provider {
-		GetExtensionSettingsUseCase(
-			instance(),
-			instance(),
-		)
-	}
-	bind<GetInstalledExtensionUseCase>() with provider { GetInstalledExtensionUseCase(instance()) }
-	bind<GetRepositoryUseCase>() with provider { GetRepositoryUseCase(instance()) }
-	bind<LoadRepositoriesUseCase>() with provider { LoadRepositoriesUseCase(instance()) }
-	bind<LoadReaderThemes>() with provider {
-		LoadReaderThemes(instance(), instance())
-	}
-	bind<LoadChaptersResumeFirstUnreadUseCase>() with provider {
-		LoadChaptersResumeFirstUnreadUseCase(instance())
-	}
+	bind<UpdateBookmarkedNovelUseCase>() with provider { new(::UpdateBookmarkedNovelUseCase) }
 
-	bind<LoadNavigationStyleUseCase>() with provider { LoadNavigationStyleUseCase(instance()) }
-	bind<LoadRequireDoubleBackUseCase>() with provider { LoadRequireDoubleBackUseCase(instance()) }
+	bind<UninstallExtensionUseCase>() with provider { new(::UninstallExtensionUseCase) }
 
-	bind<LoadLiveAppThemeUseCase>() with provider { LoadLiveAppThemeUseCase(instance()) }
+	bind<GetURLUseCase>() with provider { new(::GetURLUseCase) }
 
-	bind<LoadNovelUIColumnsPUseCase>() with provider { LoadNovelUIColumnsPUseCase(instance()) }
-	bind<LoadNovelUIColumnsHUseCase>() with provider { LoadNovelUIColumnsHUseCase(instance()) }
-	bind<LoadNovelUIBadgeToastUseCase>() with provider { LoadNovelUIBadgeToastUseCase(instance()) }
-	bind<LoadNovelUITypeUseCase>() with provider { LoadNovelUITypeUseCase(instance()) }
-	bind<StartAppUpdateInstallWorkerUseCase>() with provider {
-		StartAppUpdateInstallWorkerUseCase(instance())
-	}
-	bind<SetNovelUITypeUseCase>() with provider {
-		SetNovelUITypeUseCase(instance())
-	}
+	bind<IsOnlineUseCase>() with provider { new(::IsOnlineUseCase) }
 
-	bind<GetNovelSettingFlowUseCase>() with provider {
-		GetNovelSettingFlowUseCase(instance())
-	}
-	bind<UpdateNovelSettingUseCase>() with provider {
-		UpdateNovelSettingUseCase(instance())
-	}
-	bind<LoadDeletePreviousChapterUseCase>() with provider {
-		LoadDeletePreviousChapterUseCase(instance())
-	}
+	bind<GetCatalogueQueryDataUseCase>() with provider { new(::GetCatalogueQueryDataUseCase) }
 
-	bind<PurgeNovelCacheUseCase>() with provider {
-		PurgeNovelCacheUseCase(instance())
-	}
+	bind<GetExtensionSettingsUseCase>() with provider { new(::GetExtensionSettingsUseCase) }
 
-	bind<StartBackupWorkerUseCase>() with provider {
-		StartBackupWorkerUseCase(instance(), instance())
-	}
+	bind<GetInstalledExtensionUseCase>() with provider { new(::GetInstalledExtensionUseCase) }
 
-	bind<StartBackupMigrationWorkerUseCase>() with provider {
-		StartBackupMigrationWorkerUseCase(instance(), instance(), instance())
-	}
+	bind<GetRepositoryUseCase>() with provider { new(::GetRepositoryUseCase) }
 
-	bind<StartRestoreWorkerUseCase>() with provider {
-		StartRestoreWorkerUseCase(instance())
-	}
+	bind<LoadRepositoriesUseCase>() with provider { new(::LoadRepositoriesUseCase) }
 
-	bind<AddRepositoryUseCase>() with provider {
-		AddRepositoryUseCase(instance())
-	}
-	bind<DeleteRepositoryUseCase>() with provider {
-		DeleteRepositoryUseCase(instance())
-	}
-	bind<UpdateRepositoryUseCase>() with provider {
-		UpdateRepositoryUseCase(instance())
-	}
-	bind<GetReaderSettingUseCase>() with provider {
-		GetReaderSettingUseCase(instance(), instance())
-	}
+	bind<LoadReaderThemes>() with provider { new(::LoadReaderThemes) }
 
-	bind<LoadLibraryFilterSettingsUseCase>() with provider {
-		LoadLibraryFilterSettingsUseCase(instance())
-	}
+	bind<LoadChaptersResumeFirstUnreadUseCase>() with
+		provider { new(::LoadChaptersResumeFirstUnreadUseCase) }
 
-	bind<GetCategoriesUseCase>() with provider { GetCategoriesUseCase(instance()) }
+	bind<LoadNavigationStyleUseCase>() with provider { new(::LoadNavigationStyleUseCase) }
 
-	bind<AddCategoryUseCase>() with provider {
-		AddCategoryUseCase(instance())
-	}
+	bind<LoadRequireDoubleBackUseCase>() with provider { new(::LoadRequireDoubleBackUseCase) }
 
-	bind<DeleteCategoryUseCase>() with provider {
-		DeleteCategoryUseCase(instance())
-	}
+	bind<LoadLiveAppThemeUseCase>() with provider { new(::LoadLiveAppThemeUseCase) }
 
-	bind<MoveCategoryUseCase>() with provider {
-		MoveCategoryUseCase(instance(), instance())
-	}
+	bind<LoadNovelUIColumnsPUseCase>() with provider { new(::LoadNovelUIColumnsPUseCase) }
+	bind<LoadNovelUIColumnsHUseCase>() with provider { new(::LoadNovelUIColumnsHUseCase) }
+	bind<LoadNovelUIBadgeToastUseCase>() with provider { new(::LoadNovelUIBadgeToastUseCase) }
+	bind<LoadNovelUITypeUseCase>() with provider { new(::LoadNovelUITypeUseCase) }
 
-	bind<GetNovelCategoriesUseCase>() with provider {
-		GetNovelCategoriesUseCase(instance())
-	}
+	bind<StartAppUpdateInstallWorkerUseCase>() with
+		provider { new(::StartAppUpdateInstallWorkerUseCase) }
 
-	bind<SetNovelCategoriesUseCase>() with provider {
-		SetNovelCategoriesUseCase(instance())
-	}
+	bind<SetNovelUITypeUseCase>() with provider { new(::SetNovelUITypeUseCase) }
 
-	bind<SetNovelsCategoriesUseCase>() with provider {
-		SetNovelsCategoriesUseCase(instance())
-	}
+	bind<GetNovelSettingFlowUseCase>() with provider { new(::GetNovelSettingFlowUseCase) }
 
-	bind<UpdateLibraryFilterStateUseCase>() with provider {
-		UpdateLibraryFilterStateUseCase(instance())
-	}
+	bind<UpdateNovelSettingUseCase>() with provider { new(::UpdateNovelSettingUseCase) }
 
-	bind<GetExtListingNamesUseCase>() with provider {
-		GetExtListingNamesUseCase(instance())
-	}
+	bind<LoadDeletePreviousChapterUseCase>() with provider { new(::LoadDeletePreviousChapterUseCase) }
 
-	bind<UpdateExtSelectedListing>() with provider {
-		UpdateExtSelectedListing(instance())
-	}
+	bind<PurgeNovelCacheUseCase>() with provider { new(::PurgeNovelCacheUseCase) }
 
-	bind<GetExtSelectedListingUseCase>() with provider {
-		GetExtSelectedListingUseCase(instance())
-	}
+	bind<StartBackupWorkerUseCase>() with provider { new(::StartBackupWorkerUseCase) }
 
-	bind<GetExtSelectedListingFlowUseCase>() with provider {
-		GetExtSelectedListingFlowUseCase(instance())
-	}
+	bind<StartBackupMigrationWorkerUseCase>() with
+		provider { new(::StartBackupMigrationWorkerUseCase) }
 
-	bind<UpdateExtensionSettingUseCase>() with provider {
-		UpdateExtensionSettingUseCase(instance(), instance(), instance())
-	}
+	bind<StartRestoreWorkerUseCase>() with provider { new(::StartRestoreWorkerUseCase) }
 
-	bind<ForceInsertRepositoryUseCase>() with provider {
-		ForceInsertRepositoryUseCase(instance())
-	}
+	bind<AddRepositoryUseCase>() with provider { new(::AddRepositoryUseCase) }
+	bind<DeleteRepositoryUseCase>() with provider { new(::DeleteRepositoryUseCase) }
+	bind<UpdateRepositoryUseCase>() with provider { new(::UpdateRepositoryUseCase) }
 
-	bind<CancelExtensionInstallUseCase>() with provider { CancelExtensionInstallUseCase(instance()) }
+	bind<GetReaderSettingUseCase>() with provider { new(::GetReaderSettingUseCase) }
 
-	bind<RemoveExtensionEntityUseCase>() with provider {
-		RemoveExtensionEntityUseCase(
-			instance(),
-			instance(),
-		)
-	}
+	bind<LoadLibraryFilterSettingsUseCase>() with provider { new(::LoadLibraryFilterSettingsUseCase) }
 
-	bind<InstallExtensionUseCase>() with provider {
-		InstallExtensionUseCase(
-			instance(),
-			instance(),
-			instance(),
-		)
-	}
+	bind<GetCategoriesUseCase>() with provider { new(::GetCategoriesUseCase) }
+	bind<AddCategoryUseCase>() with provider { new(::AddCategoryUseCase) }
+	bind<DeleteCategoryUseCase>() with provider { new(::DeleteCategoryUseCase) }
+	bind<MoveCategoryUseCase>() with provider { new(::MoveCategoryUseCase) }
 
-	bind<RecordChapterIsReadingUseCase>() with provider {
-		RecordChapterIsReadingUseCase(
-			instance(),
-			instance(),
-		)
-	}
-	bind<RecordChapterIsReadUseCase>() with provider {
-		RecordChapterIsReadUseCase(
-			instance(),
-			instance(),
-		)
-	}
+	bind<GetNovelCategoriesUseCase>() with provider { new(::GetNovelCategoriesUseCase) }
+	bind<SetNovelCategoriesUseCase>() with provider { new(::SetNovelCategoriesUseCase) }
+	bind<SetNovelsCategoriesUseCase>() with provider { new(::SetNovelsCategoriesUseCase) }
 
-	bind<GetLastReadChapterUseCase>() with provider { GetLastReadChapterUseCase(instance()) }
+	bind<UpdateLibraryFilterStateUseCase>() with provider { new(::UpdateLibraryFilterStateUseCase) }
 
-	bind<TrueDeleteChapterUseCase>() with provider {
-		TrueDeleteChapterUseCase(
-			instance(),
-			instance(),
-		)
-	}
-	bind<GetTrueDeleteChapterUseCase>() with provider { GetTrueDeleteChapterUseCase(instance()) }
+	bind<GetExtListingNamesUseCase>() with provider { new(::GetExtListingNamesUseCase) }
+
+	bind<UpdateExtSelectedListingUseCase>() with provider { new(::UpdateExtSelectedListingUseCase) }
+	bind<GetExtSelectedListingUseCase>() with provider { new(::GetExtSelectedListingUseCase) }
+	bind<GetExtSelectedListingFlowUseCase>() with provider { new(::GetExtSelectedListingFlowUseCase) }
+
+	bind<UpdateExtensionSettingUseCase>() with provider { new(::UpdateExtensionSettingUseCase) }
+
+	bind<ForceInsertRepositoryUseCase>() with provider { new(::ForceInsertRepositoryUseCase) }
+
+	bind<RemoveExtensionEntityUseCase>() with provider { new(::RemoveExtensionEntityUseCase) }
+
+	bind<InstallExtensionUseCase>() with provider { new(::InstallExtensionUseCase) }
+	bind<CancelExtensionInstallUseCase>() with provider { new(::CancelExtensionInstallUseCase) }
+
+	bind<RecordChapterIsReadingUseCase>() with provider { new(::RecordChapterIsReadingUseCase) }
+	bind<RecordChapterIsReadUseCase>() with provider { new(::RecordChapterIsReadUseCase) }
+
+	bind<GetLastReadChapterUseCase>() with provider { new(::GetLastReadChapterUseCase) }
+
+	bind<TrueDeleteChapterUseCase>() with provider { new(::TrueDeleteChapterUseCase) }
+	bind<GetTrueDeleteChapterUseCase>() with provider { new(::GetTrueDeleteChapterUseCase) }
 }

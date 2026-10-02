@@ -22,7 +22,7 @@ import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 /**
  * 11 / 03 / 2021
  */
-class UpdateExtSelectedListing(
+class UpdateExtSelectedListingUseCase(
 	private val iExtensionSettingsRepository: IExtensionSettingsRepository,
 ) {
 	suspend operator fun invoke(extensionID: Int, selectedListing: Int) {
