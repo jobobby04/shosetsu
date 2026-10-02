@@ -746,6 +746,8 @@
 	<string name="reader_error_chapter_reading">Failed to record chapter as being read.</string>
 	<string name="reader_error_chapter_read">Failed to record chapter as read.</string>
 	<string name="webview_required">WebView is required for the app to function</string>
+	<string name="webview_outdated">Please update the WebView app for better compatibility</string>
+	<string name="cloudflare_bypass_failure">Failed to bypass Cloudflare</string>
 	<string name="reader_error_chapter_read_cancelled">Job to record chapter as read was cancelled.</string>
 	<string name="reader_error_chapter_reading_cancelled">Job to record chapter as being read was cancelled.</string>
 	<string name="search_error_ext_broken">Extension \'%s\'(%d) is broken! Ignoring it.</string>
