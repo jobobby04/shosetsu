@@ -37,6 +37,10 @@ abstract class AExtensionConfigureViewModel :
 	ShosetsuViewModel(),
 	SubscribeViewModel<InstalledExtensionUI?> {
 
+	/**
+	 * The repository name, null if loading.
+	 */
+	abstract val repoName: StateFlow<String?>
 	abstract val extensionSettings: StateFlow<ImmutableList<FilterEntity>>
 
 	/**

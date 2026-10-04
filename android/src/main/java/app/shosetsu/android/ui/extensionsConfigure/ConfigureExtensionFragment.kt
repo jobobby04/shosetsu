@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -43,23 +46,23 @@ import app.shosetsu.android.R
 import app.shosetsu.android.common.enums.TriStateState
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.domain.model.local.FilterEntity
+import app.shosetsu.android.view.compose.AnimatedRefresh
 import app.shosetsu.android.view.compose.ImageLoadingError
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.SimpleIconButton
+import app.shosetsu.android.view.compose.minimumTouchTargetSize
 import app.shosetsu.android.view.compose.placeholder
 import app.shosetsu.android.view.compose.setting.DropdownSettingContent
 import app.shosetsu.android.view.compose.setting.StringSettingContent
 import app.shosetsu.android.view.compose.setting.widget.SwitchPreferenceWidget
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
-import app.shosetsu.lib.ExtensionType
-import app.shosetsu.lib.Novel
-import app.shosetsu.lib.Version
+import app.shosetsu.lib.*
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import kotlin.random.Random
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /*
  * This file is part of shosetsu.
@@ -106,6 +109,7 @@ fun ConfigureExtensionView(
 fun ConfigureExtensionContent(viewModel: AExtensionConfigureViewModel, onBack: () -> Unit) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
+	val repoName by viewModel.repoName.collectAsState()
 	val errors by viewModel.errors.collectAsState(null)
 
 	// for snackbars
@@ -141,10 +145,11 @@ fun ConfigureExtensionContent(viewModel: AExtensionConfigureViewModel, onBack: (
 			contentPadding = PaddingValues(bottom = 8.dp),
 			modifier = Modifier.padding(paddingValues),
 		) {
-			stickyHeader(1000000) {
+			item(Integer.MAX_VALUE) {
+				val extensionUIResult = extensionUIResult
 				if (extensionUIResult != null) {
-					ConfigureExtensionHeaderContent(extensionUIResult!!) {
-						viewModel.uninstall(extensionUIResult!!)
+					ConfigureExtensionHeaderContent(extensionUIResult, repoName) {
+						viewModel.uninstall(extensionUIResult)
 						onBack()
 					}
 				}
@@ -307,68 +312,199 @@ fun PreviewConfigureExtensionHeaderContent() {
 			"",
 			"en",
 			version = Version(1, 0, 0),
-			md5 = "",
+			md5 = "b0f0d8ff8cc965a7b70b07e0c6b4c028f132597196ae9c70c620cb9e41344106",
 			type = ExtensionType.LuaScript,
 			enabled = true,
 			chapterType = Novel.ChapterType.HTML,
 		),
+		repoName = "Test",
+	) {
+	}
+}
+
+@Preview
+@Composable
+fun PreviewNoRepoNameConfigureExtensionHeaderContent() {
+	ConfigureExtensionHeaderContent(
+		InstalledExtensionUI(
+			1,
+			1,
+			"This is an extension",
+			"fileName",
+			"",
+			"en",
+			version = Version(1, 0, 0),
+			md5 = "b0f0d8ff8cc965a7b70b07e0c6b4c028f132597196ae9c70c620cb9e41344106",
+			type = ExtensionType.LuaScript,
+			enabled = true,
+			chapterType = Novel.ChapterType.HTML,
+		),
+		repoName = null,
 	) {
 	}
 }
 
 @Composable
-fun ConfigureExtensionHeaderContent(extension: InstalledExtensionUI, onUninstall: () -> Unit) {
+fun ConfigureExtensionHeaderContent(
+	extension: InstalledExtensionUI,
+	repoName: String?,
+	onUninstall: () -> Unit,
+) {
 	Card {
-		Row(
-			modifier = Modifier.fillMaxWidth(),
-			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalAlignment = Alignment.CenterVertically,
-		) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
+		SelectionContainer {
+			Column(
+				verticalArrangement = Arrangement.spacedBy(4.dp),
 			) {
-				if (extension.imageURL.isNotEmpty()) {
-					SubcomposeAsyncImage(
-						ImageRequest.Builder(LocalContext.current)
-							.data(extension.imageURL)
-							.crossfade(true)
-							.build(),
-						contentDescription = stringResource(R.string.extension_image_desc),
-						modifier = Modifier.size(100.dp),
-						error = {
-							ImageLoadingError()
-						},
-						loading = {
-							Box(Modifier.placeholder(true))
-						},
+				Row(
+					modifier = Modifier.fillMaxWidth(),
+					horizontalArrangement = Arrangement.SpaceBetween,
+					verticalAlignment = Alignment.CenterVertically,
+				) {
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						modifier = Modifier.padding(top = 4.dp),
+					) {
+						if (extension.imageURL.isNotEmpty()) {
+							SubcomposeAsyncImage(
+								ImageRequest.Builder(LocalContext.current)
+									.data(extension.imageURL)
+									.crossfade(true)
+									.build(),
+								contentDescription = stringResource(R.string.extension_image_desc),
+								modifier = Modifier
+									.width(100.dp)
+									.aspectRatio(1.0f),
+								error = {
+									ImageLoadingError()
+								},
+								loading = {
+									Box(Modifier.placeholder(true))
+								},
+							)
+						} else {
+							Box(
+								Modifier
+									.width(100.dp)
+									.aspectRatio(1.0f),
+								contentAlignment = Alignment.Center,
+							) {
+								ImageLoadingError(
+									Modifier
+										.size(80.dp)
+										.clip(MaterialTheme.shapes.extraSmall),
+								)
+							}
+						}
+
+						Column(modifier = Modifier.fillMaxWidth(0.60f)) {
+							Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+								Text(extension.name, style = MaterialTheme.typography.titleLarge)
+							}
+							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+								Text(
+									stringResource(R.string.label_identification),
+									style = MaterialTheme.typography.labelLarge,
+								)
+								Text(
+									extension.id.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+							}
+							Row(
+								horizontalArrangement = Arrangement.spacedBy(4.dp),
+								verticalAlignment = Alignment.CenterVertically,
+							) {
+								Text(
+									stringResource(R.string.view_config_ext_label_repo),
+									style = MaterialTheme.typography.labelLarge,
+								)
+								Text(
+									extension.repoID.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+								if (repoName == null) {
+									AnimatedRefresh(size = 16.dp)
+								} else {
+									Text(repoName, style = MaterialTheme.typography.bodyMedium)
+								}
+							}
+							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+								Text(
+									stringResource(R.string.view_config_ext_label_version),
+									style = MaterialTheme.typography.labelLarge,
+								)
+								Text(
+									extension.version.toString(),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+							}
+							Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+								Text(
+									stringResource(R.string.view_config_ext_label_language),
+									style = MaterialTheme.typography.labelLarge,
+								)
+								Text(
+									extension.displayLang,
+									style = MaterialTheme.typography.bodyMedium,
+								)
+							}
+						}
+					}
+
+					SimpleIconButton(
+						Icons.Default.Delete,
+						stringResource(R.string.uninstall),
+						onClick = onUninstall,
+						modifier = Modifier.minimumTouchTargetSize(),
 					)
-				} else {
-					Box(Modifier.size(100.dp), contentAlignment = Alignment.Center) {
-						ImageLoadingError(
-							Modifier
-								.size(80.dp)
-								.clip(MaterialTheme.shapes.extraSmall),
+				}
+
+				Column(modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 4.dp)) {
+					Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+						Text(
+							stringResource(R.string.view_config_ext_label_filename),
+							style = MaterialTheme.typography.labelLarge,
+						)
+						Text(extension.fileName, style = MaterialTheme.typography.bodyMedium)
+					}
+
+					Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+						Text(
+							stringResource(R.string.view_config_ext_label_type),
+							style = MaterialTheme.typography.labelLarge,
+						)
+						Text(
+							when (extension.type) {
+								ExtensionType.LuaScript -> stringResource(R.string.extension_type_lua)
+							},
+							style = MaterialTheme.typography.bodyMedium,
 						)
 					}
-				}
 
-				Column {
-					Text(extension.name)
-					Row(
-						horizontalArrangement = Arrangement.SpaceBetween,
-					) {
-						Text(extension.id.toString())
-						Text(extension.fileName, modifier = Modifier.padding(start = 16.dp))
+					Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+						Text(
+							stringResource(R.string.view_config_ext_label_chapter_type),
+							style = MaterialTheme.typography.labelLarge,
+						)
+						Text(
+							when (extension.chapterType) {
+								Novel.ChapterType.STRING -> stringResource(R.string.chapter_type_string)
+								Novel.ChapterType.HTML -> stringResource(R.string.chapter_type_html)
+							},
+							style = MaterialTheme.typography.bodyMedium,
+						)
 					}
-					Text(extension.displayLang)
+
+					Row {
+						Text(
+							stringResource(R.string.view_config_ext_label_checksum),
+							style = MaterialTheme.typography.labelLarge,
+						)
+						Text(extension.md5, style = MaterialTheme.typography.bodyMedium)
+					}
 				}
 			}
-
-			SimpleIconButton(
-				Icons.Default.Delete,
-				stringResource(R.string.uninstall),
-				onClick = onUninstall,
-			)
 		}
 	}
 }

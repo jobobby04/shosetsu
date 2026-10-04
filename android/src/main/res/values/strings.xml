@@ -746,6 +746,8 @@
 	<string name="reader_error_chapter_reading">Failed to record chapter as being read.</string>
 	<string name="reader_error_chapter_read">Failed to record chapter as read.</string>
 	<string name="webview_required">WebView is required for the app to function</string>
+	<string name="webview_outdated">Please update the WebView app for better compatibility</string>
+	<string name="cloudflare_bypass_failure">Failed to bypass Cloudflare</string>
 	<string name="reader_error_chapter_read_cancelled">Job to record chapter as read was cancelled.</string>
 	<string name="reader_error_chapter_reading_cancelled">Job to record chapter as being read was cancelled.</string>
 	<string name="search_error_ext_broken">Extension \'%s\'(%d) is broken! Ignoring it.</string>
@@ -796,5 +798,17 @@
 	<string name="view_browse_label_cant_open_catalogue">Do nothing, please install extension</string>
 	<string name="view_browse_label_install_extension">Install extension "%s"</string>
 	<string name="view_browse_label_open_settings">Open %s settings</string>
+	<string name="label_identification">Id:</string>
+	<string name="view_config_ext_label_filename">File Name:</string>
+	<string name="view_config_ext_label_language">Language:</string>
+	<string name="view_config_ext_label_repo">Repository:</string>
+	<string name="view_config_ext_label_checksum">Checksum:</string>
+	<string name="view_config_ext_label_version">Version:</string>
+	<string name="view_config_ext_label_type">Type:</string>
+	<string name="extension_type_lua">Lua Script</string>
+	<string name="view_config_ext_label_chapter_type">Chapter Type:</string>
+	<string name="chapter_type_string">Basic String</string>
+	<string name="chapter_type_html">HTML</string>
+	<string name="invalid_listing_selection">Invalid listing selection!</string>
 
 </resources>

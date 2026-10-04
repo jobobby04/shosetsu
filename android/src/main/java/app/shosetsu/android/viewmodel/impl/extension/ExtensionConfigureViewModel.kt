@@ -55,6 +55,7 @@ class ExtensionConfigureViewModel(
 	private val uninstallExtensionUI: UninstallExtensionUseCase,
 	private val getExtensionSettings: GetExtensionSettingsUseCase,
 	private val updateSetting: UpdateExtensionSettingUseCase,
+	private val repoRepository: IExtensionRepoRepository,
 ) : AExtensionConfigureViewModel() {
 	private val extensionIdFlow: MutableStateFlow<Int> by lazy { MutableStateFlow(-1) }
 
@@ -82,6 +83,19 @@ class ExtensionConfigureViewModel(
 	}
 
 	override val errors: MutableSharedFlow<Throwable> = MutableSharedFlow()
+
+	override val repoName: StateFlow<String?> = liveData.map {
+		// Is the extension info loaded yet?
+		if (it != null) {
+			// Get the repo by its id, maybe
+			repoRepository.getRepo(it.repoID)?.name
+		} else {
+			// Null if not loaded yet!
+			null
+		}
+	}.catch {
+		errors.emit(it)
+	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 
 	override fun setExtensionID(id: Int) {
 		logV("Setting extension id = $id")

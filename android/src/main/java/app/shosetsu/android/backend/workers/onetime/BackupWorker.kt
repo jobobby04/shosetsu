@@ -313,6 +313,7 @@ class BackupWorker(appContext: Context, params: WorkerParameters) :
 		return Result.failure()
 	}
 
+	@OptIn(ExperimentalSerializationApi::class)
 	@Throws(IOException::class)
 	private suspend fun writeBackup(
 		extensions: List<InstalledExtensionEntity>,

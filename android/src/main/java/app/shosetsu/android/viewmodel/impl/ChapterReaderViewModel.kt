@@ -66,13 +66,13 @@ import app.shosetsu.android.view.uimodels.model.ExceptionSnackbarModel
 import app.shosetsu.android.view.uimodels.model.NovelReaderSettingUI
 import app.shosetsu.android.view.uimodels.model.reader.ChapterPassage
 import app.shosetsu.android.view.uimodels.model.reader.ElementToTTSTextIterator
-import app.shosetsu.android.view.uimodels.model.reader.LazyTTSText
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderChapterUI
 import app.shosetsu.android.view.uimodels.model.reader.ReaderUIItem.ReaderDividerUI
 import app.shosetsu.android.view.uimodels.model.reader.RewindableMutableListIterator
 import app.shosetsu.android.view.uimodels.model.reader.TTSPlayback
 import app.shosetsu.android.view.uimodels.model.reader.TTSText
+import app.shosetsu.android.view.uimodels.model.reader.TtsElementExtractor
 import app.shosetsu.android.viewmodel.abstracted.AChapterReaderViewModel
 import app.shosetsu.android.viewmodel.abstracted.ShosetsuCssViewModelComponent
 import app.shosetsu.lib.IExtension
@@ -384,14 +384,8 @@ class ChapterReaderViewModel(
 
 					tryToDedupTitles(document)
 
-					val ttsElements = document.body().select("*:not(:has(*)):not(br)")
-
-					// we need to generate the ids here
-					// as to ensure they stay here when the html is rendered
 					logV("Generating ids for views")
-					ttsElements.parallelStream().map(::LazyTTSText).forEach {
-						it.id
-					}
+					val ttsElements = TtsElementExtractor.traverse(document.body())
 					logV("Finished generating ids for views")
 
 					// run GC as we just created a lot of objects

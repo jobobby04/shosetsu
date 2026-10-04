@@ -21,7 +21,7 @@ import app.shosetsu.android.datasource.remote.impl.update.PlayAppUpdateDataSourc
 import app.shosetsu.android.datasource.remote.impl.update.UpToDownAppUpdateDataSource
 import org.kodein.di.DI
 import org.kodein.di.bind
-import org.kodein.di.instance
+import org.kodein.di.new
 import org.kodein.di.singleton
 
 /*
@@ -47,24 +47,19 @@ import org.kodein.di.singleton
  * These modules load chapters from online
  */
 val remoteDataSouceModule: DI.Module = DI.Module("remote_data_source") {
-	bind<IRemoteCatalogueDataSource>() with singleton { RemoteCatalogueDataSource() }
-
-	bind<IRemoteChaptersDataSource>() with singleton { RemoteChaptersDataSource() }
-
-	bind<IRemoteNovelDataSource>() with singleton { RemoteNovelDataSource() }
-
-	bind<IRemoteExtensionDataSource>() with singleton { RemoteExtensionDataSource(instance()) }
-
-	bind<IRemoteExtRepoDataSource>() with singleton { RemoteExtRepoDataSource(instance()) }
-
-	bind<IRemoteExtLibDataSource>() with singleton { RemoteExtLibDataSource(instance()) }
+	bind<IRemoteCatalogueDataSource>() with singleton { new(::RemoteCatalogueDataSource) }
+	bind<IRemoteChaptersDataSource>() with singleton { new(::RemoteChaptersDataSource) }
+	bind<IRemoteNovelDataSource>() with singleton { new(::RemoteNovelDataSource) }
+	bind<IRemoteExtensionDataSource>() with singleton { new(::RemoteExtensionDataSource) }
+	bind<IRemoteExtRepoDataSource>() with singleton { new(::RemoteExtRepoDataSource) }
+	bind<IRemoteExtLibDataSource>() with singleton { new(::RemoteExtLibDataSource) }
 
 	bind<IRemoteAppUpdateDataSource>() with singleton {
 		when (flavor()) {
-			ProductFlavors.PLAY_STORE -> PlayAppUpdateDataSource()
-			ProductFlavors.F_DROID -> FDroidAppUpdateDataSource(instance())
-			ProductFlavors.UP_TO_DOWN -> UpToDownAppUpdateDataSource(instance())
-			ProductFlavors.STANDARD -> GitAppUpdateDataSource(instance())
+			ProductFlavors.PLAY_STORE -> new(::PlayAppUpdateDataSource)
+			ProductFlavors.F_DROID -> new(::FDroidAppUpdateDataSource)
+			ProductFlavors.UP_TO_DOWN -> new(::UpToDownAppUpdateDataSource)
+			ProductFlavors.STANDARD -> new(::GitAppUpdateDataSource)
 		}
 	}
 }
