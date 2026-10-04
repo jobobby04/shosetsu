@@ -142,7 +142,7 @@ interface INovelsRepository {
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun getCatalogueData(
 		ext: Extension,
-		listing: Extension.Listing.Item,
+		listing: Extension.Listing.Novels,
 		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>

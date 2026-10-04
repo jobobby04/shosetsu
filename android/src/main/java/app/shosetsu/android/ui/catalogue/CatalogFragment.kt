@@ -90,7 +90,7 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import app.shosetsu.lib.Extension
-import app.shosetsu.lib.lua.MutableLuaListingItem
+import app.shosetsu.lib.lua.MutableLuaListing
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -348,25 +348,21 @@ fun ListingsContent(
 							.padding(horizontal = 8.dp, vertical = 16.dp),
 						verticalAlignment = Alignment.CenterVertically,
 					) {
-						when (it) {
-							is Extension.Listing.Item -> {
-								Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
-								Spacer(modifier = Modifier.width(16.dp))
-								Text(
-									text = it.name,
-									style = MaterialTheme.typography.bodyLarge,
-								)
-							}
-
-							is Extension.Listing.List -> {
-								Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "list")
-								Spacer(modifier = Modifier.width(16.dp))
-								Text(
-									text = it.name,
-									style = MaterialTheme.typography.bodyLarge,
-								)
-							}
-						}
+						Icon(
+							imageVector = if (it.novels !=
+								null
+							) {
+								Icons.AutoMirrored.Default.ArrowForward
+							} else {
+								Icons.AutoMirrored.Default.List
+							},
+							contentDescription = "list",
+						)
+						Spacer(modifier = Modifier.width(16.dp))
+						Text(
+							text = it.name,
+							style = MaterialTheme.typography.bodyLarge,
+						)
 					}
 				}
 			}
@@ -380,7 +376,7 @@ fun PreviewCatalogContent() {
 	var listingSelectionData: StableHolder<Extension.Listing> by
 		remember {
 			mutableStateOf(
-				StableHolder(MutableLuaListingItem()),
+				StableHolder(MutableLuaListing()),
 			)
 		}
 
@@ -487,7 +483,7 @@ fun CatalogContent(
 					if (
 						items.loadState.refresh is LoadState.NotLoading &&
 						items.itemCount == 0 &&
-						selectedListing?.item !is Extension.Listing.Item
+						selectedListing?.item?.novels == null
 					) {
 						ListingsContent(
 							listingOptions,

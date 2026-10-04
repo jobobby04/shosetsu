@@ -30,14 +30,14 @@ import org.luaj.vm2.LuaError
 class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	override suspend fun loadListing(
 		ext: Extension,
-		listing: Extension.Listing.Item,
+		listing: Extension.Listing.Novels,
 		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info> = if (!listing.isIncrementing && page > ext.startIndex) {
 		emptyList()
 	} else {
 		try {
-			listing.getListing(data, page).toList()
+			listing.get(data, page).toList()
 		} catch (e: LuaError) {
 			throw e.cause ?: e
 		}

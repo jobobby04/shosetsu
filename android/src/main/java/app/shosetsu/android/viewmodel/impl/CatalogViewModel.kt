@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
@@ -119,12 +120,8 @@ class CatalogViewModel(
 		.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
 
 	override val listingOptions: StateFlow<ImmutableList<Extension.Listing>> =
-		selectedListing.mapLatest {
-			when (it) {
-				is Extension.Listing.List -> it.getListings().toList().toImmutableList()
-				else -> persistentListOf()
-			}
-		}
+		selectedListing.mapNotNull { it?.listings }
+			.mapLatest { it.get().toList().toImmutableList() }
 			.catch { exceptionFlow.emit(it) }
 			.stateIn(viewModelScopeIO, SharingStarted.Lazily, persistentListOf())
 
@@ -200,14 +197,15 @@ class CatalogViewModel(
 										load(data)
 									}
 								}
-							if (query.isEmpty() && listing is Extension.Listing.Item) {
+							val novels = listing.novels
+							if (query.isEmpty() && novels != null) {
 								page { data ->
-									getCatalogueListingData(extId, ext, data, listing)
+									getCatalogueListingData(extId, ext, data, novels)
 								}
 							} else {
 								// Prevents always searching for list listings
 								if (!filtersApplied.value &&
-									listing !is Extension.Listing.Item
+									novels == null
 								) {
 									return@flatMapLatest flowOf(null)
 								}
@@ -232,7 +230,7 @@ class CatalogViewModel(
 		pagerFlow.combine(selectedListing, ::Pair).transformLatest { (pager, listing) ->
 			if (pager != null) {
 				emitAll(pager.flow)
-			} else if (listing !is Extension.Listing.Item) {
+			} else if (listing?.novels == null) {
 				emit(
 					PagingData.empty(
 						sourceLoadStates = LoadStates(

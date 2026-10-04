@@ -47,7 +47,7 @@ class GetCatalogueListingDataUseCase(
 		val extensionId: Int,
 		val iExtension: Extension,
 		val data: Map<Int, Any>,
-		private val listing: Extension.Listing.Item,
+		private val listing: Extension.Listing.Novels,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
 			state.anchorPosition?.let {
@@ -104,7 +104,7 @@ class GetCatalogueListingDataUseCase(
 		extensionId: Int,
 		iExtension: Extension,
 		data: Map<Int, Any>,
-		listing: Extension.Listing.Item,
+		listing: Extension.Listing.Novels,
 	) = MyPagingSource(extensionId, iExtension, data, listing)
 
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
@@ -112,7 +112,7 @@ class GetCatalogueListingDataUseCase(
 		extensionId: Int,
 		iExtension: Extension,
 		data: Map<Int, Any>,
-		listing: Extension.Listing.Item,
+		listing: Extension.Listing.Novels,
 		page: Int,
 	): List<ACatalogNovelUI> {
 		val list = novelsRepository.getCatalogueData(

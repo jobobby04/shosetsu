@@ -223,12 +223,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 
 	bind<UpdateLibraryFilterStateUseCase>() with provider { new(::UpdateLibraryFilterStateUseCase) }
 
-	bind<GetExtListingNamesUseCase>() with provider { new(::GetExtListingNamesUseCase) }
-
-	bind<UpdateExtSelectedListingUseCase>() with provider { new(::UpdateExtSelectedListingUseCase) }
-	bind<GetExtSelectedListingUseCase>() with provider { new(::GetExtSelectedListingUseCase) }
-	bind<GetExtSelectedListingFlowUseCase>() with provider { new(::GetExtSelectedListingFlowUseCase) }
-
 	bind<UpdateExtensionSettingUseCase>() with provider { new(::UpdateExtensionSettingUseCase) }
 
 	bind<ForceInsertRepositoryUseCase>() with provider { new(::ForceInsertRepositoryUseCase) }

@@ -35,7 +35,7 @@ interface IRemoteCatalogueDataSource {
 	@Throws(HTTPException::class, IOException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun loadListing(
 		ext: Extension,
-		listing: Extension.Listing.Item,
+		listing: Extension.Listing.Novels,
 		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>
