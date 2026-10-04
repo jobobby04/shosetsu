@@ -14,14 +14,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -69,6 +67,7 @@ import app.shosetsu.android.common.enums.NovelCardType.COZY
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.common.utils.MockListing
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.ui.library.ViewTypeButton
 import app.shosetsu.android.ui.novel.CategoriesDialog
@@ -89,13 +88,12 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
-import app.shosetsu.lib.Extension
-import app.shosetsu.lib.lua.MutableLuaListing
+import app.shosetsu.lib.*
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.acra.ACRA
 
 /*
@@ -376,7 +374,7 @@ fun PreviewCatalogContent() {
 	var listingSelectionData: StableHolder<Extension.Listing> by
 		remember {
 			mutableStateOf(
-				StableHolder(MutableLuaListing()),
+				StableHolder(MockListing()),
 			)
 		}
 
