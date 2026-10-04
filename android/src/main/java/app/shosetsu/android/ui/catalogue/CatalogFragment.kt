@@ -2,7 +2,6 @@ package app.shosetsu.android.ui.catalogue
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -43,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,6 +65,7 @@ import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
 import app.shosetsu.android.common.utils.MockListing
+import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.ui.library.ViewTypeButton
 import app.shosetsu.android.ui.novel.CategoriesDialog
@@ -75,7 +73,6 @@ import app.shosetsu.android.ui.theme.ShosetsuTheme
 import app.shosetsu.android.view.BottomSheetDialog
 import app.shosetsu.android.view.compose.ErrorAction
 import app.shosetsu.android.view.compose.ErrorContent
-import app.shosetsu.android.view.compose.LazyColumnScrollbar
 import app.shosetsu.android.view.compose.NavigateBackButton
 import app.shosetsu.android.view.compose.NovelCardCompressedContent
 import app.shosetsu.android.view.compose.NovelCardCozyContent
@@ -294,7 +291,6 @@ fun CatalogueView(
 		hasSearch = hasSearch,
 		hostState = hostState,
 		showImages = showImages,
-		selectedListing = selectedListing?.let { StableHolder(it) },
 		listingOptions = listingOptions,
 		setSelectedListing = onSelectListing,
 	)
@@ -330,44 +326,6 @@ fun CatalogueView(
 	}
 }
 
-@Composable
-fun ListingsContent(
-	items: ImmutableList<Extension.Listing>,
-	onSelectListing: (Extension.Listing) -> Unit,
-) {
-	Crossfade(items, label = "listing_items") {
-		key(it) {
-			LazyColumnScrollbar(modifier = Modifier.fillMaxSize()) {
-				items(items) {
-					Row(
-						Modifier
-							.fillMaxWidth()
-							.clickable { onSelectListing(it) }
-							.padding(horizontal = 8.dp, vertical = 16.dp),
-						verticalAlignment = Alignment.CenterVertically,
-					) {
-						Icon(
-							imageVector = if (it.novels !=
-								null
-							) {
-								Icons.AutoMirrored.Default.ArrowForward
-							} else {
-								Icons.AutoMirrored.Default.List
-							},
-							contentDescription = "list",
-						)
-						Spacer(modifier = Modifier.width(16.dp))
-						Text(
-							text = it.name,
-							style = MaterialTheme.typography.bodyLarge,
-						)
-					}
-				}
-			}
-		}
-	}
-}
-
 @Preview
 @Composable
 fun PreviewCatalogContent() {
@@ -382,7 +340,15 @@ fun PreviewCatalogContent() {
 		"Meow",
 		"",
 		{},
-		emptyFlow<PagingData<ACatalogNovelUI>>().collectAsLazyPagingItems(),
+		flowOf(
+			PagingData.from(
+				listOf(
+					ACatalogNovelUI(StrippedBookmarkedNovelEntity(0, "Mock Novel", "")),
+					ACatalogNovelUI(StrippedBookmarkedNovelEntity(0, "Mock Novel", "")),
+					ACatalogNovelUI(StrippedBookmarkedNovelEntity(0, "Mock Novel", "")),
+				),
+			),
+		).collectAsLazyPagingItems(),
 		NORMAL,
 		{},
 		2,
@@ -396,8 +362,10 @@ fun PreviewCatalogContent() {
 		{},
 		false,
 		remember { SnackbarHostState() },
-		selectedListing = listingSelectionData,
-		listingOptions = listOf<Extension.Listing>().toImmutableList(),
+		listingOptions = listOf(
+			MockListing("Mock Listing 1"),
+			MockListing("Mock Listing 2"),
+		).toImmutableList(),
 		setSelectedListing = {
 			listingSelectionData = StableHolder(it)
 		},
@@ -431,7 +399,6 @@ fun CatalogContent(
 	hasSearch: Boolean,
 	hostState: SnackbarHostState,
 	showImages: Boolean,
-	selectedListing: StableHolder<Extension.Listing>?,
 	listingOptions: ImmutableList<Extension.Listing>,
 	setSelectedListing: (Extension.Listing) -> Unit,
 ) {
@@ -478,26 +445,17 @@ fun CatalogContent(
 						.pullRefresh(pullRefreshState)
 						.padding(padding),
 				) {
-					if (
-						items.loadState.refresh is LoadState.NotLoading &&
-						items.itemCount == 0 &&
-						selectedListing?.item?.novels == null
-					) {
-						ListingsContent(
-							listingOptions,
-							setSelectedListing,
-						)
-					} else {
-						CatalogGrid(
-							items,
-							columnsInH,
-							columnsInV,
-							cardType,
-							onClick,
-							onLongClick,
-							showImages = showImages,
-						)
-					}
+					CatalogGrid(
+						novels = items,
+						listings = listingOptions,
+						onSelectListing = setSelectedListing,
+						columnsInH,
+						columnsInV,
+						cardType,
+						onClick,
+						onLongClick,
+						showImages = showImages,
+					)
 				}
 			}
 		}
@@ -585,7 +543,9 @@ fun CatalogTopBar(
  */
 @Composable
 fun CatalogGrid(
-	items: LazyPagingItems<ACatalogNovelUI>,
+	novels: LazyPagingItems<ACatalogNovelUI>,
+	listings: ImmutableList<Extension.Listing>,
+	onSelectListing: (Extension.Listing) -> Unit,
 	columnsInH: Int,
 	columnsInV: Int,
 	cardType: NovelCardType,
@@ -597,13 +557,12 @@ fun CatalogGrid(
 	val w = LocalConfiguration.current.screenWidthDp
 	val o = LocalConfiguration.current.orientation
 
-	val size =
-		(
-			w / when (o) {
-				Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-				else -> columnsInV
-			}
-			).dp - 8.dp
+	val size = (
+		w / when (o) {
+			Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+			else -> columnsInV
+		}
+		).dp - 8.dp
 
 	val state = rememberLazyGridState()
 
@@ -620,9 +579,20 @@ fun CatalogGrid(
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
 		verticalArrangement = Arrangement.spacedBy(4.dp),
 	) {
+		items(
+			count = listings.size,
+			key = { index -> "listing/$index/${listings[index].link}" },
+			contentType = { "listing" },
+			span = { GridItemSpan(maxLineSpan) },
+		) {
+			val listing = listings[it]
+			ListingRow(listing, onSelect = { onSelectListing(listing) })
+		}
+
 		itemsIndexed(
-			items,
-			key = { index, item -> item.hashCode() + index },
+			novels,
+			key = { index, item -> "novel/$index/${item.id}" },
+			contentType = { _, _ -> "novel_card" },
 		) { _, item ->
 			when (cardType) {
 				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
@@ -630,8 +600,33 @@ fun CatalogGrid(
 				COZY -> CatalogCozyCard(item, onClick, onLongClick)
 			}
 		}
-		appendBar(items)
-		noMoreBar(items)
+		appendBar(novels)
+		noMoreBar(novels)
+	}
+}
+
+@Composable
+fun ListingRow(listing: Extension.Listing, onSelect: () -> Unit) {
+	Row(
+		Modifier
+			.fillMaxWidth()
+			.clickable { onSelect() }
+			.padding(horizontal = 8.dp, vertical = 16.dp),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		Icon(
+			imageVector = if (listing.novels != null) {
+				Icons.AutoMirrored.Default.ArrowForward
+			} else {
+				Icons.AutoMirrored.Default.List
+			},
+			contentDescription = "list",
+		)
+		Spacer(modifier = Modifier.width(16.dp))
+		Text(
+			text = listing.name,
+			style = MaterialTheme.typography.bodyLarge,
+		)
 	}
 }
 
@@ -735,7 +730,7 @@ fun CatalogErrorContent(
  */
 fun LazyGridScope.appendBar(items: LazyPagingItems<ACatalogNovelUI>) {
 	if (items.loadState.append == LoadState.Loading) {
-		item(span = { GridItemSpan(maxLineSpan) }) {
+		item(span = { GridItemSpan(maxLineSpan) }, contentType = "loading_bar") {
 			LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 		}
 	}
@@ -748,7 +743,7 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
 	if (items.loadState.refresh.endOfPaginationReached ||
 		items.loadState.append.endOfPaginationReached
 	) {
-		item(span = { GridItemSpan(maxLineSpan) }) {
+		item(span = { GridItemSpan(maxLineSpan) }, contentType = "no_more_bar") {
 			CatalogContentNoMore()
 		}
 	}

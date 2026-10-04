@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.Flow
 fun <T : Any> LazyGridScope.itemsIndexed(
 	items: LazyPagingItems<T>,
 	key: ((index: Int, item: T) -> Any)? = null,
+	contentType: ((index: Int, item: T) -> Any?)? = null,
 	itemContent: @Composable LazyGridItemScope.(index: Int, value: T?) -> Unit,
 ) {
 	items(
@@ -63,6 +64,18 @@ fun <T : Any> LazyGridScope.itemsIndexed(
 					PagingPlaceholderKey(index)
 				} else {
 					key(index, item)
+				}
+			}
+		},
+		contentType = if (contentType == null) {
+			{ null }
+		} else {
+			{ index ->
+				val item = items.peek(index)
+				if (item == null) {
+					PagingPlaceholderKey(index)
+				} else {
+					contentType(index, item)
 				}
 			}
 		},
