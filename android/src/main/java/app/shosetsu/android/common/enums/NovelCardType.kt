@@ -24,7 +24,8 @@ package app.shosetsu.android.common.enums
 enum class NovelCardType(private val code: Int) {
 	NORMAL(0),
 	COMPRESSED(1),
-	COZY(2), ;
+	COZY(2),
+	EXTENDED(3), ;
 
 	fun toInt(): Int = code
 
