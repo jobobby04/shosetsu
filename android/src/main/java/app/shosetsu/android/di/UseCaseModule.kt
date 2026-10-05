@@ -30,9 +30,6 @@ import app.shosetsu.android.domain.usecases.get.GetCatalogueQueryDataUseCase
 import app.shosetsu.android.domain.usecases.get.GetCategoriesUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterPassageUseCase
 import app.shosetsu.android.domain.usecases.get.GetChapterUIsUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
@@ -72,7 +69,6 @@ import app.shosetsu.android.domain.usecases.start.StartRestoreWorkerUseCase
 import app.shosetsu.android.domain.usecases.start.StartUpdateWorkerUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateBookmarkedNovelUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateChapterUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateLibraryFilterStateUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateNovelSettingUseCase
@@ -226,12 +222,6 @@ val useCaseModule: DI.Module = DI.Module("useCase") {
 	bind<SetNovelsCategoriesUseCase>() with provider { new(::SetNovelsCategoriesUseCase) }
 
 	bind<UpdateLibraryFilterStateUseCase>() with provider { new(::UpdateLibraryFilterStateUseCase) }
-
-	bind<GetExtListingNamesUseCase>() with provider { new(::GetExtListingNamesUseCase) }
-
-	bind<UpdateExtSelectedListingUseCase>() with provider { new(::UpdateExtSelectedListingUseCase) }
-	bind<GetExtSelectedListingUseCase>() with provider { new(::GetExtSelectedListingUseCase) }
-	bind<GetExtSelectedListingFlowUseCase>() with provider { new(::GetExtSelectedListingFlowUseCase) }
 
 	bind<UpdateExtensionSettingUseCase>() with provider { new(::UpdateExtensionSettingUseCase) }
 

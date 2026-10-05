@@ -2,22 +2,29 @@ package app.shosetsu.android.ui.catalogue
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -26,6 +33,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -75,17 +83,16 @@ import app.shosetsu.android.view.compose.NovelCardExtendedContent
 import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
-import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
+import app.shosetsu.lib.Extension
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.launch
 import org.acra.ACRA
 
 /*
@@ -117,11 +124,17 @@ import org.acra.ACRA
  * A catalogue is a view showcasing novels from a given extension.
  */
 @Composable
-fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack: () -> Unit) {
+fun CatalogueView(
+	extensionId: Int,
+	listing: String?,
+	onOpenNovel: (novelId: Int) -> Unit,
+	onSelectListing: (Extension.Listing) -> Unit,
+	onBack: () -> Unit,
+) {
 	val viewModel: ACatalogViewModel = viewModelDi()
 
 	LaunchedEffect(extensionId) {
-		viewModel.setExtensionID(extensionId)
+		viewModel.setListing(extensionId, listing)
 	}
 
 	val type by viewModel.novelCardTypeLive.collectAsState()
@@ -140,11 +153,12 @@ fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack:
 	val exception by viewModel.exceptionFlow.collectAsState(null)
 	val hasFilters by viewModel.hasFilters.collectAsState()
 
+	val listingOptions by viewModel.listingOptions.collectAsState()
+
 	val categories by viewModel.categories.collectAsState()
 
 	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
-	val listingSelectionData by viewModel.listingSelectionData.collectAsState()
 
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
@@ -277,8 +291,8 @@ fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack:
 		onBack = onBack,
 		hasSearch = hasSearch,
 		hostState = hostState,
-		listingSelectionData = listingSelectionData,
-		setListing = viewModel::setSelectedListing,
+		listingOptions = listingOptions,
+		setSelectedListing = onSelectListing,
 		showImages = showImages,
 	)
 	if (categoriesDialogItem != null) {
@@ -316,16 +330,6 @@ fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack:
 @Preview
 @Composable
 fun PreviewCatalogContent() {
-	var listingSelectionData by
-		remember {
-			mutableStateOf(
-				ListingSelectionData(
-					listOf("A", "B", "C").toImmutableList(),
-					0,
-				),
-			)
-		}
-
 	CatalogContent(
 		"Meow",
 		"",
@@ -344,18 +348,65 @@ fun PreviewCatalogContent() {
 		{},
 		false,
 		remember { SnackbarHostState() },
-		listingSelectionData,
-		{
-			listingSelectionData = listingSelectionData.copy(selection = it)
-		},
+		persistentListOf(),
+		{},
 		showImages = true,
 	)
 }
 
+fun LazyGridScope.listingsContent(
+	items: ImmutableList<Extension.Listing>,
+	onSelectListing: (Extension.Listing) -> Unit,
+) {
+	items(
+		items,
+		span = { GridItemSpan(maxLineSpan) },
+		key = { it.link },
+	) {
+		Row(
+			Modifier
+				.fillMaxWidth()
+				.clickable { onSelectListing(it) }
+				.padding(horizontal = 8.dp, vertical = 16.dp),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
+			Spacer(modifier = Modifier.width(16.dp))
+			Text(
+				text = it.name,
+				style = MaterialTheme.typography.bodyLarge,
+			)
+		}
+	}
+}
+
+fun LazyListScope.listingsContent(
+	items: ImmutableList<Extension.Listing>,
+	onSelectListing: (Extension.Listing) -> Unit,
+) {
+	items(
+		items,
+		key = { it.link },
+	) {
+		Row(
+			Modifier
+				.fillMaxWidth()
+				.clickable { onSelectListing(it) }
+				.padding(horizontal = 8.dp, vertical = 16.dp),
+			verticalAlignment = Alignment.CenterVertically,
+		) {
+			Icon(imageVector = Icons.AutoMirrored.Default.ArrowForward, contentDescription = "list")
+			Spacer(modifier = Modifier.width(16.dp))
+			Text(
+				text = it.name,
+				style = MaterialTheme.typography.bodyLarge,
+			)
+		}
+	}
+}
+
 /**
  * Content of [CatalogueView]
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -377,8 +428,8 @@ fun CatalogContent(
 	onBack: () -> Unit,
 	hasSearch: Boolean,
 	hostState: SnackbarHostState,
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
+	listingOptions: ImmutableList<Extension.Listing>,
+	setSelectedListing: (Extension.Listing) -> Unit,
 	showImages: Boolean,
 ) {
 	Scaffold(
@@ -425,9 +476,14 @@ fun CatalogContent(
 						.padding(padding),
 				) {
 					CatalogGrid(
-						items, columnsInH, columnsInV, cardType, onClick, onLongClick,
-						listingSelectionData,
-						setListing,
+						items,
+						columnsInH,
+						columnsInV,
+						cardType,
+						onClick,
+						onLongClick,
+						listingOptions,
+						setSelectedListing,
 						showImages = showImages,
 					)
 				}
@@ -526,8 +582,8 @@ fun CatalogGrid(
 	cardType: NovelCardType,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
+	listingOptions: ImmutableList<Extension.Listing>,
+	setSelectedListing: (Extension.Listing) -> Unit,
 	showImages: Boolean,
 ) {
 	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
@@ -546,8 +602,7 @@ fun CatalogGrid(
 		LazyColumn(
 			verticalArrangement = Arrangement.spacedBy(4.dp),
 		) {
-			catalogListingSelection(listingSelectionData, setListing)
-
+			listingsContent(listingOptions, setSelectedListing)
 			itemsIndexed(
 				items,
 				key = { index, item -> item.hashCode() + index },
@@ -586,8 +641,7 @@ fun CatalogGrid(
 			horizontalArrangement = Arrangement.spacedBy(4.dp),
 			verticalArrangement = Arrangement.spacedBy(4.dp),
 		) {
-			catalogListingSelection(listingSelectionData, setListing)
-
+			listingsContent(listingOptions, setSelectedListing)
 			itemsIndexed(
 				items,
 				key = { index, item -> item.hashCode() + index },
@@ -601,63 +655,6 @@ fun CatalogGrid(
 			}
 			appendBar(items)
 			noMoreBar(items)
-		}
-	}
-}
-
-/**
- * Selection so the user can quickly change the listing in UI.
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
- */
-fun LazyGridScope.catalogListingSelection(
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
-) {
-	item(span = { GridItemSpan(maxLineSpan) }) {
-		AnimatedVisibility(listingSelectionData != null && listingSelectionData.choices.size > 1) {
-			if (listingSelectionData != null) {
-				ListPreferenceWidget(
-					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-					subtitle = listingSelectionData.choices.getOrNull(listingSelectionData.selection)
-						?: stringResource(R.string.invalid_listing_selection),
-					value = listingSelectionData.selection,
-					entries = listingSelectionData.choices.withIndex()
-						.associate { (index, value) -> index to value },
-					onValueChange = setListing,
-					isSubtitleTheValue = true,
-					icon = null,
-					iconDescription = null,
-				)
-			}
-		}
-	}
-}
-
-/**
- * Selection so the user can quickly change the listing in UI.
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
- */
-fun LazyListScope.catalogListingSelection(
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
-) {
-	item {
-		AnimatedVisibility(listingSelectionData?.choices?.isNotEmpty() ?: false) {
-			if (listingSelectionData != null) {
-				ListPreferenceWidget(
-					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-					subtitle = listingSelectionData.choices[listingSelectionData.selection],
-					icon = null,
-					iconDescription = null,
-					value = listingSelectionData.selection,
-					entries = listingSelectionData.choices.withIndex()
-						.associate { it.index to it.value },
-					onValueChange = setListing,
-					isSubtitleTheValue = true,
-				)
-			}
 		}
 	}
 }

@@ -127,6 +127,8 @@
 -dontwarn org.apache.bcel.generic.ReturnInstruction
 -dontwarn org.apache.bcel.generic.StackInstruction
 -dontwarn org.apache.bcel.generic.Type
+-dontwarn com.google.re2j.Matcher
+-dontwarn com.google.re2j.Pattern
 
 # Kodein is complaining about fingerprint manager, meh
 -dontwarn android.hardware.fingerprint.FingerprintManager

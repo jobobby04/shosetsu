@@ -22,7 +22,7 @@ import app.shosetsu.android.domain.usecases.RequestInstallExtensionUseCase
 import app.shosetsu.android.domain.usecases.StartRepositoryUpdateManagerUseCase
 import app.shosetsu.android.domain.usecases.get.GetURLUseCase
 import app.shosetsu.android.viewmodel.abstracted.AAddShareViewModel
-import app.shosetsu.lib.IExtension.Companion.KEY_NOVEL_URL
+import app.shosetsu.lib.Extension.Companion.KEY_NOVEL_URL
 import app.shosetsu.lib.exceptions.InvalidMetaDataException
 import app.shosetsu.lib.share.ExtensionLink
 import app.shosetsu.lib.share.NovelLink

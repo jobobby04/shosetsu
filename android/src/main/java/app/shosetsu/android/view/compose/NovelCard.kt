@@ -48,9 +48,9 @@ import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.*
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import kotlinx.collections.immutable.persistentListOf
 import java.text.NumberFormat
 import java.util.Locale
+import kotlinx.collections.immutable.persistentListOf
 
 /*
  * This file is part of shosetsu.

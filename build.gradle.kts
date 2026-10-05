@@ -7,24 +7,14 @@ plugins {
 
 allprojects {
 	repositories {
-		exclusiveContent {
-			forRepository {
-				maven("https://gitlab.com/api/v4/groups/12585416/-/packages/maven")
-			}
-			filter {
+		maven("https://gitlab.com/api/v4/projects/61884451/packages/maven") {
+			name = "stringly fork"
+			content {
 				includeGroupAndSubgroups("app.shosetsu")
 			}
 		}
 		google()
 		mavenCentral()
-		exclusiveContent {
-			forRepository {
-				maven("https://jitpack.io")
-			}
-			filter {
-				includeGroup("com.gitlab.shosetsuorg")
-			}
-		}
 	}
 }
 

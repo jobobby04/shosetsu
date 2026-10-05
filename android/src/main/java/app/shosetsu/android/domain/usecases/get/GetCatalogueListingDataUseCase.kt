@@ -6,15 +6,12 @@ import androidx.paging.PagingState
 import app.shosetsu.android.common.InvalidListingIndex
 import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
-import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.PAGE_INDEX
+import app.shosetsu.lib.*
 import javax.net.ssl.SSLException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.luaj.vm2.LuaError
+import kotlinx.coroutines.*
+import org.luaj.vm2.*
 
 /*
  * This file is part of shosetsu.
@@ -37,14 +34,11 @@ import org.luaj.vm2.LuaError
  * shosetsu
  * 15 / 05 / 2020
  */
-class GetCatalogueListingDataUseCase(
-	private val novelsRepository: INovelsRepository,
-	private val extSettingsRepo: IExtensionSettingsRepository,
-) {
+class GetCatalogueListingDataUseCase(private val novelsRepository: INovelsRepository) {
 	inner class MyPagingSource(
-		val extensionId: Int,
-		val iExtension: IExtension,
+		val iExtension: Extension,
 		val data: Map<Int, Any>,
+		private val listing: Extension.Listing.Novels,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
 			state.anchorPosition?.let {
@@ -64,11 +58,13 @@ class GetCatalogueListingDataUseCase(
 					// Suspending network load via Retrofit. This doesn't need to be wrapped in a
 					// withContext(Dispatcher.IO) { ... } block since Retrofit's Coroutine
 					// CallAdapter dispatches on a worker thread.
-					val response = search(
-						extensionId,
-						iExtension,
-						HashMap(data).also { it[PAGE_INDEX] = pageNumber },
-					)
+					val response =
+						search(
+							iExtension,
+							data,
+							listing,
+							pageNumber,
+						)
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
 					// be loaded before it.
@@ -95,29 +91,30 @@ class GetCatalogueListingDataUseCase(
 	}
 
 	@Throws(SSLException::class, LuaError::class)
-	operator fun invoke(extensionId: Int, iExtension: IExtension, data: Map<Int, Any>) =
-		MyPagingSource(extensionId, iExtension, data)
+	operator fun invoke(
+		iExtension: Extension,
+		data: Map<Int, Any>,
+		listing: Extension.Listing.Novels,
+	) = MyPagingSource(iExtension, data, listing)
 
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
 	suspend fun search(
-		extensionId: Int,
-		iExtension: IExtension,
+		iExtension: Extension,
 		data: Map<Int, Any>,
-	): List<ACatalogNovelUI> {
-		val selectedListing = extSettingsRepo.getSelectedListing(extensionId)
-
-		// Load catalogue data
-		val list = novelsRepository.getCatalogueData(
-			iExtension,
-			selectedListing,
-			data,
-		)
-
-		return list.mapNotNull { novelListing ->
+		listing: Extension.Listing.Novels,
+		page: Int,
+	): List<ACatalogNovelUI> = novelsRepository.getCatalogueData(
+		iExtension,
+		listing,
+		data,
+		page,
+	).let { list ->
+		list.mapNotNull { novelListing ->
+			val ne = novelListing.convertTo(iExtension.exMetaData.id)
 			// For each, insert and return a stripped card
 			// This operation is to pre-cache URL and ID so loading occurs smoothly
 			try {
-				novelsRepository.insertReturnStripped(novelListing.convertTo(extensionId))
+				novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension.exMetaData.id))
 					?.let { ACatalogNovelUI(it, novelListing) }
 			} catch (e: SQLiteException) {
 				logE("Failed to load parse novel", e)

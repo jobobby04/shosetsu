@@ -3,21 +3,16 @@ package app.shosetsu.android.domain.usecases.get
 import android.database.sqlite.SQLiteException
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import app.shosetsu.android.common.IncompatibleExtensionException
-import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.ext.convertTo
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.Novel
-import app.shosetsu.lib.PAGE_INDEX
+import app.shosetsu.lib.*
 import app.shosetsu.lib.exceptions.HTTPException
 import coil.network.HttpException
 import java.io.IOException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.luaj.vm2.LuaError
+import kotlinx.coroutines.*
+import org.luaj.vm2.*
 
 /*
  * This file is part of shosetsu.
@@ -40,15 +35,12 @@ import org.luaj.vm2.LuaError
  * shosetsu
  * 15 / 05 / 2020
  */
-class GetCatalogueQueryDataUseCase(
-	private val getExt: GetExtensionUseCase,
-	private val novelsRepository: INovelsRepository,
-) {
+class GetCatalogueQueryDataUseCase(private val novelsRepository: INovelsRepository) {
 	inner class MyPagingSource(
-		val extensionId: Int,
-		val iExtension: IExtension,
+		val iExtension: Extension,
 		val query: String,
-		val data: Map<Int, Any>,
+		val filters: Map<Int, Any>,
+		private val search: Extension.Listing.Search,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
 			state.anchorPosition?.let {
@@ -71,13 +63,15 @@ class GetCatalogueQueryDataUseCase(
 					val response =
 						novelsRepository.getCatalogueSearch(
 							iExtension,
+							search,
 							query,
-							HashMap(data).also { it[PAGE_INDEX] = pageNumber },
+							filters,
+							pageNumber,
 						).let {
 							val data: List<Novel.Info> = it
 							data.mapNotNull { novelListing ->
 								try {
-									novelsRepository.insertReturnStripped(novelListing.convertTo(extensionId))
+									novelsRepository.insertReturnStripped(novelListing.convertTo(iExtension.exMetaData.id))
 										?.let { ACatalogNovelUI(it, novelListing) }
 								} catch (e: SQLiteException) {
 									logE("Failed to load parse novel", e)
@@ -117,25 +111,11 @@ class GetCatalogueQueryDataUseCase(
 			}
 	}
 
-	@Throws(
-		SQLiteException::class,
-		IncompatibleExtensionException::class,
-		LuaError::class,
-		MissingExtensionException::class,
-	)
-	suspend operator fun invoke(
-		extensionId: Int,
-		query: String,
-		filters: Map<Int, Any>,
-	): MyPagingSource = getExt(extensionId)?.let {
-		invoke(extensionId, it, query, filters)
-	} ?: throw MissingExtensionException(extensionId)
-
 	@Throws(LuaError::class)
 	operator fun invoke(
-		extensionId: Int,
-		ext: IExtension,
+		ext: Extension,
 		query: String,
 		filters: Map<Int, Any>,
-	): MyPagingSource = MyPagingSource(extensionId, ext, query, filters)
+		search: Extension.Listing.Search,
+	): MyPagingSource = MyPagingSource(ext, query, filters, search)
 }

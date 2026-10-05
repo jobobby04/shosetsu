@@ -24,15 +24,12 @@ import app.shosetsu.android.common.ext.logV
 import app.shosetsu.android.domain.model.local.FilterEntity
 import app.shosetsu.android.domain.repository.base.IExtensionRepoRepository
 import app.shosetsu.android.domain.usecases.UninstallExtensionUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtListingNamesUseCase
-import app.shosetsu.android.domain.usecases.get.GetExtSelectedListingFlowUseCase
 import app.shosetsu.android.domain.usecases.get.GetExtensionSettingsUseCase
 import app.shosetsu.android.domain.usecases.get.GetInstalledExtensionUseCase
-import app.shosetsu.android.domain.usecases.update.UpdateExtSelectedListingUseCase
 import app.shosetsu.android.domain.usecases.update.UpdateExtensionSettingUseCase
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.abstracted.AExtensionConfigureViewModel
+import kotlin.getValue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -60,9 +57,6 @@ class ExtensionConfigureViewModel(
 	private val loadInstalledExtension: GetInstalledExtensionUseCase,
 	private val uninstallExtensionUI: UninstallExtensionUseCase,
 	private val getExtensionSettings: GetExtensionSettingsUseCase,
-	private val getExtListNames: GetExtListingNamesUseCase,
-	private val updateExtSelectedListing: UpdateExtSelectedListingUseCase,
-	private val getExtSelectedListingFlow: GetExtSelectedListingFlowUseCase,
 	private val updateSetting: UpdateExtensionSettingUseCase,
 	private val repoRepository: IExtensionRepoRepository,
 ) : AExtensionConfigureViewModel() {
@@ -77,24 +71,14 @@ class ExtensionConfigureViewModel(
 		}.onIO().stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
 	}
 
-	private val extListNamesFlow: Flow<ListingSelectionData> = extensionIdFlow.flatMapLatest { id ->
-		val listingNames = getExtListNames(id).toImmutableList()
-
-		getExtSelectedListingFlow(id).mapLatest { selectedListing ->
-			ListingSelectionData(listingNames, selectedListing)
-		}
-	}.catch {
-		// Safely pass on exceptions
-		errors.emit(it)
-	}
-
-	private val extensionSettingsFlow: Flow<ImmutableList<FilterEntity>> =
+	private val extensionSettingsFlow: Flow<ImmutableList<FilterEntity>> by lazy {
 		extensionIdFlow.flatMapLatest { extensionID ->
 			getExtensionSettings(extensionID).map { it.toImmutableList() }
 		}.catch {
 			// Safely pass on exceptions
 			errors.emit(it)
 		}
+	}
 
 	override val extensionSettings: StateFlow<ImmutableList<FilterEntity>> by lazy {
 		extensionSettingsFlow.onIO()
@@ -115,11 +99,6 @@ class ExtensionConfigureViewModel(
 	}.catch {
 		errors.emit(it)
 	}.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
-
-	override val extensionListing: StateFlow<ListingSelectionData?> by lazy {
-		extListNamesFlow.onIO()
-			.stateIn(viewModelScopeIO, SharingStarted.Lazily, null)
-	}
 
 	override fun setExtensionID(id: Int) {
 		logV("Setting extension id = $id")
@@ -183,18 +162,6 @@ class ExtensionConfigureViewModel(
 				updateSetting(extensionIdFlow.value, id, value)
 			} catch (e: Exception) {
 				logE("Failed updating setting", e)
-				errors.emit(e)
-				ACRA.errorReporter.handleSilentException(e)
-			}
-		}
-	}
-
-	override fun setSelectedListing(value: Int) {
-		launchIO {
-			try {
-				updateExtSelectedListing(extensionIdFlow.value, value)
-			} catch (e: Exception) {
-				logE("Failed updating selected listing", e)
 				errors.emit(e)
 				ACRA.errorReporter.handleSilentException(e)
 			}

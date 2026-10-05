@@ -1,7 +1,6 @@
 package app.shosetsu.android.datasource.remote.base
 
-import app.shosetsu.android.common.InvalidListingIndex
-import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
 import java.io.IOException
@@ -34,11 +33,28 @@ interface IRemoteCatalogueDataSource {
 	 * Runs a search on an extension
 	 */
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
-	suspend fun search(ext: IExtension, query: String, data: Map<Int, Any>): List<Novel.Info>
+	suspend fun loadSearch(
+		ext: Extension,
+		search: Extension.Listing.Search,
+		query: String,
+		filters: Map<Int, Any>,
+		page: Int,
+	): List<Novel.Info>
+
+	/**
+	 * Loads a listing's listing list from an extension
+	 */
+	@Throws(HTTPException::class, IOException::class, LuaError::class)
+	suspend fun loadListings(listings: Extension.Listing.Listings): List<Extension.Listing>
 
 	/**
 	 * Loads a listings data from an extension
 	 */
-	@Throws(HTTPException::class, LuaError::class, IOException::class, InvalidListingIndex::class)
-	suspend fun loadListing(ext: IExtension, listingIndex: Int, data: Map<Int, Any>): List<Novel.Info>
+	@Throws(HTTPException::class, IOException::class, LuaError::class)
+	suspend fun loadNovels(
+		ext: Extension,
+		novels: Extension.Listing.Novels,
+		data: Map<Int, Any>,
+		page: Int,
+	): List<Novel.Info>
 }
