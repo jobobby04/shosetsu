@@ -234,7 +234,11 @@ fun ViewTypeItem(
 }
 
 @Composable
-fun ViewTypeButton(selectedType: NovelCardType, onSetType: (NovelCardType) -> Unit) {
+fun ViewTypeButton(
+	selectedType: NovelCardType,
+	onSetType: (NovelCardType) -> Unit,
+	showExtended: Boolean = false,
+) {
 	var showDropDown by remember { mutableStateOf(false) }
 	SimpleIconButton(
 		Icons.Default.ViewModule,
@@ -269,6 +273,15 @@ fun ViewTypeButton(selectedType: NovelCardType, onSetType: (NovelCardType) -> Un
 			selectedType,
 			onSetType,
 		)
+
+		if (showExtended) {
+			ViewTypeItem(
+				stringResource(R.string.extended),
+				NovelCardType.EXTENDED,
+				selectedType,
+				onSetType,
+			)
+		}
 	}
 }
 
