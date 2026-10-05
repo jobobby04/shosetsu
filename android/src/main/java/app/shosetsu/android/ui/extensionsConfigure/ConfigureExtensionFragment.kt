@@ -109,7 +109,6 @@ fun ConfigureExtensionView(
 @Composable
 fun ConfigureExtensionContent(viewModel: AExtensionConfigureViewModel, onBack: () -> Unit) {
 	val extensionUIResult by viewModel.liveData.collectAsState()
-	val extensionListingResult by viewModel.extensionListing.collectAsState()
 	val extensionSettingsResult by viewModel.extensionSettings.collectAsState()
 	val repoName by viewModel.repoName.collectAsState()
 	val errors by viewModel.errors.collectAsState(null)
@@ -154,33 +153,6 @@ fun ConfigureExtensionContent(viewModel: AExtensionConfigureViewModel, onBack: (
 						viewModel.uninstall(extensionUIResult)
 						onBack()
 					}
-				}
-			}
-
-			val extensionListingResult = extensionListingResult
-			if (extensionListingResult != null && extensionListingResult.choices.size > 1) {
-				item {
-					val selection = extensionListingResult.selection.takeIf { it != -1 } ?: 0
-					val choices = extensionListingResult.choices
-					val selected = choices.getOrNull(selection)
-
-					ListPreferenceWidget(
-						title = stringResource(R.string.listings),
-						subtitle = if (selected != null) {
-							stringResource(
-								R.string.fragment_configure_extension_listing_desc,
-								selected,
-							)
-						} else {
-							// If the selection is ever null, warn the user!
-							stringResource(R.string.invalid_listing_selection)
-						},
-						icon = null,
-						value = selection,
-						entries = choices.withIndex().associate { it.index to it.value },
-						onValueChange = { viewModel.setSelectedListing(it) },
-						iconDescription = null,
-					)
 				}
 			}
 

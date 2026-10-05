@@ -68,18 +68,18 @@ class ExtensionLibrariesRepository(
 		FilePermissionException::class,
 		MissingExtensionLibrary::class,
 	)
-	override suspend fun loadExtLibrary(name: String): String {
+	override suspend fun loadExtLibrary(name: String): LuaLibrary {
 		val extLib = databaseSource.getExtLibsMatchingName(name).maxByOrNull { it.version }
 			?: throw MissingExtensionLibrary(name)
 
 		var data = memSource.loadLibrary(extLib)
 
 		if (data != null) {
-			return data
+			return LuaLibrary(data)
 		} else {
 			data = fileSource.loadExtLib(extLib)
 			memSource.setLibrary(extLib, data)
-			return data
+			return LuaLibrary(data)
 		}
 	}
 

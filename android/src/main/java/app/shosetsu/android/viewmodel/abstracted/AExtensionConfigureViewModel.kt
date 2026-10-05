@@ -1,7 +1,6 @@
 package app.shosetsu.android.viewmodel.abstracted
 
 import app.shosetsu.android.domain.model.local.FilterEntity
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.model.InstalledExtensionUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
 import app.shosetsu.android.viewmodel.base.SubscribeViewModel
@@ -43,7 +42,6 @@ abstract class AExtensionConfigureViewModel :
 	 */
 	abstract val repoName: StateFlow<String?>
 
-	abstract val extensionListing: StateFlow<ListingSelectionData?>
 	abstract val extensionSettings: StateFlow<ImmutableList<FilterEntity>>
 
 	/**
@@ -67,6 +65,4 @@ abstract class AExtensionConfigureViewModel :
 	abstract fun saveSetting(id: Int, value: String)
 	abstract fun saveSetting(id: Int, value: Boolean)
 	abstract fun saveSetting(id: Int, value: Int)
-
-	abstract fun setSelectedListing(value: Int)
 }

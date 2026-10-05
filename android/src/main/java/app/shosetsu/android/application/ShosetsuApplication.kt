@@ -272,15 +272,7 @@ class ShosetsuApplication :
 
 		ShosetsuLuaLib.libLoader = libLoader@{ name ->
 			Log.i("LuaLibLoader", "Loading ($name)")
-			try {
-				val result = runBlocking { extLibRepository.loadExtLibrary(name) }
-				val l =
-					shosetsuGlobals().load(result, "lib($name)")
-				l.call()
-			} catch (e: Throwable) {
-				logE("${e.message}", e)
-				null
-			}
+			runBlocking { extLibRepository.loadExtLibrary(name) }
 		}
 
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(

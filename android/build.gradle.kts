@@ -1,8 +1,8 @@
 import org.eclipse.jgit.api.Git
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
 	alias(libs.plugins.android.application)
-	alias(libs.plugins.kotlin.android)
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.google.ksp)
 	alias(libs.plugins.kotlin.compose)
@@ -20,7 +20,7 @@ android {
 	buildToolsVersion = "37.0.0"
 	defaultConfig {
 		applicationId = "app.shosetsu.android.sy"
-		minSdk = 22
+		minSdk = 23
 		targetSdk = 36
 		versionCode = 50
 		versionName = "2.5.3"
@@ -50,10 +50,6 @@ android {
 		viewBinding = true
 		compose = true
 		buildConfig = true
-	}
-
-	composeOptions {
-		kotlinCompilerExtensionVersion = "1.5.7"
 	}
 
 	/*
@@ -146,10 +142,6 @@ android {
 		targetCompatibility = JavaVersion.VERSION_17
 		isCoreLibraryDesugaringEnabled = true
 	}
-	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_17.toString()
-		freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all-compatibility"
-	}
 
 	lint {
 		disable.addAll(listOf("MissingTranslation", "ExtraTranslation"))
@@ -163,8 +155,15 @@ android {
 	}
 	sourceSets {
 		named("main") {
-			kotlin.srcDir(generateContributors.map { it.generatedKotlinDir })
+			kotlin.directories.add(generateContributors.map { it.generatedKotlinDir.get().asFile.absolutePath }.get())
 		}
+	}
+}
+
+kotlin {
+	compilerOptions {
+		jvmTarget.set(JvmTarget.JVM_17)
+		freeCompilerArgs.add("-Xjvm-default=all-compatibility")
 	}
 }
 
