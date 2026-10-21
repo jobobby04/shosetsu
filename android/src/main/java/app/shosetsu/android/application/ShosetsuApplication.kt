@@ -42,7 +42,6 @@ import app.shosetsu.android.domain.usecases.get.GetUserAgentUseCase
 import app.shosetsu.android.viewmodel.factory.ViewModelFactory
 import app.shosetsu.lib.ShosetsuSharedLib
 import app.shosetsu.lib.lua.ShosetsuLuaLib
-import app.shosetsu.lib.lua.shosetsuGlobals
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
@@ -267,15 +266,7 @@ class ShosetsuApplication :
 
 		ShosetsuLuaLib.libLoader = libLoader@{ name ->
 			Log.i("LuaLibLoader", "Loading ($name)")
-			try {
-				val result = runBlocking { extLibRepository.loadExtLibrary(name) }
-				val l =
-					shosetsuGlobals().load(result, "lib($name)")
-				l.call()
-			} catch (e: Throwable) {
-				logE("${e.message}", e)
-				null
-			}
+			runBlocking { extLibRepository.loadExtLibrary(name) }
 		}
 
 		ShosetsuSharedLib.shosetsuHeaders = arrayOf(

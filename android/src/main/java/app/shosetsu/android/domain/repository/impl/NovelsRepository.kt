@@ -152,9 +152,8 @@ class NovelsRepository(
 	override suspend fun getCatalogueData(
 		ext: Extension,
 		listing: Extension.Listing.Novels,
-		data: Map<Int, Any>,
 		page: Int,
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data, page) }
+	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, page) }
 
 	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> = database.getAnalytics()
 }

@@ -189,19 +189,18 @@ class CatalogViewModel(
 						.combine(filtersApplied, ::Pair)
 						.flatMapLatest { (query, filtersApplied) ->
 							if (listing == null) return@flatMapLatest flowOf(null)
-							fun page(load: (Map<Int, Any>) -> PagingSource<Int, ACatalogNovelUI>) =
-								filterDataFlow.mapLatest { data ->
-									Pager(
-										PagingConfig(10),
-									) {
-										load(data)
-									}
-								}
+							fun page(load: () -> PagingSource<Int, ACatalogNovelUI>) = Pager(
+								PagingConfig(10),
+							) {
+								load()
+							}
 							val novels = listing.novels
-							if (query.isEmpty() && novels != null) {
-								page { data ->
-									getCatalogueListingData(extId, ext, data, novels)
-								}
+							if (query.isEmpty() && !filtersApplied.value && novels != null) {
+								flowOf(
+									page {
+										getCatalogueListingData(extId, ext, novels)
+									},
+								)
 							} else {
 								// Prevents always searching for list listings
 								if (!filtersApplied.value &&
@@ -211,14 +210,16 @@ class CatalogViewModel(
 								}
 
 								val search = listing.search ?: return@flatMapLatest flowOf(null)
-								page { data ->
-									loadCatalogueQueryDataUseCase(
-										extId,
-										ext,
-										query,
-										data,
-										search,
-									)
+								filterDataFlow.mapLatest { data ->
+									page {
+										loadCatalogueQueryDataUseCase(
+											extId,
+											ext,
+											query,
+											data,
+											search,
+										)
+									}
 								}
 							}
 						},

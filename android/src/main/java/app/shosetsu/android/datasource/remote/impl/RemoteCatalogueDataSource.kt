@@ -2,7 +2,6 @@ package app.shosetsu.android.datasource.remote.impl
 
 import app.shosetsu.android.datasource.remote.base.IRemoteCatalogueDataSource
 import app.shosetsu.lib.Extension
-import app.shosetsu.lib.IExtension
 import app.shosetsu.lib.Novel
 import org.luaj.vm2.LuaError
 
@@ -31,13 +30,12 @@ class RemoteCatalogueDataSource : IRemoteCatalogueDataSource {
 	override suspend fun loadListing(
 		ext: Extension,
 		listing: Extension.Listing.Novels,
-		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info> = if (!listing.isIncrementing && page > ext.startIndex) {
 		emptyList()
 	} else {
 		try {
-			listing.get(data, page).toList()
+			listing.get(page).toList()
 		} catch (e: LuaError) {
 			throw e.cause ?: e
 		}

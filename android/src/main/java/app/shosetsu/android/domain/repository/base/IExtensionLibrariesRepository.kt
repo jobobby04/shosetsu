@@ -5,6 +5,7 @@ import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.lib.exceptions.HTTPException
+import app.shosetsu.lib.lua.LuaLibrary
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -62,7 +63,7 @@ interface IExtensionLibrariesRepository {
 	 * @return Library ext content
 	 */
 	@Throws(FileNotFoundException::class, FilePermissionException::class)
-	suspend fun loadExtLibrary(name: String): String
+	suspend fun loadExtLibrary(name: String): LuaLibrary
 
 	/**
 	 * Update the [entity], used primarily for depriortiziation

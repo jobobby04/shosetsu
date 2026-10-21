@@ -36,7 +36,6 @@ interface IRemoteCatalogueDataSource {
 	suspend fun loadListing(
 		ext: Extension,
 		listing: Extension.Listing.Novels,
-		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>
 

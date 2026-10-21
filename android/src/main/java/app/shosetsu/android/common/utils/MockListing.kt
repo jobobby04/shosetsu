@@ -29,7 +29,7 @@ class MockListing(override val name: String = "Mock Listing") : Extension.Listin
 	class Novels : Extension.Listing.Novels {
 		override val isIncrementing: Boolean get() = false
 
-		override fun get(data: Map<Int, *>, page: Int): Array<Novel.Info> = arrayOf(
+		override fun get(page: Int): Array<Novel.Info> = arrayOf(
 			Novel.Info("Mock Novel 1"),
 			Novel.Info("Mock Novel 2"),
 			Novel.Info("Mock Novel 3"),

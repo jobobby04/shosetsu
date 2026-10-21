@@ -143,7 +143,6 @@ interface INovelsRepository {
 	suspend fun getCatalogueData(
 		ext: Extension,
 		listing: Extension.Listing.Novels,
-		data: Map<Int, Any>,
 		page: Int,
 	): List<Novel.Info>
 

@@ -10,9 +10,6 @@ import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.lib.Extension
-import app.shosetsu.lib.PAGE_INDEX
-import app.shosetsu.lib.exceptions.HTTPException
-import coil.network.HttpException
 import javax.net.ssl.SSLException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -46,7 +43,6 @@ class GetCatalogueListingDataUseCase(
 	inner class MyPagingSource(
 		val extensionId: Int,
 		val iExtension: Extension,
-		val data: Map<Int, Any>,
 		private val listing: Extension.Listing.Novels,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
@@ -67,10 +63,9 @@ class GetCatalogueListingDataUseCase(
 					// Suspending network load via Retrofit. This doesn't need to be wrapped in a
 					// withContext(Dispatcher.IO) { ... } block since Retrofit's Coroutine
 					// CallAdapter dispatches on a worker thread.
-					val response = search(
+					val response = invoke(
 						extensionId,
 						iExtension,
-						data,
 						listing,
 						pageNumber,
 					)
@@ -100,25 +95,19 @@ class GetCatalogueListingDataUseCase(
 	}
 
 	@Throws(SSLException::class, LuaError::class)
-	operator fun invoke(
-		extensionId: Int,
-		iExtension: Extension,
-		data: Map<Int, Any>,
-		listing: Extension.Listing.Novels,
-	) = MyPagingSource(extensionId, iExtension, data, listing)
+	operator fun invoke(extensionId: Int, iExtension: Extension, listing: Extension.Listing.Novels) =
+		MyPagingSource(extensionId, iExtension, listing)
 
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
-	suspend fun search(
+	suspend operator fun invoke(
 		extensionId: Int,
 		iExtension: Extension,
-		data: Map<Int, Any>,
 		listing: Extension.Listing.Novels,
 		page: Int,
 	): List<ACatalogNovelUI> {
 		val list = novelsRepository.getCatalogueData(
 			iExtension,
 			listing,
-			data,
 			page,
 		)
 		return list.mapNotNull { novelListing ->
