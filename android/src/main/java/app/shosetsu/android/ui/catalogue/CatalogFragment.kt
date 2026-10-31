@@ -403,6 +403,8 @@ fun CatalogContent(
 		)
 
 		Column {
+			CatalogListingSelection(listingSelectionData, setListing)
+
 			CatalogRefreshBar(items)
 
 			val errorState = items.loadState.refresh
@@ -420,9 +422,12 @@ fun CatalogContent(
 						.padding(padding),
 				) {
 					CatalogGrid(
-						items, columnsInH, columnsInV, cardType, onClick, onLongClick,
-						listingSelectionData,
-						setListing,
+						items,
+						columnsInH,
+						columnsInV,
+						cardType,
+						onClick,
+						onLongClick,
 						showImages = showImages,
 					)
 				}
@@ -520,8 +525,6 @@ fun CatalogGrid(
 	cardType: NovelCardType,
 	onClick: (ACatalogNovelUI) -> Unit,
 	onLongClick: (ACatalogNovelUI) -> Unit,
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
 	showImages: Boolean,
 ) {
 	// TODO Figure out how to use "LocalWindowInfo.current.containerSize" here, current issue is that only one column occurs
@@ -551,8 +554,6 @@ fun CatalogGrid(
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
 		verticalArrangement = Arrangement.spacedBy(4.dp),
 	) {
-		catalogListingSelection(listingSelectionData, setListing)
-
 		itemsIndexed(
 			items,
 			key = { index, item -> item.hashCode() + index },
@@ -573,26 +574,25 @@ fun CatalogGrid(
  * @param listingSelectionData Data of what listing the user selected
  * @param setListing Function to update the listing
  */
-fun LazyGridScope.catalogListingSelection(
+@Composable
+fun CatalogListingSelection(
 	listingSelectionData: ListingSelectionData?,
 	setListing: (selection: Int) -> Unit,
 ) {
-	item(span = { GridItemSpan(maxLineSpan) }) {
-		AnimatedVisibility(listingSelectionData != null && listingSelectionData.choices.size > 1) {
-			if (listingSelectionData != null) {
-				ListPreferenceWidget(
-					title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-					subtitle = listingSelectionData.choices.getOrNull(listingSelectionData.selection)
-						?: stringResource(R.string.invalid_listing_selection),
-					value = listingSelectionData.selection,
-					entries = listingSelectionData.choices.withIndex()
-						.associate { (index, value) -> index to value },
-					onValueChange = setListing,
-					isSubtitleTheValue = true,
-					icon = null,
-					iconDescription = null,
-				)
-			}
+	AnimatedVisibility(listingSelectionData != null && listingSelectionData.choices.size > 1) {
+		if (listingSelectionData != null) {
+			ListPreferenceWidget(
+				title = stringResource(R.string.fragment_catalogue_listing_selection_title),
+				subtitle = listingSelectionData.choices.getOrNull(listingSelectionData.selection)
+					?: stringResource(R.string.invalid_listing_selection),
+				value = listingSelectionData.selection,
+				entries = listingSelectionData.choices.withIndex()
+					.associate { (index, value) -> index to value },
+				onValueChange = setListing,
+				isSubtitleTheValue = true,
+				icon = null,
+				iconDescription = null,
+			)
 		}
 	}
 }
