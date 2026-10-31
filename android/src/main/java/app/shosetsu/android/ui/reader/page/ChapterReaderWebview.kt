@@ -60,8 +60,8 @@ class ChapterReaderWebview(context: Context, attrs: AttributeSet? = null) :
 						selectedText?.let {
 							searchInBrowser(it)
 						}
+						mode?.finish()
 					}
-					mode?.finish()
 					return true
 				}
 				return callback?.onActionItemClicked(mode, item) ?: false
