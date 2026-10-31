@@ -407,10 +407,10 @@ fun CatalogContent(
 
 			CatalogRefreshBar(items)
 
-			val errorState = items.loadState.refresh
-			if (errorState is LoadState.Error) {
+			val refreshState = items.loadState.refresh
+			if (refreshState is LoadState.Error) {
 				CatalogErrorContent(
-					errorState,
+					refreshState,
 					items,
 					openWebView,
 					clearCookies,
