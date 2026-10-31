@@ -1,5 +1,7 @@
 package app.shosetsu.android.common
 
+import java.io.Serial
+
 /*
  * This file is part of shosetsu.
  *
@@ -23,5 +25,13 @@ package app.shosetsu.android.common
  * @since 16 / 05 / 2022
  * @author Doomsdayrs
  */
-data class MissingExtensionException(val id: Int, override val cause: Throwable? = null) :
-	Exception("Extension $id is missing")
+data class MissingExtensionException(
+	val id: Int,
+	override val cause: Throwable? = null,
+	override val message: String? = "Extension $id is missing",
+) : Exception() {
+	companion object {
+		@Serial
+		private const val serialVersionUID: Long = -4589456510226934185L
+	}
+}

@@ -7,11 +7,10 @@ import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
 import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.Novel
+import app.shosetsu.lib.*
+import kotlinx.coroutines.flow.*
+import org.luaj.vm2.*
 import java.io.IOException
-import kotlinx.coroutines.flow.Flow
-import org.luaj.vm2.LuaError
 
 /*
  * This file is part of shosetsu.
@@ -38,16 +37,27 @@ import org.luaj.vm2.LuaError
  */
 interface IChaptersRepository {
 	/**
-	 * Loads a [ChapterEntity]s text
-	 * First checks memory
-	 * Then checks storage
-	 * Then checks network
+	 * Loads a [ChapterEntity]s text.
 	 *
-	 * Saves successful passages into caches
+	 * Checks (In order):
+	 * 1. Memory
+	 * 2. Storage
+	 * 3. Network
 	 *
+	 * Saves successful passages into caches.
+	 *
+	 * If the [extension] is null, will not load from the network.
+	 *
+	 * @param extension The extension to load from
+	 * @param chapterType The expected chapter type
+	 * @param entity The chapter entity
 	 */
 	@Throws(FilePermissionException::class, FileNotFoundException::class, LuaError::class)
-	suspend fun getChapterPassage(formatter: IExtension, entity: ChapterEntity): ByteArray
+	suspend fun getChapterPassage(
+		extension: IExtension?,
+		chapterType: Novel.ChapterType,
+		entity: ChapterEntity,
+	): ByteArray
 
 	/**
 	 * Save the [ChapterEntity] [passage] to storage
