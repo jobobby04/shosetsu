@@ -402,7 +402,7 @@ fun CatalogContent(
 			onRefresh = { items.refresh() },
 		)
 
-		Column {
+		Column(Modifier.padding(padding)) {
 			CatalogListingSelection(listingSelectionData, setListing)
 
 			CatalogRefreshBar(items)
@@ -418,8 +418,7 @@ fun CatalogContent(
 			} else {
 				Box(
 					Modifier
-						.pullRefresh(pullRefreshState)
-						.padding(padding),
+						.pullRefresh(pullRefreshState),
 				) {
 					CatalogGrid(
 						items,
