@@ -52,7 +52,7 @@ abstract class ACatalogViewModel :
 	/**
 	 * Displayed listings from the extension
 	 */
-	abstract val selectedListing: StateFlow<Extension.Listing?>
+	abstract val contentListing: StateFlow<Extension.Listing?>
 
 	abstract val listingOptions: StateFlow<ImmutableList<Extension.Listing>>
 
@@ -111,6 +111,14 @@ abstract class ACatalogViewModel :
 	 * @param extensionID The id of the extension.
 	 */
 	abstract fun setListing(extensionID: Int, link: String?)
+
+	/**
+	 * Sets the content listing.
+	 * Will override listing options and items, but keep filters, search behavior, and sublistings.
+	 */
+	abstract fun setContentListing(link: String?)
+	abstract val subListingOptions: StateFlow<ImmutableList<Extension.Listing>>
+	abstract val subListing: StateFlow<Extension.Listing?>
 
 	/**
 	 * Apply a query.

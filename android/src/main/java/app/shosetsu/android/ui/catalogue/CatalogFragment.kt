@@ -152,8 +152,9 @@ fun CatalogueView(
 	val exception by viewModel.exceptionFlow.collectAsState(null)
 	val hasFilters by viewModel.hasFilters.collectAsState()
 
-	val selectedListing by viewModel.selectedListing.collectAsState()
 	val listingOptions by viewModel.listingOptions.collectAsState()
+	val subListingOptions by viewModel.subListingOptions.collectAsState()
+	val subListing by viewModel.subListing.collectAsState()
 
 	val categories by viewModel.categories.collectAsState()
 
@@ -294,6 +295,9 @@ fun CatalogueView(
 		showImages = showImages,
 		listingOptions = listingOptions,
 		setSelectedListing = onSelectListing,
+		subListingOptions = subListingOptions,
+		selectedSubListing = subListing,
+		setSelectedSubListing = viewModel::setContentListing,
 	)
 	if (categoriesDialogItem != null) {
 		CategoriesDialog(
@@ -370,14 +374,15 @@ fun PreviewCatalogContent() {
 		setSelectedListing = {
 			listingSelectionData = StableHolder(it)
 		},
+		subListingOptions = persistentListOf(),
+		selectedSubListing = null,
+		setSelectedSubListing = {},
 		showImages = true,
 	)
 }
 
 /**
  * Content of [CatalogueView]
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -402,6 +407,9 @@ fun CatalogContent(
 	showImages: Boolean,
 	listingOptions: ImmutableList<Extension.Listing>,
 	setSelectedListing: (Extension.Listing) -> Unit,
+	subListingOptions: ImmutableList<Extension.Listing>,
+	selectedSubListing: Extension.Listing?,
+	setSelectedSubListing: (String?) -> Unit,
 ) {
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -430,7 +438,7 @@ fun CatalogContent(
 		)
 
 		Column(Modifier.padding(padding)) {
-			CatalogListingSelection(listingSelectionData, setListing)
+			CatalogListingSelection(subListingOptions, selectedSubListing, setSelectedSubListing)
 
 			CatalogRefreshBar(items)
 
@@ -606,28 +614,29 @@ fun CatalogGrid(
 
 /**
  * Selection so the user can quickly change the listing in UI.
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
  */
 @Composable
 fun CatalogListingSelection(
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
+	subListings: ImmutableList<Extension.Listing>,
+	selectedSubListing: Extension.Listing?,
+	onSelectSubListing: (String?) -> Unit,
 ) {
-	AnimatedVisibility(listingSelectionData != null && listingSelectionData.choices.size > 1) {
-		if (listingSelectionData != null) {
-			ListPreferenceWidget(
-				title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-				subtitle = listingSelectionData.choices.getOrNull(listingSelectionData.selection)
-					?: stringResource(R.string.invalid_listing_selection),
-				value = listingSelectionData.selection,
-				entries = listingSelectionData.choices.withIndex()
-					.associate { (index, value) -> index to value },
-				onValueChange = setListing,
-				isSubtitleTheValue = true,
-				icon = null,
-				iconDescription = null,
-			)
+	AnimatedVisibility(subListings.size > 1) {
+		ListPreferenceWidget(
+			title = stringResource(R.string.fragment_catalogue_listing_selection_title),
+			subtitle = selectedSubListing?.name ?: stringResource(R.string.invalid_listing_selection),
+			value = selectedSubListing,
+			entries = subListings.associateWith { it.name },
+			onValueChange = { onSelectSubListing(it?.link) },
+			isSubtitleTheValue = true,
+			icon = null,
+			iconDescription = null,
+		)
+
+		LaunchedEffect(selectedSubListing) {
+			if (selectedSubListing == null) {
+				onSelectSubListing(subListings.first().link)
+			}
 		}
 	}
 }
