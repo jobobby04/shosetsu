@@ -64,7 +64,6 @@ import app.shosetsu.android.common.enums.NovelCardType.COZY
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
-import app.shosetsu.android.common.utils.MockListing
 import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.ui.library.ViewTypeButton
@@ -87,6 +86,7 @@ import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNov
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
 import app.shosetsu.lib.*
+import app.shosetsu.lib.mock.MockListing
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
