@@ -3,6 +3,7 @@ package app.shosetsu.android.domain.repository.impl
 import android.database.sqlite.SQLiteException
 import app.shosetsu.android.common.FileNotFoundException
 import app.shosetsu.android.common.FilePermissionException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.enums.ReadingStatus
 import app.shosetsu.android.common.ext.onIO
 import app.shosetsu.android.datasource.local.database.base.IDBChaptersDataSource
@@ -14,12 +15,10 @@ import app.shosetsu.android.domain.model.local.ChapterEntity
 import app.shosetsu.android.domain.model.local.ReaderChapterEntity
 import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.Novel
+import app.shosetsu.lib.*
 import java.io.IOException
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import org.luaj.vm2.LuaError
+import kotlinx.coroutines.flow.*
+import org.luaj.vm2.*
 
 /*
  * This file is part of shosetsu.
@@ -61,28 +60,43 @@ class ChaptersRepository(
 	) = saveChapterPassageToMemory(entity, chapterType, result)
 
 	@Throws(FilePermissionException::class, FileNotFoundException::class, LuaError::class)
-	override suspend fun getChapterPassage(formatter: IExtension, entity: ChapterEntity): ByteArray =
-		onIO {
-			return@onIO try {
-				memorySource.loadChapterFromCache(entity.id!!)!!
-			} catch (e: Exception) {
+	override suspend fun getChapterPassage(
+		extension: IExtension?,
+		chapterType: Novel.ChapterType,
+		entity: ChapterEntity,
+	): ByteArray = onIO {
+		val chapterId = entity.id!!
+		return@onIO try {
+			memorySource.loadChapterFromCache(chapterId)!!
+		} catch (_: Exception) {
+			// Not in memory, check file cache
+			try {
+				cacheSource.loadChapterPassage(chapterId, chapterType).also { result ->
+					memorySource.saveChapterInCache(chapterId, result)
+				}
+			} catch (_: Exception) {
+				// Not in file cache, check downloads
 				try {
-					cacheSource.loadChapterPassage(entity.id!!, formatter.chapterType).also { result ->
-						memorySource.saveChapterInCache(entity.id!!, result)
-					}
-				} catch (e: Exception) {
-					try {
-						fileSource.load(entity, formatter.chapterType)
-							.also { placeIntoCache(entity, formatter.chapterType, it) }
-					} catch (e: Exception) {
+					fileSource.load(entity, chapterType)
+						.also { placeIntoCache(entity, chapterType, it) }
+				} catch (_: Exception) {
+					// Not in the downloads, try to download it
+					if (extension != null) {
 						remoteSource.loadChapterPassage(
-							formatter,
+							extension,
 							entity.url,
-						).also { placeIntoCache(entity, formatter.chapterType, it) }
+						).also { placeIntoCache(entity, chapterType, it) }
+					} else {
+						throw MissingExtensionException(
+							entity.extensionID,
+							message = "Extension (${entity.extensionID}) not installed, " +
+								"cannot load any new chapters.",
+						)
 					}
 				}
 			}
 		}
+	}
 
 	suspend fun saveChapterPassageToMemory(
 		chapterEntity: ChapterEntity,

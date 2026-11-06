@@ -59,15 +59,12 @@ import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.*
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import org.luaj.vm2.LuaError
+import org.luaj.vm2.*
 
 /*
  * This file is part of shosetsu.
@@ -163,13 +160,14 @@ class DownloadWorker(appContext: Context, params: WorkerParameters) :
 	private suspend fun download(downloadEntity: DownloadEntity) =
 		chapRepo.getChapter(downloadEntity.chapterID)!!.let { chapterEntity ->
 			getExt(chapterEntity.extensionID)!!.let { iExtension ->
-				chapRepo.getChapterPassage(iExtension, chapterEntity).let { passage ->
-					chapRepo.saveChapterPassageToStorage(
-						chapterEntity,
-						iExtension.chapterType,
-						passage,
-					)
-				}
+				chapRepo.getChapterPassage(iExtension, iExtension.chapterType, chapterEntity)
+					.let { passage ->
+						chapRepo.saveChapterPassageToStorage(
+							chapterEntity,
+							iExtension.chapterType,
+							passage,
+						)
+					}
 			}
 		}
 

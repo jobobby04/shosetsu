@@ -28,6 +28,7 @@ class MockListing(override val name: String = "Mock Listing") : Extension.Listin
 
 	class Novels : Extension.Listing.Novels {
 		override val isIncrementing: Boolean get() = false
+		override val isDynamic get() = true
 
 		override fun get(page: Int): Array<Novel.Info> = arrayOf(
 			Novel.Info("Mock Novel 1"),
@@ -39,6 +40,7 @@ class MockListing(override val name: String = "Mock Listing") : Extension.Listin
 	override val listings: Extension.Listing.Listings = Listings()
 
 	class Listings : Extension.Listing.Listings {
+		override val isDynamic get() = true
 		override fun get(): Array<Extension.Listing> = arrayOf(
 			MockListing("Mock Listing 1"),
 			MockListing("Mock Listing 2"),
