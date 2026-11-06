@@ -15,6 +15,7 @@ import app.shosetsu.android.common.ext.launchIO
 import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.common.ext.logI
 import app.shosetsu.android.common.ext.logV
+import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.NovelBackgroundAddUseCase
 import app.shosetsu.android.domain.usecases.SetNovelCategoriesUseCase
@@ -30,31 +31,13 @@ import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
-import app.shosetsu.lib.Extension
-import app.shosetsu.lib.Filter
+import app.shosetsu.lib.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.toList
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.transformLatest
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 
 /*
@@ -91,6 +74,7 @@ class CatalogViewModel(
 	private val getCategoriesUseCase: GetCategoriesUseCase,
 	private val setNovelCategoriesUseCase: SetNovelCategoriesUseCase,
 	private val settingsRepository: ISettingsRepository,
+	private val extensionSettingsRepository: IExtensionSettingsRepository,
 ) : ACatalogViewModel() {
 	override val queryFlow: MutableStateFlow<String> = MutableStateFlow("")
 
@@ -129,10 +113,10 @@ class CatalogViewModel(
 		}
 	}
 
-	private val subListingFlow: MutableStateFlow<Pair<ListingSpec, String?>> =
-		MutableStateFlow(ListingSpec.DEFAULT to null)
 	override fun setContentListing(link: String?) {
-		subListingFlow.value = mainListingIdFlow.value to link
+		viewModelScopeIO.launch {
+			extensionSettingsRepository.setSelectedListing(mainListingIdFlow.value.ext, link ?: "")
+		}
 	}
 
 	/**
@@ -166,14 +150,18 @@ class CatalogViewModel(
 
 	private val selectedSubListingInternal: StateFlow<InternalSelectedListing?> =
 		selectedListingInternal
-			.combine(subListingFlow, ::Pair)
-			.mapLatest { (l, r) ->
-				if (l == null || r.second.isNullOrBlank()) return@mapLatest null
-				if (l.spec != r.first) return@mapLatest null
+			.flatMapLatest { selectedListing ->
+				if (selectedListing == null) return@flatMapLatest flowOf(null)
+				extensionSettingsRepository.observeSelectedListing(selectedListing.spec.ext)
+					.map { selectedListing to it }
+			}
+			.mapLatest {
+				val (selectedListing, subListing) = it ?: return@mapLatest null
+				if (subListing.isBlank()) return@mapLatest null
 				InternalSelectedListing(
-					spec = ListingSpec(l.spec.ext, r.second),
-					listing = l.ext.getListing(r.second),
-					ext = l.ext,
+					spec = ListingSpec(selectedListing.spec.ext, subListing),
+					listing = it.first.ext.getListing(subListing),
+					ext = it.first.ext,
 				)
 			}
 			.stateIn(viewModelScopeIO, SharingStarted.Eagerly, null)
