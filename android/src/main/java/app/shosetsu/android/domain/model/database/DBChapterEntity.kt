@@ -55,7 +55,7 @@ import app.shosetsu.lib.Novel.Chapter
 	],
 	indices = [
 		Index("novelID"),
-		Index(value = ["url", "formatterID"], unique = true),
+		Index(value = ["url", "novelID"], unique = true),
 	],
 )
 data class DBChapterEntity(
