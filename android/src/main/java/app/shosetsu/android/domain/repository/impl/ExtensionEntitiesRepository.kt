@@ -84,6 +84,8 @@ class ExtensionEntitiesRepository(
 		memorySource.putExtensionInMemory(extensionEntity.id, iExt)
 
 		fileSource.writeExtension(extensionEntity, extensionContent)
+
+		setSettings(extensionEntity, iExt, iExt.settingsModel.toList())
 	}
 
 	suspend fun getInt(extensionID: Int, settingID: Int, default: Int): Int =
