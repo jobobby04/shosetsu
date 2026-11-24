@@ -290,14 +290,18 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) :
 	}
 
 	/**
-	 * @param isRetry If this is a recurssion
+	 * Restores the novels of [backupExtensionEntity] to the library.
+	 *
+	 * The extension is installed when possible. When it is missing from the
+	 * repositories or cannot be installed, the novels are still restored so a
+	 * backup does not become useless: the novels then show up with a missing
+	 * extension and can be migrated to another source.
 	 */
 	private suspend fun restoreExtension(
 		repoId: Int?,
 		extensions: List<GenericExtensionEntity>,
 		backupExtensionEntity: BackupExtensionEntity,
 		categoryOrderToCategoryIds: Map<Int, Int>,
-		isRetry: Boolean = false,
 	) {
 		val extensionID = backupExtensionEntity.id
 		val backupNovels = backupExtensionEntity.novels
@@ -307,60 +311,13 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) :
 				it.id == extensionID
 		}
 		if (extensionEntity == null) {
-			// TODO this should probably be handled
 			notify(
 				getString(R.string.restore_notification_content_extension_not_found) + " $extensionID",
 				notificationId = extensionID,
 			)
-			logE("Extension not found")
-			return
-		}
-		// Install the extension
-		if (!extensionsRepo.isExtensionInstalled(extensionEntity)) {
-			logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
-			notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
-			try {
-				installExtension(extensionEntity)
-			} catch (e: InvalidMetaDataException) {
-				notify(
-					getString(R.string.worker_extension_install_error_lua) +
-						" ${extensionEntity.id} | ${extensionEntity.name}",
-					notificationId = extensionID,
-				)
-				return
-			} catch (e: SocketTimeoutException) {
-				notify(
-					getString(
-						// change string if this is a retry or not
-						if (isRetry) {
-							R.string.worker_extension_install_error_network_retried
-						} else {
-							R.string.worker_extension_install_error_network
-						},
-						e.message ?: e.javaClass.simpleName,
-						extensionEntity.id,
-						extensionEntity.name,
-					),
-					notificationId = extensionID,
-				)
-
-				// Only retry once
-				if (!isRetry) {
-					restoreExtension(repoId, extensions, backupExtensionEntity, categoryOrderToCategoryIds, true)
-				}
-
-				return
-			} catch (e: Exception) {
-				notify(
-					getString(R.string.worker_extension_install_error_lua) +
-						" ${extensionEntity.id} | ${extensionEntity.name}",
-					notificationId = extensionID,
-				)
-				ACRA.errorReporter.handleSilentException(e)
-				return
-			}
+			logE("Extension not found, restoring its novels without the extension")
 		} else {
-			logI("Extension is installed, moving on")
+			installExtensionIfNeeded(extensionEntity, extensionID)
 		}
 
 		logI("Restoring extension novels")
@@ -374,6 +331,78 @@ class RestoreBackupWorker(appContext: Context, params: WorkerParameters) :
 			} catch (e: Exception) {
 				e.printStackTrace()
 			}
+		}
+	}
+
+	/**
+	 * Installs [extensionEntity] if it is not installed yet, notifying on failure.
+	 * A network failure is retried once. Failures are non-fatal: the novels are
+	 * restored by the caller even when the extension could not be installed.
+	 */
+	private suspend fun installExtensionIfNeeded(
+		extensionEntity: GenericExtensionEntity,
+		extensionID: Int,
+	) {
+		if (extensionsRepo.isExtensionInstalled(extensionEntity)) {
+			logI("Extension is installed, moving on")
+			return
+		}
+		logI("Installing extension $extensionID via repo ${extensionEntity.repoID}")
+		notify(getString(R.string.installing) + " ${extensionEntity.id} | ${extensionEntity.name}")
+		try {
+			installExtension(extensionEntity)
+			return
+		} catch (e: InvalidMetaDataException) {
+			notify(
+				getString(R.string.worker_extension_install_error_lua) +
+					" ${extensionEntity.id} | ${extensionEntity.name}",
+				notificationId = extensionID,
+			)
+			logE("Failed to install extension", e)
+			return
+		} catch (e: SocketTimeoutException) {
+			notify(
+				getString(
+					R.string.worker_extension_install_error_network,
+					e.message ?: e.javaClass.simpleName,
+					extensionEntity.id,
+					extensionEntity.name,
+				),
+				notificationId = extensionID,
+			)
+		} catch (e: Exception) {
+			notify(
+				getString(R.string.worker_extension_install_error_lua) +
+					" ${extensionEntity.id} | ${extensionEntity.name}",
+				notificationId = extensionID,
+			)
+			logE("Failed to install extension", e)
+			ACRA.errorReporter.handleSilentException(e)
+			return
+		}
+
+		// Retry once after a network error
+		try {
+			installExtension(extensionEntity)
+		} catch (e: SocketTimeoutException) {
+			notify(
+				getString(
+					R.string.worker_extension_install_error_network_retried,
+					e.message ?: e.javaClass.simpleName,
+					extensionEntity.id,
+					extensionEntity.name,
+				),
+				notificationId = extensionID,
+			)
+			logE("Failed to install extension after retry", e)
+		} catch (e: Exception) {
+			notify(
+				getString(R.string.worker_extension_install_error_lua) +
+					" ${extensionEntity.id} | ${extensionEntity.name}",
+				notificationId = extensionID,
+			)
+			logE("Failed to install extension after retry", e)
+			ACRA.errorReporter.handleSilentException(e)
 		}
 	}
 
