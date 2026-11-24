@@ -93,9 +93,9 @@ interface ChaptersDao : BaseDao<DBChapterEntity> {
 
 		newData.forEach { newChapter ->
 			// Try to find a matching chapter
-			// This can be done via the chapter order or url
+			// This can be done via the url or title
 			val matchingChapter = dbChapters.find { it.url == newChapter.link }
-				?: dbChapters.find { it.order == newChapter.order }
+				?: dbChapters.find { it.title == newChapter.title }
 
 			if (matchingChapter != null) {
 				update(
