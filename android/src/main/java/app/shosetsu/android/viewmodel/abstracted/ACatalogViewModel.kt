@@ -2,11 +2,11 @@ package app.shosetsu.android.viewmodel.abstracted
 
 import androidx.paging.PagingData
 import app.shosetsu.android.common.enums.NovelCardType
-import app.shosetsu.android.view.uimodels.ListingSelectionData
 import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.CategoryUI
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.base.ShosetsuViewModel
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.Filter
 import javax.security.auth.Destroyable
 import kotlinx.collections.immutable.ImmutableList
@@ -50,6 +50,13 @@ abstract class ACatalogViewModel :
 	abstract val exceptionFlow: Flow<Throwable>
 
 	/**
+	 * Displayed listings from the extension
+	 */
+	abstract val contentListing: StateFlow<Extension.Listing?>
+
+	abstract val listingOptions: StateFlow<ImmutableList<Extension.Listing>>
+
+	/**
 	 * The list of items that will be presented as the filter menu
 	 */
 	abstract val filterItemsLive: StateFlow<ImmutableList<StableHolder<Filter<*>>>>
@@ -70,11 +77,6 @@ abstract class ACatalogViewModel :
 	 * Name of the extension that is used for its catalogue
 	 */
 	abstract val extensionName: StateFlow<String>
-
-	/**
-	 * Provides the selection data for which listing is shown
-	 */
-	abstract val listingSelectionData: StateFlow<ListingSelectionData?>
 
 	/**
 	 * What type of card to display
@@ -108,7 +110,15 @@ abstract class ACatalogViewModel :
 	 *
 	 * @param extensionID The id of the extension.
 	 */
-	abstract fun setExtensionID(extensionID: Int)
+	abstract fun setListing(extensionID: Int, link: String?)
+
+	/**
+	 * Sets the content listing.
+	 * Will override listing options and items, but keep filters, search behavior, and sublistings.
+	 */
+	abstract fun setContentListing(link: String?)
+	abstract val subListingOptions: StateFlow<ImmutableList<Extension.Listing>>
+	abstract val subListing: StateFlow<Extension.Listing?>
 
 	/**
 	 * Apply a query.
@@ -225,10 +235,4 @@ abstract class ACatalogViewModel :
 	 * The current query set to the extension.
 	 */
 	abstract val queryFlow: StateFlow<String>
-
-	/**
-	 * Set the selected listing to use and display
-	 * @param value Selection as per [listingSelectionData].
-	 */
-	abstract fun setSelectedListing(value: Int)
 }

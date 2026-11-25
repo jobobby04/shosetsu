@@ -26,9 +26,9 @@ import kotlinx.coroutines.flow.StateFlow
  * Provides all functions needed for extension settings
  */
 interface IExtensionSettingsRepository {
-	suspend fun getSelectedListing(extensionID: Int): Int
-	suspend fun observeSelectedListing(extensionID: Int): StateFlow<Int>
-	suspend fun setSelectedListing(extensionID: Int, selectedListing: Int)
+	suspend fun getSelectedListing(extensionID: Int): String
+	suspend fun observeSelectedListing(extensionID: Int): StateFlow<String>
+	suspend fun setSelectedListing(extensionID: Int, selectedListing: String)
 
 	// -- suspended getters
 

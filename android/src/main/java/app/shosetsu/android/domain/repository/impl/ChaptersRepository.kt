@@ -16,9 +16,9 @@ import app.shosetsu.android.domain.model.local.ReaderChapterEntity
 import app.shosetsu.android.domain.model.local.backup.BackupChapterEntity
 import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.lib.*
+import java.io.IOException
 import kotlinx.coroutines.flow.*
 import org.luaj.vm2.*
-import java.io.IOException
 
 /*
  * This file is part of shosetsu.

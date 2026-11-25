@@ -9,8 +9,7 @@ import app.shosetsu.android.common.ext.logE
 import app.shosetsu.android.domain.repository.base.IExtensionSettingsRepository
 import app.shosetsu.android.domain.repository.base.INovelsRepository
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
-import app.shosetsu.lib.IExtension
-import app.shosetsu.lib.PAGE_INDEX
+import app.shosetsu.lib.Extension
 import javax.net.ssl.SSLException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -43,8 +42,8 @@ class GetCatalogueListingDataUseCase(
 ) {
 	inner class MyPagingSource(
 		val extensionId: Int,
-		val iExtension: IExtension,
-		val data: Map<Int, Any>,
+		val iExtension: Extension,
+		private val listing: Extension.Listing.Novels,
 	) : PagingSource<Int, ACatalogNovelUI>() {
 		override fun getRefreshKey(state: PagingState<Int, ACatalogNovelUI>): Int? =
 			state.anchorPosition?.let {
@@ -64,10 +63,11 @@ class GetCatalogueListingDataUseCase(
 					// Suspending network load via Retrofit. This doesn't need to be wrapped in a
 					// withContext(Dispatcher.IO) { ... } block since Retrofit's Coroutine
 					// CallAdapter dispatches on a worker thread.
-					val response = search(
+					val response = invoke(
 						extensionId,
 						iExtension,
-						HashMap(data).also { it[PAGE_INDEX] = pageNumber },
+						listing,
+						pageNumber,
 					)
 
 					// Since 0 is the lowest page number, return null to signify no more pages should
@@ -95,24 +95,21 @@ class GetCatalogueListingDataUseCase(
 	}
 
 	@Throws(SSLException::class, LuaError::class)
-	operator fun invoke(extensionId: Int, iExtension: IExtension, data: Map<Int, Any>) =
-		MyPagingSource(extensionId, iExtension, data)
+	operator fun invoke(extensionId: Int, iExtension: Extension, listing: Extension.Listing.Novels) =
+		MyPagingSource(extensionId, iExtension, listing)
 
 	@Throws(SSLException::class, LuaError::class, InvalidListingIndex::class)
-	suspend fun search(
+	suspend operator fun invoke(
 		extensionId: Int,
-		iExtension: IExtension,
-		data: Map<Int, Any>,
+		iExtension: Extension,
+		listing: Extension.Listing.Novels,
+		page: Int,
 	): List<ACatalogNovelUI> {
-		val selectedListing = extSettingsRepo.getSelectedListing(extensionId)
-
-		// Load catalogue data
 		val list = novelsRepository.getCatalogueData(
 			iExtension,
-			selectedListing,
-			data,
+			listing,
+			page,
 		)
-
 		return list.mapNotNull { novelListing ->
 			// For each, insert and return a stripped card
 			// This operation is to pre-cache URL and ID so loading occurs smoothly

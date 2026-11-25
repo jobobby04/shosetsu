@@ -1,4 +1,5 @@
 import org.eclipse.jgit.api.Git
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
 	alias(libs.plugins.android.application)
@@ -146,9 +147,11 @@ android {
 		targetCompatibility = JavaVersion.VERSION_17
 		isCoreLibraryDesugaringEnabled = true
 	}
-	kotlinOptions {
-		jvmTarget = JavaVersion.VERSION_17.toString()
-		freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all-compatibility"
+	kotlin {
+		compilerOptions {
+			jvmTarget = JvmTarget.JVM_17
+			freeCompilerArgs.add("-Xjvm-default=all-compatibility")
+		}
 	}
 
 	lint {

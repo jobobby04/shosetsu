@@ -2,13 +2,17 @@ package app.shosetsu.android.ui.catalogue
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -16,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -24,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -57,6 +64,7 @@ import app.shosetsu.android.common.enums.NovelCardType.COZY
 import app.shosetsu.android.common.enums.NovelCardType.NORMAL
 import app.shosetsu.android.common.ext.openInWebView
 import app.shosetsu.android.common.ext.viewModelDi
+import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.ui.library.SearchAction
 import app.shosetsu.android.ui.library.ViewTypeButton
 import app.shosetsu.android.ui.novel.CategoriesDialog
@@ -71,12 +79,15 @@ import app.shosetsu.android.view.compose.NovelCardNormalContent
 import app.shosetsu.android.view.compose.SimpleIconButton
 import app.shosetsu.android.view.compose.itemsIndexed
 import app.shosetsu.android.view.compose.setting.widget.ListPreferenceWidget
-import app.shosetsu.android.view.uimodels.ListingSelectionData
+import app.shosetsu.android.view.uimodels.StableHolder
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Added
 import app.shosetsu.android.viewmodel.abstracted.ACatalogViewModel.BackgroundNovelAddProgress.Adding
+import app.shosetsu.lib.*
+import app.shosetsu.lib.mock.MockListing
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
@@ -112,11 +123,17 @@ import org.acra.ACRA
  * A catalogue is a view showcasing novels from a given extension.
  */
 @Composable
-fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack: () -> Unit) {
+fun CatalogueView(
+	extensionId: Int,
+	listing: String?,
+	onOpenNovel: (novelId: Int) -> Unit,
+	onSelectListing: (Extension.Listing) -> Unit,
+	onBack: () -> Unit,
+) {
 	val viewModel: ACatalogViewModel = viewModelDi()
 
 	LaunchedEffect(extensionId) {
-		viewModel.setExtensionID(extensionId)
+		viewModel.setListing(extensionId, listing)
 	}
 
 	val type by viewModel.novelCardTypeLive.collectAsState()
@@ -135,11 +152,14 @@ fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack:
 	val exception by viewModel.exceptionFlow.collectAsState(null)
 	val hasFilters by viewModel.hasFilters.collectAsState()
 
+	val listingOptions by viewModel.listingOptions.collectAsState()
+	val subListingOptions by viewModel.subListingOptions.collectAsState()
+	val subListing by viewModel.subListing.collectAsState()
+
 	val categories by viewModel.categories.collectAsState()
 
 	val backgroundAddState by viewModel.backgroundAddState.collectAsState()
 	val isFilterMenuVisible by viewModel.isFilterMenuVisible.collectAsState()
-	val listingSelectionData by viewModel.listingSelectionData.collectAsState()
 
 	val scope = rememberCoroutineScope()
 	val context = LocalContext.current
@@ -272,9 +292,12 @@ fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack:
 		onBack = onBack,
 		hasSearch = hasSearch,
 		hostState = hostState,
-		listingSelectionData = listingSelectionData,
-		setListing = viewModel::setSelectedListing,
 		showImages = showImages,
+		listingOptions = listingOptions,
+		setSelectedListing = onSelectListing,
+		subListingOptions = subListingOptions,
+		selectedSubListing = subListing,
+		setSelectedSubListing = viewModel::setContentListing,
 	)
 	if (categoriesDialogItem != null) {
 		CategoriesDialog(
@@ -311,13 +334,10 @@ fun CatalogueView(extensionId: Int, onOpenNovel: (novelId: Int) -> Unit, onBack:
 @Preview
 @Composable
 fun PreviewCatalogContent() {
-	var listingSelectionData by
+	var listingSelectionData: StableHolder<Extension.Listing> by
 		remember {
 			mutableStateOf(
-				ListingSelectionData(
-					listOf("A", "B", "C").toImmutableList(),
-					0,
-				),
+				StableHolder(MockListing()),
 			)
 		}
 
@@ -325,7 +345,15 @@ fun PreviewCatalogContent() {
 		"Meow",
 		"",
 		{},
-		emptyFlow<PagingData<ACatalogNovelUI>>().collectAsLazyPagingItems(),
+		flowOf(
+			PagingData.from(
+				listOf(
+					ACatalogNovelUI(StrippedBookmarkedNovelEntity(0, "Mock Novel", "")),
+					ACatalogNovelUI(StrippedBookmarkedNovelEntity(0, "Mock Novel", "")),
+					ACatalogNovelUI(StrippedBookmarkedNovelEntity(0, "Mock Novel", "")),
+				),
+			),
+		).collectAsLazyPagingItems(),
 		NORMAL,
 		{},
 		2,
@@ -339,18 +367,22 @@ fun PreviewCatalogContent() {
 		{},
 		false,
 		remember { SnackbarHostState() },
-		listingSelectionData,
-		{
-			listingSelectionData = listingSelectionData.copy(selection = it)
+		listingOptions = listOf(
+			MockListing("Mock Listing 1"),
+			MockListing("Mock Listing 2"),
+		).toImmutableList(),
+		setSelectedListing = {
+			listingSelectionData = StableHolder(it)
 		},
+		subListingOptions = persistentListOf(),
+		selectedSubListing = null,
+		setSelectedSubListing = {},
 		showImages = true,
 	)
 }
 
 /**
  * Content of [CatalogueView]
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -372,9 +404,12 @@ fun CatalogContent(
 	onBack: () -> Unit,
 	hasSearch: Boolean,
 	hostState: SnackbarHostState,
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
 	showImages: Boolean,
+	listingOptions: ImmutableList<Extension.Listing>,
+	setSelectedListing: (Extension.Listing) -> Unit,
+	subListingOptions: ImmutableList<Extension.Listing>,
+	selectedSubListing: Extension.Listing?,
+	setSelectedSubListing: (String?) -> Unit,
 ) {
 	Scaffold(
 		modifier = Modifier.fillMaxSize(),
@@ -403,7 +438,7 @@ fun CatalogContent(
 		)
 
 		Column(Modifier.padding(padding)) {
-			CatalogListingSelection(listingSelectionData, setListing)
+			CatalogListingSelection(subListingOptions, selectedSubListing, setSelectedSubListing)
 
 			CatalogRefreshBar(items)
 
@@ -416,12 +451,11 @@ fun CatalogContent(
 					clearCookies,
 				)
 			} else {
-				Box(
-					Modifier
-						.pullRefresh(pullRefreshState),
-				) {
+				Box(Modifier.pullRefresh(pullRefreshState)) {
 					CatalogGrid(
-						items,
+						novels = items,
+						listings = listingOptions,
+						onSelectListing = setSelectedListing,
 						columnsInH,
 						columnsInV,
 						cardType,
@@ -513,12 +547,12 @@ fun CatalogTopBar(
 
 /**
  * Main content, the grid of items
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
  */
 @Composable
 fun CatalogGrid(
-	items: LazyPagingItems<ACatalogNovelUI>,
+	novels: LazyPagingItems<ACatalogNovelUI>,
+	listings: ImmutableList<Extension.Listing>,
+	onSelectListing: (Extension.Listing) -> Unit,
 	columnsInH: Int,
 	columnsInV: Int,
 	cardType: NovelCardType,
@@ -530,13 +564,12 @@ fun CatalogGrid(
 	val w = LocalConfiguration.current.screenWidthDp
 	val o = LocalConfiguration.current.orientation
 
-	val size =
-		(
-			w / when (o) {
-				Configuration.ORIENTATION_LANDSCAPE -> columnsInH
-				else -> columnsInV
-			}
-			).dp - 8.dp
+	val size = (
+		w / when (o) {
+			Configuration.ORIENTATION_LANDSCAPE -> columnsInH
+			else -> columnsInV
+		}
+		).dp - 8.dp
 
 	val state = rememberLazyGridState()
 
@@ -553,9 +586,20 @@ fun CatalogGrid(
 		horizontalArrangement = Arrangement.spacedBy(4.dp),
 		verticalArrangement = Arrangement.spacedBy(4.dp),
 	) {
+		items(
+			count = listings.size,
+			key = { index -> "listing/$index/${listings[index].link}" },
+			contentType = { "listing" },
+			span = { GridItemSpan(maxLineSpan) },
+		) {
+			val listing = listings[it]
+			ListingRow(listing, onSelect = { onSelectListing(listing) })
+		}
+
 		itemsIndexed(
-			items,
-			key = { index, item -> item.hashCode() + index },
+			novels,
+			key = { index, item -> "novel/$index/${item.id}" },
+			contentType = { _, _ -> "novel_card" },
 		) { _, item ->
 			when (cardType) {
 				NORMAL -> CatalogNormalCard(item, onClick, onLongClick)
@@ -563,36 +607,62 @@ fun CatalogGrid(
 				COZY -> CatalogCozyCard(item, onClick, onLongClick)
 			}
 		}
-		appendBar(items)
-		noMoreBar(items)
+		appendBar(novels)
+		noMoreBar(novels)
 	}
 }
 
 /**
  * Selection so the user can quickly change the listing in UI.
- * @param listingSelectionData Data of what listing the user selected
- * @param setListing Function to update the listing
  */
 @Composable
 fun CatalogListingSelection(
-	listingSelectionData: ListingSelectionData?,
-	setListing: (selection: Int) -> Unit,
+	subListings: ImmutableList<Extension.Listing>,
+	selectedSubListing: Extension.Listing?,
+	onSelectSubListing: (String?) -> Unit,
 ) {
-	AnimatedVisibility(listingSelectionData != null && listingSelectionData.choices.size > 1) {
-		if (listingSelectionData != null) {
-			ListPreferenceWidget(
-				title = stringResource(R.string.fragment_catalogue_listing_selection_title),
-				subtitle = listingSelectionData.choices.getOrNull(listingSelectionData.selection)
-					?: stringResource(R.string.invalid_listing_selection),
-				value = listingSelectionData.selection,
-				entries = listingSelectionData.choices.withIndex()
-					.associate { (index, value) -> index to value },
-				onValueChange = setListing,
-				isSubtitleTheValue = true,
-				icon = null,
-				iconDescription = null,
-			)
+	AnimatedVisibility(subListings.size > 1) {
+		ListPreferenceWidget(
+			title = stringResource(R.string.fragment_catalogue_listing_selection_title),
+			subtitle = selectedSubListing?.name ?: stringResource(R.string.invalid_listing_selection),
+			value = selectedSubListing,
+			entries = subListings.associateWith { it.name },
+			onValueChange = { onSelectSubListing(it?.link) },
+			isSubtitleTheValue = true,
+			icon = null,
+			iconDescription = null,
+		)
+
+		LaunchedEffect(selectedSubListing) {
+			if (selectedSubListing == null) {
+				onSelectSubListing(subListings.first().link)
+			}
 		}
+	}
+}
+
+@Composable
+fun ListingRow(listing: Extension.Listing, onSelect: () -> Unit) {
+	Row(
+		Modifier
+			.fillMaxWidth()
+			.clickable { onSelect() }
+			.padding(horizontal = 8.dp, vertical = 16.dp),
+		verticalAlignment = Alignment.CenterVertically,
+	) {
+		Icon(
+			imageVector = if (listing.novels != null) {
+				Icons.AutoMirrored.Default.ArrowForward
+			} else {
+				Icons.AutoMirrored.Default.List
+			},
+			contentDescription = "list",
+		)
+		Spacer(modifier = Modifier.width(16.dp))
+		Text(
+			text = listing.name,
+			style = MaterialTheme.typography.bodyLarge,
+		)
 	}
 }
 
@@ -696,7 +766,7 @@ fun CatalogErrorContent(
  */
 fun LazyGridScope.appendBar(items: LazyPagingItems<ACatalogNovelUI>) {
 	if (items.loadState.append == LoadState.Loading) {
-		item(span = { GridItemSpan(maxLineSpan) }) {
+		item(span = { GridItemSpan(maxLineSpan) }, contentType = "loading_bar") {
 			LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
 		}
 	}
@@ -709,7 +779,7 @@ fun LazyGridScope.noMoreBar(items: LazyPagingItems<ACatalogNovelUI>) {
 	if (items.loadState.refresh.endOfPaginationReached ||
 		items.loadState.append.endOfPaginationReached
 	) {
-		item(span = { GridItemSpan(maxLineSpan) }) {
+		item(span = { GridItemSpan(maxLineSpan) }, contentType = "no_more_bar") {
 			CatalogContentNoMore()
 		}
 	}

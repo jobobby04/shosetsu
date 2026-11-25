@@ -46,6 +46,10 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+# Some transitive dependency probably?
+-dontwarn com.google.re2j.Matcher
+-dontwarn com.google.re2j.Pattern
+
 # Ignore java packages as included by qrcode BufferedImageCanvas
 -dontwarn java.awt.Color
 -dontwarn java.awt.Graphics2D

@@ -11,6 +11,7 @@ import androidx.paging.filter
 import androidx.paging.map
 import app.shosetsu.android.R
 import app.shosetsu.android.common.IncompatibleExtensionException
+import app.shosetsu.android.common.MissingExtensionException
 import app.shosetsu.android.common.enums.NovelCardType
 import app.shosetsu.android.common.ext.generify
 import app.shosetsu.android.common.ext.launchIO
@@ -26,7 +27,6 @@ import app.shosetsu.android.domain.usecases.load.LoadNovelUITypeUseCase
 import app.shosetsu.android.view.uimodels.model.catlog.ACatalogNovelUI
 import app.shosetsu.android.view.uimodels.model.search.SearchRowUI
 import app.shosetsu.android.viewmodel.abstracted.ASearchViewModel
-import app.shosetsu.lib.PAGE_INDEX
 import app.shosetsu.lib.exceptions.MissingOrInvalidKeysException
 import app.shosetsu.lib.mapify
 import kotlinx.collections.immutable.ImmutableList
@@ -100,7 +100,7 @@ class SearchViewModel(
 	override val exceptions: MutableSharedFlow<String> = MutableSharedFlow()
 
 	private val searchFlows =
-		HashMap<Int, Flow<PagingData<ACatalogNovelUI>>>()
+		HashMap<Pair<Int, String?>, Flow<PagingData<ACatalogNovelUI>>>()
 
 	private val refreshFlows =
 		HashMap<Int, MutableSharedFlow<Unit>>()
@@ -113,12 +113,11 @@ class SearchViewModel(
 		.transformLatest { result ->
 			emit(
 				result.let { list ->
-					val arrayList = arrayListOf<InstalledExtensionEntity>()
-					list.forEach { extension ->
+					list.mapNotNull { extension ->
 						try {
 							extEntitiesRepo.get(extension.generify()).let { entity ->
-								if (entity.hasSearch) {
-									arrayList.add(extension)
+								if (entity.getListing(null).search != null) {
+									return@mapNotNull extension
 								}
 							}
 						} catch (e: SerializationException) {
@@ -159,8 +158,8 @@ class SearchViewModel(
 							)
 							ACRA.errorReporter.handleSilentException(e)
 						}
-					}
-					arrayList.map { (id, _, name, _, imageURL, _, _, _, _, _, _) ->
+						return@mapNotNull null
+					}.map { (id, _, name, _, imageURL, _, _, _, _, _, _) ->
 						SearchRowUI(id, name, imageURL)
 					}
 				},
@@ -224,10 +223,12 @@ class SearchViewModel(
 	override fun searchLibrary(): Flow<PagingData<ACatalogNovelUI>> =
 		libraryResultFlow.cachedIn(viewModelScope).onIO()
 
-	override fun searchExtension(extensionId: Int): Flow<PagingData<ACatalogNovelUI>> =
-		searchFlows.getOrPut(extensionId) {
-			loadExtension(extensionId).cachedIn(viewModelScope)
-		}
+	override fun searchExtension(
+		extensionId: Int,
+		listing: String?,
+	): Flow<PagingData<ACatalogNovelUI>> = searchFlows.getOrPut(extensionId to listing) {
+		loadExtension(extensionId, listing).cachedIn(viewModelScope)
+	}
 
 	override fun getException(id: Int): Flow<Throwable?> = getExceptionFlow(id)
 
@@ -290,35 +291,37 @@ class SearchViewModel(
 	 * Creates a flow for an extension query
 	 */
 	@OptIn(ExperimentalCoroutinesApi::class)
-	private fun loadExtension(extensionID: Int): Flow<PagingData<ACatalogNovelUI>> = flow {
-		val ext = getExtensionUseCase(extensionID)!!
-		val exceptionFlow = getExceptionFlow(extensionID)
+	private fun loadExtension(extensionID: Int, listing: String?): Flow<PagingData<ACatalogNovelUI>> =
+		flow {
+			val ext = getExtensionUseCase(extensionID)!!
+			val exceptionFlow = getExceptionFlow(extensionID)
 
-		emitAll(
-			appliedQueryFlow.combine(getRefreshFlow(extensionID)) { query, _ -> query }
-				.filterNotNull()
-				.transformLatest { query ->
-					exceptionFlow.value = null
+			emitAll(
+				appliedQueryFlow.combine(getRefreshFlow(extensionID)) { query, _ -> query }
+					.filterNotNull()
+					.transformLatest { query ->
+						exceptionFlow.value = null
 
-					emitAll(
-						Pager(
-							PagingConfig(10),
-						) {
-							runBlocking {
-								loadCatalogueQueryDataUseCase(
-									extensionID,
-									query,
-									HashMap<Int, Any>().apply {
-										putAll(ext.searchFiltersModel.toList().mapify())
-										this[PAGE_INDEX] = ext.startIndex
-									},
-								)
-							}
-						}.flow,
-					)
-				}.catch {
-					exceptionFlow.value = it
-				},
-		)
-	}.onIO()
+						emitAll(
+							Pager(
+								PagingConfig(10),
+							) {
+								runBlocking {
+									val listing = ext.getListing(listing).search
+										?: throw MissingExtensionException(extensionID)
+									loadCatalogueQueryDataUseCase(
+										extensionID,
+										ext,
+										query,
+										listing.filters.toList().mapify(),
+										listing,
+									)
+								}
+							}.flow,
+						)
+					}.catch {
+						exceptionFlow.value = it
+					},
+			)
+		}.onIO()
 }

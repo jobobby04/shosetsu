@@ -13,7 +13,7 @@ import app.shosetsu.android.domain.model.local.NovelEntity
 import app.shosetsu.android.domain.model.local.StrippedBookmarkedNovelEntity
 import app.shosetsu.android.domain.model.local.StrippedNovelEntity
 import app.shosetsu.android.domain.repository.base.INovelsRepository
-import app.shosetsu.lib.IExtension
+import app.shosetsu.lib.Extension
 import app.shosetsu.lib.Novel
 import app.shosetsu.lib.exceptions.HTTPException
 import java.io.IOException
@@ -116,7 +116,7 @@ class NovelsRepository(
 
 	@Throws(HTTPException::class, IOException::class, LuaError::class)
 	override suspend fun retrieveNovelInfo(
-		extension: IExtension,
+		extension: Extension,
 		novelEntity: NovelEntity,
 		loadChapters: Boolean,
 	): Novel.Info = onIO {
@@ -135,10 +135,12 @@ class NovelsRepository(
 
 	@Throws(LuaError::class)
 	override suspend fun getCatalogueSearch(
-		ext: IExtension,
+		ext: Extension,
+		search: Extension.Listing.Search,
 		query: String,
-		data: Map<Int, Any>,
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, query, data) }
+		filters: Map<Int, Any>,
+		page: Int,
+	): List<Novel.Info> = onIO { remoteCatalogueDataSource.search(ext, search, query, filters, page) }
 
 	@Throws(
 		SSLException::class,
@@ -148,10 +150,10 @@ class NovelsRepository(
 		InvalidListingIndex::class,
 	)
 	override suspend fun getCatalogueData(
-		ext: IExtension,
-		listing: Int,
-		data: Map<Int, Any>,
-	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, data) }
+		ext: Extension,
+		listing: Extension.Listing.Novels,
+		page: Int,
+	): List<Novel.Info> = onIO { remoteCatalogueDataSource.loadListing(ext, listing, page) }
 
 	override fun getAnalytics(): Flow<List<AnalyticsNovelEntity>> = database.getAnalytics()
 }

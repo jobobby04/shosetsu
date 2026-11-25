@@ -32,6 +32,7 @@ import app.shosetsu.android.common.ext.setNotOngoing
 import app.shosetsu.android.common.ext.setOngoing
 import app.shosetsu.android.common.ext.setSmallIcon
 import app.shosetsu.android.common.utils.await
+import app.shosetsu.android.datasource.local.memory.base.IMemExtLibDataSource
 import app.shosetsu.android.domain.model.local.ExtLibEntity
 import app.shosetsu.android.domain.model.local.GenericExtensionEntity
 import app.shosetsu.android.domain.model.local.RepositoryEntity
@@ -101,6 +102,7 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 	private val removeExtension: RemoveExtensionEntityUseCase by instance()
 	private val extRepoRepo: IExtensionRepoRepository by instance()
 	private val extensionLibrariesRepo: IExtensionLibrariesRepository by instance()
+	private val memExtLibDataSource: IMemExtLibDataSource by instance()
 
 	private val iSettingsRepository by instance<ISettingsRepository>()
 
@@ -116,6 +118,7 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 	private suspend fun updateLibraries(
 		repoExtLibList: List<RepoLibrary>,
 		repository: RepositoryEntity,
+		force: Boolean,
 	) {
 		// the extension libs currently present in the database matching the repo
 		val dbExtLibs = try {
@@ -338,7 +341,7 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 	/**
 	 * Handle updating the repository with its data from its index
 	 */
-	private suspend fun updateRepository(repo: RepositoryEntity) {
+	private suspend fun updateRepository(repo: RepositoryEntity, force: Boolean) {
 		logI("Updating $repo")
 
 		// The repository index
@@ -409,7 +412,7 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 		}
 
 		// update the libraries first
-		updateLibraries(repoIndex.libraries, repo)
+		updateLibraries(repoIndex.libraries, repo, force = force)
 
 		// update the extensions
 		updateExtensions(repoIndex.extensions, repo)
@@ -419,6 +422,7 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 	 * @see [CoroutineWorker.doWork]
 	 */
 	override suspend fun doWork(): Result {
+		val force = inputData.getBoolean(FORCE, false)
 		logI("Starting Update")
 		notify("Starting Repository Update") { setOngoing() }
 
@@ -432,13 +436,14 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 			// Check if the repository is enabled
 			if (repo.isEnabled) {
 				// Enabled repositories get updated
-				updateRepository(repo)
+				updateRepository(repo, force = force)
 			} else {
 				// Disable the repository fully
 				disableRepository(repo)
 			}
 		}
 
+		memExtLibDataSource.clearExtLibs()
 		notify("Completed") { setNotOngoing() }
 		delay(1000)
 		notificationManager.cancel(defaultNotificationID)
@@ -499,7 +504,13 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 				workerManager.enqueueUniqueWork(
 					REPOSITORY_UPDATE_TAG,
 					ExistingWorkPolicy.REPLACE,
-					OneTimeWorkRequestBuilder<RepositoryUpdateWorker>().setInputData(data)
+					OneTimeWorkRequestBuilder<RepositoryUpdateWorker>()
+						.setInputData(
+							Data.Builder().apply {
+								putAll(data)
+								putBoolean(FORCE, force)
+							}.build(),
+						)
 						.setConstraints(
 							Constraints.Builder().apply {
 								if (!force) {
@@ -537,5 +548,9 @@ class RepositoryUpdateWorker(appContext: Context, params: WorkerParameters) :
 		 * Stops the service.
 		 */
 		override fun stop(): Operation = workerManager.cancelUniqueWork(REPOSITORY_UPDATE_TAG)
+	}
+
+	companion object {
+		const val FORCE = "force"
 	}
 }

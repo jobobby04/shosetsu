@@ -46,4 +46,8 @@ class MemExtLibDataSource(factory: ICache.Factory) : IMemExtLibDataSource {
 	override fun removeLibrary(entity: ExtLibEntity) {
 		libraries.remove(entity)
 	}
+
+	override fun clearExtLibs() {
+		libraries.clear()
+	}
 }

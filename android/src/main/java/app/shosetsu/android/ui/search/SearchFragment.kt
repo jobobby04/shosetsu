@@ -128,7 +128,7 @@ fun SearchView(initalQuery: String?, openNovel: (novelId: Int) -> Unit, onBack: 
 			if (it == -1) {
 				viewModel.searchLibrary()
 			} else {
-				viewModel.searchExtension(it)
+				viewModel.searchExtension(it, null)
 			}
 		},
 		getException = viewModel::getException,

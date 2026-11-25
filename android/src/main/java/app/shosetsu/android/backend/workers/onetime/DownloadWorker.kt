@@ -57,14 +57,14 @@ import app.shosetsu.android.domain.repository.base.IChaptersRepository
 import app.shosetsu.android.domain.repository.base.IDownloadsRepository
 import app.shosetsu.android.domain.repository.base.ISettingsRepository
 import app.shosetsu.android.domain.usecases.get.GetExtensionUseCase
+import java.io.IOException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.*
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 import org.luaj.vm2.*
-import java.io.IOException
-import java.util.concurrent.CopyOnWriteArrayList
 
 /*
  * This file is part of shosetsu.

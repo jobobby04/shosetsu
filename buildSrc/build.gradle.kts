@@ -1,6 +1,6 @@
 plugins {
 	`kotlin-dsl`
-	alias(libs.plugins.kotlin.serialization) version libs.versions.kotlin
+	alias(libs.plugins.kotlin.serialization) version libs.versions.kotlinGradleEmbedded
 }
 
 repositories {

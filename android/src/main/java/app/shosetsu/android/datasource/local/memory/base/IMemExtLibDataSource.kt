@@ -32,4 +32,7 @@ interface IMemExtLibDataSource {
 
 	/** Remove Library by ID from cache*/
 	fun removeLibrary(entity: ExtLibEntity)
+
+	/** Clear all libraries from memory */
+	fun clearExtLibs()
 }
